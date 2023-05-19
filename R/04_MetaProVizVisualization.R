@@ -1762,6 +1762,45 @@ MetaProVizLolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "
   
 }
 
+
+# Add the functionality to lollipop graph to plot from multiple conditions - maybe up to 4 different comparisons:
+# 1. create the input for the lillipop based on the different comparisons.
+# here is an example if you have two DFs, we basically create a new column "Condition" that we use to colour code. It would be good if the user could provide a matched list of condition names or we use the input names as condition names?
+Input_C1 <- DF
+Input_C1$Condition <- "Condition 1"
+
+Input_C2 <- DF
+Input_C2$Condition <- "Condition 2"
+
+Input <- rbind(C1, C2)
+
+
+#2. Now we need to update the graph, colour coding for the conditions. Here example for two conditions:
+Lollipop_VAE <- function(Input, Comparison){
+  Plot <- Input
+  Dotplot1 <-ggplot(Plot, aes(x=reorder(metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
+  geom_point(stat='identity', aes(size = `Log2FC`, col=Condition))  +
+  geom_segment(aes(y =(Reduce(max,`Log2FC`)), 
+                   x = metabolite, 
+                   yend = `Log2FC`,
+                   xend = metabolite), 
+               color = "black") +
+  scale_size(name="Log2FC",range = c(2,16))+
+  geom_text(color="black", size=2) +
+  labs(title=paste(Comparison)) + 
+  ylim(((Reduce(min,Plot$`Log2FC`))-0.5),((Reduce(max,Plot$`Log2FC`))+0.5)) +
+  theme_minimal() +
+  coord_flip()+
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(color = "black", size=10),
+        plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
+  labs(y="Log2FC", x="")
+ggsave(file=paste("Figures/LollipopGraph_", Comparison,".pdf", sep=""), plot=Dotplot1, width=10, height=10)
+plot(Dotplot1)
+}
+
+
+
 ###########----------------------
 # Use function
 #plotLolipop(Input_data = DMA_output, plot_pathways = "together") # or individual ot together
