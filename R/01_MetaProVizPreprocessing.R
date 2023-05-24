@@ -28,6 +28,7 @@
 #' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering (Bijlsma S. et al., 2006).\strong{Default=0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default=TRUE}
 #' @param Filter_Potential_Outliers \emph{Optional: } If TRUE, potential outliers between confidence of 0.95 and 0.99 are filtered out.\strong{Default=FALSE}
+#' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default=TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF, e.g. "blank_1", "blank_2". \strong{Default=FALSE}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default=svg}
 #'
@@ -40,12 +41,13 @@
 ###################################################
 
 
-MetaProVizPreprocessing <- function(Input_data=data,
-                          Experimental_design= design,
+MetaProVizPreprocessing <- function(Input_data,
+                          Experimental_design,
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value=0.8,
                           TIC_Normalization= TRUE,
                           Filter_Potential_Outliers= FALSE,
+                          ExportQCPlots=TRUE,
                           CoRe = FALSE,
                           Save_as = svg #  Save_as = "svg"
                           ){
@@ -139,9 +141,11 @@ MetaProVizPreprocessing <- function(Input_data=data,
   MetaProViz_results_folder_Preprocessing_Outlier_detection_folder = paste(MetaProViz_results_folder_Preprocessing_folder, "/MetaProViz_Outlier_detection", sep="")
   if (!dir.exists(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder)}  # check and create folder
   # Create Quality_Control_PCA directory
-  MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder = paste(MetaProViz_results_folder_Preprocessing_folder, "/MetaProViz_Quality_Control_PCA", sep="")
-  if (!dir.exists(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}  # check and create folder
-
+  if (ExportQCPlots == TRUE){
+    MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder = paste(MetaProViz_results_folder_Preprocessing_folder, "/MetaProViz_Quality_Control_PCA", sep="")
+    if (!dir.exists(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}  # check and create folder
+  }
+  
   #####################################################
   ### ### ### make output plot save_as name ### ### ###
   Save_as= deparse(substitute(Save_as))
@@ -447,7 +451,7 @@ MetaProVizPreprocessing <- function(Input_data=data,
       }
 
       # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
-      sm_out <- c()
+      sm_out <- c() # list of outliers samples
       for (i in 1:length(hotelling_qcc[["violations"]][["beyond.limits"]])){
         sm_out <-  append(sm_out, rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][i]]  )
       }
@@ -471,7 +475,9 @@ MetaProVizPreprocessing <- function(Input_data=data,
     }
   }else{message("No sample outliers were found")}
 
-  ### Potential Outlier testing.
+  ##################################
+  ### Potential Outlier testing. ###
+  
   # When we are done with the filtering of the outliers. We do one more round with lower thresholds for potential outliers.
   PCA.res<- prcomp(data_norm, center = TRUE, scale. = TRUE) # Do PCA
   inflect_df<- as.data.frame(c(1:length(PCA.res$sdev)))
@@ -491,6 +497,8 @@ MetaProVizPreprocessing <- function(Input_data=data,
     paste(c(length(potent_Outlier), " Potential outliers found. Samples", n_potent_outlier), collapse=" ")
   } else{  message("No potential outliers were found")}
 
+  
+  # Remove potential outliers
   if(length(potent_Outlier)>0){
     # The user can filter the potentially outlier samples
     if (Filter_Potential_Outliers== TRUE){
@@ -507,11 +515,14 @@ MetaProVizPreprocessing <- function(Input_data=data,
       message("*** No filtering for potential sample outliers performed ***")
     }
   }
+  
+  
+  
   data_norm_filtered <- data_norm
   data_norm_filtered <- as.data.frame(as.matrix(mutate_all(as.data.frame(data_norm_filtered), function(x) as.numeric(as.character(x)))))
 
-  # IF in the output we use the filtered exp design the this line is ok . If not then remove this line
-  Experimental_design_filtered<- Experimental_design%>%
+  # If in the output we use the filtered exp design the this line is ok . If not then remove this line
+  Experimental_design_filtered <- Experimental_design %>%
     filter( rownames(Experimental_design) %in% rownames(data_norm_filtered) )
 
   ### make outlier columns and add them to output dataframe
@@ -575,8 +586,9 @@ MetaProVizPreprocessing <- function(Input_data=data,
     scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
     scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
   
-  ggsave(filename = paste0(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot=pca_QC, width =10,  height = 8)
-  
+  if (ExportQCPlots == TRUE){
+   ggsave(filename = paste0(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot=pca_QC, width =10,  height = 8)
+  }
   
   if(is.null(Biological_Replicates)!=TRUE){
     ### ### QC PCA color for replicates
@@ -590,17 +602,29 @@ MetaProVizPreprocessing <- function(Input_data=data,
       scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
     
-    ggsave(filename = paste0(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot=pca_QC_repl, width =10,  height = 8)
-    
+    if (ExportQCPlots == TRUE){
+      ggsave(filename = paste0(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot=pca_QC_repl, width =10,  height = 8)
+    }
   }
 
   ###################################################################
   ### ### ### Merge analytical replicates (if they exist) ### ### ###
 
   if(is.null(Analytical_Replicates)!=TRUE){
+ 
+    
     data_norm_filtered_sumed<- merge(Experimental_design%>% select(Biological_Replicates,Analytical_Replicates, Conditions),data_norm_filtered, by=0)
     rownames(data_norm_filtered_sumed) <- data_norm_filtered_sumed$Row.names
     data_norm_filtered_sumed$Row.names <- c()
+    
+    if (total_outliers$Outlier_filtering_round_1>0){
+      total_outliers$Outlier_filtering_round_1
+      
+      total_outliers$Outlier_filtering_round_1
+      
+      a <- data_norm_filtered_sumed %>% filter(rownames(data_norm_filtered_sumed) == "AJ01_076")
+    }
+   
 
     # Problem here what names and information from design to keep in the data frame
     data_norm_filtered_sumed<-as.data.frame( data_norm_filtered_sumed %>%
@@ -622,13 +646,11 @@ MetaProVizPreprocessing <- function(Input_data=data,
     preprocessing_output_list <- list(Experimental_design=Experimental_design, 
                                       Raw_data=as.data.frame(Input_data), 
                                       Processed_data= data_norm_filtered_full,
-                                      Processed_data_matrix_OutliersRemoved =data_norm_filtered, 
                                       Processed_summed_data =data_norm_filtered_sumed)
   }else{
     preprocessing_output_list <- list(Experimental_design=Experimental_design, 
                                       Raw_data=as.data.frame(Input_data), 
-                                      Processed_data= data_norm_filtered_full,
-                                      Processed_data_matrix_OutliersRemoved =data_norm_filtered)
+                                      Processed_data= data_norm_filtered_full)
   }
 
 
@@ -638,7 +660,7 @@ MetaProVizPreprocessing <- function(Input_data=data,
 
   # Return the result
   message("Done")
-  return(preprocessing_output_list )
+  return(preprocessing_output_list)
 }
 
 

@@ -217,7 +217,7 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
       STAT_C1vC2$Pathway[  is.na(STAT_C1vC2$Pathway)] <- "unknown"    # Merge the pathways to DMA result. All non matching metabolites get NA that are changed into "unknown".
     }else{
       warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
-    }
+   # }
   }else{
     message("No pathway information was added")
   }
