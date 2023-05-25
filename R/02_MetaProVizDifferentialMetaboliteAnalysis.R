@@ -37,12 +37,12 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   ## ------------ Create Results output folder ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
-  MetaProViz_results_folder <- file.path(WorkD, name) # Make Results folder
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
-  MetaProViz_results_folder_DMA_folder <- file.path(MetaProViz_results_folder,"MetaProVizDMA") # Make DMA results folder
-  if (!dir.exists(MetaProViz_results_folder_DMA_folder)) {dir.create(MetaProViz_results_folder_DMA_folder)} 
-  MetaProViz_results_folder_Conditions <- file.path(MetaProViz_results_folder_DMA_folder,paste0(Condition1,"_vs_",Condition2)) # Make comparison folder
-  if (!dir.exists(MetaProViz_results_folder_Conditions)) {dir.create(MetaProViz_results_folder_Conditions)} 
+  Results_folder <- file.path(WorkD, name) # Make Results folder
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
+  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
+  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(Condition1,"_vs_",Condition2)) # Make comparison folder
+  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
 
   ## ------------  Make output plot save_as name ----------- ##
   Save_as= deparse(substitute(Save_as))
@@ -224,28 +224,31 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
 
   DMA_Output <- STAT_C1vC2
   
-  padjVALs = as.numeric(unlist(strsplit(padjVALs, ",")))
-  log2FCs = as.numeric(unlist(strsplit(log2FCs, ",")))
-  DMA_Output_out_list <- list(all = DMA_Output)
-  for (log2.FC in log2FCs){
-    for (padjVAL in padjVALs){
-      # Subset results based on different significance thresholds adn save them into different sheets in output excel file
-      DMA_Output_padj_Log2FC <-  DMA_Output %>% filter(p.adj < padjVAL & abs(Log2FC) > log2.FC)# %>% order(DMA_Heart$Log2FC)
-      #DMA_Output_padj_Log2FC <- DMA_Output[which(DMA_Output$p.adj < padjVAL & abs(DMA_Output$Log2FC) > log2.FC),]
-      DMA_Output_padj_Log2FC <- DMA_Output_padj_Log2FC[order(DMA_Output_padj_Log2FC$Log2FC), ]
-      
-      # Save data
-      if (nrow(DMA_Output_padj_Log2FC) > 0) {
-        
-        sheet = paste0("abslog2fold>", log2.FC, " padj<", padjVAL)
-        DMA_Output_out_list[[sheet]] <- DMA_Output_padj_Log2FC
-        
-      }
-    }
-  }
+  # padjVAL = 0.05
+  # log2FC = 0.5
+  # 
+  # # padjVALs = as.numeric(unlist(strsplit(padjVALs, ",")))
+  # # log2FCs = as.numeric(unlist(strsplit(log2FCs, ",")))
+  # # DMA_Output_out_list <- list(all = DMA_Output)
+  # # for (log2.FC in log2FCs){
+  # #   for (padjVAL in padjVALs){
+  # #     # Subset results based on different significance thresholds adn save them into different sheets in output excel file
+  # #     DMA_Output_padj_Log2FC <-  DMA_Output %>% filter(p.adj < padjVAL & abs(Log2FC) > log2.FC)# %>% order(DMA_Heart$Log2FC)
+  # #     #DMA_Output_padj_Log2FC <- DMA_Output[which(DMA_Output$p.adj < padjVAL & abs(DMA_Output$Log2FC) > log2.FC),]
+  # #     DMA_Output_padj_Log2FC <- DMA_Output_padj_Log2FC[order(DMA_Output_padj_Log2FC$Log2FC), ]
+  #     
+  #     # Save data
+  #     if (nrow(DMA_Output_padj_Log2FC) > 0) {
+  #       
+  #       sheet = paste0("abslog2fold>", log2.FC, " padj<", padjVAL)
+  #       DMA_Output_out_list[[sheet]] <- DMA_Output_padj_Log2FC
+  #       
+  #     }
+  #   }
+  # }
   
   # Save the DMA results table
-  xlsDMA <- file.path(MetaProViz_results_folder_Conditions,paste0("DMA_Output_",Condition1,"_vs_",Condition2,"_", OutputName, ".xlsx"))
+  xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",Condition1,"_vs_",Condition2,"_", OutputName, ".xlsx"))
   
   if (Pooled == TRUE){
     writexl::write_xlsx(DMA_Output_out_list,xlsDMA, col_names = TRUE)
@@ -255,8 +258,7 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   }
 
 # Make a simple Volcano plot --> implemet plot true or false
-  for (padjVAL in padjVALs){
-    for (log2.FC in log2FCs){
+  
   VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
                                  lab = DMA_Output$Metabolite,#Metabolite name
                                  x = "Log2FC",#Log2FC
@@ -288,16 +290,13 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   OutputPlotName = paste0(OutputName,"_padj_",padjVAL,"log2FC_",log2.FC)
   
   
-  volcanoDMA <- file.path(MetaProViz_results_folder_Conditions,paste0( "Volcano_Plot_",Condition1,"-versus-",Condition2,"_", OutputPlotName,".",Save_as))
+  volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",Condition1,"-versus-",Condition2,"_", OutputPlotName,".",Save_as))
   if(Pooled==TRUE){
     ggsave(volcanoDMA,plot=VolcanoPlot, width=12, height=9)
   }else{
     ggsave(volcanoDMA,plot=VolcanoPlot, width=12, height=9)
   }
-  
-  
-    }
-  }
+ 
   return(DMA_Output)
 }
 

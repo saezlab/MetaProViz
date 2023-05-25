@@ -41,7 +41,7 @@
 ###################################################
 
 
-MetaProVizPreprocessing <- function(Input_data,
+Preprocessing <- function(Input_data,
                           Experimental_design,
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value = 0.8,
@@ -123,18 +123,18 @@ MetaProVizPreprocessing <- function(Input_data,
   ### ### ### Create output folders ### ### ###
   
   # This searches for a folder called "Results" within the current working directory and if its not found it creates one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  MetaProViz_results_folder_Preprocessing_folder = paste(MetaProViz_results_folder, "/MetaProViz_Preprocessing", sep = "")
-  if (!dir.exists(MetaProViz_results_folder_Preprocessing_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_folder)}  # check and create folder
+  Results_folder_Preprocessing_folder = paste(Results_folder, "/Preprocessing", sep = "")
+  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
   # Create Outlier_Detection directory
-  MetaProViz_results_folder_Preprocessing_Outlier_detection_folder = paste(MetaProViz_results_folder_Preprocessing_folder, "/MetaProViz_Outlier_detection", sep =  "")
-  if (!dir.exists(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder)}  # check and create folder
+  Results_folder_Preprocessing_Outlier_detection_folder = paste(Results_folder_Preprocessing_folder, "/Outlier_detection", sep =  "")
+  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}  # check and create folder
   # Create Quality_Control_PCA directory
   if (ExportQCPlots ==  TRUE){
-    MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder = paste(MetaProViz_results_folder_Preprocessing_folder, "/MetaProViz_Quality_Control_PCA", sep =  "")
-    if (!dir.exists(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}  # check and create folder
+    Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = paste(Results_folder_Preprocessing_folder, "/Quality_Control_PCA", sep =  "")
+    if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}  # check and create folder
   }
   
   #####################################################
@@ -185,13 +185,13 @@ MetaProVizPreprocessing <- function(Input_data,
       filtered_matrix <- Input_data
       # save filtering result
       feat_file_res <- "There where no metabolites exluded"
-      write.table(feat_file_res,row.names =  FALSE, file = paste(MetaProViz_results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
       message(paste( length(unique(miss)) ,"metabolites where removed:"))
       message(unique(colnames(Input_data)[miss]))
       filtered_matrix <- Input_data[,-miss]
       # save filtering output
-      write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(MetaProViz_results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     }
   }
   if (Feature_Filtering ==  "Standard"){
@@ -219,13 +219,13 @@ MetaProVizPreprocessing <- function(Input_data,
       filtered_matrix <- Input_data
       # save filtering result
       feat_file_res <- "There where no metabolites exluded"
-      write.table(feat_file_res,row.names =  FALSE, file = paste(MetaProViz_results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
       message(paste( length(unique(miss)) ,"metabolites where removed:"))
       message(unique(colnames(Input_data)[miss]))
       filtered_matrix <- Input_data[,-miss]
       # save filtering output
-      write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(MetaProViz_results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     }
   }
   if (Feature_Filtering ==  "None"){
@@ -404,11 +404,11 @@ MetaProVizPreprocessing <- function(Input_data,
     k = k+1
 
     ### Save the outlier detection plots in the outlier detection folder
-    ggsave(filename = paste(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as, sep = ""),
+    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as, sep = ""),
            plot = pca_outlier, width = 10,height = 8)
-    ggsave(filename = paste(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder, "//Scree_plot_OD_round_" ,a ,".",Save_as, sep = ""),
+    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "//Scree_plot_OD_round_" ,a ,".",Save_as, sep = ""),
            plot = screeplot, width = 10,height = 8)
-    ggsave(filename = paste(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as, sep = ""),
+    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as, sep = ""),
            plot = HotellingT2plot, width = 10,height = 8)
     a = a+1
 
@@ -439,7 +439,7 @@ MetaProVizPreprocessing <- function(Input_data,
 
   # Save outlier result
  # pdf(file = paste("Results_", Sys.Date(),"/","Preprocessing", "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
-  pdf(file = paste(MetaProViz_results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
+  pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
   for (plot in outlier_plot_list) {
     replayPlot(plot)
   }
@@ -520,7 +520,7 @@ MetaProVizPreprocessing <- function(Input_data,
     scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
 
   if (ExportQCPlots == TRUE){
-   ggsave(filename = paste0(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot = pca_QC, width = 10,  height = 8)
+   ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot = pca_QC, width = 10,  height = 8)
   }
   
   if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
@@ -536,7 +536,7 @@ MetaProVizPreprocessing <- function(Input_data,
       scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
     
     if (ExportQCPlots == TRUE){
-      ggsave(filename = paste0(MetaProViz_results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot = pca_QC_repl, width = 10,  height = 8)
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot = pca_QC_repl, width = 10,  height = 8)
     }
   }
 
@@ -554,7 +554,7 @@ MetaProVizPreprocessing <- function(Input_data,
 
   ##Write to file
   preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe
-  writexl::write_xlsx(preprocessing_output_list_out, paste(MetaProViz_results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
+  writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
 
   # Return the result
   message("Done")
@@ -611,11 +611,11 @@ ReplicateSum <- function(Input_data){
   ### ### ### Create Output folder ### ### ###
   
   # This searches for a folder called "Results" within the current working directory and if its not found it creates one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  MetaProViz_results_folder_Preprocessing_folder = paste(MetaProViz_results_folder, "/MetaProViz_Preprocessing", sep = "")
-  if (!dir.exists(MetaProViz_results_folder_Preprocessing_folder)) {dir.create(MetaProViz_results_folder_Preprocessing_folder)}  # check and create folder
+  Results_folder_Preprocessing_folder = paste(Results_folder, "/MetaProViz_Preprocessing", sep = "")
+  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
   
   Input_data_numeric <-  select_if(Input_data, is.numeric) # take only the numeric values. This includes the replicate information
   
@@ -637,7 +637,7 @@ ReplicateSum <- function(Input_data){
   Input_data_numeric_summed <- merge(nReplicates,Input_data_numeric_summed, by = c("Conditions","Biological_Replicates"))
   
   # Export result
-  writexl::write_xlsx(Input_data_numeric_summed, paste(MetaProViz_results_folder_Preprocessing_folder, "/ReplicateSum_output.xlsx", sep = ""))#,showNA = TRUE)
+  writexl::write_xlsx(Input_data_numeric_summed, paste(Results_folder_Preprocessing_folder, "/ReplicateSum_output.xlsx", sep = ""))#,showNA = TRUE)
   
   # Return the result
   message("Done")

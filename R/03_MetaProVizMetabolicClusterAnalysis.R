@@ -28,7 +28,7 @@ library(alluvial) # For alluvial plots
 ### ### ### Metabolic Cluster Analysis ### ### ###
 ##########################################
 
-MetaProVizMCA <- function(Input_data1,
+MCA <- function(Input_data1,
                           Input_data2,
                           Output_Name = "",
                           Condition1,
@@ -48,13 +48,13 @@ MetaProVizMCA <- function(Input_data1,
   ### ### ### Create Results output folder ### ### ###
   
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   
   ####################################################
   ### Create MetabolicClusters folder in  result directory ###
-  MetaProViz_results_folder_MCA_folder = paste(MetaProViz_results_folder, "/MetaProVizMCA", sep="") # select name of result directory
-  if (!dir.exists(MetaProViz_results_folder_MCA_folder)) {dir.create(MetaProViz_results_folder_MCA_folder)}  # check and create folder
+  Results_folder_MCA_folder = paste(Results_folder, "/MCA", sep="") # select name of result directory
+  if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
   
   #####################################################
   ### ### ### make output plot save_as name ### ### ###
@@ -172,7 +172,7 @@ MetaProVizMCA <- function(Input_data1,
     
     Alluvial_DF.final <- DMA
     
-    writexl::write_xlsx(Alluvial_DF.final, paste0(MetaProViz_results_folder_MCA_folder,"/",Name,Output_Name,".xlsx", sep = ""))
+    writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/",Name,Output_Name,".xlsx", sep = ""))
     
     Alluvial_DF2 <- Alluvial_DF.final
     
@@ -315,7 +315,7 @@ MetaProVizMCA <- function(Input_data1,
     names(Alluvial_DF.final) <- gsub(x = names(Alluvial_DF.final), pattern = "MetaboliteChange_Significant", replacement =  paste("MetaboliteChange_Significant_",test,pCutoff,"logFC",FCcutoff, sep = ""))
     
     ##Write to file
-    writexl::write_xlsx(Alluvial_DF.final, paste0(MetaProViz_results_folder_MCA_folder,"/MCA_Output_",Name,Output_Name,".xlsx", sep = ""))
+    writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/MCA_Output_",Name,Output_Name,".xlsx", sep = ""))
     # write.csv(Alluvial_DF2, paste("AlluvianDF", Output, ".csv", sep="_"), row.names= TRUE)
     
     
@@ -386,7 +386,7 @@ MetaProVizMCA <- function(Input_data1,
   }
   
   
-  Save_as_var(paste(MetaProViz_results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9)
+  Save_as_var(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9)
   par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
   alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
             col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],

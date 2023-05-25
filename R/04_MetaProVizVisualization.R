@@ -37,7 +37,7 @@ library(ggfortify) # For visualization PCA
 # Palette changing is still missing
 # To do: select a better palette and add option to the user to change the palette to whatever they like
 
-MetaProVizPCA <- function(data= data, Design= NULL, Color = FALSE, Shape = FALSE, Show_Loadings = FALSE,  Scaling= TRUE,
+PCA <- function(data= data, Design= NULL, Color = FALSE, Shape = FALSE, Show_Loadings = FALSE,  Scaling= TRUE,
                           # Palette= "Set2".
                           Theme=theme_classic(), # theme_bw()
                           OutputPlotName= 'PCA_plot',
@@ -51,11 +51,11 @@ MetaProVizPCA <- function(data= data, Design= NULL, Color = FALSE, Shape = FALSE
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create PCA plots folder in  result directory ###
-  MetaProViz_results_folder_plots_PCA_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_PCA",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_PCA_folder)) {dir.create(MetaProViz_results_folder_plots_PCA_folder)}
+  Results_folder_plots_PCA_folder = paste(Results_folder,"/PCA",  sep="")
+  if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}
   
   
   #####################################################
@@ -663,8 +663,8 @@ MetaProVizPCA <- function(data= data, Design= NULL, Color = FALSE, Shape = FALSE
   loading_data_table <-as.data.frame(loading_data$rotation)
   loading_data_table <- loading_data_table[,1:2]
   loading_data_table <- tibble::rownames_to_column(loading_data_table, "Metabolite")
-  writexl::write_xlsx(loading_data_table, paste(MetaProViz_results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.xlsx", sep=""), col_names = TRUE)
-  ggsave(file=paste(MetaProViz_results_folder_plots_PCA_folder,"/", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
+  writexl::write_xlsx(loading_data_table, paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.xlsx", sep=""), col_names = TRUE)
+  ggsave(file=paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
 }
 
 ##########-------------------------
@@ -685,18 +685,18 @@ MetaProVizPCA <- function(data= data, Design= NULL, Color = FALSE, Shape = FALSE
 #' also after normal volcano add volcano multiple that it plots 2 plots together i.e. c1vsko1 and c2vsko2 in the same plots
 #' Change the shapes to something normal
 
-MetaProVizVolcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FCcutoff=0.5, OutputPlotName= 'PCAftw', Theme=theme_classic(),
+Volcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FCcutoff=0.5, OutputPlotName= 'PCAftw', Theme=theme_classic(),
                              xlab =NULL, ylab=NULL, data2=NULL, Cond1name="Comparisson 1", Cond2name="Comparisson 2", connectors = FALSE, Save_as = svg){
   
   
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Volcano_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Volcano",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Volcano_folder)) {dir.create(MetaProViz_results_folder_plots_Volcano_folder)}
+  Results_folder_plots_Volcano_folder = paste(Results_folder,"/Volcano",  sep="")
+  if (!dir.exists(Results_folder_plots_Volcano_folder)) {dir.create(Results_folder_plots_Volcano_folder)}
   
   
   #####################################################
@@ -749,7 +749,7 @@ MetaProVizVolcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff
                               gridlines.minor = FALSE,
                               drawConnectors = connectors)
       Plot <- Plot+Theme
-     # ggsave(file=paste(MetaProViz_results_folder_plots_Volcano_folder, "/", OutputPlotName, ".", Save_as, sep=""), plot=Plot, width=12, height=9)
+     # ggsave(file=paste(Results_folder_plots_Volcano_folder, "/", OutputPlotName, ".", Save_as, sep=""), plot=Plot, width=12, height=9)
       
     }else if(test=="p.val"){
       # Change plot labs if the user has put the input
@@ -1272,7 +1272,7 @@ MetaProVizVolcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff
   #     height = 8)
   # plot(Plot)
   # dev.off()
-  ggsave(file=paste(MetaProViz_results_folder_plots_Volcano_folder, "/", OutputPlotName,  ".", Save_as , sep=""), plot=Plot, width=12, height=9)
+  ggsave(file=paste(Results_folder_plots_Volcano_folder, "/", OutputPlotName,  ".", Save_as , sep=""), plot=Plot, width=12, height=9)
   
 }
 
@@ -1296,7 +1296,7 @@ MetaProVizVolcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff
 ######################################=
 #' Notes; Check the alluvial in the Metabolic Clusters. This one is a bit old but kept here to return to if nedded
 
-MetaProVizMCAlluvial <- function(Input_data1, Input_data2,  Output_Name = "Metabolic_Clusters_Output_Condition1-versus-Condition2",  Condition1,  Condition2,
+Alluvial <- function(Input_data1, Input_data2,  Output_Name = "Metabolic_Clusters_Output_Condition1-versus-Condition2",  Condition1,  Condition2,
                                  pCutoff= 0.05 , FCcutoff=0.5, test = "p.adj", plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite"),
                                  safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000"), # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible
                                  plot_color_variable = "Overall_Change",  plot_color_remove_variable = "SameDirection_NoChange",
@@ -1305,11 +1305,11 @@ MetaProVizMCAlluvial <- function(Input_data1, Input_data2,  Output_Name = "Metab
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_MetabolicCluster_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_MetabolicCluster",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_MetabolicCluster_folder)) {dir.create(MetaProViz_results_folder_plots_MetabolicCluster_folder)}
+  Results_folder_plots_MetabolicCluster_folder = paste(Results_folder,"/Alluvial",  sep="")
+  if (!dir.exists(Results_folder_plots_MetabolicCluster_folder)) {dir.create(Results_folder_plots_MetabolicCluster_folder)}
   
   
   
@@ -1512,7 +1512,7 @@ MetaProVizMCAlluvial <- function(Input_data1, Input_data2,  Output_Name = "Metab
   }
   
   
-  Save_as_var(paste(MetaProViz_results_folder_plots_MetabolicCluster_folder,"/Metabolic_Clusters_",Condition1,"-versus-",Condition2,"_", Output_Name,  ".",Save_as, sep=""), width=12, height=9)
+  Save_as_var(paste(Results_folder_plots_MetabolicCluster_folder,"/Metabolic_Clusters_",Condition1,"-versus-",Condition2,"_", Output_Name,  ".",Save_as, sep=""), width=12, height=9)
   par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
   alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
             col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
@@ -1615,16 +1615,16 @@ MetaProVizMCAlluvial <- function(Input_data1, Input_data2,  Output_Name = "Metab
 #library(cowplot)
 #library(showtext)
 
-MetaProVizLolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "p.adj",OutputPlotName= "lolipop plot", plot_pathways = "none",# or "individual" or "together
+Lolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "p.adj",OutputPlotName= "lolipop plot", plot_pathways = "none",# or "individual" or "together
                               Theme=theme_classic(), Save_as = svg ){
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Lolipop_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Lolipop",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Lolipop_folder)) {dir.create(MetaProViz_results_folder_plots_Lolipop_folder)}
+  Results_folder_plots_Lolipop_folder = paste(Results_folder,"/Lolipop",  sep="")
+  if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}
   
   
   #####################################################
@@ -1653,7 +1653,7 @@ MetaProVizLolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "
         ggtitle(label = paste(i," Pathway"), subtitle = paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
       #ggsave(filename = "Loli_plot2.pdf", plot = last_plot(), width=10, height=8)
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Lolipop_folder, "/",i,"_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+      ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/",i,"_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
       
       # svg(filename = paste("Results_", Sys.Date(), "/Lolipop_plots/",i,"_", OutputPlotName, ".svg", sep=""),
       #     width = 10,
@@ -1734,7 +1734,7 @@ MetaProVizLolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "
       p2 <- p2+Theme
       # p2 + xlab("Metabolites") +  ggtitle("Titile is missing") # desnt work
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Lolipop_folder, "/","together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
+      ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/","together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
       # dev.off()
       # svg(filename = paste("Results_", Sys.Date(), "/Lolipop_plots/","together", OutputPlotName, ".svg", sep=""),
       #     width = 14,
@@ -1751,7 +1751,7 @@ MetaProVizLolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "
         ggtitle(paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
       #ggsave(filename = "Loli_plot2.pdf", plot = last_plot(), width=10, height=8)
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Lolipop_folder, "/", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+      ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
       
       # svg(filename = paste("Results_", Sys.Date(), "/Lolipop_plots/", OutputPlotName, ".svg", sep=""),
       #     width = 10,
@@ -1818,16 +1818,16 @@ plot(Dotplot1)
 #' @param Selected_Comparisons Select between which comparison to take statistics.Works only together with the Selected_Conditions. To select Comparisons add in a list
 # the positions of the Conditions in the Selected_Conditions i.e. c(1,2) to take at-test between the 1st and 2nd Condition.
 #
-MetaProVizViolin <- function(Input_data,Experimental_design, OutputPlotName= "Violin", out_plots = "individual", # or "together"
+Violin <- function(Input_data,Experimental_design, OutputPlotName= "Violin", out_plots = "individual", # or "together"
                              Selected_Conditions = NULL, Selected_Comparisons = NULL, Theme=theme_classic() , Save_as = svg){
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Violin_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Violin",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Violin_folder)) {dir.create(MetaProViz_results_folder_plots_Violin_folder)}
+  Results_folder_plots_Violin_folder = paste(Results_folder,"/Violin",  sep="")
+  if (!dir.exists(Results_folder_plots_Violin_folder)) {dir.create(Results_folder_plots_Violin_folder)}
   
   
   #####################################################
@@ -1874,7 +1874,7 @@ MetaProVizViolin <- function(Input_data,Experimental_design, OutputPlotName= "Vi
       i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
       i <- (gsub(":","_",i))
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Violin_folder, "/", i, ".",Save_as, sep=""), plot=violinplot, width=10, height=10)
+      ggsave(file=paste(Results_folder_plots_Violin_folder, "/", i, ".",Save_as, sep=""), plot=violinplot, width=10, height=10)
       
       # svg(filename = paste("Results_", Sys.Date(), "/Violin_plots/",i, ".", Save_as, sep=""),
       #     width = 10,
@@ -1892,7 +1892,7 @@ MetaProVizViolin <- function(Input_data,Experimental_design, OutputPlotName= "Vi
     
   }
   
-  pdf(file= paste(MetaProViz_results_folder_plots_Violin_folder,"/", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
+  pdf(file= paste(Results_folder_plots_Violin_folder,"/", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
   for (plot in violin_plot_list){
     replayPlot(plot)
   }
@@ -1913,16 +1913,16 @@ MetaProVizViolin <- function(Input_data,Experimental_design, OutputPlotName= "Vi
 #################################
 #; selected comparisons doesnt work
 
-MetaProVizBarplots <- function(Input_data,Experimental_design, OutputPlotName= "Barplot", out_plots = "individual", # or "together"
+Barplot <- function(Input_data,Experimental_design, OutputPlotName= "Barplot", out_plots = "individual", # or "together"
                                Selected_Conditions = NULL, Selected_Comparisons = NULL,Theme=theme_classic(), Save_as=svg){
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Barplots_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Barplots",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Barplots_folder)) {dir.create(MetaProViz_results_folder_plots_Barplots_folder)}
+  Results_folder_plots_Barplots_folder = paste(Results_folder,"/Barplot",  sep="")
+  if (!dir.exists(Results_folder_plots_Barplots_folder)) {dir.create(Results_folder_plots_Barplots_folder)}
   
   
   #####################################################
@@ -1978,7 +1978,7 @@ MetaProVizBarplots <- function(Input_data,Experimental_design, OutputPlotName= "
       i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
       i <- (gsub(":","_",i))
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Barplots_folder, "/",i, ".",Save_as, sep=""), plot=barplot, width=10, height=8)
+      ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as, sep=""), plot=barplot, width=10, height=8)
       
       # svg(filename = paste("Results_", Sys.Date(), "/Bar_plots/",i, ".svg", sep=""),
       #     width = 10,
@@ -1996,7 +1996,7 @@ MetaProVizBarplots <- function(Input_data,Experimental_design, OutputPlotName= "
     
   }
   
-  pdf(file= paste(MetaProViz_results_folder_plots_Barplots_folder,"/", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
+  pdf(file= paste(Results_folder_plots_Barplots_folder,"/", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
   for (plot in outlier_plot_list){
     replayPlot(plot)
   }
@@ -2018,16 +2018,16 @@ MetaProVizBarplots <- function(Input_data,Experimental_design, OutputPlotName= "
 ### ### ### Boxplots ### ### ###
 ################################
 
-plotBoxplots <- function(Input_data,Experimental_design, OutputPlotName= "Boxplot", out_plots = "individual", # or "together"
+Boxplot <- function(Input_data,Experimental_design, OutputPlotName= "Boxplot", out_plots = "individual", # or "together"
                          Selected_Conditions = NULL, Selected_Comparisons = NULL, Theme=theme_classic(), Save_as=svg ){
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Boxplots_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Boxplots",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Boxplots_folder)) {dir.create(MetaProViz_results_folder_plots_Boxplots_folder)}
+  Results_folder_plots_Boxplots_folder = paste(Results_folder,"/Boxplot",  sep="")
+  if (!dir.exists(Results_folder_plots_Boxplots_folder)) {dir.create(Results_folder_plots_Boxplots_folder)}
   
   #####################################################
   ### ### ### make output plot save_as name ### ### ###
@@ -2074,7 +2074,7 @@ plotBoxplots <- function(Input_data,Experimental_design, OutputPlotName= "Boxplo
       i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
       i <- (gsub(":","_",i))
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Boxplots_folder, "/",i, ".",Save_as, sep=""), plot=boxplot, width=10, height=8)
+      ggsave(file=paste(Results_folder_plots_Boxplots_folder, "/",i, ".",Save_as, sep=""), plot=boxplot, width=10, height=8)
       
       # svg(filename = paste("Results_", Sys.Date(), "/Box_plots/",i, ".svg", sep=""),
       #     width = 10,
@@ -2092,7 +2092,7 @@ plotBoxplots <- function(Input_data,Experimental_design, OutputPlotName= "Boxplo
     
   }
   
-  pdf(file= paste(MetaProViz_results_folder_plots_Boxplots_folder,"/",OutputPlotName, ".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
+  pdf(file= paste(Results_folder_plots_Boxplots_folder,"/",OutputPlotName, ".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
   for (plot in box_plot_list){
     replayPlot(plot)
   }
@@ -2113,16 +2113,16 @@ plotBoxplots <- function(Input_data,Experimental_design, OutputPlotName= "Boxplo
 #; This works only if you have biological replicates in the experimental design
 
 
-plotSuperplots <- function(Input_data,Experimental_design,select_conditions, OutputPlotName= "Superplot", out_plots = "individual", Selected_Conditions = NULL,
+Superplot <- function(Input_data,Experimental_design,select_conditions, OutputPlotName= "Superplot", out_plots = "individual", Selected_Conditions = NULL,
                            Selected_Comparisons = NULL, Theme=theme_classic()){
   
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Superplots_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Superplots",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Superplots_folder)) {dir.create(MetaProViz_results_folder_plots_Superplots_folder)}
+  Results_folder_plots_Superplots_folder = paste(Results_folder,"/Superplot",  sep="")
+  if (!dir.exists(Results_folder_plots_Superplots_folder)) {dir.create(Results_folder_plots_Superplots_folder)}
   
   
   #####################################################
@@ -2169,7 +2169,7 @@ plotSuperplots <- function(Input_data,Experimental_design,select_conditions, Out
       i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
       i <- (gsub(":","_",i))
       
-      ggsave(file=paste(MetaProViz_results_folder_plots_Superplots_folder, "/",i, ".",Save_as, sep=""), plot=superplot, width=10, height=8)
+      ggsave(file=paste(Results_folder_plots_Superplots_folder, "/",i, ".",Save_as, sep=""), plot=superplot, width=10, height=8)
       
       # svg(filename = paste("Results_", Sys.Date(), "/Super_plots/",i, ".svg", sep=""),
       #     width = 10,
@@ -2187,7 +2187,7 @@ plotSuperplots <- function(Input_data,Experimental_design,select_conditions, Out
     
   }
   
-  pdf(file= paste(MetaProViz_results_folder_plots_Superplots_folder,"/", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
+  pdf(file= paste(Results_folder_plots_Superplots_folder,"/", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
   for (plot in super_plot_list){
     replayPlot(plot)
   }
@@ -2206,7 +2206,7 @@ plotSuperplots <- function(Input_data,Experimental_design,select_conditions, Out
 ### ### ### Heatmap ### ### ###
 ###############################
 
-plotHeatmaps<- function(Input_data,
+Heatmap<- function(Input_data,
 						Experimental_design,
 						Clustering_Condition = "Conditions",
 						Clustering_method = "single",
@@ -2219,11 +2219,11 @@ plotHeatmaps<- function(Input_data,
   set.seed(12345)
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  MetaProViz_results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(MetaProViz_results_folder)) {dir.create(MetaProViz_results_folder)}
+  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   ### Create Volcano plots folder in  result directory ###
-  MetaProViz_results_folder_plots_Heatmaps_folder = paste(MetaProViz_results_folder,"/MetaProVizplots_Heatmaps",  sep="")
-  if (!dir.exists(MetaProViz_results_folder_plots_Heatmaps_folder)) {dir.create(MetaProViz_results_folder_plots_Heatmaps_folder)}
+  Results_folder_plots_Heatmaps_folder = paste(Results_folder,"/Heatmap",  sep="")
+  if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}
   
   
   #####################################################
@@ -2249,7 +2249,7 @@ plotHeatmaps<- function(Input_data,
                   kmeans_k = k,
                   clustering_distance_rows = "correlation",
                   annotation_col = my_annot)
-   ggsave(file=paste0(MetaProViz_results_folder_plots_Heatmaps_folder,"/", OutputPlotName, "_kmeans-",k,".",Save_as), plot=out, width=10, height=12)
+   ggsave(file=paste0(Results_folder_plots_Heatmaps_folder,"/", OutputPlotName, "_kmeans-",k,".",Save_as), plot=out, width=10, height=12)
    Metabolite_clusters <- out[["kmeans"]][["cluster"]] %>% as.data.frame()
    names(Metabolite_clusters) <- "Clusters"
    
@@ -2257,7 +2257,7 @@ plotHeatmaps<- function(Input_data,
    names(Mouse_Cluster_Analysis)[1] <- "Metabolite"
    
    Mouse_Cluster_Analysis_selectec <- Mouse_Cluster_Analysis 
-   writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(MetaProViz_results_folder_plots_Heatmaps_folder,"/","Clustering_k=",k,"_t(Input_data).xlsx", sep=""),col_names = TRUE)
+   writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/","Clustering_k=",k,"_t(Input_data).xlsx", sep=""),col_names = TRUE)
  }
 
   # selarate genes in # groups and get which genes are in which group
@@ -2265,7 +2265,7 @@ plotHeatmaps<- function(Input_data,
   # lbl <- cutree(hc, 5) # you'll need to change '5' to the number of gene-groups you're interested in
   # which(lbl==1) 
   
-  ggsave(file=paste(MetaProViz_results_folder_plots_Heatmaps_folder,"/", OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=10, height=12)
+  ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=10, height=12)
 
   }
 
