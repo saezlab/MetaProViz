@@ -299,6 +299,7 @@ Preprocessing <- function(Input_data,
   
   data_norm <- Data_TIC %>% as.data.frame()
 
+  
   ################################################
   ### ### ### Sample outlier filtering ### ### ###
 
@@ -308,9 +309,27 @@ Preprocessing <- function(Input_data,
   sample_outliers <- list()
   scree_plot_list <- list()
   outlier_plot_list <- list()
+  metabolite_zero_var_total_list <- list()
   k =  1
   a =  1
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
+
+    # calculate each metabolites variance
+    metabolite_var <- as.data.frame( apply(data_norm, 2, var) %>% t())
+    metabolite_zero_var_list <- list( colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metablolites with zero variance and puts them in list
+    
+    if(sum(metabolite_var[1,]==0)==0){
+      metabolite_zero_var_total_list[loop] <- 0
+    } else if(sum(metabolite_var[1,]==0)>0){
+    metabolite_zero_var_total_list[loop] <-metabolite_zero_var_list
+    }
+    
+    # Remove the metabolites with zero variance from the data to do PCA
+    for (metab in metabolite_zero_var_list){
+      data_norm <- data_norm %>% select(-metab)
+    }
+   
+    
     PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE) # Do PCA
 
     
@@ -453,6 +472,29 @@ Preprocessing <- function(Input_data,
     }
   }else{message("No sample outliers were found")}
   
+  zero_var_metab_export_df <- data.frame(1,2)
+  names(zero_var_metab_export_df) <- c("Filtering round","Metabolite")
+  # Print zero variance metabolites
+  count = 1
+  for (i in 1:length(metabolite_zero_var_total_list)){
+    if (metabolite_zero_var_total_list[[i]] != 0){
+      message("Filtering round ",i ,". Zero variance metabolites identified: ", paste( metabolite_zero_var_total_list[[i]] ," "))
+      zero_var_metab_export_df[count,"Filtering round"] <- paste(i)
+      zero_var_metab_export_df[count,"Metabolite"] <- paste(metabolite_zero_var_total_list[[i]])
+      count = count +1
+    }
+  }
+  
+  write.table(zero_var_metab_export_df,row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  ""))
+  
+  
+  
+  if(length(metabolite_zero_var_total_list)>0){
+    message("There are sample outliers that were removed from the data") #This was a warning
+    for (i in 1:length(sample_outliers)  ){
+      message("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
+    }
+  }else{message("No sample outliers were found")}
   
   #############################################
   ### ### ### Make Output Dataframe ### ### ###
