@@ -14,7 +14,7 @@
 #' @param CoRe \emph{Optional: } TRUE or FALSE \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #' 
-#' @return
+#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
 #'
 ########################################################
