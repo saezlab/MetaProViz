@@ -65,15 +65,9 @@ DMA <-function(Input_data,
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
   if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
-  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(Condition1,"_vs_",Condition2)) # Make comparison folder
+  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
   if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
 
-  ## ------------ Check for pooled sample comparison ----------- ##  
-  if(length(Condition1)>1 |length(Condition2)>1){
-    Pooled=TRUE
-  }else{
-    Pooled=FALSE
-  }
   
   ################################################################################################################################################################################################
   ############### Check inputs ############### 
@@ -90,11 +84,13 @@ DMA <-function(Input_data,
     Input_data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
     
       C1 <- Input_data %>%
-        subset(design$Conditions == paste(Condition1)) %>%
+        filter(design$Conditions %in% Condition1) %>%
         select_if(is.numeric)#only keep numeric columns with metabolite values
       C2 <- Input_data %>%
-        subset(design$Conditions == paste(Condition2)) %>%
+        filter(design$Conditions %in% Condition2) %>%
         select_if(is.numeric)
+      
+      
       
       if(nrow(C1)==1){
         stop("There is only one sample available for ", Condition1, ", so no statistical test can be performed.")
@@ -217,7 +213,6 @@ DMA <-function(Input_data,
   if(CoRe==TRUE){#add consumption release info to the result
     CoRe_info <- t(CoRe_info) %>% as.data.frame()
     CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
-    
     names(CoRe_info)[2] <- paste("Mean", "CoRe", Condition1, sep="_")
     names(CoRe_info)[3] <- paste("Mean", "CoRe", Condition2, sep="_")
     names(CoRe_info)[4] <- "CoRe"
@@ -237,83 +232,46 @@ DMA <-function(Input_data,
     }else{
       warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
     }
-
-
   DMA_Output <- STAT_C1vC2
   
-  # 0.05 = 0.05
-  # log2FC = 0.5
-  # 
-  # # 0.05s = as.numeric(unlist(strsplit(0.05s, ",")))
-  # # log2FCs = as.numeric(unlist(strsplit(log2FCs, ",")))
-  # # DMA_Output_out_list <- list(all = DMA_Output)
-  # # for (0.5 in log2FCs){
-  # #   for (0.05 in 0.05s){
-  # #     # Subset results based on different significance thresholds adn save them into different sheets in output excel file
-  # #     DMA_Output_padj_Log2FC <-  DMA_Output %>% filter(p.adj < 0.05 & abs(Log2FC) > 0.5)# %>% order(DMA_Heart$Log2FC)
-  # #     #DMA_Output_padj_Log2FC <- DMA_Output[which(DMA_Output$p.adj < 0.05 & abs(DMA_Output$Log2FC) > 0.5),]
-  # #     DMA_Output_padj_Log2FC <- DMA_Output_padj_Log2FC[order(DMA_Output_padj_Log2FC$Log2FC), ]
-  #     
-  #     # Save data
-  #     if (nrow(DMA_Output_padj_Log2FC) > 0) {
-  #       
-  #       sheet = paste0("abslog2fold>", 0.5, " padj<", 0.05)
-  #       DMA_Output_out_list[[sheet]] <- DMA_Output_padj_Log2FC
-  #       
-  #     }
-  #   }
-  # }
-  
-  # Save the DMA results table
-  xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",Condition1,"_vs_",Condition2,"_", OutputName, ".xlsx"))
-  
-  if (Pooled == TRUE){
-    writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE)
-    
-  } else{
-    writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE)
-  }
 
-# Make a simple Volcano plot --> implemet plot true or false
-  
-  VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
-                                 lab = DMA_Output$Metabolite,#Metabolite name
-                                 x = "Log2FC",#Log2FC
-                                 y = "p.adj",#p-value or q-value
-                                 xlab = bquote(~Log[2]~ FC),
-                                 ylab = bquote(~-Log[10]~p.adj),#(~-Log[10]~adjusted~italic(P))
-                                 pCutoff = 0.05,
-                                 FCcutoff = 0.5,#Cut off Log2FC, automatically 2
-                                 pointSize = 3,
-                                 labSize = 2,
-                                 titleLabSize = 16,
-                                 # colCustom = c("black", "grey", "grey", "red"),
-                                 colAlpha = 0.7,
-                                 title= paste0(Condition1,"-vs-",Condition2),
-                                 subtitle = bquote(italic("Differential metabolite analysis")),
-                                 caption = paste0("total = ", nrow(DMA_Output), " Metabolites"),
-                                 xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2  ),
-                                 ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Output$p.adj))))),
-                                 cutoffLineType = "dashed",
-                                 cutoffLineCol = "black",
-                                 cutoffLineWidth = 1,
-                                 legendLabels=c('No changes',paste(0.5,"< |Log2FC|"),paste("p.adj <",0.05) , paste('p.adj<',0.05,' &',0.5,"< |Log2FC|")),
-                                 legendPosition = 'right',
-                                 legendLabSize = 8,
-                                 legendIconSize =4,
-                                 gridlines.major = FALSE,
-                                 gridlines.minor = FALSE,
-                                 drawConnectors = FALSE)
-  OutputPlotName = paste0(OutputName,"_padj_",0.05,"log2FC_",0.5)
-  
-  
-  volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",Condition1,"-versus-",Condition2,"_", OutputPlotName,".",Save_as))
-  if(Pooled==TRUE){
-    ggsave(volcanoDMA,plot=VolcanoPlot, width=12, height=9)
-  }else{
-    ggsave(volcanoDMA,plot=VolcanoPlot, width=12, height=9)
-  }
+  xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
+  writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
  
+  if ( plot == TRUE){ # Make a simple Volcano plot --> implemet plot true or false
+    VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
+                                   lab = DMA_Output$Metabolite,#Metabolite name
+                                   x = "Log2FC",#Log2FC
+                                   y = "p.adj",#p-value or q-value
+                                   xlab = bquote(~Log[2]~ FC),
+                                   ylab = bquote(~-Log[10]~p.adj),#(~-Log[10]~adjusted~italic(P))
+                                   pCutoff = 0.05,
+                                   FCcutoff = 0.5,#Cut off Log2FC, automatically 2
+                                   pointSize = 3,
+                                   labSize = 2,
+                                   titleLabSize = 16,
+                                   # colCustom = c("black", "grey", "grey", "red"),
+                                   colAlpha = 0.7,
+                                   title= paste0(Condition1,"-vs-",Condition2),
+                                   subtitle = bquote(italic("Differential metabolite analysis")),
+                                   caption = paste0("total = ", nrow(DMA_Output), " Metabolites"),
+                                   xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2  ),
+                                   ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Output$p.adj))))),
+                                   cutoffLineType = "dashed",
+                                   cutoffLineCol = "black",
+                                   cutoffLineWidth = 1,
+                                   legendLabels=c('No changes',paste(0.5,"< |Log2FC|"),paste("p.adj <",0.05) , paste('p.adj<',0.05,' &',0.5,"< |Log2FC|")),
+                                   legendPosition = 'right',
+                                   legendLabSize = 8,
+                                   legendIconSize =4,
+                                   gridlines.major = FALSE,
+                                   gridlines.minor = FALSE,
+                                   drawConnectors = FALSE)
+    OutputPlotName = paste0(OutputName,"_padj_",0.05,"log2FC_",0.5)
+    
+    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as))
+    ggsave(volcanoDMA,plot=VolcanoPlot, width=12, height=9) # save the voplcano plot
+  }
   return(DMA_Output)
 }
 
