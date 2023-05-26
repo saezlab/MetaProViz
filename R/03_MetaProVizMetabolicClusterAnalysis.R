@@ -4,65 +4,94 @@
 #'
 #' This script allows you to perform differential metabolite analysis
 #'
-#' @param Input_data1 Data matrix which contains samples in rows and metabolites, Log fold changes, pvalus and padjustee values in columns
-#' @param Input_data2 Data matrix dame as data1 for another comparison
-#' @param Output_Name String which contains the name of the output file of the Metabolic Clusters
+#' @param Input_data1 Dataframe which contains metabolites in rows and Log fold changes, pvalus and padjustee values in columns
+#' @param Input_data2 Dataframe same as Input_data1 for another comparison
+#' @param Output_Name String which is added to the output files of the Metabolic Clusters
 #' @param Condition1 String which contains the name of the first condition
 #' @param Condition2 String which contains the name of the second condition
 #' @param pCutoff Number of the desired p value cutoff for assessing significance
 #' @param FCcutoff Number of the desired log fold change cutoff for assessing significance
 #' @param test String which selects pvalue or padj for significance
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
+#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
+#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
 #'
 #'
 #' @keywords Metabolic Clusters,
 #' @export
-#'
-#'
-#'
-# Load libraries
-#library(tidyverse) # general scripting
-library(alluvial) # For alluvial plots
 
 
-##########################################
+##################################################
 ### ### ### Metabolic Cluster Analysis ### ### ###
-##########################################
+##################################################
 
 MCA <- function(Input_data1,
-                          Input_data2,
-                          Output_Name = "",
-                          Condition1,
-                          Condition2,
-                          pCutoff= 0.05 ,
-                          FCcutoff=0.5,
-                          test = "p.adj",
+                Input_data2,
+                Output_Name = "",
+                Condition1,
+                Condition2,
+                pCutoff= 0.05 ,
+                FCcutoff=0.5,
+                test = "p.adj",
                 plot = TRUE,
-                          plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite"),
-                          plot_color_variable = "Overall_Change",
-                          plot_color_remove_variable = "SameDirection_NoChange",
-                          safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","red", "white", "#000"), # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible,
-                          CoRe=FALSE,
-                          Save_as = pdf  # Save_as = "pdf" 
-){
+                CoRe=FALSE,
+                Save_as = "pdf"
+               ){
+  
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", "alluvial")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    install.packages(new.packages)
+  }
+  suppressMessages(library(tidyverse))
+  
+  
+  ## ------------ Check Input files ----------- ##
+  `%notin%` <- Negate(`%in%`) # Create a 'not in' function
+  for(Input_data in list(Input_data1, Input_data2)){
+    if(any(duplicated(row.names(Input_data)))==TRUE){
+      stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+    } 
+  }
+  if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
+    stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
+  }
+  if( is.numeric(FCcutoff)== FALSE  | FCcutoff < 0){
+    stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
+  }
+  if(test != "p.val" & test != "p.adj" ){
+    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
+  }
+  for(Input_data in list(Input_data1, Input_data2)){
+    if(test %notin% colnames(Input_data)){
+      stop("Check Input data. There is no column ", test, " for assessing significance.")
+    } 
+  }
+  if(is.logical(plot) == FALSE){
+    stop("Check input. The plot value should be either =TRUE if an Alluvial plot presenting the Metabolic Cluster Analysisresults is to be exported or =FALSE if not.")
+  }
+  if(is.logical(CoRe) == FALSE){
+    stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
+  }
+  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  if(Save_as %notin% Save_as_options){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+  
   
   ####################################################
   ### ### ### Create Results output folder ### ### ###
   
-  # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) # Make Results folder
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  
-  ####################################################
-  ### Create MetabolicClusters folder in  result directory ###
-  Results_folder_MCA_folder = paste(Results_folder, "/MCA", sep="") # select name of result directory
+  Results_folder_MCA_folder = file.path(Results_folder, "MCA") # select name of result directory
   if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
   
-  #####################################################
-  ### ### ### make output plot save_as name ### ### ###
-  Save_as_var <- Save_as
-  Save_as= deparse(substitute(Save_as))
   
-  if (CoRe==TRUE){
+  if (CoRe == TRUE){
     
     Name = paste0("MCA_Output_",gsub(" ", "_",Condition1),"_with_",gsub(" ", "_",Condition2), sep = "")
     
@@ -318,158 +347,115 @@ MCA <- function(Input_data1,
     ##Write to file
     writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/MCA_Output_",Name,Output_Name,".xlsx", sep = ""))
     # write.csv(Alluvial_DF2, paste("AlluvianDF", Output, ".csv", sep="_"), row.names= TRUE)
-    
-    if(plot == TRUE){
-    
-    # 1. Regulation:
-    Alluvial_DF2  <- Alluvial_DF  %>%
-      mutate(MetaboliteChange = case_when(Log2FC >= FCcutoff  ~ 'UP',
-                                          Log2FC <= -FCcutoff ~ 'DOWN',
-                                          TRUE ~ 'No_Change'))
-    
-    if (test == "p.val"){
-      # 2. Excluded according to p-value:
-      Alluvial_DF2  <- Alluvial_DF2  %>%
-        mutate(Excluded_by_pval = case_when(p.val <= pCutoff ~ 'NO',
-                                            p.val > pCutoff ~ 'YES'))
-      #3. Excluded according to P-value?
-      Alluvial_DF2  <- Alluvial_DF2  %>%
-        mutate(MetaboliteChange_Excluded = case_when(Log2FC >= FCcutoff & p.val < pCutoff ~ 'UP',
-                                                     Log2FC <= -FCcutoff & p.val < pCutoff ~ 'DOWN',
-                                                     Log2FC >= FCcutoff & p.val >= pCutoff ~ 'UP_Excluded',
-                                                     Log2FC <= -FCcutoff & p.val >= pCutoff ~ 'DOWN_Excluded',
-                                                     TRUE ~ 'No_Change'))
-      #4. After exlusion by p-value
-      Alluvial_DF2  <- Alluvial_DF2  %>%
-        mutate(MetaboliteChange_Significant = case_when(Log2FC >= FCcutoff & p.val < pCutoff ~ 'UP',
-                                                        Log2FC <= -FCcutoff & p.val < pCutoff ~ 'DOWN',
-                                                        TRUE ~ 'No_Change'))
-    }else if(test=="p.adj"){
-      # 2. Excluded according to p-value:
-      Alluvial_DF2  <- Alluvial_DF2  %>%
-        mutate(Excluded_by_pval = case_when(p.adj <= pCutoff ~ 'NO',
-                                            p.adj > pCutoff ~ 'YES'))
-      #3. Excluded according to P-value?
-      Alluvial_DF2  <- Alluvial_DF2  %>%
-        mutate(MetaboliteChange_Excluded = case_when(Log2FC >= FCcutoff & p.adj < pCutoff ~ 'UP',
-                                                     Log2FC <= -FCcutoff & p.adj < pCutoff ~ 'DOWN',
-                                                     Log2FC >= FCcutoff & p.adj >= pCutoff ~ 'UP_Excluded',
-                                                     Log2FC <= -FCcutoff & p.adj >= pCutoff ~ 'DOWN_Excluded',
-                                                     TRUE ~ 'No_Change'))
-      #4. After exlusion by p-value
-      Alluvial_DF2  <- Alluvial_DF2  %>%
-        mutate(MetaboliteChange_Significant = case_when(Log2FC >= FCcutoff & p.adj < pCutoff ~ 'UP',
-                                                        Log2FC <= -FCcutoff & p.adj < pCutoff ~ 'DOWN',
-                                                        TRUE ~ 'No_Change'))
-    }
-    
   }
   
-  ###########################
-  ### Make Alluvial plot ###
-  
-  #5. Frequency:
-  Alluvial_DF2[,"Frequency"]  <- as.numeric("1")
-  
-  Alluvial_Plot <- Alluvial_DF2
-  
-  if (CoRe == TRUE){
-    plot_column_names= c("Intracellular Change", "CoRe Change", "Metabolite Cluster", "Metabolite")
-    plot_color_variable = "Metabolite Cluster"
+  if(plot == TRUE){
     
-    # Remove the No Change No Change from the plot
-    Alluvial_Plot <- Alluvial_Plot[!c(Alluvial_Plot$`Intracellular Change`=="No Change" & Alluvial_Plot$`CoRe Change`== "No Change"),]
-  }
-  
-  
-  #Make the Selection Plot:
-  if(plot_color_remove_variable %in% Alluvial_Plot[,plot_color_variable] ){
-    Alluvial_Plot<- Alluvial_Plot[-which(Alluvial_Plot[,plot_color_variable]==plot_color_remove_variable),]#remove the metabolites that do not change in either of the conditions
-  }
-  
-  
-  Save_as_var(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9)
-  par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
-  alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
-            col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[4] ~ safe_colorblind_palette[4],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[5] ~ safe_colorblind_palette[5],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[6] ~ safe_colorblind_palette[6],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[7] ~ safe_colorblind_palette[7],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[8] ~ safe_colorblind_palette[8],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[9] ~ safe_colorblind_palette[9],
-                            Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[10] ~ safe_colorblind_palette[10],
-                            TRUE ~ 'black'),
-            border = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[4] ~ safe_colorblind_palette[4],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[5] ~ safe_colorblind_palette[5],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[6] ~ safe_colorblind_palette[6],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[7] ~ safe_colorblind_palette[7],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[8] ~ safe_colorblind_palette[8],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[9] ~ safe_colorblind_palette[9],
-                               Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[10] ~ safe_colorblind_palette[10],
-                               
-                               TRUE ~ 'black'),
-            hide = Alluvial_Plot$Frequency == 0,
-            cex = 0.3,
-            cex.axis=0.5)
-  mtext("Selection of metabolites that change in at least one of the two conditions", side=3, line=6, cex=1.2, col="black", outer=TRUE) #https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
-  mtext(paste("",Name), side=3, line=5, cex=0.8, col="black", outer=TRUE)
-  mtext(paste("Underlying comparison: ",Condition1,"-versus-",Condition2), side=2, line=0, cex=0.8, col="black", outer=TRUE)
-  
-  if(CoRe==FALSE){
-  #mtext("Legend", side=3, line=5, adj=1.0, cex=1, col="black", outer=TRUE)
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[1])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[1]), side=3, line=6, adj=0, cex=0.6, col=safe_colorblind_palette[1], outer=TRUE)
+    ###########################
+    ### Make Alluvial plot ###
+    
+    #Add Frequency:
+    Alluvial_DF[,"Frequency"]  <- as.numeric("1")
+    Alluvial_Plot <- Alluvial_DF
+    
+    ### select Plot parameters
+    if (CoRe == TRUE){
+      plot_column_names= c("Intracellular Change", "CoRe Change", "Metabolite Cluster", "Metabolite")
+      plot_color_variable = "Metabolite Cluster"
+      # Remove the No Change No Change from the plot
+      Alluvial_Plot <- Alluvial_Plot[!c(Alluvial_Plot$`Intracellular Change`=="No Change" & Alluvial_Plot$`CoRe Change`== "No Change"),]
+    }else{
+      plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite")
+      plot_color_variable = "Overall_Change"
+      Alluvial_Plot<- Alluvial_Plot[-which(Alluvial_Plot[,plot_color_variable]=="SameDirection_NoChange"),]
     }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[2])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[2]), side=3, line=5, adj=0, cex=0.6, col=safe_colorblind_palette[2], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[3])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[3]), side=3, line=4, adj=0, cex=0.6, col=safe_colorblind_palette[3], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[4])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[4]), side=3, line=3, adj=0, cex=0.6, col=safe_colorblind_palette[4], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[5])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[5]), side=3, line=2, adj=0, cex=0.6, col=safe_colorblind_palette[5], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[6])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[6]), side=3, line=1, adj=0, cex=0.6, col=safe_colorblind_palette[6], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[7])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[7]), side=3, line=0, adj=0, cex=0.6, col=safe_colorblind_palette[7], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[8])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[8]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[8], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[9])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[9]), side=3, line=6, adj=1, cex=0.6, col=safe_colorblind_palette[9], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[10])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[10]), side=3, line=5, adj=1, cex=0.6, col=safe_colorblind_palette[10], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[11])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[11]), side=3, line=4, adj=1, cex=0.6, col=safe_colorblind_palette[11], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[12])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[12]), side=3, line=3, adj=1, cex=0.6, col=safe_colorblind_palette[12], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[13])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[13]), side=3, line=2, adj=1, cex=0.6, col=safe_colorblind_palette[13], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[14])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[14]), side=3, line=1, adj=1, cex=0.6, col=safe_colorblind_palette[14], outer=TRUE)
-    }
-    if( is.na(unique(Alluvial_Plot[,plot_color_variable])[15])==FALSE)  {
-      mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[15]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[15], outer=TRUE)
-    }
-  } 
-  dev.off()# Close the pdf file
+    safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","red", "white", "#000") # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible,
+    
+    
+    Save_as_var(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9)
+    par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
+    alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
+                        col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[4] ~ safe_colorblind_palette[4],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[5] ~ safe_colorblind_palette[5],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[6] ~ safe_colorblind_palette[6],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[7] ~ safe_colorblind_palette[7],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[8] ~ safe_colorblind_palette[8],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[9] ~ safe_colorblind_palette[9],
+                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[10] ~ safe_colorblind_palette[10],
+                                        TRUE ~ 'black'),
+                        border = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[4] ~ safe_colorblind_palette[4],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[5] ~ safe_colorblind_palette[5],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[6] ~ safe_colorblind_palette[6],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[7] ~ safe_colorblind_palette[7],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[8] ~ safe_colorblind_palette[8],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[9] ~ safe_colorblind_palette[9],
+                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[10] ~ safe_colorblind_palette[10],
+                                           
+                                           TRUE ~ 'black'),
+                        hide = Alluvial_Plot$Frequency == 0,
+                        cex = 0.3,
+                        cex.axis=0.5)
+    mtext("Selection of metabolites that change in at least one of the two conditions", side=3, line=6, cex=1.2, col="black", outer=TRUE) #https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
+    mtext(paste("",Name), side=3, line=5, cex=0.8, col="black", outer=TRUE)
+    mtext(paste("Underlying comparison: ",Condition1,"-versus-",Condition2), side=2, line=0, cex=0.8, col="black", outer=TRUE)
+    
+    if(CoRe==FALSE){
+      #mtext("Legend", side=3, line=5, adj=1.0, cex=1, col="black", outer=TRUE)
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[1])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[1]), side=3, line=6, adj=0, cex=0.6, col=safe_colorblind_palette[1], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[2])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[2]), side=3, line=5, adj=0, cex=0.6, col=safe_colorblind_palette[2], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[3])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[3]), side=3, line=4, adj=0, cex=0.6, col=safe_colorblind_palette[3], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[4])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[4]), side=3, line=3, adj=0, cex=0.6, col=safe_colorblind_palette[4], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[5])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[5]), side=3, line=2, adj=0, cex=0.6, col=safe_colorblind_palette[5], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[6])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[6]), side=3, line=1, adj=0, cex=0.6, col=safe_colorblind_palette[6], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[7])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[7]), side=3, line=0, adj=0, cex=0.6, col=safe_colorblind_palette[7], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[8])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[8]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[8], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[9])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[9]), side=3, line=6, adj=1, cex=0.6, col=safe_colorblind_palette[9], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[10])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[10]), side=3, line=5, adj=1, cex=0.6, col=safe_colorblind_palette[10], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[11])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[11]), side=3, line=4, adj=1, cex=0.6, col=safe_colorblind_palette[11], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[12])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[12]), side=3, line=3, adj=1, cex=0.6, col=safe_colorblind_palette[12], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[13])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[13]), side=3, line=2, adj=1, cex=0.6, col=safe_colorblind_palette[13], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[14])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[14]), side=3, line=1, adj=1, cex=0.6, col=safe_colorblind_palette[14], outer=TRUE)
+      }
+      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[15])==FALSE)  {
+        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[15]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[15], outer=TRUE)
+      }
+    } 
+    dev.off()# Close the pdf file
+    
+    
   }
 }
 

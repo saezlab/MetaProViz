@@ -56,7 +56,6 @@ Preprocessing <- function(Input_data,
   RequiredPackages <- c("tidyverse", "factoextra", "qcc", "ggplot2","hash", "inflection")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
-  
   suppressMessages(library(tidyverse))
   
   # library(tidyverse) # general scripting
