@@ -58,21 +58,10 @@ DMA <-function(Input_data,
   
   suppressMessages(library(tidyverse))
   
-  ## ------------ Create Results output folder ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) # Make Results folder
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
-  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
-  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
-  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
-
-  
   ################################################################################################################################################################################################
   ############### Check inputs ############### 
   ## ------------ Check Input files ----------- ##
-  #1. Input_data
+  #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
   } else if("Conditions" %in% colnames(Input_data)==FALSE){
@@ -89,8 +78,6 @@ DMA <-function(Input_data,
       C2 <- Input_data %>%
         filter(design$Conditions %in% Condition2) %>%
         select_if(is.numeric)
-      
-      
       
       if(nrow(C1)==1){
         stop("There is only one sample available for ", Condition1, ", so no statistical test can be performed.")
@@ -112,7 +99,28 @@ DMA <-function(Input_data,
       }
   }
   
-  #2. Input_Pathways
+  #2. General parameters
+  `%notin%` <- Negate(`%in%`) # Create a 'not in' function
+  STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
+  if(STAT_pval %notin% STAT_pval_options ){
+    stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid. Please select one of the folowwing: ",paste(STAT_pval_options,collapse = ", "),"." )
+  }
+  STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
+  if(STAT_padj %notin% STAT_padj_options ){
+    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
+  } 
+  if(is.logical(CoRe) == FALSE){
+    stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
+  }
+  if(is.logical(plot) == FALSE){
+    stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
+  }
+  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  if(Save_as %notin% Save_as_options){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+
+  #3. Input_Pathways
   if(is.null(Input_Pathways)!=TRUE){
     if('Metabolite' %in% colnames(Input_Pathways)==FALSE){
       warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.")
@@ -120,6 +128,19 @@ DMA <-function(Input_data,
      warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.") 
     }
   }
+  
+  
+  ## ------------ Create Results output folder ----------- ##
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) # Make Results folder
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
+  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
+  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
+  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
+  
+  
   
   ## ------------ Check data normality and statistical test chosen ----------- ##
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test. 
@@ -140,7 +161,7 @@ DMA <-function(Input_data,
   NotNorm <- format(round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of not-normally distributed metabolites across samples
   message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test.")
   
-  if (Norm > 50 & STAT_pval =="wilcox-test"){
+  if (Norm > 50 & STAT_pval =="wilcox.test"){
       warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
     }else if(NotNorm > 50 & STAT_pval =="t.test"){
     message(NotNorm, " % of the metabolites follow a not-normal distribution but 't.test' for parametric Hypothesis testing was chosen. Please consider selecting a non-parametric test (wilcox.test) instead.")
@@ -207,7 +228,7 @@ DMA <-function(Input_data,
   STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   
   ################################################################################################################################################################################################
-  ############### Add Information and safe ############### 
+  
   ## ------------ Add information on groups to DMA results----------- ##
   if(CoRe==TRUE){#add consumption release info to the result
     CoRe_info <- t(CoRe_info) %>% as.data.frame()
@@ -250,7 +271,7 @@ DMA <-function(Input_data,
                                    title= paste0(toString(Condition1),"-vs-",toString(Condition2)),
                                    subtitle = bquote(italic("Differential metabolite analysis")),
                                    caption = paste0("total = ", nrow(DMA_Output), " Metabolites"),
-                                   xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2  ),
+                                   xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2),
                                    ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Output$p.adj))))),
                                    cutoffLineType = "dashed",
                                    cutoffLineCol = "black",
@@ -270,29 +291,6 @@ DMA <-function(Input_data,
   return(DMA_Output)
 }
 
-
-
-########################################
-### ### ### Run the Analysis ### ### ###
-
-#DMA_output <- DMA(Input_data =preprocessing_output[["data_processed"]] ,
-# Experimental_design= preprocessing_output[["Experimental_design"]],
-#STAT_padj="BH",
-# Condition1 = "Control",
-# Condition2 = "Rot",
-# Input_Pathways = pathways)
-
-
-
-
-
-#' Notes/ Things to add
-#' Check for heteroscedasticity alongside normality?? in order to apply a transformation, log if n is small and vst if n is large. But how smass is small? For this
-#' the problem will be solved as we will do thr apgelm normalization is the preprocessing step. So it should be solved ina previous step.
-
-# Let the user decide in which file format the df is safed (xlsx/csv/tsv/...)
-# Let the user decide which test to use when normally distributed (default=t.test) or when not nromally disctributed (default=wilcox.test)
-# Question to check: If the amount of normally distributed to not-normally distributed metabolites is 51%:49% is it ok to perfom a t.test? (is there a threshold for those decisions?)
 
 
 

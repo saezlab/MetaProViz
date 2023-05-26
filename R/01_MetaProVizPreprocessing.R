@@ -67,27 +67,11 @@ Preprocessing <- function(Input_data,
   # library(inflection) # For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   ## ------------------ Run ------------------- ##
-
-  #############################################
-  ### ### ### Create output folders ### ### ###
-  
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) 
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_Preprocessing_folder = file.path(Results_folder, "Preprocessing")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
-  Results_folder_Preprocessing_Outlier_detection_folder = file.path(Results_folder_Preprocessing_folder, "Outlier_detection")   # Create Outlier_Detection directory
-  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}  
-  if (ExportQCPlots ==  TRUE){   # Create Quality_Control_PCA directory
-    Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = file.path(Results_folder_Preprocessing_folder, "Quality_Control_PCA")
-    if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}
-  }
-  
   
   #######################################################################################
   ### ### ### Check Input Information and add Experimental_design information ### ### ###
 
+  #1.  Inpur data
   if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
   } else{
@@ -104,12 +88,14 @@ Preprocessing <- function(Input_data,
     }
   }
 
+  #2. Conditions
   if ( "Conditions" %in% colnames(Experimental_design)){   # Parse Condition and Replicate information
     Conditions <- Experimental_design$Conditions
   }else{
     Conditions <- NULL
   }
 
+  #3. Core parameters
   if (CoRe ==  TRUE){   # parse CoRe normalisation factor
     message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
     if ("CoRe_norm_factor" %in% colnames(Experimental_design)){
@@ -126,9 +112,52 @@ Preprocessing <- function(Input_data,
            column labeled as 'blank' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = TRUE for your analysis")
     }
   }
-
+  
+  #4. General parameters
+  `%notin%` <- Negate(`%in%`) # Create a not in function
+  Feature_Filtering_options <- c("Standard","Modified", "none")
+  if(Feature_Filtering %notin% Feature_Filtering_options ){
+    stop("Check input. The selected Feature_Filtering option is not valid. Please select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
+  }
+  if( is.numeric(Feature_Filt_Value) == FALSE |Feature_Filt_Value > 1 | Feature_Filt_Value < 0){
+    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
+  }
+  if(is.logical(TIC_Normalization) == FALSE){
+    stop("Check input. The TIC_Normalization value should be either =TRUE if TIC normalization is to be performed or =FALSE if no data normalization is to be applied.")
+  }
+  if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
+    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
+  }
+  if(is.logical(ExportQCPlots) == FALSE){
+    stop("Check input. The ExportQCPlots value should be either =TRUE if QC plots are to be exported or =FALSE if not.")
+  }
+  if(is.logical(CoRe) == FALSE){
+    stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
+  }
+  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  if(Save_as %notin% Save_as_options){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+  
   Input_data <- as.matrix(mutate_all(as.data.frame(Input_data), function(x) as.numeric(as.character(x))))
-
+  
+  
+  #############################################
+  ### ### ### Create output folders ### ### ###
+  
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) 
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+  Results_folder_Preprocessing_folder = file.path(Results_folder, "Preprocessing")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
+  Results_folder_Preprocessing_Outlier_detection_folder = file.path(Results_folder_Preprocessing_folder, "Outlier_detection")   # Create Outlier_Detection directory
+  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}  
+  if (ExportQCPlots ==  TRUE){   # Create Quality_Control_PCA directory
+    Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = file.path(Results_folder_Preprocessing_folder, "Quality_Control_PCA")
+    if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}
+  }
+  
 
   #########################################
   ### ### ### Feature filtering ### ### ###
@@ -137,13 +166,7 @@ Preprocessing <- function(Input_data,
 
   if (Feature_Filtering ==  "Modified"){
     message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
-    Feature_Filt_Value <- as.numeric(Feature_Filt_Value)
-
-    if(Feature_Filt_Value > 0 & Feature_Filt_Value < 1){ # Check if filtering value input is correct
-      message(paste("filtering value selected:", Feature_Filt_Value))
-    } else{
-      stop("Check input. The filtering value should be between 0 and 1")
-    }
+    message(paste("filtering value selected:", Feature_Filt_Value))
 
     Input_data <- as.data.frame(Input_data)
     unique_conditions <- unique(Conditions) # saves the different conditions
@@ -182,12 +205,7 @@ Preprocessing <- function(Input_data,
   }
   if (Feature_Filtering ==  "Standard"){
     message("Here we apply the so-called 80%-filtering rule is used, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
-    Feature_Filt_Value <- as.numeric(Feature_Filt_Value)
-    if(Feature_Filt_Value > 0 & Feature_Filt_Value < 1){  # Check if filtering value input is correct
-      message(paste("filtering value selected:", Feature_Filt_Value))
-    } else{
-      stop("Check input. The filtering value should be between 0 and 1")
-    }
+    message(paste("filtering value selected:", Feature_Filt_Value))
     split_Input <- Input_data
 
     miss <- c()
@@ -213,6 +231,7 @@ Preprocessing <- function(Input_data,
     warning("No feature filtering is selected")
     filtered_matrix <- as.data.frame(Input_data)
   }
+  
   filtered_matrix <- as.matrix(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
   
   
@@ -225,7 +244,6 @@ Preprocessing <- function(Input_data,
   if (length(zero_var_metabs) > 1){
     message(paste("There are metabolits with Zero variance. These are: ",zero_var_metabs ))
   }
-
   zero_var_removed <- filtered_matrix[, sapply(filtered_matrix, var,na.rm  =  TRUE) !=  0] # Remove zero variance metabolites
   filtered_matrix <- zero_var_removed
   
@@ -240,19 +258,18 @@ Preprocessing <- function(Input_data,
   #######################################################
   ### ### ### Total Ion Current Normalization ### ### ###
 
-   if (TIC_Normalization ==  TRUE){ # Ask if we want to normalize for total ion counts
+  if (TIC_Normalization ==  TRUE){ # Ask if we want to normalize for total ion counts
     message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
     RowSums <- rowSums(NA_removed_matrix)
     Median_RowSums <- median(RowSums) #This will built the median
     Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
     Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
     Data_TIC <- as.data.frame(Data_TIC)
-    }else{  # TIC_Normalization == FALSE
-    Data_TIC <- as.data.frame(NA_removed_matrix)
-    warning("***Total Ion Count normalization is not performed***")
-    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    } else {  # TIC_Normalization == FALSE
+      Data_TIC <- as.data.frame(NA_removed_matrix)
+      warning("***Total Ion Count normalization is not performed***")
+      message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
     }
-
 
   if (CoRe ==  TRUE){
     blankMeans <- colMeans( Data_TIC[grep("blank", Conditions),])
@@ -275,10 +292,12 @@ Preprocessing <- function(Input_data,
   data_norm <- Data_TIC %>% as.data.frame()
 
   
-  ################################################
+  #####################################################
   ### ### ### Sample outlier identification ### ### ###
 
   message("Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.")
+  message(paste("HotellinsConfidence value selected:", HotellinsConfidence))
+ 
   
   Outlier_filtering_loop = 10
   sample_outliers <- list()
@@ -419,9 +438,7 @@ Preprocessing <- function(Input_data,
     }
   }
 
-  # Save outlier result
- # pdf(file = paste("Results_", Sys.Date(),"/","Preprocessing", "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
-  pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
+  pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or Outlier detection related plots
   for (plot in outlier_plot_list) {
     replayPlot(plot)
   }
@@ -429,7 +446,7 @@ Preprocessing <- function(Input_data,
 
   
   # Print Outlier detection results about samples and metabolites
-  if(length(sample_outliers)>0){   # Print outlier samples
+  if(length(sample_outliers) > 0){   # Print outlier samples
     message("There are sample outliers that were removed from the data") #This was a warning
     for (i in 1:length(sample_outliers)  ){
       message("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
@@ -439,8 +456,9 @@ Preprocessing <- function(Input_data,
   zero_var_metab_export_df <- data.frame(1,2)
   names(zero_var_metab_export_df) <- c("Filtering round","Metabolite")
 
+  # Print zero variance metabolites
   count = 1
-  for (i in 1:length(metabolite_zero_var_total_list)){    # Print zero variance metabolites
+  for (i in 1:length(metabolite_zero_var_total_list)){  
     if (metabolite_zero_var_total_list[[i]] != 0){
       message("Filtering round ",i ,". Zero variance metabolites identified: ", paste( metabolite_zero_var_total_list[[i]] ," "))
       zero_var_metab_export_df[count,"Filtering round"] <- paste(i)
@@ -455,7 +473,7 @@ Preprocessing <- function(Input_data,
   ### ### ### Make Output Dataframe ### ### ###
   
   total_outliers <- hash::hash() # make a dictionary
-  if(length(sample_outliers)>0){ # Create columns with outliers to merge to output dataframe
+  if(length(sample_outliers) > 0){ # Create columns with outliers to merge to output dataframe
     for (i in 1:length(sample_outliers)  ){
       total_outliers[[paste("Outlier_filtering_round_",i, sep = "")]] <- sample_outliers[i]
     }
@@ -463,7 +481,7 @@ Preprocessing <- function(Input_data,
   
   data_norm_filtered_full <- as.data.frame(Data_TIC)
   
-  if(length(total_outliers)>0){  # add outlier information to the full output dataframe
+  if(length(total_outliers) > 0){  # add outlier information to the full output dataframe
     data_norm_filtered_full$Outliers <- "no"
     for (i in 1:length(total_outliers)){
       for (k in 1:length( hash::values(total_outliers)[i] ) ){
@@ -537,11 +555,7 @@ Preprocessing <- function(Input_data,
   ### ### ###  Make list with output dataframes ### ### ###
 
   output_list <- list()  #Here we make a list in which we will save the output
-  preprocessing_output_list <- list(Experimental_design = Experimental_design, 
-                                    Raw_data = as.data.frame(Input_data), 
-                                    Processed_data = data_norm_filtered_full)
-
-
+  preprocessing_output_list <- list(Experimental_design = Experimental_design, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
 
   ##Write to file
   preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe
