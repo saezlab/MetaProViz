@@ -196,15 +196,14 @@ DMA <-function(Input_data,
   }
   Metabolite <- colnames(C2)
   PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
-  #p-adjusted
-  #library(stats)
-  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2])))
+ 
+  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   PADJ_C1vC2 <- data.frame(Metabolite, VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
   STAT_C1vC2 <- merge(Log2FC_C1vC2,STAT_C1vC2, by="Metabolite")
   names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPVAL_C1vC2"] <- "p.val"
   names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
-  STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.adj / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
+  STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.val / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
   STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   
   ################################################################################################################################################################################################
@@ -218,10 +217,6 @@ DMA <-function(Input_data,
     names(CoRe_info)[4] <- "CoRe"
     STAT_C1vC2 <- merge(STAT_C1vC2,CoRe_info,by= "Metabolite")
     STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
-  }else if(CoRe==FALSE){#Add general info
-    
-  }else{
-   stop("Please select an apropriate hypothesis testing option.")
   }
   
   ## ------------ Add pathway information to DMA results ----------- ##
@@ -235,7 +230,7 @@ DMA <-function(Input_data,
   DMA_Output <- STAT_C1vC2
   
 
-  xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
+  xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
   writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
  
   if ( plot == TRUE){ # Make a simple Volcano plot --> implemet plot true or false
@@ -252,7 +247,7 @@ DMA <-function(Input_data,
                                    titleLabSize = 16,
                                    # colCustom = c("black", "grey", "grey", "red"),
                                    colAlpha = 0.7,
-                                   title= paste0(Condition1,"-vs-",Condition2),
+                                   title= paste0(toString(Condition1),"-vs-",toString(Condition2)),
                                    subtitle = bquote(italic("Differential metabolite analysis")),
                                    caption = paste0("total = ", nrow(DMA_Output), " Metabolites"),
                                    xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2  ),
