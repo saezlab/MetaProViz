@@ -105,9 +105,9 @@ DMA <-function(Input_data,
       }else if(nrow(C2)==0){
         stop("There is no sample available for ", Condition2, ".")
       }else{
-        Mean_C1 <- C1%>%
+        Mean_C1 <- C1 %>%
           summarise_all("mean")
-        Mean_C2 <- C2%>%
+        Mean_C2 <- C2 %>%
           summarise_all("mean")
         
         #add +1 count to the metabolites with 0 because otherwise the Log2FC with NAs
@@ -208,7 +208,8 @@ DMA <-function(Input_data,
   STAT_C1vC2 <- merge(Log2FC_C1vC2,STAT_C1vC2, by="Metabolite")
   names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPVAL_C1vC2"] <- "p.val"
   names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
-  
+  STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.adj / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
+  STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   
   ################################################################################################################################################################################################
   ############### Add Information and safe ############### 
@@ -221,6 +222,7 @@ DMA <-function(Input_data,
     names(CoRe_info)[3] <- paste("Mean", "CoRe", Condition2, sep="_")
     names(CoRe_info)[4] <- "CoRe"
     STAT_C1vC2 <- merge(STAT_C1vC2,CoRe_info,by= "Metabolite")
+    STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   }else if(CoRe==FALSE){#Add general info
     
   }else{
