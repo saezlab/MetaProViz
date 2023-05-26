@@ -36,6 +36,7 @@ MCA <- function(Input_data1,
                           pCutoff= 0.05 ,
                           FCcutoff=0.5,
                           test = "p.adj",
+                plot = TRUE,
                           plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite"),
                           plot_color_variable = "Overall_Change",
                           plot_color_remove_variable = "SameDirection_NoChange",
@@ -318,6 +319,7 @@ MCA <- function(Input_data1,
     writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/MCA_Output_",Name,Output_Name,".xlsx", sep = ""))
     # write.csv(Alluvial_DF2, paste("AlluvianDF", Output, ".csv", sep="_"), row.names= TRUE)
     
+    if(plot == TRUE){
     
     # 1. Regulation:
     Alluvial_DF2  <- Alluvial_DF  %>%
@@ -468,5 +470,6 @@ MCA <- function(Input_data1,
     }
   } 
   dev.off()# Close the pdf file
+  }
 }
 

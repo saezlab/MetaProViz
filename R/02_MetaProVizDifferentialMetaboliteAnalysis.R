@@ -1,14 +1,30 @@
-#' Metabolomics pre-processing pipeline
-#' @author Prymidis Dimitrios, Schmidt Christina
-#' Date: "2022-10-28"
-#'
+## ---------------------------
+##
+## Script name: DMA
+##
+## Purpose of script: Differential Metabolomics Analysis 
+##
+## Author: Dimitrios Prymidis and Christina Schmidt
+##
+## Date Created: 2022-10-28
+##
+## Copyright (c) Dimitrios Prymidis and Christina Schmidt
+## Email:
+##
+## ---------------------------
+##
+## Notes:
+##
+##
+## ---------------------------
+
 #' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
 #'
 #' @param Input DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column
 #' @param Conditon1 Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".
 #' @param Conditon2 Input needs to contain a column named "Condition" including Condition2 that is compared to Condition1, e.g. "WT".
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
-#' @param padj_test \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
+#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
 #' @param OutputName String which contains the name of the output file of the DMA
 #' @param Input_Pathways \emph{Optional: } DF which contains the pathway information for each metabolite. \strong{NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE \strong{FALSE}
@@ -16,14 +32,22 @@
 #' 
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
-#'
+
+
 ########################################################
 ### ### ### Differential Metabolite Analysis ### ### ###
 ########################################################
 
-DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with actual test name t.test
-                         padj_test="fdr", #rename to STAT_padj
-               Condition1,  Condition2, Input_Pathways = NULL, OutputName='', CoRe=FALSE, plot = TRUE, Save_as = svg){
+DMA <-function(Input_data, 
+               Condition1,
+               Condition2,
+               STAT_pval ="t.test",
+               STAT_padj="fdr",
+               Input_Pathways = NULL, 
+               OutputName='', 
+               CoRe=FALSE, 
+               plot = TRUE, 
+               Save_as = "svg"){
   
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
@@ -44,9 +68,7 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(Condition1,"_vs_",Condition2)) # Make comparison folder
   if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
 
-  ## ------------  Make output plot save_as name ----------- ##
-  Save_as= deparse(substitute(Save_as))
-  
+  ## ------------ Check for pooled sample comparison ----------- ##  
   if(length(Condition1)>1 |length(Condition2)>1){
     Pooled=TRUE
   }else{
@@ -62,20 +84,25 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   } else if("Conditions" %in% colnames(Input_data)==FALSE){
     stop("There is no column named `Conditions` in Input_data to obtain Condition1 and Condition2.")
   }else{ # select samples according to the input conditions
-      C1 <- Input_data%>%
-        subset(Conditions== paste(Condition1))%>%
+    
+    ### Separate design from the data
+    design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
+    Input_data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
+    
+      C1 <- Input_data %>%
+        subset(design$Conditions == paste(Condition1)) %>%
         select_if(is.numeric)#only keep numeric columns with metabolite values
-      C2<- Input_data%>%
-        subset(Conditions== paste(Condition2))%>%
+      C2 <- Input_data %>%
+        subset(design$Conditions == paste(Condition2)) %>%
         select_if(is.numeric)
       
       if(nrow(C1)==1){
         stop("There is only one sample available for ", Condition1, ", so no statistical test can be performed.")
       } else if(nrow(C2)==1){
         stop("There is only one sample available for ", Condition2, ", so no statistical test can be performed.")
-      }else if(nrow(C1)=NULL){
+      }else if(nrow(C1)==0){
         stop("There is no sample available for ", Condition1, ".")
-      }else if(nrow(C2)=NULL){
+      }else if(nrow(C2)==0){
         stop("There is no sample available for ", Condition2, ".")
       }else{
         Mean_C1 <- C1%>%
@@ -97,13 +124,14 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
      warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.") 
     }
   }
-
+  
   ## ------------ Check data normality and statistical test chosen ----------- ##
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test. 
   
   # 1. Load the data and perform the shapiro.test on each metabolite:
   shaptest <-  Input_data %>% # Select data
-    filter(Experimental_design$Conditions %in% Condition1 | Experimental_design$Conditions %in% Condition2)
+    filter(design$Conditions %in% Condition1 | design$Conditions %in% Condition2)%>%
+    select_if(is.numeric)
   
   temp<- as.vector(sapply(shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
   shaptest <- shaptest[,!temp]
@@ -112,13 +140,13 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   shaptestres <- as.data.frame(t(shaptestres))
   
   # 2. Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
-  Norm <- format(round(sum(shapirotres$p.value > 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of normally distributed metabolites across samples
-  NotNorm <- format(round(sum(shapirotres$p.value < 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+  Norm <- format(round(sum(shaptestres$p.value > 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of normally distributed metabolites across samples
+  NotNorm <- format(round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of not-normally distributed metabolites across samples
   message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test.")
   
   if (Norm > 50 & STAT_pval =="wilcox-test"){
       warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
-    }else if(NotNorm > 50 & STAT_pval =="t-test"){
+    }else if(NotNorm > 50 & STAT_pval =="t.test"){
     message(NotNorm, " % of the metabolites follow a not-normal distribution but 't.test' for parametric Hypothesis testing was chosen. Please consider selecting a non-parametric test (wilcox.test) instead.")
     }else if((STAT_pval =="wilcox-test" & nrow(C1)<5)|(STAT_pval =="wilcox-test" & nrow(C2)<5)){# check number of samples for wilcoxons test
       warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
@@ -161,17 +189,6 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   }else{
     stop("Please choose CoRe= TRUE or CoRe=FALSE.")
   }
-    
-  
-  ## ------------ Select the test for hypothesis testing ----------- ##
-  if(STAT_pval=="t-test"){
-    STAT_pval= t.test
-  }else if(STAT_pval=="wilcox-test") {
-    STAT_pval=wilcox.test
-  }else{
-    stop("Please select an apropriate hypothesis testing option.")
-  }
-  
   
   ## ------------ Perform Hypothesis testing ----------- ##
   T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
@@ -185,7 +202,7 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
   #p-adjusted
   #library(stats)
-  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = padj_test, n = length((PVal_C1vC2[,2])))
+  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2])))
   PADJ_C1vC2 <- data.frame(Metabolite, VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
   STAT_C1vC2 <- merge(Log2FC_C1vC2,STAT_C1vC2, by="Metabolite")
@@ -217,30 +234,28 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
       STAT_C1vC2$Pathway[  is.na(STAT_C1vC2$Pathway)] <- "unknown"    # Merge the pathways to DMA result. All non matching metabolites get NA that are changed into "unknown".
     }else{
       warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
-   # }
-  }else{
-    message("No pathway information was added")
-  }
+    }
+
 
   DMA_Output <- STAT_C1vC2
   
-  # padjVAL = 0.05
+  # 0.05 = 0.05
   # log2FC = 0.5
   # 
-  # # padjVALs = as.numeric(unlist(strsplit(padjVALs, ",")))
+  # # 0.05s = as.numeric(unlist(strsplit(0.05s, ",")))
   # # log2FCs = as.numeric(unlist(strsplit(log2FCs, ",")))
   # # DMA_Output_out_list <- list(all = DMA_Output)
-  # # for (log2.FC in log2FCs){
-  # #   for (padjVAL in padjVALs){
+  # # for (0.5 in log2FCs){
+  # #   for (0.05 in 0.05s){
   # #     # Subset results based on different significance thresholds adn save them into different sheets in output excel file
-  # #     DMA_Output_padj_Log2FC <-  DMA_Output %>% filter(p.adj < padjVAL & abs(Log2FC) > log2.FC)# %>% order(DMA_Heart$Log2FC)
-  # #     #DMA_Output_padj_Log2FC <- DMA_Output[which(DMA_Output$p.adj < padjVAL & abs(DMA_Output$Log2FC) > log2.FC),]
+  # #     DMA_Output_padj_Log2FC <-  DMA_Output %>% filter(p.adj < 0.05 & abs(Log2FC) > 0.5)# %>% order(DMA_Heart$Log2FC)
+  # #     #DMA_Output_padj_Log2FC <- DMA_Output[which(DMA_Output$p.adj < 0.05 & abs(DMA_Output$Log2FC) > 0.5),]
   # #     DMA_Output_padj_Log2FC <- DMA_Output_padj_Log2FC[order(DMA_Output_padj_Log2FC$Log2FC), ]
   #     
   #     # Save data
   #     if (nrow(DMA_Output_padj_Log2FC) > 0) {
   #       
-  #       sheet = paste0("abslog2fold>", log2.FC, " padj<", padjVAL)
+  #       sheet = paste0("abslog2fold>", 0.5, " padj<", 0.05)
   #       DMA_Output_out_list[[sheet]] <- DMA_Output_padj_Log2FC
   #       
   #     }
@@ -251,10 +266,10 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
   xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",Condition1,"_vs_",Condition2,"_", OutputName, ".xlsx"))
   
   if (Pooled == TRUE){
-    writexl::write_xlsx(DMA_Output_out_list,xlsDMA, col_names = TRUE)
+    writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE)
     
   } else{
-    writexl::write_xlsx(DMA_Output_out_list,xlsDMA, col_names = TRUE)
+    writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE)
   }
 
 # Make a simple Volcano plot --> implemet plot true or false
@@ -265,8 +280,8 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
                                  y = "p.adj",#p-value or q-value
                                  xlab = bquote(~Log[2]~ FC),
                                  ylab = bquote(~-Log[10]~p.adj),#(~-Log[10]~adjusted~italic(P))
-                                 pCutoff = padjVAL,
-                                 FCcutoff = log2.FC,#Cut off Log2FC, automatically 2
+                                 pCutoff = 0.05,
+                                 FCcutoff = 0.5,#Cut off Log2FC, automatically 2
                                  pointSize = 3,
                                  labSize = 2,
                                  titleLabSize = 16,
@@ -280,14 +295,14 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
                                  cutoffLineType = "dashed",
                                  cutoffLineCol = "black",
                                  cutoffLineWidth = 1,
-                                 legendLabels=c('No changes',paste(log2.FC,"< |Log2FC|"),paste("p.adj <",padjVAL) , paste('p.adj<',padjVAL,' &',log2.FC,"< |Log2FC|")),
+                                 legendLabels=c('No changes',paste(0.5,"< |Log2FC|"),paste("p.adj <",0.05) , paste('p.adj<',0.05,' &',0.5,"< |Log2FC|")),
                                  legendPosition = 'right',
                                  legendLabSize = 8,
                                  legendIconSize =4,
                                  gridlines.major = FALSE,
                                  gridlines.minor = FALSE,
                                  drawConnectors = FALSE)
-  OutputPlotName = paste0(OutputName,"_padj_",padjVAL,"log2FC_",log2.FC)
+  OutputPlotName = paste0(OutputName,"_padj_",0.05,"log2FC_",0.5)
   
   
   volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",Condition1,"-versus-",Condition2,"_", OutputPlotName,".",Save_as))
@@ -307,7 +322,7 @@ DMA <-function(Input_data , STAT_pval ="t-test", #lets try and have it work with
 
 #DMA_output <- DMA(Input_data =preprocessing_output[["data_processed"]] ,
 # Experimental_design= preprocessing_output[["Experimental_design"]],
-#padj_test="BH",
+#STAT_padj="BH",
 # Condition1 = "Control",
 # Condition2 = "Rot",
 # Input_Pathways = pathways)

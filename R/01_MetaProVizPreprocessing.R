@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: MetaProVizPreprocessing
+## Script name: Preprocessing
 ##
 ## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalisation and outlier detection
 ##
@@ -18,12 +18,11 @@
 ##
 ## ---------------------------
 
-#' MetaProVizPreprocessing
-#'
+
 #' Applies 80%-filtering rule, total-ion count normalisation, missing value imputation and HotellingT2 outlier detection
 #'
-#' @param Input Dataframe which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param Experimental_design Dataframe which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates"
+#' @param Input DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates"
 #' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to Standard then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design including the individual conditions you want to apply the filtering to (Yang, J et al., 2015).\strong{Default = TRUE} \strong{Default = Modified}
 #' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering (Bijlsma S. et al., 2006).\strong{Default = 0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
@@ -49,7 +48,7 @@ Preprocessing <- function(Input_data,
                           HotellinsConfidence = 0.99,
                           ExportQCPlots = TRUE,
                           CoRe = FALSE,
-                          Save_as = svg #  Save_as = "svg"
+                          Save_as = "svg"
                           ){
 
 
@@ -58,6 +57,7 @@ Preprocessing <- function(Input_data,
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   
+  suppressMessages(library(tidyverse))
   
   # Load libraries
   # library(tidyverse) # general scripting
@@ -69,6 +69,28 @@ Preprocessing <- function(Input_data,
 
   ## ------------------ Run ------------------- ##
 
+  #############################################
+  ### ### ### Create output folders ### ### ###
+  
+  # This searches for a folder called "Results" within the current working directory and if its not found it creates one
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) 
+  # Make Results folder
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+  Results_folder_Preprocessing_folder = file.path(Results_folder, "Preprocessing")
+  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
+  # Create Outlier_Detection directory
+  Results_folder_Preprocessing_Outlier_detection_folder = file.path(Results_folder_Preprocessing_folder, "Outlier_detection")
+  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}  # check and create folder
+  # Create Quality_Control_PCA directory
+  if (ExportQCPlots ==  TRUE){
+    Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = file.path(Results_folder_Preprocessing_folder, "Quality_Control_PCA")
+    if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}  # check and create folder
+  }
+  
+  
   #######################################################################################
   ### ### ### Check Input Information and add Experimental_design information ### ### ###
 
@@ -117,29 +139,6 @@ Preprocessing <- function(Input_data,
 
   Input_data <- as.matrix(mutate_all(as.data.frame(Input_data), function(x) as.numeric(as.character(x))))
 
-
-
-  #############################################
-  ### ### ### Create output folders ### ### ###
-  
-  # This searches for a folder called "Results" within the current working directory and if its not found it creates one
-  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  Results_folder_Preprocessing_folder = paste(Results_folder, "/Preprocessing", sep = "")
-  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
-  # Create Outlier_Detection directory
-  Results_folder_Preprocessing_Outlier_detection_folder = paste(Results_folder_Preprocessing_folder, "/Outlier_detection", sep =  "")
-  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}  # check and create folder
-  # Create Quality_Control_PCA directory
-  if (ExportQCPlots ==  TRUE){
-    Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = paste(Results_folder_Preprocessing_folder, "/Quality_Control_PCA", sep =  "")
-    if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}  # check and create folder
-  }
-  
-  #####################################################
-  ### ### ### make output plot save_as name ### ### ###
-  Save_as = deparse(substitute(Save_as))
 
   #########################################
   ### ### ### Feature filtering ### ### ###
@@ -233,11 +232,12 @@ Preprocessing <- function(Input_data,
     filtered_matrix <- as.data.frame(Input_data)
   }
 
-
   filtered_matrix <- as.matrix(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
+  
   
   ################################################
   ### ### ###Zero variance metabolites ### ### ###
+  
   filtered_matrix <- filtered_matrix %>% as.data.frame()
   zero_var_metabs <- filtered_matrix[, sapply(filtered_matrix, var,na.rm =  TRUE) ==  0] %>% colnames()
   zero_var_metabs <- paste(zero_var_metabs, collapse = ', ')
@@ -248,6 +248,7 @@ Preprocessing <- function(Input_data,
   zero_var_removed <- filtered_matrix[, sapply(filtered_matrix, var,na.rm  =  TRUE) !=  0]
   filtered_matrix <- zero_var_removed
   
+  
   ################################################
   ### ### ### Missing value Imputation ### ### ###
 
@@ -256,6 +257,7 @@ Preprocessing <- function(Input_data,
   # Check if a metabolite has very small changes
   #which(apply(NA_removed_matrix,2,sd)<1)
 
+  
   #######################################################
   ### ### ### Total Ion Current Normalization ### ### ###
 
@@ -296,12 +298,11 @@ Preprocessing <- function(Input_data,
     }
   }
   
-  
   data_norm <- Data_TIC %>% as.data.frame()
 
   
   ################################################
-  ### ### ### Sample outlier filtering ### ### ###
+  ### ### ### Sample outlier identification ### ### ###
 
   message("Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.")
   
@@ -348,7 +349,6 @@ Preprocessing <- function(Input_data,
       scale_x_continuous(paste("PC1 ",summary(PCA.res)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(PCA.res)$importance[2,][[2]]*100,"%"))
     
-
     
     plot(pca_outlier)
     outlier_plot_list[[k]] <- recordPlot()
@@ -464,7 +464,8 @@ Preprocessing <- function(Input_data,
   }
   dev.off()
 
-  # Print outlier result
+  
+  # Print Outlier detection results about samples and metabolites
   if(length(sample_outliers)>0){
     message("There are sample outliers that were removed from the data") #This was a warning
     for (i in 1:length(sample_outliers)  ){
@@ -484,22 +485,13 @@ Preprocessing <- function(Input_data,
       count = count +1
     }
   }
+  write.table(zero_var_metab_export_df,row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
   
-  write.table(zero_var_metab_export_df,row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  ""))
-  
-  
-  
-  if(length(metabolite_zero_var_total_list)>0){
-    message("There are sample outliers that were removed from the data") #This was a warning
-    for (i in 1:length(sample_outliers)  ){
-      message("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
-    }
-  }else{message("No sample outliers were found")}
   
   #############################################
   ### ### ### Make Output Dataframe ### ### ###
   
-  ###   make outlier columns and add them to output dataframe ### 
+  # Make outlier columns and add them to output dataframe
   total_outliers <- hash::hash() # make a dictionary
   # Create columns with outliers to merge to output dataframe
   if(length(sample_outliers)>0){
@@ -533,7 +525,7 @@ Preprocessing <- function(Input_data,
   ################################################
   ### ### ### Quality Control (QC) PCA ### ### ###
 
-  QC_PCA_data <- Data_TIC
+  QC_PCA_data <- Data_TIC %>% as.data.frame()
   QC_PCA_data$Conditions <- Experimental_design$Conditions
   if (is.null(Experimental_design$Biological_Replicates) != TRUE){
     QC_PCA_data$Biological_Replicates <-  as.character(Experimental_design$Biological_Replicates)
