@@ -20,12 +20,12 @@
 
 #' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
 #'
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param Conditon1 Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".
 #' @param Conditon2 Input needs to contain a column named "Condition" including Condition2 that is compared to Condition1, e.g. "WT".
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
-#' @param OutputName String which is added to the output files of the DMA
+#' @param OutputName String which is added to the output files of the DMA.
 #' @param Input_Pathways \emph{Optional: } DF which contains the pathway information for each metabolite. \strong{NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}

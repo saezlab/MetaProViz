@@ -4,16 +4,16 @@
 #'
 #' This script allows you to perform differential metabolite analysis
 #'
-#' @param Input_data1 Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns
-#' @param Input_data2 Dataframe same as Input_data1 for another comparison
-#' @param Output_Name String which is added to the output files of the Metabolic Clusters
-#' @param Condition1 String which contains the name of the first condition
-#' @param Condition2 String which contains the name of the second condition
-#' @param pCutoff Number of the desired p value cutoff for assessing significance
-#' @param FCcutoff Number of the desired log fold change cutoff for assessing significance
-#' @param test String which selects pvalue or padj for significance
-#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
+#' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns.
+#' @param Input_data2 Dataframe same as Input_data for another comparison.
+#' @param Output_Name String which is added to the output files of the Metabolic Clusters.
+#' @param Condition1 String which contains the name of the first condition.
+#' @param Condition2 String which contains the name of the second condition.
+#' @param pCutoff Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
+#' @param FCcutoff Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param test String which selects pvalue or padj for significance.  \strong{Default = padj}
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
+#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
 #'
 #'
@@ -25,7 +25,7 @@
 ### ### ### Metabolic Cluster Analysis ### ### ###
 ##################################################
 
-MCA <- function(Input_data1,
+MCA <- function(Input_data,
                 Input_data2,
                 Output_Name = "",
                 Condition1,
@@ -48,9 +48,8 @@ MCA <- function(Input_data1,
   
   
   ## ------------ Check Input files ----------- ##
-  `%notin%` <- Negate(`%in%`) # Create a 'not in' function
-  for(Input_data in list(Input_data1, Input_data2)){
-    if(any(duplicated(row.names(Input_data)))==TRUE){
+  for(data in list(Input_data, Input_data2)){
+    if(any(duplicated(row.names(data)))==TRUE){
       stop("Duplicated row.names of Input_data, whilst row.names must be unique")
     } 
   }
@@ -63,8 +62,8 @@ MCA <- function(Input_data1,
   if(test != "p.val" & test != "p.adj" ){
     stop("Check input. The selected test option for assessing significance is not valid. Please select one of the following: p.adj, p.val.")
   }
-  for(Input_data in list(Input_data1, Input_data2)){
-    if(test %notin% colnames(Input_data)){
+  for(Input_data in list(Input_data, Input_data2)){
+    if(test %in% colnames(Input_data) == FALSE){
       stop("Check Input data. There is no column ", test, " for assessing significance.")
     } 
   }
@@ -75,7 +74,7 @@ MCA <- function(Input_data1,
     stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
   }
   Save_as_options <- c("svg","pdf")
-  if(Save_as %notin% Save_as_options){
+  if(Save_as %in% Save_as_options == FALSE){
     stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
   }
   
@@ -95,7 +94,7 @@ MCA <- function(Input_data1,
     
     Name = paste0("MCA_Output_",gsub(" ", "_",Condition1),"_with_",gsub(" ", "_",Condition2), sep = "")
     
-    C1 <- Input_data1
+    C1 <- Input_data
     C1 <- na.omit(C1)
     C2 <- Input_data2
     C2 <- na.omit(C2)
@@ -214,7 +213,7 @@ MCA <- function(Input_data1,
   }else{ #  else if(CoRe == FALSE){
     Name = paste0("MCA_Output_",gsub(" ", "_",Condition1),"_with_",gsub(" ", "_",Condition2), sep = "")
     
-    C1 <- Input_data1
+    C1 <- Input_data
     C1 <- na.omit(C1)
     C1$class <- paste (Condition1)
     C2 <- Input_data2

@@ -32,13 +32,13 @@
 #' @param Shape \emph{Optional: }String which contains the name of the output file of the Metabolic Clusters
 #' @param Show_Loadings  \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling  \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param Theme \emph{Optional: }
+# @param  Palette \emph{Optional: } ??
+#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
 #' 
 #' @keywords PCA
 #' @export
-
 
 PCA <- function(Input_data, 
                 Color = FALSE, 
@@ -100,6 +100,8 @@ PCA <- function(Input_data,
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
   Results_folder_plots_PCA_folder = file.path(Results_folder, "PCA")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
   if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}  # check and create folder
+  
+  
   
   ### select plot based on arguments
   #1
@@ -656,8 +658,12 @@ PCA <- function(Input_data,
 }
 
 
-#Notes
-#  The x=0 and y=0 black lines in PCA will always be there regardless the theme change. I cannot yet make it to be there by default and not be there when you change theme.
+##------- How to use -------##
+# PCA(Input_data = preprocessing_output_Intra$Processed_data)
+# PCA(Input_data = preprocessing_output_Intra$Processed_data, Color = "Conditions",  Shape = "Symbols_for_PCA")
+
+# Notes
+# The x=0 and y=0 black lines in PCA will always be there regardless the theme change. I cannot yet make it to be there by default and not be there when you change theme.
 # Well It can be done but it requires a lot additional of work. So for now the lines will be there
 # Palette changing is still missing
 # To do: select a better palette and add option to the user to change the palette to whatever they like
@@ -666,43 +672,134 @@ PCA <- function(Input_data,
 
 
 
-
-
-
 #####################################
 ### ### ### Volcano Plots ### ### ###
 #####################################
-#' Notes.
-#' careful with x and y limits.
-#' save as pdf or png user decides
-#' save in results_volcano plots, and then plots
-#' also after normal volcano add volcano multiple that it plots 2 plots together i.e. c1vsko1 and c2vsko2 in the same plots
-#' Change the shapes to something normal
 
-Volcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FCcutoff=0.5, OutputPlotName= 'PCAftw', Theme=theme_classic(),
-                             xlab =NULL, ylab=NULL, data2=NULL, Cond1name="Comparisson 1", Cond2name="Comparisson 2", connectors = FALSE, Save_as = svg){
+#' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns.
+#' @param test String which selects pvalue or padj for significance. \strong{Default = padj}
+#' @param pCutoff Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
+#' @param FCcutoff Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param Output_Name String which is added to the output files of the Metabolic Clusters.
+#' @param Input_Pathways \emph{Optional: } DF which contains a 'Metabolite' and a 'Pathway' columns, with pathway information for each metabolite. It can be the same as Input_data or another dataFrame. \strong{Default = NULL}
+#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
+#' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
+#' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
+#' @param Input_data2 Dataframe same as Input_data1 for another comparison.
+#' @param Cond1name \emph{Optional: } String with name of the first Input_data when use 2 Input_datasets. \strong{Default = Comparisson 1}
+#' @param Cond2name \emph{Optional: } String with name of the second Input_data when use 2 Input_datasets. \strong{Default = Comparisson 2}
+#' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
+#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
+#' 
+#' @keywords Volcano plot, pathways
+#' @export
+
+Volcano <- function(Input_data,
+                   test = "p.adj", 
+                   pCutoff = 0.05 ,
+                   FCcutoff = 0.5, 
+                   OutputPlotName = '', 
+                   Input_Pathways = NULL, 
+                   Theme = theme_classic(),
+                   xlab = NULL, 
+                   ylab = NULL, 
+                   Input_data2 = NULL, 
+                   Cond1name="Comparisson 1", 
+                   Cond2name="Comparisson 2", 
+                   Connectors = FALSE, 
+                   Save_as = "svg"
+){
+  
+  
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", "EnhancedVolcano")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
   
   
   
-  ####################################################
-  # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  ### Create Volcano plots folder in  result directory ###
-  Results_folder_plots_Volcano_folder = paste(Results_folder,"/Volcano",  sep="")
-  if (!dir.exists(Results_folder_plots_Volcano_folder)) {dir.create(Results_folder_plots_Volcano_folder)}
+  ## ------------ Check Input files ----------- ##
+  for(data in list(Input_data, Input_data2)){
+    if(any(duplicated(row.names(data)))==TRUE){
+      stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+    } 
+  }
+  if(is.null(Input_data2)){
+    if("Metabolite" %in% colnames(data) == FALSE){
+      stop("Check Input. Metabolite column is missing from Input_data")
+    }
+  }else{
+    for(data in list(Input_data, Input_data2)){
+      if(test %in% colnames(data) == FALSE){
+        stop("Check Input data. There is no column ", test, " for assessing significance.")
+      } 
+    }
+  }
+  if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
+    stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
+  }
+  if( is.numeric(FCcutoff)== FALSE  | FCcutoff < 0){
+    stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
+  }
+  if(test != "p.val" & test != "p.adj" ){
+    stop("Check input. The selected test option for assessing significance is not valid. Please select one of the following: p.adj, p.val.")
+  }
+  if(is.null(Input_data2)){
+    if(test %in% colnames(Input_data) == FALSE){
+      stop("Check Input data. There is no column ", test, " for assessing significance.")
+    } 
+  }else{
+    for(data in list(Input_data, Input_data2)){
+      if(test %in% colnames(data) == FALSE){
+        stop("Check Input data. There is no column ", test, " for assessing significance.")
+      } 
+    }
+  }
+  if(is.logical(Connectors) == FALSE){
+    stop("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
+  }
+  Save_as_options <- c("svg","pdf")
+  if(Save_as %in% Save_as_options == FALSE){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+  if(is.null(Input_Pathways) == FALSE){
+    if("Metabolite" %in% colnames(Input_Pathways) == FALSE){
+      stop("Check Input. Metabolite column is missing from Input_data")
+    }
+    if("Pathway" %in% colnames(Input_Pathways) == FALSE){
+      stop("Check Input. Pathway column is missing from Input_Pathways")
+    }
+    if(identical(sort(Input_data$Metabolite), sort(Input_Pathways$Metabolite)) == FALSE){
+      warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_Pathways. We will take into consideration only the common Metabolites.")
+      # find common metabolites
+      common_metabolites <- Input_data[Input_data$Metabolite %in% Input_Pathways$Metabolite, "Metabolite"]
+      # Take the data that have both pval reslults and pathwayss
+      Input_data <- Input_data %>% filter(Metabolite %in%common_metabolites)
+      Input_Pathways <- Input_Pathways %>% filter(Metabolite %in%common_metabolites)
+    }
+    safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000","gold1","darkorchid4","red","orange")
+  }
   
   
-  #####################################################
-  ### ### ### make output plot save_as name ### ### ###
-  Save_as= deparse(substitute(Save_as))
+  
+  ## ------------ Create Output folders ----------- ##
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) 
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+  Results_folder_plots_Volcano_folder = file.path(Results_folder, "Volcano")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+  if (!dir.exists(Results_folder_plots_Volcano_folder)) {dir.create(Results_folder_plots_Volcano_folder)}  # check and create folder
+  
+  
   
   Multiple = FALSE
-  if(is.null(data2)!="TRUE"){
+  if(is.null(Input_data2)!="TRUE"){
     Multiple = TRUE
   }
   
-  if(Multiple == FALSE & pathway==FALSE){
+  
+  if(Multiple == FALSE & is.null(Input_Pathways) == TRUE){
     if(test=="p.adj"){
       # Change plot labs if the user has put the input
       if(is.null(xlab)){
@@ -711,41 +808,40 @@ Volcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FC
       if(is.null(ylab)){
         ylab=bquote(~-Log[10]~p.adj)
       }
-      Plot<- EnhancedVolcano (data,
-                              lab = data$Metabolite,#Metabolite name
-                              x = "Log2FC",#Log2FC
-                              y = "p.adj",#p-value or q-value
-                              xlab  =xlab,
-                              ylab =ylab,#(~-Log[10]~adjusted~italic(P))
-                              pCutoff = pCutoff,
-                              FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                              pointSize = 3,
-                              labSize = 3,
-                              titleLabSize = 16,
-                              # colCustom = c("black", "grey", "grey", "red"),
-                              colAlpha = 1,
-                              title= paste(OutputPlotName),
-                              subtitle = bquote(italic("Differential metabolomics analysis")),
-                              caption = paste0("total = ", nrow(data), " Metabolites"),
-                              # xlim = c((ceiling(Reduce(min,data$Log2FC))-0.2),(ceiling(Reduce(max,data$Log2FC))+0.2)),
-                              
-                              xlim =  c(min(data$Log2FC[is.finite(data$Log2FC )])-0.2,max(data$Log2FC[is.finite(data$Log2FC )])+0.2  ),
-                              
-                              ylim = c(0,(ceiling(-log10(Reduce(min,data$p.adj))))),
-                              cutoffLineType = "dashed",
-                              cutoffLineCol = "black",
-                              cutoffLineWidth = 0.5,
-                              legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                              legendPosition = 'right',
-                              legendLabSize = 8,
-                              legendIconSize =4,
-                              gridlines.major = FALSE,
-                              gridlines.minor = FALSE,
-                              drawConnectors = connectors)
+      Plot<- EnhancedVolcano::EnhancedVolcano (Input_data,
+                                               lab = Input_data$Metabolite,#Metabolite name
+                                               x = "Log2FC",#Log2FC
+                                               y = "p.adj",#p-value or q-value
+                                               xlab  =xlab,
+                                               ylab =ylab,#(~-Log[10]~adjusted~italic(P))
+                                               pCutoff = pCutoff,
+                                               FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                               pointSize = 3,
+                                               labSize = 3,
+                                               titleLabSize = 16,
+                                               # colCustom = c("black", "grey", "grey", "red"),
+                                               colAlpha = 1,
+                                               title= paste(OutputPlotName),
+                                               subtitle = bquote(italic("Differential metabolomics analysis")),
+                                               caption = paste0("total = ", nrow(Input_data), " Metabolites"),
+                                               # xlim = c((ceiling(Reduce(min,Input_data$Log2FC))-0.2),(ceiling(Reduce(max,Input_data$Log2FC))+0.2)),
+                                               
+                                               xlim =  c(min(Input_data$Log2FC[is.finite(Input_data$Log2FC )])-0.2,max(Input_data$Log2FC[is.finite(Input_data$Log2FC )])+0.2  ),
+                                               
+                                               ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.adj))))),
+                                               cutoffLineType = "dashed",
+                                               cutoffLineCol = "black",
+                                               cutoffLineWidth = 0.5,
+                                               legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                               legendPosition = 'right',
+                                               legendLabSize = 8,
+                                               legendIconSize =4,
+                                               gridlines.major = FALSE,
+                                               gridlines.minor = FALSE,
+                                               drawConnectors = Connectors)
       Plot <- Plot+Theme
-     # ggsave(file=paste(Results_folder_plots_Volcano_folder, "/", OutputPlotName, ".", Save_as, sep=""), plot=Plot, width=12, height=9)
       
-    }else if(test=="p.val"){
+    }else{ # else if(test=="p.val"){
       # Change plot labs if the user has put the input
       if(is.null(xlab)){
         xlab=bquote(~Log[2]~ FC)
@@ -753,342 +849,329 @@ Volcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FC
       if(is.null(ylab)){
         ylab=bquote(~-Log[10]~p.val)
       }
-      Plot<- EnhancedVolcano (data,
-                              lab = data$Metabolite,#Metabolite name
-                              x = "Log2FC",#Log2FC
-                              y = "p.val",#p-value or q-value
-                              xlab = xlab,
-                              ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                              pCutoff = pCutoff,
-                              FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                              pointSize = 3,
-                              labSize = 3,
-                              titleLabSize = 16,
-                              #    colCustom = c("black", "grey", "grey", "red"),
-                              colAlpha = 1,
-                              title= paste(OutputPlotName),
-                              subtitle = bquote(italic("Differential metabolomics analysis")),
-                              caption = paste0("total = ", nrow(data), " Metabolites"),
-                              #xlim = c((ceiling(Reduce(min,data$Log2FC))-0.2),(ceiling(Reduce(max,data$Log2FC))+0.2)),
-                              xlim =  c(min(data$Log2FC[is.finite(data$Log2FC )])-0.2,max(data$Log2FC[is.finite(data$Log2FC )])+0.2  ),
-                              ylim = c(0,(ceiling(-log10(Reduce(min,data$p.val))))),
-                              cutoffLineType = "dashed",
-                              cutoffLineCol = "black",
-                              cutoffLineWidth = 0.5,
-                              legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                              legendPosition = 'right',
-                              legendLabSize = 8,
-                              legendIconSize =4,
-                              gridlines.major = FALSE,
-                              gridlines.minor = FALSE,
-                              drawConnectors = connectors)
+      Plot<- EnhancedVolcano::EnhancedVolcano (Input_data,
+                                               lab = Input_data$Metabolite,#Metabolite name
+                                               x = "Log2FC",#Log2FC
+                                               y = "p.val",#p-value or q-value
+                                               xlab = xlab,
+                                               ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                               pCutoff = pCutoff,
+                                               FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                               pointSize = 3,
+                                               labSize = 3,
+                                               titleLabSize = 16,
+                                               #    colCustom = c("black", "grey", "grey", "red"),
+                                               colAlpha = 1,
+                                               title= paste(OutputPlotName),
+                                               subtitle = bquote(italic("Differential metabolomics analysis")),
+                                               caption = paste0("total = ", nrow(Input_data), " Metabolites"),
+                                               #xlim = c((ceiling(Reduce(min,Input_data$Log2FC))-0.2),(ceiling(Reduce(max,Input_data$Log2FC))+0.2)),
+                                               xlim =  c(min(Input_data$Log2FC[is.finite(Input_data$Log2FC )])-0.2,max(Input_data$Log2FC[is.finite(Input_data$Log2FC )])+0.2  ),
+                                               ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.val))))),
+                                               cutoffLineType = "dashed",
+                                               cutoffLineCol = "black",
+                                               cutoffLineWidth = 0.5,
+                                               legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                               legendPosition = 'right',
+                                               legendLabSize = 8,
+                                               legendIconSize =4,
+                                               gridlines.major = FALSE,
+                                               gridlines.minor = FALSE,
+                                               drawConnectors = Connectors)
       Plot <- Plot+Theme
-     # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as , sep=""), plot=Plot, width=12, height=9)
+      
+    }
+  }
+  else if(Multiple == FALSE & is.null(Input_Pathways) == FALSE){
+    if(test=="p.adj"){
+      # Change plot labs if the user has put the input
+      if(is.null(xlab)){
+        xlab=bquote(~Log[2]~ FC)
+      }
+      if(is.null(ylab)){
+        ylab=bquote(~-Log[10]~p.adj)
+      }
+      
+      if(is.null(Input_data$Pathway) == FALSE){
+        Input_data$Pathway <- NULL
+      }
+      
+      
+      Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      DMA_Input_PathwaysPlot_IEC <- merge(Input_data,Input_Pathways, by = "Metabolite" )
+      DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+      
+      
+      #Make a list of metabolites that we want to see on the plot:
+      Labels <- subset(DMA_Input_PathwaysPlot_IEC, Pathway != "unknown")
+      Labels <-Labels[,1]
+      
+      #Prepare new colour scheme:
+      # Take colors for pathways
+      safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+      
+      keyvals <- c()
+      
+      for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
+        keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
+        names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        
+        keyvals <- c(keyvals, keyval)
+      }
+      
+      
+      #Plot
+      Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
+                                               lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+                                               selectLab =Labels,
+                                               x = "Log2FC",#Log2FC
+                                               y = "p.adj",#p-value or q-value
+                                               xlab = xlab,
+                                               ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                               pCutoff = pCutoff,
+                                               FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                               pointSize = 3,
+                                               labSize = 3,
+                                               titleLabSize = 16,
+                                               colCustom = keyvals,
+                                               colAlpha = 1,
+                                               title= paste(OutputPlotName),
+                                               subtitle = bquote(italic("Differential metabolomics analysis")),
+                                               caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
+                                               # xlim = c((ceiling(Reduce(min,Input_data$Log2FC))-0.2),(ceiling(Reduce(max,Input_data$Log2FC))+0.2)),
+                                               xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                               ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.adj))))),
+                                               #xlim = c(-5,10),
+                                               #ylim = c(0,65),
+                                               #drawConnectors = TRUE,
+                                               #widthConnectors = 0.5,
+                                               #colConnectors = "black",
+                                               #arrowheads=FALSE,
+                                               cutoffLineType = "dashed",
+                                               cutoffLineCol = "black",
+                                               cutoffLineWidth = 0.5,
+                                               legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                               legendPosition = 'right',
+                                               legendLabSize = 8,
+                                               legendIconSize =4,
+                                               gridlines.major = FALSE,
+                                               gridlines.minor = FALSE,
+                                               drawConnectors = Connectors)
+      Plot <- Plot+Theme  + labs(color='Input_Pathways') +
+        guides(color = guide_legend(title = "Pathway"))
+      
+      
+    }else{ # else if(test=="p.val"){
+      # Change plot labs if the user has put the input
+      if(is.null(xlab)){
+        xlab=bquote(~Log[2]~ FC)
+      }
+      if(is.null(ylab)){
+        ylab=bquote(~-Log[10]~p.val)
+      }
+      Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      DMA_Input_PathwaysPlot_IEC <- merge(Input_data,Input_Pathways, by = "Metabolite" )
+      DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+      
+      
+      #Make a list of metabolites that we want to see on the plot:
+      Labels <- subset(DMA_Input_PathwaysPlot_IEC, Pathway != "Other")
+      Labels <-Labels[,1]
+      
+      #Prepare new colour scheme:
+      # Take colors for pathways
+      safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+      
+      keyvals <- c()
+      
+      for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
+        keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
+        names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        
+        keyvals <- c(keyvals, keyval)
+      }
+      
+      #Plot
+      Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
+                                               lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+                                               selectLab =Labels,
+                                               x = "Log2FC",#Log2FC
+                                               y = "p.val",#p-value or q-value
+                                               xlab = xlab,
+                                               ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                               pCutoff = pCutoff,
+                                               FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                               pointSize = 3,
+                                               labSize = 3,
+                                               titleLabSize = 16,
+                                               colCustom = keyvals,
+                                               colAlpha = 1,
+                                               title= paste(OutputPlotName),
+                                               subtitle = bquote(italic("Differential metabolomics analysis")),
+                                               caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
+                                               #xlim = c((ceiling(Reduce(min,Input_data$Log2FC))-0.2),(ceiling(Reduce(max,Input_data$Log2FC))+0.2)),
+                                               xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                               ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.val))))),
+                                               #xlim = c(-5,10),
+                                               #ylim = c(0,65),
+                                               #drawConnectors = TRUE,
+                                               #widthConnectors = 0.5,
+                                               #colConnectors = "black",
+                                               #arrowheads=FALSE,
+                                               cutoffLineType = "dashed",
+                                               cutoffLineCol = "black",
+                                               cutoffLineWidth = 0.5,
+                                               legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                               legendPosition = 'right',
+                                               legendLabSize = 8,
+                                               legendIconSize =4,
+                                               gridlines.major = FALSE,
+                                               gridlines.minor = FALSE,
+                                               drawConnectors = Connectors)
+      Plot <- Plot+Theme
+      #  ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
+      
+    }
+  }
+  else if(Multiple == TRUE & is.null(Input_Pathways) == TRUE){
     
-    }else{
-      print("Please select a significance test p.val or p.adj")
-    }
-  }else if(Multiple == FALSE & pathway==TRUE){
-    if(test=="p.adj"){
-      # Change plot labs if the user has put the input
-      if(is.null(xlab)){
-        xlab=bquote(~Log[2]~ FC)
-      }
-      if(is.null(ylab)){
-        ylab=bquote(~-Log[10]~p.adj)
-      }
-      DMA_PathwaysPlot_IEC <- data
-      
-      #Make a list of metabolites that we want to see on the plot:
-      Labels <- subset(DMA_PathwaysPlot_IEC,DMA_PathwaysPlot_IEC$Pathway != "unknown")
-      Labels <-Labels[,1]
-      
-      #Prepare new colour scheme:
-      keyvals <- ifelse(
-        DMA_PathwaysPlot_IEC$Pathway == "amino acid and conjugate", "blue",
-        ifelse(DMA_PathwaysPlot_IEC$Pathway == "glycolysis and PPP", "red",
-               ifelse(DMA_PathwaysPlot_IEC$Pathway == "long chain acylcarnitine", "gold4",
-                      ifelse(DMA_PathwaysPlot_IEC$Pathway == "nucleotides", "seagreen",
-                             ifelse(DMA_PathwaysPlot_IEC$Pathway == "purine metabolism", "darkorchid1",
-                                    ifelse(DMA_PathwaysPlot_IEC$Pathway == "pyrimidine metabolism", "darkorchid4",
-                                           ifelse(DMA_PathwaysPlot_IEC$Pathway == "redox homeostasis", "orange",
-                                                  ifelse(DMA_PathwaysPlot_IEC$Pathway == "short chain acylcarnitine", "gold1",
-                                                         ifelse(DMA_PathwaysPlot_IEC$Pathway == "medium chain carnitine", "gold3",
-                                                                ifelse(DMA_PathwaysPlot_IEC$Pathway == "TCA cycle", "firebrick4",
-                                                                       "gray"))))))))))
-                                                                       keyvals[is.na(keyvals)] <- 'gray'
-                                                                         names(keyvals)[keyvals == 'gray'] <- 'Other'
-                                                                         names(keyvals)[keyvals == 'blue'] <- "Amino acid and Conjugates"
-                                                                         names(keyvals)[keyvals == 'red'] <- "Glycolysis and PPP"
-                                                                         names(keyvals)[keyvals == 'gold4'] <- "Long chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'seagreen'] <- "Nucleotides"
-                                                                         names(keyvals)[keyvals == 'darkorchid1'] <- "Purine metabolism"
-                                                                         names(keyvals)[keyvals == 'darkorchid4'] <- "Pyrimidine metabolism"
-                                                                         names(keyvals)[keyvals == 'orange'] <- "Redox homeostasis"
-                                                                         names(keyvals)[keyvals == 'gold1'] <- "Short chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'firebrick4'] <- "TCA cycle"
-                                                                         names(keyvals)[keyvals == 'gold3'] <- "Medium chain Carnitines"
-                                                                         
-                                                                         #Plot
-                                                                         Plot<- EnhancedVolcano (DMA_PathwaysPlot_IEC,
-                                                                                                 lab = DMA_PathwaysPlot_IEC$Metabolite,#Metabolite name
-                                                                                                 selectLab =Labels,
-                                                                                                 x = "Log2FC",#Log2FC
-                                                                                                 y = "p.adj",#p-value or q-value
-                                                                                                 xlab = xlab,
-                                                                                                 ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                                                                                                 pCutoff = pCutoff,
-                                                                                                 FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                                                                                                 pointSize = 3,
-                                                                                                 labSize = 3,
-                                                                                                 titleLabSize = 16,
-                                                                                                 colCustom = keyvals,
-                                                                                                 colAlpha = 1,
-                                                                                                 title= paste(OutputPlotName),
-                                                                                                 subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                                                                 caption = paste0("total = ", nrow(DMA_PathwaysPlot_IEC), " Metabolites"),
-                                                                                                 # xlim = c((ceiling(Reduce(min,data$Log2FC))-0.2),(ceiling(Reduce(max,data$Log2FC))+0.2)),
-                                                                                                 xlim =  c(min(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])+0.2  ),
-                                                                                                 ylim = c(0,(ceiling(-log10(Reduce(min,data$p.adj))))),
-                                                                                                 #xlim = c(-5,10),
-                                                                                                 #ylim = c(0,65),
-                                                                                                 #drawConnectors = TRUE,
-                                                                                                 #widthConnectors = 0.5,
-                                                                                                 #colConnectors = "black",
-                                                                                                 #arrowheads=FALSE,
-                                                                                                 cutoffLineType = "dashed",
-                                                                                                 cutoffLineCol = "black",
-                                                                                                 cutoffLineWidth = 0.5,
-                                                                                                 legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                                                                                                 legendPosition = 'right',
-                                                                                                 legendLabSize = 8,
-                                                                                                 legendIconSize =4,
-                                                                                                 gridlines.major = FALSE,
-                                                                                                 gridlines.minor = FALSE,
-                                                                                                 drawConnectors = connectors)
-                                                                         Plot <- Plot+Theme  + labs(color='Pathway') 
-                                                                       #  ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as , sep=""), plot=Plot, width=12, height=9)
-                                                                        
-    }else if(test=="p.val"){
-      # Change plot labs if the user has put the input
-      if(is.null(xlab)){
-        xlab=bquote(~Log[2]~ FC)
-      }
-      if(is.null(ylab)){
-        ylab=bquote(~-Log[10]~p.val)
-      }
-      DMA_PathwaysPlot_IEC <- data
-      
-      #Make a list of metabolites that we want to see on the plot:
-      Labels <- subset(DMA_PathwaysPlot_IEC,DMA_PathwaysPlot_IEC$Pathway != "unknown")
-      Labels <-Labels[,1]
-      
-      #Prepare new colour scheme:
-      keyvals <- ifelse(
-        DMA_PathwaysPlot_IEC$Pathway == "amino acid and conjugate", "blue",
-        ifelse(DMA_PathwaysPlot_IEC$Pathway == "glycolysis and PPP", "red",
-               ifelse(DMA_PathwaysPlot_IEC$Pathway == "long chain acylcarnitine", "gold4",
-                      ifelse(DMA_PathwaysPlot_IEC$Pathway == "nucleotides", "seagreen",
-                             ifelse(DMA_PathwaysPlot_IEC$Pathway == "purine metabolism", "darkorchid1",
-                                    ifelse(DMA_PathwaysPlot_IEC$Pathway == "pyrimidine metabolism", "darkorchid4",
-                                           ifelse(DMA_PathwaysPlot_IEC$Pathway == "redox homeostasis", "orange",
-                                                  ifelse(DMA_PathwaysPlot_IEC$Pathway == "short chain acylcarnitine", "gold1",
-                                                         ifelse(DMA_PathwaysPlot_IEC$Pathway == "medium chain carnitine", "gold3",
-                                                                ifelse(DMA_PathwaysPlot_IEC$Pathway == "TCA cycle", "firebrick4",
-                                                                       "gray"))))))))))
-                                                                       keyvals[is.na(keyvals)] <- 'gray'
-                                                                         names(keyvals)[keyvals == 'gray'] <- 'Other'
-                                                                         names(keyvals)[keyvals == 'blue'] <- "Amino acid and Conjugates"
-                                                                         names(keyvals)[keyvals == 'red'] <- "Glycolysis and PPP"
-                                                                         names(keyvals)[keyvals == 'gold4'] <- "Long chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'seagreen'] <- "Nucleotides"
-                                                                         names(keyvals)[keyvals == 'darkorchid1'] <- "Purine metabolism"
-                                                                         names(keyvals)[keyvals == 'darkorchid4'] <- "Pyrimidine metabolism"
-                                                                         names(keyvals)[keyvals == 'orange'] <- "Redox homeostasis"
-                                                                         names(keyvals)[keyvals == 'gold1'] <- "Short chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'firebrick4'] <- "TCA cycle"
-                                                                         names(keyvals)[keyvals == 'gold3'] <- "Medium chain Carnitines"
-                                                                         
-                                                                         #Plot
-                                                                         Plot<- EnhancedVolcano (DMA_PathwaysPlot_IEC,
-                                                                                                 lab = DMA_PathwaysPlot_IEC$Metabolite,#Metabolite name
-                                                                                                 selectLab =Labels,
-                                                                                                 x = "Log2FC",#Log2FC
-                                                                                                 y = "p.val",#p-value or q-value
-                                                                                                 xlab = xlab,
-                                                                                                 ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                                                                                                 pCutoff = pCutoff,
-                                                                                                 FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                                                                                                 pointSize = 3,
-                                                                                                 labSize = 3,
-                                                                                                 titleLabSize = 16,
-                                                                                                 colCustom = keyvals,
-                                                                                                 colAlpha = 1,
-                                                                                                 title= paste(OutputPlotName),
-                                                                                                 subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                                                                 caption = paste0("total = ", nrow(DMA_PathwaysPlot_IEC), " Metabolites"),
-                                                                                                 #xlim = c((ceiling(Reduce(min,data$Log2FC))-0.2),(ceiling(Reduce(max,data$Log2FC))+0.2)),
-                                                                                                 xlim =  c(min(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])+0.2  ),
-                                                                                                 ylim = c(0,(ceiling(-log10(Reduce(min,data$p.val))))),
-                                                                                                 #xlim = c(-5,10),
-                                                                                                 #ylim = c(0,65),
-                                                                                                 #drawConnectors = TRUE,
-                                                                                                 #widthConnectors = 0.5,
-                                                                                                 #colConnectors = "black",
-                                                                                                 #arrowheads=FALSE,
-                                                                                                 cutoffLineType = "dashed",
-                                                                                                 cutoffLineCol = "black",
-                                                                                                 cutoffLineWidth = 0.5,
-                                                                                                 legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                                                                                                 legendPosition = 'right',
-                                                                                                 legendLabSize = 8,
-                                                                                                 legendIconSize =4,
-                                                                                                 gridlines.major = FALSE,
-                                                                                                 gridlines.minor = FALSE,
-                                                                                                 drawConnectors = connectors)
-                                                                         Plot <- Plot+Theme
-                                                                       #  ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
-                                                                         
-    }else{
-      print("Please select a significance test p.val or p.adj")
-    }
-  }else if(Multiple == TRUE & pathway==FALSE){
-    print("Multiple yes pathway no")
-    InputData_1 <- data
+    Input_data_1 <- Input_data
     Condition_1<- Cond1name
-    InputData_2<- data2
+    Input_data_2<- Input_data2
     Condition_2<-  Cond2name
     
     
     #1. Include a column naming the set Proteomics or RNAseq:
-    InputData_1[,"comparison"]  <- as.character("InputData1")
-    InputData_2[,"comparison"]  <- as.character("InputData2")
+    Input_data_1[,"comparison"]  <- as.character("Input_data1")
+    Input_data_2[,"comparison"]  <- as.character("Input_data2")
     #2. Add the colour:
-    InputData_1[,"colour"]  <- as.character("red")
-    InputData_2[,"colour"]  <- as.character("blue")
+    Input_data_1[,"colour"]  <- as.character("red")
+    Input_data_2[,"colour"]  <- as.character("blue")
     #3. Combine the files
-    Combined_DMA <- rbind(InputData_1,InputData_2)
+    Combined_DMA <- rbind(Input_data_1,Input_data_2)
     #4.Prepare new colour scheme
     keyvals <- ifelse(
       Combined_DMA$colour == "red", "red",
       ifelse(Combined_DMA$colour == "blue", "blue",
              "black"))
-             keyvals[is.na(keyvals)] <- 'black'
-               names(keyvals)[keyvals == 'red'] <- paste(Condition_1)
-               names(keyvals)[keyvals == 'blue'] <- paste(Condition_2)
-               names(keyvals)[keyvals == 'black'] <- 'X'
-               if(test=="p.adj"){
-                 # Change plot labs if the user has put the input
-                 if(is.null(xlab)){
-                   xlab=bquote(~Log[2]~ FC)
-                 }
-                 if(is.null(ylab)){
-                   ylab=bquote(~-Log[10]~p.adj)
-                 }
-                 Plot <- EnhancedVolcano (Combined_DMA,
-                                          lab = Combined_DMA$Metabolite,#Metabolite name
-                                          x = "Log2FC",#Log2FC
-                                          y = "p.adj",#p-value or q-value
-                                          xlab = xlab,
-                                          ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                                          pCutoff = pCutoff,
-                                          FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                                          pointSize = 3,
-                                          labSize = 3,
-                                          colCustom = keyvals,
-                                          titleLabSize = 16,
-                                          col=c("black", "grey", "grey", "purple"),#if you want to change colors
-                                          colAlpha = 1,
-                                          title=paste(OutputPlotName),
-                                          subtitle = bquote(italic("Differential Metabolomics Analysis (DMA)")),
-                                          caption = paste0("total = ", (nrow(Combined_DMA)/2), " Metabolites"),
-                                          xlim =  c(min(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])-0.2,max(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])+0.2  ),
-                                          ylim = c(0,(ceiling(-log10(Reduce(min,Combined_DMA$p.adj))))),
-                                          #drawConnectors = TRUE,
-                                          #widthConnectors = 0.5,
-                                          #colConnectors = "black",
-                                          cutoffLineType = "dashed",
-                                          cutoffLineCol = "black",
-                                          cutoffLineWidth = 0.5,
-                                          legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                                          legendPosition = 'right',
-                                          legendLabSize = 12,
-                                          legendIconSize = 5.0,
-                                          gridlines.major = FALSE,
-                                          gridlines.minor = FALSE,
-                                          drawConnectors = connectors)
-                 Plot <- Plot+Theme
-                # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=8, height=6)
-                
-               }else if(test=="p.val"){
-                 if(is.null(xlab)){
-                   xlab=bquote(~Log[2]~ FC)
-                 }
-                 if(is.null(ylab)){
-                   ylab=bquote(~-Log[10]~p.val)
-                 }
-                 Plot <- EnhancedVolcano (Combined_DMA,
-                                          lab = Combined_DMA$Metabolite,#Metabolite name
-                                          x = "Log2FC",#Log2FC
-                                          y = "p.val",#p-value or q-value
-                                          xlab = xlab,
-                                          ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                                          pCutoff = pCutoff,
-                                          FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                                          pointSize = 3,
-                                          labSize = 3,
-                                          colCustom = keyvals,
-                                          titleLabSize = 16,
-                                          col=c("black", "grey", "grey", "purple"),#if you want to change colors
-                                          colAlpha = 1,
-                                          title=paste(OutputPlotName),
-                                          subtitle = bquote(italic("Differential Metabolomics Analysis (DMA)")),
-                                          caption = paste0("total = ", (nrow(Combined_DMA)/2), " Metabolites"),
-                                          xlim =  c(min(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])-0.2,max(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])+0.2  ),
-                                          ylim = c(0,(ceiling(-log10(Reduce(min,Combined_DMA$p.val))))),
-                                          #drawConnectors = TRUE,
-                                          #widthConnectors = 0.5,
-                                          #colConnectors = "black",
-                                          cutoffLineType = "dashed",
-                                          cutoffLineCol = "black",
-                                          cutoffLineWidth = 0.5,
-                                          legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                                          legendPosition = 'right',
-                                          legendLabSize = 12,
-                                          legendIconSize = 5.0,
-                                          gridlines.major = FALSE,
-                                          gridlines.minor = FALSE,
-                                          drawConnectors = connectors)
-                 Plot <- Plot+Theme
-                # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
-                
-               }else{
-                 print("Please select a significance test p.val or p.adj")
-               }
-  }else if(Multiple == TRUE & pathway==TRUE){
-    print("Multiple yes pathway yes")
-    InputData_1 <- data
+    keyvals[is.na(keyvals)] <- 'black'
+    names(keyvals)[keyvals == 'red'] <- paste(Condition_1)
+    names(keyvals)[keyvals == 'blue'] <- paste(Condition_2)
+    names(keyvals)[keyvals == 'black'] <- 'X'
+    if(test=="p.adj"){
+      # Change plot labs if the user has put the input
+      if(is.null(xlab)){
+        xlab=bquote(~Log[2]~ FC)
+      }
+      if(is.null(ylab)){
+        ylab=bquote(~-Log[10]~p.adj)
+      }
+      Plot <- EnhancedVolcano::EnhancedVolcano (Combined_DMA,
+                                                lab = Combined_DMA$Metabolite,#Metabolite name
+                                                x = "Log2FC",#Log2FC
+                                                y = "p.adj",#p-value or q-value
+                                                xlab = xlab,
+                                                ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                                pCutoff = pCutoff,
+                                                FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                                pointSize = 3,
+                                                labSize = 3,
+                                                colCustom = keyvals,
+                                                titleLabSize = 16,
+                                                col=c("black", "grey", "grey", "purple"),#if you want to change colors
+                                                colAlpha = 1,
+                                                title=paste(OutputPlotName),
+                                                subtitle = bquote(italic("Differential Metabolomics Analysis (DMA)")),
+                                                caption = paste0("total = ", (nrow(Combined_DMA)/2), " Metabolites"),
+                                                xlim =  c(min(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])-0.2,max(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])+0.2  ),
+                                                ylim = c(0,(ceiling(-log10(Reduce(min,Combined_DMA$p.adj))))),
+                                                #drawConnectors = TRUE,
+                                                #widthConnectors = 0.5,
+                                                #colConnectors = "black",
+                                                cutoffLineType = "dashed",
+                                                cutoffLineCol = "black",
+                                                cutoffLineWidth = 0.5,
+                                                legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                                legendPosition = 'right',
+                                                legendLabSize = 12,
+                                                legendIconSize = 5.0,
+                                                gridlines.major = FALSE,
+                                                gridlines.minor = FALSE,
+                                                drawConnectors = Connectors)+
+        guides(color = guide_legend(title = "Comparissons"))
+      Plot <- Plot+Theme
+      # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=8, height=6)
+      
+    }else{ # else if(test=="p.val"){
+      if(is.null(xlab)){
+        xlab=bquote(~Log[2]~ FC)
+      }
+      if(is.null(ylab)){
+        ylab=bquote(~-Log[10]~p.val)
+      }
+      Plot <- EnhancedVolcano::EnhancedVolcano (Combined_DMA,
+                                                lab = Combined_DMA$Metabolite,#Metabolite name
+                                                x = "Log2FC",#Log2FC
+                                                y = "p.val",#p-value or q-value
+                                                xlab = xlab,
+                                                ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                                pCutoff = pCutoff,
+                                                FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                                pointSize = 3,
+                                                labSize = 3,
+                                                colCustom = keyvals,
+                                                titleLabSize = 16,
+                                                col=c("black", "grey", "grey", "purple"),#if you want to change colors
+                                                colAlpha = 1,
+                                                title=paste(OutputPlotName),
+                                                subtitle = bquote(italic("Differential Metabolomics Analysis (DMA)")),
+                                                caption = paste0("total = ", (nrow(Combined_DMA)/2), " Metabolites"),
+                                                xlim =  c(min(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])-0.2,max(Combined_DMA$Log2FC[is.finite(Combined_DMA$Log2FC )])+0.2  ),
+                                                ylim = c(0,(ceiling(-log10(Reduce(min,Combined_DMA$p.val))))),
+                                                #drawConnectors = TRUE,
+                                                #widthConnectors = 0.5,
+                                                #colConnectors = "black",
+                                                cutoffLineType = "dashed",
+                                                cutoffLineCol = "black",
+                                                cutoffLineWidth = 0.5,
+                                                legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                                legendPosition = 'right',
+                                                legendLabSize = 12,
+                                                legendIconSize = 5.0,
+                                                gridlines.major = FALSE,
+                                                gridlines.minor = FALSE,
+                                                drawConnectors = Connectors)
+      Plot <- Plot+Theme
+      # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
+      
+    }
+  }
+  else if(Multiple == TRUE &  is.null(Input_Pathways) == FALSE){
+    Input_data_1 <- Input_data
     Condition_1<- Cond1name
-    InputData_2<- data2
+    Input_data_2<- Input_data2
     Condition_2<-  Cond2name
+    
+    Input_data_1 <- Input_data_1[c("Metabolite","Log2FC", test)]
+    Input_data_2 <- Input_data_2[c("Metabolite","Log2FC", test)]
     
     
     #1. Include a column naming the set Proteomics or RNAseq:
-    InputData_1[,"comparison"]  <- as.character("InputData1")
-    InputData_2[,"comparison"]  <- as.character("InputData2")
+    Input_data_1[,"comparison"]  <- as.character("Input_data1")
+    Input_data_2[,"comparison"]  <- as.character("Input_data2")
     #2. Add the colour:
-    InputData_1[,"shape"]  <- 17
-    InputData_2[,"shape"]  <- 64
+    Input_data_1[,"shape"]  <- 17
+    Input_data_2[,"shape"]  <- 15
     #3. Combine the files
-    Combined_DMA <- rbind(InputData_1,InputData_2)
+    Combined_DMA <- rbind(Input_data_1,Input_data_2)
     #4.Prepare new colour scheme
     keyvalsshape <- ifelse(                  # shape doesnt work
       Combined_DMA$shape == 17, 17,
-      ifelse(Combined_DMA$shape == 64, 64,
+      ifelse(Combined_DMA$shape == 15, 15,
              4))
     keyvalsshape[is.na(keyvalsshape)] <- 4
     names(keyvalsshape)[keyvalsshape == 17] <- paste(Condition_1)
-    names(keyvalsshape)[keyvalsshape == 64] <- paste(Condition_2)
+    names(keyvalsshape)[keyvalsshape == 15] <- paste(Condition_2)
     names(keyvalsshape)[keyvalsshape == 4] <- 'X'
     if(test=="p.adj"){
       # Change plot labs if the user has put the input
@@ -1098,81 +1181,79 @@ Volcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FC
       if(is.null(ylab)){
         ylab=bquote(~-Log[10]~p.adj)
       }
-      DMA_PathwaysPlot_IEC <- Combined_DMA
+      
+      
+      DMA_Input_PathwaysPlot_IEC <- Combined_DMA
+      
+      Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      DMA_Input_PathwaysPlot_IEC <- merge(Combined_DMA,Input_Pathways, by = "Metabolite" )
+      DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+      
       
       #Make a list of metabolites that we want to see on the plot:
-      Labels <- subset(DMA_PathwaysPlot_IEC,DMA_PathwaysPlot_IEC$Pathway != "unknown")
+      Labels <- subset(DMA_Input_PathwaysPlot_IEC, Pathway != "Other")
       Labels <-Labels[,1]
       
       #Prepare new colour scheme:
-      keyvals <- ifelse(
-        DMA_PathwaysPlot_IEC$Pathway == "amino acid and conjugate", "blue",
-        ifelse(DMA_PathwaysPlot_IEC$Pathway == "glycolysis and PPP", "red",
-               ifelse(DMA_PathwaysPlot_IEC$Pathway == "long chain acylcarnitine", "gold4",
-                      ifelse(DMA_PathwaysPlot_IEC$Pathway == "nucleotides", "seagreen",
-                             ifelse(DMA_PathwaysPlot_IEC$Pathway == "purine metabolism", "darkorchid1",
-                                    ifelse(DMA_PathwaysPlot_IEC$Pathway == "pyrimidine metabolism", "darkorchid4",
-                                           ifelse(DMA_PathwaysPlot_IEC$Pathway == "redox homeostasis", "orange",
-                                                  ifelse(DMA_PathwaysPlot_IEC$Pathway == "short chain acylcarnitine", "gold1",
-                                                         ifelse(DMA_PathwaysPlot_IEC$Pathway == "medium chain carnitine", "gold3",
-                                                                ifelse(DMA_PathwaysPlot_IEC$Pathway == "TCA cycle", "firebrick4",
-                                                                       "gray"))))))))))
-                                                                       keyvals[is.na(keyvals)] <- 'gray'
-                                                                         names(keyvals)[keyvals == 'gray'] <- 'Other'
-                                                                         names(keyvals)[keyvals == 'blue'] <- "Amino acid and Conjugates"
-                                                                         names(keyvals)[keyvals == 'red'] <- "Glycolysis and PPP"
-                                                                         names(keyvals)[keyvals == 'gold4'] <- "Long chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'seagreen'] <- "Nucleotides"
-                                                                         names(keyvals)[keyvals == 'darkorchid1'] <- "Purine metabolism"
-                                                                         names(keyvals)[keyvals == 'darkorchid4'] <- "Pyrimidine metabolism"
-                                                                         names(keyvals)[keyvals == 'orange'] <- "Redox homeostasis"
-                                                                         names(keyvals)[keyvals == 'gold1'] <- "Short chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'firebrick4'] <- "TCA cycle"
-                                                                         names(keyvals)[keyvals == 'gold3'] <- "Medium chain Carnitines"
-                                                                         
-                                                                         #Plot
-                                                                         #DMA_PathwaysPlot_IEC$shape <- as.numeric(DMA_PathwaysPlot_IEC$shape) ### shape doesnt work
-                                                                         
-                                                                         Plot<- EnhancedVolcano (DMA_PathwaysPlot_IEC,
-                                                                                                 lab = DMA_PathwaysPlot_IEC$Metabolite,#Metabolite name
-                                                                                                 selectLab =Labels,
-                                                                                                 x = "Log2FC",#Log2FC
-                                                                                                 y = "p.adj",#p-value or q-value
-                                                                                                 xlab = xlab,
-                                                                                                 ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                                                                                                 pCutoff = pCutoff,
-                                                                                                 FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                                                                                                 pointSize = 3,
-                                                                                                 labSize = 3,
-                                                                                                 titleLabSize = 16,
-                                                                                                 colCustom = keyvals,
-                                                                                                 shapeCustom = keyvalsshape,#### shape doesnt work
-                                                                                                 colAlpha = 1,
-                                                                                                 title= paste(OutputPlotName),
-                                                                                                 subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                                                                 caption = paste0("total = ", nrow(DMA_PathwaysPlot_IEC), " Metabolites"),
-                                                                                                 xlim =  c(min(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])+0.2  ),
-                                                                                                 ylim = c(0,(ceiling(-log10(Reduce(min,data$p.adj))))),
-                                                                                                 #xlim = c(-5,10),
-                                                                                                 #ylim = c(0,65),
-                                                                                                 #drawConnectors = TRUE,
-                                                                                                 #widthConnectors = 0.5,
-                                                                                                 #colConnectors = "black",
-                                                                                                 #arrowheads=FALSE,
-                                                                                                 cutoffLineType = "dashed",
-                                                                                                 cutoffLineCol = "black",
-                                                                                                 cutoffLineWidth = 0.5,
-                                                                                                 legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                                                                                                 legendPosition = 'right',
-                                                                                                 legendLabSize = 8,
-                                                                                                 legendIconSize =4,
-                                                                                                 gridlines.major = FALSE,
-                                                                                                 gridlines.minor = FALSE,
-                                                                                                 drawConnectors = connectors)
-                                                                         Plot <- Plot+Theme
-                                                                      #   ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
-                                                                       
-    }else if(test=="p.val"){
+      # Take colors for pathways
+      
+      safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+      
+      keyvals <- c()
+      
+      for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
+        keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
+        names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        
+        keyvals <- c(keyvals, keyval)
+      }
+      
+      
+      #Plot
+      #DMA_Input_PathwaysPlot_IEC$shape <- as.numeric(DMA_Input_PathwaysPlot_IEC$shape) ### shape doesnt work
+      
+      Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
+                                               lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+                                               selectLab =Labels,
+                                               x = "Log2FC",#Log2FC
+                                               y = "p.adj",#p-value or q-value
+                                               xlab = xlab,
+                                               ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                               pCutoff = pCutoff,
+                                               FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                               pointSize = 3,
+                                               labSize = 3,
+                                               titleLabSize = 16,
+                                               colCustom = keyvals,
+                                               shapeCustom = keyvalsshape,#### shape doesnt work
+                                               colAlpha = 1,
+                                               title= paste(OutputPlotName),
+                                               subtitle = bquote(italic("Differential metabolomics analysis")),
+                                               caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
+                                               xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                               ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.adj))))),
+                                               #xlim = c(-5,10),
+                                               #ylim = c(0,65),
+                                               #drawConnectors = TRUE,
+                                               #widthConnectors = 0.5,
+                                               #colConnectors = "black",
+                                               #arrowheads=FALSE,
+                                               cutoffLineType = "dashed",
+                                               cutoffLineCol = "black",
+                                               cutoffLineWidth = 0.5,
+                                               legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.adj <",pCutoff) , paste('p.adj<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                               legendPosition = 'right',
+                                               legendLabSize = 8,
+                                               legendIconSize =4,
+                                               gridlines.major = FALSE,
+                                               gridlines.minor = FALSE,
+                                               drawConnectors = Connectors) +
+        guides(color = guide_legend(title = "Pathway"), shape = guide_legend(title = "Comparison"))
+      Plot <- Plot+Theme
+      #   ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
+      
+    }
+    else{ # else if(test=="p.val"){
       # Change plot labs if the user has put the input
       if(is.null(xlab)){
         xlab=bquote(~Log[2]~ FC)
@@ -1180,109 +1261,96 @@ Volcano <-function(data =data ,pathway= FALSE, test = "p.adj", pCutoff= 0.05 ,FC
       if(is.null(ylab)){
         ylab=bquote(~-Log[10]~p.val)
       }
-      DMA_PathwaysPlot_IEC <- Combined_DMA
+      DMA_Input_PathwaysPlot_IEC <- Combined_DMA
+      
+      Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      DMA_Input_PathwaysPlot_IEC <- merge(Combined_DMA,Input_Pathways, by = "Metabolite" )
+      DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+      
       
       #Make a list of metabolites that we want to see on the plot:
-      Labels <- subset(DMA_PathwaysPlot_IEC,DMA_PathwaysPlot_IEC$Pathway != "unknown")
+      Labels <- subset(DMA_Input_PathwaysPlot_IEC, Pathway != "Other")
       Labels <-Labels[,1]
       
       #Prepare new colour scheme:
-      keyvals <- ifelse(
-        DMA_PathwaysPlot_IEC$Pathway == "amino acid and conjugate", "blue",
-        ifelse(DMA_PathwaysPlot_IEC$Pathway == "glycolysis and PPP", "red",
-               ifelse(DMA_PathwaysPlot_IEC$Pathway == "long chain acylcarnitine", "gold4",
-                      ifelse(DMA_PathwaysPlot_IEC$Pathway == "nucleotides", "seagreen",
-                             ifelse(DMA_PathwaysPlot_IEC$Pathway == "purine metabolism", "darkorchid1",
-                                    ifelse(DMA_PathwaysPlot_IEC$Pathway == "pyrimidine metabolism", "darkorchid4",
-                                           ifelse(DMA_PathwaysPlot_IEC$Pathway == "redox homeostasis", "orange",
-                                                  ifelse(DMA_PathwaysPlot_IEC$Pathway == "short chain acylcarnitine", "gold1",
-                                                         ifelse(DMA_PathwaysPlot_IEC$Pathway == "medium chain carnitine", "gold3",
-                                                                ifelse(DMA_PathwaysPlot_IEC$Pathway == "TCA cycle", "firebrick4",
-                                                                       "gray"))))))))))
-                                                                       keyvals[is.na(keyvals)] <- 'gray'
-                                                                         names(keyvals)[keyvals == 'gray'] <- 'Other'
-                                                                         names(keyvals)[keyvals == 'blue'] <- "Amino acid and Conjugates"
-                                                                         names(keyvals)[keyvals == 'red'] <- "Glycolysis and PPP"
-                                                                         names(keyvals)[keyvals == 'gold4'] <- "Long chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'seagreen'] <- "Nucleotides"
-                                                                         names(keyvals)[keyvals == 'darkorchid1'] <- "Purine metabolism"
-                                                                         names(keyvals)[keyvals == 'darkorchid4'] <- "Pyrimidine metabolism"
-                                                                         names(keyvals)[keyvals == 'orange'] <- "Redox homeostasis"
-                                                                         names(keyvals)[keyvals == 'gold1'] <- "Short chain Acylcarnitines"
-                                                                         names(keyvals)[keyvals == 'firebrick4'] <- "TCA cycle"
-                                                                         names(keyvals)[keyvals == 'gold3'] <- "Medium chain Carnitines"
-                                                                         
-                                                                         #Plot
-                                                                         #DMA_PathwaysPlot_IEC$shape <- as.numeric(DMA_PathwaysPlot_IEC$shape) ### shape doesnt work
-                                                                         
-                                                                         Plot<- EnhancedVolcano (DMA_PathwaysPlot_IEC,
-                                                                                                 lab = DMA_PathwaysPlot_IEC$Metabolite,#Metabolite name
-                                                                                                 selectLab =Labels,
-                                                                                                 x = "Log2FC",#Log2FC
-                                                                                                 y = "p.val",#p-value or q-value
-                                                                                                 xlab = xlab,
-                                                                                                 ylab = ylab,#(~-Log[10]~adjusted~italic(P))
-                                                                                                 pCutoff = pCutoff,
-                                                                                                 FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
-                                                                                                 pointSize = 3,
-                                                                                                 labSize = 3,
-                                                                                                 titleLabSize = 16,
-                                                                                                 colCustom = keyvals,
-                                                                                                 shapeCustom = keyvalsshape,
-                                                                                                 colAlpha = 1,
-                                                                                                 title= paste(OutputPlotName),
-                                                                                                 subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                                                                 caption = paste0("total = ", nrow(DMA_PathwaysPlot_IEC), " Metabolites"),
-                                                                                                 xlim =  c(min(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_PathwaysPlot_IEC$Log2FC[is.finite(DMA_PathwaysPlot_IEC$Log2FC )])+0.2  ),
-                                                                                                 ylim = c(0,(ceiling(-log10(Reduce(min,data$p.val))))),
-                                                                                                 #xlim = c(-5,10),
-                                                                                                 #ylim = c(0,65),
-                                                                                                 #drawConnectors = TRUE,
-                                                                                                 #widthConnectors = 0.5,
-                                                                                                 #colConnectors = "black",
-                                                                                                 #arrowheads=FALSE,
-                                                                                                 cutoffLineType = "dashed",
-                                                                                                 cutoffLineCol = "black",
-                                                                                                 cutoffLineWidth = 0.5,
-                                                                                                 legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
-                                                                                                 legendPosition = 'right',
-                                                                                                 legendLabSize = 8,
-                                                                                                 legendIconSize =4,
-                                                                                                 gridlines.major = FALSE,
-                                                                                                 gridlines.minor = FALSE,
-                                                                                                 drawConnectors = connectors)
-                                                                         Plot <- Plot+Theme
-                                                                        # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
-                                                                        
-                                                                         
-    }else{
-      print("Please select a significance test p.val or p.adj")
+      # Take colors for pathways
+      safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+      
+      keyvals <- c()
+      
+      for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
+        keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
+        names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        
+        keyvals <- c(keyvals, keyval)
+      }
+      
+      #Plot
+      #DMA_Input_PathwaysPlot_IEC$shape <- as.numeric(DMA_Input_PathwaysPlot_IEC$shape) ### shape doesnt work
+      
+      Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
+                                               lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+                                               selectLab =Labels,
+                                               x = "Log2FC",#Log2FC
+                                               y = "p.val",#p-value or q-value
+                                               xlab = xlab,
+                                               ylab = ylab,#(~-Log[10]~adjusted~italic(P))
+                                               pCutoff = pCutoff,
+                                               FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                               pointSize = 3,
+                                               labSize = 3,
+                                               titleLabSize = 16,
+                                               colCustom = keyvals,
+                                               shapeCustom = keyvalsshape,
+                                               colAlpha = 1,
+                                               title= paste(OutputPlotName),
+                                               subtitle = bquote(italic("Differential metabolomics analysis")),
+                                               caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
+                                               xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                               ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.val))))),
+                                               #xlim = c(-5,10),
+                                               #ylim = c(0,65),
+                                               #drawConnectors = TRUE,
+                                               #widthConnectors = 0.5,
+                                               #colConnectors = "black",
+                                               #arrowheads=FALSE,
+                                               cutoffLineType = "dashed",
+                                               cutoffLineCol = "black",
+                                               cutoffLineWidth = 0.5,
+                                               legendLabels=c('No changes',paste(FCcutoff,"< |Log2FC|"),paste("p.val <",pCutoff) , paste('p.val<',pCutoff,' &',FCcutoff,"< |Log2FC|")),
+                                               legendPosition = 'right',
+                                               legendLabSize = 8,
+                                               legendIconSize =4,
+                                               gridlines.major = FALSE,
+                                               gridlines.minor = FALSE,
+                                               drawConnectors = Connectors) +
+        guides(color = guide_legend(title = "Pathway"), shape = guide_legend(title = "Comparison"))
+      Plot <- Plot+Theme
+      # ggsave(file=paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName,  ".", Save_as, sep=""), plot=Plot, width=12, height=9)
+      
+      
     }
   }
   
-  # # save as svg
-  # svg(filename = paste("Results_", Sys.Date(), "/Volcano_plots/", OutputPlotName, ".svg", sep=""),
-  #     width = 10,
-  #     height = 8)
-  # plot(Plot)
-  # dev.off()
-  ggsave(file=paste(Results_folder_plots_Volcano_folder, "/", OutputPlotName,  ".", Save_as , sep=""), plot=Plot, width=12, height=9)
   
+  if(OutputPlotName ==""){
+    ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
+  }else{
+    ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
+  }
 }
 
-###------------------------
-### Test the Volcano plots
-## multi false path false
-#plotVolcano(data =DMA_output ,pathway= FALSE, test = "p.adj", pCutoff= 0.05, FCcutoff=1, OutputPlotName= 'Volcano yes yes padj')
-## muli false path true
-#plotVolcano(data =DMA_output ,pathway= TRUE, test = "p.adj", pCutoff= 0.05, FCcutoff=0.9, OutputPlotName= 'Volcano yes path true')
-## test multiple true pathways false
-#DMA_output2 <- DMA_output
-#DMA_output2$Log2FC<- DMA_output2$Log2FC+1
-#plotVolcano(data =DMA_output ,pathway= FALSE, test = "p.adj", pCutoff= 0.05, FCcutoff=1, OutputPlotName= 'Volc Multi yes paths no', data2=DMA_output2)
-## test multiple true pathways true
-#plotVolcano(data =DMA_output ,pathway= TRUE, test = "p.adj", pCutoff= 0.05, FCcutoff=1, OutputPlotName= 'VOlc all in55', data2=DMA_output2)
-###------------------------
+
+##------- How to use -------##
+# Volcano(Input_data = DMA_output_Intra) 
+# Volcano(Input_data = DMA_output_Intra, Input_Pathways = DMA_output_Intra)
+# Volcano(Input_data = DMA_output_Intra, Input_Pathways = Pathways_df)
+# Volcano(Input_data = DMA_output_Intra ,Input_data2=DMA_output_Intra2) 
+# Volcano(Input_data = DMA_output_Intra, Input_data2 = DMA_output_Intra2, Input_Pathways = DMA_output_Intra) 
+
+# Notes.
+# careful with x and y limits.
+###-------------------------##
 
 
 ######################################
