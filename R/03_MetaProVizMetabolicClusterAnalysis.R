@@ -4,7 +4,7 @@
 #'
 #' This script allows you to perform differential metabolite analysis
 #'
-#' @param Input_data1 Dataframe which contains metabolites in rows and Log fold changes, pvalus and padjustee values in columns
+#' @param Input_data1 Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns
 #' @param Input_data2 Dataframe same as Input_data1 for another comparison
 #' @param Output_Name String which is added to the output files of the Metabolic Clusters
 #' @param Condition1 String which contains the name of the first condition
@@ -14,7 +14,7 @@
 #' @param test String which selects pvalue or padj for significance
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
+#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
 #'
 #'
 #' @keywords Metabolic Clusters,
@@ -35,7 +35,7 @@ MCA <- function(Input_data1,
                 test = "p.adj",
                 plot = TRUE,
                 CoRe=FALSE,
-                Save_as = "pdf"
+                Save_as = "svg"
                ){
   
   ## ------------ Setup and installs ----------- ##
@@ -61,7 +61,7 @@ MCA <- function(Input_data1,
     stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
   }
   if(test != "p.val" & test != "p.adj" ){
-    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
+    stop("Check input. The selected test option for assessing significance is not valid. Please select one of the following: p.adj, p.val.")
   }
   for(Input_data in list(Input_data1, Input_data2)){
     if(test %notin% colnames(Input_data)){
@@ -74,9 +74,9 @@ MCA <- function(Input_data1,
   if(is.logical(CoRe) == FALSE){
     stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
   }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  Save_as_options <- c("svg","pdf")
   if(Save_as %notin% Save_as_options){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
   }
   
   
@@ -156,7 +156,7 @@ MCA <- function(Input_data1,
       #   match("Released" ,str_split(DMA$CoRe[a], " ", simplify = TRUE),nomatch= FALSE) !=0 &
       #   match("Consumed" ,str_split(DMA$CoRe[a], " ", simplify = TRUE),nomatch= FALSE) !=0
       
-    }else if(test== "p.adj"){
+    }else{ # else if(test== "p.adj")
       DMA <- DMA%>%
         mutate(`Intracellular Change` = case_when(Log2FC_Intra >= 0.5 & p.adj_Intra< 0.05 ~ 'UP',
                                                   Log2FC_Intra <= -0.5 & p.adj_Intra< 0.05 ~ 'DOWN',
@@ -170,8 +170,6 @@ MCA <- function(Input_data1,
                                          Log2FC_CoRe <= -0.5 & p.adj_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
                                          Log2FC_CoRe <= -0.5 & p.adj_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
                                          TRUE ~ 'No Change'))
-    }else{
-      stop("Please select an apropriate measure to use to assess significance (p.val or p.adj)")
     }
     
     
@@ -200,15 +198,20 @@ MCA <- function(Input_data1,
                                               Log2FC_Intra <= -0.5 & p.val_Intra< 0.05 ~ 'DOWN',
                                               TRUE ~ 'X'))
     
+    # Make a df with the clusters and how metabolites are sssigned to them
+    Cluster_assignment_df <- data.frame("Cluster" = seq(1,21),
+                                        "Intracellular Change"= c(rep("UP",7),rep("No Change",7),rep("DOWN",7)), 
+                                        "CoRe Change"= rep(c("Release UP","Release DOWN","Consume UP","Consume DOWN","Released/Consumed UP","Released/Consumed DOWN","No Change"),3))  
+    
     Alluvial_DF.final <- DMA
     
     writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/",Name,Output_Name,".xlsx", sep = ""))
+    write.table(Cluster_assignment_df,row.names =  FALSE, file = paste0(Results_folder_MCA_folder,"/Cluster_assignment_table.csv", sep = "")     )
     
-    Alluvial_DF2 <- Alluvial_DF.final
+    Alluvial_DF <- Alluvial_DF.final
     
     
-  }
-  else{
+  }else{ #  else if(CoRe == FALSE){
     Name = paste0("MCA_Output_",gsub(" ", "_",Condition1),"_with_",gsub(" ", "_",Condition2), sep = "")
     
     C1 <- Input_data1
@@ -371,8 +374,13 @@ MCA <- function(Input_data1,
     }
     safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","red", "white", "#000") # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible,
     
+    if(Save_as=="pdf"){
+    pdf(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9) # Save_as_var
+    }else{
+      svg(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9) # Save_as_var
+    }
     
-    Save_as_var(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9)
+    
     par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
     alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
                         col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],

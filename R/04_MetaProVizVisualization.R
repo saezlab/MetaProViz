@@ -1,677 +1,671 @@
-#' Metabolomics pre-processing pipeline
-#' @author Prymidis Dimitrios, Schmidt Christina
-#' Date: "2022-10-28"
+## ---------------------------
+##
+## Script name: DMA
+##
+## Purpose of script: Differential Metabolomics Analysis 
+##
+## Author: Dimitrios Prymidis and Christina Schmidt
+##
+## Date Created: 2022-10-28
+##
+## Copyright (c) Dimitrios Prymidis and Christina Schmidt
+## Email:
+##
+## ---------------------------
+##
+## Notes:
+##
+##
+## ---------------------------
 #'
-#' This script allows you to perform differential metabolite analysis
-#'
-#' @param Input_data1 Data matrix which contains samples in rows and metabolites, Log fold changes, pvalus and padjustee values in columns
-#' @param Input_data2 Data matrix dame as data1 for another comparison
-#' @param Output_Name String which contains the name of the output file of the Metabolic Clusters
-#' @param Condition1 String which contains the name of the first condition
-#' @param Condition2 String which contains the name of the second condition
-#' @param pCutoff Number of the desired p value cutoff for assessing significance
-#' @param FCcutoff Number of the desired log fold change cutoff for assessing significance
-#' @param test String which selects pvalue or padj for significance
-#'
-#' @export
-#'
-#'
-# Load libraries
-#library(tidyverse) # general scripting
-library(ggfortify) # For visualization PCA
-#library(reshape2) # for melting the data
-#library(EnhancedVolcano) # for Volcano plots
-#library(kableExtra) # used for table
-#library(alluvial) # For alluvial plots
-#library(ggpubr) # For general plots for adding statistics
-#library(ggbeeswarm) # for superplots
+#' This script allows you to perform different data visualizations
+
 
 
 
 #################################
 ### ### ### PCA Plots ### ### ###
 #################################
+
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column
+#' @param Color \emph{Optional: }String which contains the name of the output file of the Metabolic Clusters
+#' @param Shape \emph{Optional: }String which contains the name of the output file of the Metabolic Clusters
+#' @param Show_Loadings  \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
+#' @param Scaling  \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
+#' @param Theme \emph{Optional: }
+#' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA
+#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
+#' 
+#' @keywords PCA
+#' @export
+
+
+PCA <- function(Input_data, 
+                Color = FALSE, 
+                Shape = FALSE, 
+                Show_Loadings = FALSE, 
+                Scaling = TRUE,
+                # Palette= "Set2".
+                Theme=theme_classic(), 
+                OutputPlotName= '',
+                Save_as = "svg"){
+  
+  
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse","ggfortify")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+  
+  
+  ## ------------ Check Input files ----------- ##
+  #1. Input_data 
+  if(any(duplicated(row.names(Input_data)))==TRUE){
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else if("Conditions" %in% colnames(Input_data)==FALSE){
+    stop("There is no column named `Conditions` in Input_data.")
+  }else{ # select samples according to the input conditions
+    
+    ### Separate design from the data
+    Design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
+    Input_data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
+  }
+  #2. Parameters
+  if(Color != FALSE & Color %in% colnames(Design)==FALSE){
+    stop(paste("PCA with Color was selected. However, there is no column named: " ,Color," in Input_data.",sep = "") )
+  }
+  if(Shape != FALSE & Shape %in% colnames(Design)==FALSE){
+    stop(paste("PCA with Shapes was selected. However, there is no column named: " ,Shape," in Input_data.",sep = "") )
+  }
+  if(length(unique(Design[,Shape]))>6){
+    stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
+  }
+  if(is.logical(Show_Loadings) == FALSE){
+    stop("Check input. The Show_Loadings value should be either =TRUE if loadings are to also be shown in the PCA plot or = FALSE if not.")
+  }
+  if(is.logical(Scaling) == FALSE){
+    stop("Check input. The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
+  }
+  # Theme ???
+  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  if(Save_as %in% Save_as_options == FALSE){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+  
+  
+  ## ------------ Create Output folders ----------- ##
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) 
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+  Results_folder_plots_PCA_folder = file.path(Results_folder, "PCA")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+  if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}  # check and create folder
+  
+  ### select plot based on arguments
+  #1
+  if (Color != FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling == TRUE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = ",Shape,", Show_Loadings = TRUE, Scaling = TRUE",sep = ""))
+    
+    mdata <- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data <- merge(Input_data, mdata %>% select(all_of(Color)), by = 0) # Add the selected columns(the ones wanted to plot) and add them to the data
+    data <- column_to_rownames(data, "Row.names")
+    
+    data <- merge(data, mdata %>% select(all_of(Shape)), by = 0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    # For color if we have character we go with discrete. If we have numeric we to discrete until 4groups. if e have more we go for continuous
+    if(is.numeric(data[,Color]) == TRUE | is.integer(data[,Color]) == TRUE){
+      if(length(unique(data[,Color])) > 4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    PCA <- autoplot(prcomp(as.matrix(data %>% select(-all_of(c(Shape, Color)))),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   fill = Color,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data %>% select(-all_of(c(Shape, Color)))),scale. = TRUE)
+    
+    #2
+  }
+  else if(Color != FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling == FALSE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = ",Shape,", Show_Loadings = TRUE, Scaling = FALSE",sep = ""))
+    
+    mdata <- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data <- merge(Input_data, mdata %>% select(all_of(Color)), by = 0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    data <- merge(data, mdata %>% select(all_of(Shape)), by = 0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    # For color if we have character we go with discrete. If we have numeric we to discrete until 4groups. if e have more we go for continuous
+    if(is.numeric(data[,Color]) == TRUE | is.integer(data[,Color]) == TRUE){
+      if(length(unique(data[,Color])) > 4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    
+    PCA <- autoplot(prcomp(as.matrix(data %>% select(-all_of(c(Shape, Color)))),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   fill = Color,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label = T,
+                   label.size =2.5,
+                   label.repel = TRUE,
+                   loadings = T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size = 2.5,
+                   loadings.colour = "grey10",
+                   loadings.label.colour = "grey10") +
+      scale_shape_manual(values = c(22,21,24,23,25,7,8,11,12)) + #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept = 0,  color = "black", linewidth = 0.1) +
+      geom_vline(xintercept = 0,  color = "black", linewidth = 0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of(c(Shape, Color)))),scale. = FALSE)
+    
+    #3 Done
+  }
+  else if(Color != FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = ",Shape,", Show_Loadings = FALSE, Scaling = TRUE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Color)), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    data<- merge(data, mdata %>%select(all_of(Shape)), by=0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
+    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
+      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(c(Shape, Color)))),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   fill = Color,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of(c(Shape, Color)))),scale. = TRUE)
+    
+    #4 Done
+  } 
+  else if(Color != FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = ",Shape,", Show_Loadings = FALSE, Scaling = FALSE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Color)), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    data<- merge(data, mdata %>%select(all_of(Shape)), by=0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4 groups. if e have more we go for continouus
+    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
+      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(c(Shape, Color)))),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   fill = Color,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of(c(Shape, Color)))),scale. = FALSE)
+    
+    #5 Done
+  } 
+  else if (Color == FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = ",Shape,", Show_Loadings = TRUE, Scaling = TRUE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Shape)), by=0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Shape))),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Shape))),scale. = TRUE)
+    
+    #6 Done
+  }
+  else if(Color == FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = ",Shape,", Show_Loadings = TRUE, Scaling = FALSE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Shape)), by=0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Shape))),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Shape))),scale. = FALSE)
+    
+    #7 Done
+  }
+  else if(Color == FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = ",Shape,", Show_Loadings = FALSE, Scaling = TRUE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Shape)), by=0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Shape))),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Shape))),scale. = TRUE)
+    
+    #8 Done
+  } 
+  else if(Color == FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = ",Shape,", Show_Loadings = FALSE, Scaling = FALSE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Shape)), by=0) # merge the data with the design to get only the kept samples
+    data <- column_to_rownames(data, "Row.names")
+    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Shape))),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   shape = Shape,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Shape))),scale. = FALSE)
+    
+    #9 Done
+  } 
+  else if (Color != FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = FALSE, Show_Loadings = TRUE, Scaling = TRUE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Color)), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
+    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
+      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Color))),scale. = TRUE)
+    
+    #10 Done
+  }
+  else if(Color != FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = FALSE, Show_Loadings = TRUE, Scaling = FALSE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Color)), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
+    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
+      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Color))),scale. = FALSE)
+    
+    #11 Done
+  }
+  else if(Color != FALSE & Shape == FALSE & Show_Loadings == FALSE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = FALSE, Show_Loadings = TRUE, Scaling = TRUE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    
+    data<- merge(Input_data, mdata %>%select(all_of(Color)), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
+    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
+      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Color))),scale. = TRUE)
+    
+    #12 Done
+  } 
+  else if(Color != FALSE & Shape == FALSE & Show_Loadings == FALSE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = ",Color,", Shape = FALSE, Show_Loadings = FALSE, Scaling = FALSE",sep=""))
+    
+    mdata<- merge(Input_data, Design, by=0) # merge the data with the design to get only the kept samples
+    mdata <- column_to_rownames(mdata, "Row.names")
+    data<- merge(Input_data, mdata %>%select(all_of(Color)), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
+    data <- column_to_rownames(data, "Row.names")
+    
+    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
+    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
+      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
+        data[,Color] <- as.numeric(data[,Color])
+      }else(data[,Color] <- as.factor(data[,Color]))
+    }
+    
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   colour = Color,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data%>% select(-all_of( Color))),scale. = FALSE)
+    
+    #13 Done
+  } 
+  else if (Color == FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = FALSE, Show_Loadings = TRUE, Scaling = TRUE"))
+    
+    data<- Input_data
+    PCA<- autoplot(prcomp(as.matrix(data),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data),scale. = TRUE)
+    
+    #14 Done
+  }
+  else if(Color == FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = FALSE, Show_Loadings = TRUE, Scaling = FALSE"))
+    
+    data<- Input_data
+    PCA<- autoplot(prcomp(as.matrix(data),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE,
+                   loadings=T, #draws Eigenvectors
+                   loadings.label = TRUE,
+                   loadings.label.vjust = 1.2,
+                   loadings.label.size=2.5,
+                   loadings.colour="grey10",
+                   loadings.label.colour="grey10") +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data),scale. = FALSE)
+    
+    #15 Done
+  }
+  else if(Color == FALSE &  Shape == FALSE & Show_Loadings == FALSE & Scaling== TRUE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = FALSE, Show_Loadings = FALSE, Scaling = TRUE"))
+    
+    data<- Input_data
+    PCA<- autoplot(prcomp(as.matrix(data),scale. = TRUE),   # Run and plot PCA
+                   data= data,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data),scale. = TRUE)
+    
+    #16 Done
+  } 
+  else if(Color == FALSE &  Shape == FALSE & Show_Loadings == FALSE & Scaling== FALSE){
+    message(paste("Selected option for PCA: Color = FALSE, Shape = FALSE, Show_Loadings = FALSE, Scaling = FALSE"))
+    
+    data<- Input_data
+    PCA<- autoplot(prcomp(as.matrix(data),scale. = FALSE),   # Run and plot PCA
+                   data= data,
+                   size = 3,
+                   alpha = 0.8,
+                   label=T,
+                   label.size=2.5,
+                   label.repel = TRUE) +
+      ggtitle(paste(OutputPlotName)) +
+      Theme +
+      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    
+    loading_data <- prcomp(as.matrix(data),scale. = FALSE)
+    
+    # For the selected few
+  } 
+  else {
+    print("What are you doing? You've got it all wrong!")
+  }
+  
+  loading_data_table <-as.data.frame(loading_data$rotation)
+  loading_data_table <- loading_data_table[,1:2]
+  loading_data_table <- tibble::rownames_to_column(loading_data_table, "Metabolite")
+  
+  # Save output
+  writexl::write_xlsx(loading_data_table, paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.xlsx", sep=""), col_names = TRUE)
+  
+  if(OutputPlotName ==""){
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
+  }else{
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
+  }
+  
+}
+
+
 #Notes
 #  The x=0 and y=0 black lines in PCA will always be there regardless the theme change. I cannot yet make it to be there by default and not be there when you change theme.
 # Well It can be done but it requires a lot additional of work. So for now the lines will be there
 # Palette changing is still missing
 # To do: select a better palette and add option to the user to change the palette to whatever they like
 
-PCA <- function(data= data, Design= NULL, Color = FALSE, Shape = FALSE, Show_Loadings = FALSE,  Scaling= TRUE,
-                          # Palette= "Set2".
-                          Theme=theme_classic(), # theme_bw()
-                          OutputPlotName= 'PCA_plot',
-                          Save_as = svg){
-  
-  
-  # Make arguments into strings
-  # Color<- deparse(substitute(Color)) # make the input variables into strings
-  # Shape<- deparse(substitute(Shape))
-  # 
-  
-  ####################################################
-  # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  ### Create PCA plots folder in  result directory ###
-  Results_folder_plots_PCA_folder = paste(Results_folder,"/PCA",  sep="")
-  if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}
-  
-  
-  #####################################################
-  ### ### ### make output plot save_as name ### ### ###
-  Save_as= deparse(substitute(Save_as))
-  
-  ### select plot based on arguments
-  #1
-  if (Color != FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling== TRUE){
-    print("yes color yes shape yes loadings yes scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>% select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   fill = Color,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = TRUE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coT_shT_loT_scT",  ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #2
-  }else if(Color != FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling== FALSE){
-    print("yes color yes shape yes loadings no scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>% select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    data<- merge(data, mdata %>% select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   fill = Color,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = FALSE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coT_shT_loT_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    
-    #3 Done
-  }else if(Color != FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== TRUE){
-    print("yes color yes shape no loadings yes scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   fill = Color,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = TRUE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coT_shT_loF_scT", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #4 Done
-  } else if(Color != FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== FALSE){
-    print("yes color yes shape no loadings no scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   fill = Color,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape, -Color)),scale. = FALSE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coT_shT_loF_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #5 Done
-  } else if (Color == FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling== TRUE){
-    print("no color yes shape yes loadings yes scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape)),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape)),scale. = TRUE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shT_loT_scT",".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    
-    
-    #6 Done
-  }else if(Color == FALSE & Shape != FALSE & Show_Loadings == TRUE & Scaling== FALSE){
-    print("no color yes shape yes loadings no scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape)),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape)),scale. = FALSE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shT_loT_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    
-    #7 Done
-  }else if(Color == FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== TRUE){
-    print("no color yes shape no loadings yes scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape)),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape)),scale. = TRUE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shT_loF_scT", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #8 Done
-  } else if(Color == FALSE & Shape != FALSE & Show_Loadings == FALSE & Scaling== FALSE){
-    print("no color yes shape no loadings no scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Shape), by=0) # merge the data with the design to get only the kept samples
-    data <- column_to_rownames(data, "Row.names")
-    data[,Shape] <- as.factor(data[,Shape]) # make the shape into a factor to be discrete
-    
-    if(length(unique(data[,Shape]))>6){
-      stop("Error. You tried to plot more than 6 shapes. It would be preferable to use color instead of shape" )
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Shape)),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   shape = Shape,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      scale_shape_manual(values=c(22,21,24,23,25,7,8,11,12))+ #needed if more than 6 shapes are in place
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select(-Shape)),scale. = FALSE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shT_loF_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    
-    #9 Done
-  } else if (Color != FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== TRUE){
-    print("yes color no shape yes loadings yes scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select( -Color)),scale. = TRUE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coT_shF_loT_scT", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #10 Done
-  }else if(Color != FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== FALSE){
-    print("yes color no shape yes loadings no scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select( -Color)),scale. = FALSE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coT_shF_loT_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #11 Done
-  }else if(Color != FALSE & Shape == FALSE & Show_Loadings == FALSE & Scaling== TRUE){
-    print("yes color no shape no loadings yes scale")
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    
-    data<- merge(data, mdata %>%select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select( -Color)),scale. = TRUE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coT_shF_loF_scT", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #12 Done
-  } else if(Color != FALSE & Shape == FALSE & Show_Loadings == FALSE & Scaling== FALSE){
-    print("yes color no shape no loadings no scale")
-    
-    
-    mdata<- merge(data, Design, by=0) # merge the data with the design to get only the kept samples
-    mdata <- column_to_rownames(mdata, "Row.names")
-    data<- merge(data, mdata %>%select(Color), by=0) # Add the selected columns(the ones wanted to plot) and add them to the dat
-    data <- column_to_rownames(data, "Row.names")
-    
-    # For color if we have character we go with disctere. If we have numeriic we to discrete untill 4groupd. if e have more we go for continouus
-    if(is.numeric(data[,Color])==TRUE | is.integer(data[,Color])==TRUE){
-      if(length(unique(data[,Color]))>4){ # change this to change the number after which color becomes from distinct to continuous
-        data[,Color] <- as.numeric(data[,Color])
-      }else(data[,Color] <- as.factor(data[,Color]))
-    }
-    
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   colour = Color,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data%>% select( -Color)),scale. = FALSE)
-  #  ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coT_shF_loF_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #13 Done
-  } else if (Color == FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== TRUE){
-    print("no color no shape yes loadings yes scale")
-    
-    mdata<- data
-    PCA<- autoplot(prcomp(as.matrix(data),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data),scale. = TRUE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shF_loT_scT", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #14 Done
-  }else if(Color == FALSE & Shape == FALSE & Show_Loadings == TRUE & Scaling== FALSE){
-    print("no color no shape yes loadings no scale")
-    
-    mdata<- data
-    PCA<- autoplot(prcomp(as.matrix(data),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings=T, #draws Eigenvectors
-                   loadings.label = TRUE,
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data),scale. = FALSE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coF_shF_loT_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #15 Done
-  }else if(Color == FALSE &  Shape == FALSE & Show_Loadings == FALSE & Scaling== TRUE){
-    print("no color no shape no loadings yes scale")
-    
-    mdata<- data
-    PCA<- autoplot(prcomp(as.matrix(data),scale. = TRUE),   # Run and plot PCA
-                   data= data,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data),scale. = TRUE)
-   # ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName,"_coF_shF_loF_scT", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    #16 Done
-  } else if(Color == FALSE &  Shape == FALSE & Show_Loadings == FALSE & Scaling== FALSE){
-    print("no color no shape no loadings no scale")
-    
-    mdata<- data
-    PCA<- autoplot(prcomp(as.matrix(data),scale. = FALSE),   # Run and plot PCA
-                   data= data,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE) +
-      ggtitle(paste(OutputPlotName)) +
-      Theme +
-      geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-      geom_vline(xintercept=0,  color = "black", linewidth=0.1)
-    
-    loading_data <- prcomp(as.matrix(data),scale. = FALSE)
-    #ggsave(file=paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shF_loF_scF", ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-    
-    
-    # For the selected few
-  }  else {
-    print("What are you doing? You've got it all wrong!")
-  }
-  
-  # svg(filename = paste("Results_", Sys.Date(), "/PCA_plots/", OutputPlotName, "_coF_shF_loF_scF", ".svg", sep=""),
-  #     width = 10,
-  #     height = 8)
-  # plot(PCA)
-  # dev.off()
-  
-  loading_data_table <-as.data.frame(loading_data$rotation)
-  loading_data_table <- loading_data_table[,1:2]
-  loading_data_table <- tibble::rownames_to_column(loading_data_table, "Metabolite")
-  writexl::write_xlsx(loading_data_table, paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.xlsx", sep=""), col_names = TRUE)
-  ggsave(file=paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
-}
 
-##########-------------------------
-### Use function
-#plotPCA(data= preprocessing_output[["data_processed"]], Scaling =TRUE, Show_Loadings = FALSE, Design= preprocessing_output[["Experimental_design"]], Color = Conditions, Shape = time, OutputPlotName= 'PCAftw')
-#plotPCA(data= preprocessing_output[["data_processed"]], Scaling =TRUE, Show_Loadings = FALSE)
-##########--------------------------
+
+
+
 
 
 

@@ -20,7 +20,7 @@
 
 #' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
 #'
-#' @param Input DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column
 #' @param Conditon1 Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".
 #' @param Conditon2 Input needs to contain a column named "Condition" including Condition2 that is compared to Condition1, e.g. "WT".
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
@@ -100,13 +100,12 @@ DMA <-function(Input_data,
   }
   
   #2. General parameters
-  `%notin%` <- Negate(`%in%`) # Create a 'not in' function
   STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
-  if(STAT_pval %notin% STAT_pval_options ){
+  if(STAT_pval %in% STAT_pval_options == FALSE){
     stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid. Please select one of the folowwing: ",paste(STAT_pval_options,collapse = ", "),"." )
   }
   STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
-  if(STAT_padj %notin% STAT_padj_options ){
+  if(STAT_padj %in% STAT_padj_options == FALSE){
     stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
   } 
   if(is.logical(CoRe) == FALSE){
@@ -116,15 +115,15 @@ DMA <-function(Input_data,
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
   Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %notin% Save_as_options){
+  if(Save_as %in% Save_as_options == FALSE){
     stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
   }
 
   #3. Input_Pathways
-  if(is.null(Input_Pathways)!=TRUE){
-    if('Metabolite' %in% colnames(Input_Pathways)==FALSE){
+  if(is.null(Input_Pathways) != TRUE){
+    if('Metabolite' %in% colnames(Input_Pathways) == FALSE){
       warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.")
-    }else if('Pathway' %in% colnames(Input_Pathways)==FALSE){
+    }else if('Pathway' %in% colnames(Input_Pathways) == FALSE){
      warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.") 
     }
   }

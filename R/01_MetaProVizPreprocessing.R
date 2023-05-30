@@ -70,7 +70,7 @@ Preprocessing <- function(Input_data,
   #######################################################################################
   ### ### ### Check Input Information and add Experimental_design information ### ### ###
 
-  #1.  Inpur data
+  #1.  Input data
   if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
   } else{
@@ -113,9 +113,8 @@ Preprocessing <- function(Input_data,
   }
   
   #4. General parameters
-  `%notin%` <- Negate(`%in%`) # Create a not in function
   Feature_Filtering_options <- c("Standard","Modified", "none")
-  if(Feature_Filtering %notin% Feature_Filtering_options ){
+  if(Feature_Filtering %in% Feature_Filtering_options == FALSE ){
     stop("Check input. The selected Feature_Filtering option is not valid. Please select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
   }
   if( is.numeric(Feature_Filt_Value) == FALSE |Feature_Filt_Value > 1 | Feature_Filt_Value < 0){
@@ -134,7 +133,7 @@ Preprocessing <- function(Input_data,
     stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
   }
   Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %notin% Save_as_options){
+  if(Save_as %in% Save_as_options == FALSE){
     stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
   }
   
@@ -317,7 +316,7 @@ Preprocessing <- function(Input_data,
     }
     
     for (metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
-      data_norm <- data_norm %>% select(-metab)
+      data_norm <- data_norm %>% select(-all_of(metab))
     }
    
     ### ### PCA  ### ###
