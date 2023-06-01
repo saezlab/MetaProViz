@@ -46,7 +46,8 @@ PCA <- function(Input_data,
                 # Palette= "Set2".
                 Theme=theme_classic(), 
                 OutputPlotName= '',
-                Save_as = "svg"){
+                Save_as = "svg"
+                ){
   
   
   ## ------------ Setup and installs ----------- ##
@@ -674,12 +675,12 @@ PCA <- function(Input_data,
 #####################################
 
 #' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns.
-#' @param test String which selects pvalue or padj for significance. \strong{Default = padj}
-#' @param pCutoff Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
-#' @param FCcutoff Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param Output_Name String which is added to the output files of the Metabolic Clusters.
-#' @param Input_Pathways \emph{Optional: } DF which contains a 'Metabolite' and a 'Pathway' columns, with pathway information for each metabolite. It can be the same as Input_data or another dataFrame. \strong{Default = NULL}
-#' @param Plot_Pathways \emph{Optional: } String with plotting information about Metabolite pathways. Available only when the Input_Pathways parameter has a file. Options are "None" if no pathways are to be plotted, "Individual" for plots of each individual pathway and "Together" for metabolite pathways color-coded on a single volcano plot \strong{Default = "Together"}
+#' @param test \emph{Optional: } String which selects pvalue or padj for significance. \strong{Default = padj}
+#' @param pCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
+#' @param FCcutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
+#' @param Input_pathways \emph{Optional: } DF which contains a 'Metabolite' and a 'Pathway' columns, with pathway information for each metabolite. It can be the same as Input_data or another data frame. \strong{Default = NULL}
+#' @param Plot_pathways \emph{Optional: } String with plotting information about Metabolite pathways. Available only when the Input_pathways parameter has a file. Options are "None" if no pathways are to be plotted, "Individual" for plots of each individual pathway and "Together" for metabolite pathways color-coded on a single volcano plot \strong{Default = "Together"}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
@@ -697,8 +698,8 @@ Volcano <- function(Input_data,
                    pCutoff = 0.05 ,
                    FCcutoff = 0.5, 
                    OutputPlotName = '', 
-                   Plot_Pathways = "none",
-                   Input_Pathways = NULL, 
+                   Plot_pathways = "none",
+                   Input_pathways = NULL, 
                    Theme = theme_classic(),
                    xlab = NULL, 
                    ylab = NULL, 
@@ -707,7 +708,7 @@ Volcano <- function(Input_data,
                    Cond2name="Comparisson 2", 
                    Connectors = FALSE, 
                    Save_as = "svg"
-){
+                   ){
   
   
   ## ------------ Setup and installs ----------- ##
@@ -730,8 +731,8 @@ Volcano <- function(Input_data,
     }
   }else{
     for(data in list(Input_data, Input_data2)){
-      if(test %in% colnames(data) == FALSE){
-        stop("Check Input data. There is no column ", test, " for assessing significance.")
+      if("Metabolite" %in% colnames(data) == FALSE){
+        stop("Check Input. Metabolite column is missing from Input_data")
       } 
     }
   }
@@ -762,24 +763,29 @@ Volcano <- function(Input_data,
   if(Save_as %in% Save_as_options == FALSE){
     stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
   }
-  if(is.null(Input_Pathways) == FALSE){
-    if("Metabolite" %in% colnames(Input_Pathways) == FALSE){
+  Plot_pathways_options <- c("None", "Individual", "Together")
+  if (Plot_pathways %in% Plot_pathways_options == FALSE){
+    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Plot_pathways_options,collapse = ", "),"." )
+  }
+  if(is.null(Input_pathways) == TRUE){
+    if (Plot_pathways != "None"){
+      warning("No Input_pathways were added. Yet the Plot_pathways optios was changed. This will have no effect on the plot")
+    }
+  }
+  if(is.null(Input_pathways) == FALSE){
+    if("Metabolite" %in% colnames(Input_pathways) == FALSE){
       stop("Check Input. Metabolite column is missing from Input_data")
     }
-    if("Pathway" %in% colnames(Input_Pathways) == FALSE){
-      stop("Check Input. Pathway column is missing from Input_Pathways")
+    if("Pathway" %in% colnames(Input_pathways) == FALSE){
+      stop("Check Input. Pathway column is missing from Input_pathways")
     }
-    if(identical(sort(Input_data$Metabolite), sort(Input_Pathways$Metabolite)) == FALSE){
-      warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_Pathways. We will take into consideration only the common Metabolites.")
+    if(identical(sort(Input_data$Metabolite), sort(Input_pathways$Metabolite)) == FALSE){
+      warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_pathways. We will take into consideration only the common Metabolites.")
       # find common metabolites
-      common_metabolites <- Input_data[Input_data$Metabolite %in% Input_Pathways$Metabolite, "Metabolite"]
+      common_metabolites <- Input_data[Input_data$Metabolite %in% Input_pathways$Metabolite, "Metabolite"]
       # Take the data that have both pval reslults and pathwayss
       Input_data <- Input_data %>% filter(Metabolite %in% common_metabolites)
-      Input_Pathways <- Input_Pathways %>% filter(Metabolite %in% common_metabolites)
-    }
-    Plot_Pathways_options <- c("None", "Individual", "Together")
-    if (Plot_Pathways %in% Plot_Pathways_options == FALSE){
-      stop("Check Input the Plot_Pathways option is incorrect. The Allowed options are the following: ",paste(Plot_Pathways_options,collapse = ", "),"." )
+      Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
     }
     safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000","gold1","darkorchid4","red","orange")
   }
@@ -811,15 +817,15 @@ Volcano <- function(Input_data,
   if(is.null(Input_data2)!="TRUE"){
     Multiple = TRUE
   }
-  if (Plot_Pathways == "None"){
-    if(is.null(Input_Pathways)==FALSE){
-      warning("An Input_Pathways file has been added. However, Plot_Pathways = none ,thus no pathway information will be incorporated in the Volcano plot. To use Pathway information please change Plot_Pathways to Individual or Together.")
+  if (Plot_pathways == "None"){
+    if(is.null(Input_pathways)==FALSE){
+      warning("An Input_pathways file has been added. However, Plot_pathways = none ,thus no pathway information will be incorporated in the Volcano plot. To use Pathway information please change Plot_pathways to Individual or Together.")
     }
-    Input_Pathways = NULL
+    Input_pathways = NULL
   }
 
   
-  if(Multiple == FALSE & is.null(Input_Pathways) == TRUE){
+  if(Multiple == FALSE & is.null(Input_pathways) == TRUE){
     if(test=="p.adj"){
       # Change plot labs if the user has put the input
       if(is.null(xlab)){
@@ -907,8 +913,8 @@ Volcano <- function(Input_data,
       ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
     }
     }
-  else if(Multiple == FALSE & is.null(Input_Pathways) == FALSE){
-    if(Plot_Pathways == "Together"){
+  else if(Multiple == FALSE & is.null(Input_pathways) == FALSE){
+    if(Plot_pathways == "Together"){
       if(test=="p.adj"){
         # Change plot labs if the user has put the input
         if(is.null(xlab)){
@@ -923,32 +929,32 @@ Volcano <- function(Input_data,
         }
         
         
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Input_data,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Input_data,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
         
         #Make a list of metabolites that we want to see on the plot:
-        Labels <- subset(DMA_Input_PathwaysPlot_IEC, Pathway != "unknown")
+        Labels <- subset(DMA_Input_pathwaysPlot_IEC, Pathway != "unknown")
         Labels <-Labels[,1]
         
         #Prepare new colour scheme:
         # Take colors for pathways
-        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_pathwaysPlot_IEC$Pathway))]
         
         keyvals <- c()
         
-        for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
-          keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
-          names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        for(row in 1:nrow(DMA_Input_pathwaysPlot_IEC)){
+          keyval <- safe_colorblind_palette[unique(DMA_Input_pathwaysPlot_IEC$Pathway) %in% DMA_Input_pathwaysPlot_IEC[row, "Pathway"]]
+          names(keyval) <- DMA_Input_pathwaysPlot_IEC$Pathway[row]
           
           keyvals <- c(keyvals, keyval)
         }
         
         
         #Plot
-        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
-                                                 lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC,
+                                                 lab = DMA_Input_pathwaysPlot_IEC$Metabolite,#Metabolite name
                                                  selectLab =Labels,
                                                  x = "Log2FC",#Log2FC
                                                  y = "p.adj",#p-value or q-value
@@ -963,9 +969,9 @@ Volcano <- function(Input_data,
                                                  colAlpha = 1,
                                                  title= paste(OutputPlotName),
                                                  subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                 caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
+                                                 caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC), " Metabolites"),
                                                  # xlim = c((ceiling(Reduce(min,Input_data$Log2FC))-0.2),(ceiling(Reduce(max,Input_data$Log2FC))+0.2)),
-                                                 xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                                 xlim =  c(min(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])+0.2  ),
                                                  ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.adj))))),
                                                  #xlim = c(-5,10),
                                                  #ylim = c(0,65),
@@ -983,7 +989,7 @@ Volcano <- function(Input_data,
                                                  gridlines.major = FALSE,
                                                  gridlines.minor = FALSE,
                                                  drawConnectors = Connectors)
-        Plot <- Plot+Theme  + labs(color='Input_Pathways') +
+        Plot <- Plot+Theme  + labs(color='Input_pathways') +
           guides(color = guide_legend(title = "Pathway"))
         
         
@@ -995,31 +1001,31 @@ Volcano <- function(Input_data,
         if(is.null(ylab)){
           ylab=bquote(~-Log[10]~p.val)
         }
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Input_data,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Input_data,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
         
         #Make a list of metabolites that we want to see on the plot:
-        Labels <- subset(DMA_Input_PathwaysPlot_IEC, Pathway != "Other")
+        Labels <- subset(DMA_Input_pathwaysPlot_IEC, Pathway != "Other")
         Labels <- Labels[,1]
         
         #Prepare new colour scheme:
         # Take colors for pathways
-        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_pathwaysPlot_IEC$Pathway))]
         
         keyvals <- c()
         
-        for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
-          keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
-          names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        for(row in 1:nrow(DMA_Input_pathwaysPlot_IEC)){
+          keyval <- safe_colorblind_palette[unique(DMA_Input_pathwaysPlot_IEC$Pathway) %in% DMA_Input_pathwaysPlot_IEC[row, "Pathway"]]
+          names(keyval) <- DMA_Input_pathwaysPlot_IEC$Pathway[row]
           
           keyvals <- c(keyvals, keyval)
         }
         
         #Plot
-        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
-                                                 lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC,
+                                                 lab = DMA_Input_pathwaysPlot_IEC$Metabolite,#Metabolite name
                                                  selectLab =Labels,
                                                  x = "Log2FC",#Log2FC
                                                  y = "p.val",#p-value or q-value
@@ -1034,9 +1040,9 @@ Volcano <- function(Input_data,
                                                  colAlpha = 1,
                                                  title= paste(OutputPlotName),
                                                  subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                 caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
+                                                 caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC), " Metabolites"),
                                                  #xlim = c((ceiling(Reduce(min,Input_data$Log2FC))-0.2),(ceiling(Reduce(max,Input_data$Log2FC))+0.2)),
-                                                 xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                                 xlim =  c(min(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])+0.2  ),
                                                  ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.val))))),
                                                  #xlim = c(-5,10),
                                                  #ylim = c(0,65),
@@ -1078,17 +1084,17 @@ Volcano <- function(Input_data,
         }
         
         
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Input_data,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Input_data,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
-        for (pathway in unique(DMA_Input_PathwaysPlot_IEC$Pathway)) {
+        for (pathway in unique(DMA_Input_pathwaysPlot_IEC$Pathway)) {
           print(pathway)
           
-          DMA_Input_PathwaysPlot_IEC_pathway <- DMA_Input_PathwaysPlot_IEC %>% filter(Pathway ==pathway)
+          DMA_Input_pathwaysPlot_IEC_pathway <- DMA_Input_pathwaysPlot_IEC %>% filter(Pathway ==pathway)
           
-          Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC_pathway,
-                                                   lab = DMA_Input_PathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
+          Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC_pathway,
+                                                   lab = DMA_Input_pathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
                                                    x = "Log2FC",#Log2FC
                                                    y = "p.adj",#p-value or q-value
                                                    xlab  =xlab,
@@ -1102,12 +1108,12 @@ Volcano <- function(Input_data,
                                                    colAlpha = 1,
                                                    title= paste(OutputPlotName),
                                                    subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                   caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC_pathway), " Metabolites"),
-                                                   # xlim = c((ceiling(Reduce(min,DMA_Input_PathwaysPlot_IEC_pathway$Log2FC))-0.2),(ceiling(Reduce(max,DMA_Input_PathwaysPlot_IEC_pathway$Log2FC))+0.2)),
+                                                   caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC_pathway), " Metabolites"),
+                                                   # xlim = c((ceiling(Reduce(min,DMA_Input_pathwaysPlot_IEC_pathway$Log2FC))-0.2),(ceiling(Reduce(max,DMA_Input_pathwaysPlot_IEC_pathway$Log2FC))+0.2)),
                                                    
-                                                   xlim =  c(min(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
+                                                   xlim =  c(min(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
                                                    
-                                                   ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Input_PathwaysPlot_IEC_pathway$p.adj))))),
+                                                   ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Input_pathwaysPlot_IEC_pathway$p.adj))))),
                                                    cutoffLineType = "dashed",
                                                    cutoffLineCol = "black",
                                                    cutoffLineWidth = 0.5,
@@ -1141,17 +1147,17 @@ Volcano <- function(Input_data,
         if(is.null(ylab)){
           ylab=bquote(~-Log[10]~p.val)
         }
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Input_data,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Input_data,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
-        for (pathway in unique(DMA_Input_PathwaysPlot_IEC$Pathway)) {
+        for (pathway in unique(DMA_Input_pathwaysPlot_IEC$Pathway)) {
           print(pathway)
           
-          DMA_Input_PathwaysPlot_IEC_pathway <- DMA_Input_PathwaysPlot_IEC %>% filter(Pathway ==pathway)
+          DMA_Input_pathwaysPlot_IEC_pathway <- DMA_Input_pathwaysPlot_IEC %>% filter(Pathway ==pathway)
           
-          Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC_pathway,
-                                                   lab = DMA_Input_PathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
+          Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC_pathway,
+                                                   lab = DMA_Input_pathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
                                                    x = "Log2FC",#Log2FC
                                                    y = "p.val",#p-value or q-value
                                                    xlab  =xlab,
@@ -1165,12 +1171,12 @@ Volcano <- function(Input_data,
                                                    colAlpha = 1,
                                                    title= paste(OutputPlotName),
                                                    subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                   caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC_pathway), " Metabolites"),
-                                                   # xlim = c((ceiling(Reduce(min,DMA_Input_PathwaysPlot_IEC_pathway$Log2FC))-0.2),(ceiling(Reduce(max,DMA_Input_PathwaysPlot_IEC_pathway$Log2FC))+0.2)),
+                                                   caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC_pathway), " Metabolites"),
+                                                   # xlim = c((ceiling(Reduce(min,DMA_Input_pathwaysPlot_IEC_pathway$Log2FC))-0.2),(ceiling(Reduce(max,DMA_Input_pathwaysPlot_IEC_pathway$Log2FC))+0.2)),
                                                    
-                                                   xlim =  c(min(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
+                                                   xlim =  c(min(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
                                                    
-                                                   ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Input_PathwaysPlot_IEC_pathway$p.val))))),
+                                                   ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Input_pathwaysPlot_IEC_pathway$p.val))))),
                                                    cutoffLineType = "dashed",
                                                    cutoffLineCol = "black",
                                                    cutoffLineWidth = 0.5,
@@ -1194,7 +1200,7 @@ Volcano <- function(Input_data,
       }
     }
   }
-  else if(Multiple == TRUE & is.null(Input_Pathways) == TRUE){
+  else if(Multiple == TRUE & is.null(Input_pathways) == TRUE){
     
     Input_data_1 <- Input_data
     Condition_1<- Cond1name
@@ -1315,8 +1321,8 @@ Volcano <- function(Input_data,
       ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
     }
   }
-  else if(Multiple == TRUE &  is.null(Input_Pathways) == FALSE){
-    if(Plot_Pathways == "Together"){
+  else if(Multiple == TRUE &  is.null(Input_pathways) == FALSE){
+    if(Plot_pathways == "Together"){
       
       Input_data_1 <- Input_data
       Condition_1<- Cond1name
@@ -1348,42 +1354,42 @@ Volcano <- function(Input_data,
         }
         
         
-        DMA_Input_PathwaysPlot_IEC <- Combined_DMA
+        DMA_Input_pathwaysPlot_IEC <- Combined_DMA
         
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Combined_DMA,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Combined_DMA,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
         
-        keyvalsshape <- DMA_Input_PathwaysPlot_IEC$shape
+        keyvalsshape <- DMA_Input_pathwaysPlot_IEC$shape
         names(keyvalsshape)[keyvalsshape == 17] <- paste(Condition_1)
         names(keyvalsshape)[keyvalsshape == 15] <- paste(Condition_2)
         
         
         #Make a list of metabolites that we want to see on the plot:
-        Labels <- subset(DMA_Input_PathwaysPlot_IEC)
+        Labels <- subset(DMA_Input_pathwaysPlot_IEC)
         Labels <-Labels[,1]
         
         #Prepare new colour scheme:
         # Take colors for pathways
         
-        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_pathwaysPlot_IEC$Pathway))]
         
         keyvals <- c()
         
-        for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
-          keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
-          names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        for(row in 1:nrow(DMA_Input_pathwaysPlot_IEC)){
+          keyval <- safe_colorblind_palette[unique(DMA_Input_pathwaysPlot_IEC$Pathway) %in% DMA_Input_pathwaysPlot_IEC[row, "Pathway"]]
+          names(keyval) <- DMA_Input_pathwaysPlot_IEC$Pathway[row]
           
           keyvals <- c(keyvals, keyval)
         }
         
         
         #Plot
-        #DMA_Input_PathwaysPlot_IEC$shape <- as.numeric(DMA_Input_PathwaysPlot_IEC$shape) ### shape doesnt work
+        #DMA_Input_pathwaysPlot_IEC$shape <- as.numeric(DMA_Input_pathwaysPlot_IEC$shape) ### shape doesnt work
         
-        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
-                                                 lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC,
+                                                 lab = DMA_Input_pathwaysPlot_IEC$Metabolite,#Metabolite name
                                                  selectLab =Labels,
                                                  x = "Log2FC",#Log2FC
                                                  y = "p.adj",#p-value or q-value
@@ -1399,8 +1405,8 @@ Volcano <- function(Input_data,
                                                  colAlpha = 1,
                                                  title= paste(OutputPlotName),
                                                  subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                 caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
-                                                 xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                                 caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC), " Metabolites"),
+                                                 xlim =  c(min(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])+0.2  ),
                                                  ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.adj))))),
                                                  #xlim = c(-5,10),
                                                  #ylim = c(0,65),
@@ -1431,38 +1437,38 @@ Volcano <- function(Input_data,
         if(is.null(ylab)){
           ylab=bquote(~-Log[10]~p.val)
         }
-        DMA_Input_PathwaysPlot_IEC <- Combined_DMA
+        DMA_Input_pathwaysPlot_IEC <- Combined_DMA
         
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Combined_DMA,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Combined_DMA,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
-        keyvalsshape <- DMA_Input_PathwaysPlot_IEC$shape
+        keyvalsshape <- DMA_Input_pathwaysPlot_IEC$shape
         names(keyvalsshape)[keyvalsshape == 17] <- paste(Condition_1)
         names(keyvalsshape)[keyvalsshape == 15] <- paste(Condition_2)
         
         #Make a list of metabolites that we want to see on the plot:
-        Labels <- subset(DMA_Input_PathwaysPlot_IEC)
+        Labels <- subset(DMA_Input_pathwaysPlot_IEC)
         Labels <-Labels[,1]
         
         #Prepare new colour scheme:
         # Take colors for pathways
-        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_PathwaysPlot_IEC$Pathway))]
+        safe_colorblind_palette <- safe_colorblind_palette[1:length(unique(DMA_Input_pathwaysPlot_IEC$Pathway))]
         
         keyvals <- c()
         
-        for(row in 1:nrow(DMA_Input_PathwaysPlot_IEC)){
-          keyval <- safe_colorblind_palette[unique(DMA_Input_PathwaysPlot_IEC$Pathway) %in% DMA_Input_PathwaysPlot_IEC[row, "Pathway"]]
-          names(keyval) <- DMA_Input_PathwaysPlot_IEC$Pathway[row]
+        for(row in 1:nrow(DMA_Input_pathwaysPlot_IEC)){
+          keyval <- safe_colorblind_palette[unique(DMA_Input_pathwaysPlot_IEC$Pathway) %in% DMA_Input_pathwaysPlot_IEC[row, "Pathway"]]
+          names(keyval) <- DMA_Input_pathwaysPlot_IEC$Pathway[row]
           
           keyvals <- c(keyvals, keyval)
         }
         
         #Plot
-        #DMA_Input_PathwaysPlot_IEC$shape <- as.numeric(DMA_Input_PathwaysPlot_IEC$shape) ### shape doesnt work
+        #DMA_Input_pathwaysPlot_IEC$shape <- as.numeric(DMA_Input_pathwaysPlot_IEC$shape) ### shape doesnt work
         
-        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC,
-                                                 lab = DMA_Input_PathwaysPlot_IEC$Metabolite,#Metabolite name
+        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC,
+                                                 lab = DMA_Input_pathwaysPlot_IEC$Metabolite,#Metabolite name
                                                  selectLab =Labels,
                                                  x = "Log2FC",#Log2FC
                                                  y = "p.val",#p-value or q-value
@@ -1478,8 +1484,8 @@ Volcano <- function(Input_data,
                                                  colAlpha = 1,
                                                  title= paste(OutputPlotName),
                                                  subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                 caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC), " Metabolites"),
-                                                 xlim =  c(min(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC$Log2FC )])+0.2  ),
+                                                 caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC), " Metabolites"),
+                                                 xlim =  c(min(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC$Log2FC )])+0.2  ),
                                                  ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.val))))),
                                                  #xlim = c(-5,10),
                                                  #ylim = c(0,65),
@@ -1509,7 +1515,7 @@ Volcano <- function(Input_data,
         ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
       }
     } 
-    else{ #  Plot_Pathways == "Individual"
+    else{ #  Plot_pathways == "Individual"
       
       Input_data_1 <- Input_data
       Condition_1<- Cond1name
@@ -1542,25 +1548,25 @@ Volcano <- function(Input_data,
         }
         
         
-        DMA_Input_PathwaysPlot_IEC <- Combined_DMA
+        DMA_Input_pathwaysPlot_IEC <- Combined_DMA
         
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Combined_DMA,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Combined_DMA,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
         
-        for (pathway in unique(DMA_Input_PathwaysPlot_IEC$Pathway)) {
+        for (pathway in unique(DMA_Input_pathwaysPlot_IEC$Pathway)) {
           print(pathway)
           
-          DMA_Input_PathwaysPlot_IEC_pathway <- DMA_Input_PathwaysPlot_IEC %>% filter(Pathway == pathway)
-          keyvalsshape <- DMA_Input_PathwaysPlot_IEC_pathway$shape
+          DMA_Input_pathwaysPlot_IEC_pathway <- DMA_Input_pathwaysPlot_IEC %>% filter(Pathway == pathway)
+          keyvalsshape <- DMA_Input_pathwaysPlot_IEC_pathway$shape
           names(keyvalsshape)[keyvalsshape == 17] <- paste(Condition_1)
           names(keyvalsshape)[keyvalsshape == 15] <- paste(Condition_2)
           
 
           
-          Plot <- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC_pathway,
-                                                   lab = DMA_Input_PathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
+          Plot <- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC_pathway,
+                                                   lab = DMA_Input_pathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
                                                    selectLab =Labels,
                                                    x = "Log2FC",#Log2FC
                                                    y = "p.adj",#p-value or q-value
@@ -1575,8 +1581,8 @@ Volcano <- function(Input_data,
                                                    colAlpha = 1,
                                                    title= paste(OutputPlotName),
                                                    subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                   caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC_pathway), " Metabolites"),
-                                                   xlim =  c(min(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
+                                                   caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC_pathway), " Metabolites"),
+                                                   xlim =  c(min(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
                                                    ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.adj))))),
                                                    #xlim = c(-5,10),
                                                    #ylim = c(0,65),
@@ -1613,25 +1619,25 @@ Volcano <- function(Input_data,
         if(is.null(ylab)){
           ylab=bquote(~-Log[10]~p.val)
         }
-        DMA_Input_PathwaysPlot_IEC <- Combined_DMA
+        DMA_Input_pathwaysPlot_IEC <- Combined_DMA
         
-        Input_Pathways <- Input_Pathways %>% select(all_of(c("Metabolite", "Pathway")))
-        DMA_Input_PathwaysPlot_IEC <- merge(Combined_DMA,Input_Pathways, by = "Metabolite" )
-        DMA_Input_PathwaysPlot_IEC["Pathway"][DMA_Input_PathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
+        Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+        DMA_Input_pathwaysPlot_IEC <- merge(Combined_DMA,Input_pathways, by = "Metabolite" )
+        DMA_Input_pathwaysPlot_IEC["Pathway"][DMA_Input_pathwaysPlot_IEC["Pathway"] == "unknown"] <- "Other"
         
         
-        for (pathway in unique(DMA_Input_PathwaysPlot_IEC$Pathway)) {
+        for (pathway in unique(DMA_Input_pathwaysPlot_IEC$Pathway)) {
           print(pathway)
           
-          DMA_Input_PathwaysPlot_IEC_pathway <- DMA_Input_PathwaysPlot_IEC %>% filter(Pathway ==pathway)
-          keyvalsshape <- DMA_Input_PathwaysPlot_IEC_pathway$shape
+          DMA_Input_pathwaysPlot_IEC_pathway <- DMA_Input_pathwaysPlot_IEC %>% filter(Pathway ==pathway)
+          keyvalsshape <- DMA_Input_pathwaysPlot_IEC_pathway$shape
           names(keyvalsshape)[keyvalsshape == 17] <- paste(Condition_1)
           names(keyvalsshape)[keyvalsshape == 15] <- paste(Condition_2)
         }
         
         
-        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_PathwaysPlot_IEC_pathway,
-                                                 lab = DMA_Input_PathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
+        Plot<- EnhancedVolcano::EnhancedVolcano (DMA_Input_pathwaysPlot_IEC_pathway,
+                                                 lab = DMA_Input_pathwaysPlot_IEC_pathway$Metabolite,#Metabolite name
                                                  selectLab =Labels,
                                                  x = "Log2FC",#Log2FC
                                                  y = "p.val",#p-value or q-value
@@ -1646,8 +1652,8 @@ Volcano <- function(Input_data,
                                                  colAlpha = 1,
                                                  title= paste(OutputPlotName),
                                                  subtitle = bquote(italic("Differential metabolomics analysis")),
-                                                 caption = paste0("total = ", nrow(DMA_Input_PathwaysPlot_IEC_pathway), " Metabolites"),
-                                                 xlim =  c(min(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_PathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
+                                                 caption = paste0("total = ", nrow(DMA_Input_pathwaysPlot_IEC_pathway), " Metabolites"),
+                                                 xlim =  c(min(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])-0.2,max(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC[is.finite(DMA_Input_pathwaysPlot_IEC_pathway$Log2FC )])+0.2  ),
                                                  ylim = c(0,(ceiling(-log10(Reduce(min,Input_data$p.val))))),
                                                  #xlim = c(-5,10),
                                                  #ylim = c(0,65),
@@ -1681,10 +1687,11 @@ Volcano <- function(Input_data,
 
 ##------- How to use -------##
 # Volcano(Input_data = DMA_output_Intra) 
-# Volcano(Input_data = DMA_output_Intra, Input_Pathways = DMA_output_Intra)
-# Volcano(Input_data = DMA_output_Intra, Input_Pathways = Pathways_df)
+# Volcano(Input_data = DMA_output_Intra, Input_pathways = DMA_output_Intra)
+# Volcano(Input_data = DMA_output_Intra, Input_pathways = Pathways_df, Plot_pathways = "Together")
+# Volcano(Input_data = DMA_output_Intra, Input_pathways = Pathways_df, Plot_pathways = "Individual")
 # Volcano(Input_data = DMA_output_Intra ,Input_data2=DMA_output_Intra2) 
-# Volcano(Input_data = DMA_output_Intra, Input_data2 = DMA_output_Intra2, Input_Pathways = DMA_output_Intra) 
+# Volcano(Input_data = DMA_output_Intra, Input_data2 = DMA_output_Intra2, Input_pathways = DMA_output_Intra) 
 
 # Notes.
 # careful with x and y limits.
@@ -1696,11 +1703,20 @@ Volcano <- function(Input_data,
 ######################################=
 #' Notes; Check the alluvial in the Metabolic Clusters. This one is a bit old but kept here to return to if nedded
 
-Alluvial <- function(Input_data1, Input_data2,  Output_Name = "Metabolic_Clusters_Output_Condition1-versus-Condition2",  Condition1,  Condition2,
-                                 pCutoff= 0.05 , FCcutoff=0.5, test = "p.adj", plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite"),
-                                 safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000"), # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible
-                                 plot_color_variable = "Overall_Change",  plot_color_remove_variable = "SameDirection_NoChange",
-                                 Save_as = pdf ){
+Alluvial <- function(Input_data1, 
+                     Input_data2, 
+                     Output_Name = "Metabolic_Clusters_Output_Condition1-versus-Condition2",  
+                     Condition1,  
+                     Condition2,
+                     pCutoff= 0.05 , 
+                     FCcutoff=0.5, 
+                     test = "p.adj", 
+                     plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite"),
+                     safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000"), # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible
+                     plot_color_variable = "Overall_Change",  
+                     plot_color_remove_variable = "SameDirection_NoChange",
+                     Save_as = pdf 
+                     ){
   
   
   ####################################################
@@ -2008,59 +2024,171 @@ Alluvial <- function(Input_data1, Input_data2,  Output_Name = "Metabolic_Cluster
 #####################################
 ### ### ### Lolipop Plots ### ### ###
 #####################################
-#' Should probaly add to be able to change the size and color variable to whatever we want
-#' Issues with save as pdf, and some in svg for the together plot
-#' for none the color and size show the same thing
-#library(tidyverse)
-#library(cowplot)
-#library(showtext)
 
-Lolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "p.adj",OutputPlotName= "lolipop plot", plot_pathways = "none",# or "individual" or "together
-                              Theme=theme_classic(), Save_as = svg ){
+#' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns. Multiple Input data frames can be added using a list ie. list(df1, df2, df3)
+#' @param test \emph{Optional: } String which selects pvalue or padj for significance. \strong{Default = padj}
+#' @param pCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
+#' @param FCcutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot
+#' @param Input_pathways \emph{Optional: } DF which contains a 'Metabolite' and a 'Pathway' columns, with pathway information for each metabolite. It can be the same as Input_data or another data frame. \strong{Default = NULL}
+#' @param Plot_pathways \emph{Optional: } String with plotting information about Metabolite pathways. Available only when the Input_pathways parameter has a file. Options are "None" if no pathways are to be plotted, "Individual" for plots of each Individual pathway and "Together" for metabolite pathways color-coded on a single volcano plot \strong{Default = "Together"}
+#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
+#' @param CondNames \emph{Optional: } list of Input dataset names as strings when multiple input datasets are used. \strong{Default = Comparisson 1}
+#' @param Comparison \emph{Optional: } String that is placed as the plot title which multiple datasets are used. \strong{Default = Comparisson 1} ## add this to multiple = false
+#' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
+#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
+#' 
+#' @keywords Volcano plot, pathways
+#' @export
+#' 
+#' 
+
+Lolipop <- function(Input_data, # a dataframe of list of dataframes
+                    test = "p.adj",
+                    pCutoff= 0.05 , 
+                    FCcutoff=0.5, 
+                    OutputPlotName= "", 
+                    Input_pathways = NULL,
+                    Plot_pathways = "None",# or "Individual" or "Together
+                    Theme=theme_classic(),
+                    CondNames = NULL, # list of dataframe names
+                    Comparison = "Plot Title",
+                    Save_as = "svg"
+){
   
-  ####################################################
-  # This searches for a Results directory within the current working directory and if its not found it creates a new one
-  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  ### Create Volcano plots folder in  result directory ###
-  Results_folder_plots_Lolipop_folder = paste(Results_folder,"/Lolipop",  sep="")
-  if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}
+  
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", "showtext", "cowplot")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+  
+  ## ------------ Check Input files ----------- ##
+  if(inherits(Input_data,"list") ==FALSE){
+    temp <- list(Input_data)
+    Input_data <- temp
+  }
+  for(data in Input_data){
+    if(any(duplicated(row.names(data)))==TRUE){
+      stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+    } 
+    if("Metabolite" %in% colnames(data) == FALSE){
+      stop("Check Input. Metabolite column is missing from Input_data")
+    } 
+    if(any(duplicated(data$Metabolite))==TRUE){
+      stop("Duplicated Metabolite names in Input_data, Metabolites must be unique")
+    } 
+  }
+  
+  if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
+    stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
+  }
+  if( is.numeric(FCcutoff)== FALSE  | FCcutoff < 0){
+    stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
+  }
+  if(test != "p.val" & test != "p.adj"){
+    stop("Check input. The selected test option for assessing significance is not valid. Please select one of the following: p.adj, p.val.")
+  }
+  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  if(Save_as %in% Save_as_options == FALSE){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+  Plot_pathways_options <- c("None", "Individual", "Together")
+  if (Plot_pathways %in% Plot_pathways_options == FALSE){
+    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Plot_pathways_options,collapse = ", "),"." )
+  }
+  if(is.null(Input_pathways) == TRUE){
+    if (Plot_pathways != "None"){
+      warning("No Input_pathways were added. Yet the Plot_pathways option was changed. This will have no effect on the plot")
+      Plot_pathways = "None"
+    }
+  }
+  if(is.null(Input_pathways) == FALSE){
+    if("Metabolite" %in% colnames(Input_pathways) == FALSE){
+      stop("Check Input. Metabolite column is missing from Input_pathways")
+    }
+    if("Pathway" %in% colnames(Input_pathways) == FALSE){
+      stop("Check Input. Pathway column is missing from Input_pathways")
+    }
+    for(i in 1:length(Input_data)){ # Here we check every data in the input data with the Input pathways. We dont check common metablites between each input dataset. Should we also add this?
+      data <- Input_data[[i]]
+      if(identical(sort(data$Metabolite), sort(Input_pathways$Metabolite)) == FALSE){
+        warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_pathways. We will take into consideration only the common Metabolites.")
+        # find common metabolites
+        common_metabolites <- data[data$Metabolite %in% Input_pathways$Metabolite, "Metabolite"]
+        # Take the data that have both pval reslults and pathwayss
+        Input_data <- data %>% filter(Metabolite %in% common_metabolites)
+        Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
+      }
+    }
+  }
   
   
-  #####################################################
-  ### ### ### make output plot save_as name ### ### ###
-  Save_as= deparse(substitute(Save_as))
+  for(i in 1:length(Input_data)){
+    data <- Input_data[[i]]
+    if("Pathway" %in% colnames(data)){
+      data$Pathway <- NULL
+      Input_data[[1]] <- data
+    } 
+  }
   
   
-  # Remove rows with NAs
-  Input_data<- Input_data %>% drop_na()
-  #Select metabolites for the cut offs selected
-  loli.data <- Input_data %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff)
+  
+  ## ------------ Create Output folders ----------- ##
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) 
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+  Results_folder_plots_Lolipop_folder = file.path(Results_folder, "Lolipop")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+  if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}  # check and create folder
   
   
-  if(plot_pathways == "individual"){
+  Multiple = FALSE
+  if(length(Input_data) > 1){
+    Multiple = TRUE
+  }
+  if (Plot_pathways == "None"){
+    if(is.null(Input_pathways)==FALSE){
+      warning("An Input_pathways file has been added. However, Plot_pathways = none ,thus no pathway information will be incorporated in the Volcano plot. To use Pathway information please change Plot_pathways to Individual or Together.")
+    }
+    Input_pathways = NULL
+  }
+  
+  if(Multiple == FALSE){
+    # Remove rows with NAs
+    Input_data <- Input_data[[1]]
+    loli.data<- Input_data %>% drop_na()
     
-    Pathway_Names <- unique(Input_data$Pathway)
-    for (i in Pathway_Names){
-      print(i)
-      loli.data_path_indi <- loli.data %>% filter(Pathway==i)
+    if (is.null(Input_pathways)== FALSE){
+      Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      loli.data <- merge(loli.data,Input_pathways, by = "Metabolite" )
+    }
+    #Select metabolites for the cut offs selected
+    loli.data <- loli.data %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & test > pCutoff)
+    
+    if(Plot_pathways == "Individual"){
       
-      lolipop_plot <- ggplot(loli.data_path_indi , aes(x = Log2FC, y = names)) +
-        geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
-        geom_point(aes(colour = p.adj, size = p.adj ))   +
-        scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
-        scale_colour_gradient(low = "red", high = "blue", limits = c(0, max(loli.data[,test]))) +
-        ggtitle(label = paste(i," Pathway"), subtitle = paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
-      #ggsave(filename = "Loli_plot2.pdf", plot = last_plot(), width=10, height=8)
-      
-      ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/",i,"_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
-      
-      # svg(filename = paste("Results_", Sys.Date(), "/Lolipop_plots/",i,"_", OutputPlotName, ".svg", sep=""),
-      #     width = 10,
-      #     height = 8)
-      # plot(lolipop_plot)
-      # dev.off()
-    }}else if(plot_pathways == "together"){
+      Pathway_Names <- unique(loli.data$Pathway)
+      for (i in Pathway_Names){
+        print(i)
+        loli.data_path_indi <- loli.data %>% filter(Pathway==i)
+        
+        lolipop_plot <- ggplot(loli.data_path_indi , aes(x = Log2FC, y = names)) +
+          geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+          geom_point(aes(colour = p.adj, size = p.adj ))   +
+          scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+          scale_colour_gradient(low = "red", high = "blue", limits = c(0, max(loli.data[,test]))) +
+          ggtitle(label = paste(i," Pathway"), subtitle = paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
+        #ggsave(filename = "Loli_plot2.pdf", plot = last_plot(), width=10, height=8)
+        
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/",i, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+        }
+        
+      }}
+    else if(Plot_pathways == "Together"){
       
       loli.data <- loli.data %>%
         arrange(Pathway, Metabolite)
@@ -2132,79 +2260,241 @@ Lolipop <- function(Input_data, pCutoff= 0.05 , FCcutoff=0.5, test = "p.adj",Out
       p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 3, y = 0, label = "Significantly changed metabolites and their pathways", size = 8)
       
       p2 <- p2+Theme
-      # p2 + xlab("Metabolites") +  ggtitle("Titile is missing") # desnt work
       
-      ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/","together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
-      # dev.off()
-      # svg(filename = paste("Results_", Sys.Date(), "/Lolipop_plots/","together", OutputPlotName, ".svg", sep=""),
-      #     width = 14,
-      #     height = 10)
-      # plot(p2)
-      # dev.off()
       
-    }else if(plot_pathways == "none"){
+      if(OutputPlotName ==""){
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
+      }else{
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together_", OutputPlotName, ".",Save_as, sep=""), plot=p2,  width=20, height=20)
+      }
+      
+    }
+    else if(Plot_pathways == "None"){
       lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
         geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
         geom_point(aes(colour = p.adj, size = p.adj ))   +
         scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
         scale_colour_gradient(low = "red", high = "blue", limits = c(0, max(loli.data[,test]))) +
         ggtitle(paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
-      #ggsave(filename = "Loli_plot2.pdf", plot = last_plot(), width=10, height=8)
       
-      ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+      if(OutputPlotName ==""){
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+      }else{
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+      }
       
-      # svg(filename = paste("Results_", Sys.Date(), "/Lolipop_plots/", OutputPlotName, ".svg", sep=""),
-      #     width = 10,
-      #     height = 8)
-      # plot(lolipop_plot)
-      # dev.off()
     }
-  
+  }
+  else{
+    
+    if(Plot_pathways == "Individual"){
+      
+      Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      Combined_Input <- data.frame(matrix(ncol = 5, nrow = 0))
+      comb.colnames <- c("Metabolite","Log2FC",test, "Condition","Pathway")
+      colnames(Combined_Input) <- comb.colnames
+      
+      for ( i in 1:length(Input_data)){
+        Input_data[[i]]$Condition <- CondNames[[i]]
+        Input_data_pathways <- merge( Input_data[[i]],Input_pathways, by = "Metabolite" )
+        Combined_Input <- rbind(Combined_Input, Input_data_pathways %>% select(all_of(c("Metabolite","Log2FC",test, "Condition", "Pathway"))))
+      }
+      
+      Combined_Input["Pathway"][Combined_Input["Pathway"] == "unknown"] <- "Other"
+      Combined_Input[test] <- round(Combined_Input[test], digits = 6)
+      
+      
+      for (pathway in unique(Combined_Input$Pathway)){
+        Combined_Input_pathway <- Combined_Input %>% filter(Pathway == pathway)
+        
+        Dotplot1 <-ggplot(Combined_Input_pathway, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
+          geom_point(stat='identity', aes(size = abs(`Log2FC`), col=Condition))  +
+          geom_segment(aes(y =(Reduce(max,`Log2FC`)), 
+                           x = Metabolite, 
+                           yend = `Log2FC`,
+                           xend = Metabolite), 
+                       color = "black") +
+          scale_size(name="abs(Log2FC)",range = c(6,16))+
+          geom_text(color="black", size=2) +
+          labs(title=paste(Comparison)) + 
+          ylim(((Reduce(min,Combined_Input_pathway$`Log2FC`))-0.5),((Reduce(max,Combined_Input_pathway$`Log2FC`))+0.5)) +
+          theme_minimal() +
+          coord_flip()+
+          theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                plot.subtitle = element_text(color = "black", size=10),
+                plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
+          labs(y="Log2FC", x="")+
+          geom_hline(yintercept=0,  color = "black", linewidth=0.1)
+        
+        
+        
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop",pathway, ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",pathway,"_", OutputPlotName, ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
+        }
+      }
+    }
+    else if(Plot_pathways == "Together"){
+      
+      Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
+      Combined_Input <- data.frame(matrix(ncol = 5, nrow = 0))
+      comb.colnames <- c("Metabolite","Log2FC",test, "Condition","Pathway")
+      colnames(Combined_Input) <- comb.colnames
+      
+      for ( i in 1:length(Input_data)){
+        Input_data[[i]]$Condition <- CondNames[[i]]
+        Input_data_pathways <- merge( Input_data[[i]],Input_pathways, by = "Metabolite" )
+        Combined_Input <- rbind(Combined_Input, Input_data_pathways %>% select(all_of(c("Metabolite","Log2FC",test, "Condition", "Pathway"))))
+      }
+      
+      Combined_Input["Pathway"][Combined_Input["Pathway"] == "unknown"] <- "Other"
+      Combined_Input[test] <- round(Combined_Input[test], digits = 6)
+      
+      
+      ######
+      loli.data <- Combined_Input
+      
+      loli.data <- loli.data %>%
+        arrange(Pathway, Metabolite)
+      
+      loli.data_avg <- loli.data %>%
+        arrange(Pathway, Metabolite) %>%
+        mutate(Metab_name = row_number()) %>%
+        group_by(Condition, Pathway) %>%
+        mutate(
+          avg = mean(Log2FC)
+        ) %>%
+        ungroup() %>%
+        mutate(Pathway = factor(Pathway))
+      
+      loli.data_avg$Metab_name <- rep(seq.int(length(loli.data_avg$Metab_name)/length(Input_data)), each= length(Input_data) )
+      
+      
+      loli_lines <-   loli.data_avg %>%
+        arrange(Pathway, Metabolite) %>%
+        group_by(Pathway) %>%
+        summarize(
+          start_x = min(Metab_name) -0.5,
+          end_x = max(Metab_name) + 0.5,
+          y = 0#unique(avg)
+        ) %>%
+        pivot_longer(
+          cols = c(start_x, end_x),
+          names_to = "type",
+          values_to = "x"
+        ) %>%
+        mutate(
+          x_group = if_else(type == "start_x", x + .1, x - .1),
+          x_group = if_else(type == "start_x" & x == min(x), x_group - .1, x_group),
+          x_group = if_else(type == "end_x" & x == max(x), x_group + .1, x_group) )
+      
+      p2 <- loli.data_avg %>%
+        ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
+        geom_hline(
+          data = tibble(y = -5:5),
+          aes(yintercept = y),
+          color = "grey82",
+          size = .5 )
+      
+      p2 <- p2 + geom_segment(
+        aes(
+          xend = Metab_name,          # names
+          yend = 0,#avg,
+          color = Pathway,
+          #color = after_scale(colorspace::lighten(color, .2))
+        ))
+      
+      p2 <- p2 + # geom_line( data = loli_lines, aes(x, y),  color = "grey40"  ) +
+        geom_line(
+          data = loli_lines,
+          aes( x_group, y,
+               color = Pathway,
+               #  color = after_scale(colorspace::darken(color, .2))
+          ), size = 2.5) +  geom_point(aes(size = p.adj, color = Pathway, shape = Condition  )
+          )+ scale_size(trans = 'reverse')
+      
+      
+      p2<- p2 + coord_flip()
+      p2<-p2+ theme(axis.text.x=element_text())
+      
+      lab_metab <- loli.data_avg  %>% group_by(Metabolite,Metab_name) %>% summarise(max= Log2FC[which.max(abs(Log2FC))])
+      
+      
+      lab_pos_metab <- lab_metab[rep(seq_len(nrow(lab_metab)), each = length(Input_data)), ] %>% filter(max>0)
+      lab_neg_metab <- lab_metab[rep(seq_len(nrow(lab_metab)), each = length(Input_data)), ] %>% filter(max<0)
+      
+      p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$max+1, label = lab_pos_metab$Metabolite, size = 4)
+      p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$max-1, label = lab_neg_metab$Metabolite, size = 4)
+      
+      p2
+      
+      p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+10, y = 0, label = "Significantly changed metabolites and their pathways", size = 8)
+      
+      p2 <- p2+Theme
+      
+      if(OutputPlotName ==""){
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
+      }else{
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together_", OutputPlotName, ".",Save_as, sep=""), plot=p2,  width=20, height=20)
+      }
+    }
+    else if(Plot_pathways == "None"){
+      
+      Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
+      comb.colnames <- c("Metabolite","Log2FC",test, "Condition")
+      colnames(Combined_Input) <- comb.colnames
+      
+      for ( i in 1:length(Input_data)){
+        Input_data[[i]]$Condition <- CondNames[[i]]
+        Combined_Input <- rbind(Combined_Input, Input_data[[i]] %>% select(all_of(c("Metabolite","Log2FC",test, "Condition"))))
+        
+      }
+      
+      # Combined_Input <- Combined_Input %>% filter(abs(Log2FC) >=FCcutoff)
+      # Combined_Input <- Combined_Input[Combined_Input[test] <= pCutoff,]
+      # Combined_Input<- Combined_Input %>% drop_na()
+      Combined_Input[test] <- round(Combined_Input[test], digits = 6)
+      
+      
+      
+      Dotplot1 <-ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
+        geom_point(stat='identity', aes(size = abs(`Log2FC`), col=Condition))  +
+        geom_segment(aes(y =(Reduce(max,`Log2FC`)), 
+                         x = Metabolite, 
+                         yend = `Log2FC`,
+                         xend = Metabolite), 
+                     color = "black") +
+        scale_size(name="abs(Log2FC)",range = c(6,16))+
+        geom_text(color="black", size=2) +
+        labs(title=paste(Comparison)) + 
+        ylim(((Reduce(min,Combined_Input$`Log2FC`))-0.5),((Reduce(max,Combined_Input$`Log2FC`))+0.5)) +
+        theme_minimal() +
+        coord_flip()+
+        theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+              plot.subtitle = element_text(color = "black", size=10),
+              plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
+        labs(y="Log2FC", x="")
+      
+      
+      
+      if(OutputPlotName ==""){
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
+      }else{
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
+      }
+      
+    }
+  }
 }
-
-
-# Add the functionality to lollipop graph to plot from multiple conditions - maybe up to 4 different comparisons:
-# 1. create the input for the lillipop based on the different comparisons.
-# here is an example if you have two DFs, we basically create a new column "Condition" that we use to colour code. It would be good if the user could provide a matched list of condition names or we use the input names as condition names?
-Input_C1 <- DF
-Input_C1$Condition <- "Condition 1"
-
-Input_C2 <- DF
-Input_C2$Condition <- "Condition 2"
-
-Input <- rbind(C1, C2)
-
-
-#2. Now we need to update the graph, colour coding for the conditions. Here example for two conditions:
-Lollipop_VAE <- function(Input, Comparison){
-  Plot <- Input
-  Dotplot1 <-ggplot(Plot, aes(x=reorder(metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
-  geom_point(stat='identity', aes(size = `Log2FC`, col=Condition))  +
-  geom_segment(aes(y =(Reduce(max,`Log2FC`)), 
-                   x = metabolite, 
-                   yend = `Log2FC`,
-                   xend = metabolite), 
-               color = "black") +
-  scale_size(name="Log2FC",range = c(2,16))+
-  geom_text(color="black", size=2) +
-  labs(title=paste(Comparison)) + 
-  ylim(((Reduce(min,Plot$`Log2FC`))-0.5),((Reduce(max,Plot$`Log2FC`))+0.5)) +
-  theme_minimal() +
-  coord_flip()+
-  theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
-        plot.subtitle = element_text(color = "black", size=10),
-        plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
-  labs(y="Log2FC", x="")
-ggsave(file=paste("Figures/LollipopGraph_", Comparison,".pdf", sep=""), plot=Dotplot1, width=10, height=10)
-plot(Dotplot1)
-}
-
 
 
 ###########----------------------
 # Use function
-#plotLolipop(Input_data = DMA_output, plot_pathways = "together") # or individual ot together
+#plotLolipop(Input_data = DMA_output, Plot_pathways = "Together") # or Individual ot Together
 ######---------------------------
+
+
 
 
 ####################################

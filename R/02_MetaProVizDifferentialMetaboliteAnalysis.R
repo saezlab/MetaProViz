@@ -47,7 +47,7 @@ DMA <-function(Input_data,
                Input_Pathways = NULL, 
                OutputName='', 
                CoRe=FALSE, 
-               plot = TRUE, 
+               Plot = TRUE, 
                Save_as = "svg"){
   
   ## ------------ Setup and installs ----------- ##
@@ -111,7 +111,7 @@ DMA <-function(Input_data,
   if(is.logical(CoRe) == FALSE){
     stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
   }
-  if(is.logical(plot) == FALSE){
+  if(is.logical(Plot) == FALSE){
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
   Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
@@ -120,7 +120,7 @@ DMA <-function(Input_data,
   }
 
   #3. Input_Pathways
-  if(is.null(Input_Pathways) != TRUE){
+  if(is.null(Input_Pathways) == FALSE){
     if('Metabolite' %in% colnames(Input_Pathways) == FALSE){
       warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.")
     }else if('Pathway' %in% colnames(Input_Pathways) == FALSE){
@@ -252,7 +252,7 @@ DMA <-function(Input_data,
   xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
   writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
  
-  if ( plot == TRUE){ # Make a simple Volcano plot --> implemet plot true or false
+  if ( Plot == TRUE){ # Make a simple Volcano plot --> implemet plot true or false
     VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
                                    lab = DMA_Output$Metabolite,#Metabolite name
                                    x = "Log2FC",#Log2FC
