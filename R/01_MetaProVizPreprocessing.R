@@ -23,10 +23,10 @@
 #'
 #' @param Input DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to Standard then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design including the individual conditions you want to apply the filtering to (Yang, J et al., 2015).\strong{Default = TRUE} \strong{Default = Modified}
-#' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering (Bijlsma S. et al., 2006). \strong{Default = 0.8}
+#' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015).\strong{Default = TRUE} \strong{Default = Modified}
+#' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
-#' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. \strong{Default = 0.99}
+#' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF, e.g. "blank_1", "blank_2". \strong{Default = FALSE}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
@@ -107,8 +107,8 @@ Preprocessing <- function(Input_data,
       stop("The CoRe_norm_factor length is different from the amount of samples. Please input a vector with a value for each sample. Blanks should take a value of 1.")
     }
     if(length(grep("blank", Conditions)) < 1){     # Check for blank samples
-      stop("No blank samples were provided in the 'Conditions' in the Experimental design'. For a CoRe experiment control media samples have to also be measured and be added in the 'Conditions'
-           column labeled as 'blank' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = TRUE for your analysis")
+      stop("No blank samples were provided in the 'Conditions' in the Experimental design'. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
+           column labeled as 'blank' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = FALSE for your analysis")
     }
   }
   
@@ -170,10 +170,10 @@ Preprocessing <- function(Input_data,
     unique_conditions <- unique(Conditions) # saves the different conditions
 
     if(is.null(unique(Conditions)) ==  TRUE){
-      stop("Condition information is missing from the Experimental design")
+      stop("Condition information is missing from the Experimental design.")
     }
     if(length(unique(Conditions)) ==  1){
-      stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the COndition column in the Experimental design. Consider using the Standard feature filtering option.")
+      stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
     }
 
     miss <- c()
@@ -183,7 +183,7 @@ Preprocessing <- function(Input_data,
 
       for (m in split_Input){ # Select metabolites to be filtered for different conditions
         for(i in 1:ncol(m)) {
-          if(length(which(is.na(m[,i]))) > Feature_Filt_Value*nrow(m))  ## Check complete.case instead of is.na. it is faster and you dont have to use which
+          if(length(which(is.na(m[,i]))) > (1-Feature_Filt_Value)*nrow(m))
             miss <- append(miss,i)
         }
       }
@@ -195,21 +195,21 @@ Preprocessing <- function(Input_data,
       feat_file_res <- "There where no metabolites exluded"
       write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
-      message(paste( length(unique(miss)) ,"metabolites where removed:"))
+      message(paste(length(unique(miss)) ," metabolites where removed."))
       message(unique(colnames(Input_data)[miss]))
       filtered_matrix <- Input_data[,-miss]
       write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     }
   }
   if (Feature_Filtering ==  "Standard"){
-    message("Here we apply the so-called 80%-filtering rule is used, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
+    message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
     message(paste("filtering value selected:", Feature_Filt_Value))
     split_Input <- Input_data
 
     miss <- c()
     message("***Performing standard feature filtering***")
     for(i in 1:ncol(split_Input)) { # Select metabolites to be filtered for one condition
-      if(length(which(is.na(split_Input[,i]))) > (Feature_Filt_Value)*nrow(split_Input))
+      if(length(which(is.na(split_Input[,i]))) > (1-Feature_Filt_Value)*nrow(split_Input))
         miss <- append(miss,i)
     }
     
@@ -226,7 +226,7 @@ Preprocessing <- function(Input_data,
     }
   }
   if (Feature_Filtering ==  "None"){
-    warning("No feature filtering is selected")
+    warning("No feature filtering is selected.")
     filtered_matrix <- as.data.frame(Input_data)
   }
   
@@ -240,7 +240,7 @@ Preprocessing <- function(Input_data,
   zero_var_metabs <- filtered_matrix[, sapply(filtered_matrix, var,na.rm =  TRUE) ==  0] %>% colnames()
   zero_var_metabs <- paste(zero_var_metabs, collapse = ', ')
   if (length(zero_var_metabs) > 1){
-    message(paste("There are metabolits with Zero variance. These are: ",zero_var_metabs ))
+    message(paste("There are metabolites with Zero variance across the samples. These are: ",zero_var_metabs ))
   }
   zero_var_removed <- filtered_matrix[, sapply(filtered_matrix, var,na.rm  =  TRUE) !=  0] # Remove zero variance metabolites
   filtered_matrix <- zero_var_removed
@@ -256,7 +256,7 @@ Preprocessing <- function(Input_data,
   #######################################################
   ### ### ### Total Ion Current Normalization ### ### ###
 
-  if (TIC_Normalization ==  TRUE){ # Ask if we want to normalize for total ion counts
+  if (TIC_Normalization ==  TRUE){
     message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
     RowSums <- rowSums(NA_removed_matrix)
     Median_RowSums <- median(RowSums) #This will built the median
@@ -307,7 +307,7 @@ Preprocessing <- function(Input_data,
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
 
     metabolite_var <- as.data.frame( apply(data_norm, 2, var) %>% t()) # calculate each metabolites variance
-    metabolite_zero_var_list <- list( colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metablolites with zero variance and puts them in list
+    metabolite_zero_var_list <- list( colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metabollites with zero variance and puts them in list
     
     if(sum(metabolite_var[1,]==0)==0){
       metabolite_zero_var_total_list[loop] <- 0
@@ -368,7 +368,7 @@ Preprocessing <- function(Input_data,
     ### ### HotellingT2 test for outliers ### ###
     data_hot <- as.matrix(PCA.res$x[,1:npcs])
     message("***Checking for outliers***")
-    hotelling_qcc <- qcc::mqcc(data_hot, type = "T2.single",labels = rownames(data_hot),confidence.level = HotellinsConfidence, title = paste("Outlier filtering via HotellingT2 test filtering round ",loop,", with 99% Confidence",  sep = ""), plot = FALSE)
+    hotelling_qcc <- qcc::mqcc(data_hot, type = "T2.single",labels = rownames(data_hot),confidence.level = HotellinsConfidence, title = paste("Outlier filtering via HotellingT2 test filtering round ",loop,", with ",HotellinsConfidence, "% Confidence",  sep = ""), plot = FALSE)
     HotellingT2plot_data <- as.data.frame(hotelling_qcc$statistics)
     HotellingT2plot_data <- rownames_to_column(HotellingT2plot_data, "Samples")
     colnames(HotellingT2plot_data) <- c("Samples", "Group summary statisctics")
@@ -464,7 +464,7 @@ Preprocessing <- function(Input_data,
       count = count +1
     }
   }
-  write.table(zero_var_metab_export_df,row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
+  write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
   
   
   #############################################
