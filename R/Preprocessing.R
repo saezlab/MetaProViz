@@ -53,17 +53,16 @@ Preprocessing <- function(Input_data,
 
 
   ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "factoextra", "qcc", "ggplot2","hash", "inflection")
+  RequiredPackages <- c("tidyverse", # general scripting
+                        "factoextra", # visualize PCA
+                        "qcc", # for hotelling plots
+                        "ggplot2", # For visualization PCA
+                        "hash", # Dictionary in R for making column of outliers
+                        "inflection")# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
+
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
-  
-  # library(tidyverse) # general scripting
-  # library(factoextra) # visualize PCA
-  # library(qcc) # for hotelling plots
-  # library(ggplot2) # For visualization PCA
-  # library(hash) # Dictionary in R for making column of outliers
-  # library(inflection) # For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   ## ------------------ Run ------------------- ##
   
@@ -573,8 +572,10 @@ Preprocessing <- function(Input_data,
 ### ### ### Merge analytical replicates function ### ### ###
 ############################################################
 
-
+#' Merges the analytical replicates of an experiment
+#'
 #' @param Input Dataframe which contains unique sample identifiers as row names the Experimental design and the metabolite numerical values in columns with metabolite identifiers as column names. Needs to have Conditions, Biological_Replicates and Analytical_Replicate columns
+#' 
 #' @keywords Analyrical Replicate Merge
 #' @export Dataframe with merged Analytical Replicates based on Biological Replicates and Conditions
 
