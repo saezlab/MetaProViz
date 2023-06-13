@@ -59,14 +59,13 @@ DMA <-function(Input_data,
   suppressMessages(library(tidyverse))
   
   ################################################################################################################################################################################################
-  ############### Check inputs ############### 
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Input_data)==FALSE){
-    stop("There is no column named `Conditions` in Input_data to obtain Condition1 and Condition2.")
-  }else{ # select samples according to the input conditions
+    } else if("Conditions" %in% colnames(Input_data)==FALSE){
+      stop("There is no column named `Conditions` in Input_data to obtain Condition1 and Condition2.")
+      }else{ # select samples according to the input conditions
     
     ### Separate design from the data
     design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
@@ -87,17 +86,13 @@ DMA <-function(Input_data,
         stop("There is no sample available for ", Condition1, ".")
       }else if(nrow(C2)==0){
         stop("There is no sample available for ", Condition2, ".")
-      }else{
+      }else{#build the mean of the replicates for each condition:
         Mean_C1 <- C1 %>%
           summarise_all("mean")
         Mean_C2 <- C2 %>%
           summarise_all("mean")
-        
-        #add +1 count to the metabolites with 0 because otherwise the Log2FC with NAs
-        #Mean_C1[,which(Mean_C1[1,]==0)] <- Mean_C1[,which(LMean_C1[1,]==0)]+1# was Log2FC_Condition1
-        #Mean_C2[,which(Mean_C2[1,]==0)] <- Mean_C2[,which(Mean_C2[1,]==0)]+1
       }
-  }
+      }
   
   #2. General parameters
   STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
@@ -122,9 +117,9 @@ DMA <-function(Input_data,
   #3. Input_Pathways
   if(is.null(Input_Pathways) == FALSE){
     if('Metabolite' %in% colnames(Input_Pathways) == FALSE){
-      warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.")
+      warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
     }else if('Pathway' %in% colnames(Input_Pathways) == FALSE){
-     warning("The provided file Input_Pathways must have 2 columns named: Metabolite and Pathway.") 
+     warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.") 
     }
   }
   
@@ -167,43 +162,59 @@ DMA <-function(Input_data,
       warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
     }
   
-  
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval ############### 
-  ## ------------ Calculate Log2FC ----------- ##
-  if(CoRe==TRUE){
-    temp1 <- Mean_C1
-    temp2 <- Mean_C2
-    #Add Info:
-    CoRe_info <- rbind(temp1, temp2,rep(0,length(temp1)))
-    for (i in 1:length(temp1)){
-      if (temp1[i]>0 & temp2[i]>0){
-        CoRe_info[3,i] <- "Released"
-      }else if (temp1[i]<0 & temp2[i]<0){
-        CoRe_info[3,i] <- "Consumed"
-      }else if(temp1[i]>0 & temp2[i]<0){
-        CoRe_info[3,i] <- paste("Released in" ,Condition1 , "and Consumed",Condition2 , sep=" ")
-      } else if(temp1[i]<0 & temp2[i]>0){
-        CoRe_info[3,i] <- paste("Consumed in" ,Condition1 , " and Released",Condition2 , sep=" ")
+  
+  ## ------------ 1. Calculate Log2FC ----------- ##
+  if(CoRe==TRUE){#Calculate Log2FC by taking into account the distance between the means:
+    #CoRe values can be negative and positive, which can lead to problems when calculating the Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A or B being negative, with x being a constant that is adapted to the size range of the respective metabolite.
+    Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
+      rownames_to_column("Metabolite")
+    Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
+      rownames_to_column("Metabolite")
+    Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
+      rename("C1"=2,
+             "C2"=3)%>%
+      mutate(C1_Adapted = case_when(C1 < 0 & C2 > 0 ~ paste(C1*-1),
+                                    C1 > 0 & C2 < 0 ~ paste(C1+C2),
+                                    C1 > 0 & C2 > 0 ~ paste(C1),
+                                    C1 < 0 & C2 < 0 ~ paste(C1),
+                                    C2 == 0 ~ paste(C1),
+                                    C1 == 0 ~ paste(C1),
+                                    TRUE ~ 'NA'))%>%
+      mutate(C2_Adapted = case_when(C2 < 0 & C1 > 0 ~ paste(C2*-1),
+                                    C2 > 0 & C1 < 0 ~ paste(C2+C1),
+                                    C2 > 0 & C1 > 0 ~ paste(C2),
+                                    C2 < 0 & C1 < 0 ~ paste(C2),
+                                    C2 == 0 ~ paste(C2),
+                                    C1 == 0 ~ paste(C2),
+                                    TRUE ~ 'NA'))
+    
+    Mean_C1_Ad <-Mean_Merge[,c(1,4)]%>%
+      column_to_rownames("Metabolite")
+    Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted)) 
+    Mean_C2_Ad <-Mean_Merge[,c(1,5)]%>%
+      column_to_rownames("Metabolite")
+    Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted)) 
+      
+    #Calculate the Log2FC
+    FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1_Ad, Mean_C2_Ad)
+    Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
+    Log2FC_C1vC2 <- cbind(rownames(Log2FC_C1vC2), data.frame(Log2FC_C1vC2, row.names=NULL))
+    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
+    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
+    }else if(CoRe==FALSE){
+      #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to ?
+      
+      #Calculate the Log2FC
+      FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1, Mean_C2)
+      Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
+      Log2FC_C1vC2 <- cbind(rownames(Log2FC_C1vC2), data.frame(Log2FC_C1vC2, row.names=NULL))
+      names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
+      names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
       }else{
-        CoRe_info[3,i] <- "No Change"
-      }
-    }
-    #Calculate Log2FC by taking into account the distance between the means
-    FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1, Mean_C2)
-    Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
-    Log2FC_C1vC2 <- cbind(rownames(Log2FC_C1vC2), data.frame(Log2FC_C1vC2, row.names=NULL))
-    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
-    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
-  }else if(CoRe==FALSE){
-    FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1, Mean_C2)
-    Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
-    Log2FC_C1vC2 <- cbind(rownames(Log2FC_C1vC2), data.frame(Log2FC_C1vC2, row.names=NULL))
-    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
-    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
-  }else{
-    stop("Please choose CoRe= TRUE or CoRe=FALSE.")
-  }
+        stop("Please choose CoRe= TRUE or CoRe=FALSE.")
+        }
   
   ## ------------ Perform Hypothesis testing ----------- ##
   T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
@@ -229,6 +240,24 @@ DMA <-function(Input_data,
   
   ## ------------ Add information on groups to DMA results----------- ##
   if(CoRe==TRUE){#add consumption release info to the result
+    temp1 <- Mean_C1
+    temp2 <- Mean_C2
+    #Add Info:
+    CoRe_info <- rbind(temp1, temp2,rep(0,length(temp1)))
+    for (i in 1:length(temp1)){
+      if (temp1[i]>0 & temp2[i]>0){
+        CoRe_info[3,i] <- "Released"
+      }else if (temp1[i]<0 & temp2[i]<0){
+        CoRe_info[3,i] <- "Consumed"
+      }else if(temp1[i]>0 & temp2[i]<0){
+        CoRe_info[3,i] <- paste("Released in" ,Condition1 , "and Consumed",Condition2 , sep=" ")
+      } else if(temp1[i]<0 & temp2[i]>0){
+        CoRe_info[3,i] <- paste("Consumed in" ,Condition1 , " and Released",Condition2 , sep=" ")
+      }else{
+        CoRe_info[3,i] <- "No Change"
+      }
+    }
+    
     CoRe_info <- t(CoRe_info) %>% as.data.frame()
     CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
     names(CoRe_info)[2] <- paste("Mean", "CoRe", Condition1, sep="_")
