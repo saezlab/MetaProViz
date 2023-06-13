@@ -25,7 +25,7 @@
 ### ### ### PCA Plots ### ### ###
 #################################
 
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param Color \emph{Optional: }String which contains the name of the output file of the Metabolic Clusters
 #' @param Shape \emph{Optional: }String which contains the name of the output file of the Metabolic Clusters
 #' @param Show_Loadings  \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
@@ -51,10 +51,11 @@ PCA <- function(Input_data,
   
   
   ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse","ggfortify")
+  RequiredPackages <- c("tidyverse","ggfortify", "ggplot2")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
+  library("ggfortify")
   
   
   ## ------------ Check Input files ----------- ##
@@ -418,7 +419,7 @@ PCA <- function(Input_data,
       }else(data[,Color] <- as.factor(data[,Color]))
     }
     
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = TRUE),   # Run and plot PCA
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Color))),scale. = TRUE),   # Run and plot PCA
                    data= data,
                    colour = Color,
                    size = 3,
@@ -457,7 +458,7 @@ PCA <- function(Input_data,
       }else(data[,Color] <- as.factor(data[,Color]))
     }
     
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = FALSE),   # Run and plot PCA
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Color))),scale. = FALSE),   # Run and plot PCA
                    data= data,
                    colour = Color,
                    size = 3,
@@ -496,7 +497,7 @@ PCA <- function(Input_data,
       }else(data[,Color] <- as.factor(data[,Color]))
     }
     
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = TRUE),   # Run and plot PCA
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Color))),scale. = TRUE),   # Run and plot PCA
                    data= data,
                    colour = Color,
                    size = 3,
@@ -528,7 +529,7 @@ PCA <- function(Input_data,
       }else(data[,Color] <- as.factor(data[,Color]))
     }
     
-    PCA<- autoplot(prcomp(as.matrix(data%>% select(-Color)),scale. = FALSE),   # Run and plot PCA
+    PCA<- autoplot(prcomp(as.matrix(data%>% select(-all_of(Color))),scale. = FALSE),   # Run and plot PCA
                    data= data,
                    colour = Color,
                    size = 3,
@@ -698,7 +699,7 @@ Volcano <- function(Input_data,
                    pCutoff = 0.05 ,
                    FCcutoff = 0.5, 
                    OutputPlotName = '', 
-                   Plot_pathways = "none",
+                   Plot_pathways = "None",
                    Input_pathways = NULL, 
                    Theme = theme_classic(),
                    xlab = NULL, 
@@ -721,7 +722,7 @@ Volcano <- function(Input_data,
   
   ## ------------ Check Input files ----------- ##
   for(data in list(Input_data, Input_data2)){
-    if(any(duplicated(row.names(data)))==TRUE){
+    if(any(duplicated(row.names(data))) == TRUE){
       stop("Duplicated row.names of Input_data, whilst row.names must be unique")
     } 
   }
@@ -779,6 +780,9 @@ Volcano <- function(Input_data,
     if("Pathway" %in% colnames(Input_pathways) == FALSE){
       stop("Check Input. Pathway column is missing from Input_pathways")
     }
+    if (sum(duplicated(Input_pathways$Metabolite)) > 0){
+      stop("Duplicated Metabolites found in the Input_Pathways. The Metabolites must be unique.") 
+    }
     if(identical(sort(Input_data$Metabolite), sort(Input_pathways$Metabolite)) == FALSE){
       warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_pathways. We will take into consideration only the common Metabolites.")
       # find common metabolites
@@ -787,7 +791,7 @@ Volcano <- function(Input_data,
       Input_data <- Input_data %>% filter(Metabolite %in% common_metabolites)
       Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
     }
-    safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000","gold1","darkorchid4","red","orange")
+    safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
   }
   if(is.null(Input_data2)){
     if("Pathway" %in% colnames(Input_data)){
@@ -912,7 +916,7 @@ Volcano <- function(Input_data,
     }else{
       ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
     }
-    }
+    } 
   else if(Multiple == FALSE & is.null(Input_pathways) == FALSE){
     if(Plot_pathways == "Together"){
       if(test=="p.adj"){
@@ -1199,7 +1203,7 @@ Volcano <- function(Input_data,
         
       }
     }
-  }
+  } 
   else if(Multiple == TRUE & is.null(Input_pathways) == TRUE){
     
     Input_data_1 <- Input_data
@@ -1320,7 +1324,7 @@ Volcano <- function(Input_data,
     } else{
       ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=12, height=9)
     }
-  }
+  } 
   else if(Multiple == TRUE &  is.null(Input_pathways) == FALSE){
     if(Plot_pathways == "Together"){
       
@@ -1719,6 +1723,14 @@ Alluvial <- function(Input_data1,
                      ){
   
   
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", "alluvial")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    install.packages(new.packages)
+  }
+  suppressMessages(library(tidyverse))
+  
   ####################################################
   # This searches for a Results directory within the current working directory and if its not found it creates a new one
   Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep="")
@@ -1930,7 +1942,7 @@ Alluvial <- function(Input_data1,
   
   Save_as_var(paste(Results_folder_plots_MetabolicCluster_folder,"/Metabolic_Clusters_",Condition1,"-versus-",Condition2,"_", Output_Name,  ".",Save_as, sep=""), width=12, height=9)
   par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
-  alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
+  alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
             col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
                             Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
                             Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
@@ -2007,6 +2019,7 @@ Alluvial <- function(Input_data1,
     mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[15]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[15], outer=TRUE)
   }
   dev.off()# Close the pdf file
+
 }
 
 
@@ -2109,6 +2122,9 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
     if("Pathway" %in% colnames(Input_pathways) == FALSE){
       stop("Check Input. Pathway column is missing from Input_pathways")
     }
+    if (sum(duplicated(Input_pathways$Metabolite)) > 0){
+      stop("Duplicated Metabolites found in the Input_Pathways. The Metabolites must be unique.") 
+    }
     for(i in 1:length(Input_data)){ # Here we check every data in the input data with the Input pathways. We dont check common metablites between each input dataset. Should we also add this?
       data <- Input_data[[i]]
       if(identical(sort(data$Metabolite), sort(Input_pathways$Metabolite)) == FALSE){
@@ -2127,7 +2143,7 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
     data <- Input_data[[i]]
     if("Pathway" %in% colnames(data)){
       data$Pathway <- NULL
-      Input_data[[1]] <- data
+      Input_data[[i]] <- data
     } 
   }
   
@@ -2308,10 +2324,10 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
         
         Dotplot1 <-ggplot(Combined_Input_pathway, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
           geom_point(stat='identity', aes(size = abs(`Log2FC`), col=Condition))  +
-          geom_segment(aes(y =(Reduce(max,`Log2FC`)), 
-                           x = Metabolite, 
+          geom_segment(aes(y = 0,
+                           x = Metabolite,
                            yend = `Log2FC`,
-                           xend = Metabolite), 
+                           xend = Metabolite),
                        color = "black") +
           scale_size(name="abs(Log2FC)",range = c(6,16))+
           geom_text(color="black", size=2) +
@@ -2444,7 +2460,7 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
       comb.colnames <- c("Metabolite","Log2FC",test, "Condition")
       colnames(Combined_Input) <- comb.colnames
       
-      for ( i in 1:length(Input_data)){
+      for (i in 1:length(Input_data)){
         Input_data[[i]]$Condition <- CondNames[[i]]
         Combined_Input <- rbind(Combined_Input, Input_data[[i]] %>% select(all_of(c("Metabolite","Log2FC",test, "Condition"))))
         
@@ -2454,15 +2470,16 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
       # Combined_Input <- Combined_Input[Combined_Input[test] <= pCutoff,]
       # Combined_Input<- Combined_Input %>% drop_na()
       Combined_Input[test] <- round(Combined_Input[test], digits = 6)
+
+      # Remove the metabolite with inf in logFC because it messes the plot
+      Combined_Input <- Combined_Input[is.finite(Combined_Input$Log2FC),]
       
-      
-      
-      Dotplot1 <-ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
-        geom_point(stat='identity', aes(size = abs(`Log2FC`), col=Condition))  +
-        geom_segment(aes(y =(Reduce(max,`Log2FC`)), 
-                         x = Metabolite, 
+      Dotplot1 <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) + 
+        geom_point(stat = 'identity', aes(size = abs(`Log2FC`), col = Condition))  +
+        geom_segment(aes(y =0,
+                         x = Metabolite,
                          yend = `Log2FC`,
-                         xend = Metabolite), 
+                         xend = Metabolite),
                      color = "black") +
         scale_size(name="abs(Log2FC)",range = c(6,16))+
         geom_text(color="black", size=2) +
@@ -2475,7 +2492,7 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
               plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
         labs(y="Log2FC", x="")
       
-      
+      Dotplot1
       
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
@@ -2568,6 +2585,9 @@ Heatmap <- function(Input_data,
     if("Pathway" %in% colnames(Input_pathways) == FALSE){
       stop("Check Input. Pathway column is missing from Input_pathways")
     }
+    if (sum(duplicated(Input_pathways$Metabolite)) > 0){
+      stop("Duplicated Metabolites found in the Input_Pathways. The Metabolites must be unique.") 
+    }
     if(identical(sort(colnames(data)), sort(Input_pathways$Metabolite)) == FALSE){
       warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_pathways. We will take into consideration only the common Metabolites.")
       # find common metabolites
@@ -2576,10 +2596,8 @@ Heatmap <- function(Input_data,
       data <- data %>% select(common_metabolites)
       Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
     }
+    Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
   }
-  
-  
-  
   
   
   ## ------------ Create Output folders ----------- ##
@@ -2589,9 +2607,6 @@ Heatmap <- function(Input_data,
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
   Results_folder_plots_Heatmaps_folder = file.path(Results_folder, "Heatmap")  
   if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}  # check and create folder
-  
-  
-  Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
   
   
   if(Plot_pathways == "Individual"){
@@ -2610,16 +2625,15 @@ Heatmap <- function(Input_data,
   
     for (path in unique(Input_pathways$Pathway)){
       
-      #  path = unique(Input_pathways$Pathway)[1]
+      #  path = unique(Input_pathways$Pathway)[2]
       selected_path <- Input_pathways %>% filter(Pathway == path)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
       data_path <- data %>% select(all_of(selected_path_metabs))
       
       
-      
       for (k in kMEAN){
         set.seed(1234)
-        out <-pheatmap(t(data_path),
+        out <-pheatmap::pheatmap(t(data_path),
                        clustering_method =  "complete",
                        scale = SCALE,
                        kmeans_k = k,
@@ -2642,9 +2656,9 @@ Heatmap <- function(Input_data,
         if(is.na(k)==FALSE){
           
           if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path,"_kmeans-",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
+            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path,"_kmeans=",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
           }else{
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path, "_kmeans-",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
+            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path, "_kmeans=",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
           }
           writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/Heatmap_",path,"Clustering_k=",k,"_data.xlsx", sep=""),col_names = TRUE)
         }else{
@@ -2677,7 +2691,7 @@ Heatmap <- function(Input_data,
     
     for (k in kMEAN){
       set.seed(1234)
-      out <-pheatmap(t(data),
+      out <-pheatmap::pheatmap(t(data),
                      clustering_method =  "complete",
                      scale = SCALE,
                      kmeans_k = k,
@@ -2699,9 +2713,9 @@ Heatmap <- function(Input_data,
       if(is.na(k)==FALSE){
         
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap","_kmeans-",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
+          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap","_kmeans=",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
         }else{
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_", "kmeans-",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
+          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_", "kmeans=",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
         }
         writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/","Clustering_k=",k,"_t(data).xlsx", sep=""),col_names = TRUE)
       }else{
@@ -2728,7 +2742,7 @@ Heatmap <- function(Input_data,
     
     for (k in kMEAN){
       set.seed(1234)
-      out <-pheatmap(t(data),
+      out <-pheatmap::pheatmap(t(data),
                      clustering_method =  "complete",
                      scale = SCALE,
                      kmeans_k = k,
@@ -2749,9 +2763,9 @@ Heatmap <- function(Input_data,
       if(is.na(k)==FALSE){
         
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap","_kmeans-",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
+          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap","_kmeans=",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
         }else{
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_", "kmeans-",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
+          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_", "kmeans=",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
         }
         writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/","Clustering_k=",k,"_t(data).xlsx", sep=""),col_names = TRUE)
       }else{
@@ -2869,7 +2883,7 @@ Barplot <- function(Input_data,
     if(is.null(Selected_Comparisons)== TRUE){
       # names(barplotdataMeans)[2] <- "Intensity"
       # a <- max(barplotdataMeans$Intensity)
-      barplot <- ggplot(barplotdata, aes(x = factor(Conditions, levels = c("Control", "Rot", "3NPA")), y = Intensity)) +
+      barplot <- ggplot(barplotdata, aes(x = factor(Conditions), y = Intensity)) +
         geom_bar(stat = "summary", fun = "mean", fill = "skyblue") +
         geom_errorbar(data = barplotdataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)+
         theme(legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
@@ -2878,7 +2892,7 @@ Barplot <- function(Input_data,
       
       # names(barplotdataMeans)[2] <- "Intensity"
       # a <- max(barplotdataMeans$Intensity)
-      barplot <- ggplot(barplotdata, aes(x = factor(Conditions, levels = c("Control", "Rot", "3NPA")), y = Intensity)) +
+      barplot <- ggplot(barplotdata, aes(x = factor(Conditions), y = Intensity)) +
         geom_bar(stat = "summary", fun = "mean", fill = "skyblue") +
         geom_errorbar(data = barplotdataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)+
         ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
@@ -3112,7 +3126,7 @@ Boxplot <- function(Input_data,
 #' @keywords Violinplot
 #' @export
 #' 
-violinplot <- function(Input_data, 
+Violinplot <- function(Input_data, 
                        OutputPlotName = "", 
                        Output_plots = "Together", 
                        Selected_Conditions = NULL, 
@@ -3184,7 +3198,7 @@ violinplot <- function(Input_data,
     
     if(is.null(Selected_Comparisons)== TRUE){
       violinplot <- ggplot(violinplotdata, aes(x=Conditions, y=Intensity)) +
-        geom_violinplot(fill="skyblue",width = 1)  +
+        geom_violin(fill="skyblue",width = 1)  +
         geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.7)+xlab("Conditions")+ ylab("Mean Intensity")
       
     }else{
@@ -3192,7 +3206,7 @@ violinplot <- function(Input_data,
       # names(barplotdataMeans)[2] <- "Intensity"
       # a <- max(barplotdataMeans$Intensity)
       violinplot <- ggplot(violinplotdata, aes(x=Conditions, y=Intensity)) +
-        geom_violinplot(fill="skyblue") +
+        geom_violin(fill="skyblue") +
         geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.7)+xlab("Conditions")+ ylab("Mean Intensity")+
         ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
                                    label = "p.format", method = "t.test", hide.ns = TRUE, position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE) +
@@ -3213,9 +3227,9 @@ violinplot <- function(Input_data,
       i <- (gsub(":","_",i))
       
       if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_violinplots_folder, "/",i, ".",Save_as, sep=""), plot=violinplot, width=10, height=8)
+        ggsave(file=paste(Results_folder_plots_Violinplots_folder, "/",i, ".",Save_as, sep=""), plot=violinplot, width=10, height=8)
       }else{
-        ggsave(file=paste(Results_folder_plots_violinplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=violinplot, width=10, height=8)
+        ggsave(file=paste(Results_folder_plots_Violinplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=violinplot, width=10, height=8)
       }
       
     } else if(Output_plots=="Together"){
@@ -3267,7 +3281,7 @@ violinplot <- function(Input_data,
 #' @keywords Barplot
 #' @export
 #' 
-superplot <- function(Input_data, 
+Superplot <- function(Input_data, 
                       OutputPlotName = "", 
                       Output_plots = "Together", 
                       Selected_Conditions = NULL, 
@@ -3407,7 +3421,7 @@ superplot <- function(Input_data,
 
 ###--------------------------------
 # Use function
-superplot(Input_data = preprocessing_output_Intra$Processed_data)
-superplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"),  Output_plots = "Individual")
-superplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),  Output_plots = "Individual")
+#superplot(Input_data = preprocessing_output_Intra$Processed_data)
+#superplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"),  Output_plots = "Individual")
+#superplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),  Output_plots = "Individual")
 ###-----------------------------------

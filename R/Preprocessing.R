@@ -444,7 +444,7 @@ Preprocessing <- function(Input_data,
   
   # Print Outlier detection results about samples and metabolites
   if(length(sample_outliers) > 0){   # Print outlier samples
-    message("There are sample outliers that were removed from the data") #This was a warning
+    message("There are possible outlier samples in the data") #This was a warning
     for (i in 1:length(sample_outliers)  ){
       message("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
     }
