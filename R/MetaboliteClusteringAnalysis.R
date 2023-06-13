@@ -2,7 +2,7 @@
 #' @author Prymidis Dimitrios, Schmidt Christina
 #' Date: "2022-10-28"
 #'
-#' This script allows you to perform differential metabolite analysis
+#' This script allows you to perform metabolite clustering analysis
 #'
 #' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns.
 #' @param Input_data2 Dataframe same as Input_data for another comparison.
@@ -22,7 +22,7 @@
 
 
 ##################################################
-### ### ### Metabolic Cluster Analysis ### ### ###
+### ### ### Metabolite Clustering Analysis ### ### ###
 ##################################################
 
 MCA <- function(Input_data,
