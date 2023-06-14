@@ -17,22 +17,21 @@ This is the tutorial showcasing the different functionalities MetaProViz offers.
 For this we downloaded two publicly available datasets and use them as the example data for MetaProViz.
 
 # Installation
-[MetaProViz](Add to bioconductor) is an R package distributed as part of the Bioconductor project. To install the package, start R and enter:\
+[MetaProViz](Link to bioconductor) is an R package distributed as part of the Bioconductor project. To install the package, start R and enter:\
 \
 ```{r bioconductor_install, eval=FALSE}
 install.packages("BiocManager")
 BiocManager::install("MetaProViz")
 ```
 \
-Alternatively, you can instead install the latest development version from [GitHub](https://github.com/ChristinaSchmidt1/MetaProViz) with:
+Alternatively, you can install the latest development version from [GitHub](https://github.com/ChristinaSchmidt1/MetaProViz) with:
 
 ```{r github_install, eval=FALSE}
 BiocManager::install("ChristinaSchmidt1/MetaProViz")
 ```
 
-
 ## Libraries
-[MetaProViz](Add to bioconductor) can be imported as:
+[MetaProViz](Link to bioconductor) can be imported as:
 
 ```{r load_library, message=FALSE}
 library(MetaProViz)
@@ -42,35 +41,25 @@ library(dplyr)
 library(tidyverse)
 ```
 
-
 # Input data
 Example datasets are publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax media.\
 Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.
 
-The mapping file was downloaded from: https://github.com/saezlab/ocean/blob/marco_paper/data/mapping_table.RData
-
 ## 1. Intracellular experiment
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+\
 Load the intracellular example data:
 ```{r}
-Intra <-
+Intra <- read.csv("data_example/MS55_RawPeakData.csv", check.names = FALSE)
 
 ```
 
 ## 2. CoRe experiment 
 The raw data is available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
+\
 Load the CoRe example data:
 ```{r}
-Media <-
-
-
-DF <- read.csv("data/MS51_RawPeakData.csv", check.names = FALSE)%>%
-  column_to_rownames("code")
-
-DF_t <- as.data.frame(t(DF[,-c(1:5)]))%>%
-  rownames_to_column("metab")
-
-DF_t <- merge(mapping_table, DF_t, by="metab", all.y=TRUE)
+Media <-read.csv("data_example/MS51_RawPeakData.csv", check.names = FALSE)
 
 
 
@@ -78,7 +67,7 @@ DF_t <- merge(mapping_table, DF_t, by="metab", all.y=TRUE)
 # Once toy data is part of the package we can use: data <- get_toy_data()
 #inputs_dir <- system.file("extdata", package = "MetaProViz")
 #data <- readRDS(file.path(inputs_dir, "MS51_RawPeakData.rds"))
-
+    
 ```
 
 
