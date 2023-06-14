@@ -67,6 +67,7 @@ MetaProViz::toy_data()
 MetaProViz has four main pillars (Fig. 1).
 
 Create figure overview and add here --> usable for manuscript as well
+--> maybe combine circlepacking and emapplot
 
 ## 1. Pre-processing
 Discuss pitfalls of missing value imputation as discussed with Aurelien and give a clear statement!
