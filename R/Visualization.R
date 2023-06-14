@@ -1,8 +1,8 @@
 ## ---------------------------
 ##
-## Script name: DMA
+## Script name: Visualization
 ##
-## Purpose of script: Differential Metabolomics Analysis 
+## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -18,7 +18,7 @@
 ##
 ## ---------------------------
 #'
-#' This script allows you to perform different data visualizations
+#' This script allows you to perform different data visualizations using the results of the MetaProViz analysis
 
 
 #################################
@@ -38,7 +38,7 @@
 #' @keywords PCA
 #' @export
 
-PCA <- function(Input_data, 
+VizPCA <- function(Input_data, 
                 Color = FALSE, 
                 Shape = FALSE, 
                 Show_Loadings = FALSE, 
@@ -694,7 +694,7 @@ PCA <- function(Input_data,
 #' @keywords Volcano plot, pathways
 #' @export
 
-Volcano <- function(Input_data,
+VizVolcano <- function(Input_data,
                    test = "p.adj", 
                    pCutoff = 0.05 ,
                    FCcutoff = 0.5, 
@@ -1707,7 +1707,7 @@ Volcano <- function(Input_data,
 ######################################=
 #' Notes; Check the alluvial in the Metabolic Clusters. This one is a bit old but kept here to return to if nedded
 
-Alluvial <- function(Input_data1, 
+VizAlluvial <- function(Input_data1, 
                      Input_data2, 
                      Output_Name = "Metabolic_Clusters_Output_Condition1-versus-Condition2",  
                      Condition1,  
@@ -2055,7 +2055,7 @@ Alluvial <- function(Input_data1,
 #' @export
 #'
 
-Lolipop <- function(Input_data, # a dataframe of list of dataframes
+VizLolipop <- function(Input_data, # a dataframe of list of dataframes
                     test = "p.adj",
                     pCutoff= 0.05 , 
                     FCcutoff=0.5, 
@@ -2530,7 +2530,7 @@ Lolipop <- function(Input_data, # a dataframe of list of dataframes
 #' 
 #' 
 
-Heatmap <- function(Input_data,
+VizHeatmap <- function(Input_data,
                     Clustering_Condition = "Conditions",
                     Input_pathways = NULL,
                     Plot_pathways = "None",# or "Individual" or "Together=
@@ -2802,7 +2802,7 @@ Heatmap <- function(Input_data,
 #' @keywords Barplot
 #' @export
 
-Barplot <- function(Input_data, 
+VizBarplot <- function(Input_data, 
                     OutputPlotName = "", 
                     Output_plots = "Together", 
                     Selected_Conditions = NULL, 
@@ -2963,7 +2963,7 @@ Barplot <- function(Input_data,
 #' @keywords Boxplot
 #' @export
 #' 
-Boxplot <- function(Input_data, 
+VizBoxplot <- function(Input_data, 
                     OutputPlotName = "", 
                     Output_plots = "Together", 
                     Selected_Conditions = NULL, 
@@ -3126,7 +3126,7 @@ Boxplot <- function(Input_data,
 #' @keywords Violinplot
 #' @export
 #' 
-Violinplot <- function(Input_data, 
+VizViolinplot <- function(Input_data, 
                        OutputPlotName = "", 
                        Output_plots = "Together", 
                        Selected_Conditions = NULL, 
@@ -3281,7 +3281,7 @@ Violinplot <- function(Input_data,
 #' @keywords Barplot
 #' @export
 #' 
-Superplot <- function(Input_data, 
+VizSuperplot <- function(Input_data, 
                       OutputPlotName = "", 
                       Output_plots = "Together", 
                       Selected_Conditions = NULL, 
