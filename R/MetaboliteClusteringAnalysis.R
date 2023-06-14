@@ -150,10 +150,6 @@ MCA <- function(Input_data,
                                          Log2FC_CoRe <= -0.5 & p.val_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
                                          TRUE ~ 'No Change'))
       
-      # match("Released" ,str_split(DMA$CoRe[a], " ", simplify = TRUE),nomatch= FALSE) < 
-      #   match("Consumed" ,str_split(DMA$CoRe[a], " ", simplify = TRUE),nomatch= FALSE) &
-      #   match("Released" ,str_split(DMA$CoRe[a], " ", simplify = TRUE),nomatch= FALSE) !=0 &
-      #   match("Consumed" ,str_split(DMA$CoRe[a], " ", simplify = TRUE),nomatch= FALSE) !=0
       
     }else{ # else if(test== "p.adj")
       DMA <- DMA%>%

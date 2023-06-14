@@ -20,7 +20,8 @@
 
 #' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
 #'
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental Experimental_design and outlier column.
+#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
 #' @param Conditon1 Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".
 #' @param Conditon2 Input needs to contain a column named "Condition" including Condition2 that is compared to Condition1, e.g. "WT".
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
@@ -40,6 +41,7 @@
 ########################################################
 
 DMA <-function(Input_data, 
+               Experimental_design,
                Condition1,
                Condition2,
                STAT_pval ="t.test",
@@ -61,21 +63,29 @@ DMA <-function(Input_data,
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
+  
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-    } else if("Conditions" %in% colnames(Input_data)==FALSE){
-      stop("There is no column named `Conditions` in Input_data to obtain Condition1 and Condition2.")
-      }else{ # select samples according to the input conditions
-    
-    ### Separate design from the data
-    design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-    Input_data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
-    
+    } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+      stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+    } else{
+      Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+      if((any(Test_num) ==  FALSE) ==  TRUE){
+        stop("Input_data needs to be of class numeric")
+      } else{
+        Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+        if(nrow(Test_match) ==  0){
+          stop("row.names Input_data need to match row.names Experimental_design.")
+        } else(
+          Input_data <- Input_data
+        )
+      }
+      
       C1 <- Input_data %>%
-        filter(design$Conditions %in% Condition1) %>%
+        filter(Experimental_design$Conditions %in% Condition1) %>%
         select_if(is.numeric)#only keep numeric columns with metabolite values
       C2 <- Input_data %>%
-        filter(design$Conditions %in% Condition2) %>%
+        filter(Experimental_design$Conditions %in% Condition2) %>%
         select_if(is.numeric)
       
       if(nrow(C1)==1){
@@ -92,8 +102,8 @@ DMA <-function(Input_data,
         Mean_C2 <- C2 %>%
           summarise_all("mean")
       }
-      }
-  
+    }
+
   #2. General parameters
   STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
   if(STAT_pval %in% STAT_pval_options == FALSE){
@@ -140,7 +150,7 @@ DMA <-function(Input_data,
   
   # 1. Load the data and perform the shapiro.test on each metabolite:
   shaptest <-  Input_data %>% # Select data
-    filter(design$Conditions %in% Condition1 | design$Conditions %in% Condition2)%>%
+    filter(Experimental_design$Conditions %in% Condition1 | Experimental_design$Conditions %in% Condition2)%>%
     select_if(is.numeric)
   
   temp<- as.vector(sapply(shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.

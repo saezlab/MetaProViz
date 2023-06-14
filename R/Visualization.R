@@ -39,15 +39,16 @@
 #' @export
 
 VizPCA <- function(Input_data, 
-                Color = FALSE, 
-                Shape = FALSE, 
-                Show_Loadings = FALSE, 
-                Scaling = TRUE,
-                # Palette= "Set2".
-                Theme=theme_classic(), 
-                OutputPlotName= '',
-                Save_as = "svg"
-                ){
+                   Experimental_design, 
+                   Color = FALSE, 
+                   Shape = FALSE, 
+                   Show_Loadings = FALSE, 
+                   Scaling = TRUE,
+                   #Palette= "Set2".
+                   Theme=theme_classic(), 
+                   OutputPlotName= '',
+                   Save_as = "svg"
+                  ){
   
   
   ## ------------ Setup and installs ----------- ##
@@ -60,16 +61,28 @@ VizPCA <- function(Input_data,
   
   ## ------------ Check Input files ----------- ##
   #1. Input_data 
+
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Input_data)==FALSE){
-    stop("There is no column named `Conditions` in Input_data.")
-  }else{ # select samples according to the input conditions
-    
-    ### Separate design from the data
-    Design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-    Input_data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
+  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Experimental_design.")
+      } else(
+        Input_data <- Input_data
+      )
+    }
+    Design <- Experimental_design
   }
+    
+    
+    
   #2. Parameters
   if(Color != FALSE & Color %in% colnames(Design)==FALSE){
     stop(paste("PCA with Color was selected. However, there is no column named: " ,Color," in Input_data.",sep = "") )
@@ -695,6 +708,7 @@ VizPCA <- function(Input_data,
 #' @export
 
 VizVolcano <- function(Input_data,
+                       Experimental_design,
                    test = "p.adj", 
                    pCutoff = 0.05 ,
                    FCcutoff = 0.5, 
@@ -2535,6 +2549,7 @@ VizLolipop <- function(Input_data, # a dataframe of list of dataframes
 #' 
 
 VizHeatmap <- function(Input_data,
+                       Experimental_design,
                     Clustering_Condition = "Conditions",
                     Input_pathways = NULL,
                     Plot_pathways = "None",# or "Individual" or "Together=
@@ -2557,13 +2572,24 @@ VizHeatmap <- function(Input_data,
   #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Experimental_design.")
+      } else(
+        data <- Input_data
+      )
+    }
+    Design <- Experimental_design
   }
   
-  # Selarate Design from data
-  # Input_data = preprocessing_output_Intra$Processed_data
-  ### Separate design from the data
-  Experimental_design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-  data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
+  
   
   if(Clustering_Condition %in% colnames(Experimental_design)==FALSE){
     stop("Check Inpit. The clustering congitions does not exist in the column names on the Input data.")
@@ -2629,7 +2655,7 @@ VizHeatmap <- function(Input_data,
   
     for (path in unique(Input_pathways$Pathway)){
       
-      #  path = unique(Input_pathways$Pathway)[2]
+      #  path = unique(Input_pathways$Pathway)[1]
       selected_path <- Input_pathways %>% filter(Pathway == path)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
       data_path <- data %>% select(all_of(selected_path_metabs))
@@ -2807,6 +2833,7 @@ VizHeatmap <- function(Input_data,
 #' @export
 
 VizBarplot <- function(Input_data, 
+                       Experimental_design,
                     OutputPlotName = "", 
                     Output_plots = "Together", 
                     Selected_Conditions = NULL, 
@@ -2826,10 +2853,25 @@ VizBarplot <- function(Input_data,
   #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Experimental_design.")
+      } else(
+        data <- Input_data
+      )
+    }
+    Experimental_design <- Experimental_design
   }
   
-  Experimental_design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-  data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
+  
+  
   
   Output_plots_options <- c("Individual", "Together")
   if (Output_plots %in% Output_plots_options == FALSE){
@@ -2968,6 +3010,7 @@ VizBarplot <- function(Input_data,
 #' @export
 #' 
 VizBoxplot <- function(Input_data, 
+                       Experimental_design,
                     OutputPlotName = "", 
                     Output_plots = "Together", 
                     Selected_Conditions = NULL, 
@@ -2985,12 +3028,32 @@ VizBoxplot <- function(Input_data,
   
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
+  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+  
+  
+  ## ------------ Check Input files ----------- ##
+  #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Experimental_design.")
+      } else(
+        data <- Input_data
+      )
+    }
+    Experimental_design <- Experimental_design
   }
-  
-  Experimental_design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-  data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
   
   Output_plots_options <- c("Individual", "Together")
   if (Output_plots %in% Output_plots_options == FALSE){
@@ -3131,6 +3194,7 @@ VizBoxplot <- function(Input_data,
 #' @export
 #' 
 VizViolinplot <- function(Input_data, 
+                          Experimental_design,
                        OutputPlotName = "", 
                        Output_plots = "Together", 
                        Selected_Conditions = NULL, 
@@ -3148,12 +3212,32 @@ VizViolinplot <- function(Input_data,
   
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
+  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+  
+  
+  ## ------------ Check Input files ----------- ##
+  #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Experimental_design.")
+      } else(
+        data <- Input_data
+      )
+    }
+    Experimental_design <- Experimental_design
   }
-  
-  Experimental_design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-  data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
   
   Output_plots_options <- c("Individual", "Together")
   if (Output_plots %in% Output_plots_options == FALSE){
@@ -3286,6 +3370,7 @@ VizViolinplot <- function(Input_data,
 #' @export
 #' 
 VizSuperplot <- function(Input_data, 
+                         Experimental_design,
                       OutputPlotName = "", 
                       Output_plots = "Together", 
                       Selected_Conditions = NULL, 
@@ -3303,12 +3388,32 @@ VizSuperplot <- function(Input_data,
   
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
+  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+  
+  
+  ## ------------ Check Input files ----------- ##
+  #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
+    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Experimental_design.")
+      } else(
+        data <- Input_data
+      )
+    }
+    Experimental_design <- Experimental_design
   }
-  
-  Experimental_design <- Input_data[,1:which( colnames(Input_data)== "Outliers")]
-  data<- Input_data[,(which(colnames(Input_data)== "Outliers")+1):length(Input_data)]
   
   Output_plots_options <- c("Individual", "Together")
   if (Output_plots %in% Output_plots_options == FALSE){
