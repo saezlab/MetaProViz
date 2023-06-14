@@ -287,6 +287,7 @@ Preprocessing <- function(Input_data,
   scree_plot_list <- list()
   outlier_plot_list <- list()
   metabolite_zero_var_total_list <- list()
+  zero_var_metab_warning = FALSE
   k =  1
   a =  1
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering

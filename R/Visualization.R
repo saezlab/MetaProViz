@@ -792,6 +792,10 @@ VizVolcano <- function(Input_data,
       Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
     }
     safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+    if (length(unique(Input_pathways$Pathway)) >  length(safe_colorblind_palette)){
+      stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
+    }
+    
   }
   if(is.null(Input_data2)){
     if("Pathway" %in% colnames(Input_data)){
