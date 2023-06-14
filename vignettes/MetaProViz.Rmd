@@ -1,6 +1,6 @@
 ---
 title: "TutorialR"
-author: "Christina Schmidt, Dimitrios,..."
+author: "Christina Schmidt, Dimitrios"
 date: "24 November 2022"
 output:
   html_document:
@@ -43,41 +43,67 @@ library(tidyverse)
 
 # Input data
 Example datasets are publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax media.\
-Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers. As part of the package you can load:\
-1. Intracellular experiment (Intra)
-  + The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.
-2. CoRe experiment (Media)
-  + The raw data is available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.
-3. Pathway information mapping the trivial metabolite names to KEGG IDs and pathways (Pathways)
+Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+As part of the package you can load:\
+\
+**1. Intracellular experiment (Intra)** \
+The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+\
+**2. CoRe experiment (Media)** \
+The raw data is available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
+\
+**3. Pathway information mapping the trivial metabolite names to KEGG IDs and pathways (Pathways)** \
+\
 \
 You can load the example data into your global environment using toy_data():
 ```{r}
+devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
 
 MetaProViz::toy_data()
 
 ```
 
-
 # Run MetaProViz functions
+MetaProViz has four main pillars (Fig. 1).
+
+Create figure overview and add here --> usable for manuscript as well
 
 ## 1. Pre-processing
+Discuss pitfalls of missing value imputation as discussed with Aurelien and give a clear statement!
+"Benchmark": 
+- Show MVI results with different percentages (not just 50% as per half minimum!)
+- Show that per feature imputation is advantageous over the "standard" imputation
+- Cite the benchmark of the different methods and explain why we did not implement the others (e.g. quantile is only good for normal distribution)
+
 ### Intracellular experiment
+
 
 ### CoRe experiment
 
-1. MetaProViz::Preprocessing()
+
 
 
 ```{r}
+#MetaProViz::Preprocessing()
+
 
 ```
 
+## 2. Differntial Metabolite Analysis (DMA)
+Here explain the way we deal with 0/NA --> again refer back to above!
+
+### Intracellular experiment
+
+### CoRe experiment
+Here explain how we adapted the Log2FC calculation
+- Benchmark: e.g. how many metabolites do we identify with the new Log2FC calculation opposed to using the absolute values (perfect example would be a metabolite that has -10 in C1 qand +11 in C2, and hence a small Log2FC)
 
 
-## 2. Biological clustering
+## 3. Metabolite Clustering Analysis (MCA)
 
+Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
 
-## 3. Visualisation
+## 4. Visualisation (Viz)
 No replicates
 
 
@@ -92,6 +118,6 @@ sessionInfo()
 # Bibliography
 ```{r vignetteBiblio, results = "asis", echo = FALSE, warning = FALSE, message = FALSE}
 ## Print bibliography
-PrintBibliography(bib, .opts = list(hyperlink = "to.doc", style = "html"))
+#PrintBibliography(bib, .opts = list(hyperlink = "to.doc", style = "html"))
 ```
 
