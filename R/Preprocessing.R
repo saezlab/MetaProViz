@@ -233,19 +233,6 @@ Preprocessing <- function(Input_data,
   
   
   ################################################
-  ### ### ###Zero variance metabolites ### ### ###
-  
-  filtered_matrix <- filtered_matrix %>% as.data.frame()
-  zero_var_metabs <- filtered_matrix[, sapply(filtered_matrix, var,na.rm =  TRUE) ==  0] %>% colnames()
-  zero_var_metabs <- paste(zero_var_metabs, collapse = ', ')
-  if (length(zero_var_metabs) > 1){
-    message(paste("There are metabolites with Zero variance across the samples. These are: ",zero_var_metabs ))
-  }
-  zero_var_removed <- filtered_matrix[, sapply(filtered_matrix, var,na.rm  =  TRUE) !=  0] # Remove zero variance metabolites
-  filtered_matrix <- zero_var_removed
-  
-  
-  ################################################
   ### ### ### Missing value Imputation ### ### ###
 
   message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
@@ -294,7 +281,6 @@ Preprocessing <- function(Input_data,
 
   message("Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.")
   message(paste("HotellinsConfidence value selected:", HotellinsConfidence))
- 
   
   Outlier_filtering_loop = 10
   sample_outliers <- list()
@@ -305,13 +291,16 @@ Preprocessing <- function(Input_data,
   a =  1
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
 
+    #################################################
+    ### ### ### Zero variance metabolites ### ### ###
     metabolite_var <- as.data.frame( apply(data_norm, 2, var) %>% t()) # calculate each metabolites variance
     metabolite_zero_var_list <- list( colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metabollites with zero variance and puts them in list
     
     if(sum(metabolite_var[1,]==0)==0){
       metabolite_zero_var_total_list[loop] <- 0
     } else if(sum(metabolite_var[1,]==0)>0){
-    metabolite_zero_var_total_list[loop] <-metabolite_zero_var_list
+    metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
+    zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
     }
     
     for (metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
@@ -450,10 +439,16 @@ Preprocessing <- function(Input_data,
     }
   }else{message("No sample outliers were found")}
   
+  
+  #######################################################
+  ### ### ### Zero variance metabolites part2.### ### ###
   zero_var_metab_export_df <- data.frame(1,2)
   names(zero_var_metab_export_df) <- c("Filtering round","Metabolite")
 
   # Print zero variance metabolites
+  if (zero_var_metab_warning==TRUE){
+    warning("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
+  }
   count = 1
   for (i in 1:length(metabolite_zero_var_total_list)){  
     if (metabolite_zero_var_total_list[[i]] != 0){
@@ -463,7 +458,10 @@ Preprocessing <- function(Input_data,
       count = count +1
     }
   }
-  write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
+  if (zero_var_metab_warning==TRUE){
+    write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
+  }
+ 
   
   
   #############################################
