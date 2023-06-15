@@ -39,8 +39,8 @@ toy_data <- function() {
   
   # Return the toy data into environment
   assign("Intra", Intra, envir=.GlobalEnv)
-  assign("Media", Intra, envir=.GlobalEnv)
-  assign("Pathways", Intra, envir=.GlobalEnv)
+  assign("Media", Media, envir=.GlobalEnv)
+  assign("Pathways", Pathways, envir=.GlobalEnv)
 }
 
 

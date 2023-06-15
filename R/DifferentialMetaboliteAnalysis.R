@@ -76,10 +76,11 @@ DMA <-function(Input_data,
         Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
         if(nrow(Test_match) ==  0){
           stop("row.names Input_data need to match row.names Experimental_design.")
-        } else(
-          Input_data <- Input_data
-        )
+        } else{
+           Input_data <- Input_data
+        }
       }
+    }
       
       C1 <- Input_data %>%
         filter(Experimental_design$Conditions %in% Condition1) %>%
@@ -102,7 +103,6 @@ DMA <-function(Input_data,
         Mean_C2 <- C2 %>%
           summarise_all("mean")
       }
-    }
 
   #2. General parameters
   STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
@@ -160,8 +160,8 @@ DMA <-function(Input_data,
   shaptestres <- as.data.frame(t(shaptestres))
   
   # 2. Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
-  Norm <- format(round(sum(shaptestres$p.value > 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of normally distributed metabolites across samples
-  NotNorm <- format(round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],2), nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+  Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+  NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
   message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test.")
   
   if (Norm > 50 & STAT_pval =="wilcox.test"){
@@ -323,8 +323,10 @@ DMA <-function(Input_data,
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"log2FC_",0.5)
     
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as))
-    ggsave(volcanoDMA,plot=VolcanoPlot, width=12, height=9) # save the voplcano plot
+    ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
   }
+  
+  assign(paste0("DMA_",toString(Condition1),"_vs_",toString(Condition2)), DMA_Output, envir=.GlobalEnv)
   return(DMA_Output)
 }
 
