@@ -97,11 +97,6 @@ DMA <-function(Input_data,
         stop("There is no sample available for ", Condition1, ".")
       }else if(nrow(C2)==0){
         stop("There is no sample available for ", Condition2, ".")
-      }else{#build the mean of the replicates for each condition:
-        Mean_C1 <- C1 %>%
-          summarise_all("mean")
-        Mean_C2 <- C2 %>%
-          summarise_all("mean")
       }
 
   #2. General parameters
@@ -133,17 +128,26 @@ DMA <-function(Input_data,
     }
   }
   
+  ## ------------ Check Missingness ------------- ##
+  # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
+  # Here we will check how many metabolites this affects in C1 and C2, and weather all replicates of a metabolite are affected.
+  C1_Miss <- replace(C1, C1==0, NA)
+  C1_Miss <- C1_Miss[, (colSums(is.na(C1_Miss)) > 0), drop = FALSE]
   
-  ## ------------ Create Results output folder ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) # Make Results folder
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
-  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
-  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
-  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
+  C2_Miss <- replace(C2, C2==0, NA)
+  C2_Miss <- C2_Miss[, (colSums(is.na(C2_Miss)) > 0), drop = FALSE]
   
+  if(nrow(C1_Miss)>0 & nrow(C2_Miss)==0){
+    message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- colnames(C1_Miss)
+  } else if(nrow(C1_Miss)==0 & nrow(C2_Miss)>0)){
+    message("In `Condition2` ",paste0(toString(Condition2)), ", NA/0 values exist in ", ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- colnames(C2_Miss)
+  } else if(nrow(C1_Miss)>0 & nrow(C2_Miss)>0)){
+    message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), " and in `Condition2`",paste0(toString(Condition2)), " ",ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- c(colnames(C1_Miss), colnames(C2_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+  }
   
   ## ------------ Check data normality and statistical test chosen ----------- ##
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test. 
@@ -172,10 +176,31 @@ DMA <-function(Input_data,
       warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
     }
   
+  ## ------------ Create Results output folder ----------- ##
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) # Make Results folder
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
+  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
+  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
+  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
+  
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval ############### 
+
+  ## ------------  Calculate Log2FC ----------- ##
+  # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if mean = 0 (If one value is NA, the mean will be NA even though all other values are available.)
+  C1_Zero <- C1
+  C1_Zero[is.na(C1_Zero)] <- 0
+  Mean_C1 <- C1_Zero %>%
+    summarise_all("mean")
   
-  ## ------------ 1. Calculate Log2FC ----------- ##
+  C2_Zero <- C2
+  C2_Zero[is.na(C2_Zero)] <- 0
+  Mean_C2 <- C2_Zero %>%
+    summarise_all("mean")
+  
   if(CoRe==TRUE){#Calculate Log2FC by taking into account the distance between the means:
     #CoRe values can be negative and positive, which can lead to problems when calculating the Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A or B being negative, with x being a constant that is adapted to the size range of the respective metabolite.
     Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
@@ -184,26 +209,39 @@ DMA <-function(Input_data,
       rownames_to_column("Metabolite")
     Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
       rename("C1"=2,
-             "C2"=3)%>%
-      mutate(C1_Adapted = case_when(C1 < 0 & C2 > 0 ~ paste(C1*-1),
-                                    C1 > 0 & C2 < 0 ~ paste(C1+C2),
-                                    C1 > 0 & C2 > 0 ~ paste(C1),
-                                    C1 < 0 & C2 < 0 ~ paste(C1),
-                                    C2 == 0 ~ paste(C1),
-                                    C1 == 0 ~ paste(C1),
+             "C2"=3)
+    Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
+    
+    Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
+      mutate(C1_Adapted = case_when(C1 < 0 & C2 > 0 ~ paste(C1*-1),#Here we have a negative value and transform it into a positive value
+                                    C1 > 0 & C2 < 0 ~ paste(C1+(C2*2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
+                                    C1 > 0 & C2 > 0 ~ paste(C1),#Both values are positive, so no action needed
+                                    C1 < 0 & C2 < 0 ~ paste(C1),#Both values are negative, so no action needed
+                                    C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                    C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     TRUE ~ 'NA'))%>%
-      mutate(C2_Adapted = case_when(C2 < 0 & C1 > 0 ~ paste(C2*-1),
-                                    C2 > 0 & C1 < 0 ~ paste(C2+C1),
-                                    C2 > 0 & C1 > 0 ~ paste(C2),
-                                    C2 < 0 & C1 < 0 ~ paste(C2),
-                                    C2 == 0 ~ paste(C2),
-                                    C1 == 0 ~ paste(C2),
+      mutate(C2_Adapted = case_when(C2 < 0 & C1 > 0 ~ paste(C2*-1),#Here we have a negative value and transform it into a positive value
+                                    C2 > 0 & C1 < 0 ~ paste(C2+(C1*2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
+                                    C2 > 0 & C1 > 0 ~ paste(C2),#Both values are positive, so no action needed
+                                    C2 < 0 & C1 < 0 ~ paste(C2),#Both values are negative, so no action needed
+                                    C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                    C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     TRUE ~ 'NA'))
     
-    Mean_C1_Ad <-Mean_Merge[,c(1,4)]%>%
+    if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
+      X <- Mean_Merge%>%
+        subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
+      message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
+    }
+    
+    Mean_C1_Ad <-Mean_Merge[,c(1,5)]%>%
       column_to_rownames("Metabolite")
     Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted)) 
-    Mean_C2_Ad <-Mean_Merge[,c(1,5)]%>%
+    Mean_C2_Ad <-Mean_Merge[,c(1,6)]%>%
       column_to_rownames("Metabolite")
     Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted)) 
       
@@ -214,7 +252,40 @@ DMA <-function(Input_data,
     names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
     names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
     }else if(CoRe==FALSE){
-      #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to ?
+      #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
+      Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
+        rownames_to_column("Metabolite")
+      Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
+        rownames_to_column("Metabolite")
+      Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
+        rename("C1"=2,
+               "C2"=3)
+      Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
+      
+      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
+        mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                      C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                      C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                      C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                      TRUE ~ paste(C1)))%>%
+        mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                      C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                      C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                      C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                      TRUE ~ paste(C2)))
+      
+      if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
+        X <- Mean_Merge%>%
+          subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
+        message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
+      }
+      
+      Mean_C1_Ad <-Mean_Merge[,c(1,5)]%>%
+        column_to_rownames("Metabolite")
+      Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted)) 
+      Mean_C2_Ad <-Mean_Merge[,c(1,6)]%>%
+        column_to_rownames("Metabolite")
+      Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted)) 
       
       #Calculate the Log2FC
       FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1, Mean_C2)
@@ -227,6 +298,11 @@ DMA <-function(Input_data,
         }
   
   ## ------------ Perform Hypothesis testing ----------- ##
+  # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
+  C1[is.na(C1)] <- 0
+  C2[is.na(C2)] <- 0
+  
+  #### 1. p.value
   T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
   
   VecPVAL_C1vC2 <- c()
@@ -236,15 +312,37 @@ DMA <-function(Input_data,
   }
   Metabolite <- colnames(C2)
   PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
- 
+  
+  #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
+  PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss 
+  PVal_C1vC2 <-PVal_C1vC2%>%
+    mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
+                             TRUE ~ paste(VecPVAL_C1vC2)))
+  PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val)) 
+  
+  #### 2. p. adjusted
+  #Split data for p.value adjustment to exclude NA
+  PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1,4)]
+  PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1,4)]
+  
+  #perform adjustment
   VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
+  Metabolite <- PVal_C1vC2[,1]
   PADJ_C1vC2 <- data.frame(Metabolite, VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
   STAT_C1vC2 <- merge(Log2FC_C1vC2,STAT_C1vC2, by="Metabolite")
-  names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPVAL_C1vC2"] <- "p.val"
   names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
+  
+  #### 3. t.value
   STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.val / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
   STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
+  
+  #Add Metabolites that have p.val=NA back into the DF for completeness.
+  PVal_NA <- merge(Log2FC_C1vC2,PVal_NA, by="Metabolite", all.y=TRUE)
+  PVal_NA$p.adj <- NA
+  PVal_NA$t.val <- NA
+  
+  STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
   
   ################################################################################################################################################################################################
   
