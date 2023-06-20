@@ -153,7 +153,9 @@ DMA <-function(Input_data,
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test. 
   
   # 1. Load the data and perform the shapiro.test on each metabolite:
-  shaptest <-  Input_data %>% # Select data
+  Input_data_NA <- replace(Input_data, Input_data==0, NA)#Shapiro test ignores NAs!
+  
+  shaptest <-   Input_data_NA %>% # Select data
     filter(Experimental_design$Conditions %in% Condition1 | Experimental_design$Conditions %in% Condition2)%>%
     select_if(is.numeric)
   
@@ -166,7 +168,7 @@ DMA <-function(Input_data,
   # 2. Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
   Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
   NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
-  message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test.")
+  message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
   
   if (Norm > 50 & STAT_pval =="wilcox.test"){
       warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
