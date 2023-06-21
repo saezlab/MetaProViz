@@ -2671,7 +2671,7 @@ VizHeatmap <- function(Input_data,
                        kmeans_k = k,
                        clustering_distance_rows = "correlation",
                        annotation_col = my_annot,
-                     #  annotation_row = my_paths,
+                     #annotation_row = my_paths,
                        main = paste(path, " pathway", sep = ""))
         
         if(is.na(k)==FALSE){

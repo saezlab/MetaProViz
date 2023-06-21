@@ -28,7 +28,7 @@
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
-#' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF, e.g. "blank_1", "blank_2". \strong{Default = FALSE}
+#' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
@@ -177,7 +177,7 @@ Preprocessing <- function(Input_data,
 
     miss <- c()
     message("***Performing modified feature filtering***")
-    for (i in unique_conditions){
+   # for (i in unique_conditions){
       split_Input <- split(Input_data, Conditions) # splits data frame into a list of dataframes by condition
 
       for (m in split_Input){ # Select metabolites to be filtered for different conditions
@@ -186,7 +186,7 @@ Preprocessing <- function(Input_data,
             miss <- append(miss,i)
         }
       }
-    }
+ #   }
   
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
@@ -256,6 +256,7 @@ Preprocessing <- function(Input_data,
     }
 
   if (CoRe ==  TRUE){
+    
     blankMeans <- colMeans( Data_TIC[grep("blank", Conditions),])
     blankSd <- as.data.frame( apply(Data_TIC[grep("blank", Conditions),], 2, sd) )
 

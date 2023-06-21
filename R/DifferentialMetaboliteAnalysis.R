@@ -140,14 +140,14 @@ DMA <-function(Input_data,
   if(nrow(C1_Miss)>0 & nrow(C2_Miss)==0){
     message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(C1_Miss)
-  } else if(nrow(C1_Miss)==0 & nrow(C2_Miss)>0)){
+    } else if(nrow(C1_Miss)==0 & nrow(C2_Miss)>0){
     message("In `Condition2` ",paste0(toString(Condition2)), ", NA/0 values exist in ", ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(C2_Miss)
-  } else if(nrow(C1_Miss)>0 & nrow(C2_Miss)>0)){
+    } else if(nrow(C1_Miss)>0 & nrow(C2_Miss)>0){
     message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), " and in `Condition2`",paste0(toString(Condition2)), " ",ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- c(colnames(C1_Miss), colnames(C2_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
-  }
+    }
   
   ## ------------ Check data normality and statistical test chosen ----------- ##
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test. 
