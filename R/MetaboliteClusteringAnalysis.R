@@ -1,43 +1,50 @@
-#' Metabolomics pre-processing pipeline
-#' @author Prymidis Dimitrios, Schmidt Christina
-#' Date: "2022-10-28"
+#' ## ---------------------------
+##
+## Script name: MCA
+##
+## Purpose of script: Metabolite Clustering Analysis generates clusters of metabolites based on regulatory rules or kmeans clustering.
+##
+## Author: Dimitrios Prymidis and Christina Schmidt
+##
+## Date Created: 2022-10-28
+##
+## Copyright (c) Dimitrios Prymidis and Christina Schmidt
+## Email:
+##
+## ---------------------------
+##
+## Notes:
+##
+##
+## ---------------------------
+
+
+#' MCA_2Cond
 #'
-#' This script allows you to perform metabolite clustering analysis
+#' This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between two conditions (e.g. KO versus WT in Hypoxia = Cond1 and KO versus WT in Normoxia = Cond2).
 #'
-#' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns.
-#' @param Input_data2 Dataframe same as Input_data for another comparison.
-#' @param Output_Name String which is added to the output files of the Metabolic Clusters.
-#' @param Condition1 String which contains the name of the first condition.
-#' @param Condition2 String which contains the name of the second condition.
-#' @param pCutoff Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
-#' @param FCcutoff Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param test String which selects pvalue or padj for significance.  \strong{Default = padj}
-#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
-#'
-#'
-#' @keywords Metabolic Clusters,
+#' @param Cond1_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param Cond2_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param MetaboliteID Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.
+#' @param Cond1ValueCol Column name of Log2FC in Cond1File
+#' @param Cond1PadjCol Column name of adjusted p-value in Cond1File. Can also be you p-value column if you want to use this instead.
+#' @param Cond2ValueCol  Column name of Log2FC in Cond2File
+#' @param Cond2PadjCol Column name of adjusted p-value in Cond2File. Can also be you p-value column if you want to use this instead.
+#' @param Cond1_padj_cutoff  \emph{Optional: } adjusted p-value cutoff for Cond1File. \strong{Default=0.05}
+#' @param Cond1_FC_cutoff \emph{Optional: } Log2FC cutoff for Cond1File. \strong{Default=0.5}
+#' @param Cond2_padj_cutoff \emph{Optional: } adjusted p-value cutoff for Cond2File. \strong{Default=0.05}
+#' @param Cond2_FC_cutoff \emph{Optional: } Log2FC cutoff for Cond2File. \strong{Default=0.5}
+#' @param backgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
+#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
+#' @return MCA an instance of the MetaProViz package
 #' @export
-
+#'
 
 ##################################################
-### ### ### Metabolite Clustering Analysis ### ### ###
+### ### ### Metabolite Clustering Analysis: 2 Conditions ### ### ###
 ##################################################
 
-MCA <- function(Input_data,
-                Input_data2,
-                Output_Name = "",
-                Condition1,
-                Condition2,
-                pCutoff= 0.05 ,
-                FCcutoff=0.5,
-                test = "p.adj",
-                plot = TRUE,
-                CoRe=FALSE,
-                Save_as = "svg"
-               ){
-  
+MCA_2Cond <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1ValueCol="Log2FC",Cond1PadjCol="p.adj", Cond2ValueCol="Log2FC", Cond2PadjCol="p.adj",Cond1_padj_cutoff= 0.05, Cond2_padj_cutoff = 0.05,Cond1_FC_cutoff= 1, Cond2_FC_cutoff = 1, backgroundMethod="C1&C2", OutputFileName = "MCA_2Cond_"){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -48,39 +55,39 @@ MCA <- function(Input_data,
   
   
   ## ------------ Check Input files ----------- ##
-  for(data in list(Input_data, Input_data2)){
-    if(any(duplicated(row.names(data)))==TRUE){
-      stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-    } 
+  
+  if( is.numeric(Cond1_padj_cutoff)== FALSE |Cond1_padj_cutoff > 1 | Cond1_padj_cutoff < 0 | is.numeric(Cond2_padj_cutoff)== FALSE |Cond2_padj_cutoff > 1 | Cond2_padj_cutoff < 0){
+    stop("Check input. The selected Cond_padj_cutoff value should be numeric and between 0 and 1.")
   }
-  if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
-    stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
-  }
-  if( is.numeric(FCcutoff)== FALSE  | FCcutoff < 0){
-    stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
-  }
-  if(test != "p.val" & test != "p.adj" ){
-    stop("Check input. The selected test option for assessing significance is not valid. Please select one of the following: p.adj, p.val.")
-  }
-  for(Input_data in list(Input_data, Input_data2)){
-    if(test %in% colnames(Input_data) == FALSE){
-      stop("Check Input data. There is no column ", test, " for assessing significance.")
-    } 
-  }
-  if(is.logical(plot) == FALSE){
-    stop("Check input. The plot value should be either =TRUE if an Alluvial plot presenting the Metabolic Cluster Analysisresults is to be exported or =FALSE if not.")
-  }
-  if(is.logical(CoRe) == FALSE){
-    stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
-  }
-  Save_as_options <- c("svg","pdf")
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  if( is.numeric(Cond1_FC_cutoff)== FALSE  | Cond1_FC_cutoff < 0 | is.numeric(Cond2_FC_cutoff)== FALSE  | Cond2_FC_cutoff < 0){
+    stop("Check input. The selected Cond_FC_cutoff value should be numeric and positive (absolute value).")
   }
   
+  #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
+  Cond2_DF <- as.data.frame(Cond2_File)%>%
+    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
+                  "ValueCol"=paste(Cond2ValueCol),
+                  "PadjCol"=paste(Cond2PadjCol))
+  Cond1_DF<- as.data.frame(Cond1_File)%>%
+    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
+                  "ValueCol"=paste(Cond1ValueCol),
+                  "PadjCol"=paste(Cond1PadjCol))
   
-  ####################################################
-  ### ### ### Create Results output folder ### ### ###
+  #First check for duplicates in "MetaboliteID" and drop if there are any
+  if(length(Cond2_DF[duplicated(Cond2_DF$MetaboliteID), "MetaboliteID"]) > 0){
+    doublons <- as.character(Cond2_DF[duplicated(Cond2_DF$MetaboliteID), "MetaboliteID"])#number of duplications
+    Cond2_DF <-Cond2_DF[!duplicated(Cond2_DF$MetaboliteID),]#remove duplications
+    warning("Cond2 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
+    warning("Note that you should do this before running MCA.")
+  }
+  if(length(Cond1_DF[duplicated(Cond1_DF$MetaboliteID), "MetaboliteID"]) > 0){
+    doublons <- as.character(Cond1_DF[duplicated(Cond1_DF$MetaboliteID), "MetaboliteID"])#number of duplications
+    Cond1_DF <-Cond1_DF[!duplicated(Cond1_DF$MetaboliteID),]#remove duplications
+    warning("Cond1 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
+    warning("Note that you should do this before running MCA.")
+  }
+  
+  ## -------- Create Results output folder ---------- ##
   
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
@@ -90,375 +97,943 @@ MCA <- function(Input_data,
   if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
   
   
-  if (CoRe == TRUE){
-    
-    Name = paste0("MCA_Output_",gsub(" ", "_",Condition1),"_with_",gsub(" ", "_",Condition2), sep = "")
-    
-    C1 <- Input_data
-    C1 <- na.omit(C1)
-    C2 <- Input_data2
-    C2 <- na.omit(C2)
-    
-    #C1 <- C1 %>% drop_na()
-    #C2 <- C2 %>% drop_na()
-    
-    # Make intracellular data C1 and CoRe C2
-    if ("CoRe" %in% colnames(C1)){
-      DMA_Intra <- C2
-      DMA_CoRe <- C1
-    }else if ("CoRe" %in% colnames(C2)){
-      DMA_Intra <- C1
-      DMA_CoRe <- C2
-    }else{
-      stop("No CoRe column was found")
-    }
-    
-    # Remove the metabolite Means column from CoRe
-    # grep("Mean",colnames(DMA_CoRe))
-    # DMA_CoRe <- DMA_CoRe[,-grep("Mean",colnames(DMA_CoRe))]
-    
-    # 0. Overall Regulation: label the selection of metabolites that change or where at least we have a change in one of the two conditions
-    
-    # Merge the Intracellular and CoRe results
-    DMA_Intra <- DMA_Intra%>%
-      rename("Log2FC_Intra"="Log2FC",
-             "p.val_Intra"="p.val",
-             "p.adj_Intra"="p.adj")
-    
-    DMA_CoRe <- DMA_CoRe%>%
-      rename("Log2FC_CoRe"="Log2FC",
-             "p.val_CoRe"="p.val",
-             "p.adj_CoRe"="p.adj")
-    
-    
-    DMA <- merge( DMA_Intra, DMA_CoRe, by="Metabolite")
-    
-    
-    # Define the clusters based on p.val or p.adj
-    if(test== "p.val"){
-      DMA <- DMA%>%
-        mutate(`Intracellular Change` = case_when(Log2FC_Intra >= 0.5 & p.val_Intra< 0.05 ~ 'UP',
-                                                  Log2FC_Intra <= -0.5 & p.val_Intra< 0.05 ~ 'DOWN',
-                                                  TRUE ~ 'No Change'))%>%
-        mutate(`CoRe Change` = case_when(Log2FC_CoRe >= 0.5 & p.val_CoRe < 0.05 & CoRe =="Released" ~ 'Release UP',
-                                         Log2FC_CoRe <= -0.5 & p.val_CoRe < 0.05 & CoRe =="Released" ~ 'Release DOWN',
-                                         Log2FC_CoRe >= 0.5 & p.val_CoRe < 0.05 & CoRe =="Consumed"~ 'Consume UP',
-                                         Log2FC_CoRe <= -0.5 & p.val_CoRe < 0.05 & CoRe =="Consumed"~ 'Consume DOWN',
-                                         Log2FC_CoRe >= 0.5 & p.val_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed UP',
-                                         Log2FC_CoRe >= 0.5 & p.val_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed UP',
-                                         Log2FC_CoRe <= -0.5 & p.val_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
-                                         Log2FC_CoRe <= -0.5 & p.val_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
-                                         TRUE ~ 'No Change'))
-      
-      
-    }else{ # else if(test== "p.adj")
-      DMA <- DMA%>%
-        mutate(`Intracellular Change` = case_when(Log2FC_Intra >= 0.5 & p.adj_Intra< 0.05 ~ 'UP',
-                                                  Log2FC_Intra <= -0.5 & p.adj_Intra< 0.05 ~ 'DOWN',
-                                                  TRUE ~ 'No Change'))%>%
-        mutate(`CoRe Change` = case_when(Log2FC_CoRe >= 0.5 & p.adj_CoRe < 0.05 & CoRe =="Released" ~ 'Release UP',
-                                         Log2FC_CoRe <= -0.5 & p.adj_CoRe < 0.05 & CoRe =="Released" ~ 'Release DOWN',
-                                         Log2FC_CoRe >= 0.5 & p.adj_CoRe < 0.05 & CoRe =="Consumed"~ 'Consume UP',
-                                         Log2FC_CoRe <= -0.5 & p.adj_CoRe < 0.05 & CoRe =="Consumed"~ 'Consume DOWN',
-                                         Log2FC_CoRe >= 0.5 & p.adj_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed UP',
-                                         Log2FC_CoRe >= 0.5 & p.adj_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed UP',
-                                         Log2FC_CoRe <= -0.5 & p.adj_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
-                                         Log2FC_CoRe <= -0.5 & p.adj_CoRe < 0.05 & all(c("Released", "Consumed") %in% str_split(DMA$CoRe," ",simplify = TRUE)) ~ 'Released/Consumed DOWN',
-                                         TRUE ~ 'No Change'))
-    }
-    
-    
-    DMA <- DMA%>%
-      mutate(`Metabolite Cluster` = case_when(`Intracellular Change` == "UP" & `CoRe Change`== "Release UP" ~ '1',
-                                              `Intracellular Change` == "UP" & `CoRe Change`== "Release DOWN" ~ '2',
-                                              `Intracellular Change` == "UP" & `CoRe Change`== "Consume UP" ~ '3',
-                                              `Intracellular Change` == "UP" & `CoRe Change`== "Consume DOWN" ~ '4',
-                                              `Intracellular Change` == "UP" & `CoRe Change`== "Released/Consumed UP" ~ '5',
-                                              `Intracellular Change` == "UP" & `CoRe Change`== "Released/Consumed DOWN" ~ '6',
-                                              `Intracellular Change` == "UP" & `CoRe Change`== "No Change" ~ '7',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "Release UP" ~ '8',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "Release DOWN" ~ '9',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "Consume UP" ~ '10',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "Consume DOWN" ~ '11',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "Released/Consumed UP" ~ '12',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "Released/Consumed DOWN" ~ '13',
-                                              `Intracellular Change` == "No Change" & `CoRe Change`== "No Change" ~ '14',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "Release UP" ~ '15',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "Release DOWN" ~ '16',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "Consume UP" ~ '17',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "Consume DOWN" ~ '18',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "Released/Consumed UP" ~ '19',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "Released/Consumed DOWN" ~ '20',
-                                              `Intracellular Change` == "DOWN" & `CoRe Change`== "No Change" ~ '21',
-                                              Log2FC_Intra <= -0.5 & p.val_Intra< 0.05 ~ 'DOWN',
-                                              TRUE ~ 'X'))
-    
-    # Make a df with the clusters and how metabolites are sssigned to them
-    Cluster_assignment_df <- data.frame("Cluster" = seq(1,21),
-                                        "Intracellular Change"= c(rep("UP",7),rep("No Change",7),rep("DOWN",7)), 
-                                        "CoRe Change"= rep(c("Release UP","Release DOWN","Consume UP","Consume DOWN","Released/Consumed UP","Released/Consumed DOWN","No Change"),3))  
-    
-    Alluvial_DF.final <- DMA
-    
-    writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/",Name,Output_Name,".xlsx", sep = ""))
-    write.table(Cluster_assignment_df,row.names =  FALSE, file = paste0(Results_folder_MCA_folder,"/Cluster_assignment_table.csv", sep = "")     )
-    
-    Alluvial_DF <- Alluvial_DF.final
-    
-    
-  }else{ #  else if(CoRe == FALSE){
-    Name = paste0("MCA_Output_",gsub(" ", "_",Condition1),"_with_",gsub(" ", "_",Condition2), sep = "")
-    
-    C1 <- Input_data
-    C1 <- na.omit(C1)
-    C1$class <- paste (Condition1)
-    C2 <- Input_data2
-    C2 <- na.omit(C2)
-    C2$class <- paste (Condition2)
-    
-    #C1 <- C1 %>% drop_na()
-    #C2 <- C2 %>% drop_na()
-    
-    # 0. Overall Regulation: label the selection of metabolites that change or where at least we have a change in one of the two conditions
-    if(test== "p.val"){
-      C1 <- C1 %>%
-        mutate(MetaboliteChange_Significant = case_when(Log2FC >= FCcutoff & p.val < pCutoff ~ 'UP',
-                                                        Log2FC <= -FCcutoff & p.val < pCutoff ~ 'DOWN',
-                                                        TRUE ~ 'No_Change'))
-      C2 <- C2%>%
-        mutate(MetaboliteChange_Significant1 = case_when(Log2FC >= FCcutoff & p.val < pCutoff ~ 'UP',
-                                                         Log2FC <= -FCcutoff & p.val < pCutoff ~ 'DOWN',
-                                                         TRUE ~ 'No_Change'))%>%
-        rename("class1"="class",
-               "Log2FC1"="Log2FC",
-               "p.val1"="p.val",
-               "p.adj1"="p.adj")
-      
-    }else{
-      C1 <- C1 %>%
-        mutate(MetaboliteChange_Significant = case_when(Log2FC >= FCcutoff & p.adj < pCutoff ~ 'UP',
-                                                        Log2FC <= -FCcutoff & p.adj < pCutoff ~ 'DOWN',
-                                                        TRUE ~ 'No_Change'))
-      C2 <- C2%>%
-        mutate(MetaboliteChange_Significant1 = case_when(Log2FC >= FCcutoff & p.adj < pCutoff ~ 'UP',
-                                                         Log2FC <= -FCcutoff & p.adj < pCutoff ~ 'DOWN',
-                                                         TRUE ~ 'No_Change'))%>%
-        rename("class1"="class",
-               "Log2FC1"="Log2FC",
-               "p.val1"="p.val",
-               "p.adj1"="p.adj")
-    }
-    
-    
-    
-    MergeDF<- merge(C1, C2[,c("Metabolite","MetaboliteChange_Significant1", "class1","Log2FC1","p.val1","p.adj1")], by="Metabolite")%>%
-      mutate(Change_Specific = case_when((class== paste(Condition1)& MetaboliteChange_Significant == "UP")       & (class1== paste(Condition2)& MetaboliteChange_Significant1 == "DOWN") ~ 'OppositeChange',
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "DOWN")     & (class1== paste(Condition2)& MetaboliteChange_Significant1 == "UP") ~ 'OppositeChange',
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "UP")       & (class1== paste(Condition2)& MetaboliteChange_Significant1 == "UP") ~ 'SameDirection_UP',
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "DOWN")     & (class1== paste(Condition2)& MetaboliteChange_Significant1 == "DOWN") ~ 'SameDirection_DOWN',
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "No_Change")& (class1== paste(Condition2)& MetaboliteChange_Significant1 == "DOWN") ~ paste("ChangeOnly", Condition2, "DOWN", sep="_"),
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "No_Change")& (class1== paste(Condition2)& MetaboliteChange_Significant1 == "UP") ~ paste("ChangeOnly", Condition2, "UP", sep="_"),
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "UP")       & (class1== paste(Condition2)& MetaboliteChange_Significant1 == "No_Change") ~ paste("ChangeOnly", Condition1, "UP", sep="_"),
-                                         (class== paste(Condition1)& MetaboliteChange_Significant == "DOWN")     & (class1== paste(Condition2)& MetaboliteChange_Significant1 == "No_Change") ~ paste("ChangeOnly", Condition1, "DOWN", sep="_"),
-                                         TRUE ~ 'SameDirection_NoChange'))
-    
-    
-    MergeDF_C1 <-MergeDF %>% select(-c( "MetaboliteChange_Significant1", "class1", "Log2FC1", "p.val1", "p.adj1")) %>%
-      unite(col=UniqueID, c(Metabolite, MetaboliteChange_Significant, class), sep = "_", remove = FALSE, na.rm = FALSE)%>%
-      mutate(Change_Specific = case_when(Change_Specific== 'OppositeChange' ~ 'OppositeChange',
-                                         Change_Specific== 'SameDirection_UP'~ 'SameDirection_UP',
-                                         Change_Specific== 'SameDirection_DOWN' ~ 'SameDirection_DOWN',
-                                         Change_Specific== 'SameDirection_NoChange' ~ 'SameDirection_NoChange',
-                                         Change_Specific== paste("ChangeOnly", Condition2, "DOWN", sep="_") ~paste("ChangeOnly", Condition2, "DOWN", sep="_"),
-                                         Change_Specific== paste("ChangeOnly", Condition2, "UP", sep="_") ~paste("ChangeOnly", Condition2, "UP", sep="_"),
-                                         Change_Specific== paste("ChangeOnly", Condition1, "DOWN", sep="_") ~paste("Unique", Condition1,"DOWN", sep="_"),
-                                         Change_Specific== paste("ChangeOnly", Condition1, "UP", sep="_") ~paste("Unique", Condition1, "UP", sep="_"),
-                                         TRUE ~ paste("Unique", Condition1, sep="_")))
-    
-    MergeDF_C2 <- MergeDF %>% select(-c( "MetaboliteChange_Significant", "class", "Log2FC", "p.val", "p.adj")) %>%
-      unite(col=UniqueID, c(Metabolite, MetaboliteChange_Significant1, class1), sep = "_", remove = FALSE, na.rm = FALSE)%>%
-      rename("class"="class1",
-             "MetaboliteChange_Significant"="MetaboliteChange_Significant1",
-             "Log2FC"="Log2FC1",
-             "p.val"="p.val1",
-             "p.adj"="p.adj1")%>%
-      mutate(Change_Specific = case_when(Change_Specific== 'OppositeChange' ~ 'OppositeChange',
-                                         Change_Specific== 'SameDirection_UP'~ 'SameDirection_UP',
-                                         Change_Specific== 'SameDirection_DOWN' ~ 'SameDirection_DOWN',
-                                         Change_Specific== 'SameDirection_NoChange' ~ 'SameDirection_NoChange',
-                                         Change_Specific== paste("ChangeOnly", Condition1, "DOWN", sep="_") ~paste("ChangeOnly", Condition1, "DOWN", sep="_"),
-                                         Change_Specific== paste("ChangeOnly", Condition1, "UP", sep="_") ~paste("ChangeOnly", Condition1, "UP", sep="_"),
-                                         Change_Specific== paste("ChangeOnly", Condition2, "DOWN", sep="_") ~paste("Unique", Condition2,"DOWN", sep="_"),
-                                         Change_Specific== paste("ChangeOnly", Condition2, "UP", sep="_") ~paste("Unique", Condition2, "UP", sep="_"),
-                                         TRUE ~ paste("Unique", Condition1, sep="_")))
-    
-    
-    Alluvial_DF <- rbind(MergeDF_C1, MergeDF_C2)
-    Alluvial_DF<- Alluvial_DF%>%
-      mutate(Amount_Change_Specific = case_when(Change_Specific== 'OppositeChange' ~ paste((sum(Alluvial_DF$Change_Specific=="OppositeChange", na.rm=T))/2),
-                                                Change_Specific== 'SameDirection_UP' ~ paste((sum(Alluvial_DF$Change_Specific=="SameDirection_UP", na.rm=T))/2),
-                                                Change_Specific== 'SameDirection_DOWN' ~ paste((sum(Alluvial_DF$Change_Specific=="SameDirection_DOWN", na.rm=T))/2),
-                                                Change_Specific== paste("ChangeOnly", Condition1, "UP", sep="_") ~ paste(sum(Alluvial_DF$Change_Specific==paste("ChangeOnly", Condition1, "UP", sep="_"), na.rm=T)),
-                                                Change_Specific== paste("ChangeOnly", Condition1, "DOWN", sep="_") ~ paste(sum(Alluvial_DF$Change_Specific==paste("ChangeOnly", Condition1, "DOWN", sep="_"), na.rm=T)),
-                                                Change_Specific== paste("ChangeOnly", Condition2, "UP" ,sep="_") ~ paste(sum(Alluvial_DF$Change_Specific==paste("ChangeOnly", Condition2, "UP", sep="_"), na.rm=T)),
-                                                Change_Specific== paste("ChangeOnly", Condition2, "DOWN", sep="_") ~ paste(sum(Alluvial_DF$Change_Specific==paste("ChangeOnly", Condition2, "DOWN", sep="_"), na.rm=T)),
-                                                Change_Specific== 'SameDirection_NoChange' ~ paste((sum(Alluvial_DF$Change_Specific=="SameDirection_NoChange", na.rm=T))/2),
-                                                Change_Specific== paste("Unique", Condition1,"DOWN", sep="_") ~paste(sum(Alluvial_DF$Change_Specific==paste("Unique", Condition1,"DOWN", sep="_"), na.rm=T)),
-                                                Change_Specific== paste("Unique", Condition1,"UP", sep="_") ~paste(sum(Alluvial_DF$Change_Specific==paste("Unique", Condition1,"UP", sep="_"), na.rm=T)),
-                                                Change_Specific== paste("Unique", Condition2,"DOWN", sep="_") ~paste(sum(Alluvial_DF$Change_Specific==paste("Unique", Condition2,"DOWN", sep="_"), na.rm=T)),
-                                                Change_Specific== paste("Unique", Condition2,"UP", sep="_") ~paste(sum(Alluvial_DF$Change_Specific==paste("Unique", Condition2,"UP", sep="_"), na.rm=T)),
-                                                TRUE ~ 'FALSE'))
-    Alluvial_DF<- Alluvial_DF%>%
-      mutate(Overall_Change = case_when(Change_Specific== 'OppositeChange' ~ 'OppositeChange',
-                                        Change_Specific== 'SameDirection_UP'~ 'SameDirection_UP_or_DOWN',
-                                        Change_Specific== 'SameDirection_DOWN' ~ 'SameDirection_UP_or_DOWN',
-                                        Change_Specific== 'SameDirection_NoChange' ~ 'SameDirection_NoChange',
-                                        Change_Specific== paste("ChangeOnly", Condition2, "DOWN", sep="_") & MetaboliteChange_Significant == "No_Change" ~ paste("ChangeOnly", Condition2, sep="_"),
-                                        Change_Specific== paste("ChangeOnly", Condition2, "UP", sep="_") & MetaboliteChange_Significant == "No_Change" ~ paste("ChangeOnly", Condition2, sep="_"),
-                                        Change_Specific== paste("Unique", Condition1, "DOWN",sep="_") ~paste("Unique", Condition1, sep="_"),
-                                        Change_Specific== paste("Unique", Condition1, "UP",sep="_") ~paste("Unique", Condition1, sep="_"),
-                                        Change_Specific== paste("ChangeOnly", Condition1, "DOWN", sep="_") & MetaboliteChange_Significant == "No_Change" ~ paste("ChangeOnly", Condition1, sep="_"),
-                                        Change_Specific== paste("ChangeOnly", Condition1, "UP", sep="_") & MetaboliteChange_Significant == "No_Change" ~ paste("ChangeOnly", Condition1, sep="_"),
-                                        Change_Specific== paste("Unique", Condition2,"DOWN", sep="_") ~paste("Unique", Condition2, sep="_"),
-                                        Change_Specific== paste("Unique", Condition2,"UP", sep="_") ~paste("Unique", Condition2, sep="_"),
-                                        TRUE ~ "FALSE"))
-    Alluvial_DF <- Alluvial_DF %>%
-      mutate(Amount_Overall_Change = case_when(Overall_Change== 'OppositeChange' ~ paste((sum(Alluvial_DF$Overall_Change=="OppositeChange", na.rm=T))/2),
-                                               Overall_Change== 'SameDirection_UP_or_DOWN' ~ paste((sum(Alluvial_DF$Overall_Change=="SameDirection_UP_or_DOWN", na.rm=T))/2),
-                                               Overall_Change== paste("Unique", Condition1, sep="_") ~ paste(sum(Alluvial_DF$Overall_Change==paste("Unique", Condition1, sep="_"), na.rm=T)),
-                                               Overall_Change== paste("Unique", Condition2, sep="_") ~ paste(sum(Alluvial_DF$Overall_Change==paste("Unique", Condition2, sep="_"), na.rm=T)),
-                                               Overall_Change== paste("ChangeOnly", Condition1, sep="_") ~ paste(sum(Alluvial_DF$Overall_Change==paste("ChangeOnly", Condition1, sep="_"), na.rm=T)),
-                                               Overall_Change== paste("ChangeOnly", Condition2, sep="_") ~ paste(sum(Alluvial_DF$Overall_Change==paste("ChangeOnly", Condition2, sep="_"), na.rm=T)),
-                                               Overall_Change== 'SameDirection_NoChange' ~ paste((sum(Alluvial_DF$Overall_Change=="SameDirection_NoChange", na.rm=T))/2),
-                                               TRUE ~ 'FALSE'))
-    
-    # Create Alluvial final output df
-    C1.final<- Alluvial_DF %>% filter(class == Condition1)
-    C1.final <- C1.final %>% select(-c("UniqueID", "class", "Change_Specific","Amount_Change_Specific", "Overall_Change", "Amount_Overall_Change" ))
-    C2.final<- Alluvial_DF %>% filter(class == Condition2)
-    C2.final <- C2.final %>% select(-c("UniqueID", "class" ))
-    Alluvial_DF.final <- merge(C1.final, C2.final, by = "Metabolite")
-    names(Alluvial_DF.final) <- gsub(".x",paste(".",Condition1, sep = ""),names(Alluvial_DF.final))
-    names(Alluvial_DF.final) <- gsub(".y",paste(".",Condition2, sep = ""),names(Alluvial_DF.final))
-    names(Alluvial_DF.final) <- gsub(x = names(Alluvial_DF.final), pattern = "MetaboliteChange_Significant", replacement =  paste("MetaboliteChange_Significant_",test,pCutoff,"logFC",FCcutoff, sep = ""))
-    
-    ##Write to file
-    writexl::write_xlsx(Alluvial_DF.final, paste0(Results_folder_MCA_folder,"/MCA_Output_",Name,Output_Name,".xlsx", sep = ""))
-    # write.csv(Alluvial_DF2, paste("AlluvianDF", Output, ".csv", sep="_"), row.names= TRUE)
+  
+  ## ------------ Assign Groups -------- ##
+  #Tag genes that are detected in each data layer
+  Cond2_DF$Detected <- "TRUE"
+  Cond1_DF$Detected <- "TRUE"
+  
+  #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
+  Cond2_DF <- Cond2_DF%>%
+    mutate(Cutoff = case_when(Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol > Cond2_FC_cutoff ~ 'UP',
+                              Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol < -Cond2_FC_cutoff ~ 'DOWN',
+                              TRUE ~ 'No Change')) %>%
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
+                                       Cutoff == "DOWN" ~ 'DOWN',
+                                       Cutoff == "No Change" & Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & Cond2_DF$PadjCol > Cond2_padj_cutoff ~ 'Not Significant',
+                                       TRUE ~ 'FALSE'))
+  
+  Cond1_DF <-Cond1_DF%>%
+    mutate(Cutoff = case_when(Cond1_DF$PadjCol <Cond1_padj_cutoff &Cond1_DF$ValueCol >Cond1_FC_cutoff ~ 'UP',
+                              Cond1_DF$PadjCol <Cond1_padj_cutoff &Cond1_DF$ValueCol < -Cond1_FC_cutoff ~ 'DOWN',
+                              TRUE ~ 'No Change'))%>%
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
+                                       Cutoff == "DOWN" ~ 'DOWN',
+                                       Cutoff == "No Change" & Cond1_DF$PadjCol < Cond1_padj_cutoff & Cond1_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & Cond1_DF$PadjCol < Cond1_padj_cutoff & Cond1_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & Cond1_DF$PadjCol > Cond1_padj_cutoff ~ 'Not Significant',
+                                       TRUE ~ 'FALSE'))
+  
+  #Merge the dataframes together: Merge the supplied Cond1 and Cond2 dataframes together.
+  ##Add prefix to column names to distinguish the different data types after merge
+  colnames(Cond2_DF) <- paste0("Cond2_DF_", colnames(Cond2_DF))
+  Cond2_DF <- Cond2_DF%>%
+    dplyr::rename("MetaboliteID" = "Cond2_DF_MetaboliteID")
+  
+  colnames(Cond1_DF) <- paste0("Cond1_DF_", colnames(Cond1_DF))
+  Cond1_DF <-Cond1_DF%>%
+    dplyr::rename("MetaboliteID"="Cond1_DF_MetaboliteID")
+  
+  ##Merge
+  MergeDF <- merge(Cond1_DF, Cond2_DF, by="MetaboliteID", all=TRUE)
+  
+  ##Mark the undetected genes in each data layer
+  MergeDF<-MergeDF %>%
+    mutate_at(c("Cond2_DF_Detected","Cond1_DF_Detected"), ~replace_na(.,"FALSE"))%>%
+    mutate_at(c("Cond2_DF_Cutoff","Cond1_DF_Cutoff"), ~replace_na(.,"No Change"))%>%
+    mutate_at(c("Cond2_DF_Cutoff_Specific", "Cond1_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))
+  
+  #Apply Background filter (label genes that will be removed based on choosen background)
+  if(backgroundMethod == "C1|C2"){# C1|C2 = Cond2 OR Cond1
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+                                   Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
+                                   Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "C1&C2"){ # Cond2 AND Cond1
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "C2"){ # Cond2 has to be there
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+                                   Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "C1"){ #Cond1 has to be there
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+                                   Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "*"){ # Use all genes as the background
+    MergeDF$BG_Method <- "TRUE"
+  }else{
+    stop("Please use one of the following backgroundMethods: C1|C2, C1&C2, C2, C1, *")#error message
   }
   
-  if(plot == TRUE){
-    
-    ###########################
-    ### Make Alluvial plot ###
-    
-    #Add Frequency:
-    Alluvial_DF[,"Frequency"]  <- as.numeric("1")
-    Alluvial_Plot <- Alluvial_DF
-    
-    ### select Plot parameters
-    if (CoRe == TRUE){
-      plot_column_names= c("Intracellular Change", "CoRe Change", "Metabolite Cluster", "Metabolite")
-      plot_color_variable = "Metabolite Cluster"
-      # Remove the No Change No Change from the plot
-      Alluvial_Plot <- Alluvial_Plot[!c(Alluvial_Plot$`Intracellular Change`=="No Change" & Alluvial_Plot$`CoRe Change`== "No Change"),]
-    }else{
-      plot_column_names= c("class", "MetaboliteChange_Significant", "Overall_Change", "Metabolite")
-      plot_color_variable = "Overall_Change"
-      Alluvial_Plot<- Alluvial_Plot[-which(Alluvial_Plot[,plot_color_variable]=="SameDirection_NoChange"),]
-    }
-    safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","red", "white", "#000") # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible,
-    
-    if(Save_as=="pdf"){
-    pdf(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9) # Save_as_var
-    }else{
-      svg(paste(Results_folder_MCA_folder,"/AlluvianPlot", Name,Output_Name, ".",Save_as, sep=""), width=12, height=9) # Save_as_var
-    }
-    
-    
-    par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
-    alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
-                        col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[4] ~ safe_colorblind_palette[4],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[5] ~ safe_colorblind_palette[5],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[6] ~ safe_colorblind_palette[6],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[7] ~ safe_colorblind_palette[7],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[8] ~ safe_colorblind_palette[8],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[9] ~ safe_colorblind_palette[9],
-                                        Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[10] ~ safe_colorblind_palette[10],
-                                        TRUE ~ 'black'),
-                        border = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[2] ~ safe_colorblind_palette[2],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[3] ~ safe_colorblind_palette[3],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[4] ~ safe_colorblind_palette[4],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[5] ~ safe_colorblind_palette[5],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[6] ~ safe_colorblind_palette[6],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[7] ~ safe_colorblind_palette[7],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[8] ~ safe_colorblind_palette[8],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[9] ~ safe_colorblind_palette[9],
-                                           Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[10] ~ safe_colorblind_palette[10],
-                                           
-                                           TRUE ~ 'black'),
-                        hide = Alluvial_Plot$Frequency == 0,
-                        cex = 0.3,
-                        cex.axis=0.5)
-    mtext("Selection of metabolites that change in at least one of the two conditions", side=3, line=6, cex=1.2, col="black", outer=TRUE) #https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
-    mtext(paste("",Name), side=3, line=5, cex=0.8, col="black", outer=TRUE)
-    mtext(paste("Underlying comparison: ",Condition1,"-versus-",Condition2), side=2, line=0, cex=0.8, col="black", outer=TRUE)
-    
-    if(CoRe==FALSE){
-      #mtext("Legend", side=3, line=5, adj=1.0, cex=1, col="black", outer=TRUE)
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[1])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[1]), side=3, line=6, adj=0, cex=0.6, col=safe_colorblind_palette[1], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[2])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[2]), side=3, line=5, adj=0, cex=0.6, col=safe_colorblind_palette[2], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[3])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[3]), side=3, line=4, adj=0, cex=0.6, col=safe_colorblind_palette[3], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[4])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[4]), side=3, line=3, adj=0, cex=0.6, col=safe_colorblind_palette[4], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[5])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[5]), side=3, line=2, adj=0, cex=0.6, col=safe_colorblind_palette[5], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[6])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[6]), side=3, line=1, adj=0, cex=0.6, col=safe_colorblind_palette[6], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[7])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[7]), side=3, line=0, adj=0, cex=0.6, col=safe_colorblind_palette[7], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[8])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[8]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[8], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[9])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[9]), side=3, line=6, adj=1, cex=0.6, col=safe_colorblind_palette[9], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[10])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[10]), side=3, line=5, adj=1, cex=0.6, col=safe_colorblind_palette[10], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[11])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[11]), side=3, line=4, adj=1, cex=0.6, col=safe_colorblind_palette[11], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[12])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[12]), side=3, line=3, adj=1, cex=0.6, col=safe_colorblind_palette[12], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[13])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[13]), side=3, line=2, adj=1, cex=0.6, col=safe_colorblind_palette[13], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[14])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[14]), side=3, line=1, adj=1, cex=0.6, col=safe_colorblind_palette[14], outer=TRUE)
-      }
-      if( is.na(unique(Alluvial_Plot[,plot_color_variable])[15])==FALSE)  {
-        mtext(paste(unique( Alluvial_Plot[,plot_color_variable])[15]), side=3, line=7, adj=1, cex=0.6, col=safe_colorblind_palette[15], outer=TRUE)
-      }
-    } 
-    dev.off()# Close the pdf file
-    
-    
-  }
+  #Assign SiRCle cluster names to the genes
+  MergeDF <- MergeDF%>%
+    mutate(RG1_Specific_Cond2 = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                                          Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',#State 1
+                                          Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',#State 2
+                                          Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',#State 3
+                                          Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',#State 4
+                                          Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',#State 5
+                                          Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 DOWN + Cond2 UP',#State 6
+                                          
+                                          Cond1_DF_Cutoff=="No Change" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 No Change + Cond2 DOWN',#State 7
+                                          Cond1_DF_Cutoff=="No Change" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 No Change + Cond2 Not Detected',#State 8
+                                          Cond1_DF_Cutoff=="No Change" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 No Change + Cond2 Not Significant',#State 9
+                                          Cond1_DF_Cutoff=="No Change" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 No Change + Cond2 Significant Negative',#State 10
+                                          Cond1_DF_Cutoff=="No Change" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 No Change + Cond2 Significant Positive',#State 11
+                                          Cond1_DF_Cutoff=="No Change" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 No Change + Cond2 UP',#State 6
+                                          
+                                          Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 UP + Cond2 DOWN',#State 12
+                                          Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',#State 13
+                                          Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',#State 14
+                                          Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',#State 15
+                                          Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',#State 16
+                                          Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 UP + Cond2 UP',#State 17
+                                          TRUE ~ 'NA'))%>%
+    mutate(RG1_Specific_Cond1 = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                                          Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="DOWN" ~ 'Cond2 DOWN + Cond1 DOWN',#State 1
+                                          Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="Not Detected" ~ 'Cond2 DOWN + Cond1 Not Detected',#State 2
+                                          Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="Not Significant" ~ 'Cond2 DOWN + Cond1 Not Significant',#State 3
+                                          Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond2 DOWN + Cond1 Significant Negative',#State 4
+                                          Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond2 DOWN + Cond1 Significant Positive',#State 5
+                                          Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="UP" ~ 'Cond2 DOWN + Cond1 UP',#State 6
+                                          
+                                          Cond2_DF_Cutoff=="No Change" & Cond1_DF_Cutoff_Specific=="DOWN" ~ 'Cond2 No Change + Cond1 DOWN',#State 7
+                                          Cond2_DF_Cutoff=="No Change" & Cond1_DF_Cutoff_Specific=="Not Detected" ~ 'Cond2 No Change + Cond1 Not Detected',#State 8
+                                          Cond2_DF_Cutoff=="No Change" & Cond1_DF_Cutoff_Specific=="Not Significant" ~ 'Cond2 No Change + Cond1 Not Significant',#State 9
+                                          Cond2_DF_Cutoff=="No Change" & Cond1_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond2 No Change + Cond1 Significant Negative',#State 10
+                                          Cond2_DF_Cutoff=="No Change" & Cond1_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond2 No Change + Cond1 Significant Positive',#State 11
+                                          Cond2_DF_Cutoff=="No Change" & Cond1_DF_Cutoff_Specific=="UP" ~ 'Cond2 No Change + Cond1 UP',#State 6
+                                          
+                                          Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="DOWN" ~ 'Cond2 UP + Cond1 DOWN',#State 12
+                                          Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="Not Detected" ~ 'Cond2 UP + Cond1 Not Detected',#State 13
+                                          Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="Not Significant" ~ 'Cond2 UP + Cond1 Not Significant',#State 14
+                                          Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond2 UP + Cond1 Significant Negative',#State 15
+                                          Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond2 UP + Cond1 Significant Positive',#State 16
+                                          Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="UP" ~ 'Cond2 UP + Cond1 UP',#State 17
+                                          TRUE ~ 'NA'))%>%
+    mutate(RG1_All = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                               Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',#State 1
+                               Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',#State 2
+                               Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',#State 3
+                               Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',#State 4
+                               Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',#State 5
+                               Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 DOWN + Cond2 UP',#State 6
+                               
+                               Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 UP + Cond2 DOWN',#State 12
+                               Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',#State 13
+                               Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',#State 14
+                               Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',#State 15
+                               Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',#State 16
+                               Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 UP + Cond2 UP',#State 17
+                               
+                               Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 Not Detected + Cond2 DOWN',#State 12
+                               Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 Not Detected + Cond2 Not Detected',#State 13
+                               Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 Not Detected + Cond2 Not Significant',#State 14
+                               Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 Not Detected + Cond2 Significant Negative',#State 15
+                               Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 Not Detected + Cond2 Significant Positive',#State 16
+                               Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 Not Detected + Cond2 UP',#State 17
+                               
+                               Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 Significant Negative + Cond2 DOWN',#State 12
+                               Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 Significant Negative + Cond2 Not Detected',#State 13
+                               Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 Significant Negative + Cond2 Not Significant',#State 14
+                               Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 Significant Negative + Cond2 Significant Negative',#State 15
+                               Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 Significant Negative + Cond2 Significant Positive',#State 16
+                               Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 Significant Negative + Cond2 UP',#State 17
+                               
+                               Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 Significant Positive + Cond2 DOWN',#State 12
+                               Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 Significant Positive + Cond2 Not Detected',#State 13
+                               Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 Significant Positive + Cond2 Not Significant',#State 14
+                               Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 Significant Positive + Cond2 Significant Negative',#State 15
+                               Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 Significant Positive + Cond2 Significant Positive',#State 16
+                               Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 Significant Positive + Cond2 UP',#State 17
+                               
+                               Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 Not Significant + Cond2 DOWN',#State 12
+                               Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 Not Significant + Cond2 Not Detected',#State 13
+                               Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 Not Significant + Cond2 Not Significant',#State 14
+                               Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1 Not Significant + Cond2 Significant Negative',#State 15
+                               Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 Not Significant + Cond2 Significant Positive',#State 16
+                               Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 Not Significant + Cond2 UP',#State 1
+                               TRUE ~ 'NA'))%>%
+    mutate(RG2_Significant = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                                       Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Core_DOWN',#State 1
+                                       Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1_DOWN',#State 2
+                                       Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1_DOWN',#State 3
+                                       Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Core_DOWN',#State 4
+                                       Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Opposite',#State 5
+                                       Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Opposite',#State 6
+                                       
+                                       Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Opposite',#State 12
+                                       Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1_UP',#State 13
+                                       Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1_UP',#State 14
+                                       Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Opposite',#State 15
+                                       Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Core_UP',#State 16
+                                       Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Core_UP',#State 17
+                                       
+                                       Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond2_DOWN',#State 12
+                                       Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                       Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                       Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                       Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                       Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 17
+                                       
+                                       Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Core_DOWN',#State 12
+                                       Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                       Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                       Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                       Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                       Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Opposite',#State 17
+                                       
+                                       Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Opposite',#State 12
+                                       Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                       Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                       Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                       Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                       Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Core_UP',#State 17
+                                       
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond2_DOWN',#State 12
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1_UP',#State 1
+                                       TRUE ~ 'NA'))%>%
+    mutate(RG3_SignificantChange = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                                             Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Core_DOWN',#State 1
+                                             Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1_DOWN',#State 2
+                                             Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1_DOWN',#State 3
+                                             Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1_DOWN',#State 4
+                                             Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1_DOWN',#State 5
+                                             Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Opposite',#State 6
+                                             
+                                             Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Opposite',#State 12
+                                             Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1_UP',#State 13
+                                             Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1_UP',#State 14
+                                             Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'Cond1_UP',#State 15
+                                             Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1_UP',#State 16
+                                             Cond1_DF_Cutoff_Specific=="UP" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Core_UP',#State 17
+                                             
+                                             Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond2_DOWN',#State 12
+                                             Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                             Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                             Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                             Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                             Cond1_DF_Cutoff_Specific=="Not Detected" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 17
+                                             
+                                             Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond2_DOWN',#State 12
+                                             Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                             Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                             Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                             Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                             Cond1_DF_Cutoff_Specific=="Significant Negative" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 17
+                                             
+                                             Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond2_DOWN',#State 12
+                                             Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                             Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                             Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                             Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                             Cond1_DF_Cutoff_Specific=="Significant Positive" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 17
+                                             
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond2_DOWN',#State 12
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'None',#State 13
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1_UP',#State 1
+                                             TRUE ~ 'NA'))
+  
+  #Safe the DF and return the groupings
+  ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
+  MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Cond1_DF_Detected","Cond1_DF_ValueCol","Cond1_DF_PadjCol","Cond1_DF_Cutoff", "Cond1_DF_Cutoff_Specific", "Cond2_DF_Detected", "Cond2_DF_ValueCol","Cond2_DF_PadjCol","Cond2_DF_Cutoff", "Cond2_DF_Cutoff_Specific", "BG_Method", "RG1_All", "RG2_Significant", "RG3_SignificantChange")]
+  
+  Cond2ValueCol_Unique<-paste("Cond2_DF_",Cond2ValueCol)
+  Cond2PadjCol_Unique <-paste("Cond2_DF_",Cond2PadjCol)
+  Cond1ValueCol_Unique<-paste("Cond1_DF_",Cond1ValueCol)
+  Cond1PadjCol_Unique <-paste("Cond1_DF_",Cond1PadjCol)
+  
+  MergeDF_Select2<- subset(MergeDF, select=-c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_Method, RG1_All, RG2_Significant, RG3_SignificantChange))%>%
+    dplyr::rename(!!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
+                  !!Cond2PadjCol_Unique :="Cond2_DF_PadjCol",
+                  !!Cond1ValueCol_Unique :="Cond1_DF_ValueCol",
+                  !!Cond1PadjCol_Unique :="Cond1_DF_PadjCol")
+  
+  MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
+  
+  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""), row.names = FALSE)
+  
+  
+  ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
+  ClusterSummary_RG1 <- MergeDF_Rearrange[,c("MetaboliteID", "RG1_All")]%>%
+    count(RG1_All, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG1_All")
+  ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
+  
+  ClusterSummary_RG2 <- MergeDF_Rearrange[,c("MetaboliteID", "RG2_Significant")]%>%
+    count(RG2_Significant, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
+  ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
+  
+  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("MetaboliteID", "RG3_SignificantChange")]%>%
+    count(RG3_SignificantChange, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
+  ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
+  
+  ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
+  ClusterSummary <- ClusterSummary[,c(3,1,2)]
+  
+  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""), row.names = FALSE)
+  
+  return(MergeDF_Rearrange)
 }
 
+
+
+
+#' MCA_CoRe
+#'
+#' This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (CoRe experiment).
+#'
+#' @param Intra_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param CoRe_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require 
+#' @param MetaboliteID Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.
+#' @param IntraValueCol Column name of Log2FC in IntraFile
+#' @param IntraPadjCol Column name of adjusted p-value in IntraFile. Can also be you p-value column if you want to use this instead.
+#' @param CoReValueCol  Column name of Log2FC in CoReFile
+#' @param CoRePadjCol Column name of adjusted p-value in CoReFile. Can also be you p-value column if you want to use this instead.
+#' @param Intra_padj_cutoff  \emph{Optional: } adjusted p-value cutoff for IntraFile. \strong{Default=0.05}
+#' @param Intra_FC_cutoff \emph{Optional: } Log2FC cutoff for IntraFile. \strong{Default=0.5}
+#' @param CoRe_padj_cutoff \emph{Optional: } adjusted p-value cutoff for CoReFile. \strong{Default=0.05}
+#' @param CoRe_FC_cutoff \emph{Optional: } Log2FC cutoff for CoReFile. \strong{Default=0.5}
+#' @param backgroundMethod \emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="C1&C2"}
+#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
+#' @return MCA an instance of the MetaProViz package
+#' @export
+#'
+
+##################################################
+### ### ### Metabolite Clustering Analysis ### ### ###
+##################################################
+
+MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraValueCol="Log2FC",IntraPadjCol="p.adj", CoReValueCol="Log2FC", CoReDirectionCol="CoRe_info", CoRePadjCol="p.adj",Intra_padj_cutoff= 0.05, CoRe_padj_cutoff = 0.05,Intra_FC_cutoff= 1, CoRe_FC_cutoff = 1, backgroundMethod="Intra&CoRe", OutputFileName = "MCA_CoRe_"){
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", "alluvial")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    install.packages(new.packages)
+  }
+  suppressMessages(library(tidyverse))
+  
+  
+  ## ------------ Check Input files ----------- ##
+  
+  if( is.numeric(Intra_padj_cutoff)== FALSE |Intra_padj_cutoff > 1 | Intra_padj_cutoff < 0 | is.numeric(CoRe_padj_cutoff)== FALSE |CoRe_padj_cutoff > 1 | CoRe_padj_cutoff < 0){
+    stop("Check input. The selected Cond_padj_cutoff value should be numeric and between 0 and 1.")
+  }
+  if( is.numeric(Intra_FC_cutoff)== FALSE  | Intra_FC_cutoff < 0 | is.numeric(CoRe_FC_cutoff)== FALSE  | CoRe_FC_cutoff < 0){
+    stop("Check input. The selected Cond_FC_cutoff value should be numeric and positive (absolute value).")
+  }
+  
+  #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
+  CoRe_DF <- as.data.frame(CoRe_File)%>%
+    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
+                  "ValueCol"=paste(CoReValueCol),
+                  "PadjCol"=paste(CoRePadjCol),
+                  "CoRe_Direction"=paste(CoReDirectionCol))
+  Intra_DF<- as.data.frame(Intra_File)%>%
+    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
+                  "ValueCol"=paste(IntraValueCol),
+                  "PadjCol"=paste(IntraPadjCol))
+  
+   #First check for duplicates in "MetaboliteID" and drop if there are any
+  if(length(CoRe_DF[duplicated(CoRe_DF$MetaboliteID), "MetaboliteID"]) > 0){
+    doublons <- as.character(CoRe_DF[duplicated(CoRe_DF$MetaboliteID), "MetaboliteID"])#number of duplications
+    CoRe_DF <-CoRe_DF[!duplicated(CoRe_DF$MetaboliteID),]#remove duplications
+    warning("CoRe dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
+    warning("Note that you should do this before running MCA.")
+  }
+  if(length(Intra_DF[duplicated(Intra_DF$MetaboliteID), "MetaboliteID"]) > 0){
+    doublons <- as.character(Intra_DF[duplicated(Intra_DF$MetaboliteID), "MetaboliteID"])#number of duplications
+    Intra_DF <-Intra_DF[!duplicated(Intra_DF$MetaboliteID),]#remove duplications
+    warning("Intra dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
+    warning("Note that you should do this before running MCA.")
+  }
+  
+  
+  ## -------- Create Results output folder ---------- ##
+  
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) # Make Results folder
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+  Results_folder_MCA_folder = file.path(Results_folder, "MCA") # select name of result directory
+  if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
+  
+  
+  
+  ## ------------ Assign Groups -------- ##
+  #Tag genes that are detected in each data layer
+  CoRe_DF$Detected <- "TRUE"
+  Intra_DF$Detected <- "TRUE"
+  
+  #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
+  CoRe_DF <- CoRe_DF%>%
+    mutate(Cutoff = case_when(CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol > CoRe_FC_cutoff ~ 'UP',
+                              CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol < -CoRe_FC_cutoff ~ 'DOWN',
+                              TRUE ~ 'No Change')) %>%
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
+                                       Cutoff == "DOWN" ~ 'DOWN',
+                                       Cutoff == "No Change" & CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & CoRe_DF$PadjCol > CoRe_padj_cutoff ~ 'Not Significant',
+                                       TRUE ~ 'FALSE'))
+  
+  Intra_DF <-Intra_DF%>%
+    mutate(Cutoff = case_when(Intra_DF$PadjCol <Intra_padj_cutoff &Intra_DF$ValueCol >Intra_FC_cutoff ~ 'UP',
+                              Intra_DF$PadjCol <Intra_padj_cutoff &Intra_DF$ValueCol < -Intra_FC_cutoff ~ 'DOWN',
+                              TRUE ~ 'No Change'))%>%
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
+                                       Cutoff == "DOWN" ~ 'DOWN',
+                                       Cutoff == "No Change" & Intra_DF$PadjCol < Intra_padj_cutoff & Intra_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & Intra_DF$PadjCol < Intra_padj_cutoff & Intra_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & Intra_DF$PadjCol > Intra_padj_cutoff ~ 'Not Significant',
+                                       TRUE ~ 'FALSE'))
+  
+  #Merge the dataframes together: Merge the supplied Intra and CoRe dataframes together.
+  ##Add prefix to column names to distinguish the different data types after merge
+  colnames(CoRe_DF) <- paste0("CoRe_DF_", colnames(CoRe_DF))
+  CoRe_DF <- CoRe_DF%>%
+    dplyr::rename("MetaboliteID" = "CoRe_DF_MetaboliteID")
+  
+  colnames(Intra_DF) <- paste0("Intra_DF_", colnames(Intra_DF))
+  Intra_DF <-Intra_DF%>%
+    dplyr::rename("MetaboliteID"="Intra_DF_MetaboliteID")
+  
+  ##Merge
+  MergeDF <- merge(Intra_DF, CoRe_DF, by="MetaboliteID", all=TRUE)
+  
+  ##Mark the undetected genes in each data layer
+  MergeDF<-MergeDF %>%
+    mutate_at(c("CoRe_DF_Detected","Intra_DF_Detected"), ~replace_na(.,"FALSE"))%>%
+    mutate_at(c("CoRe_DF_Cutoff","Intra_DF_Cutoff"), ~replace_na(.,"No Change"))%>%
+    mutate_at(c("CoRe_DF_Cutoff_Specific", "Intra_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))%>%
+    mutate at(c("CoRe_Direction"), ~replace_na(.,"Not Detected")))
+  
+  #Apply Background filter (label metabolites that will be removed based on chosen background)
+  if(backgroundMethod == "Intra|CoRe"){# C1|C2 = CoRe OR Intra
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
+                                   Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
+                                   Intra_DF_Detected=="FALSE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', # Just CoRe
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "Intra&CoRe"){ # CoRe AND Intra
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "CoRe"){ # CoRe has to be there
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
+                                   Intra_DF_Detected=="FALSE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', # Just CoRe
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "Intra"){ #Intra has to be there
+    MergeDF <- MergeDF%>%
+      mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
+                                   Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
+                                   TRUE ~ 'FALSE'))
+  }else if(backgroundMethod == "*"){ # Use all metabolites as the background
+    MergeDF$BG_Method <- "TRUE"
+  }else{
+    stop("Please use one of the following backgroundMethods: Intra|CoRe, Intra&CoRe, CoRe, Intra, *")#error message
+  }
+  
+  #Assign Metabolite cluster names to the metabolites
+  MergeDF <- MergeDF%>%
+        mutate(RG1_All = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Intra DOWN + CoRe DOWN_Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra DOWN + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'Intra DOWN + CoRe Not Significant_Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'Intra DOWN + CoRe Significant Negative_Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'Intra DOWN + CoRe Significant Positive_Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Intra DOWN + CoRe UP_Released',
+                               
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Intra UP + CoRe DOWN_Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'Intra UP + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released" ~ 'Intra UP + CoRe Not Significant_Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released" ~ 'Intra UP + CoRe Significant Negative_Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released" ~ 'Intra UP + CoRe Significant Positive_Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Intra UP + CoRe UP_Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Intra Not Detected + CoRe DOWN_Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'Intra Not Detected + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released" ~ 'Intra Not Detected + CoRe Not Significant_Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released" ~ 'Intra Not Detected + CoRe Significant Negative_Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released" ~ 'Intra Not Detected + CoRe Significant Positive_Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Intra Not Detected + CoRe UP_Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'Intra Significant Negative + CoRe DOWN_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Significant Negative + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'Intra Significant Negative + CoRe Not Significant_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'Intra Significant Negative + CoRe Significant Negative_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'Intra Significant Negative + CoRe Significant Positive_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'Intra Significant Negative + CoRe UP_Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'Intra Significant Positive + CoRe DOWN_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Significant Positive + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'Intra Significant Positive + CoRe Not Significant_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'Intra Significant Positive + CoRe Significant Negative_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'Intra Significant Positive + CoRe Significant Positive_Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'Intra Significant Positive + CoRe UP_Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'Intra Not Significant + CoRe DOWN_Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Not Significant + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'Intra Not Significant + CoRe Not Significant_Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'Intra Not Significant + CoRe Significant Negative_Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'Intra Not Significant + CoRe Significant Positive_Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'Intra Not Significant + CoRe UP_Released',
+                               
+                               #Consumed:
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Intra DOWN + CoRe DOWN_Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra DOWN + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'Intra DOWN + CoRe Not Significant_Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'Intra DOWN + CoRe Significant Negative_Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'Intra DOWN + CoRe Significant Positive_Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Intra DOWN + CoRe UP_Consumed',
+                               
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Intra UP + CoRe DOWN_Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'Intra UP + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed" ~ 'Intra UP + CoRe Not Significant_Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed" ~ 'Intra UP + CoRe Significant Negative_Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed" ~ 'Intra UP + CoRe Significant Positive_Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Intra UP + CoRe UP_Consumed',
+                               
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Intra Not Detected + CoRe DOWN_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'Intra Not Detected + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed" ~ 'Intra Not Detected + CoRe Not Significant_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed" ~ 'Intra Not Detected + CoRe Significant Negative_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed" ~ 'Intra Not Detected + CoRe Significant Positive_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Intra Not Detected + CoRe UP_Consumed',
+                               
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'Intra Significant Negative + CoRe DOWN_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Significant Negative + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'Intra Significant Negative + CoRe Not Significant_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'Intra Significant Negative + CoRe Significant Negative_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'Intra Significant Negative + CoRe Significant Positive_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'Intra Significant Negative + CoRe UP_Consumed',
+                               
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'Intra Significant Positive + CoRe DOWN_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Significant Positive + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'Intra Significant Positive + CoRe Not Significant_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'Intra Significant Positive + CoRe Significant Negative_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'Intra Significant Positive + CoRe Significant Positive_Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'Intra Significant Positive + CoRe UP_Consumed',
+                               
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe DOWN_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Not Significant + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe Not Significant_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe Significant Negative_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe Significant Positive_Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe UP_Consumed',
+                               
+                               #Consumed/Released (Consumed in one, released in the other)
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed/Released" ~ 'Intra DOWN + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra DOWN + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed/Released"~ 'Intra DOWN + CoRe Not Significant_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed/Released"~ 'Intra DOWN + CoRe Significant Negative_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed/Released"~ 'Intra DOWN + CoRe Significant Positive_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed/Released" ~ 'Intra DOWN + CoRe UP_Consumed/Released',
+                               
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'Intra UP + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe Not Significant_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe Significant Negative_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe Significant Positive_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe UP_Consumed/Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'Intra Not Detected + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe Not Significant_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe Significant Negative_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe Significant Positive_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe UP_Consumed/Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Significant Negative + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe Not Significant_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe Significant Negative_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe Significant Positive_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe UP_Consumed/Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Significant Positive + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe Not Significant_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe Significant Negative_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe Significant Positive_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe UP_Consumed/Released',
+                               
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'Intra Not Significant + CoRe Not Detected',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe Not Significant_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe Significant Negative_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe Significant Positive_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe UP_Consumed/Released',
+                               TRUE ~ 'NA'))%>%
+    mutate(RG2_Significant = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Both_DOWN (Released)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'Both_DOWN (Released)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'Opposite (Released UP)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Opposite (Released UP)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Opposite (Released DOWN)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released" ~ 'Opposite (Released UP)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released" ~ 'Both_UP (Released)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Both_UP (Released)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'CoRe_DOWN (Released)',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'CoRe_UP (Released)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'Both_DOWN (Released)',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'Opposite (Released UP)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'Opposite (Released DOWN)',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'Both_UP (Released)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'CoRe_DOWN (Released)',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'CoRe_UP (Released)',
+                                       
+                                       #Consumed:
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Both_DOWN (Consumed)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'Both_DOWN (Consumed)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'Opposite (Consumed UP)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Opposite (Consumed UP)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Opposite (Consumed DOWN)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed" ~ 'Opposite (Consumed UP)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed" ~ 'Both_UP (Consumed)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Both_UP (Consumed)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'CoRe_DOWN (Consumed)',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'CoRe_UP (Consumed)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'Both_DOWN (Consumed)',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'Opposite (Consumed UP)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'Opposite (Consumed DOWN)',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'Both_UP (Consumed)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'CoRe_DOWN (Consumed)',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'CoRe_UP (Consumed)',
+                                       
+                                       #Consumed/Released (Consumed in one, released in the other)
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed" ~ 'Both_DOWN (Released/Consumed)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'Both_DOWN (Released/Consumed)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'Opposite (Released/Consumed UP)',
+                                       Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed" ~ 'Opposite (Released/Consumed UP)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed" ~ 'Opposite (Released/Consumed DOWN)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed" ~ 'Opposite (Released/Consumed UP)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed" ~ 'Both_UP (Released/Consumed)',
+                                       Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed" ~ 'Both_UP (Released/Consumed)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed" ~ 'CoRe_DOWN (Released/Consumed)',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed" ~ 'CoRe_UP (Released/Consumed)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed"~ 'Both_DOWN (Released/Consumed)',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed"~ 'Opposite (Released/Consumed UP)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed"~ 'Opposite (Released/Consumed DOWN)',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed"~ 'Both_UP (Released/Consumed)',
+                                       
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed"~ 'CoRe_DOWN (Released/Consumed)',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                       Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed"~ 'CoRe_UP (Released/Consumed)',
+                                       TRUE ~ 'NA'))%>%
+    mutate(RG3_Change = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Both_DOWN (Released)',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Opposite (Released UP)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'Opposite (Released DOWN)',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'Both_UP (Released)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released" ~ 'CoRe_DOWN (Released)',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released" ~ 'CoRe_UP (Released)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'CoRe_DOWN (Released)',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'CoRe_UP (Released)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'CoRe_DOWN (Released)',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'CoRe_UP (Released)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released"~ 'CoRe_DOWN (Released)',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released"~ 'CoRe_UP (Released)',
+                                  
+                                  #Consumed:
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Both_DOWN (Consumed)',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Opposite (Consumed UP)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'Opposite (Consumed DOWN)',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'Both_UP (Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed" ~ 'CoRe_DOWN (Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed" ~ 'CoRe_UP (Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'CoRe_DOWN (Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'CoRe_UP (Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'CoRe_DOWN (Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'CoRe_UP (Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Consumed"~ 'CoRe_DOWN (Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Consumed"~ 'CoRe_UP (Consumed)',
+                                  
+                                  #Consumed/Released (Consumed in one, released in the other)
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed" ~ 'Both_DOWN (Released/Consumed)',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed" ~ 'Opposite (Released/Consumed UP)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed" ~ 'Opposite (Released/Consumed DOWN)',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed" ~ 'Both_UP (Released/Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed" ~ 'CoRe_DOWN (Released/Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed" ~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed" ~ 'CoRe_UP (Released/Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed"~ 'CoRe_DOWN (Released/Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed"~ 'CoRe_UP (Released/Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed"~ 'CoRe_DOWN (Released/Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed"~ 'CoRe_UP (Released/Consumed)',
+                                  
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_Direction=="Released/Consumed"~ 'CoRe_DOWN (Released/Consumed)',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_Direction=="Not Detected"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_Direction=="Released/Consumed"~ 'None',
+                                  Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_Direction=="Released/Consumed"~ 'CoRe_UP (Released/Consumed)',
+                                  TRUE ~ 'NA'))
+  
+  #Safe the DF and return the groupings
+  ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
+  MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Intra_DF_Detected","Intra_DF_ValueCol","Intra_DF_PadjCol","Intra_DF_Cutoff", "Intra_DF_Cutoff_Specific", "CoRe_DF_Detected", "CoRe_DF_ValueCol","CoRe_DF_PadjCol","CoRe_DF_Cutoff", "CoRe_DF_Cutoff_Specific", "BG_Method", "RG1_All", "RG2_Significant", "RG3_SignificantChange")]
+  
+  CoReValueCol_Unique<-paste("CoRe_DF_",CoReValueCol)
+  CoRePadjCol_Unique <-paste("CoRe_DF_",CoRePadjCol)
+  IntraValueCol_Unique<-paste("Intra_DF_",IntraValueCol)
+  IntraPadjCol_Unique <-paste("Intra_DF_",IntraPadjCol)
+  
+  MergeDF_Select2<- subset(MergeDF, select=-c(Intra_DF_Detected,Intra_DF_Cutoff, CoRe_DF_Detected,CoRe_DF_Cutoff, CoRe_DF_Cutoff_Specific, BG_Method, RG1_All, RG2_Significant, RG3_SignificantChange))%>%
+    dplyr::rename(!!CoReValueCol_Unique :="CoRe_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
+                  !!CoRePadjCol_Unique :="CoRe_DF_PadjCol",
+                  !!IntraValueCol_Unique :="Intra_DF_ValueCol",
+                  !!IntraPadjCol_Unique :="Intra_DF_PadjCol")
+  
+  MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
+  
+  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""), row.names = FALSE)
+  
+  
+  ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
+  ClusterSummary_RG1 <- MergeDF_Rearrange[,c("MetaboliteID", "RG1_All")]%>%
+    count(RG1_All, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG1_All")
+  ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
+  
+  ClusterSummary_RG2 <- MergeDF_Rearrange[,c("MetaboliteID", "RG2_Significant")]%>%
+    count(RG2_Significant, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
+  ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
+  
+  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("MetaboliteID", "RG3_SignificantChange")]%>%
+    count(RG3_SignificantChange, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
+  ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
+  
+  ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
+  ClusterSummary <- ClusterSummary[,c(3,1,2)]
+  
+  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""), row.names = FALSE)
+  
+  return(MergeDF_Rearrange)
+}
+
+
+
+
+
+#' MCA_Distance
+#'
+#' This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between two conditions.
+#'
+#' @param Cond1_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param Cond2_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param MetaboliteID Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.
+#' @param Cond1ValueCol Column name of Log2FC in Cond1File
+#' @param Cond1PadjCol Column name of adjusted p-value in Cond1File. Can also be you p-value column if you want to use this instead.
+#' @param Cond2ValueCol  Column name of Log2FC in Cond2File
+#' @param Cond2PadjCol Column name of adjusted p-value in Cond2File. Can also be you p-value column if you want to use this instead.
+#' @param Cond1_padj_cutoff  \emph{Optional: } adjusted p-value cutoff for Cond1File. \strong{Default=0.05}
+#' @param Cond2_padj_cutoff \emph{Optional: } adjusted p-value cutoff for Cond2File. \strong{Default=0.05}
+#' @param backgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
+#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
+#' @return MCA an instance of the MetaProViz package
+#' @export
+#'
+
+##################################################
+### ### ### Metabolite Clustering Analysis ### ### ###
+##################################################
+
+MCA_Distance <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1ValueCol="Log2FC",Cond1PadjCol="p.adj", Cond2ValueCol="Log2FC", Cond2PadjCol="p.adj",Cond1_padj_cutoff= 0.05, Cond2_padj_cutoff = 0.05, backgroundMethod="C1&C2", OutputFileName = "MCA_Distance_")
+
+  
+  
+  
+  
+#' MCA_KMeans
+#'
+#' This script allows you to perform kmeans clustering to compute clusters of metabolites.
+#'
+#' @param 
+#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
+#' @return MCA an instance of the MetaProViz package
+#' @export
+#'
+
+###############################################################
+### ### ### Metabolite Clustering Analysis: K-means ### ### ###
+###############################################################
+
+MCA_KMeans <- function()
+  
+  
+  
+  

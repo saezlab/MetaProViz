@@ -1,0 +1,109 @@
+Intra,CoRe,Core_Direction,RG1_All,R2_Significant,RG3_Change,RG3_ChangeNum
+DOWN,DOWN,Released,Intra DOWN+ CoRe DOWN_Released,Both_DOWN (Released),Both_DOWN (Released),1
+DOWN,Not Detected,Not Detected,Intra DOWN+ CoRe Not Detected,None,None,2
+DOWN,Not Significant,Released,Intra DOWN+ CoRe Not Significant_Released,None,None,2
+DOWN,Significant Negative,Released,Intra DOWN+ CoRe Significant Negative_Released,Both_DOWN (Released),None,2
+DOWN,Significant Positive,Released,Intra DOWN+ CoRe Significant Positive_Released,Opposite (Released UP),None,2
+DOWN,UP,Released,Intra DOWN+ CoRe UP_Released,Opposite (Released UP),Opposite (Released UP),3
+UP,DOWN,Released,Intra UP+ CoRe DOWN_Released,Opposite (Released DOWN),Opposite (Released DOWN),4
+UP,Not Detected,Not Detected,Intra UP+ CoRe Not Detected,None,None,5
+UP,Not Significant,Released,Intra UP+ CoRe Not Significant_Released,None,None,5
+UP,Significant Negative,Released,Intra UP+ CoRe Significant Negative_Released,Opposite (Released UP),None,5
+UP,Significant Positive,Released,Intra UP+ CoRe Significant Positive_Released,Both_UP (Released),None,5
+UP,UP,Released,Intra UP+ CoRe UP_Released,Both_UP (Released),Both_UP (Released),6
+Not Detected,DOWN,Released,Intra Not Detected+ CoRe DOWN_Released,CoRe_DOWN (Released),CoRe_DOWN (Released),7
+Not Detected,Not Detected,Not Detected,Intra Not Detected+ CoRe Not Detected,None,None,8
+Not Detected,Not Significant,Released,Intra Not Detected+ CoRe Not Significant_Released,None,None,8
+Not Detected,Significant Negative,Released,Intra Not Detected+ CoRe Significant Negative_Released,None,None,8
+Not Detected,Significant Positive,Released,Intra Not Detected+ CoRe Significant Positive_Released,None,None,8
+Not Detected,UP,Released,Intra Not Detected+ CoRe UP_Released,CoRe_UP (Released),CoRe_UP (Released),9
+Significant Negative,DOWN,Released,Intra Significant Negative+ CoRe DOWN_Released,Both_DOWN (Released),CoRe_DOWN (Released),7
+Significant Negative,Not Detected,Not Detected,Intra Significant Negative+ CoRe Not Detected,None,None,8
+Significant Negative,Not Significant,Released,Intra Significant Negative+ CoRe Not Significant_Released,None,None,8
+Significant Negative,Significant Negative,Released,Intra Significant Negative+ CoRe Significant Negative_Released,None,None,8
+Significant Negative,Significant Positive,Released,Intra Significant Negative+ CoRe Significant Positive_Released,None,None,8
+Significant Negative,UP,Released,Intra Significant Negative+ CoRe UP_Released,Opposite (Released UP),CoRe_UP (Released),9
+Significant Positive,DOWN,Released,Intra Significant Positive+ CoRe DOWN_Released,Opposite (Released DOWN),CoRe_DOWN (Released),7
+Significant Positive,Not Detected,Not Detected,Intra Significant Positive+ CoRe Not Detected,None,None,8
+Significant Positive,Not Significant,Released,Intra Significant Positive+ CoRe Not Significant_Released,None,None,8
+Significant Positive,Significant Negative,Released,Intra Significant Positive+ CoRe Significant Negative_Released,None,None,8
+Significant Positive,Significant Positive,Released,Intra Significant Positive+ CoRe Significant Positive_Released,None,None,8
+Significant Positive,UP,Released,Intra Significant Positive+ CoRe UP_Released,Both_UP (Released),CoRe_UP (Released),9
+Not Significant,DOWN,Released,Intra Not Significant+ CoRe DOWN_Released,CoRe_DOWN (Released),CoRe_DOWN (Released),7
+Not Significant,Not Detected,Not Detected,Intra Not Significant+ CoRe Not Detected,None,None,8
+Not Significant,Not Significant,Released,Intra Not Significant+ CoRe Not Significant_Released,None,None,8
+Not Significant,Significant Negative,Released,Intra Not Significant+ CoRe Significant Negative_Released,None,None,8
+Not Significant,Significant Positive,Released,Intra Not Significant+ CoRe Significant Positive_Released,None,None,8
+Not Significant,UP,Released,Intra Not Significant+ CoRe UP_Released,CoRe_UP (Released),CoRe_UP (Released),9
+DOWN,DOWN,Consumed,Intra DOWN+ CoRe DOWN_Consumed,Both_DOWN (Consumed),Both_DOWN (Consumed),10
+DOWN,Not Detected,Not Detected,Intra DOWN+ CoRe Not Detected,None,None,2
+DOWN,Not Significant,Consumed,Intra DOWN+ CoRe Not Significant_Consumed,None,None,2
+DOWN,Significant Negative,Consumed,Intra DOWN+ CoRe Significant Negative_Consumed,Both_DOWN (Consumed),None,2
+DOWN,Significant Positive,Consumed,Intra DOWN+ CoRe Significant Positive_Consumed,Opposite (Consumed UP),None,2
+DOWN,UP,Consumed,Intra DOWN+ CoRe UP_Consumed,Opposite (Consumed UP),Opposite (Consumed UP),11
+UP,DOWN,Consumed,Intra UP+ CoRe DOWN_Consumed,Opposite (Consumed DOWN),Opposite (Consumed DOWN),12
+UP,Not Detected,Not Detected,Intra UP+ CoRe Not Detected,None,None,5
+UP,Not Significant,Consumed,Intra UP+ CoRe Not Significant_Consumed,None,None,5
+UP,Significant Negative,Consumed,Intra UP+ CoRe Significant Negative_Consumed,Opposite (Consumed UP),None,5
+UP,Significant Positive,Consumed,Intra UP+ CoRe Significant Positive_Consumed,Both_UP (Consumed),None,5
+UP,UP,Consumed,Intra UP+ CoRe UP_Consumed,Both_UP (Consumed),Both_UP (Consumed),13
+Not Detected,DOWN,Consumed,Intra Not Detected+ CoRe DOWN_Consumed,CoRe_DOWN (Consumed),CoRe_DOWN (Consumed),14
+Not Detected,Not Detected,Not Detected,Intra Not Detected+ CoRe Not Detected,None,None,8
+Not Detected,Not Significant,Consumed,Intra Not Detected+ CoRe Not Significant_Consumed,None,None,8
+Not Detected,Significant Negative,Consumed,Intra Not Detected+ CoRe Significant Negative_Consumed,None,None,8
+Not Detected,Significant Positive,Consumed,Intra Not Detected+ CoRe Significant Positive_Consumed,None,None,8
+Not Detected,UP,Consumed,Intra Not Detected+ CoRe UP_Consumed,CoRe_UP (Consumed),CoRe_UP (Consumed),15
+Significant Negative,DOWN,Consumed,Intra Significant Negative+ CoRe DOWN_Consumed,Both_DOWN (Consumed),CoRe_DOWN (Consumed),14
+Significant Negative,Not Detected,Not Detected,Intra Significant Negative+ CoRe Not Detected,None,None,8
+Significant Negative,Not Significant,Consumed,Intra Significant Negative+ CoRe Not Significant_Consumed,None,None,8
+Significant Negative,Significant Negative,Consumed,Intra Significant Negative+ CoRe Significant Negative_Consumed,None,None,8
+Significant Negative,Significant Positive,Consumed,Intra Significant Negative+ CoRe Significant Positive_Consumed,None,None,8
+Significant Negative,UP,Consumed,Intra Significant Negative+ CoRe UP_Consumed,Opposite (Consumed UP),CoRe_UP (Consumed),15
+Significant Positive,DOWN,Consumed,Intra Significant Positive+ CoRe DOWN_Consumed,Opposite (Consumed DOWN),CoRe_DOWN (Consumed),14
+Significant Positive,Not Detected,Not Detected,Intra Significant Positive+ CoRe Not Detected,None,None,8
+Significant Positive,Not Significant,Consumed,Intra Significant Positive+ CoRe Not Significant_Consumed,None,None,8
+Significant Positive,Significant Negative,Consumed,Intra Significant Positive+ CoRe Significant Negative_Consumed,None,None,8
+Significant Positive,Significant Positive,Consumed,Intra Significant Positive+ CoRe Significant Positive_Consumed,None,None,8
+Significant Positive,UP,Consumed,Intra Significant Positive+ CoRe UP_Consumed,Both_UP (Consumed),CoRe_UP (Consumed),15
+Not Significant,DOWN,Consumed,Intra Not Significant+ CoRe DOWN_Consumed,CoRe_DOWN (Consumed),CoRe_DOWN (Consumed),14
+Not Significant,Not Detected,Not Detected,Intra Not Significant+ CoRe Not Detected,None,None,8
+Not Significant,Not Significant,Consumed,Intra Not Significant+ CoRe Not Significant_Consumed,None,None,8
+Not Significant,Significant Negative,Consumed,Intra Not Significant+ CoRe Significant Negative_Consumed,None,None,8
+Not Significant,Significant Positive,Consumed,Intra Not Significant+ CoRe Significant Positive_Consumed,None,None,8
+Not Significant,UP,Consumed,Intra Not Significant+ CoRe UP_Consumed,CoRe_UP (Consumed),CoRe_UP (Consumed),15
+DOWN,DOWN,Released/Consumed,Intra DOWN + CoRe DOWN_Released/Consumed,Both_DOWN (Released/Consumed),Both_DOWN (Released/Consumed),16
+DOWN,Not Detected,Not Detected,Intra DOWN + CoRe Not Detected,None,None,2
+DOWN,Not Significant,Released/Consumed,Intra DOWN + CoRe Not Significant_Released/Consumed,None,None,2
+DOWN,Significant Negative,Released/Consumed,Intra DOWN + CoRe Significant Negative_Released/Consumed,Both_DOWN (Released/Consumed),None,2
+DOWN,Significant Positive,Released/Consumed,Intra DOWN + CoRe Significant Positive_Released/Consumed,Opposite (Released/Consumed UP),None,2
+DOWN,UP,Released/Consumed,Intra DOWN + CoRe UP_Released/Consumed,Opposite (Released/Consumed UP),Opposite (Released/Consumed UP),17
+UP,DOWN,Released/Consumed,Intra UP + CoRe DOWN_Released/Consumed,Opposite (Released/Consumed DOWN),Opposite (Released/Consumed DOWN),18
+UP,Not Detected,Not Detected,Intra UP + CoRe Not Detected,None,None,5
+UP,Not Significant,Released/Consumed,Intra UP + CoRe Not Significant_Released/Consumed,None,None,5
+UP,Significant Negative,Released/Consumed,Intra UP + CoRe Significant Negative_Released/Consumed,Opposite (Released/Consumed UP),None,5
+UP,Significant Positive,Released/Consumed,Intra UP + CoRe Significant Positive_Released/Consumed,Both_UP (Released/Consumed),None,5
+UP,UP,Released/Consumed,Intra UP + CoRe UP_Released/Consumed,Both_UP (Released/Consumed),Both_UP (Released/Consumed),19
+Not Detected,DOWN,Released/Consumed,Intra Not Detected + CoRe DOWN_Released/Consumed,CoRe_DOWN (Released/Consumed),CoRe_DOWN (Released/Consumed),20
+Not Detected,Not Detected,Not Detected,Intra Not Detected + CoRe Not Detected,None,None,8
+Not Detected,Not Significant,Released/Consumed,Intra Not Detected + CoRe Not Significant_Released/Consumed,None,None,8
+Not Detected,Significant Negative,Released/Consumed,Intra Not Detected + CoRe Significant Negative_Released/Consumed,None,None,8
+Not Detected,Significant Positive,Released/Consumed,Intra Not Detected + CoRe Significant Positive_Released/Consumed,None,None,8
+Not Detected,UP,Released/Consumed,Intra Not Detected + CoRe UP_Released/Consumed,CoRe_UP (Released/Consumed),CoRe_UP (Released/Consumed),21
+Significant Negative,DOWN,Released/Consumed,Intra Significant Negative + CoRe DOWN_Released/Consumed,Both_DOWN (Released/Consumed),CoRe_DOWN (Released/Consumed),20
+Significant Negative,Not Detected,Not Detected,Intra Significant Negative + CoRe Not Detected,None,None,8
+Significant Negative,Not Significant,Released/Consumed,Intra Significant Negative + CoRe Not Significant_Released/Consumed,None,None,8
+Significant Negative,Significant Negative,Released/Consumed,Intra Significant Negative + CoRe Significant Negative_Released/Consumed,None,None,8
+Significant Negative,Significant Positive,Released/Consumed,Intra Significant Negative + CoRe Significant Positive_Released/Consumed,None,None,8
+Significant Negative,UP,Released/Consumed,Intra Significant Negative + CoRe UP_Released/Consumed,Opposite (Released/Consumed UP),CoRe_UP (Released/Consumed),21
+Significant Positive,DOWN,Released/Consumed,Intra Significant Positive + CoRe DOWN_Released/Consumed,Opposite (Released/Consumed DOWN),CoRe_DOWN (Released/Consumed),20
+Significant Positive,Not Detected,Not Detected,Intra Significant Positive + CoRe Not Detected,None,None,8
+Significant Positive,Not Significant,Released/Consumed,Intra Significant Positive + CoRe Not Significant_Released/Consumed,None,None,8
+Significant Positive,Significant Negative,Released/Consumed,Intra Significant Positive + CoRe Significant Negative_Released/Consumed,None,None,8
+Significant Positive,Significant Positive,Released/Consumed,Intra Significant Positive + CoRe Significant Positive_Released/Consumed,None,None,8
+Significant Positive,UP,Released/Consumed,Intra Significant Positive + CoRe UP_Released/Consumed,Both_UP (Released/Consumed),CoRe_UP (Released/Consumed),21
+Not Significant,DOWN,Released/Consumed,Intra Not Significant + CoRe DOWN_Released/Consumed,CoRe_DOWN (Released/Consumed),CoRe_DOWN (Released/Consumed),20
+Not Significant,Not Detected,Not Detected,Intra Not Significant + CoRe Not Detected,None,None,8
+Not Significant,Not Significant,Released/Consumed,Intra Not Significant + CoRe Not Significant_Released/Consumed,None,None,8
+Not Significant,Significant Negative,Released/Consumed,Intra Not Significant + CoRe Significant Negative_Released/Consumed,None,None,8
+Not Significant,Significant Positive,Released/Consumed,Intra Not Significant + CoRe Significant Positive_Released/Consumed,None,None,8
+Not Significant,UP,Released/Consumed,Intra Not Significant + CoRe UP_Released/Consumed,CoRe_UP (Released/Consumed),CoRe_UP (Released/Consumed),21
