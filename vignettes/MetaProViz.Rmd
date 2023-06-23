@@ -1,124 +1,307 @@
 ---
-title: "TutorialR"
-author: "Christina Schmidt, Dimitrios"
-date: "24 November 2022"
+#title: "**MetaProViz**"
+#author: "Authors: Christina Schmidt, Dimitrios"
+#date: "24 November 2022"
 output:
-  html_document:
-    toc: true
-    toc_depth: 4
-    toc_float: true
-editor_options: 
-  chunk_output_type: console
+   html_document:
+     yml: _site.yml
+    #css: style.css
+    #theme: flatly
+    #highlight: tango #`default`, `tango`, `pygments`, `kate`, `monochrome`, `espresso`, `zenburn`, `haddock`, `breezedark`, `textmate`, `arrow`, or `rstudio`
+    #self_contained: true
+    #toc: true
+   # toc_float: true
+    #toc_depth: 2
+    #code_folding: show
+#vignette: >
+#  %\VignetteEngine{knitr::rmarkdown}
+#  %\VignetteIndexEntry{MetaProViz}
+#  %\VignetteEncoding{UTF-8}
+#editor_options: 
+#  chunk_output_type: console
 ---
-
-# Usage MetaProViz
-***MetaProViz*** (Authors. 2023. Journal. DOI: ) enables the user to pre-process metabolomics data including consumption-release (CoRe) data and contains different visualisation methods to extract biological interpretable graphs.\
-This is the tutorial showcasing the different functionalities MetaProViz offers.\
-For this we downloaded two publicly available datasets and use them as the example data for MetaProViz.
-
-# Installation
-[MetaProViz](Link to bioconductor) is an R package distributed as part of the Bioconductor project. To install the package, start R and enter:\
 \
+<a href="#" class="btn btn-link">[**Browse source code**](https://github.com/ChristinaSchmidt1)</a>
+<a href="#" class="btn btn-link">[**View on Bioconductor**](https://github.com/ChristinaSchmidt1)</a>
+<a href="#" class="btn btn-link">[**Citing MetaProViz**](https://github.com/ChristinaSchmidt1)</a>
+<a href="#" class="btn btn-link">[**FrezzaLab**](https://twitter.com/FrezzaLab)</a>
+<a href="#" class="btn btn-link">[**SaezLab**](https://twitter.com/saezlab)</a>
+
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+```{r vignette_setup, echo=FALSE, message=FALSE, warning = FALSE, eval=FALSE}
+# Track time spent on making the vignette.
+start_time <- Sys.time()
+
+# Bib setup.
+library(RefManageR)
+
+# Write bibliography information
+bib <- c(
+    MetaProViz = citation("MetaProViz")[1],
+)
+```
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+# **Introduction**
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+**MetaProViz** (Authors. 2023. Journal. DOI: ) enables the user to pre-process metabolomics data including consumption-release (CoRe) data, perform differential analysis (DMA), do clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs (**Fig.1**).\
+\
+<center>
+![**Fig. 1:** Overview of MetaProViz functions.](Fig.1.png){width=60%}
+</center>
+\
+\
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+# Tutorials {.tabset .tabset-fade .tabset-pills}
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within **MetaProViz**.\
+In the first section you will find information about the installation of the package and its dependencies and in the following sections you can follow specific user case examples for different analysis.
+
+## Installation
+[MetaProViz](Link to bioconductor) is an R package distributed as part of the Bioconductor project. To install the package, start R and enter:
 ```{r bioconductor_install, eval=FALSE}
 install.packages("BiocManager")
 BiocManager::install("MetaProViz")
 ```
 \
-Alternatively, you can install the latest development version from [GitHub](https://github.com/ChristinaSchmidt1/MetaProViz) with:
-
+Alternatively, you can install the latest development version from [GitHub](https://github.com/ChristinaSchmidt1/MetaProViz) with:\
 ```{r github_install, eval=FALSE}
 BiocManager::install("ChristinaSchmidt1/MetaProViz")
 ```
-
-## Libraries
-[MetaProViz](Link to bioconductor) can be imported as:
-
+\
+Now [MetaProViz](Link to bioconductor) can be imported as:
 ```{r load_library, message=FALSE}
-library(MetaProViz)
+#library(MetaProViz)
 
 # Extra dependencies:
 library(dplyr)
 library(tidyverse)
 ```
-
-# Input data
-Example datasets are publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax media.\
-Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.\
-As part of the package you can load:\
 \
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+## Standard metabolomics
+A standard metabolomics experiment refers to intracellular extracts (e.g. cell or bacteria culture), to tissue samples (e.g. from animals or patients), to plasma samples (e.g. blood) and many other types of experimental setups.\
+\
+<u>In this notebook we showcase how to use **MetaProViz**</u>:\
+`1.` To process raw peak data and identify outliers.\
+`2.` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics.\
+`3.` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviour.\
+`4.` To use specific visualisations to aid biological interpretation of the results.
+
+***
+### Loading the example data
+***
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media. Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+\
+As part of the package you can load:\
 **1. Intracellular experiment (Intra)** \
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
-\
-**2. CoRe experiment (Media)** \
-The raw data is available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
-\
-**3. Pathway information mapping the trivial metabolite names to KEGG IDs and pathways (Pathways)** \
-\
+**2. Pathway information mapping the trivial metabolite names to KEGG IDs and pathways (Pathways)** \
 \
 You can load the example data into your global environment using toy_data():
 ```{r}
-devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
+#devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
 
-MetaProViz::toy_data()
+#MetaProViz::toy_data()
 
+
+# Check how our data looks like:
+#head(Intra)
 ```
 
-# Run MetaProViz functions
-MetaProViz has four main pillars (Fig. 1).
-
-Create figure overview and add here --> usable for manuscript as well
---> maybe combine circlepacking and emapplot
-
-## 1. Pre-processing
-Discuss pitfalls of missing value imputation as discussed with Aurelien and give a clear statement!
+***
+### Run MetaProViz functions
+***
+#### 1. Pre-processing
+Discuss pitfalls of missing value imputation as discussed with Aurelien and give a clear statement! Cite the papers I have mentioned on my trello card
 "Benchmark": 
 - Show MVI results with different percentages (not just 50% as per half minimum!)
 - Show that per feature imputation is advantageous over the "standard" imputation
 - Cite the benchmark of the different methods and explain why we did not implement the others (e.g. quantile is only good for normal distribution)
 
-### Intracellular experiment
+```{r, eval=FALSE}
 
+Intra_M <- Intra[1:47,-c(2:4)]%>%
+  column_to_rownames("Code")
+Intra_M <- replace(Intra_M, Intra_M==0, NA)
 
-### CoRe experiment
-
-
-
-
-```{r}
-#MetaProViz::Preprocessing()
+Design <-Intra[c(1:47),c(1:4)]%>%
+  column_to_rownames("Code")
+Pathways_S <- Pathways[,c(1,4)]
+  
+#MetaProViz::Preprocessing
 
 
 ```
 
-## 2. Differntial Metabolite Analysis (DMA)
+
+#### 2. Differential Metabolite Analysis (DMA)
 Here explain the way we deal with 0/NA --> again refer back to above!
+```{r, eval=FALSE}
 
-### Intracellular experiment
+MetaProViz::Preprocessing(Input_data=Intra_M, 
+               Experimental_design=Design,
+               Condition1="HK2",
+               Condition2="786-O",
+               STAT_pval ="t.test",
+               STAT_padj="fdr",
+               Input_Pathways = Pathways_S, 
+               OutputName='test', 
+               CoRe=FALSE, 
+               Plot = TRUE, 
+               Save_as = "svg")
 
-### CoRe experiment
-Here explain how we adapted the Log2FC calculation
-- Benchmark: e.g. how many metabolites do we identify with the new Log2FC calculation opposed to using the absolute values (perfect example would be a metabolite that has -10 in C1 qand +11 in C2, and hence a small Log2FC)
+
+```
+Similar to DESEq2 explain what it means if a Log2FC = Inf & p.val=NA versus Log2FC= Value & p.val=NA
 
 
-## 3. Metabolite Clustering Analysis (MCA)
+#### 3. Metabolite Clustering Analysis (MCA)
 
 Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
 
-## 4. Visualisation (Viz)
+#### 4. Visualisation (Viz)
 No replicates
 
+```{r, fig.align="center", fig.width=6, fig.height=6, fig.cap="Figure: Here is a really important caption."}
 
-
-
-# Session information
-```{r}
-sessionInfo()
 ```
 
+***
+<p class="text-success">*Now you have finished with the example run for standard metabolomics data. #2</p> 
+\
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 
-# Bibliography
+## CoRe Metabolomics (Cell Culture Media)
+Description
+
+***
+### Loading the example data
+***
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media.\
+Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+As part of the package you can load:\
+\
+**1. CoRe experiment (Cell Culture Media)** \
+The raw data is available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
+\
+**2. Intracellular experiment (Intra)** \
+The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+\
+**3. Pathway information mapping the trivial metabolite names to KEGG IDs and pathways (Pathways)** \
+\
+\
+You can load the example data into your global environment using toy_data():
+```{r, eval=FALSE}
+devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
+
+MetaProViz::toy_data()
+
+# Check how our data looks like:
+head(Media)
+```
+
+***
+### Run MetaProViz functions
+***
+#### 1. Pre-processing
+Discuss pitfalls of missing value imputation as discussed with Aurelien and give a clear statement! Cite the papers I have mentioned on my trello card
+"Benchmark": 
+- Show MVI results with different percentages (not just 50% as per half minimum!)
+- Show that per feature imputation is advantageous over the "standard" imputation
+- Cite the benchmark of the different methods and explain why we did not implement the others (e.g. quantile is only good for normal distribution)
+
+```{r}
+
+
+#MetaProViz::Preprocessing
+
+
+```
+
+#### 2. Differntial Metabolite Analysis (DMA)
+Here explain the way we deal with 0/NA --> again refer back to above!
+
+Here explain how we adapted the Log2FC calculation
+- Benchmark: e.g. how many metabolites do we identify with the new Log2FC calculation opposed to using the absolute values (perfect example would be a metabolite that has -10 in C1 qand +11 in C2, and hence a small Log2FC)
+
+```{r}
+
+#MetaProViz::Preprocessing
+
+
+```
+Similar to DESEq2 explain what it means if a Log2FC = Inf & p.val=NA versus Log2FC= Value & p.val=NA
+
+
+
+
+#### 3. Metabolite Clustering Analysis (MCA)
+
+Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
+
+#### 4. Visualisation (Viz)
+No replicates
+
+***
+<p class="text-success">*Now you have finished with the example run for CoRe metabolomics data. #3</p> 
+\
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+# References
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+## Citation
+Text
+
+
+## Bibliography
+
 ```{r vignetteBiblio, results = "asis", echo = FALSE, warning = FALSE, message = FALSE}
 ## Print bibliography
 #PrintBibliography(bib, .opts = list(hyperlink = "to.doc", style = "html"))
+```
+
+## Session information
+***
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
 ```
 
