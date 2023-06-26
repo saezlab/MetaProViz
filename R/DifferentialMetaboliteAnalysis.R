@@ -2,7 +2,7 @@
 ##
 ## Script name: DMA
 ##
-## Purpose of script: Differential Metabolomics Analysis 
+## Purpose of script: Differential Metabolomics Analysis
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -31,7 +31,7 @@
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
-#' 
+#'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
 
@@ -40,18 +40,18 @@
 ### ### ### Differential Metabolite Analysis ### ### ###
 ########################################################
 
-DMA <-function(Input_data, 
+DMA <-function(Input_data,
                Experimental_design,
                Condition1,
                Condition2,
                STAT_pval ="t.test",
                STAT_padj="fdr",
-               Input_Pathways = NULL, 
-               OutputName='', 
-               CoRe=FALSE, 
-               Plot = TRUE, 
+               Input_Pathways = NULL,
+               OutputName='',
+               CoRe=FALSE,
+               Plot = TRUE,
                Save_as = "svg"){
-  
+
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -59,11 +59,11 @@ DMA <-function(Input_data,
     install.packages(new.packages)
     }
   suppressMessages(library(tidyverse))
-  
+
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
-  
+
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
     } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
@@ -81,14 +81,14 @@ DMA <-function(Input_data,
         }
       }
     }
-      
+
       C1 <- Input_data %>%
         filter(Experimental_design$Conditions %in% Condition1) %>%
         select_if(is.numeric)#only keep numeric columns with metabolite values
       C2 <- Input_data %>%
         filter(Experimental_design$Conditions %in% Condition2) %>%
         select_if(is.numeric)
-      
+
       if(nrow(C1)==1){
         stop("There is only one sample available for ", Condition1, ", so no statistical test can be performed.")
       } else if(nrow(C2)==1){
@@ -107,7 +107,7 @@ DMA <-function(Input_data,
   STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
   if(STAT_padj %in% STAT_padj_options == FALSE){
     stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
-  } 
+  }
   if(is.logical(CoRe) == FALSE){
     stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
   }
@@ -124,52 +124,56 @@ DMA <-function(Input_data,
     if('Metabolite' %in% colnames(Input_Pathways) == FALSE){
       warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
     }else if('Pathway' %in% colnames(Input_Pathways) == FALSE){
-     warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.") 
+     warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
     }
   }
-  
+
   ## ------------ Check Missingness ------------- ##
   # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
   # Here we will check how many metabolites this affects in C1 and C2, and weather all replicates of a metabolite are affected.
   C1_Miss <- replace(C1, C1==0, NA)
   C1_Miss <- C1_Miss[, (colSums(is.na(C1_Miss)) > 0), drop = FALSE]
-  
+
   C2_Miss <- replace(C2, C2==0, NA)
   C2_Miss <- C2_Miss[, (colSums(is.na(C2_Miss)) > 0), drop = FALSE]
-  
-  if(nrow(C1_Miss)>0 & nrow(C2_Miss)==0){
+
+  if((ncol(C1_Miss)>0 & ncol(C2_Miss)==0)){
     message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(C1_Miss)
-    } else if(nrow(C1_Miss)==0 & nrow(C2_Miss)>0){
+    } else if(ncol(C1_Miss)==0 & ncol(C2_Miss)>0){
     message("In `Condition2` ",paste0(toString(Condition2)), ", NA/0 values exist in ", ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(C2_Miss)
-    } else if(nrow(C1_Miss)>0 & nrow(C2_Miss)>0){
+    } else if(ncol(C1_Miss)>0 & ncol(C2_Miss)>0){
     message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), " and in `Condition2`",paste0(toString(Condition2)), " ",ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- c(colnames(C1_Miss), colnames(C2_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
+    } else{
+    message("There are no NA/0 values")
+    Metabolites_Miss <- c(colnames(C1_Miss), colnames(C2_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
     }
-  
+
   ## ------------ Check data normality and statistical test chosen ----------- ##
-  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test. 
-  
+  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test.
+
   # 1. Load the data and perform the shapiro.test on each metabolite:
   Input_data_NA <- replace(Input_data, Input_data==0, NA)#Shapiro test ignores NAs!
-  
+
   shaptest <-   Input_data_NA %>% # Select data
     filter(Experimental_design$Conditions %in% Condition1 | Experimental_design$Conditions %in% Condition2)%>%
     select_if(is.numeric)
-  
+
   temp<- as.vector(sapply(shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
   shaptest <- shaptest[,!temp]
-  
+
   shaptestres <- as.data.frame(sapply(shaptest, function(x) shapiro.test(x))) # do the test for each metabolite
   shaptestres <- as.data.frame(t(shaptestres))
-  
+
   # 2. Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
   Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
   NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
   message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
-  
+
   if (Norm > 50 & STAT_pval =="wilcox.test"){
       warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
     }else if(NotNorm > 50 & STAT_pval =="t.test"){
@@ -177,19 +181,19 @@ DMA <-function(Input_data,
     }else if((STAT_pval =="wilcox-test" & nrow(C1)<5)|(STAT_pval =="wilcox-test" & nrow(C2)<5)){# check number of samples for wilcoxons test
       warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
     }
-  
+
   ## ------------ Create Results output folder ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
   Results_folder <- file.path(WorkD, name) # Make Results folder
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
-  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)} 
+  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
   Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
-  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)} 
-  
+  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
+
   ################################################################################################################################################################################################
-  ############### Calculate Log2FC, pval, padj, tval ############### 
+  ############### Calculate Log2FC, pval, padj, tval ###############
 
   ## ------------  Calculate Log2FC ----------- ##
   # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if mean = 0 (If one value is NA, the mean will be NA even though all other values are available.)
@@ -197,12 +201,12 @@ DMA <-function(Input_data,
   C1_Zero[is.na(C1_Zero)] <- 0
   Mean_C1 <- C1_Zero %>%
     summarise_all("mean")
-  
+
   C2_Zero <- C2
   C2_Zero[is.na(C2_Zero)] <- 0
   Mean_C2 <- C2_Zero %>%
     summarise_all("mean")
-  
+
   if(CoRe==TRUE){#Calculate Log2FC by taking into account the distance between the means:
     #CoRe values can be negative and positive, which can lead to problems when calculating the Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A or B being negative, with x being a constant that is adapted to the size range of the respective metabolite.
     Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
@@ -213,7 +217,7 @@ DMA <-function(Input_data,
       rename("C1"=2,
              "C2"=3)
     Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
-    
+
     Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
       mutate(C1_Adapted = case_when(C1 < 0 & C2 > 0 ~ paste(C1*-1),#Here we have a negative value and transform it into a positive value
                                     C1 > 0 & C2 < 0 ~ paste(C1+(C2*2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
@@ -233,20 +237,20 @@ DMA <-function(Input_data,
                                     C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     TRUE ~ 'NA'))
-    
+
     if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
       X <- Mean_Merge%>%
         subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
       message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
     }
-    
+
     Mean_C1_Ad <-Mean_Merge[,c(1,5)]%>%
       column_to_rownames("Metabolite")
-    Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted)) 
+    Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted))
     Mean_C2_Ad <-Mean_Merge[,c(1,6)]%>%
       column_to_rownames("Metabolite")
-    Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted)) 
-      
+    Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted))
+
     #Calculate the Log2FC
     FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1_Ad, Mean_C2_Ad)
     Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
@@ -263,7 +267,7 @@ DMA <-function(Input_data,
         rename("C1"=2,
                "C2"=3)
       Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
-      
+
       Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
         mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
@@ -275,20 +279,20 @@ DMA <-function(Input_data,
                                       C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       TRUE ~ paste(C2)))
-      
+
       if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
         X <- Mean_Merge%>%
           subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
         message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
       }
-      
+
       Mean_C1_Ad <-Mean_Merge[,c(1,5)]%>%
         column_to_rownames("Metabolite")
-      Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted)) 
+      Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted))
       Mean_C2_Ad <-Mean_Merge[,c(1,6)]%>%
         column_to_rownames("Metabolite")
-      Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted)) 
-      
+      Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted))
+
       #Calculate the Log2FC
       FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1, Mean_C2)
       Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
@@ -298,15 +302,15 @@ DMA <-function(Input_data,
       }else{
         stop("Please choose CoRe= TRUE or CoRe=FALSE.")
         }
-  
+
   ## ------------ Perform Hypothesis testing ----------- ##
   # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
   C1[is.na(C1)] <- 0
   C2[is.na(C2)] <- 0
-  
+
   #### 1. p.value
   T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
-  
+
   VecPVAL_C1vC2 <- c()
   for(i in 1:length(T_C1vC2)){
     p_value <- unlist(T_C1vC2[[i]][3])
@@ -314,19 +318,19 @@ DMA <-function(Input_data,
   }
   Metabolite <- colnames(C2)
   PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
-  
+
   #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
-  PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss 
+  PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
   PVal_C1vC2 <-PVal_C1vC2%>%
     mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
                              TRUE ~ paste(VecPVAL_C1vC2)))
-  PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val)) 
-  
+  PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
+
   #### 2. p. adjusted
   #Split data for p.value adjustment to exclude NA
   PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1,4)]
   PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1,4)]
-  
+
   #perform adjustment
   VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   Metabolite <- PVal_C1vC2[,1]
@@ -334,20 +338,22 @@ DMA <-function(Input_data,
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
   STAT_C1vC2 <- merge(Log2FC_C1vC2,STAT_C1vC2, by="Metabolite")
   names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
-  
+
   #### 3. t.value
   STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.val / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
   STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
-  
+
   #Add Metabolites that have p.val=NA back into the DF for completeness.
+  if(nrow(PVal_NA)>0){
   PVal_NA <- merge(Log2FC_C1vC2,PVal_NA, by="Metabolite", all.y=TRUE)
   PVal_NA$p.adj <- NA
   PVal_NA$t.val <- NA
-  
   STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
-  
+  }
+
+
   ################################################################################################################################################################################################
-  
+
   ## ------------ Add information on groups to DMA results----------- ##
   if(CoRe==TRUE){#add consumption release info to the result
     temp1 <- Mean_C1
@@ -367,7 +373,7 @@ DMA <-function(Input_data,
         CoRe_info[3,i] <- "No Change"
       }
     }
-    
+
     CoRe_info <- t(CoRe_info) %>% as.data.frame()
     CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
     names(CoRe_info)[2] <- paste("Mean", "CoRe", Condition1, sep="_")
@@ -376,7 +382,7 @@ DMA <-function(Input_data,
     STAT_C1vC2 <- merge(STAT_C1vC2,CoRe_info,by= "Metabolite")
     STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   }
-  
+
   ## ------------ Add pathway information to DMA results ----------- ##
   if(is.null(Input_Pathways)!=TRUE & 'Metabolite' %in% colnames(Input_Pathways) & 'Pathway' %in% colnames(Input_Pathways)){
       STAT_C1vC2$Metabolite %in% Input_Pathways$Metabolite
@@ -386,11 +392,11 @@ DMA <-function(Input_data,
       warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
     }
   DMA_Output <- STAT_C1vC2
-  
+
 
   xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
   writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
- 
+
   if ( Plot == TRUE){ # Make a simple Volcano plot --> implemet plot true or false
     VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
                                    lab = DMA_Output$Metabolite,#Metabolite name
@@ -421,11 +427,11 @@ DMA <-function(Input_data,
                                    gridlines.minor = FALSE,
                                    drawConnectors = FALSE)
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"log2FC_",0.5)
-    
+
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
   }
-  
+
   assign(paste0("DMA_",toString(Condition1),"_vs_",toString(Condition2)), DMA_Output, envir=.GlobalEnv)
   return(DMA_Output)
 }

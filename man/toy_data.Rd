@@ -4,7 +4,10 @@
 \alias{toy_data}
 \title{Toy Data Import}
 \usage{
-toy_data()
+toy_data(data)
+}
+\arguments{
+\item{data}{Either "Standard", "CoRe" or "Pathways" depending which data you would like to load}
 }
 \value{
 A data frame containing the toy data.

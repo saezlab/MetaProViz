@@ -23,9 +23,10 @@
 #'
 #' @param Input DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015).\strong{Default = TRUE} \strong{Default = Modified}
+#' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}
 #' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
+#' @param MVI \emph{Optional: } If TRUE, Mivving Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}
@@ -45,6 +46,7 @@ Preprocessing <- function(Input_data,
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value = 0.8,
                           TIC_Normalization = TRUE,
+                          MVI= TRUE,
                           HotellinsConfidence = 0.99,
                           ExportQCPlots = TRUE,
                           CoRe = FALSE,
@@ -65,7 +67,7 @@ Preprocessing <- function(Input_data,
   suppressMessages(library(tidyverse))
 
   ## ------------------ Run ------------------- ##
-  
+
   #######################################################################################
   ### ### ### Check Input Information and add Experimental_design information ### ### ###
 
@@ -110,7 +112,7 @@ Preprocessing <- function(Input_data,
            column labeled as 'blank' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = FALSE for your analysis")
     }
   }
-  
+
   #4. General parameters
   Feature_Filtering_options <- c("Standard","Modified", "none")
   if(Feature_Filtering %in% Feature_Filtering_options == FALSE ){
@@ -121,6 +123,9 @@ Preprocessing <- function(Input_data,
   }
   if(is.logical(TIC_Normalization) == FALSE){
     stop("Check input. The TIC_Normalization value should be either =TRUE if TIC normalization is to be performed or =FALSE if no data normalization is to be applied.")
+  }
+  if(is.logical(MVI) == FALSE){
+    stop("Check input. MVI value should be either =TRUE if mising value imputation should be performed or =FALSE if not.")
   }
   if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
     stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
@@ -135,32 +140,34 @@ Preprocessing <- function(Input_data,
   if(Save_as %in% Save_as_options == FALSE){
     stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
   }
-  
+
   Input_data <- as.matrix(mutate_all(as.data.frame(Input_data), function(x) as.numeric(as.character(x))))
-  
-  
+
+
   #############################################
   ### ### ### Create output folders ### ### ###
-  
+
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) 
+  Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
   Results_folder_Preprocessing_folder = file.path(Results_folder, "Preprocessing")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
   if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
   Results_folder_Preprocessing_Outlier_detection_folder = file.path(Results_folder_Preprocessing_folder, "Outlier_detection")   # Create Outlier_Detection directory
-  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}  
+  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}
   if (ExportQCPlots ==  TRUE){   # Create Quality_Control_PCA directory
     Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = file.path(Results_folder_Preprocessing_folder, "Quality_Control_PCA")
     if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}
   }
-  
+
 
   #########################################
   ### ### ### Feature filtering ### ### ###
-  
-  message("Feature filtering is performed to reduce missing values that can bias the analysis and cause methods to underperform, which leads to low precision in the statistical analysis. REF: Steuer et. al. (2007), Methods Mol Biol. 358:105-26., doi:10.1007/978-1-59745-244-1_7.")
+  #message("Feature filtering is performed to reduce missing values that can bias the analysis and cause methods to underperform, which leads to low precision in the statistical analysis. REF: Steuer et. al. (2007), Methods Mol Biol. 358:105-26., doi:10.1007/978-1-59745-244-1_7.")
+  #Prepare data:
+  Input_data <- replace(Input_data, Input_data==0, NA)
 
+  #Perfrom filtering as selected
   if (Feature_Filtering ==  "Modified"){
     message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
     message(paste("filtering value selected:", Feature_Filt_Value))
@@ -187,15 +194,15 @@ Preprocessing <- function(Input_data,
         }
       }
  #   }
-  
+
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
       filtered_matrix <- Input_data
       feat_file_res <- "There where no metabolites exluded"
       write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
-      message(paste(length(unique(miss)) ," metabolites where removed."))
-      message(unique(colnames(Input_data)[miss]))
+      names<-unique(colnames(Input_data)[miss])
+      message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- Input_data[,-miss]
       write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     }
@@ -211,15 +218,15 @@ Preprocessing <- function(Input_data,
       if(length(which(is.na(split_Input[,i]))) > (1-Feature_Filt_Value)*nrow(split_Input))
         miss <- append(miss,i)
     }
-    
+
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
       filtered_matrix <- Input_data
       feat_file_res <- "There where no metabolites exluded"
       write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
-      message(paste( length(unique(miss)) ,"metabolites where removed:"))
-      message(unique(colnames(Input_data)[miss]))
+      names<-unique(colnames(Input_data)[miss])
+      message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- Input_data[,-miss]
       write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
     }
@@ -228,17 +235,21 @@ Preprocessing <- function(Input_data,
     warning("No feature filtering is selected.")
     filtered_matrix <- as.data.frame(Input_data)
   }
-  
+
   filtered_matrix <- as.matrix(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
-  
-  
+
+
   ################################################
   ### ### ### Missing value Imputation ### ### ###
 
+  if (TIC_Normalization ==  TRUE){
   message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
   NA_removed_matrix <- replace(filtered_matrix, filtered_matrix %in% NA, ((min(filtered_matrix, na.rm =  TRUE))/2))
+  } else if(TIC_Normalization == FALSE){
+  message("Missing value imputation is not performed.")
+  }
 
-  
+
   #######################################################
   ### ### ### Total Ion Current Normalization ### ### ###
 
@@ -256,7 +267,7 @@ Preprocessing <- function(Input_data,
     }
 
   if (CoRe ==  TRUE){
-    
+
     blankMeans <- colMeans( Data_TIC[grep("blank", Conditions),])
     blankSd <- as.data.frame( apply(Data_TIC[grep("blank", Conditions),], 2, sd) )
 
@@ -269,20 +280,20 @@ Preprocessing <- function(Input_data,
     Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-blank_df$blankMeans)))  #Subtract from each sample the blank mean
     message("CoRe data are normalised using CoRe_norm_factor")
     Data_TIC <- apply(Data_TIC_CoRe, 2, function(i) i*CoRe_norm_factor)
-    
+
     if (var(CoRe_norm_factor) ==  0){
-      warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples") 
+      warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
     }
   }
   data_norm <- Data_TIC %>% as.data.frame()
 
-  
+
   #####################################################
   ### ### ### Sample outlier identification ### ### ###
 
   message("Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.")
   message(paste("HotellinsConfidence value selected:", HotellinsConfidence))
-  
+
   Outlier_filtering_loop = 10
   sample_outliers <- list()
   scree_plot_list <- list()
@@ -297,26 +308,26 @@ Preprocessing <- function(Input_data,
     ### ### ### Zero variance metabolites ### ### ###
     metabolite_var <- as.data.frame( apply(data_norm, 2, var) %>% t()) # calculate each metabolites variance
     metabolite_zero_var_list <- list( colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metabollites with zero variance and puts them in list
-    
+
     if(sum(metabolite_var[1,]==0)==0){
       metabolite_zero_var_total_list[loop] <- 0
     } else if(sum(metabolite_var[1,]==0)>0){
     metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
     zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
     }
-    
+
     for (metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
       data_norm <- data_norm %>% select(-all_of(metab))
     }
-   
+
     ### ### PCA  ### ###
-    PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE) 
-    outlier_PCA_data <- data_norm 
+    PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
+    outlier_PCA_data <- data_norm
     outlier_PCA_data$Conditions <- Conditions
     pca.obj <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
     dtp <- data.frame('Conditions' = outlier_PCA_data$Conditions, pca.obj$x[,c(1,2)])
     pca_outlier <- ggplot(data = dtp) +
-      geom_point(aes(x = PC1, y = PC2, colour = Conditions), size = 4, alpha = 0.8, show.legend = TRUE) +  
+      geom_point(aes(x = PC1, y = PC2, colour = Conditions), size = 4, alpha = 0.8, show.legend = TRUE) +
       ggtitle(paste("PCA outlier test filtering round ",loop))+
       theme_classic()+
       geom_hline(yintercept =  0,  color = "black", linewidth =  0.1)+
@@ -324,8 +335,8 @@ Preprocessing <- function(Input_data,
       geom_text(aes(x = PC1, y = PC2, label = rownames(outlier_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
       scale_x_continuous(paste("PC1 ",summary(PCA.res)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(PCA.res)$importance[2,][[2]]*100,"%"))
-    
-    
+
+
     plot(pca_outlier)
     outlier_plot_list[[k]] <- recordPlot()
     dev.off()
@@ -368,13 +379,13 @@ Preprocessing <- function(Input_data,
     LegendTitle = "Limits"
 
     HotellingT2plot <- ggplot(HotellingT2plot_data, aes(x = Samples, y = `Group summary statisctics`, group = 1, fill = ))
-    HotellingT2plot <- HotellingT2plot + 
-      geom_point(aes(x = Samples,y = `Group summary statisctics`), color = 'blue', size = 2) + 
-      geom_point(data = outlier, aes(x = Samples,y = `Group summary statisctics`), color = 'red',size = 3) + 
+    HotellingT2plot <- HotellingT2plot +
+      geom_point(aes(x = Samples,y = `Group summary statisctics`), color = 'blue', size = 2) +
+      geom_point(data = outlier, aes(x = Samples,y = `Group summary statisctics`), color = 'red',size = 3) +
       geom_line(linetype = 2)
 
     #draw the horizontal lines corresponding to the LCL,UCL
-    HotellingT2plot <- HotellingT2plot + geom_hline(aes(yintercept = limits[,1]), color = "black", data = limits,  show.legend = F) + 
+    HotellingT2plot <- HotellingT2plot + geom_hline(aes(yintercept = limits[,1]), color = "black", data = limits,  show.legend = F) +
       geom_hline(aes(yintercept = limits[,2], linetype = "UCL"), color = "red", data = limits, show.legend = T) +
       #only the LCl and UCL to be shown in y axis
       scale_y_continuous(breaks = sort(c(ggplot_build(HotellingT2plot)$layout$panel_ranges[[1]]$y.major_source, c(limits[,1],limits[,2]))))
@@ -432,7 +443,7 @@ Preprocessing <- function(Input_data,
   }
   dev.off()
 
-  
+
   # Print Outlier detection results about samples and metabolites
   if(length(sample_outliers) > 0){   # Print outlier samples
     message("There are possible outlier samples in the data") #This was a warning
@@ -440,8 +451,8 @@ Preprocessing <- function(Input_data,
       message("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
     }
   }else{message("No sample outliers were found")}
-  
-  
+
+
   #######################################################
   ### ### ### Zero variance metabolites part2.### ### ###
   zero_var_metab_export_df <- data.frame(1,2)
@@ -452,7 +463,7 @@ Preprocessing <- function(Input_data,
     warning("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
   }
   count = 1
-  for (i in 1:length(metabolite_zero_var_total_list)){  
+  for (i in 1:length(metabolite_zero_var_total_list)){
     if (metabolite_zero_var_total_list[[i]] != 0){
       message("Filtering round ",i ,". Zero variance metabolites identified: ", paste( metabolite_zero_var_total_list[[i]] ," "))
       zero_var_metab_export_df[count,"Filtering round"] <- paste(i)
@@ -463,21 +474,21 @@ Preprocessing <- function(Input_data,
   if (zero_var_metab_warning==TRUE){
     write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
   }
- 
-  
-  
+
+
+
   #############################################
   ### ### ### Make Output Dataframe ### ### ###
-  
+
   total_outliers <- hash::hash() # make a dictionary
   if(length(sample_outliers) > 0){ # Create columns with outliers to merge to output dataframe
     for (i in 1:length(sample_outliers)  ){
       total_outliers[[paste("Outlier_filtering_round_",i, sep = "")]] <- sample_outliers[i]
     }
   }
-  
+
   data_norm_filtered_full <- as.data.frame(Data_TIC)
-  
+
   if(length(total_outliers) > 0){  # add outlier information to the full output dataframe
     data_norm_filtered_full$Outliers <- "no"
     for (i in 1:length(total_outliers)){
@@ -488,13 +499,13 @@ Preprocessing <- function(Input_data,
   }else{
     data_norm_filtered_full$Outliers <- "no"
   }
-  
+
   data_norm_filtered_full <- data_norm_filtered_full %>% relocate(Outliers) #Put Outlier columns in the front
   data_norm_filtered_full <- merge(Experimental_design, data_norm_filtered_full,  by = 0) # add the design in the output df (merge by rownames/sample names)
   rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
   data_norm_filtered_full$Row.names <- c()
 
-  
+
   ################################################
   ### ### ### Quality Control (QC) PCA ### ### ###
 
@@ -504,7 +515,7 @@ Preprocessing <- function(Input_data,
     QC_PCA_data$Biological_Replicates <-  as.character(Experimental_design$Biological_Replicates)
   }
   pca.obj <- prcomp(Data_TIC, center = TRUE, scale. = TRUE)
-  
+
   dtp <- merge(data_norm_filtered_full %>% select(Conditions, Outliers), pca.obj$x[,1:2],by = 0)
   dtp <- dtp%>%  mutate(Outliers = case_when(Outliers == "no" ~ 'no',
                                   Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
@@ -512,13 +523,13 @@ Preprocessing <- function(Input_data,
                                   Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
                                   Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
                                   TRUE ~ 'Outlier_filtering_round = or > 5'))
-  
+
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
   ## PCA conditions and Outlier
   pca_QC <- ggplot(data = dtp) +
-    geom_point(aes(x = PC1, y = PC2, color = Conditions, shape = Outliers), size = 4, alpha = 0.8) +  
-    ggtitle("Quality COntrol PCA Condition clustering and Outlier check")+
+    geom_point(aes(x = PC1, y = PC2, color = Conditions, shape = Outliers), size = 4, alpha = 0.8) +
+    ggtitle("Quality Control PCA Condition clustering and Outlier check")+
     theme_classic()+
     geom_hline(yintercept = 0,  color = "black", linewidth = 0.1)+
     geom_vline(xintercept = 0,  color = "black", linewidth = 0.1)+
@@ -529,11 +540,11 @@ Preprocessing <- function(Input_data,
   if (ExportQCPlots == TRUE){
    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot = pca_QC, width = 10,  height = 8)
   }
-  
+
   if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
     ### ### QC PCA color for replicates
     pca_QC_repl <- ggplot(data = dtp) +
-      geom_point(aes(x = PC1, y = PC2, colour = Experimental_design$Conditions, shape = as.factor(Experimental_design$Biological_Replicates)), size = 4, alpha = 0.8) +  
+      geom_point(aes(x = PC1, y = PC2, colour = Experimental_design$Conditions, shape = as.factor(Experimental_design$Biological_Replicates)), size = 4, alpha = 0.8) +
       ggtitle("Quality Control PCA replicate spread check")+
       theme_classic()+
       geom_hline(yintercept = 0,  color = "black", linewidth = 0.1)+
@@ -541,13 +552,13 @@ Preprocessing <- function(Input_data,
       geom_text(aes(x = PC1, y = PC2, label = rownames(QC_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
       scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
-    
+
     if (ExportQCPlots == TRUE){
       ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot = pca_QC_repl, width = 10,  height = 8)
     }
   }
 
-  
+
   #########################################################
   ### ### ###  Make list with output dataframes ### ### ###
 
@@ -575,24 +586,24 @@ Preprocessing <- function(Input_data,
 #' Merges the analytical replicates of an experiment
 #'
 #' @param Input Dataframe which contains unique sample identifiers as row names the Experimental design and the metabolite numerical values in columns with metabolite identifiers as column names. Needs to have Conditions, Biological_Replicates and Analytical_Replicate columns
-#' 
+#'
 #' @keywords Analyrical Replicate Merge
-#' @export Dataframe with merged Analytical Replicates based on Biological Replicates and Conditions
+#' @export
 
 
 ReplicateSum <- function(Input_data){
-  
+
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
-  
+
   ###############################################
   ### ### ### Check Input Information ### ### ###
-  
+
   if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } 
+  }
 
   # Parse Condition and Replicate information
   if ( "Conditions" %in% colnames(Input_data)){
@@ -610,39 +621,47 @@ ReplicateSum <- function(Input_data){
   }else{
     Analytical_Replicates <- NULL
   }
-  
+
   ############################################
   ### ### ### Create Output folder ### ### ###
-  
+
   # This searches for a folder called "Results" within the current working directory and if its not found it creates one
   Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  Results_folder_Preprocessing_folder = paste(Results_folder, "/MetaProViz_Preprocessing", sep = "")
+  Results_folder_Preprocessing_folder = paste(Results_folder, "/Preprocessing", sep = "")
   if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
-  
+
+  ##############################################
+  ### ### ### Load data and process ### ### ###
+
   Input_data_numeric <-  select_if(Input_data, is.numeric) # take only the numeric values. This includes the replicate information
-  
+
   Input_data_numeric <- merge(Input_data %>% select(Conditions), Input_data_numeric, by = 0)
   Input_data_numeric <- column_to_rownames(Input_data_numeric, "Row.names")
 
-  
+
   # Make the replicate Sums
   Input_data_numeric_summed <- as.data.frame( Input_data_numeric %>%
                                              group_by(Biological_Replicates, Conditions) %>%
-                                             summarise_all("mean") %>% select(-Analytical_Replicates)) 
+                                             summarise_all("mean") %>% select(-Analytical_Replicates))
+
   # Make a number of merged replicates column
-  nReplicates <-  Input_data_numeric %>% 
+  nReplicates <-  Input_data_numeric %>%
     group_by(Biological_Replicates, Conditions) %>%
     summarise_all("max") %>% ungroup() %>% select(Analytical_Replicates, Biological_Replicates, Conditions) %>% rename(n_Replicates_Summed = Analytical_Replicates)
-  
 
-  
-  Input_data_numeric_summed <- merge(nReplicates,Input_data_numeric_summed, by = c("Conditions","Biological_Replicates"))
-  
+
+
+
+
+  Input_data_numeric_summed <- merge(nReplicates,Input_data_numeric_summed, by = c("Conditions","Biological_Replicates"))%>%
+    unite(UniqueID, c("Conditions","Biological_Replicates"), sep="_", remove=FALSE)%>% # Create a uniqueID
+    column_to_rownames("UniqueID")# set UniqueID to rownames
+
   # Export result
   writexl::write_xlsx(Input_data_numeric_summed, paste(Results_folder_Preprocessing_folder, "/ReplicateSum_output.xlsx", sep = ""))#,showNA = TRUE)
-  
+
   # Return the result
   message("Done")
   return(Input_data_numeric_summed)
@@ -650,3 +669,17 @@ ReplicateSum <- function(Input_data){
 
 
 
+
+##########################################################################
+### ### ### Metabolite detection estimation using pool samples ### ### ###
+##########################################################################
+
+#' Description
+#'
+#' @param Input
+#'
+#' @keywords
+#' @export
+
+
+#Pool_Estimation <- function(Input_data)

@@ -1,0 +1,123 @@
+---
+#title: "**MetaProViz**"
+#author: "Authors: Christina Schmidt, Dimitrios"
+#date: "24 November 2022"
+output:
+   html_document:
+    #yml: _site.yml
+    css: style.css
+    #theme: flatly
+    #highlight: tango #`default`, `tango`, `pygments`, `kate`, `monochrome`, `espresso`, `zenburn`, `haddock`, `breezedark`, `textmate`, `arrow`, or `rstudio`
+    #self_contained: true
+    #toc: true
+   # toc_float: true
+    #toc_depth: 2
+    #code_folding: show
+#vignette: >
+#  %\VignetteEngine{knitr::rmarkdown}
+#  %\VignetteIndexEntry{MetaProViz}
+#  %\VignetteEncoding{UTF-8}
+#editor_options: 
+#  chunk_output_type: console
+---
+\
+<a href="#" class="btn btn-link">[**Browse source code**](https://github.com/ChristinaSchmidt1)</a>
+<a href="#" class="btn btn-link">[**View on Bioconductor**](https://github.com/ChristinaSchmidt1)</a>
+<a href="#" class="btn btn-link">[**Citing MetaProViz**](https://github.com/ChristinaSchmidt1)</a>
+<a href="#" class="btn btn-link">[**FrezzaLab**](https://twitter.com/FrezzaLab)</a>
+<a href="#" class="btn btn-link">[**SaezLab**](https://twitter.com/saezlab)</a>
+
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+## CoRe Metabolomics (Cell Culture Media)
+Description
+
+***
+### Loading the example data
+***
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media.\
+Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+As part of the package you can load:\
+\
+**1. CoRe experiment (Cell Culture Media)** \
+The raw data is available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
+\
+**2. Intracellular experiment (Intra)** \
+The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+\
+**3. Pathway information mapping the trivial metabolite names to KEGG IDs and pathways (Pathways)** \
+\
+\
+You can load the example data into your global environment using toy_data():
+```{r, eval=FALSE}
+devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
+
+MetaProViz::toy_data()
+
+# Check how our data looks like:
+head(Media)
+```
+
+***
+### Run MetaProViz functions
+***
+#### 1. Pre-processing
+Discuss pitfalls of missing value imputation as discussed with Aurelien and give a clear statement! Cite the papers I have mentioned on my trello card
+"Benchmark": 
+- Show MVI results with different percentages (not just 50% as per half minimum!)
+- Show that per feature imputation is advantageous over the "standard" imputation
+- Cite the benchmark of the different methods and explain why we did not implement the others (e.g. quantile is only good for normal distribution)
+
+```{r}
+
+
+#MetaProViz::Preprocessing
+
+
+```
+
+#### 2. Differntial Metabolite Analysis (DMA)
+Here explain the way we deal with 0/NA --> again refer back to above!
+
+Here explain how we adapted the Log2FC calculation
+- Benchmark: e.g. how many metabolites do we identify with the new Log2FC calculation opposed to using the absolute values (perfect example would be a metabolite that has -10 in C1 qand +11 in C2, and hence a small Log2FC)
+
+```{r}
+
+#MetaProViz::Preprocessing
+
+
+```
+Similar to DESEq2 explain what it means if a Log2FC = Inf & p.val=NA versus Log2FC= Value & p.val=NA
+
+
+
+
+#### 3. Metabolite Clustering Analysis (MCA)
+
+Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
+
+#### 4. Visualisation (Viz)
+No replicates
+
+
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+# Session information
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
+```
