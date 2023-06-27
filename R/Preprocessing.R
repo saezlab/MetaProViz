@@ -597,6 +597,7 @@ ReplicateSum <- function(Input_data){
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
 
   ###############################################
   ### ### ### Check Input Information ### ### ###
@@ -609,17 +610,17 @@ ReplicateSum <- function(Input_data){
   if ( "Conditions" %in% colnames(Input_data)){
     Conditions <- Input_data$Conditions
   }else{
-    Conditions <- NULL
+    stop(Column `Condition` is required.)
   }
   if ( "Biological_Replicates" %in% colnames(Input_data)){
     Biological_Replicates <- Input_data$Biological_Replicates
   }else{
-    Biological_Replicates <- NULL
+    stop(Column `Biological_Replicates` is required.)
   }
   if ( "Analytical_Replicates" %in% colnames(Input_data)){
     Analytical_Replicates <- Input_data$Analytical_Replicates
   }else{
-    Analytical_Replicates <- NULL
+    stop(Column `Analytical_Replicates` is required.)
   }
 
   ############################################
@@ -635,11 +636,10 @@ ReplicateSum <- function(Input_data){
   ##############################################
   ### ### ### Load data and process ### ### ###
 
+  #Load the data
   Input_data_numeric <-  select_if(Input_data, is.numeric) # take only the numeric values. This includes the replicate information
-
   Input_data_numeric <- merge(Input_data %>% select(Conditions), Input_data_numeric, by = 0)
   Input_data_numeric <- column_to_rownames(Input_data_numeric, "Row.names")
-
 
   # Make the replicate Sums
   Input_data_numeric_summed <- as.data.frame( Input_data_numeric %>%
@@ -650,10 +650,6 @@ ReplicateSum <- function(Input_data){
   nReplicates <-  Input_data_numeric %>%
     group_by(Biological_Replicates, Conditions) %>%
     summarise_all("max") %>% ungroup() %>% select(Analytical_Replicates, Biological_Replicates, Conditions) %>% rename(n_Replicates_Summed = Analytical_Replicates)
-
-
-
-
 
   Input_data_numeric_summed <- merge(nReplicates,Input_data_numeric_summed, by = c("Conditions","Biological_Replicates"))%>%
     unite(UniqueID, c("Conditions","Biological_Replicates"), sep="_", remove=FALSE)%>% # Create a uniqueID
