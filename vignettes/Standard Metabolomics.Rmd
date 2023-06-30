@@ -236,6 +236,8 @@ DMA_HK2v786M2A <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we n
                Save_as = "svg")
 
 ```
+Why are the plots not shown? 
+--> mention/show that the volcano plot is saved when Plot=TRUE
 
 ## 2.3. MCA
 Metabolite Clustering Analysis (`MCA`)is a module 
@@ -259,17 +261,80 @@ easyalluvial::alluvial_wide(MCA_2Cond[,c(1:2,5)], fill_by = 'last_variable' )
 ```
 
 Now let's use the data and do clustering:
+mention sircle concept that was adapted here! --> add the citation to function?
+```{r}
+Test <- MetaProViz::MCA_2Cond(Cond1_File=DMA_HK2v786O,
+                      Cond2_File=DMA_HK2v786M1A,
+                      MetaboliteID= "Metabolite",
+                      Cond1ValueCol="Log2FC",
+                      Cond1PadjCol="p.adj",
+                      Cond2ValueCol="Log2FC",
+                      Cond2PadjCol="p.adj",
+                      Cond1_padj_cutoff= 0.05,
+                      Cond2_padj_cutoff = 0.05,
+                      Cond1_FC_cutoff= 1,
+                      Cond2_FC_cutoff = 1,
+                      backgroundMethod="C1&C2",
+                      OutputFileName = "MCA_2Cond")
+
+
+# Check how our data looks like:
+knitr::kable(Summary_MCA_2Cond , caption = "Summary of MCA: 2 Conditions.", row.names=FALSE)
+
+```
+
+Next lets try kmeans clustering:
 ```{r}
 
 ```
 
-
 ## 2.4. Visualisation (Viz)
-No replicates
+--> Always do the overview and then the narrow down with colours/individual plots: explain concept
+
+### Volcano plot
+
+Plot_Settings: Additional plotting information to add color or individual plots based on additional metadata information (e.g. Metabolite pathways, metabolite clusters, demographics,...):
+1. "Standard" (no additional information and standard plot will be produced)
+2. "Individual" (= individual plot for each pathway/cluster/demographics)
+3. "Color" (= Uses pathway/cluster/demographics info to colour code.)
+4. "Individual_Color" (= Plots individual plot for each pathway/cluster and colour codes for pathway/cluster)
+5. "Compare" (= Add another Input_DF with the same column names to compare)
+6. "Individual_Compare (=Add another Input_DF with the same column names to compare to be plotted as individual plots based on provided pathways/cluster names/ other demographics).
+7. "Shape" (unique/multiple)
+8. "Individual_Shape"
+
+#' @param Plot_SettingsInfo \emph{Optional: } Provide DF (e.g. pathways) or named vector with column names for 1. "color" and 2. "individual", with the information that should be used to "color" code the plot and/or to save "individual" plots.  \strong{Default = NULL}
 
 ```{r, fig.align="center", fig.width=6, fig.height=6, fig.cap="Figure: Here is a really important caption."}
 
+Plot_SettingsFile<- merge( Pathways[,c(1,4)],Test[,c(1,15)], by.y="MetaboliteID", by.x="Metabolite", all=TRUE)
+Plot_SettingsFile$shape <- Plot_SettingsFile$RG3_SignificantChange
+
+MetaProViz::VizVolcano(Plot_Settings="Standard",
+                       Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway", shape="shape"),
+                       Plot_SettingsFile= Plot_SettingsFile,
+                       Input_data=DMA_HK2v786M1A,
+                       y= "p.adj",
+                       x= "Log2FC",
+                       AdditionalInput_data= NULL,
+                       OutputPlotName= "",
+                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
+                       xlab= NULL,
+                       ylab= NULL,
+                       pCutoff= 0.05,
+                       FCcutoff= 0.5,
+                       Connectors=  FALSE,
+                       Subtitle= "",
+                       Theme= NULL,
+                       Save_as= "pdf"
+                       )
+
+
 ```
+
+
+
+
 
 ***
 <p class="text-success">*Now you have finished with the example run for standard metabolomics data. #2</p> 

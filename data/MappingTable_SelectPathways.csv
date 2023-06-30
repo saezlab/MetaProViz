@@ -64,7 +64,6 @@ acetylcarnitine,C02571,O-Acetylcarnitine,Fatty acyl carnitines
 butyryl-carnitine,C02862,O-Butanoylcarnitine,Fatty acyl carnitines
 propionylcarnitine,C03017,O-Propanoylcarnitine,Fatty acyl carnitines
 isovalerylcarnitine,C20826,Isovalerylcarnitine,Fatty acyl carnitines
-isovalerylcarnitine C5,NA,NA,Fatty acyl carnitines
 methylmalonylcarnitine C3-DC-M/succinylcarnitine C4-DC,NA,NA,Fatty acyl carnitines
 butyrylcarnitine C4,NA,NA,Fatty acyl carnitines
 malonylcarnitine C3-DC,NA,NA,Fatty acyl carnitines
@@ -96,13 +95,11 @@ glucose 6-phosphate,C00092,D-Glucose 6-phosphate,Glycolysis / Gluconeogenesis
 glyceraldehyde 3-phosphate,C00118,D-Glyceraldehyde 3-phosphate,Glycolysis / Gluconeogenesis
 fructose,C02336,beta-D-Fructose,Not assigned
 carnosine,C00386,Carnosine,Not assigned
-pantothenate,C00864,Pantothenate,Not assigned
 2-hydroxyglutarate,C02630,2-Hydroxyglutarate,Not assigned
 taurine,C00245,Taurine,Not assigned
 fructose 6-Phosphate,C00085,D-Fructose 6-phosphate,Not assigned
 palmitate,C00249,Hexadecanoic acid,Not assigned
 betaine,C00719,Betaine,Not assigned
-creatine,C00300,Creatine,Not assigned
 glycerophosphoinositol,C04549,1-Phosphatidyl-1D-myo-inositol 3-phosphate,Not assigned
 myo-inositol,C00137,myo-Inositol,Not assigned
 indole-3-lactate,C02043,Indolelactate,Not assigned

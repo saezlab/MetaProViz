@@ -77,14 +77,12 @@ MCA_2Cond <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1V
   if(length(Cond2_DF[duplicated(Cond2_DF$MetaboliteID), "MetaboliteID"]) > 0){
     doublons <- as.character(Cond2_DF[duplicated(Cond2_DF$MetaboliteID), "MetaboliteID"])#number of duplications
     Cond2_DF <-Cond2_DF[!duplicated(Cond2_DF$MetaboliteID),]#remove duplications
-    warning("Cond2 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
-    warning("Note that you should do this before running MCA.")
+    warning("Cond2 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running MCA.")
   }
   if(length(Cond1_DF[duplicated(Cond1_DF$MetaboliteID), "MetaboliteID"]) > 0){
     doublons <- as.character(Cond1_DF[duplicated(Cond1_DF$MetaboliteID), "MetaboliteID"])#number of duplications
     Cond1_DF <-Cond1_DF[!duplicated(Cond1_DF$MetaboliteID),]#remove duplications
-    warning("Cond1 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
-    warning("Note that you should do this before running MCA.")
+    warning("Cond1 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running MCA.")
   }
 
   ## -------- Create Results output folder ---------- ##
@@ -365,7 +363,7 @@ MCA_2Cond <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1V
 
   MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
 
-  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""), row.names = FALSE)
+  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""))
 
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
@@ -387,8 +385,11 @@ MCA_2Cond <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1V
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
 
-  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""), row.names = FALSE)
+  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""))
 
+  #Return:
+  assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
+  assign(paste("MCA2Cond_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
   return(MergeDF_Rearrange)
 }
 
@@ -958,7 +959,7 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
 
   MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
 
-  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""), row.names = FALSE)
+  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""))
 
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
@@ -980,7 +981,12 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
 
-  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""), row.names = FALSE)
+  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""))
+
+
+  #Return:
+  assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
+  assign(paste("MCACoRe_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
 
   return(MergeDF_Rearrange)
 }

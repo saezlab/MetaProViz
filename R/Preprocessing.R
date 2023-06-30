@@ -610,17 +610,17 @@ ReplicateSum <- function(Input_data){
   if ( "Conditions" %in% colnames(Input_data)){
     Conditions <- Input_data$Conditions
   }else{
-    stop(Column `Condition` is required.)
+    stop("Column `Condition` is required.")
   }
   if ( "Biological_Replicates" %in% colnames(Input_data)){
     Biological_Replicates <- Input_data$Biological_Replicates
   }else{
-    stop(Column `Biological_Replicates` is required.)
+    stop("Column `Biological_Replicates` is required.")
   }
   if ( "Analytical_Replicates" %in% colnames(Input_data)){
     Analytical_Replicates <- Input_data$Analytical_Replicates
   }else{
-    stop(Column `Analytical_Replicates` is required.)
+    stop("Column `Analytical_Replicates` is required.")
   }
 
   ############################################
