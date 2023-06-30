@@ -1,0 +1,96 @@
+/*https://rstudio4edu.github.io/rstudio4edu-book/doc-fancy.html
+
+/*------------- Whole Document---------------- */
+body {
+text-align: justify
+font-family: `Arial`;
+color: black;
+width: 40cm;
+}
+
+p.caption {
+  font-size: 0.9em;
+  font-style: italic;
+  color: seagreen;
+  margin-right: 10%;
+  margin-left: 0%;
+  text-align: justify;
+}
+
+/*----------LOGO above TOC---------*/
+#TOC::before {
+  content: "";
+  display: block;
+  height: 200px;
+  margin: 15px 5px 15px 5px;
+  background-image: url("Hexagon_MetaProViz.png");
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+
+
+/*----------------- links ---------------------*/
+
+a {
+  color: #29AB87;
+}
+
+
+a:hover {
+    color: #3a4c40; /* darker color when hovering */
+  }
+
+
+
+/*----------------ADDING WHITE SPACE-------------*/
+
+.title {
+  margin-top: 1.0em !important;
+  margin-bottom: 0.75em;
+}
+
+
+/* Remove excessive white space at the end of page */
+
+.tocify-extend-page {
+  height: 100px !important;
+}
+
+
+/*------------Table of Contents (TOC)----------- */
+
+
+.tocify {
+  font-size: 16px;
+}
+
+.tocify ul, .tocify li { /* Increases spacing between TOC headers*/
+    line-height: 25px !important;
+}
+
+.tocify ul {
+  border-right: solid 1px #eee; /* Thin right border on TOC list */
+}
+
+
+/* Active TOC links*/
+
+.list-group-item.active,
+.list-group-item.active:hover{
+  color: black;
+  background-color: #29AB87;
+  border-color: #29AB87;
+}
+
+/* Hovered TOC links*/
+
+.list-group-item:hover {
+  color: black;
+  background-color: #29AB87;
+  border: #29AB87;
+}
+
+
+

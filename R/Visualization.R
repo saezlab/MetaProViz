@@ -760,20 +760,37 @@ VizVolcano <- function(Plot_Settings="Standard",
     stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
       }
     if(is.vector(Plot_SettingsInfo)==TRUE){
-      if("color" %in% names(Plot_SettingsInfo)==TRUE){
+      if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+        if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==TRUE){
+          Plot_SettingsFile$shape <- Plot_SettingsFile[,paste(Plot_SettingsInfo[["color"]])]
+          Plot_SettingsFile<- Plot_SettingsFile%>%
+            dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+          }
+        if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==FALSE & "color" %in% names(Plot_SettingsInfo)==TRUE){
+            Plot_SettingsFile <- Plot_SettingsFile%>%
+              dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+            }
+        if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==FALSE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+              Plot_SettingsFile <- Plot_SettingsFile%>%
+                dplyr::rename("shape"=paste(Plot_SettingsInfo[["shape"]]))
+            }
+      } else if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
         Plot_SettingsFile <- Plot_SettingsFile%>%
           dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+      } else if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+        Plot_SettingsFile <- Plot_SettingsFile%>%
+          dplyr::rename("shape"=paste(Plot_SettingsInfo[["shape"]]))
       }
+
       if("individual" %in% names(Plot_SettingsInfo)==TRUE){
       Plot_SettingsFile <- Plot_SettingsFile%>%
         dplyr::rename("individual"=paste(Plot_SettingsInfo[["individual"]]))
       }
-      if("shape" %in% names(Plot_SettingsInfo)==TRUE){
-      Plot_SettingsFile <- Plot_SettingsFile%>%
-        dplyr::rename("shape"=paste(Plot_SettingsInfo[["shape"]]))
-      }
+
+    }else if(is.null(Plot_SettingsInfo)==TRUE){
+      #No vector provided
     }else{
-      stop("Plot_SettingsInfo must be named vector and is.vector==TRUE.")
+      stop("Plot_SettingsInfo must be named vector or NULL.")
     }
 
 
@@ -928,6 +945,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
           ## Store the plot in the 'plots' list
           PlotList[[cleaned_i]] <- Plot
+          plot(Plot)
         }
       }
       # Return PlotList into the environment to enable the user to view the plots directly
@@ -935,8 +953,12 @@ VizVolcano <- function(Plot_Settings="Standard",
       # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
 
       } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
-        InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_data, by="Metabolite", all.x=TRUE)%>%
-          na.omit()
+        if(is.null(Plot_SettingsFile)==FALSE){
+          InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+            na.omit()
+          }else{
+            InputVolcano  <- Input_data
+            }
 
         if(nrow(InputVolcano)>=1){
           #Prepare the colour scheme:
