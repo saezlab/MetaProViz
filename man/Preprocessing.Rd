@@ -10,6 +10,7 @@ Preprocessing(
   Feature_Filtering = "Modified",
   Feature_Filt_Value = 0.8,
   TIC_Normalization = TRUE,
+  MVI = TRUE,
   HotellinsConfidence = 0.99,
   ExportQCPlots = TRUE,
   CoRe = FALSE,
@@ -19,17 +20,19 @@ Preprocessing(
 \arguments{
 \item{Experimental_design}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
 
-\item{Feature_Filtering}{\emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80\%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015).\strong{Default = TRUE} \strong{Default = Modified}}
+\item{Feature_Filtering}{\emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80\%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}}
 
 \item{Feature_Filt_Value}{\emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}}
 
 \item{TIC_Normalization}{\emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}}
 
+\item{MVI}{\emph{Optional: } If TRUE, Mivving Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}}
+
 \item{HotellinsConfidence}{\emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}}
 
 \item{ExportQCPlots}{\emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}}
 
-\item{CoRe}{\emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF, e.g. "blank_1", "blank_2". \strong{Default = FALSE}}
+\item{CoRe}{\emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}}
 
 \item{Save_as}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}}
 

@@ -1,48 +1,105 @@
-# MetaProViz - Metabolomics Processing and Vizualisation
-## Overview
-**`MetaProViz`** is an R package for the pre-processing, downstream analysis and visualisation of metabolomics data.
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# MetaProViz <img src="inst/figures/Hexagon_MetaProViz.png" align="right" width="200" />
 
-## Install
-**`MetaProViz`** is an R package.
-1. Install Rtools if you haven't done this yet, using the appropriate version (e.g.[windows](https://cran.r-project.org/bin/windows/Rtools/) or [macOS](https://cran.r-project.org/bin/macosx/tools/)).
-2. Install the latest development version from GitHub with: **`SiRCleR package`** direcly in R:
-    ```
-    #install.packages("devtools")
-    devtools::install_github()
-    library(MetaProViz)
-    ```
-### Dependencies 
-If you are using the visualisations you will need to install the following tools and cite them.\
-1. CRAN packages
+<!-- badges: start -->
+
+[![Lifecycle:
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![BioC
+status](http://www.bioconductor.org/shields/build/release/bioc/decoupleR.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/decoupleR)
+[![BioC dev
+status](http://www.bioconductor.org/shields/build/devel/bioc/decoupleR.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/decoupleR)
+[![R build
+status](https://github.com/saezlab/decoupleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/saezlab/decoupleR/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/saezlab/decoupleR/branch/master/graph/badge.svg)](https://codecov.io/gh/saezlab/decoupleR?branch=master)
+[![GitHub
+issues](https://img.shields.io/github/issues/ChristinaSchmidt1/MetaProViz)](https://github.com/ChristinaSchmidt1/MetaProViz/issues)
+<!-- badges: end -->
+
+# **Introduction**
+
+**MetaProViz** (Authors. 2023. Journal. DOI: ) enables the user to
+pre-process metabolomics data including consumption-release (CoRe) data,
+perform differential analysis (DMA), do clustering based on regulatory
+rules (MCA) and contains different visualisation methods to extract
+biological interpretable graphs (**Fig.1**).  
+  
+<p align="center" width="100%">
+<img src="inst/figures/Fig.1.png" align="center" width="45%">
+</p>
+
+# Tutorials
+
+We have generated several tutorials showcasing the different
+functionalities MetaProViz offers using publicly available datasets,
+which are included as example data within **MetaProViz**. You can find
+those tutorial on the top under the “Tutorial” button, where you can
+follow specific user case examples for different analysis. Otherwise,
+you can also follow the links below:  
+- [Standard metabolomics
+data](https://saezlab.github.io/decoupleR/articles/decoupleR.html)  
+- [Consumption-Release (CoRe) metabolomics data from cell culture
+media](CoRe-Metabolomics.html)  
+  
+Here you will find a brief overview and information about the
+installation of the package and its dependencies.
+
+# Installation
+
+[MetaProViz](Link%20to%20bioconductor) is an R package distributed as
+part of the Bioconductor project. To install the package, start R and
+enter:
+
+``` r
+install.packages("BiocManager")
+BiocManager::install("MetaProViz")
 ```
 
+Alternatively, you can install the latest development version from
+[GitHub](https://github.com/ChristinaSchmidt1/MetaProViz) with:  
+
+``` r
+BiocManager::install("ChristinaSchmidt1/MetaProViz")
 ```
-2. Biocmanager packages
+
+Now [MetaProViz](Link%20to%20bioconductor) can be imported as:
+
+``` r
+#library(MetaProViz)
+
+# Extra dependencies:
+library(dplyr)
+library(tidyverse)
+#> Warning: package 'tidyverse' was built under R version 4.2.3
+#> Warning: package 'ggplot2' was built under R version 4.2.3
 ```
 
-```
-While we have done our best to ensure all the dependencies are documented, if they aren't please let us know and we will try to resolve them.
+## Dependencies
 
-### Windows specifications
-Note if you are running **Windows** you might have an issue with long paths, which you can resolve in the registry on Windows 10:\
-`Computer Configuration > Administrative Templates > System > Filesystem > Enable Win32 long paths`\
-(If you have a different version of Windows, just google "Long paths fix" and your Windows version)
+If you are using the visualisations you will need to install the
+following tools and cite them.  
 
-## Tutorial
-Provide link to main tutorial
+CRAN packages
 
-Add minitutorial here:
+Biocmanager packages
 
-List the output files that can be generated:
+While we have done our best to ensure all the dependencies are
+documented, if they aren’t please let us know and we will try to resolve
+them.
 
-Output preprocessing excel table:
-Sheet_1 = Experimental_design (as provided by user)
-Sheet_2 = Raw_data (as provided by user)
-Sheet 3= processed_data (= all samples are there with the additional column of Outlier_detection and Experimental design, metabolites that were removed due to filtering are of course missing)
-Sheet 4= processed_data_matrix_OutliersRemoved (input for downstream analysis)
+## Windows specifications
 
+Note if you are running Windows you might have an issue with long paths,
+which you can resolve in the registry on Windows 10: Computer
+Configuration \> Administrative Templates \> System \> Filesystem \>
+Enable Win32 long paths (If you have a different version of Windows,
+just google “Long paths fix” and your Windows version)
 
+## Liscence
 
 ## Citation
+
+Text
