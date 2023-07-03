@@ -18,10 +18,10 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![BioC status](http://www.bioconductor.org/shields/build/release/bioc/decoupleR.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/decoupleR)
-[![BioC dev status](http://www.bioconductor.org/shields/build/devel/bioc/decoupleR.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/decoupleR)
-[![R build status](https://github.com/saezlab/decoupleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/saezlab/decoupleR/actions)
-[![Codecov test coverage](https://codecov.io/gh/saezlab/decoupleR/branch/master/graph/badge.svg)](https://codecov.io/gh/saezlab/decoupleR?branch=master)
+[![BioC status]()]()
+[![BioC dev status]()]()
+[![R build status]()]()
+[![Codecov test coverage]()]()
 [![GitHub issues](https://img.shields.io/github/issues/ChristinaSchmidt1/MetaProViz)](https://github.com/ChristinaSchmidt1/MetaProViz/issues)
 <!-- badges: end -->
 
