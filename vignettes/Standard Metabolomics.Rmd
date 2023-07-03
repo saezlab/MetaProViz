@@ -369,38 +369,29 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Subtitle= "Results of DMA shape for metabolic clusters" )
 ```
 
-```{r, eval=FALSE}
+#### Comparison
 
-
-
-
-Plot_SettingsFile<- merge( Pathways[,c(1,4)],Test[,c(1,15)], by.y="MetaboliteID", by.x="Metabolite", all=TRUE)
-Plot_SettingsFile$shape <- Plot_SettingsFile$RG3_SignificantChange
-
-MetaProViz::VizVolcano(Plot_Settings="Standard",
-                       Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway", shape="shape"),
-                       Plot_SettingsFile= Plot_SettingsFile,
+```{r, fig.align="center", fig.width=6, fig.height=6, fig.cap="Figure: Comparison."}
+MetaProViz::VizVolcano(Plot_Settings="Compare",
+                       #Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
+                       #Plot_SettingsFile= Settings,
                        Input_data=DMA_HK2v786M1A,
-                       y= "p.adj",
-                       x= "Log2FC",
-                       AdditionalInput_data= NULL,
-                       OutputPlotName= "",
-                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                       xlab= NULL,
-                       ylab= NULL,
-                       pCutoff= 0.05,
-                       FCcutoff= 0.5,
-                       Connectors=  FALSE,
-                       Subtitle= "",
-                       Theme= NULL,
-                       Save_as= "pdf"
-                       )
+                       AdditionalInput_data=DMA_HK2v786M2A,
+                       OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
+                       Subtitle= "Results of DMA" )
 
+MetaProViz::VizVolcano(Plot_Settings="Compare",
+                       Plot_SettingsInfo= c(individual="Pathway"),
+                       Plot_SettingsFile= Settings,
+                       Input_data=DMA_HK2v786M1A,
+                       AdditionalInput_data=DMA_HK2v786M2A,
+                       OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
+                       Subtitle= "Results of DMA" )
 
 ```
 
-```{r, fig.align="center", fig.width=6, fig.height=6, fig.cap="Figure: Here is a really important caption."}
-```
+
+#### GSE
 
 
 

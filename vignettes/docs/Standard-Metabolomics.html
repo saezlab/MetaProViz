@@ -1864,31 +1864,131 @@ Figure: Standard figure displaying DMA results for each pathway, colour
 coded for metabolic clusters from MCA results.
 </p>
 </div>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>Plot_SettingsFile<span class="ot">&lt;-</span> <span class="fu">merge</span>( Pathways[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>)],Test[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">15</span>)], <span class="at">by.y=</span><span class="st">&quot;MetaboliteID&quot;</span>, <span class="at">by.x=</span><span class="st">&quot;Metabolite&quot;</span>, <span class="at">all=</span><span class="cn">TRUE</span>)</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>Plot_SettingsFile<span class="sc">$</span>shape <span class="ot">&lt;-</span> Plot_SettingsFile<span class="sc">$</span>RG3_SignificantChange</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">individual=</span><span class="st">&quot;Pathway&quot;</span>, <span class="at">shape=</span><span class="st">&quot;shape&quot;</span>),</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Plot_SettingsFile,</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y=</span> <span class="st">&quot;p.adj&quot;</span>,</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">x=</span> <span class="st">&quot;Log2FC&quot;</span>,</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span> <span class="cn">NULL</span>,</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Comparison_name=</span> <span class="fu">c</span>(<span class="at">Input_data=</span><span class="st">&quot;Cond1&quot;</span>, <span class="at">AdditionalInput_data=</span> <span class="st">&quot;Cond2&quot;</span>),</span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">xlab=</span> <span class="cn">NULL</span>,</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">ylab=</span> <span class="cn">NULL</span>,</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">pCutoff=</span> <span class="fl">0.05</span>,</span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">FCcutoff=</span> <span class="fl">0.5</span>,</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Connectors=</span>  <span class="cn">FALSE</span>,</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Theme=</span> <span class="cn">NULL</span>,</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Save_as=</span> <span class="st">&quot;pdf&quot;</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>                       )</span></code></pre></div>
+</div>
+<div id="comparison" class="section level4">
+<h4>Comparison</h4>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Compare&quot;</span>,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                       <span class="co">#Plot_SettingsInfo= c(color=&quot;RG3_SignificantChange&quot;, individual=&quot;Pathway&quot;),</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                       <span class="co">#Plot_SettingsFile= Settings,</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span>DMA_HK2v786M2A,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 vs. 786M1A compared to HK2 vs. 786M2A&quot;</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-1.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Compare&quot;</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">individual=</span><span class="st">&quot;Pathway&quot;</span>),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span>DMA_HK2v786M2A,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 vs. 786M1A compared to HK2 vs. 786M2A&quot;</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-2.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-3.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-4.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-5.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-6.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-7.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-8.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-9.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-10.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-11.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-12.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-13.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-14.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-15.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-16.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-17.png" alt="Figure: Comparison." width="576" />
+<p class="caption">
+Figure: Comparison.
+</p>
+</div>
+</div>
+<div id="gse" class="section level4">
+<h4>GSE</h4>
 <hr />
 <p class="text-success">
 *Now you have finished with the example run for standard metabolomics
@@ -1920,7 +2020,7 @@ data. #2
 #&gt;  collate  English_United Kingdom.utf8
 #&gt;  ctype    English_United Kingdom.utf8
 #&gt;  tz       Europe/Berlin
-#&gt;  date     2023-06-30
+#&gt;  date     2023-07-03
 #&gt;  pandoc   2.19.2 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)
 #&gt; 
 #&gt; ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
