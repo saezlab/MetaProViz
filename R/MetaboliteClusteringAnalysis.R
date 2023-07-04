@@ -362,22 +362,25 @@ MCA_2Cond <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1V
                   !!Cond1PadjCol_Unique :="Cond1_DF_PadjCol")
 
   MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
+  MergeDF_Rearrange <-MergeDF_Rearrange%>%
+    dplyr::rename("Metabolite"="MetaboliteID")
+
 
   writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""))
 
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
-  ClusterSummary_RG1 <- MergeDF_Rearrange[,c("MetaboliteID", "RG1_All")]%>%
+  ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
     count(RG1_All, name="Number of Genes")%>%
     dplyr::rename("SiRCle cluster Name"= "RG1_All")
   ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
 
-  ClusterSummary_RG2 <- MergeDF_Rearrange[,c("MetaboliteID", "RG2_Significant")]%>%
+  ClusterSummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
     count(RG2_Significant, name="Number of Genes")%>%
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
-  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("MetaboliteID", "RG3_SignificantChange")]%>%
+  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
     count(RG3_SignificantChange, name="Number of Genes")%>%
     dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
   ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
@@ -958,22 +961,24 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
                   !!IntraPadjCol_Unique :="Intra_DF_PadjCol")
 
   MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
+  MergeDF_Rearrange <-MergeDF_Rearrange%>%
+    dplyr::rename("Metabolite"="MetaboliteID")
 
   writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""))
 
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
-  ClusterSummary_RG1 <- MergeDF_Rearrange[,c("MetaboliteID", "RG1_All")]%>%
+  ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
     count(RG1_All, name="Number of Genes")%>%
     dplyr::rename("SiRCle cluster Name"= "RG1_All")
   ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
 
-  ClusterSummary_RG2 <- MergeDF_Rearrange[,c("MetaboliteID", "RG2_Significant")]%>%
+  ClusterSummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
     count(RG2_Significant, name="Number of Genes")%>%
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
-  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("MetaboliteID", "RG3_SignificantChange")]%>%
+  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
     count(RG3_SignificantChange, name="Number of Genes")%>%
     dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
   ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
