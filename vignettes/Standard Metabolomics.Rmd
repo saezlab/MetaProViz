@@ -288,7 +288,17 @@ Next lets try kmeans clustering:
 
 ```
 
-## 2.4. Visualisation (Viz)
+## 2.4. ORA
+### On cluster
+```{r}
+PathwayInput <- Pathways[,c(1,4)]%>%
+  rename("term"="Pathway")
+PathwayInput$Description <- PathwayInput$term
+
+```
+### On DMA
+
+## 2.5. Visualisation (Viz)
 In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,...) have 3 main `Plot_Settings`.\
 `1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.
 `2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
