@@ -49,7 +49,7 @@ MC_ORA <- function(Input_data,
                    PathwayName="",
                    minGSSize=10,
                    maxGSSize=1000 ,
-                   Save_as="pdf",
+                   Save_as="svg",
                    pCutoff=0.2,
                    PercentageCutoff=10
                    ){
@@ -102,8 +102,8 @@ MC_ORA <- function(Input_data,
   if(is.numeric(maxGSSize)== FALSE){
     stop("Check input. The selected maxGSSize value should be numeric.")
   }
-  Save_as_options <- c("svg","pdf")
-  if(Save_as %in% Save_as_options == FALSE | is.null(Save_as)==FALSE){
+  Save_as_options <- c("svg","png", "pdf")
+  if(Save_as %in% Save_as_options == FALSE & is.null(Save_as)==FALSE){
     stop("Check input. The selected Save_as option is not valid. Please set Save_as=NULL or select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
   }
   if( is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){

@@ -24,8 +24,9 @@ output:
 <a href="#" class="btn btn-link">[**FrezzaLab**](https://twitter.com/FrezzaLab)</a>
 <a href="#" class="btn btn-link">[**SaezLab**](https://twitter.com/saezlab)</a>
 
-
 ```{r chunk_setup, include = FALSE}
+#https://bootswatch.com/3/flatly/
+
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
@@ -74,7 +75,7 @@ bib <- c(
 </div>
 
 We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within **MetaProViz**. You can find those tutorial on the top under the "Tutorial" button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:\
-- [Standard metabolomics data](https://saezlab.github.io/decoupleR/articles/decoupleR.html)
+- [Standard metabolomics data](Standard-Metabolomics.html)
 - [Consumption-Release (CoRe) metabolomics data from cell culture media](CoRe-Metabolomics.html)
 \
 Here you will find a brief overview and information about the installation of the package and its dependencies.

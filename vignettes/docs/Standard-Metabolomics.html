@@ -494,6 +494,14 @@ MetaProViz</strong></a></a> <a href="#" class="btn btn-link"><a
 href="https://twitter.com/FrezzaLab"><strong>FrezzaLab</strong></a></a>
 <a href="#" class="btn btn-link"><a
 href="https://twitter.com/saezlab"><strong>SaezLab</strong></a></a></p>
+<style>
+.vscroll-plot {
+    width: 1000px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
 <div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 100%">
 
@@ -724,8 +732,8 @@ identifier:</p>
 </div>
 </div>
 </div>
-<div id="run-metaproviz-functions" class="section level1">
-<h1>2. Run MetaProViz functions</h1>
+<div id="run-metaproviz-analysis" class="section level1">
+<h1>2. Run MetaProViz Analysis</h1>
 <div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 550%">
 
@@ -1538,8 +1546,155 @@ Positive</td>
 </table>
 <p>Next lets try kmeans clustering:</p>
 </div>
-<div id="visualisation-viz" class="section level2">
-<h2>2.4. Visualisation (Viz)</h2>
+<div id="ora" class="section level2">
+<h2>2.4. ORA</h2>
+<p>Over Representation Analyis: Some general information</p>
+<p>Also refer to decoupleR, if the user wants to perform other
+enrichment analysis!</p>
+<p>Explain what is needed in a pathway file and name some resources the
+user could scrape.</p>
+<p>The pathway file:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>PathwayInput <span class="ot">&lt;-</span> Pathways[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>)]<span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">&quot;term&quot;</span><span class="ot">=</span><span class="st">&quot;Pathway&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>PathwayInput<span class="sc">$</span>Description <span class="ot">&lt;-</span> PathwayInput<span class="sc">$</span>term</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check how our data looks like:</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(PathwayInput[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,] , <span class="at">caption =</span> <span class="st">&quot;Summary of MCA: 2 Conditions.&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<table style="width:100%;">
+<caption>Summary of MCA: 2 Conditions.</caption>
+<colgroup>
+<col width="22%" />
+<col width="38%" />
+<col width="38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Metabolite</th>
+<th align="left">term</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">N-acetylaspartate</td>
+<td align="left">Alanine, aspartate and glutamate metabolism</td>
+<td align="left">Alanine, aspartate and glutamate metabolism</td>
+</tr>
+<tr class="even">
+<td align="left">argininosuccinate</td>
+<td align="left">Alanine, aspartate and glutamate metabolism</td>
+<td align="left">Alanine, aspartate and glutamate metabolism</td>
+</tr>
+<tr class="odd">
+<td align="left">N-acetylaspartylglutamate</td>
+<td align="left">Alanine, aspartate and glutamate metabolism</td>
+<td align="left">Alanine, aspartate and glutamate metabolism</td>
+</tr>
+<tr class="even">
+<td align="left">creatinine</td>
+<td align="left">Arginine and proline metabolism</td>
+<td align="left">Arginine and proline metabolism</td>
+</tr>
+<tr class="odd">
+<td align="left">4-guanidinobutanoate</td>
+<td align="left">Arginine and proline metabolism</td>
+<td align="left">Arginine and proline metabolism</td>
+</tr>
+</tbody>
+</table>
+<div id="ora-on-metabolite-clusters" class="section level3">
+<h3>ORA on metabolite clusters</h3>
+<p>From the MCA (see section 2.3), we obtain clusters of metabolites.
+Now we can run ORA on each of those clusters using all metabolites as
+the background (discuss to remove the metabolites that are not in
+background, which can happen in the two-cond, not for kmeans though)</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">MC_ORA</span>(<span class="at">Input_data=</span>MCAres,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">MetabCluster_lab=</span><span class="st">&quot;RG2_Significant&quot;</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">RemoveBackground=</span><span class="cn">TRUE</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">PathwayFile=</span>PathwayInput,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">PathwayName=</span><span class="st">&quot;Selfmade&quot;</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">minGSSize=</span><span class="dv">3</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">maxGSSize=</span><span class="dv">1000</span> ,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Save_as=</span><span class="st">&quot;svg&quot;</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">pCutoff=</span><span class="fl">0.2</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">PercentageCutoff=</span><span class="dv">10</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                   )</span></code></pre></div>
+<div class="vscroll-plot">
+<pre><code>#&gt; [1] &quot;None&quot;
+#&gt; [1] 131  28
+#&gt; 
+#&gt; [1] &quot;Core_DOWN&quot;
+#&gt; [1] 13 28
+#&gt; Warning in emapplot.enrichResult(x, showCategory = showCategory, ...): Use &#39;layout.params = list(layout = your_value)&#39; instead of &#39;layout&#39;.
+#&gt;  The layout parameter will be removed in the next version.</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-2.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; [1] &quot;Core_UP&quot;
+#&gt; [1] 30 28</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-3.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; Warning in emapplot.enrichResult(x, showCategory = showCategory, ...): Use &#39;layout.params = list(layout = your_value)&#39; instead of &#39;layout&#39;.
+#&gt;  The layout parameter will be removed in the next version.</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-4.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-5.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; [1] &quot;Cond1_UP&quot;
+#&gt; [1]  3 28</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-6.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; Warning in emapplot.enrichResult(x, showCategory = showCategory, ...): Use &#39;layout.params = list(layout = your_value)&#39; instead of &#39;layout&#39;.
+#&gt;  The layout parameter will be removed in the next version.</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-7.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-8.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; [1] &quot;Cond2_DOWN&quot;
+#&gt; [1]  2 28</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-9.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; Warning in emapplot.enrichResult(x, showCategory = showCategory, ...): Use &#39;layout.params = list(layout = your_value)&#39; instead of &#39;layout&#39;.
+#&gt;  The layout parameter will be removed in the next version.</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-10.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-11.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+<pre><code>#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?
+#&gt; `geom_line()`: Each group consists of only one observation.
+#&gt; ℹ Do you need to adjust the group aesthetic?</code></pre>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-12.png" width="768" style="display: block; margin: auto auto auto 0;" /></p>
+</div>
+<p><br />
+<br />
+</p>
+</div>
+<div id="on-dma" class="section level3">
+<h3>On DMA</h3>
+</div>
+</div>
+</div>
+<div id="run-metaproviz-visualisation" class="section level1">
+<h1>3. Run MetaProViz Visualisation</h1>
 <p>In general, each of the different plot types (e.g. Volcano plot,
 Lollipop graph,…) have 3 main <code>Plot_Settings</code>.<br />
 <code>1.</code> <code>"Standard"</code> is the standard version of the
@@ -1563,16 +1718,16 @@ results from the different analysis (DMA, MCA, GSE), which will help us
 to interpret our results as this can be sometimes difficult from the
 many data tables.</p>
 <div id="standard" class="section level4">
-<h4>Standard</h4>
+<h4><strong>Standard</strong></h4>
 <p>Here we will first look into the results from the differential
 analysis (see above 2.2 DMA) for the comparison of
 <code>HK2 versus 786M1A</code>:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-12-1.png" alt="Figure: Standard figure displaying DMA results." width="768" />
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: left">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-1.png" alt="Figure: Standard figure displaying DMA results." width="672" />
 <p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
@@ -1585,11 +1740,11 @@ and use this information to color code and/or to shape the dots on the
 volcano plot. In order to choose the right column we need to provide a
 vector Plot_SettingsInfo with this information.<br />
 </p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Settings <span class="ot">&lt;-</span> MCAres[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">15</span>)]<span class="sc">%&gt;%</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">&quot;Metabolite&quot;</span><span class="ot">=</span><span class="dv">1</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check our settings:</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Settings[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,] , <span class="at">caption =</span> <span class="st">&quot;Settings for plots.&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>Settings <span class="ot">&lt;-</span> MCAres[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">15</span>)]<span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">&quot;Metabolite&quot;</span><span class="ot">=</span><span class="dv">1</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check our settings:</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Settings[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,] , <span class="at">caption =</span> <span class="st">&quot;Settings for plots.&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <table>
 <caption>Settings for plots.</caption>
 <thead>
@@ -1617,46 +1772,46 @@ vector Plot_SettingsInfo with this information.<br />
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>),</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA colour coded for metabolic clusters&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-13-1.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="768" />
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>),</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA colour coded for metabolic clusters&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: left">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-1.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672" />
 <p class="caption">
 Figure: Standard figure displaying DMA results colour coded/shaped for
 metabolic clusters from MCA results.
 </p>
 </div>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">shape=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>),</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-13-2.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="768" />
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">#If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">shape=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>),</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: left">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-2.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672" />
 <p class="caption">
 Figure: Standard figure displaying DMA results colour coded/shaped for
 metabolic clusters from MCA results.
 </p>
 </div>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Of course, we can also adapt both, color and shape for the same parameter:</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">shape=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>),</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-13-3.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="768" />
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Of course, we can also adapt both, color and shape for the same parameter:</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">shape=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: left">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-3.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672" />
 <p class="caption">
 Figure: Standard figure displaying DMA results colour coded/shaped for
 metabolic clusters from MCA results.
@@ -1666,10 +1821,10 @@ metabolic clusters from MCA results.
 Given that we also know, which metabolic pathway the metabolites
 correspond to, we can add this information into the plot too.<br />
 </p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>Settings <span class="ot">&lt;-</span> <span class="fu">merge</span>(Settings, Pathways, <span class="at">by=</span><span class="st">&quot;Metabolite&quot;</span>, <span class="at">all.x=</span><span class="cn">TRUE</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check our settings:</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Settings[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,] , <span class="at">caption =</span> <span class="st">&quot;Settings for plots.&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>Settings <span class="ot">&lt;-</span> <span class="fu">merge</span>(Settings, Pathways, <span class="at">by=</span><span class="st">&quot;Metabolite&quot;</span>, <span class="at">all.x=</span><span class="cn">TRUE</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check our settings:</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(Settings[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,] , <span class="at">caption =</span> <span class="st">&quot;Settings for plots.&quot;</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <table>
 <caption>Settings for plots.</caption>
 <colgroup>
@@ -1719,16 +1874,16 @@ correspond to, we can add this information into the plot too.<br />
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">shape=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">color=</span><span class="st">&quot;Pathway&quot;</span>),</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-14-1.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results." width="768" />
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">shape=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">color=</span><span class="st">&quot;Pathway&quot;</span>),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: left">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-17-1.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results." width="672" />
 <p class="caption">
 Figure: Standard figure displaying DMA results colour coded for
 metabolic pathways and shaped for metabolic clusters from MCA results.
@@ -1737,263 +1892,78 @@ metabolic pathways and shaped for metabolic clusters from MCA results.
 <p><br />
 We immediately see that there are many pathways displayed on the plot,
 which can make it difficult to interpret. Hence, we will change our plot
-settings in order to get individual plots for each of the
-pathways:<br />
-</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Now we can generate a plot for each pathway and color for the metabolite clusters:</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">individual=</span><span class="st">&quot;Pathway&quot;</span>),</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-1.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-2.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-3.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-4.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
+settings in order to get individual plots for each of the pathways:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Now we can generate a plot for each pathway and color for the metabolite clusters:</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Standard&quot;</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">color=</span><span class="st">&quot;RG3_SignificantChange&quot;</span>, <span class="at">individual=</span><span class="st">&quot;Pathway&quot;</span>),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 versus 786M1A&quot;</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA shape for metabolic clusters&quot;</span> )</span></code></pre></div>
+<div class="vscroll-plot">
+<p><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-1.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-2.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-3.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-4.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 <pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-5.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
+<p><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-5.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 <pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-6.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-7.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-8.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-9.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-10.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-11.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-12.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-13.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-14.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
+<p><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-6.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-7.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-8.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-9.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-10.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-11.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-12.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-13.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-14.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 <pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-15.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
-</div>
+<p><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-15.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 <pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-15-16.png" alt="Figure: Standard figure displaying DMA results for each pathway, colour coded for metabolic clusters from MCA results." width="768" />
-<p class="caption">
-Figure: Standard figure displaying DMA results for each pathway, colour
-coded for metabolic clusters from MCA results.
-</p>
+<p><img src="Standard-Metabolomics_files/figure-html/Run_not_Display-16.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 </div>
+<p><br />
+<br />
+<br />
+</p>
 </div>
 <div id="comparison" class="section level4">
-<h4>Comparison</h4>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Compare&quot;</span>,</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                       <span class="co">#Plot_SettingsInfo= c(color=&quot;RG3_SignificantChange&quot;, individual=&quot;Pathway&quot;),</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                       <span class="co">#Plot_SettingsFile= Settings,</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span>DMA_HK2v786M2A,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 vs. 786M1A compared to HK2 vs. 786M2A&quot;</span>,</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-1.png" alt="Figure: Comparison." width="576" />
+<h4><strong>Comparison</strong></h4>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Compare&quot;</span>,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                       <span class="co">#Plot_SettingsInfo= c(color=&quot;RG3_SignificantChange&quot;, individual=&quot;Pathway&quot;),</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                       <span class="co">#Plot_SettingsFile= Settings,</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span>DMA_HK2v786M2A,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 vs. 786M1A compared to HK2 vs. 786M2A&quot;</span>,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span> )</span></code></pre></div>
+<div class="figure" style="text-align: left">
+<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-18-1.png" alt="Figure: Comparison." width="672" />
 <p class="caption">
 Figure: Comparison.
 </p>
 </div>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Compare&quot;</span>,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">individual=</span><span class="st">&quot;Pathway&quot;</span>),</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span>DMA_HK2v786M2A,</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 vs. 786M1A compared to HK2 vs. 786M2A&quot;</span>,</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span> )</span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-2.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-3.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-4.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-5.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
+<p>Now we do individual plots again:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>MetaProViz<span class="sc">::</span><span class="fu">VizVolcano</span>(<span class="at">Plot_Settings=</span><span class="st">&quot;Compare&quot;</span>,</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsInfo=</span> <span class="fu">c</span>(<span class="at">individual=</span><span class="st">&quot;Pathway&quot;</span>),</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Plot_SettingsFile=</span> Settings,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Input_data=</span>DMA_HK2v786M1A,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">AdditionalInput_data=</span>DMA_HK2v786M2A,</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">OutputPlotName=</span> <span class="st">&quot;HK2 vs. 786M1A compared to HK2 vs. 786M2A&quot;</span>,</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Subtitle=</span> <span class="st">&quot;Results of DMA&quot;</span> )</span></code></pre></div>
+<div class="vscroll-plot">
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-3.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-4.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 <pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-6.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-5.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 <pre><code>#&gt; Warning: Removed 1 rows containing missing values (`geom_vline()`).</code></pre>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-7.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-8.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-9.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-10.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-11.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-12.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-13.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-14.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-15.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-16.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-16-17.png" alt="Figure: Comparison." width="576" />
-<p class="caption">
-Figure: Comparison.
-</p>
+<p><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-6.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-7.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-8.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-9.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-10.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-11.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-12.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-13.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-14.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-15.png" width="672" style="display: block; margin: auto auto auto 0;" /><img src="Standard-Metabolomics_files/figure-html/unnamed-chunk-20-16.png" width="672" style="display: block; margin: auto auto auto 0;" /></p>
 </div>
 </div>
 <div id="gse" class="section level4">
-<h4>GSE</h4>
-<hr />
-<p class="text-success">
-*Now you have finished with the example run for standard metabolomics
-data. #2
-</p>
+<h4><strong>GSE</strong></h4>
+<p>If you have performed Gene Set Enrichment (GSE) analysis such as ORA
+or GSEA, we can also plot the results or add the information into the
+Figure legends.</p>
+<ol style="list-style-type: decimal">
+<li>Plot_SettingsFile = Pathway file used for e.g. ORA. –&gt; column
+term or pathway = individual</li>
+<li>Additional_File = Results of ORA or GSEA</li>
+<li>Rename setting GSE to something else as this could also be more
+unspecific and we don’t do gene set enrichment, but metabolite!</li>
+<li>Use subtitle to display the performed tests information –&gt; this
+can be passed by the user by adding another column into
+Plot_SettingsInfo –&gt; need to ensure that this column exists in
+Additional_File of ORA/GSEA –&gt; this could e.g. NES score and p.adj of
+this pathway –&gt; Here this would need to be combined before!</li>
+</ol>
 <br />
 <br />
 <br />
@@ -2006,10 +1976,8 @@ data. #2
 </div>
 </div>
 </div>
-</div>
 <div id="session-information" class="section level1">
 <h1>Session information</h1>
-<hr />
 <pre><code>#&gt; ─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
 #&gt;  setting  value
 #&gt;  version  R version 4.2.2 (2022-10-31 ucrt)
@@ -2020,136 +1988,198 @@ data. #2
 #&gt;  collate  English_United Kingdom.utf8
 #&gt;  ctype    English_United Kingdom.utf8
 #&gt;  tz       Europe/Berlin
-#&gt;  date     2023-07-03
+#&gt;  date     2023-07-04
 #&gt;  pandoc   2.19.2 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)
 #&gt; 
 #&gt; ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
-#&gt;  ! package         * version    date (UTC) lib source
-#&gt;    abind             1.4-5      2016-07-21 [1] CRAN (R 4.2.0)
-#&gt;    backports         1.4.1      2021-12-13 [1] CRAN (R 4.2.0)
-#&gt;    brio              1.1.3      2021-11-30 [1] CRAN (R 4.2.2)
-#&gt;    broom             1.0.3      2023-01-25 [1] CRAN (R 4.2.2)
-#&gt;    bslib             0.4.2      2022-12-16 [1] CRAN (R 4.2.2)
-#&gt;    cachem            1.0.6      2021-08-19 [1] CRAN (R 4.2.2)
-#&gt;    callr             3.7.3      2022-11-02 [1] CRAN (R 4.2.2)
-#&gt;    car               3.1-1      2022-10-19 [1] CRAN (R 4.2.2)
-#&gt;    carData           3.0-5      2022-01-06 [1] CRAN (R 4.2.2)
-#&gt;    class             7.3-20     2022-01-16 [2] CRAN (R 4.2.2)
-#&gt;    cli               3.6.0      2023-01-09 [1] CRAN (R 4.2.2)
-#&gt;    codetools         0.2-18     2020-11-04 [2] CRAN (R 4.2.2)
-#&gt;    colorspace        2.1-0      2023-01-23 [1] CRAN (R 4.2.2)
-#&gt;    crayon            1.5.2      2022-09-29 [1] CRAN (R 4.2.2)
-#&gt;    desc              1.4.2      2022-09-08 [1] CRAN (R 4.2.2)
-#&gt;    devtools          2.4.5      2022-10-11 [1] CRAN (R 4.2.2)
-#&gt;    digest            0.6.31     2022-12-11 [1] CRAN (R 4.2.2)
-#&gt;    dplyr           * 1.1.0      2023-01-29 [1] CRAN (R 4.2.2)
-#&gt;    easyalluvial      0.3.1      2022-07-05 [1] CRAN (R 4.2.2)
-#&gt;    ellipsis          0.3.2      2021-04-29 [1] CRAN (R 4.2.2)
-#&gt;    EnhancedVolcano   1.16.0     2022-11-01 [1] Bioconductor
-#&gt;    evaluate          0.20       2023-01-17 [1] CRAN (R 4.2.2)
-#&gt;    factoextra        1.0.7      2020-04-01 [1] CRAN (R 4.2.2)
-#&gt;    fansi             1.0.4      2023-01-22 [1] CRAN (R 4.2.2)
-#&gt;    farver            2.1.1      2022-07-06 [1] CRAN (R 4.2.2)
-#&gt;    fastmap           1.1.0      2021-01-25 [1] CRAN (R 4.2.2)
-#&gt;    forcats         * 1.0.0      2023-01-29 [1] CRAN (R 4.2.2)
-#&gt;    fs                1.6.0      2023-01-23 [1] CRAN (R 4.2.2)
-#&gt;    future            1.31.0     2023-02-01 [1] CRAN (R 4.2.2)
-#&gt;    future.apply      1.10.0     2022-11-05 [1] CRAN (R 4.2.2)
-#&gt;    generics          0.1.3      2022-07-05 [1] CRAN (R 4.2.2)
-#&gt;    ggalluvial        0.12.4     2023-02-03 [1] CRAN (R 4.2.2)
-#&gt;    ggplot2         * 3.4.2      2023-04-03 [1] CRAN (R 4.2.3)
-#&gt;    ggpubr            0.5.0      2022-11-16 [1] CRAN (R 4.2.2)
-#&gt;    ggrepel           0.9.3      2023-02-03 [1] CRAN (R 4.2.2)
-#&gt;    ggridges          0.5.4      2022-09-26 [1] CRAN (R 4.2.2)
-#&gt;    ggsignif          0.6.4      2022-10-13 [1] CRAN (R 4.2.2)
-#&gt;    globals           0.16.2     2022-11-21 [1] CRAN (R 4.2.2)
-#&gt;    glue              1.6.2      2022-02-24 [1] CRAN (R 4.2.2)
-#&gt;    gower             1.0.1      2022-12-22 [1] CRAN (R 4.2.2)
-#&gt;    gridExtra         2.3        2017-09-09 [1] CRAN (R 4.2.2)
-#&gt;    gtable            0.3.1      2022-09-01 [1] CRAN (R 4.2.2)
-#&gt;    gtools            3.9.4      2022-11-27 [1] CRAN (R 4.2.2)
-#&gt;    hardhat           1.2.0      2022-06-30 [1] CRAN (R 4.2.2)
-#&gt;    hash              2.2.6.2    2022-03-22 [1] CRAN (R 4.2.2)
-#&gt;    highr             0.10       2022-12-22 [1] CRAN (R 4.2.2)
-#&gt;    hms               1.1.2      2022-08-19 [1] CRAN (R 4.2.2)
-#&gt;    htmltools         0.5.4      2022-12-07 [1] CRAN (R 4.2.2)
-#&gt;    htmlwidgets       1.6.1      2023-01-07 [1] CRAN (R 4.2.2)
-#&gt;    httpuv            1.6.8      2023-01-12 [1] CRAN (R 4.2.2)
-#&gt;    inflection        1.3.6      2022-06-15 [1] CRAN (R 4.2.2)
-#&gt;    ipred             0.9-13     2022-06-02 [1] CRAN (R 4.2.2)
-#&gt;    jquerylib         0.1.4      2021-04-26 [1] CRAN (R 4.2.2)
-#&gt;    jsonlite          1.8.4      2022-12-06 [1] CRAN (R 4.2.2)
-#&gt;    knitr             1.42       2023-01-25 [1] CRAN (R 4.2.2)
-#&gt;    labeling          0.4.2      2020-10-20 [1] CRAN (R 4.2.0)
-#&gt;    later             1.3.0      2021-08-18 [1] CRAN (R 4.2.2)
-#&gt;    lattice           0.20-45    2021-09-22 [2] CRAN (R 4.2.2)
-#&gt;    lava              1.7.1      2023-01-06 [1] CRAN (R 4.2.2)
-#&gt;    lifecycle         1.0.3      2022-10-07 [1] CRAN (R 4.2.2)
-#&gt;    listenv           0.9.0      2022-12-16 [1] CRAN (R 4.2.2)
-#&gt;    lubridate       * 1.9.1      2023-01-24 [1] CRAN (R 4.2.2)
-#&gt;    magrittr          2.0.3      2022-03-30 [1] CRAN (R 4.2.2)
-#&gt;    MASS              7.3-58.1   2022-08-03 [2] CRAN (R 4.2.2)
-#&gt;    Matrix            1.5-1      2022-09-13 [2] CRAN (R 4.2.2)
-#&gt;    memoise           2.0.1      2021-11-26 [1] CRAN (R 4.2.2)
-#&gt;  P MetaProViz      * 0.0.0.9000 2023-02-16 [?] load_all()
-#&gt;    mime              0.12       2021-09-28 [1] CRAN (R 4.2.0)
-#&gt;    miniUI            0.1.1.1    2018-05-18 [1] CRAN (R 4.2.2)
-#&gt;    munsell           0.5.0      2018-06-12 [1] CRAN (R 4.2.2)
-#&gt;    nnet              7.3-18     2022-09-28 [2] CRAN (R 4.2.2)
-#&gt;    parallelly        1.34.0     2023-01-13 [1] CRAN (R 4.2.2)
-#&gt;    pillar            1.8.1      2022-08-19 [1] CRAN (R 4.2.2)
-#&gt;    pkgbuild          1.4.0      2022-11-27 [1] CRAN (R 4.2.2)
-#&gt;    pkgconfig         2.0.3      2019-09-22 [1] CRAN (R 4.2.2)
-#&gt;    pkgload           1.3.2      2022-11-16 [1] CRAN (R 4.2.2)
-#&gt;    prettyunits       1.1.1      2020-01-24 [1] CRAN (R 4.2.2)
-#&gt;    processx          3.8.0      2022-10-26 [1] CRAN (R 4.2.2)
-#&gt;    prodlim           2019.11.13 2019-11-17 [1] CRAN (R 4.2.2)
-#&gt;    profvis           0.3.7      2020-11-02 [1] CRAN (R 4.2.2)
-#&gt;    progressr         0.13.0     2023-01-10 [1] CRAN (R 4.2.2)
-#&gt;    promises          1.2.0.1    2021-02-11 [1] CRAN (R 4.2.2)
-#&gt;    ps                1.7.2      2022-10-26 [1] CRAN (R 4.2.2)
-#&gt;    purrr           * 1.0.1      2023-01-10 [1] CRAN (R 4.2.2)
-#&gt;    qcc               2.7        2017-07-11 [1] CRAN (R 4.2.2)
-#&gt;    R6                2.5.1      2021-08-19 [1] CRAN (R 4.2.2)
-#&gt;    ragg              1.2.5      2023-01-12 [1] CRAN (R 4.2.2)
-#&gt;    RColorBrewer      1.1-3      2022-04-03 [1] CRAN (R 4.2.0)
-#&gt;    Rcpp              1.0.10     2023-01-22 [1] CRAN (R 4.2.2)
-#&gt;    readr           * 2.1.3      2022-10-01 [1] CRAN (R 4.2.2)
-#&gt;    recipes           1.0.4      2023-01-11 [1] CRAN (R 4.2.2)
-#&gt;    remotes           2.4.2      2021-11-30 [1] CRAN (R 4.2.2)
-#&gt;    rlang             1.1.0      2023-03-14 [1] CRAN (R 4.2.3)
-#&gt;    rmarkdown         2.20       2023-01-19 [1] CRAN (R 4.2.2)
-#&gt;    rpart             4.1.19     2022-10-21 [2] CRAN (R 4.2.2)
-#&gt;    rprojroot         2.0.3      2022-04-02 [1] CRAN (R 4.2.2)
-#&gt;    rstatix           0.7.2      2023-02-01 [1] CRAN (R 4.2.2)
-#&gt;    rstudioapi        0.14       2022-08-22 [1] CRAN (R 4.2.2)
-#&gt;    sass              0.4.5      2023-01-24 [1] CRAN (R 4.2.2)
-#&gt;    scales            1.2.1      2022-08-20 [1] CRAN (R 4.2.2)
-#&gt;    sessioninfo       1.2.2      2021-12-06 [1] CRAN (R 4.2.2)
-#&gt;    shiny             1.7.4      2022-12-15 [1] CRAN (R 4.2.2)
-#&gt;    stringi           1.7.12     2023-01-11 [1] CRAN (R 4.2.2)
-#&gt;    stringr         * 1.5.0      2022-12-02 [1] CRAN (R 4.2.2)
-#&gt;    survival          3.4-0      2022-08-09 [2] CRAN (R 4.2.2)
-#&gt;    svglite           2.1.1      2023-01-10 [1] CRAN (R 4.2.2)
-#&gt;    systemfonts       1.0.4      2022-02-11 [1] CRAN (R 4.2.2)
-#&gt;    testthat        * 3.1.6      2022-12-09 [1] CRAN (R 4.2.2)
-#&gt;    textshaping       0.3.6      2021-10-13 [1] CRAN (R 4.2.2)
-#&gt;    tibble          * 3.1.8      2022-07-22 [1] CRAN (R 4.2.2)
-#&gt;    tidyr           * 1.3.0      2023-01-24 [1] CRAN (R 4.2.2)
-#&gt;    tidyselect        1.2.0      2022-10-10 [1] CRAN (R 4.2.2)
-#&gt;    tidyverse       * 2.0.0      2023-02-22 [1] CRAN (R 4.2.3)
-#&gt;    timechange        0.2.0      2023-01-11 [1] CRAN (R 4.2.2)
-#&gt;    timeDate          4022.108   2023-01-07 [1] CRAN (R 4.2.2)
-#&gt;    tzdb              0.3.0      2022-03-28 [1] CRAN (R 4.2.2)
-#&gt;    urlchecker        1.0.1      2021-11-30 [1] CRAN (R 4.2.2)
-#&gt;    usethis           2.1.6      2022-05-25 [1] CRAN (R 4.2.2)
-#&gt;    utf8              1.2.2      2021-07-24 [1] CRAN (R 4.2.2)
-#&gt;    vctrs             0.5.2      2023-01-23 [1] CRAN (R 4.2.2)
-#&gt;    withr             2.5.0      2022-03-03 [1] CRAN (R 4.2.2)
-#&gt;    writexl           1.4.2      2023-01-06 [1] CRAN (R 4.2.2)
-#&gt;    xfun              0.36       2022-12-21 [1] CRAN (R 4.2.2)
-#&gt;    xtable            1.8-4      2019-04-21 [1] CRAN (R 4.2.2)
-#&gt;    yaml              2.3.7      2023-01-23 [1] CRAN (R 4.2.2)
+#&gt;  ! package          * version    date (UTC) lib source
+#&gt;    abind              1.4-5      2016-07-21 [1] CRAN (R 4.2.0)
+#&gt;    AnnotationDbi      1.60.0     2022-11-01 [1] Bioconductor
+#&gt;    ape                5.7-1      2023-03-13 [1] CRAN (R 4.2.3)
+#&gt;    aplot              0.1.10     2023-03-08 [1] CRAN (R 4.2.3)
+#&gt;    backports          1.4.1      2021-12-13 [1] CRAN (R 4.2.0)
+#&gt;    Biobase            2.58.0     2022-11-01 [1] Bioconductor
+#&gt;    BiocGenerics       0.44.0     2022-11-01 [1] Bioconductor
+#&gt;    BiocParallel       1.32.5     2022-12-27 [1] Bioconductor
+#&gt;    Biostrings         2.66.0     2022-11-01 [1] Bioconductor
+#&gt;    bit                4.0.5      2022-11-15 [1] CRAN (R 4.2.2)
+#&gt;    bit64              4.0.5      2020-08-30 [1] CRAN (R 4.2.2)
+#&gt;    bitops             1.0-7      2021-04-24 [1] CRAN (R 4.2.0)
+#&gt;    blob               1.2.3      2022-04-10 [1] CRAN (R 4.2.2)
+#&gt;    brio               1.1.3      2021-11-30 [1] CRAN (R 4.2.2)
+#&gt;    broom              1.0.3      2023-01-25 [1] CRAN (R 4.2.2)
+#&gt;    bslib              0.4.2      2022-12-16 [1] CRAN (R 4.2.2)
+#&gt;    cachem             1.0.6      2021-08-19 [1] CRAN (R 4.2.2)
+#&gt;    callr              3.7.3      2022-11-02 [1] CRAN (R 4.2.2)
+#&gt;    car                3.1-1      2022-10-19 [1] CRAN (R 4.2.2)
+#&gt;    carData            3.0-5      2022-01-06 [1] CRAN (R 4.2.2)
+#&gt;    class              7.3-20     2022-01-16 [2] CRAN (R 4.2.2)
+#&gt;    cli                3.6.0      2023-01-09 [1] CRAN (R 4.2.2)
+#&gt;    clusterProfiler    4.6.2      2023-03-05 [1] Bioconductor
+#&gt;    codetools          0.2-18     2020-11-04 [2] CRAN (R 4.2.2)
+#&gt;    colorspace         2.1-0      2023-01-23 [1] CRAN (R 4.2.2)
+#&gt;    cowplot            1.1.1      2020-12-30 [1] CRAN (R 4.2.2)
+#&gt;    crayon             1.5.2      2022-09-29 [1] CRAN (R 4.2.2)
+#&gt;    data.table         1.14.8     2023-02-17 [1] CRAN (R 4.2.2)
+#&gt;    DBI                1.1.3      2022-06-18 [1] CRAN (R 4.2.2)
+#&gt;    desc               1.4.2      2022-09-08 [1] CRAN (R 4.2.2)
+#&gt;    devtools           2.4.5      2022-10-11 [1] CRAN (R 4.2.2)
+#&gt;    digest             0.6.31     2022-12-11 [1] CRAN (R 4.2.2)
+#&gt;    DOSE               3.24.2     2022-11-21 [1] Bioconductor
+#&gt;    downloader         0.4        2015-07-09 [1] CRAN (R 4.2.3)
+#&gt;    dplyr            * 1.1.0      2023-01-29 [1] CRAN (R 4.2.2)
+#&gt;    easyalluvial       0.3.1      2022-07-05 [1] CRAN (R 4.2.2)
+#&gt;    ellipsis           0.3.2      2021-04-29 [1] CRAN (R 4.2.2)
+#&gt;    EnhancedVolcano    1.16.0     2022-11-01 [1] Bioconductor
+#&gt;    enrichplot         1.18.4     2023-04-03 [1] Bioconductor
+#&gt;    evaluate           0.20       2023-01-17 [1] CRAN (R 4.2.2)
+#&gt;    factoextra         1.0.7      2020-04-01 [1] CRAN (R 4.2.2)
+#&gt;    fansi              1.0.4      2023-01-22 [1] CRAN (R 4.2.2)
+#&gt;    farver             2.1.1      2022-07-06 [1] CRAN (R 4.2.2)
+#&gt;    fastmap            1.1.0      2021-01-25 [1] CRAN (R 4.2.2)
+#&gt;    fastmatch          1.1-3      2021-07-23 [1] CRAN (R 4.2.0)
+#&gt;    fgsea              1.24.0     2022-11-01 [1] Bioconductor
+#&gt;    forcats          * 1.0.0      2023-01-29 [1] CRAN (R 4.2.2)
+#&gt;    fs                 1.6.0      2023-01-23 [1] CRAN (R 4.2.2)
+#&gt;    future             1.31.0     2023-02-01 [1] CRAN (R 4.2.2)
+#&gt;    future.apply       1.10.0     2022-11-05 [1] CRAN (R 4.2.2)
+#&gt;    generics           0.1.3      2022-07-05 [1] CRAN (R 4.2.2)
+#&gt;    GenomeInfoDb       1.34.9     2023-02-02 [1] Bioconductor
+#&gt;    GenomeInfoDbData   1.2.9      2023-02-03 [1] Bioconductor
+#&gt;    ggalluvial         0.12.4     2023-02-03 [1] CRAN (R 4.2.2)
+#&gt;    ggforce            0.4.1      2022-10-04 [1] CRAN (R 4.2.2)
+#&gt;    ggfun              0.0.9      2022-11-21 [1] CRAN (R 4.2.3)
+#&gt;    ggnewscale         0.4.8      2022-10-06 [1] CRAN (R 4.2.3)
+#&gt;    ggplot2          * 3.4.2      2023-04-03 [1] CRAN (R 4.2.3)
+#&gt;    ggplotify          0.1.0      2021-09-02 [1] CRAN (R 4.2.3)
+#&gt;    ggpubr             0.5.0      2022-11-16 [1] CRAN (R 4.2.2)
+#&gt;    ggraph             2.1.0      2022-10-09 [1] CRAN (R 4.2.2)
+#&gt;    ggrepel            0.9.3      2023-02-03 [1] CRAN (R 4.2.2)
+#&gt;    ggridges           0.5.4      2022-09-26 [1] CRAN (R 4.2.2)
+#&gt;    ggsignif           0.6.4      2022-10-13 [1] CRAN (R 4.2.2)
+#&gt;    ggtree             3.6.2      2022-11-13 [1] Bioconductor
+#&gt;    ggupset            0.3.0      2020-05-05 [1] CRAN (R 4.2.2)
+#&gt;    globals            0.16.2     2022-11-21 [1] CRAN (R 4.2.2)
+#&gt;    glue               1.6.2      2022-02-24 [1] CRAN (R 4.2.2)
+#&gt;    GO.db              3.16.0     2023-04-11 [1] Bioconductor
+#&gt;    GOSemSim           2.24.0     2022-11-01 [1] Bioconductor
+#&gt;    gower              1.0.1      2022-12-22 [1] CRAN (R 4.2.2)
+#&gt;    graphlayouts       0.8.4      2022-11-24 [1] CRAN (R 4.2.2)
+#&gt;    gridExtra          2.3        2017-09-09 [1] CRAN (R 4.2.2)
+#&gt;    gridGraphics       0.5-1      2020-12-13 [1] CRAN (R 4.2.3)
+#&gt;    gson               0.1.0      2023-03-07 [1] CRAN (R 4.2.3)
+#&gt;    gtable             0.3.1      2022-09-01 [1] CRAN (R 4.2.2)
+#&gt;    gtools             3.9.4      2022-11-27 [1] CRAN (R 4.2.2)
+#&gt;    hardhat            1.2.0      2022-06-30 [1] CRAN (R 4.2.2)
+#&gt;    hash               2.2.6.2    2022-03-22 [1] CRAN (R 4.2.2)
+#&gt;    HDO.db             0.99.1     2023-04-11 [1] Bioconductor
+#&gt;    highr              0.10       2022-12-22 [1] CRAN (R 4.2.2)
+#&gt;    hms                1.1.2      2022-08-19 [1] CRAN (R 4.2.2)
+#&gt;    htmltools          0.5.4      2022-12-07 [1] CRAN (R 4.2.2)
+#&gt;    htmlwidgets        1.6.1      2023-01-07 [1] CRAN (R 4.2.2)
+#&gt;    httpuv             1.6.8      2023-01-12 [1] CRAN (R 4.2.2)
+#&gt;    httr               1.4.5      2023-02-24 [1] CRAN (R 4.2.2)
+#&gt;    igraph             1.3.5      2022-09-22 [1] CRAN (R 4.2.2)
+#&gt;    inflection         1.3.6      2022-06-15 [1] CRAN (R 4.2.2)
+#&gt;    ipred              0.9-13     2022-06-02 [1] CRAN (R 4.2.2)
+#&gt;    IRanges            2.32.0     2022-11-01 [1] Bioconductor
+#&gt;    jquerylib          0.1.4      2021-04-26 [1] CRAN (R 4.2.2)
+#&gt;    jsonlite           1.8.4      2022-12-06 [1] CRAN (R 4.2.2)
+#&gt;    KEGGREST           1.38.0     2022-11-01 [1] Bioconductor
+#&gt;    knitr              1.42       2023-01-25 [1] CRAN (R 4.2.2)
+#&gt;    labeling           0.4.2      2020-10-20 [1] CRAN (R 4.2.0)
+#&gt;    later              1.3.0      2021-08-18 [1] CRAN (R 4.2.2)
+#&gt;    lattice            0.20-45    2021-09-22 [2] CRAN (R 4.2.2)
+#&gt;    lava               1.7.1      2023-01-06 [1] CRAN (R 4.2.2)
+#&gt;    lazyeval           0.2.2      2019-03-15 [1] CRAN (R 4.2.2)
+#&gt;    lifecycle          1.0.3      2022-10-07 [1] CRAN (R 4.2.2)
+#&gt;    listenv            0.9.0      2022-12-16 [1] CRAN (R 4.2.2)
+#&gt;    lubridate        * 1.9.1      2023-01-24 [1] CRAN (R 4.2.2)
+#&gt;    magrittr           2.0.3      2022-03-30 [1] CRAN (R 4.2.2)
+#&gt;    MASS               7.3-58.1   2022-08-03 [2] CRAN (R 4.2.2)
+#&gt;    Matrix             1.5-1      2022-09-13 [2] CRAN (R 4.2.2)
+#&gt;    memoise            2.0.1      2021-11-26 [1] CRAN (R 4.2.2)
+#&gt;  P MetaProViz       * 0.0.0.9000 2023-02-16 [?] load_all()
+#&gt;    mime               0.12       2021-09-28 [1] CRAN (R 4.2.0)
+#&gt;    miniUI             0.1.1.1    2018-05-18 [1] CRAN (R 4.2.2)
+#&gt;    munsell            0.5.0      2018-06-12 [1] CRAN (R 4.2.2)
+#&gt;    nlme               3.1-160    2022-10-10 [2] CRAN (R 4.2.2)
+#&gt;    nnet               7.3-18     2022-09-28 [2] CRAN (R 4.2.2)
+#&gt;    parallelly         1.34.0     2023-01-13 [1] CRAN (R 4.2.2)
+#&gt;    patchwork          1.1.2      2022-08-19 [1] CRAN (R 4.2.3)
+#&gt;    pillar             1.8.1      2022-08-19 [1] CRAN (R 4.2.2)
+#&gt;    pkgbuild           1.4.0      2022-11-27 [1] CRAN (R 4.2.2)
+#&gt;    pkgconfig          2.0.3      2019-09-22 [1] CRAN (R 4.2.2)
+#&gt;    pkgload            1.3.2      2022-11-16 [1] CRAN (R 4.2.2)
+#&gt;    plyr               1.8.8      2022-11-11 [1] CRAN (R 4.2.2)
+#&gt;    png                0.1-8      2022-11-29 [1] CRAN (R 4.2.2)
+#&gt;    polyclip           1.10-4     2022-10-20 [1] CRAN (R 4.2.1)
+#&gt;    prettyunits        1.1.1      2020-01-24 [1] CRAN (R 4.2.2)
+#&gt;    processx           3.8.0      2022-10-26 [1] CRAN (R 4.2.2)
+#&gt;    prodlim            2019.11.13 2019-11-17 [1] CRAN (R 4.2.2)
+#&gt;    profvis            0.3.7      2020-11-02 [1] CRAN (R 4.2.2)
+#&gt;    progressr          0.13.0     2023-01-10 [1] CRAN (R 4.2.2)
+#&gt;    promises           1.2.0.1    2021-02-11 [1] CRAN (R 4.2.2)
+#&gt;    ps                 1.7.2      2022-10-26 [1] CRAN (R 4.2.2)
+#&gt;    purrr            * 1.0.1      2023-01-10 [1] CRAN (R 4.2.2)
+#&gt;    qcc                2.7        2017-07-11 [1] CRAN (R 4.2.2)
+#&gt;    qvalue             2.30.0     2022-11-01 [1] Bioconductor
+#&gt;    R6                 2.5.1      2021-08-19 [1] CRAN (R 4.2.2)
+#&gt;    ragg               1.2.5      2023-01-12 [1] CRAN (R 4.2.2)
+#&gt;    RColorBrewer       1.1-3      2022-04-03 [1] CRAN (R 4.2.0)
+#&gt;    Rcpp               1.0.10     2023-01-22 [1] CRAN (R 4.2.2)
+#&gt;    RCurl              1.98-1.10  2023-01-27 [1] CRAN (R 4.2.2)
+#&gt;    readr            * 2.1.3      2022-10-01 [1] CRAN (R 4.2.2)
+#&gt;    recipes            1.0.4      2023-01-11 [1] CRAN (R 4.2.2)
+#&gt;    remotes            2.4.2      2021-11-30 [1] CRAN (R 4.2.2)
+#&gt;    reshape2           1.4.4      2020-04-09 [1] CRAN (R 4.2.2)
+#&gt;    rlang              1.1.0      2023-03-14 [1] CRAN (R 4.2.3)
+#&gt;    rmarkdown          2.20       2023-01-19 [1] CRAN (R 4.2.2)
+#&gt;    rpart              4.1.19     2022-10-21 [2] CRAN (R 4.2.2)
+#&gt;    rprojroot          2.0.3      2022-04-02 [1] CRAN (R 4.2.2)
+#&gt;    RSQLite            2.2.20     2022-12-22 [1] CRAN (R 4.2.2)
+#&gt;    rstatix            0.7.2      2023-02-01 [1] CRAN (R 4.2.2)
+#&gt;    rstudioapi         0.14       2022-08-22 [1] CRAN (R 4.2.2)
+#&gt;    S4Vectors          0.36.1     2022-12-05 [1] Bioconductor
+#&gt;    sass               0.4.5      2023-01-24 [1] CRAN (R 4.2.2)
+#&gt;    scales             1.2.1      2022-08-20 [1] CRAN (R 4.2.2)
+#&gt;    scatterpie         0.1.8      2022-09-03 [1] CRAN (R 4.2.3)
+#&gt;    sessioninfo        1.2.2      2021-12-06 [1] CRAN (R 4.2.2)
+#&gt;    shadowtext         0.1.2      2022-04-22 [1] CRAN (R 4.2.3)
+#&gt;    shiny              1.7.4      2022-12-15 [1] CRAN (R 4.2.2)
+#&gt;    stringi            1.7.12     2023-01-11 [1] CRAN (R 4.2.2)
+#&gt;    stringr          * 1.5.0      2022-12-02 [1] CRAN (R 4.2.2)
+#&gt;    survival           3.4-0      2022-08-09 [2] CRAN (R 4.2.2)
+#&gt;    svglite            2.1.1      2023-01-10 [1] CRAN (R 4.2.2)
+#&gt;    systemfonts        1.0.4      2022-02-11 [1] CRAN (R 4.2.2)
+#&gt;    testthat         * 3.1.6      2022-12-09 [1] CRAN (R 4.2.2)
+#&gt;    textshaping        0.3.6      2021-10-13 [1] CRAN (R 4.2.2)
+#&gt;    tibble           * 3.1.8      2022-07-22 [1] CRAN (R 4.2.2)
+#&gt;    tidygraph          1.2.3      2023-02-01 [1] CRAN (R 4.2.2)
+#&gt;    tidyr            * 1.3.0      2023-01-24 [1] CRAN (R 4.2.2)
+#&gt;    tidyselect         1.2.0      2022-10-10 [1] CRAN (R 4.2.2)
+#&gt;    tidytree           0.4.2      2022-12-18 [1] CRAN (R 4.2.3)
+#&gt;    tidyverse        * 2.0.0      2023-02-22 [1] CRAN (R 4.2.3)
+#&gt;    timechange         0.2.0      2023-01-11 [1] CRAN (R 4.2.2)
+#&gt;    timeDate           4022.108   2023-01-07 [1] CRAN (R 4.2.2)
+#&gt;    treeio             1.22.0     2022-11-01 [1] Bioconductor
+#&gt;    tweenr             2.0.2      2022-09-06 [1] CRAN (R 4.2.2)
+#&gt;    tzdb               0.3.0      2022-03-28 [1] CRAN (R 4.2.2)
+#&gt;    urlchecker         1.0.1      2021-11-30 [1] CRAN (R 4.2.2)
+#&gt;    usethis            2.1.6      2022-05-25 [1] CRAN (R 4.2.2)
+#&gt;    utf8               1.2.2      2021-07-24 [1] CRAN (R 4.2.2)
+#&gt;    vctrs              0.5.2      2023-01-23 [1] CRAN (R 4.2.2)
+#&gt;    viridis            0.6.2      2021-10-13 [1] CRAN (R 4.2.2)
+#&gt;    viridisLite        0.4.1      2022-08-22 [1] CRAN (R 4.2.2)
+#&gt;    vroom              1.6.1      2023-01-22 [1] CRAN (R 4.2.2)
+#&gt;    withr              2.5.0      2022-03-03 [1] CRAN (R 4.2.2)
+#&gt;    writexl            1.4.2      2023-01-06 [1] CRAN (R 4.2.2)
+#&gt;    xfun               0.36       2022-12-21 [1] CRAN (R 4.2.2)
+#&gt;    xtable             1.8-4      2019-04-21 [1] CRAN (R 4.2.2)
+#&gt;    XVector            0.38.0     2022-11-01 [1] Bioconductor
+#&gt;    yaml               2.3.7      2023-01-23 [1] CRAN (R 4.2.2)
+#&gt;    yulab.utils        0.0.6      2022-12-20 [1] CRAN (R 4.2.2)
+#&gt;    zlibbioc           1.44.0     2022-11-01 [1] Bioconductor
 #&gt; 
 #&gt;  [1] C:/Users/chris/AppData/Local/R/win-library/4.2
 #&gt;  [2] C:/Program Files/R/R-4.2.2/library
