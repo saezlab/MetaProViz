@@ -681,13 +681,13 @@ VizPCA <- function(Input_data,
 #####################################
 ### ### ### Volcano Plots ### ### ###
 #####################################
-#' @param Plot_Settings \emph{Optional: } Choose between "Standard" (Input_data), "Compare" (plot two comparisons together Input_data and Input_data2) or "GSE" (Gene Set Enrichment results) \strong{Default = "Standard"}
-#' @param Plot_SettingsInfo \emph{Optional: } Named vector including at least one of those three information: c(color="File$ColumnName", shape= "ColumnName", individual="ColumnName") \strong{Default = NULL}
+#' @param Plot_Settings \emph{Optional: } Choose between "Standard" (Input_data), "Compare" (plot two comparisons together Input_data and Input_data2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
+#' @param Plot_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Plot_Settings="Standard" or "Compare": c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile", individual="ColumnName_Plot_SettingsFile"). For Plot_Settings="PEA" a named vector with c(PEA_Pathway="ColumnNameAdditionalInput_data", PEA_score="ColumnNameAdditionalInput_data", PEA_stat= "ColumnNameAdditionalInput_data", individual="Plot_SettingsFile), optionally you can additionally include c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile").\strong{Default = NULL}
 #' @param Plot_SettingsFile \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param Input_data DF with column "Metabolite" including the Metabolite names, Log2FC, pvalue/padjusted values. Can also include additional columns with metadata usable for Plot_Setting_Info.
 #' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
-#' @param AdditionalInput_data \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Plot_Settings="Compare") or Gene set enrichment analysis results (Plot_Settings="GSE"). \strong{Default = NULL}
+#' @param AdditionalInput_data \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Plot_Settings="Compare") or Pathway enrichment analysis results (Plot_Settings="PEA"). \strong{Default = NULL}
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
 #'
 #' @param Comparison_name \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Plot_Settings= "Compare". \strong{Default = c(Input_data="Cond1", AdditionalInput_data= "Cond2")}
@@ -757,7 +757,7 @@ VizVolcano <- function(Plot_Settings="Standard",
   }
 
   # 2. The Plot_settings: Plot_Settings, Plot_SettingInfo and Plot_SettingFile
-  Plot_options <- c("Standard", "Compare", "GSE")
+  Plot_options <- c("Standard", "Compare", "PEA")
   if (Plot_Settings %in% Plot_options == FALSE){
     stop("Plot_Settings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
     }
@@ -790,11 +790,20 @@ VizVolcano <- function(Plot_Settings="Standard",
       Plot_SettingsFile <- Plot_SettingsFile%>%
         dplyr::rename("individual"=paste(Plot_SettingsInfo[["individual"]]))
       }
-    }else if(is.null(Plot_SettingsInfo)==TRUE){
-      #No vector provided
-    }else{
+    } else{
       stop("Plot_SettingsInfo must be named vector or NULL.")
     }
+
+  if(Plot_Settings=="PEA" & is.vector(Plot_SettingsInfo)==FALSE){
+    stop("You have chosen Plot_Settings=`PEA` that requires you to provide a vector for Plot_SettingsInfo.")
+  }else if(Plot_Settings=="PEA" & is.null(Plot_SettingsFile)==TRUE){
+    stop("You have chosen Plot_Settings=`PEA` that requires you to provide a DF Plot_SettingsFile including the pathways used for the enrichment analysis.")
+  } else if(Plot_Settings=="PEA" & is.null(Plot_SettingsFile)==FALSE & is.null(Plot_SettingsFile)==FALSE){
+  if("individual" %in% names(Plot_SettingsInfo)==FALSE | "PEA_score" %in% names(Plot_SettingsInfo)==FALSE | "PEA_stat" %in% names(Plot_SettingsInfo)==FALSE | "PEA_Pathway" %in% names(Plot_SettingsInfo)==FALSE){
+      stop("You have chosen Plot_Settings=`PEA` that requires you to provide a vector for Plot_SettingsInfo including `individual`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
+  }
+  }
+
 
    #3. AdditionalInput_data
    if(Plot_Settings=="Compare" & is.data.frame(AdditionalInput_data)==TRUE){
@@ -821,9 +830,14 @@ VizVolcano <- function(Plot_Settings="Standard",
     stop("If Plot_Settings=`Comparison` you have to provide a DF for AdditionalInput_data.")
    }
 
-  if(Plot_Settings=="GSE" & is.data.frame(AdditionalInput_data)==TRUE){
-
-  }
+   if(Plot_Settings=="PEA" & is.data.frame(AdditionalInput_data)==FALSE){
+      stop("If Plot_Settings=`PEA` you have to provide a DF for AdditionalInput_data including the results of an enrichment analysis.")
+     } else if(Plot_Settings=="PEA" & is.data.frame(AdditionalInput_data)==TRUE){
+       AdditionalInput_data <- AdditionalInput_data%>%
+        dplyr::rename("PEA_score"=paste(Plot_SettingsInfo[["PEA_score"]]),
+                      "PEA_stat"=paste(Plot_SettingsInfo[["PEA_stat"]]),
+                      "PEA_Pathway"=paste(Plot_SettingsInfo[["PEA_Pathway"]]))
+       }
 
   # 4. Check other plot-specific parameters:
     if(is.null(color_palette)){
@@ -924,8 +938,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
-                                                  title= paste(OutputPlotName),
-                                                  subtitle = i,
+                                                  title= paste(OutputPlotName, ": ", i, sep=""),
+                                                  subtitle = Subtitle,
                                                   caption = paste0("total = ", nrow(InputVolcano), " Metabolites"),
                                                   xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
@@ -1119,8 +1133,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
-                                                  title= paste(OutputPlotName),
-                                                  subtitle = i,
+                                                  title= paste(OutputPlotName, ": ", i, sep=""),
+                                                  subtitle = Subtitle,
                                                   caption = paste0("total = ", (nrow(InputVolcano)/2), " Metabolites"),
                                                   xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
@@ -1258,8 +1272,123 @@ VizVolcano <- function(Plot_Settings="Standard",
         plot(Plot)
       }
     }
-  #####--- 3. GSE
-  } else if(Plot_Settings=="GSE"){############################################################################################################
+  #####--- 3. PEA
+  } else if(Plot_Settings=="PEA"){############################################################################################################
+    # Create the list of individual plots that should be made:
+    IndividualPlots <- Plot_SettingsFile[!duplicated(Plot_SettingsFile$individual),]
+    IndividualPlots <- IndividualPlots$individual
+
+    PlotList <- list()#Empty list to store all the plots
+
+    for (i in IndividualPlots){
+      Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
+      InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+        na.omit()
+
+      AdditionalInput_data_Select<- subset(AdditionalInput_data, PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
+
+      if(nrow(InputVolcano)>=1){
+        #Prepare the colour scheme:
+        if("color" %in% names(Plot_SettingsInfo)==TRUE){
+          color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+
+          keyvals <- c()
+          for(row in 1:nrow(InputVolcano)){
+            col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
+            names(col) <- InputVolcano$color[row]
+            keyvals <- c(keyvals, col)
+          }
+        } else{#here we will use the conditions if no other color is provided!
+          color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$comparison))]
+
+          keyvals <- c()
+          for(row in 1:nrow(InputVolcano)){
+            col <- color_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
+            names(col) <- InputVolcano$comparison[row]
+            keyvals <- c(keyvals, col)
+          }
+        }
+        #Prepare the shape scheme:
+        if("shape" %in% names(Plot_SettingsInfo)==TRUE & "color" %in% names(Plot_SettingsInfo)==FALSE){
+          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
+
+          keyvalsshape <- c()
+          for(row in 1:nrow(InputVolcano)){
+            sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
+            names(sha) <- InputVolcano$shape[row]
+            keyvalsshape <- c(keyvalsshape, sha)
+          }
+        } else if("shape" %in% names(Plot_SettingsInfo)==TRUE & "color" %in% names(Plot_SettingsInfo)==TRUE){
+          #Here we have already used color from Plot_SettingsInfo and we need to use shape for the conditions
+          message("For Plot_setting= `Consitions`we can only use colour or shape from Plot_SettingsFile. We ignore shape and use it to label the Comparison_name.")
+          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
+
+          keyvalsshape <- c()
+          for(row in 1:nrow(InputVolcano)){
+            sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
+            names(sha) <- InputVolcano$comparison[row]
+            keyvalsshape <- c(keyvalsshape, sha)
+          }
+        } else if("shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==FALSE){
+          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
+
+          keyvalsshape <- c()
+          for(row in 1:nrow(InputVolcano)){
+            sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
+            names(sha) <- InputVolcano$comparison[row]
+            keyvalsshape <- c(keyvalsshape, sha)
+          }
+        }
+        #Prepare the Plot:
+        Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+                                                lab = InputVolcano$Metabolite,#Metabolite name
+                                                x = paste(x),
+                                                y = paste(y),
+                                                xlab  =xlab,
+                                                ylab =ylab,
+                                                pCutoff = pCutoff,
+                                                FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
+                                                pointSize = 3,
+                                                labSize = 3,
+                                                titleLabSize = 16,
+                                                colCustom = keyvals,
+                                                shapeCustom = keyvalsshape,
+                                                colAlpha = 1,
+                                                title= paste(OutputPlotName, ": ", i, sep=""),
+                                                subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
+                                                caption = paste0("total = ", nrow(InputVolcano), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
+                                                xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
+                                                ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
+                                                cutoffLineType = "dashed",
+                                                cutoffLineCol = "black",
+                                                cutoffLineWidth = 0.5,
+                                                legendLabels=c(paste(x," < |", FCcutoff, "|"), paste(x," > |", FCcutoff, "|"), paste(y, ' < ', pCutoff) , paste(y, ' < ', pCutoff,' & ',x," < |", FCcutoff, "|")),
+                                                legendPosition = 'right',
+                                                legendLabSize = 7,
+                                                legendIconSize =4,
+                                                gridlines.major = FALSE,
+                                                gridlines.minor = FALSE,
+                                                drawConnectors = Connectors)
+        #Add the theme
+        if(is.null(Theme)==FALSE){
+          Plot <- Plot+Theme
+        }
+        #save plot and get rid of extra signs before saving
+        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+        }
+        ## Store the plot in the 'plots' list
+        PlotList[[cleaned_i]] <- Plot
+        plot(Plot)
+      }
+    }
+    # Return PlotList into the environment to enable the user to view the plots directly
+    #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
+    # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
+    Return <- PlotList
 
   }
 }
