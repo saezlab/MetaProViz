@@ -34,9 +34,9 @@ name: R-CMD-check-bioc
 ## Note that you can always run a GHA test without the cache by using the word
 ## "/nocache" in the commit message.
 env:
-  has_testthat: 'true'
-  run_covr: 'true'
-  run_pkgdown: 'true'
+  has_testthat: 'false' #unit-testing
+  run_covr: 'true' #coverage of documentation
+  run_pkgdown: 'false' # generates the gh-branch hosting stuff for .io (usethis package could help to make all of this); also I need .git to run on command line/terminal on windows
   has_RUnit: 'false'
   cache-version: 'cache-v1'
 
@@ -175,7 +175,7 @@ jobs:
       - name: Deploy package
         if: github.ref == 'refs/heads/master' && env.run_pkgdown == 'true' && runner.os == 'Linux'
         run: |
-          git config --global --add safe.directory /__w/decoupleR/decoupleR
+          git config --global --add safe.directory /__w/MetaProViz/MetaProViz
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           Rscript -e "pkgdown::deploy_to_branch(new_process = FALSE)"
@@ -185,9 +185,9 @@ jobs:
         ## branch (erasing anything you haven't version controlled!) and
         ## makes the git history recognizable by pkgdown.
 
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@master
-        with:
-          name: ${{ runner.os }}-biocversion-RELEASE_3_17-r-4.3-results
-          path: check
+      #- name: Upload check results
+      #  if: failure()
+      #  uses: actions/upload-artifact@master
+      #  with:
+       #   name: ${{ runner.os }}-biocversion-RELEASE_3_17-r-4.3-results
+       #   path: check
