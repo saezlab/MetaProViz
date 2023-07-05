@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# MetaProViz <img src="inst/figures/Hexagon_MetaProViz.png" align="right" width="200" />
+# MetaProViz <img src="vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
 
 
 <!-- badges: start -->
