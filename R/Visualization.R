@@ -695,6 +695,7 @@ VizPCA <- function(Input_data,
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
 #' @param pCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
 #' @param FCcutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param Legend \emph{Optional: } Legend=="Pie" will plot a PieChart as the legend for color or Legend="Standard, plot the standard legend for color. \strong{Default = "Standard"}
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
@@ -720,6 +721,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                        ylab= NULL,
                        pCutoff= 0.05,
                        FCcutoff= 0.5,
+                       Legend="Standard",
                        color_palette= NULL,
                        shape_palette=NULL,
                        Connectors=  FALSE,
@@ -790,7 +792,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       Plot_SettingsFile <- Plot_SettingsFile%>%
         dplyr::rename("individual"=paste(Plot_SettingsInfo[["individual"]]))
       }
-    } else{
+    } else if(is.vector(Plot_SettingsInfo)==FALSE & is.null(Plot_SettingsFile)==FALSE){
       stop("Plot_SettingsInfo must be named vector or NULL.")
     }
 
@@ -863,11 +865,16 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
     }
 
+    #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change paramter and give warning!
+
   #outputplotname
   #theme
   # Rename the x and y lab if the information has been passed:
   xlab=bquote(~Log[2]~FC)
   ylab=bquote(~-Log[10]~p.adj)
+
+  #Option PieChart isntead of legend:
+
 
 
   ## ------------ Create Output folders ----------- ##
@@ -897,7 +904,39 @@ VizVolcano <- function(Plot_Settings="Standard",
         na.omit()
 
         if(nrow(InputVolcano)>=1){
+
           #Prepare the colour scheme:
+          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
+            #Prepare Summary to make PieChart
+            color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+
+            Summary <- InputVolcano %>%
+              group_by(InputVolcano$color) %>%
+              summarise(percent = round(100 * n() / nrow(InputVolcano))) %>%
+              mutate(csum = rev(cumsum(rev(percent))),
+                     pos = percent/2 + lead(csum, 1),
+                     pos = if_else(is.na(pos), percent/2, pos))%>%
+              rename("Group"=1)
+            Summary$Label <- paste(Summary$Group, " (", Summary$percent, "%)")
+            Summary$Palette <- color_select
+
+            #Make PieChart
+            PieChart <- ggplot(Summary, aes(x="", y=percent, fill=Label))+
+              geom_col(width = 1, color = 1, alpha=0.7) +
+              coord_polar(theta = "y") +
+              scale_fill_manual(values=Summary$Palette)+
+              ggrepel::geom_label_repel(data = Summary,
+                               aes(y = pos, label = paste0(Group, " (", percent, "%)")),
+                               size = 3.5, nudge_x = 1, show.legend = FALSE, fill = "white") +
+              guides(fill = guide_legend(title = "Group")) +
+              theme_void()+
+              theme(legend.position = "none")
+
+            #Assign LegendParameter for EnahncedVolcano:
+            LegendPos<- "none"
+          } else if(Legend=="Standard"){
+            LegendPos<- "right"
+          }
           if("color" %in% names(Plot_SettingsInfo)==TRUE){
             color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
 
@@ -920,6 +959,8 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(sha) <- InputVolcano$shape[row]
               keyvalsshape <- c(keyvalsshape, sha)
             }
+            #Assign LegendParameter for EnahncedVolcano:
+            LegendPos<- "right"
           } else{
             keyvalsshape <-NULL
           }
@@ -941,13 +982,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
                                                   caption = paste0("total = ", nrow(InputVolcano), " Metabolites"),
-                                                  xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
+                                                  xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                   cutoffLineType = "dashed",
                                                   cutoffLineCol = "black",
                                                   cutoffLineWidth = 0.5,
                                                   legendLabels=c(paste(x," < |", FCcutoff, "|"), paste(x," > |", FCcutoff, "|"), paste(y, ' < ', pCutoff) , paste(y, ' < ', pCutoff,' & ',x," < |", FCcutoff, "|")),
-                                                  legendPosition = 'right',
+                                                  legendPosition = LegendPos,
                                                   legendLabSize = 7,
                                                   legendIconSize =4,
                                                   gridlines.major = FALSE,
@@ -955,8 +996,18 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   drawConnectors = Connectors)
           #Add the theme
           if(is.null(Theme)==FALSE){
-             Plot <- Plot+Theme
+            Plot <- Plot+Theme
           }
+
+          #Add PieChart
+          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
+            Plot <- Plot+ annotation_custom(
+              grob = ggplotGrob(PieChart),
+              xmin = (max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2), xmax =(max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.5),
+              ymin = ((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))+0.5), ymax =((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))-1.5)
+            )
+          }
+
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
           if(OutputPlotName ==""){
@@ -1026,7 +1077,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   title= paste(OutputPlotName),
                                                   subtitle = Subtitle,
                                                   caption = paste0("total = ", nrow(InputVolcano), " Metabolites"),
-                                                  xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
+                                                  xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                   cutoffLineType = "dashed",
                                                   cutoffLineCol = "black",
@@ -1136,7 +1187,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
                                                   caption = paste0("total = ", (nrow(InputVolcano)/2), " Metabolites"),
-                                                  xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
+                                                  xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                   cutoffLineType = "dashed",
                                                   cutoffLineCol = "black",
@@ -1246,7 +1297,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 title= paste(OutputPlotName),
                                                 subtitle = Subtitle,
                                                 caption = paste0("total = ", (nrow(InputVolcano)/2), " Metabolites"),
-                                                xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
+                                                xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
@@ -1357,7 +1408,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 title= paste(OutputPlotName, ": ", i, sep=""),
                                                 subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
                                                 caption = paste0("total = ", nrow(InputVolcano), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
-                                                xlim =  c(min(Input_data$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2,max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2),
+                                                xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
