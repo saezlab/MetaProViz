@@ -57,10 +57,10 @@ knitr::opts_chunk$set(
 A standard metabolomics experiment refers to intracellular extracts (e.g. cell or bacteria culture), to tissue samples (e.g. from animals or patients), to plasma samples (e.g. blood) and many other types of experimental setups.\
 \
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
-`1.` To process raw peak data and identify outliers.\
-`2.` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics.\
-`3.` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviours.\
-`4.` To use specific visualisations to aid biological interpretation of the results.\
+`-` To process raw peak data and identify outliers.\
+`-` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+`-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviours and perform pathway analysis using ORA on each cluster.\
+`-` To use specific visualisations to aid biological interpretation of the results.\
 \
 \
 First if you have not done yet, install the required dependencies and load the libraries:
@@ -104,6 +104,8 @@ knitr::kable(Intra[1:5, 1:7], caption = "Preview of the DF `Intra` including col
 ```
 \
 `2.` Pathway information mapping the trivial metabolite names to KEGG IDs and pathways **(Pathways)** \
+
+Note: Prepare the MetSigDB KEGG pathways based on KEGG IDs. Provide both: A mapping where we have one pathway assigned to one metabolite and the file for the Pathway analysis.
 ```{r}
 MetaProViz::toy_data(data="Pathways")
 
@@ -140,7 +142,8 @@ Currently, **MetaProViz** contains four different modules, which include differe
 `Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") (Bijlsma S. et al., 2006) or per condition (="Modified") (Yang, J et al., 2015). This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is poor and hence the metabolite should be removed from the data.\
 The paramteter `TIC_Normalization` refers to Total Ion Count (TIC) normalisation, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalisation should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects (Wulff et. al., (2018)).\
 The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) (Wei et. al., 2018 ,https://www.nature.com/articles/s41598-017-19120-0).\
-Lastly, the function `Preprocessing()` performs outlier detection and add a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence intervall that should be used for the Hotellins T2 outlier test (Hotelling, H., 1931, doi:https://doi.org/10.1214/aoms/1177732979.).\
+Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test (Hotelling, H., 1931, doi:https://doi.org/10.1214/aoms/1177732979.).\
+
 Notes on MVI: 
 - Wei quantile regression imputation of left-censored data (QRILC) as performing best even though HM performs better in some of their tests and quantile normalisation would not work well for normal distribution!
 - Show MVI results with different percentages (not just 50% as per half minimum!) --> implement parameter for user to change?
@@ -171,25 +174,24 @@ knitr::kable(Intra_Preprocessed[29:32, 1:7]%>%rownames_to_column("Code"), captio
 \
 In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an oulier in the first round of filtering.\
 As part of the `Preprocessing()` function several results are saved including quality control plots are saved, which we can further check for the outlier:
-\
-\
-<center>
 
-![](MetaProViz_Results_2023-06-26/Preprocessing/Quality_Control_PCA/PCA_Condition_Clustering.svg){width=100%}
-\
-\
-![](MetaProViz_Results_2023-06-26/Preprocessing/Outlier_detection/Hotelling_OD_round_1.svg){width=100%}
-</center>
+Show:
+Quality_Control_PCA/PCA_Condition_Clustering.svg){width=100%}
+Hotelling_OD_round_1.svg){width=100%}
+
 \
 Now we will remove the outlier before proceeding:\
 ```{r}
 Intra_Preprocessed <- Intra_Preprocessed[-29,]#remove MS55_29
 ```
 \
-As you may have noticed, in this example dataset we have several biological replicates that where injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum`, which will do this task and save the results:
+As you may have noticed, in this example dataset we have several biological replicates that where injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will do this task and save the results:
 ```{r}
 Intra_Preprocessed <- MetaProViz::ReplicateSum(Input_data=Intra_Preprocessed)
 ```
+
+--> point towards 3. Run MetaProViz Visualisation --> PCA options and heatmaps could both be usefull to have a closer look at the results!
+
 
 ## 2.2. DMA
 Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) calculates the Log2FC, p-value, adjusted p-value and t-value. With the different parameters of the `DMA` function one can choose the statistical tests to calculate the p-value and adjusted p-value (`STAT_pval` and `STAT_padj`). 
@@ -248,7 +250,7 @@ Why are the plots not shown?
 --> mention/show that the volcano plot is saved when Plot=TRUE
 
 ## 2.3. MCA
-Metabolite Clustering Analysis (`MCA`)is a module 
+Metabolite Clustering Analysis (`MCA`)is a module...
 
 
 Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
@@ -447,6 +449,33 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 \
 \
 
+```{r , eval=FALSE}
+#Now we can generate a plot for each pathway and color for the metabolite clusters:
+MetaProViz::VizVolcano(Plot_Settings="Standard",
+                       Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
+                       Plot_SettingsFile= Settings,
+                       Input_data=DMA_HK2v786M1A,
+                       OutputPlotName= "HK2 versus 786M1A",
+                       Subtitle= "Results of DMA shape for metabolic clusters",
+                       Legend="Pie")
+```
+
+<div class="vscroll-plot">
+```{r , echo=FALSE, fig.align="left", fig.width=7, fig.height=5}
+#Now we can generate a plot for each pathway and color for the metabolite clusters:
+MetaProViz::VizVolcano(Plot_Settings="Standard",
+                       Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
+                       Plot_SettingsFile= Settings,
+                       Input_data=DMA_HK2v786M1A,
+                       OutputPlotName= "HK2 versus 786M1A",
+                       Subtitle= "Results of DMA shape for metabolic clusters",
+                       Legend="Pie")
+```
+</div>
+\
+\
+\
+
 #### **Comparison**
 
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Comparison."}
@@ -483,8 +512,10 @@ MetaProViz::VizVolcano(Plot_Settings="Compare",
 ```
 </div>
 
-#### **GSE**
-If you have performed Gene Set Enrichment (GSE) analysis such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
+#### **PathwayEnrichmentAnalysis**
+If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
+
+
 
 1. Plot_SettingsFile = Pathway file used for e.g. ORA. --> column term or pathway = individual
 2. Additional_File = Results of ORA or GSEA
@@ -496,6 +527,10 @@ If you have performed Gene Set Enrichment (GSE) analysis such as ORA or GSEA, we
 \
 \
 \
+
+Generally: Do a vignette just for visuals? --> use bigger dataset, which will showcase better the usability of the visuals (e.g. from CCLE).
+
+
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>

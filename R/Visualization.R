@@ -806,7 +806,6 @@ VizVolcano <- function(Plot_Settings="Standard",
   }
   }
 
-
    #3. AdditionalInput_data
    if(Plot_Settings=="Compare" & is.data.frame(AdditionalInput_data)==TRUE){
     if(paste(x) %in% colnames(AdditionalInput_data)==TRUE & paste(y) %in% colnames(AdditionalInput_data)==TRUE){
@@ -865,16 +864,13 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
     }
 
-    #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change paramter and give warning!
+    #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change parameter and give warning!
 
   #outputplotname
   #theme
   # Rename the x and y lab if the information has been passed:
   xlab=bquote(~Log[2]~FC)
   ylab=bquote(~-Log[10]~p.adj)
-
-  #Option PieChart isntead of legend:
-
 
 
   ## ------------ Create Output folders ----------- ##
@@ -1033,8 +1029,38 @@ VizVolcano <- function(Plot_Settings="Standard",
             }
 
         if(nrow(InputVolcano)>=1){
-          #Prepare the colour scheme:
-          if("color" %in% names(Plot_SettingsInfo)==TRUE){
+          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
+            #Prepare Summary to make PieChart
+            color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+
+            Summary <- InputVolcano %>%
+              group_by(InputVolcano$color) %>%
+              summarise(percent = round(100 * n() / nrow(InputVolcano))) %>%
+              mutate(csum = rev(cumsum(rev(percent))),
+                     pos = percent/2 + lead(csum, 1),
+                     pos = if_else(is.na(pos), percent/2, pos))%>%
+              rename("Group"=1)
+            Summary$Label <- paste(Summary$Group, " (", Summary$percent, "%)")
+            Summary$Palette <- color_select
+
+            #Make PieChart
+            PieChart <- ggplot(Summary, aes(x="", y=percent, fill=Label))+
+              geom_col(width = 1, color = 1, alpha=0.7) +
+              coord_polar(theta = "y") +
+              scale_fill_manual(values=Summary$Palette)+
+              ggrepel::geom_label_repel(data = Summary,
+                                        aes(y = pos, label = paste0(Group, " (", percent, "%)")),
+                                        size = 3.5, nudge_x = 1, show.legend = FALSE, fill = "white") +
+              guides(fill = guide_legend(title = "Group")) +
+              theme_void()+
+              theme(legend.position = "none")
+
+            #Assign LegendParameter for EnahncedVolcano:
+            LegendPos<- "none"
+          } else if(Legend=="Standard"){
+            LegendPos<- "right"
+          }
+          if("color" %in% names(Plot_SettingsInfo)==TRUE ){
             color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -1056,6 +1082,8 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(sha) <- InputVolcano$shape[row]
               keyvalsshape <- c(keyvalsshape, sha)
             }
+            #Assign LegendParameter for EnahncedVolcano:
+            LegendPos<- "top"
           } else{
             keyvalsshape <-NULL
           }
@@ -1083,7 +1111,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   cutoffLineCol = "black",
                                                   cutoffLineWidth = 0.5,
                                                   legendLabels=c(paste(x," < |", FCcutoff, "|"), paste(x," > |", FCcutoff, "|"), paste(y, ' < ', pCutoff) , paste(y, ' < ', pCutoff,' & ',x," < |", FCcutoff, "|")),
-                                                  legendPosition = 'right',
+                                                  legendPosition = LegendPos,
                                                   legendLabSize = 7,
                                                   legendIconSize =4,
                                                   gridlines.major = FALSE,
@@ -1093,7 +1121,17 @@ VizVolcano <- function(Plot_Settings="Standard",
           if(is.null(Theme)==FALSE){
             Plot <- Plot+Theme
           }
-          #save plot and get rid of extra signs before saving i
+
+          #Add PieChart
+          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
+            Plot <- Plot+ annotation_custom(
+              grob = ggplotGrob(PieChart),
+              xmin = (max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC)])+0.2), xmax =(max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC)])+1.5),
+              ymin = ((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))+0.5), ymax =((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))-1.5)
+            )
+          }
+
+          #save plot and get rid of extra signs before saving
           if(OutputPlotName ==""){
             ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as, sep=""), plot=Plot, width=8, height=6)
           }else{
