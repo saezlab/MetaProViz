@@ -7,21 +7,28 @@
 \usage{
 MC_ORA(
   Input_data,
-  MetabCluster_lab = "RG2_Significant",
-  RemoveBackground = TRUE,
   PathwayFile,
   PathwayName = "",
   minGSSize = 10,
   maxGSSize = 1000,
-  Save_as = "pdf",
+  Save_as = "svg",
+  pCutoff = 0.2,
+  PercentageCutoff = 10
+)
+
+MC_ORA(
+  Input_data,
+  PathwayFile,
+  PathwayName = "",
+  minGSSize = 10,
+  maxGSSize = 1000,
+  Save_as = "svg",
   pCutoff = 0.2,
   PercentageCutoff = 10
 )
 }
 \arguments{
-\item{Input_data}{Input DF with column "Metabolite", which needs to match the identifier type in column ""Metabolite" in the PathwayFile.}
-
-\item{MetabCluster_lab}{\emph{Optional: } Provide column name for the metabolite cluster labels in the Input_data.\strong{default: "RG2_Significant"}}
+\item{Input_data}{Input DF with column "t.val" and column Metabolite", which needs to match the identifier type in column "Metabolite" in the PathwayFile.}
 
 \item{PathwayFile}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
 
@@ -37,14 +44,20 @@ MC_ORA(
 
 \item{PercentageCutoff}{\emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 10}}
 
-\item{RemoveBackgroundGenes\emph{Optional:}{} If TRUE, column "BG_Method" needs to be in Input_data, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: "TRUE"}}
+\item{MetabCluster_lab}{\emph{Optional: } Provide column name for the metabolite cluster labels in the Input_data.\strong{default: "RG2_Significant"}}
+
+\item{RemoveBackground\emph{Optional:}{} If TRUE, column "BG_Method" needs to be in Input_data, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}}
 }
 \value{
+Saves results as individual .csv files.
+
 Saves results as individual .csv files.
 }
 \description{
 This script allows you
 MC_ORA
+
+Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
 }
 \details{
 Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
