@@ -31,7 +31,6 @@
 #' @param Shape \emph{Optional: }String which contains the name of the output file of the Metabolic Clusters
 #' @param Show_Loadings  \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling  \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-# @param  Palette \emph{Optional: } ??
 #' @param Theme \emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = theme_classic} ??
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
@@ -45,7 +44,6 @@ VizPCA <- function(Input_data,
                    Shape = FALSE,
                    Show_Loadings = FALSE,
                    Scaling = TRUE,
-                   #Palette= "Set2".
                    Theme=theme_classic(),
                    OutputPlotName= '',
                    Save_as = "svg"
