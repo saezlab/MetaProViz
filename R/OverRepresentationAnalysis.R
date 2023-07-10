@@ -124,7 +124,7 @@ MC_ORA <- function(Input_data,
   ############################################################################################################
   ## ------------ Run ----------- ##
   # open the data
-  if(RemoveBackground=="TRUE"){
+  if(RemoveBackground==TRUE){
     df <- subset(Input_data, !Input_data$BG_Method == "FALSE")
   } else{
     df <- Input_data

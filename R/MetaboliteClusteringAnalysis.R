@@ -44,7 +44,19 @@
 ### ### ### Metabolite Clustering Analysis: 2 Conditions ### ### ###
 ##################################################
 
-MCA_2Cond <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1ValueCol="Log2FC",Cond1PadjCol="p.adj", Cond2ValueCol="Log2FC", Cond2PadjCol="p.adj",Cond1_padj_cutoff= 0.05, Cond2_padj_cutoff = 0.05,Cond1_FC_cutoff= 1, Cond2_FC_cutoff = 1, backgroundMethod="C1&C2", OutputFileName = "MCA_2Cond_"){
+MCA_2Cond <- function(Cond1_File,
+                      Cond2_File,
+                      MetaboliteID= "Metabolite",
+                      Cond1ValueCol="Log2FC",
+                      Cond1PadjCol="p.adj",
+                      Cond2ValueCol="Log2FC",
+                      Cond2PadjCol="p.adj",
+                      Cond1_padj_cutoff= 0.05,
+                      Cond2_padj_cutoff = 0.05,
+                      Cond1_FC_cutoff= 1,
+                      Cond2_FC_cutoff = 1,
+                      backgroundMethod="C1&C2",
+                      OutputFileName = "MCA_2Cond_"){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
