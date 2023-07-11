@@ -85,7 +85,7 @@ library(tidyverse)
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
-Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media. Here we use the integrated raw peak data as example data using the trival metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
 \
 <span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
 \
@@ -96,22 +96,9 @@ The raw data are available via [metabolomics workbench study ST002224](https://w
 devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
 
 MetaProViz::toy_data(data="Standard")
-#test <- load(MS51_RawPeakData.csv)#I need to save it as .RDS file to load it from there
-#saveRDS(globalenv(), "C:/Users/chris/Documents/GitHub/MetaProViz/inst/extdataStandard.rds")
 
 # Check how our data looks like:
 knitr::kable(Intra[1:5, 1:7], caption = "Preview of the DF `Intra` including columns with sample information and metabolite ids with their measured values.")
-```
-\
-`2.` Pathway information mapping the trivial metabolite names to KEGG IDs and pathways **(Pathways)** \
-
-Note: Prepare the MetSigDB KEGG pathways based on KEGG IDs. Provide both: A mapping where we have one pathway assigned to one metabolite and the file for the Pathway analysis.
-```{r}
-MetaProViz::toy_data(data="Pathways")
-
-# Check how our data looks like:
-knitr::kable(Pathways[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
-
 ```
 \
 We will split the experimental data into the sample information and the metabolites values using the the column "Code" as the unique identifier:
@@ -122,6 +109,23 @@ Intra_M <- Intra[1:47,-c(2:4)]%>%
 SampleInfo <-Intra[c(1:47),c(1:4)]%>%
   column_to_rownames("Code")
 
+```
+\
+`2.` Pathway information mapping the trivial metabolite names to KEGG IDs and selected pathways **(Pathways)** \
+```{r}
+MetaProViz::toy_data(data="Pathways")
+
+# Check how our data looks like:
+knitr::kable(Pathways[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
+```
+\
+`3.` KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis. **(KEGG_Pathways)**\
+```{r}
+#This will use KEGGREST to query the KEGG API to load the pathways:
+MetaProViz::Load_KEGG()
+
+# Check out how this looks:
+knitr::kable(KEGG_Pathways[1:5,], caption = "Preview of the DF `KEGG_Pathways`.")
 ```
 \
 \
@@ -135,49 +139,78 @@ SampleInfo <-Intra[c(1:47),c(1:4)]%>%
   <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
-Currently, **MetaProViz** contains four different modules, which include different methods and can be used independently from each other or in combination (see introduction for more details). Here we will go trough each of those modules and apply them to example data.
+Currently, **MetaProViz** contains four different modules, which include different methods and can be used independently from each other or in combination (see introduction for more details). Here we will go trough each of those modules and apply them to the example data.
 
-## 2.1. Pre-processing
+## Pre-processing
 **MetaProViz** includes a pre-processing module with the function `Preprocessing()` that has multiple parameters to perform customize data processing.\
-`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") (Bijlsma S. et al., 2006) or per condition (="Modified") (Yang, J et al., 2015). This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is poor and hence the metabolite should be removed from the data.\
+`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") (Bijlsma S. et al., 2006) or per condition (="Modified") (Yang, J et al., 2015). This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is pool and hence the metabolite should be removed from the data.\
 The paramteter `TIC_Normalization` refers to Total Ion Count (TIC) normalisation, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalisation should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects (Wulff et. al., (2018)).\
 The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) (Wei et. al., 2018 ,https://www.nature.com/articles/s41598-017-19120-0).\
 Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test (Hotelling, H., 1931, doi:https://doi.org/10.1214/aoms/1177732979.).\
 
 Notes on MVI: 
 - Wei quantile regression imputation of left-censored data (QRILC) as performing best even though HM performs better in some of their tests and quantile normalisation would not work well for normal distribution!
-- Show MVI results with different percentages (not just 50% as per half minimum!) --> implement parameter for user to change?
+- Show MVI results with different percentages (not just 50% as per half minimum!) --> implement parameter for user to change?!
 - Show that per feature imputation is advantageous over the "standard" imputation --> change standard to per feature!
+- Check out QRILC and see if its the same as in  proDA (https://www.bioconductor.org/packages/release/bioc/html/proDA.html) 
 \
-Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages:\
+Since our example data contains pool samples, we will do `Pool_Estimation()` before applying the `Preprocessing()` function. This is important, since one should remove the features (=metabolites) that are too variable prior to performing any data transformations such as TIC as part of the `Preprocessing()` function.\
 ```{r}
 #Do the pool control first!
 
-PPres <- MetaProViz::Preprocessing(Input_data=Intra_M,
+#--> remove features if needed.
+```
+\
+Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned to the global environment and can be easily viewed.\
+```{r}
+MetaProViz::Preprocessing(Input_data=Intra_M,
                           Experimental_design=SampleInfo,
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value = 0.8,
                           TIC_Normalization = TRUE,# As we have raw data we will perform total ion count normalisation
-                          MVI=TRUE, #We assume the values are not mising at random and perform half minimum missing value imputation
+                          MVI=TRUE, #We assume the values are not missing at random and perform half minimum missing value imputation
                           HotellinsConfidence = 0.99,# We perform outlier testing using 0.99 confidence intervall
-                          ExportQCPlots = TRUE,# we will save the quality control plots
+                          ExportQCPlots = TRUE,
                           CoRe = FALSE,# as we have a standard experiment and not a Consumption-Release (CoRe) experiment we set this to FALSE
-                          Save_as = "svg") #we will save the QC plots as .svg files
+                          Save_as = "svg") 
 
-Intra_Preprocessed <- PPres[["Processed_data"]]
+# Now we can have a look at the results table:
+Intra_Preprocessed <- PreProcessing_res[["Processed_data"]]
 
-
-# Check how our data looks like:
 knitr::kable(Intra_Preprocessed[29:32, 1:7]%>%rownames_to_column("Code"), caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.", row.names=FALSE)
 
 ```
 \
-In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an oulier in the first round of filtering.\
-As part of the `Preprocessing()` function several results are saved including quality control plots are saved, which we can further check for the outlier:
+In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an outlier in the first round of filtering.\
+As part of the `Preprocessing()` function several plots are generated, returned to the environment and saved. Those include the `Outlier_Plots`, which we can further check for the outlier:\
+```{r}
+#For each Round of HotellinsT2 test three plots will be saved:
+#1.PCA plot
+Outlier_Plots[[1]]
 
-Show:
-Quality_Control_PCA/PCA_Condition_Clustering.svg){width=100%}
-Hotelling_OD_round_1.svg){width=100%}
+#2.Screeplot
+Outlier_Plots[[2]]
+
+#3.Hotellins Outlier
+Outlier_Plots[[3]]
+
+################### 
+#If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
+#Here a second round was performed and the plots saved:
+Outlier_Plots[[4]]
+Outlier_Plots[[5]]
+Outlier_Plots[[6]]
+
+
+```
+I have a list with 6 elements, each of them being a plot. If I run `Outlier_Plots[[3]]` in the console , I will see the plot. Yet, if I knite the .rmd file I will only see `Outlier_Plots[[1]]`, not the others.
+
+\
+
+
+QC plots `QC_Plots` and
+ 
+
 
 \
 Now we will remove the outlier before proceeding:\
@@ -192,8 +225,7 @@ Intra_Preprocessed <- MetaProViz::ReplicateSum(Input_data=Intra_Preprocessed)
 
 --> point towards 3. Run MetaProViz Visualisation --> PCA options and heatmaps could both be usefull to have a closer look at the results!
 
-
-## 2.2. DMA
+## DMA
 Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) calculates the Log2FC, p-value, adjusted p-value and t-value. With the different parameters of the `DMA` function one can choose the statistical tests to calculate the p-value and adjusted p-value (`STAT_pval` and `STAT_padj`). 
 
 Notes DMA:
@@ -249,7 +281,10 @@ DMA_HK2v786M2A <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we n
 Why are the plots not shown? 
 --> mention/show that the volcano plot is saved when Plot=TRUE
 
-## 2.3. MCA
+### ORA using the DMA results
+
+
+## MCA
 Metabolite Clustering Analysis (`MCA`)is a module...
 
 
@@ -298,7 +333,7 @@ Next lets try kmeans clustering:
 
 ```
 
-## 2.4. ORA
+### ORA on each metabolite cluster
 Over Representation Analyis: Some general information
 
 Also refer to decoupleR, if the user wants to perform other enrichment analysis!
@@ -317,6 +352,7 @@ knitr::kable(PathwayInput[1:5,] , caption = "Summary of MCA: 2 Conditions.", row
 ```
 
 ### ORA on metabolite clusters
+
 From the MCA (see section 2.3), we obtain clusters of metabolites. Now we can run ORA on each of those clusters using all metabolites as the background (discuss to remove the metabolites that are not in background, which can happen in the two-cond, not for kmeans though)
 
 Here change function and just plot emapplot and upset if there is a minimum of two pathways!
@@ -448,9 +484,8 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 \
 \
 \
-
+If we have multiple clusters on one plot, we can also switch the colour legend to display as a pie chart, which gives us an overview on how much percent of each cluster is present in a pathway:
 ```{r , eval=FALSE}
-#Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
                        Plot_SettingsFile= Settings,
@@ -528,8 +563,16 @@ If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we 
 \
 \
 
-Generally: Do a vignette just for visuals? --> use bigger dataset, which will showcase better the usability of the visuals (e.g. from CCLE).
+### Lollipop graphs
 
+### Heatmaps
+
+### PCA plots
+
+### Bar/Box/Violin plots
+
+
+Generally: Do a vignette just for visuals? --> use bigger dataset, which will showcase better the usability of the visuals (e.g. from CCLE).
 
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>

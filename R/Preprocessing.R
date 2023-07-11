@@ -335,6 +335,7 @@ Preprocessing <- function(Input_data,
       scale_x_continuous(paste("PC1 ",summary(PCA.res)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(PCA.res)$importance[2,][[2]]*100,"%"))
 
+    plot.new()
     plot(pca_outlier)
     outlier_plot_list[[k]] <- recordPlot()
     dev.off()
@@ -359,6 +360,7 @@ Preprocessing <- function(Input_data,
                                linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
       annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 3)
 
+    plot.new()
     plot(screeplot)
     outlier_plot_list[[k]] <- recordPlot() # save plot
     dev.off()
@@ -396,6 +398,7 @@ Preprocessing <- function(Input_data,
     HotellingT2plot <- HotellingT2plot + theme(plot.title = element_text(size = 10, face = "bold")) +
       theme(axis.text = element_text(size = 12))
 
+    plot.new()
     plot(HotellingT2plot)
     outlier_plot_list[[k]] <- recordPlot()
     dev.off()
@@ -526,6 +529,7 @@ Preprocessing <- function(Input_data,
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
   ## PCA conditions and Outlier
+  plot.new()
   pca_QC <- ggplot(data = dtp) +
     geom_point(aes(x = PC1, y = PC2, color = Conditions, shape = Outliers), size = 4, alpha = 0.8) +
     ggtitle("Quality Control PCA Condition clustering and Outlier check")+
@@ -545,6 +549,7 @@ Preprocessing <- function(Input_data,
 
   if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
     ### ### QC PCA color for replicates
+    plot.new()
     pca_QC_repl <- ggplot(data = dtp) +
       geom_point(aes(x = PC1, y = PC2, colour = Experimental_design$Conditions, shape = as.factor(Experimental_design$Biological_Replicates)), size = 4, alpha = 0.8) +
       ggtitle("Quality Control PCA replicate spread check")+
