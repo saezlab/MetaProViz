@@ -576,7 +576,6 @@ Preprocessing <- function(Input_data,
 
   # Return the result
   assign("PreProcessing_res",  preprocessing_output_list, envir=.GlobalEnv)
-  return(preprocessing_output_list)
 }
 
 
@@ -664,7 +663,7 @@ ReplicateSum <- function(Input_data){
   writexl::write_xlsx(Input_data_numeric_summed, paste(Results_folder_Preprocessing_folder, "/ReplicateSum_output.xlsx", sep = ""))#,showNA = TRUE)
 
   # Return the result
-  message("Done")
+
   return(Input_data_numeric_summed)
 }
 
