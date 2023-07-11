@@ -183,8 +183,7 @@ Preprocessing <- function(Input_data,
     }
 
     miss <- c()
-    message("***Performing modified feature filtering***")
-   # for (i in unique_conditions){
+    # for (i in unique_conditions){
       split_Input <- split(Input_data, Conditions) # splits data frame into a list of dataframes by condition
 
       for (m in split_Input){ # Select metabolites to be filtered for different conditions
@@ -336,7 +335,6 @@ Preprocessing <- function(Input_data,
       scale_x_continuous(paste("PC1 ",summary(PCA.res)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(PCA.res)$importance[2,][[2]]*100,"%"))
 
-
     plot(pca_outlier)
     outlier_plot_list[[k]] <- recordPlot()
     dev.off()
@@ -412,6 +410,10 @@ Preprocessing <- function(Input_data,
            plot = HotellingT2plot, width = 10,height = 8)
     a = a+1
 
+    #Return the plots to environment:
+    #The `outlier_plot_list` contains all the different plots that are saved as part of the Hotellins T2 test rounds. For each round three plots are recorded.
+    assign("Outlier_Plots",  outlier_plot_list, envir=.GlobalEnv)
+
     # Here for the outliers we use confidence of 0.999 and p.val < 0.01.
     if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0){ # loop for outliers until no outlier is detected
       data_norm <- data_norm  # filter the selected outliers from the data
@@ -475,8 +477,6 @@ Preprocessing <- function(Input_data,
     write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
   }
 
-
-
   #############################################
   ### ### ### Make Output Dataframe ### ### ###
 
@@ -504,7 +504,6 @@ Preprocessing <- function(Input_data,
   data_norm_filtered_full <- merge(Experimental_design, data_norm_filtered_full,  by = 0) # add the design in the output df (merge by rownames/sample names)
   rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
   data_norm_filtered_full$Row.names <- c()
-
 
   ################################################
   ### ### ### Quality Control (QC) PCA ### ### ###
@@ -537,6 +536,9 @@ Preprocessing <- function(Input_data,
     scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
     scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
 
+  qc_plot_list <- list()
+  qc_plot_list[[1]] <- pca_QC
+
   if (ExportQCPlots == TRUE){
    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot = pca_QC, width = 10,  height = 8)
   }
@@ -552,12 +554,15 @@ Preprocessing <- function(Input_data,
       geom_text(aes(x = PC1, y = PC2, label = rownames(QC_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
       scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
+    qc_plot_list[[2]] <- pca_QC
 
     if (ExportQCPlots == TRUE){
       ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot = pca_QC_repl, width = 10,  height = 8)
     }
   }
 
+  #Return the QC plots to environment:
+  assign("QC_Plots",  qc_plot_list, envir=.GlobalEnv)
 
   #########################################################
   ### ### ###  Make list with output dataframes ### ### ###
@@ -570,7 +575,7 @@ Preprocessing <- function(Input_data,
   writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
 
   # Return the result
-  message("Done")
+  assign("PreProcessing_res",  preprocessing_output_list, envir=.GlobalEnv)
   return(preprocessing_output_list)
 }
 
