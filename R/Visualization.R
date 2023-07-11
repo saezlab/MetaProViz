@@ -1815,37 +1815,39 @@ VizAlluvial <- function(Input_data1,
 #####################################
 ### ### ### Lolipop Plots ### ### ###
 #####################################
-
-#' @param Input_data Dataframe which contains metabolites in rows and Log fold changes, pvalues and padjusted values in columns. Multiple Input data frames can be added using a list ie. list(df1, df2, df3)
+#' @param Plot_Settings \emph{Optional: } Choose between "Standard" (Input_data), "Compare" (plot two comparisons together Input_data and Input_data2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
+#' @param Plot_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Plot_Settings="Standard" or "Compare": c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile", individual="ColumnName_Plot_SettingsFile"). For Plot_Settings="PEA" a named vector with c(PEA_Pathway="ColumnNameAdditionalInput_data", PEA_score="ColumnNameAdditionalInput_data", PEA_stat= "ColumnNameAdditionalInput_data", individual="Plot_SettingsFile), optionally you can additionally include c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile").\strong{Default = NULL}
+#' @param Plot_SettingsFile \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
+#' @param Input_data DF with column "Metabolite" including the Metabolite names, Log2FC, pvalue/padjusted values. Can also include additional columns with metadata usable for Plot_Setting_Info. Multiple Input data frames can be added using a list ie. list(df1, df2, df3)
+#' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
 #' @param test \emph{Optional: } String which selects pvalue or padj for significance. \strong{Default = padj}
+#' @param Comparison_name \emph{Optional: } List including those information about the datasets that are compared on the plots when choosing Plot_Settings= "Compare". \strong{Default = list("Cond1", "Cond2")}
 #' @param pCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
 #' @param FCcutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot
-#' @param Input_pathways \emph{Optional: } DF which contains a 'Metabolite' and a 'Pathway' columns, with pathway information for each metabolite. It can be the same as Input_data or another data frame. \strong{Default = NULL}
-#' @param Plot_pathways \emph{Optional: } String with plotting information about Metabolite pathways. Available only when the Input_pathways parameter has a file. Options are "None" if no pathways are to be plotted, "Individual" for plots of each Individual pathway and "Together" for metabolite pathways color-coded on a single volcano plot \strong{Default = "Together"}
-#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
-#' @param CondNames \emph{Optional: } list of Input dataset names as strings when multiple input datasets are used. \strong{Default = Comparisson 1}
-#' @param Comparison \emph{Optional: } String that is placed as the plot title which multiple datasets are used. \strong{Default = Comparisson 1} ## add this to multiple = false
-#' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
+#' @param Legend \emph{Optional: } Legend=="Pie" will plot a PieChart as the legend for color or Legend="Standard, plot the standard legend for color. \strong{Default = "Standard"}
+#' @param Subtitle \emph{Optional: } \strong{Default = ""}
+#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = NULL}
 #'
-#' @keywords Volcano plot, pathways
+#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = "svg"}
+#'
+#' @keywords Lolipop plot, pathways
 #' @export
-#'
 
-VizLolipop <- function(Input_data, # a dataframe of list of dataframes
-                    test = "p.adj",
-                    pCutoff= 0.05 ,
-                    FCcutoff=0.5,
-                    OutputPlotName= "",
-                    Input_pathways = NULL,
-                    Plot_pathways = "None",# or "Individual" or "Together
-                    Theme=theme_classic(),
-                    CondNames = NULL, # list of dataframe names
-                    Comparison = "Plot Title",
-                    Save_as = "svg"
-                    ){
-
+# Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
+VizLolipop<- function(Plot_Settings="Standard",
+                      Plot_SettingsInfo= NULL,
+                      Plot_SettingsFile= NULL, # Input_pathways = NULL,
+                      Input_data, # a dataframe of list of dataframes
+                      test = "p.adj",
+                      pCutoff= 0.05 ,
+                      FCcutoff=0.5,
+                      # Legend="Standard",
+                      OutputPlotName= "The title",
+                      Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
+                      Subtitle= "",
+                      Theme= NULL,
+                      Save_as = "svg"
+){
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "showtext", "cowplot")
@@ -1854,75 +1856,144 @@ VizLolipop <- function(Input_data, # a dataframe of list of dataframes
   suppressMessages(library(tidyverse))
 
   ## ------------ Check Input files ----------- ##
+  # 1. The input data:
   if(inherits(Input_data,"list") ==FALSE){
     temp <- list(Input_data)
     Input_data <- temp
   }
+  if(inherits(Plot_SettingsFile,"list") ==FALSE){
+    temp <- list(Plot_SettingsFile)
+    Plot_SettingsFile <- temp
+  }
+  Plot_SettingsFile_List <- Plot_SettingsFile
+  if(length(Plot_SettingsFile_List)==1){
+    Plot_SettingsFile <- Plot_SettingsFile_List[[1]]
+  }
+
   for(data in Input_data){
     if(any(duplicated(row.names(data)))==TRUE){
       stop("Duplicated row.names of Input_data, whilst row.names must be unique")
     }
     if("Metabolite" %in% colnames(data) == FALSE){
-      stop("Check Input. Metabolite column is missing from Input_data")
+      stop("Check input. Input_data must contain a column named `Metabolite` including the metabolite names.")
     }
-    if(any(duplicated(data$Metabolite))==TRUE){
-      stop("Duplicated Metabolite names in Input_data, Metabolites must be unique")
+    # Check if the next lines work correctly in case of duplicated metabolties
+    if(length(data[duplicated(data$Metabolite), "Metabolite"]) > 0){
+      doublons <- as.character(data[duplicated(data$Metabolite), "Metabolite"])#number of duplications
+      data <-data[!duplicated(data$Metabolite),]#remove duplications
+      warning("Input_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running VizLolipop.")
     }
   }
 
+
+  # 2. The Plot_settings: Plot_Settings, Plot_SettingInfo and Plot_SettingFile
+  Plot_options <- c("Standard", "Compare", "PEA")
+  if (Plot_Settings %in% Plot_options == FALSE){
+    stop("Plot_Settings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+  }
+  if(is.vector(Plot_SettingsInfo)==TRUE & is.null(Plot_SettingsFile)==TRUE){
+    stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
+  }
+  if(is.vector(Plot_SettingsInfo)==TRUE){
+    if("color" %in% names(Plot_SettingsInfo)==TRUE & "size" %in% names(Plot_SettingsInfo)==TRUE){
+      if((Plot_SettingsInfo[["size"]] == Plot_SettingsInfo[["color"]])==TRUE){
+        Plot_SettingsFile$size <- Plot_SettingsFile[,paste(Plot_SettingsInfo[["color"]])]
+        Plot_SettingsFile<- Plot_SettingsFile%>%
+          dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+      }
+      if((Plot_SettingsInfo[["size"]] == Plot_SettingsInfo[["color"]])==FALSE & "color" %in% names(Plot_SettingsInfo)==TRUE){
+        Plot_SettingsFile <- Plot_SettingsFile%>%
+          dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+      }
+      if((Plot_SettingsInfo[["size"]] == Plot_SettingsInfo[["color"]])==FALSE & "size" %in% names(Plot_SettingsInfo)==TRUE){
+        Plot_SettingsFile <- Plot_SettingsFile%>%
+          dplyr::rename("size"=paste(Plot_SettingsInfo[["size"]]))
+      }
+      Plot_SettingsFile2 <- Plot_SettingsFile%>% select(Metabolite, color, size)########################################################
+    } else if("color" %in% names(Plot_SettingsInfo)==TRUE & "size" %in% names(Plot_SettingsInfo)==FALSE){
+      Plot_SettingsFile <- Plot_SettingsFile%>%
+        dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+      Plot_SettingsFile2 <- Plot_SettingsFile%>% select(Metabolite, color)##########################################################
+    } else if("color" %in% names(Plot_SettingsInfo)==FALSE & "size" %in% names(Plot_SettingsInfo)==TRUE){
+      if(length(Plot_SettingsFile_List)==1){
+        Plot_SettingsFile <- Plot_SettingsFile%>%
+          dplyr::rename("size"=paste(Plot_SettingsInfo[["size"]]))
+        Plot_SettingsFile2 <- Plot_SettingsFile%>% select(Metabolite,size) ##############################
+      }else if(length(Plot_SettingsFile_List)>1){
+        for(i in 1:length(Plot_SettingsFile)){
+          file <- Plot_SettingsFile[[i]]
+          file <- file%>%
+            dplyr::rename("size"=paste(Plot_SettingsInfo[["size"]]))
+          Plot_SettingsFile_List[[i]] <- file %>% select(Metabolite, size)
+          Plot_SettingsFile2 <- Plot_SettingsFile_List[[i]] # Needs fix This is not needed it is here for the code not to break
+        }
+      }
+    }
+    if("individual" %in% names(Plot_SettingsInfo)==TRUE){
+      if(length(Plot_SettingsFile_List)==1){
+        Plot_SettingsFile <- Plot_SettingsFile%>%
+          dplyr::rename("individual"=paste(Plot_SettingsInfo[["individual"]]))
+        if("color" %in% names(Plot_SettingsInfo) | "size" %in% names(Plot_SettingsInfo)){
+          Plot_SettingsFile3 <- Plot_SettingsFile %>% select(individual, Metabolite)
+          Plot_SettingsFile <- merge(Plot_SettingsFile2, Plot_SettingsFile3, by="Metabolite")
+        }
+      }else if(length(Plot_SettingsFile_List)>1){
+        for(i in 1:length(Plot_SettingsFile)){
+          file <- Plot_SettingsFile[[i]]
+          file <- file%>%
+            dplyr::rename("individual"=paste(Plot_SettingsInfo[["individual"]]))
+
+          if("size" %in% names(Plot_SettingsInfo)){
+            Plot_SettingsFile_List[[i]] <- merge(Plot_SettingsFile_List[[i]] ,file %>% select(Metabolite, individual), by = "Metabolite")
+            Plot_SettingsFile2 <- Plot_SettingsFile_List[[i]] # Needs fix This is not needed it is here for the code not to break
+
+          }else{
+            Plot_SettingsFile_List[[i]] <- file %>% select(Metabolite, individual)
+            Plot_SettingsFile2 <- Plot_SettingsFile_List[[i]] # Needs fix This is not needed it is here for the code not to break
+          }
+        }
+      }
+    }else{
+      Plot_SettingsFile <- Plot_SettingsFile2
+    }
+  }else if(is.vector(Plot_SettingsInfo)==FALSE & is.null(Plot_SettingsInfo)==FALSE){
+    stop("Plot_SettingsInfo must be named vector or NULL.")
+  }
+  if(Plot_Settings=="Compare" & "color" %in% names(Plot_SettingsInfo)==TRUE){
+    stop("Color is used to represent the datastes compared. Please use the size option.")
+  }
+
+  if(Plot_Settings=="PEA" & is.vector(Plot_SettingsInfo)==FALSE){
+    stop("You have chosen Plot_Settings=`PEA` that requires you to provide a vector for Plot_SettingsInfo.")
+  }else if(Plot_Settings=="PEA" & is.null(Plot_SettingsFile)==TRUE){
+    stop("You have chosen Plot_Settings=`PEA` that requires you to provide a DF Plot_SettingsFile including the pathways used for the enrichment analysis.")
+  } else if(Plot_Settings=="PEA" & is.null(Plot_SettingsFile)==FALSE & is.null(Plot_SettingsFile)==FALSE){
+    if("individual" %in% names(Plot_SettingsInfo)==FALSE | "PEA_score" %in% names(Plot_SettingsInfo)==FALSE | "PEA_stat" %in% names(Plot_SettingsInfo)==FALSE | "PEA_Pathway" %in% names(Plot_SettingsInfo)==FALSE){
+      stop("You have chosen Plot_Settings=`PEA` that requires you to provide a vector for Plot_SettingsInfo including `individual`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
+    }
+  }
+
+  ## The next lines need checks/corrections
+  # if(Plot_Settings=="PEA" & length(Input_data)==1){
+  #   stop("If Plot_Settings=`PEA` you have to provide a DF for AdditionalInput_data including the results of an enrichment analysis.")
+  # } else if(Plot_Settings=="PEA" & length(Input_data)>1){
+  #   AdditionalInput_data <- AdditionalInput_data%>%
+  #     dplyr::rename("PEA_score"=paste(Plot_SettingsInfo[["PEA_score"]]),
+  #                   "PEA_stat"=paste(Plot_SettingsInfo[["PEA_stat"]]),
+  #                   "PEA_Pathway"=paste(Plot_SettingsInfo[["PEA_Pathway"]]))
+  # }
+
+  # 4. Check other plot-specific parameters:
   if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
     stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
   }
   if( is.numeric(FCcutoff)== FALSE  | FCcutoff < 0){
     stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
   }
-  if(test != "p.val" & test != "p.adj"){
-    stop("Check input. The selected test option for assessing significance is not valid. Please select one of the following: p.adj, p.val.")
-  }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+
+  Save_as_options <- c("svg","pdf")
   if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
-  }
-  Plot_pathways_options <- c("None", "Individual", "Together")
-  if (Plot_pathways %in% Plot_pathways_options == FALSE){
-    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Plot_pathways_options,collapse = ", "),"." )
-  }
-  if(is.null(Input_pathways) == TRUE){
-    if (Plot_pathways != "None"){
-      warning("No Input_pathways were added. Yet the Plot_pathways option was changed. This will have no effect on the plot")
-      Plot_pathways = "None"
-    }
-  }
-  if(is.null(Input_pathways) == FALSE){
-    if("Metabolite" %in% colnames(Input_pathways) == FALSE){
-      stop("Check Input. Metabolite column is missing from Input_pathways")
-    }
-    if("Pathway" %in% colnames(Input_pathways) == FALSE){
-      stop("Check Input. Pathway column is missing from Input_pathways")
-    }
-    if (sum(duplicated(Input_pathways$Metabolite)) > 0){
-      stop("Duplicated Metabolites found in the Input_Pathways. The Metabolites must be unique.")
-    }
-    for(i in 1:length(Input_data)){ # Here we check every data in the input data with the Input pathways. We dont check common metablites between each input dataset. Should we also add this?
-      data <- Input_data[[i]]
-      if(identical(sort(data$Metabolite), sort(Input_pathways$Metabolite)) == FALSE){
-        warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_pathways. We will take into consideration only the common Metabolites.")
-        # find common metabolites
-        common_metabolites <- data[data$Metabolite %in% Input_pathways$Metabolite, "Metabolite"]
-        # Take the data that have both pval reslults and pathwayss
-        Input_data <- data %>% filter(Metabolite %in% common_metabolites)
-        Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
-      }
-    }
-  }
-
-
-  for(i in 1:length(Input_data)){
-    data <- Input_data[[i]]
-    if("Pathway" %in% colnames(data)){
-      data$Pathway <- NULL
-      Input_data[[i]] <- data
-    }
+    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
   }
 
 
@@ -1936,350 +2007,485 @@ VizLolipop <- function(Input_data, # a dataframe of list of dataframes
   if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}  # check and create folder
 
 
-  Multiple = FALSE
-  if(length(Input_data) > 1){
-    Multiple = TRUE
-  }
-  if (Plot_pathways == "None"){
-    if(is.null(Input_pathways)==FALSE){
-      warning("An Input_pathways file has been added. However, Plot_pathways = none ,thus no pathway information will be incorporated in the Volcano plot. To use Pathway information please change Plot_pathways to Individual or Together.")
-    }
-    Input_pathways = NULL
-  }
-
-  if(Multiple == FALSE){
-    # Remove rows with NAs
+  if(Plot_Settings=="Standard"){############################################################################################################
     Input_data <- Input_data[[1]]
-    loli.data<- Input_data %>% drop_na()
+    if("individual" %in% names(Plot_SettingsInfo)==TRUE){
+      # Create the list of individual plots that should be made:
+      IndividualPlots <- Plot_SettingsFile[!duplicated(Plot_SettingsFile$individual),]
+      IndividualPlots <- IndividualPlots$individual
 
-    if (is.null(Input_pathways)== FALSE){
-      Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
-      loli.data <- merge(loli.data,Input_pathways, by = "Metabolite" )
-    }
-    #Select metabolites for the cut offs selected
-    loli.data <- loli.data %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & test > pCutoff)
+      PlotList <- list()#Empty list to store all the plots
 
-    if(Plot_pathways == "Individual"){
+      for (i in IndividualPlots){
+        # i = IndividualPlots[1]
+        Plot_SettingsInfo_indi <- Plot_SettingsInfo
+        Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
+        InputLolipop  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+          na.omit()
 
-      Pathway_Names <- unique(loli.data$Pathway)
-      for (i in Pathway_Names){
-        print(i)
-        loli.data_path_indi <- loli.data %>% filter(Pathway==i)
+        #Select metabolites for the cut offs selected
+        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & test > pCutoff)
 
-        lolipop_plot <- ggplot(loli.data_path_indi , aes(x = Log2FC, y = names)) +
-          geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
-          geom_point(aes(colour = p.adj, size = p.adj ))   +
-          scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
-          scale_colour_gradient(low = "red", high = "blue", limits = c(0, max(loli.data[,test]))) +
-          ggtitle(label = paste(i," Pathway"), subtitle = paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
-        #ggsave(filename = "Loli_plot2.pdf", plot = last_plot(), width=10, height=8)
-
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder, "/",i, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+        if("size" %in% names(Plot_SettingsInfo_indi)==TRUE ){
+          if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
+            stop("Size can take only numeric values")
+          }else{# color = continuous
+            keyvalssize <- loli.data$size
+          }
+        } else{
+          Plot_SettingsInfo_indi= c(Plot_SettingsInfo_indi,size="p.adj")
+          keyvalssize <- loli.data$size
         }
 
-      }}
-    else if(Plot_pathways == "Together"){
+        p2 <- NULL
+        if("color" %in% names(Plot_SettingsInfo_indi)==TRUE ){
+          if(is.numeric(loli.data$color)==FALSE){ # run if color is discrete
 
-      loli.data <- loli.data %>%
-        arrange(Pathway, Metabolite)
+            col_var_name <- Plot_SettingsInfo_indi[['color']]
 
-      loli.data_avg <- loli.data %>%
-        arrange(Pathway, Metabolite) %>%
-        mutate(Metab_name = row_number()) %>%
-        group_by(Pathway) %>%
-        mutate(
-          avg = mean(Log2FC)
-        ) %>%
-        ungroup() %>%
-        mutate(Pathway = factor(Pathway))
+            position <- which(names(loli.data)=="color" )
+            names(loli.data)[position]<-"plot_color_variable"
 
 
-      loli_lines <-   loli.data_avg %>%
-        arrange(Pathway, Metabolite) %>%
-        group_by(Pathway) %>%
-        summarize(
-          start_x = min(Metab_name) -0.5,
-          end_x = max(Metab_name) + 0.5,
-          y = 0#unique(avg)
-        ) %>%
-        pivot_longer(
-          cols = c(start_x, end_x),
-          names_to = "type",
-          values_to = "x"
-        ) %>%
-        mutate(
-          x_group = if_else(type == "start_x", x + .1, x - .1),
-          x_group = if_else(type == "start_x" & x == min(x), x_group - .1, x_group),
-          x_group = if_else(type == "end_x" & x == max(x), x_group + .1, x_group) )
+            loli.data <- loli.data %>%
+              arrange(plot_color_variable, Metabolite)
 
-      #rm(p2)
-      p2 <- loli.data_avg %>%
-        ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
-        geom_hline(
-          data = tibble(y = -5:5),
-          aes(yintercept = y),
-          color = "grey82",
-          size = .5 )
-
-      p2 <- p2 + geom_segment(
-        aes(
-          xend = Metab_name,          # names
-          yend = 0,#avg,
-          color = Pathway,
-          #color = after_scale(colorspace::lighten(color, .2))
-        ))
-
-      p2 <- p2 + # geom_line( data = loli_lines, aes(x, y),  color = "grey40"  ) +
-        geom_line(
-          data = loli_lines,
-          aes( x_group, y,
-               color = Pathway,
-               #  color = after_scale(colorspace::darken(color, .2))
-          ), size = 2.5) +  geom_point(aes(size = p.adj, color = Pathway)
-          )
-
-      p2<- p2 + coord_flip()
-      p2<-p2+ theme(axis.text.x=element_text())
-
-      lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
-      p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite, size = 3)
-
-      lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
-      p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
-
-      p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 3, y = 0, label = "Significantly changed metabolites and their pathways", size = 8)
-
-      p2 <- p2+Theme
+            loli.data_avg <- loli.data %>%
+              arrange(plot_color_variable, Metabolite) %>%
+              mutate(Metab_name = row_number()) %>%
+              group_by(plot_color_variable) %>%
+              mutate(
+                avg = mean(Log2FC)
+              ) %>%
+              ungroup() %>%
+              mutate(plot_color_variable = factor(plot_color_variable))
 
 
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
+            loli_lines <-   loli.data_avg %>%
+              arrange(plot_color_variable, Metabolite) %>%
+              group_by(plot_color_variable) %>%
+              summarize(
+                start_x = min(Metab_name) -0.5,
+                end_x = max(Metab_name) + 0.5,
+                y = 0#unique(avg)
+              ) %>%
+              pivot_longer(
+                cols = c(start_x, end_x),
+                names_to = "type",
+                values_to = "x"
+              ) %>%
+              mutate(
+                x_group = if_else(type == "start_x", x + .1, x - .1),
+                x_group = if_else(type == "start_x" & x == min(x), x_group - .1, x_group),
+                x_group = if_else(type == "end_x" & x == max(x), x_group + .1, x_group) )
+
+            #rm(p2)
+            p2 <- loli.data_avg %>%
+              ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
+              geom_hline(
+                data = tibble(y = -5:5),
+                aes(yintercept = y),
+                color = "grey82",
+                size = .5 )
+
+            p2 <- p2 + geom_segment(
+              aes(
+                xend = Metab_name,          # names
+                yend = 0,#avg,
+                color = plot_color_variable,
+                #color = after_scale(colorspace::lighten(color, .2))
+              ))
+
+            p2 <- p2 + # geom_line( data = loli_lines, aes(x, y),  color = "grey40"  ) +
+              geom_line(
+                data = loli_lines,
+                aes( x_group, y,
+                     color = plot_color_variable,
+                     #  color = after_scale(colorspace::darken(color, .2))
+                ), size = 2.5) +  geom_point(aes(size = keyvalssize, color = plot_color_variable)
+                )
+
+            p2 <- p2 +theme(axis.text.y=element_blank(),
+                            axis.ticks.y=element_blank()
+            )
+
+            p2<- p2 + coord_flip()
+            #p2<-p2+ theme(axis.text.x=element_text())
+
+            lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
+            p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite, size = 3)
+
+            lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
+            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
+
+            #p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = "Significantly changed metabolites and their pathways", size = 4.5)
+            if(OutputPlotName==""){
+              p2 <- p2 + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)
+
+            }else{
+              p2 <- p2 + labs(title = OutputPlotName,subtitle = Subtitle)
+            }
+
+            p2 <- p2+Theme
+            p2 <- p2+ labs(color=col_var_name)+
+              labs(size=Plot_SettingsInfo_indi[['size']])
+
+            lolipop_plot <-  p2
+
+            # Put back the correct name in the data df
+            names(loli.data)[position]<- col_var_name
+
+          }else{# color = continuous
+            keyvals <- loli.data$color
+          }
+        }else{
+          Plot_SettingsInfo_indi= c(Plot_SettingsInfo_indi, color="p.adj")
+          keyvals <- loli.data$color
+        }
+
+        if(is.null(p2)==TRUE){
+          lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
+            geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+            geom_point(aes(colour = keyvals, size = keyvalssize ))   +
+            scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+            scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,test]))) +
+            ggtitle(paste(OutputPlotName,": ", i )) +
+            theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
+            labs(color=Plot_SettingsInfo_indi[['color']]) +
+            labs(size=Plot_SettingsInfo_indi[['size']])
+        }
+
+        #Add the theme
+        if(is.null(Theme)==FALSE){
+          lolipop_plot <- lolipop_plot+Theme
+        }
+
+
+        #save plot and get rid of extra signs before saving
+        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+        }
+        ## Store the plot in the 'plots' list
+        PlotList[[cleaned_i]] <- lolipop_plot
+        plot(lolipop_plot)
+      }
+      # Return PlotList into the environment to enable the user to view the plots directly
+      #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
+      # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
+      Return <- PlotList
+    }
+    else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
+
+      if(is.null(Plot_SettingsFile)==FALSE){
+        InputLolipop  <- merge(x=Plot_SettingsFile,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+          na.omit()
       }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together_", OutputPlotName, ".",Save_as, sep=""), plot=p2,  width=20, height=20)
+        InputLolipop  <- Input_data
       }
 
-    }
-    else if(Plot_pathways == "None"){
-      lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
-        geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
-        geom_point(aes(colour = p.adj, size = p.adj ))   +
-        scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
-        scale_colour_gradient(low = "red", high = "blue", limits = c(0, max(loli.data[,test]))) +
-        ggtitle(paste("Metabolites with > |",FCcutoff,"| logfold change")) + theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+Theme
+      InputLolipop<- InputLolipop %>% drop_na()
+
+      #Select metabolites for the cut offs selected
+      loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & test > pCutoff)
+
+      if("size" %in% names(Plot_SettingsInfo)==TRUE ){
+        if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
+          stop("Size can take only numeric values")
+        }else{# color = continuous
+          keyvalssize <- loli.data$size
+        }
+      } else{
+        Plot_SettingsInfo= c(Plot_SettingsInfo,size="p.adj")
+        keyvalssize <- loli.data$size
+      }
+
+      p2 <- NULL
+      if("color" %in% names(Plot_SettingsInfo)==TRUE ){
+        if(is.numeric(loli.data$color)==FALSE){ # run if color is discrete
+
+          col_var_name <- Plot_SettingsInfo[['color']]
+
+          position <- which(names(loli.data)=="color" )
+          names(loli.data)[position]<-"plot_color_variable"
+
+
+          loli.data <- loli.data %>%
+            arrange(plot_color_variable, Metabolite)
+
+          loli.data_avg <- loli.data %>%
+            arrange(plot_color_variable, Metabolite) %>%
+            mutate(Metab_name = row_number()) %>%
+            group_by(plot_color_variable) %>%
+            mutate(
+              avg = mean(Log2FC)
+            ) %>%
+            ungroup() %>%
+            mutate(plot_color_variable = factor(plot_color_variable))
+
+
+          loli_lines <-   loli.data_avg %>%
+            arrange(plot_color_variable, Metabolite) %>%
+            group_by(plot_color_variable) %>%
+            summarize(
+              start_x = min(Metab_name) -0.5,
+              end_x = max(Metab_name) + 0.5,
+              y = 0#unique(avg)
+            ) %>%
+            pivot_longer(
+              cols = c(start_x, end_x),
+              names_to = "type",
+              values_to = "x"
+            ) %>%
+            mutate(
+              x_group = if_else(type == "start_x", x + .1, x - .1),
+              x_group = if_else(type == "start_x" & x == min(x), x_group - .1, x_group),
+              x_group = if_else(type == "end_x" & x == max(x), x_group + .1, x_group) )
+
+          #rm(p2)
+          p2 <- loli.data_avg %>%
+            ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
+            geom_hline(
+              data = tibble(y = -5:5),
+              aes(yintercept = y),
+              color = "grey82",
+              size = .5 )
+
+          p2 <- p2 + geom_segment(
+            aes(
+              xend = Metab_name,          # names
+              yend = 0,#avg,
+              color = plot_color_variable,
+              #color = after_scale(colorspace::lighten(color, .2))
+            ))
+
+          p2 <- p2 + # geom_line( data = loli_lines, aes(x, y),  color = "grey40"  ) +
+            geom_line(
+              data = loli_lines,
+              aes( x_group, y,
+                   color = plot_color_variable,
+                   #  color = after_scale(colorspace::darken(color, .2))
+              ), size = 2.5) +  geom_point(aes(size = keyvalssize, color = plot_color_variable)
+              )
+
+          p2<- p2 + coord_flip()
+          p2 <- p2 +theme(axis.text.y=element_blank(),
+                          axis.ticks.y=element_blank()
+          )
+
+          lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
+          p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite, size = 3)
+
+          lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
+          p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
+
+          p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
+
+          p2 <- p2+Theme
+          p2 <- p2+ labs(color=col_var_name)+
+            labs(size=Plot_SettingsInfo[['size']])
+
+          lolipop_plot <-  p2
+
+          # Put back the correct name in the data df
+          names(loli.data)[position]<- col_var_name
+
+        }else{# color = continuous
+          keyvals <- loli.data$color
+        }
+      }else{
+        Plot_SettingsInfo= c(Plot_SettingsInfo, color="p.adj")
+        keyvals <- loli.data$color
+      }
+
+      if(is.null(p2)==TRUE){
+        lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
+          geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+          geom_point(aes(colour = keyvals, size = keyvalssize ))   +
+          scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+          scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,test]))) +
+          ggtitle(OutputPlotName) +
+          theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
+          labs(color=Plot_SettingsInfo[['color']]) +
+          labs(size=Plot_SettingsInfo[['size']])
+      }
+
+      plot(lolipop_plot)
+
+      #Add the theme
+      if(is.null(Theme)==FALSE){
+        lolipop_plot <- lolipop_plot+Theme
+      }
 
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
       }else{
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
       }
-
     }
-  }
-  else{
-
-    if(Plot_pathways == "Individual"){
-
-      Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
-      Combined_Input <- data.frame(matrix(ncol = 5, nrow = 0))
-      comb.colnames <- c("Metabolite","Log2FC",test, "Condition","Pathway")
-      colnames(Combined_Input) <- comb.colnames
-
-      for ( i in 1:length(Input_data)){
-        Input_data[[i]]$Condition <- CondNames[[i]]
-        Input_data_pathways <- merge( Input_data[[i]],Input_pathways, by = "Metabolite" )
-        Combined_Input <- rbind(Combined_Input, Input_data_pathways %>% select(all_of(c("Metabolite","Log2FC",test, "Condition", "Pathway"))))
-      }
-
-      Combined_Input["Pathway"][Combined_Input["Pathway"] == "unknown"] <- "Other"
-      Combined_Input[test] <- round(Combined_Input[test], digits = 6)
-
-
-      for (pathway in unique(Combined_Input$Pathway)){
-        Combined_Input_pathway <- Combined_Input %>% filter(Pathway == pathway)
-
-        Dotplot1 <-ggplot(Combined_Input_pathway, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) +
-          geom_point(stat='identity', aes(size = abs(`Log2FC`), col=Condition))  +
-          geom_segment(aes(y = 0,
-                           x = Metabolite,
-                           yend = `Log2FC`,
-                           xend = Metabolite),
-                       color = "black") +
-          scale_size(name="abs(Log2FC)",range = c(6,16))+
-          geom_text(color="black", size=2) +
-          labs(title=paste(Comparison)) +
-          ylim(((Reduce(min,Combined_Input_pathway$`Log2FC`))-0.5),((Reduce(max,Combined_Input_pathway$`Log2FC`))+0.5)) +
-          theme_minimal() +
-          coord_flip()+
-          theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
-                plot.subtitle = element_text(color = "black", size=10),
-                plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
-          labs(y="Log2FC", x="")+
-          geom_hline(yintercept=0,  color = "black", linewidth=0.1)
-
-
-
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop",pathway, ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",pathway,"_", OutputPlotName, ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
-        }
-      }
-    }
-    else if(Plot_pathways == "Together"){
-
-      Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
-      Combined_Input <- data.frame(matrix(ncol = 5, nrow = 0))
-      comb.colnames <- c("Metabolite","Log2FC",test, "Condition","Pathway")
-      colnames(Combined_Input) <- comb.colnames
-
-      for ( i in 1:length(Input_data)){
-        Input_data[[i]]$Condition <- CondNames[[i]]
-        Input_data_pathways <- merge( Input_data[[i]],Input_pathways, by = "Metabolite" )
-        Combined_Input <- rbind(Combined_Input, Input_data_pathways %>% select(all_of(c("Metabolite","Log2FC",test, "Condition", "Pathway"))))
-      }
-
-      Combined_Input["Pathway"][Combined_Input["Pathway"] == "unknown"] <- "Other"
-      Combined_Input[test] <- round(Combined_Input[test], digits = 6)
-
-
-      ######
-      loli.data <- Combined_Input
-
-      loli.data <- loli.data %>%
-        arrange(Pathway, Metabolite)
-
-      loli.data_avg <- loli.data %>%
-        arrange(Pathway, Metabolite) %>%
-        mutate(Metab_name = row_number()) %>%
-        group_by(Condition, Pathway) %>%
-        mutate(
-          avg = mean(Log2FC)
-        ) %>%
-        ungroup() %>%
-        mutate(Pathway = factor(Pathway))
-
-      loli.data_avg$Metab_name <- rep(seq.int(length(loli.data_avg$Metab_name)/length(Input_data)), each= length(Input_data) )
-
-
-      loli_lines <-   loli.data_avg %>%
-        arrange(Pathway, Metabolite) %>%
-        group_by(Pathway) %>%
-        summarize(
-          start_x = min(Metab_name) -0.5,
-          end_x = max(Metab_name) + 0.5,
-          y = 0#unique(avg)
-        ) %>%
-        pivot_longer(
-          cols = c(start_x, end_x),
-          names_to = "type",
-          values_to = "x"
-        ) %>%
-        mutate(
-          x_group = if_else(type == "start_x", x + .1, x - .1),
-          x_group = if_else(type == "start_x" & x == min(x), x_group - .1, x_group),
-          x_group = if_else(type == "end_x" & x == max(x), x_group + .1, x_group) )
-
-      p2 <- loli.data_avg %>%
-        ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
-        geom_hline(
-          data = tibble(y = -5:5),
-          aes(yintercept = y),
-          color = "grey82",
-          size = .5 )
-
-      p2 <- p2 + geom_segment(
-        aes(
-          xend = Metab_name,          # names
-          yend = 0,#avg,
-          color = Pathway,
-          #color = after_scale(colorspace::lighten(color, .2))
-        ))
-
-      p2 <- p2 + # geom_line( data = loli_lines, aes(x, y),  color = "grey40"  ) +
-        geom_line(
-          data = loli_lines,
-          aes( x_group, y,
-               color = Pathway,
-               #  color = after_scale(colorspace::darken(color, .2))
-          ), size = 2.5) +  geom_point(aes(size = p.adj, color = Pathway, shape = Condition  )
-          )+ scale_size(trans = 'reverse')
-
-
-      p2<- p2 + coord_flip()
-      p2<-p2+ theme(axis.text.x=element_text())
-
-      lab_metab <- loli.data_avg  %>% group_by(Metabolite,Metab_name) %>% summarise(max= Log2FC[which.max(abs(Log2FC))])
-
-
-      lab_pos_metab <- lab_metab[rep(seq_len(nrow(lab_metab)), each = length(Input_data)), ] %>% filter(max>0)
-      lab_neg_metab <- lab_metab[rep(seq_len(nrow(lab_metab)), each = length(Input_data)), ] %>% filter(max<0)
-
-      p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$max+1, label = lab_pos_metab$Metabolite, size = 4)
-      p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$max-1, label = lab_neg_metab$Metabolite, size = 4)
-
-      p2
-
-      p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+10, y = 0, label = "Significantly changed metabolites and their pathways", size = 8)
-
-      p2 <- p2+Theme
-
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together", OutputPlotName, ".",Save_as, sep=""), plot=p2, width=20, height=20)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_Together_", OutputPlotName, ".",Save_as, sep=""), plot=p2,  width=20, height=20)
-      }
-    }
-    else if(Plot_pathways == "None"){
+  }else if(Plot_Settings=="Compare"){
+    if("individual" %in% names(Plot_SettingsInfo)==TRUE){
 
       Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
       comb.colnames <- c("Metabolite","Log2FC",test, "Condition")
       colnames(Combined_Input) <- comb.colnames
 
       for (i in 1:length(Input_data)){
-        Input_data[[i]]$Condition <- CondNames[[i]]
-        Combined_Input <- rbind(Combined_Input, Input_data[[i]] %>% select(all_of(c("Metabolite","Log2FC",test, "Condition"))))
+        Input_data[[i]]$Condition <- Comparison_name[[i]]
+        data <-  Input_data[[i]]
+        if(is.null(Plot_SettingsFile)==FALSE){
+          data <- merge(Input_data[[i]], Plot_SettingsFile_List[[i]], by = "Metabolite")
+        }
+        Combined_Input <- rbind(Combined_Input, data)
 
       }
+
 
       # Combined_Input <- Combined_Input %>% filter(abs(Log2FC) >=FCcutoff)
       # Combined_Input <- Combined_Input[Combined_Input[test] <= pCutoff,]
       # Combined_Input<- Combined_Input %>% drop_na()
-      Combined_Input[test] <- round(Combined_Input[test], digits = 6)
+      Combined_Input[test] <- round(Combined_Input[test], digits = 5)
+
+      # Remove the metabolite with inf in logFC because it messes the plot
+      Combined_Input <- Combined_Input[is.finite(Combined_Input$Log2FC),]
+
+
+
+      # Create the list of individual plots that should be made:
+      IndividualPlots <- Combined_Input[!duplicated(Combined_Input$individual),]
+      IndividualPlots <- IndividualPlots$individual
+
+      PlotList <- list()#Empty list to store all the plots
+
+      for (i in IndividualPlots){
+        # i = IndividualPlots[1]
+        Plot_SettingsInfo_indi <- Plot_SettingsInfo
+        # Plot_SettingsFile_Select <- subset(Combined_Input, individual == paste(i))
+        # InputLolipop  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+        #   na.omit()
+        InputLolipop <- subset(Combined_Input, individual == paste(i))
+
+
+        #Select metabolites for the cut offs selected
+        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & test > pCutoff)
+
+
+
+        if("size" %in% names(Plot_SettingsInfo_indi)==TRUE ){
+          if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
+            stop("Size can take only numeric values")
+          }else{# color = continuous
+            keyvalssize <- loli.data$size
+          }
+        } else{
+          Plot_SettingsInfo_indi= c(Plot_SettingsInfo_indi,size="p.adj")
+          keyvalssize <- loli.data$size
+        }
+
+
+        lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
+          geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+          geom_point(aes(colour = Condition, size = keyvalssize ))   +
+          scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+          #   scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,test]))) +
+          theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
+          # #  labs(color=Plot_SettingsInfo_indi[['color']]) +
+          labs(size=Plot_SettingsInfo_indi[['size']])  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+
+        lolipop_plot
+        #Add the theme
+        if(is.null(Theme)==FALSE){
+          lolipop_plot <- lolipop_plot+Theme
+        }
+
+
+        #save plot and get rid of extra signs before saving
+        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+        }
+        ## Store the plot in the 'plots' list
+        PlotList[[cleaned_i]] <- lolipop_plot
+        plot(lolipop_plot)
+      }
+      # Return PlotList into the environment to enable the user to view the plots directly
+      #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
+      # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
+      Return <- PlotList
+
+    }
+    else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
+      Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
+      comb.colnames <- c("Metabolite","Log2FC",test, "Condition")
+      colnames(Combined_Input) <- comb.colnames
+
+      for (i in 1:length(Input_data)){
+        Input_data[[i]]$Condition <- Comparison_name[[i]]
+        data <-  Input_data[[i]]
+        if(is.null(Plot_SettingsFile)==FALSE){
+          data <- merge(Input_data[[i]], Plot_SettingsFile_List[[i]], by = "Metabolite")
+        }
+        Combined_Input <- rbind(Combined_Input, data)
+
+      }
+
+      if("size" %in% names(Plot_SettingsInfo)==TRUE ){
+        if(is.numeric(Combined_Input$size)==FALSE){ # run is color is discrete
+          stop("Size can take only numeric values")
+        }else{# color = continuous
+          keyvalssize <- Combined_Input$size
+        }
+      } else{
+        Plot_SettingsInfo= c(Plot_SettingsInfo,size="p.adj")
+        keyvalssize <- Combined_Input$p.adj
+      }
+
+
+
+      # Combined_Input <- Combined_Input %>% filter(abs(Log2FC) >=FCcutoff)
+      # Combined_Input <- Combined_Input[Combined_Input[test] <= pCutoff,]
+      # Combined_Input<- Combined_Input %>% drop_na()
+      Combined_Input[test] <- round(Combined_Input[test], digits = 5)
 
       # Remove the metabolite with inf in logFC because it messes the plot
       Combined_Input <- Combined_Input[is.finite(Combined_Input$Log2FC),]
 
       Dotplot1 <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) +
-        geom_point(stat = 'identity', aes(size = abs(`Log2FC`), col = Condition))  +
-        geom_segment(aes(y =0,
-                         x = Metabolite,
-                         yend = `Log2FC`,
-                         xend = Metabolite),
-                     color = "black") +
-        scale_size(name="abs(Log2FC)",range = c(6,16))+
+        geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
+        # geom_segment(aes(y =0,
+        #                  x = Metabolite,
+        #                  yend = `Log2FC`,
+        #                  xend = Metabolite),
+        #              color = "black") +
+        # scale_size(name="abs(Log2FC)",range = c(6,16))+
         geom_text(color="black", size=2) +
-        labs(title=paste(Comparison)) +
         ylim(((Reduce(min,Combined_Input$`Log2FC`))-0.5),((Reduce(max,Combined_Input$`Log2FC`))+0.5)) +
-        theme_minimal() +
         coord_flip()+
         theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
               plot.subtitle = element_text(color = "black", size=10),
               plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
-        labs(y="Log2FC", x="")
+        labs(y="Log2FC", x="")+ labs(title = OutputPlotName,subtitle = Subtitle) + geom_hline(yintercept = 0) +
+        labs(size=Plot_SettingsInfo[['size']])  + labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
 
-      Dotplot1
+      #Add the theme
+      if(is.null(Theme)==FALSE){
+        Dotplot1 <- Dotplot1+Theme
+      }
 
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
       }else{
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
       }
+      plot(Dotplot1)
 
     }
-  }
+  }else if(Plot_Settings=="PEA"){# Code Missing
+    }
 }
 
 
