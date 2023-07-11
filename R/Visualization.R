@@ -715,8 +715,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                        AdditionalInput_data= NULL,
                        OutputPlotName= "",
                        Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                       xlab= NULL,
-                       ylab= NULL,
+                       xlab= NULL,#"~Log[2]~FC"
+                       ylab= NULL,#"~-Log[10]~p.adj"
                        pCutoff= 0.05,
                        FCcutoff= 0.5,
                        Legend="Standard",
@@ -862,14 +862,22 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
     }
 
-    #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change parameter and give warning!
-
+  #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change parameter and give warning!
   #outputplotname
   #theme
-  # Rename the x and y lab if the information has been passed:
-  xlab=bquote(~Log[2]~FC)
-  ylab=bquote(~-Log[10]~p.adj)
 
+  # Rename the x and y lab if the information has been passed:
+  if(is.null(xlab)=TRUE){#use column name of x provided by user
+    xlab <- bquote(.(as.symbol(x)))
+    }else if(is.null(xlab)=FALSE){
+    xlab <- bquote(.(as.symbol(xlab)))
+    }
+
+  if(is.null(xlab)=TRUE){#use column name of x provided by user
+    ylab <- bquote(.(as.symbol(y)))
+    }else if(is.null(ylab)=FALSE){
+      ylab <- bquote(.(as.symbol(ylab)))
+      }
 
   ## ------------ Create Output folders ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
