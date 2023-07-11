@@ -250,7 +250,7 @@ MC_ORA <- function(Input_data,
 #' @return Saves results as individual .csv files.
 #' @export
 
-MC_ORA <- function(Input_data,
+DM_ORA <- function(Input_data,
                    PathwayFile,
                    PathwayName="",
                    minGSSize=10,
