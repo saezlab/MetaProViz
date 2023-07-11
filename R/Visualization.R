@@ -867,15 +867,15 @@ VizVolcano <- function(Plot_Settings="Standard",
   #theme
 
   # Rename the x and y lab if the information has been passed:
-  if(is.null(xlab)=TRUE){#use column name of x provided by user
+  if(is.null(xlab)==TRUE){#use column name of x provided by user
     xlab <- bquote(.(as.symbol(x)))
-    }else if(is.null(xlab)=FALSE){
+    }else if(is.null(xlab)==FALSE){
     xlab <- bquote(.(as.symbol(xlab)))
     }
 
-  if(is.null(xlab)=TRUE){#use column name of x provided by user
+  if(is.null(xlab)==TRUE){#use column name of x provided by user
     ylab <- bquote(.(as.symbol(y)))
-    }else if(is.null(ylab)=FALSE){
+    }else if(is.null(ylab)==FALSE){
       ylab <- bquote(.(as.symbol(ylab)))
       }
 

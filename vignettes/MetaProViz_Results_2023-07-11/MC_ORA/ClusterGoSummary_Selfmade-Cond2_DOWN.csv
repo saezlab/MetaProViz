@@ -1,0 +1,17 @@
+ID,Description,GeneRatio,BgRatio,pvalue,p.adjust,qvalue,MetaboliteIDs_in_pathway,Count,Metabolites_in_Pathway,Percentage_of_Pathway_detected
+Citrate cycle (TCA cycle),Citrate cycle (TCA cycle),1/2,9/176,0.09993506493506465,0.1998701298701293,0.1998701298701293,phosphoenolpyruvate,1,9,11.11
+Purine metabolism,Purine metabolism,1/2,19/176,0.20480519480519466,0.20480519480519466,0.20480519480519466,IMP,1,21,4.76
+"Alanine, aspartate and glutamate metabolism","Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,0,3,0
+Arginine and proline metabolism,Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,0,7,0
+Cysteine and methionine metabolism,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,0,6,0
+D-Amino acid metabolism,D-Amino acid metabolism,NA,NA,NA,NA,NA,NA,0,35,0
+Fatty acyl carnitines,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,0,8,0
+Glutathione metabolism,Glutathione metabolism,NA,NA,NA,NA,NA,NA,0,9,0
+Glycerophospholipid metabolism,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,0,9,0
+Glycolysis / Gluconeogenesis,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,0,8,0
+Not assigned,Not assigned,NA,NA,NA,NA,NA,NA,0,52,0
+Oxidative phosphorylation,Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,0,2,0
+Pentose phosphate pathway,Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,0,4,0
+Pyrimidine metabolism,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,0,18,0
+"Valine, leucine and isoleucine biosynthesis","Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,0,6,0
+Vitamin digestion and absorption,Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,0,3,0
