@@ -129,7 +129,9 @@ Load_KEGG<- function(){
   }
 
   # 3. Remove the pathways that do not have any metabolic compounds associated to them
-  KEGG_H_Select <- subset(KEGG_H, !KEGG_H$KEGG_CompoundID=="")
+  KEGG_H_Select <-KEGG_H%>%
+    subset(!KEGG_CompoundID=="")%>%
+    subset(!KEGGPathway=="")
 
   # 4. Make the Metabolite DF
   KEGG_Metabolite <- separate_longer_delim(KEGG_H_Select[,-5], c(Compound, KEGG_CompoundID), delim = ";")
