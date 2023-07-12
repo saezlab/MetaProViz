@@ -68,6 +68,7 @@ First if you have not done yet, install the required dependencies and load the l
 #MetaProViz
 
 #library(MetaProViz)
+devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
 
 #dependencies
 library(tidyverse)
@@ -92,9 +93,6 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 `1.` Intracellular experiment **(Intra)** \
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 ```{r}
-# check load data again from inst/extdata
-devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
-
 MetaProViz::toy_data(data="Standard")
 
 # Check how our data looks like:
@@ -206,24 +204,30 @@ Outlier_Plots[[6]]
 I have a list with 6 elements, each of them being a plot. If I run `Outlier_Plots[[3]]` in the console , I will see the plot. Yet, if I knite the .rmd file I will only see `Outlier_Plots[[1]]`, not the others.
 
 \
+The QC plots `QC_Plots` include an PCA plot using the processed data and highlighting the outliers. Moreover, if one has provided information about biological replicates a second plot is generated highlighting the biological replicates, which would highlight if there is a batch effect.\
+```{r}
+# PCA plot
+# 1. Marked Outliers:
+QC_Plots[[1]]
 
-
-QC plots `QC_Plots` and
- 
-
-
+#2. Marked Biological replicates:
+QC_Plots[[2]]
+```
 \
-Now we will remove the outlier before proceeding:\
+As part of the **MetaProViz** visualisation module one can easily customise the PCA plot and adapt colour and shape for the information of interest. You can see more below for the `VizPCA()` function.
+\
+Before we proceed, we will remove the outlier:\
 ```{r}
 Intra_Preprocessed <- Intra_Preprocessed[-29,]#remove MS55_29
 ```
 \
-As you may have noticed, in this example dataset we have several biological replicates that where injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will do this task and save the results:
+As you may have noticed, in this example dataset we have several biological replicates that where injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will do this task and save the results:\
 ```{r}
 Intra_Preprocessed <- MetaProViz::ReplicateSum(Input_data=Intra_Preprocessed)
 ```
-
---> point towards 3. Run MetaProViz Visualisation --> PCA options and heatmaps could both be usefull to have a closer look at the results!
+\
+Using the normalized we can now use the **MetaProViz** visualisation module 
+PCA options and heatmaps could both be usefull to have a closer look at the results!
 
 ## DMA
 Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) calculates the Log2FC, p-value, adjusted p-value and t-value. With the different parameters of the `DMA` function one can choose the statistical tests to calculate the p-value and adjusted p-value (`STAT_pval` and `STAT_padj`). 

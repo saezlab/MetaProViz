@@ -529,7 +529,6 @@ Preprocessing <- function(Input_data,
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
   ## PCA conditions and Outlier
-  plot.new()
   pca_QC <- ggplot(data = dtp) +
     geom_point(aes(x = PC1, y = PC2, color = Conditions, shape = Outliers), size = 4, alpha = 0.8) +
     ggtitle("Quality Control PCA Condition clustering and Outlier check")+
@@ -549,7 +548,6 @@ Preprocessing <- function(Input_data,
 
   if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
     ### ### QC PCA color for replicates
-    plot.new()
     pca_QC_repl <- ggplot(data = dtp) +
       geom_point(aes(x = PC1, y = PC2, colour = Experimental_design$Conditions, shape = as.factor(Experimental_design$Biological_Replicates)), size = 4, alpha = 0.8) +
       ggtitle("Quality Control PCA replicate spread check")+
@@ -559,7 +557,7 @@ Preprocessing <- function(Input_data,
       geom_text(aes(x = PC1, y = PC2, label = rownames(QC_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
       scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
       scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
-    qc_plot_list[[2]] <- pca_QC
+    qc_plot_list[[2]] <- pca_QC_repl
 
     if (ExportQCPlots == TRUE){
       ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot = pca_QC_repl, width = 10,  height = 8)
