@@ -214,7 +214,7 @@ QC_Plots[[1]]
 QC_Plots[[2]]
 ```
 \
-As part of the **MetaProViz** visualisation module one can easily customise the PCA plot and adapt colour and shape for the information of interest. You can see more below for the `VizPCA()` function.
+As part of the **MetaProViz** visualization module one can easily customize the PCA plot and adapt color and shape for the information of interest. You can see more below for the `VizPCA()` function.
 \
 Before we proceed, we will remove the outlier:\
 ```{r}
@@ -226,7 +226,7 @@ As you may have noticed, in this example dataset we have several biological repl
 Intra_Preprocessed <- MetaProViz::ReplicateSum(Input_data=Intra_Preprocessed)
 ```
 \
-Using the pre-processed data, we can now use the **MetaProViz** visualisation module and generate some overview heatmaps `VizHeatmap()` or PCA plots `VizPCA()`. You can see some examples below. 
+Using the pre-processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `VizHeatmap()` or PCA plots `VizPCA()`. You can see some examples below. 
 
 ## DMA
 Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) calculates the Log2FC, p-value, adjusted p-value and t-value. With the different parameters of the `DMA()` function one can choose the statistical tests to calculate the p-value and adjusted p-value (parameters `STAT_pval` and `STAT_padj`).\
@@ -234,7 +234,7 @@ As input we will use the  pre-processed data we have generated using the `Prepro
 `1.` If all values of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= Inf/-Inf and the statistics will be NA\
 `2.` If some values  of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= positive or negative value, but the statistics will be NA\
 \
-In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons:\
+In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons. The results are automatically saved and returned into the global environment. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
 ```{r}
 MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
                Experimental_design=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
@@ -277,10 +277,27 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                Save_as = "svg")
 
 ```
-Why are the plots not shown? 
---> mention/show that the volcano plot is saved when Plot=TRUE
+\
+Using the DMA results, we can now use the **MetaProViz** visualization module and generate customized Volcano plots `VizVolcano()` or Lollipop graphs `VizLollipop()`. You can see some examples below. 
 
 ### ORA using the DMA results
+Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.
+
+
+
+
+The resulting score, ora, is the minus log10 of the obtained p-value.
+
+Also refer to decoupleR, if the user wants to perform other enrichment analysis!
+
+Explain what is needed in a pathway file and name some resources the user could scrape.
+
+The pathway file:
+
+```{r}
+
+
+```
 
 
 ## MCA
@@ -350,7 +367,6 @@ knitr::kable(PathwayInput[1:5,] , caption = "Summary of MCA: 2 Conditions.", row
 
 ```
 
-### ORA on metabolite clusters
 
 From the MCA (see section 2.3), we obtain clusters of metabolites. Now we can run ORA on each of those clusters using all metabolites as the background (discuss to remove the metabolites that are not in background, which can happen in the two-cond, not for kmeans though)
 
@@ -386,8 +402,6 @@ MetaProViz::MC_ORA(Input_data=MCAres,
 </div>
 \
 \
-
-### On DMA
 
 # 3. Run MetaProViz Visualisation
 In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,...) have 3 main `Plot_Settings`.\
