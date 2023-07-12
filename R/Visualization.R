@@ -1842,9 +1842,9 @@ VizLolipop<- function(Plot_Settings="Standard",
                       pCutoff= 0.05 ,
                       FCcutoff=0.5,
                       # Legend="Standard",
-                      OutputPlotName= "",
+                      OutputPlotName= "My title",
                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                      Subtitle= "",
+                      Subtitle= "My subtitle",
                       Theme= NULL,
                       Save_as = "svg"
 ){
@@ -2120,12 +2120,16 @@ VizLolipop<- function(Plot_Settings="Standard",
 
             #p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = "Significantly changed metabolites and their pathways", size = 4.5)
 
-            p2 <- p2  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
-
-
             p2 <- p2+Theme
+
+            p2 <- p2  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change")) +
+              theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                    plot.subtitle = element_text(color = "black", size=10),
+                    plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
+
             p2 <- p2+ labs(color=col_var_name)+
               labs(size=Plot_SettingsInfo_indi[['size']])
+
 
             lolipop_plot <-  p2
 
@@ -2145,17 +2149,17 @@ VizLolipop<- function(Plot_Settings="Standard",
             geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
             scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
-            scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,test]))) +
-            ggtitle(paste(OutputPlotName,": ", i )) +
-            theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
-            labs(color=Plot_SettingsInfo_indi[['color']]) +
-            labs(size=Plot_SettingsInfo_indi[['size']])+
-            labs(subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
-        }
 
-        #Add the theme
-        if(is.null(Theme)==FALSE){
-          lolipop_plot <- lolipop_plot+Theme
+            scale_colour_gradient(low = "red", high = "blue")+
+            geom_vline(xintercept = 0)+
+            Theme+
+            labs(color=Plot_SettingsInfo_indi[['color']])+
+            labs(size=Plot_SettingsInfo_indi[['size']]) +
+            ylab("Metabolites")+
+            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+            theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                  plot.subtitle = element_text(color = "black", size=10),
+                  plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
         }
 
 
@@ -2279,13 +2283,16 @@ VizLolipop<- function(Plot_Settings="Standard",
           lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
           p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
-         # p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
+          # p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
 
           p2 <- p2+Theme
           p2 <- p2+ labs(color=col_var_name)+
             labs(size=Plot_SettingsInfo[['size']])
 
-          p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+          p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+            theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                  plot.subtitle = element_text(color = "black", size=10),
+                  plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
 
           lolipop_plot <-  p2
 
@@ -2305,19 +2312,20 @@ VizLolipop<- function(Plot_Settings="Standard",
           geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
           geom_point(aes(colour = keyvals, size = keyvalssize ))   +
           scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
-          scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,test]))) +
-          ggtitle(OutputPlotName) +
-          theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
-          labs(color=Plot_SettingsInfo[['color']]) +
-          labs(size=Plot_SettingsInfo[['size']]) + labs(subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+          scale_colour_gradient(low = "red", high = "blue")+
+          geom_vline(xintercept = 0)+
+          Theme+
+          labs(color=Plot_SettingsInfo[['color']])+
+          labs(size=Plot_SettingsInfo[['size']]) +
+          ylab("Metabolites")+
+          labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+          theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                plot.subtitle = element_text(color = "black", size=10),
+                plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
       }
 
       plot(lolipop_plot)
 
-      #Add the theme
-      if(is.null(Theme)==FALSE){
-        lolipop_plot <- lolipop_plot+Theme
-      }
 
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
@@ -2390,15 +2398,17 @@ VizLolipop<- function(Plot_Settings="Standard",
           geom_point(aes(colour = Condition, size = keyvalssize ))   +
           scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
           #   scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,test]))) +
-          theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
+          geom_vline(xintercept = 0) +
+          Theme+
+          theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                plot.subtitle = element_text(color = "black", size=10),
+                plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
+          ylab("Metabolites")+
           # #  labs(color=Plot_SettingsInfo_indi[['color']]) +
-          labs(size=Plot_SettingsInfo_indi[['size']])  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+          labs(size=Plot_SettingsInfo_indi[['size']])  +
+          labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
 
         lolipop_plot
-        #Add the theme
-        if(is.null(Theme)==FALSE){
-          lolipop_plot <- lolipop_plot+Theme
-        }
 
 
         #save plot and get rid of extra signs before saving
@@ -2456,25 +2466,17 @@ VizLolipop<- function(Plot_Settings="Standard",
 
       Dotplot1 <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) +
         geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
-        # geom_segment(aes(y =0,
-        #                  x = Metabolite,
-        #                  yend = `Log2FC`,
-        #                  xend = Metabolite),
-        #              color = "black") +
-        # scale_size(name="abs(Log2FC)",range = c(6,16))+
         geom_text(color="black", size=2) +
         ylim(((Reduce(min,Combined_Input$`Log2FC`))-0.5),((Reduce(max,Combined_Input$`Log2FC`))+0.5)) +
         coord_flip()+
+        geom_hline(yintercept = 0) +
+        Theme+
         theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
               plot.subtitle = element_text(color = "black", size=10),
               plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
-        labs(y="Log2FC", x="")+ labs(title = OutputPlotName,subtitle = Subtitle) + geom_hline(yintercept = 0) +
-        labs(size=Plot_SettingsInfo[['size']])  + labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
-
-      #Add the theme
-      if(is.null(Theme)==FALSE){
-        Dotplot1 <- Dotplot1+Theme
-      }
+        labs(y="Log2FC", x="Metabolites")+
+        labs(size=Plot_SettingsInfo[['size']])  +
+        labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
 
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=Dotplot1, width=12, height=14)
