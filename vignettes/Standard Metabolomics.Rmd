@@ -594,6 +594,91 @@ If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we 
 \
 
 ### Lollipop graphs
+Next we will look at another option we have to display our results from the different analysis (DMA, MCA, GSE) and that would be with Lolipop graphs.
+
+#### **Standard**
+Here we will first look into the results from the differential analysis (see above 2.2 DMA) for the comparison of `HK2 versus 786M1A` using a plain graph:
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
+# Run with default parameter --> only need to provide Input_data and the title we like
+MetaProViz::VizLolipop(Input_data=DMA_HK2v786M1A,
+                       OutputPlotName= "HK2 versus 786M1A",
+                       Subtitle= "Results of DMA")
+```
+\
+Next we may want to show additional information about the metabolites on the plot. We can change the dot size and/or color again using information from the Plot_SettingsFile by specifying it in the Plot_SettingsInfo vector.
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying color and size option."}
+MetaProViz::VizLolipop(Input_data = DMA_HK2v786O, 
+                       Plot_SettingsInfo= c(color="t.val", size="p.adj"), 
+                       Plot_SettingsFile= DMA_HK2v786O,
+                       OutputPlotName= "HK2 versus 786M1A",
+                       Subtitle= "Results of DMA")
+```
+\
+We can also use the metabolite cluster information of our MCA to colorcode the metabolites while showing another information using the dot size. First we need to put the displaying information together in the Settings file.
+```{r, fig.cap="Figure: Lolipop displaying metabolite clusters together."}
+SettingsO <- merge(Settings,DMA_HK2v786O, by="Metabolite" )
+# Check our settings:
+knitr::kable(Settings[1:4,] , caption = "Settings for plots.", row.names=FALSE)
+```
+
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying metabolite clusters together."}
+MetaProViz::VizLolipop(Input_data = DMA_HK2v786O, 
+           Plot_SettingsInfo= c(color="RG3_SignificantChange", size = "p.adj"), 
+           Plot_SettingsFile= SettingsO,
+           OutputPlotName= "HK2 versus 786M1A",
+           Subtitle= "Results of DMA with MCA")
+```
+\
+Alternatively we can make individual plot of each metabolite cluster
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying metabolite clusters individually"}
+MetaProViz::VizLolipop(Input_data = DMA_HK2v786O, 
+                       Plot_SettingsInfo= c(color = "t.val", size = "p.val", individual= "RG3_SignificantChange"),
+                       Plot_SettingsFile= SettingsO,
+                       OutputPlotName= "HK2 versus 786M1A",
+                       Subtitle= "Results of DMA with MCA")
+```
+\
+We can also use lolipop plots to compare 2 or more DMA results by setting the value in Plot_Settings to "Compare". Here, we have to add a list of dataframes in the Input_data as well as a list of the names of the datasets to be used for displaying the data. Colorcoding is used for the datasets. 
+```{r}
+## Compare
+MetaProViz::VizLolipop(Input_data = list(DMA_HK2v786O,DMA_HK2v786M1A), 
+           Plot_Settings="Compare", 
+           Comparison_name= list("Cond1", "Cond2"),
+           OutputPlotName= "DMA HK2v786O versus DMA HK2v786M1A",
+           Subtitle= "Results of DMA")
+
+```
+\
+Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
+```{r}
+#  When  Plot_Settings="Compare" colorcoding of hte different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
+MetaProViz::VizLolipop(Input_data = list(DMA_HK2v786O,DMA_HK2v786M1A),
+           Plot_SettingsInfo= c(size = "t.val"),  
+           Plot_Settings="Compare", 
+           Comparison_name= list("Cond1", "Cond2"), 
+           Plot_SettingsFile = list(DMA_HK2v786O,DMA_HK2v786M1A),
+           OutputPlotName= "DMA HK2v786O versus DMA HK2v786M1A",
+           Subtitle= "Results of DMA")
+
+```
+\
+Finally we can compare the DMA results and make individual plots each cluster of the MCA.
+```{r}
+SettingsM1A <- merge(Settings,DMA_HK2v786M1A, by="Metabolite" )
+knitr::kable(SettingsO[1:4,] , caption = "Settings for plots.", row.names=FALSE)
+```
+
+```{r}
+VizLolipop(Input_data = list(DMA_HK2v786O,DMA_HK2v786M1A), 
+           Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
+           Plot_Settings="Compare", 
+           Comparison_name= list("Cond1", "Cond2"), 
+           Plot_SettingsFile = list(SettingsO,SettingsM1A),
+           OutputPlotName= "DMA HK2v786O versus DMA HK2v786M1A",
+           Subtitle= "Results of DMA for each Metabolite Cluster")
+```
+
+
 
 ### Heatmaps
 
