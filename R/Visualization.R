@@ -1836,6 +1836,8 @@ VizAlluvial <- function(Input_data1,
 # Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
 
 
+
+
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
@@ -1852,6 +1854,7 @@ VizLolipop<- function(Plot_Settings="Standard",
                       Theme= NULL,
                       Save_as = "svg"
 ){
+
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "showtext", "cowplot")
@@ -2040,7 +2043,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           na.omit()
 
         #Select metabolites for the cut offs selected
-        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & stat > pCutoff)
+        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(get(x)) >=FCcutoff & stat > pCutoff)
 
         if("size" %in% names(Plot_SettingsInfo_indi)==TRUE ){
           if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
@@ -2071,7 +2074,7 @@ VizLolipop<- function(Plot_Settings="Standard",
               mutate(Metab_name = row_number()) %>%
               group_by(plot_color_variable) %>%
               mutate(
-                avg = mean(Log2FC)
+                avg = mean(get(x))
               ) %>%
               ungroup() %>%
               mutate(plot_color_variable = factor(plot_color_variable))
@@ -2097,7 +2100,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 
             #rm(p2)
             p2 <- loli.data_avg %>%
-              ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
+              ggplot(aes(Metab_name, get(x))) + # names in aes ro Metab_name
               geom_hline(
                 data = tibble(y = -5:5),
                 aes(yintercept = y),
@@ -2128,11 +2131,11 @@ VizLolipop<- function(Plot_Settings="Standard",
             if(Flip == TRUE){
               p2 <- p2 +theme(axis.text.x=element_blank(),
                               axis.ticks.x=element_blank())
-              lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
-              p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
+              lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+              p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
 
-              lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
-              p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
+              lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+              p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
 
               p2 <- p2+Theme
               p2 <- p2+ labs(color=col_var_name)+
@@ -2147,11 +2150,11 @@ VizLolipop<- function(Plot_Settings="Standard",
               p2<- p2 + coord_flip()
               p2 <- p2 +theme(axis.text.x=element_blank(),
                               axis.ticks.x=element_blank())
-              lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
-              p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite, size = 3)
+              lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+              p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite, size = 3)
 
-              lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
-              p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
+              lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+              p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
               p2 <- p2+Theme
 
@@ -2178,8 +2181,8 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
 
         if(is.null(p2)==TRUE){
-          lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
-            geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+            geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
             scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
 
@@ -2188,7 +2191,8 @@ VizLolipop<- function(Plot_Settings="Standard",
             Theme+
             labs(color=Plot_SettingsInfo_indi[['color']])+
             labs(size=Plot_SettingsInfo_indi[['size']]) +
-            ylab("Metabolites")+
+            ylab(y)+
+            xlab(x)+
             labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
             theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                   plot.subtitle = element_text(color = "black", size=10),
@@ -2227,7 +2231,7 @@ VizLolipop<- function(Plot_Settings="Standard",
       InputLolipop<- InputLolipop %>% drop_na()
 
       #Select metabolites for the cut offs selected
-      loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & stat > pCutoff)
+      loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(get(x)) >=FCcutoff & stat > pCutoff)
 
       if("size" %in% names(Plot_SettingsInfo)==TRUE ){
         if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
@@ -2258,7 +2262,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             mutate(Metab_name = row_number()) %>%
             group_by(plot_color_variable) %>%
             mutate(
-              avg = mean(Log2FC)
+              avg = mean(get(x))
             ) %>%
             ungroup() %>%
             mutate(plot_color_variable = factor(plot_color_variable))
@@ -2284,7 +2288,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 
           #rm(p2)
           p2 <- loli.data_avg %>%
-            ggplot(aes(Metab_name, Log2FC)) + # names in aes ro Metab_name
+            ggplot(aes(Metab_name, get(x))) + # names in aes ro Metab_name
             geom_hline(
               data = tibble(y = -5:5),
               aes(yintercept = y),
@@ -2312,11 +2316,11 @@ VizLolipop<- function(Plot_Settings="Standard",
             a <- p2
             p2 <- p2 +theme(axis.text.x=element_blank(),
                             axis.ticks.x=element_blank())
-            lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
-            p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
+            lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+            p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
 
-            lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
-            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
+            lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
 
             p2 <- p2+Theme
             p2 <- p2+ labs(color=col_var_name)+
@@ -2332,11 +2336,11 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2 <- p2 +theme(axis.text.y=element_blank(),
                             axis.ticks.y=element_blank()
             )
-            lab_pos_metab <- loli.data_avg %>% filter(Log2FC>0) %>% select(Metabolite, Metab_name, Log2FC)
-            p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab$Log2FC+1.5, label = lab_pos_metab$Metabolite, size = 3)
+            lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+            p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite, size = 3)
 
-            lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
-            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
+            lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
             # p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
 
@@ -2348,6 +2352,7 @@ VizLolipop<- function(Plot_Settings="Standard",
               theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                     plot.subtitle = element_text(color = "black", size=10),
                     plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
+            p2
           }
           lolipop_plot <-  p2
 
@@ -2363,8 +2368,8 @@ VizLolipop<- function(Plot_Settings="Standard",
       }
 
       if(is.null(p2)==TRUE){
-        lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
-          geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+        lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+          geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
           geom_point(aes(colour = keyvals, size = keyvalssize ))   +
           scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
           scale_colour_gradient(low = "red", high = "blue")+
@@ -2372,7 +2377,8 @@ VizLolipop<- function(Plot_Settings="Standard",
           Theme+
           labs(color=Plot_SettingsInfo[['color']])+
           labs(size=Plot_SettingsInfo[['size']]) +
-          ylab("Metabolites")+
+          ylab(y)+
+          xlab(x)+
           labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
           theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                 plot.subtitle = element_text(color = "black", size=10),
@@ -2398,7 +2404,7 @@ VizLolipop<- function(Plot_Settings="Standard",
     if("individual" %in% names(Plot_SettingsInfo)==TRUE){
 
       Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
-      comb.colnames <- c("Metabolite","Log2FC",stat, "Condition")
+      comb.colnames <- c("Metabolite",paste(x),stat, "Condition")
       colnames(Combined_Input) <- comb.colnames
 
       for (i in 1:length(Input_data)){
@@ -2412,13 +2418,13 @@ VizLolipop<- function(Plot_Settings="Standard",
       }
 
 
-      # Combined_Input <- Combined_Input %>% filter(abs(Log2FC) >=FCcutoff)
+      # Combined_Input <- Combined_Input %>% filter(abs(get(x)) >=FCcutoff)
       # Combined_Input <- Combined_Input[Combined_Input[stat] <= pCutoff,]
       # Combined_Input<- Combined_Input %>% drop_na()
       Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
 
       # Remove the metabolite with inf in logFC because it messes the plot
-      Combined_Input <- Combined_Input[is.finite(Combined_Input$Log2FC),]
+      Combined_Input <- Combined_Input[is.finite(Combined_Input[[x]]),]
 
 
 
@@ -2438,7 +2444,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
         #Select metabolites for the cut offs selected
-        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(Log2FC) >=FCcutoff & stat > pCutoff)
+        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(get(x)) >=FCcutoff & stat > pCutoff)
 
 
 
@@ -2454,8 +2460,8 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
 
         if(Flip==TRUE){
-          lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
-            geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+            geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
             scale_size_continuous(range = c(1,5))+
             geom_vline(xintercept = 0) +
@@ -2465,13 +2471,14 @@ VizLolipop<- function(Plot_Settings="Standard",
                   plot.subtitle = element_text(color = "black", size=10),
                   plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5),
                   axis.text.x = element_text(angle = 90, hjust = 1))+
-            ylab("Metabolites")+
+            ylab(y)+
+            xlab(x)+
             labs(size=Plot_SettingsInfo_indi[['size']])  +
             labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
 
         }else{
-          lolipop_plot <- ggplot(loli.data , aes(x = Log2FC, y = names)) +
-            geom_segment(aes(x = 0, xend = Log2FC, y = names, yend = names)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+            geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
             scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
             #   scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,stat]))) +
@@ -2480,7 +2487,8 @@ VizLolipop<- function(Plot_Settings="Standard",
             theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                   plot.subtitle = element_text(color = "black", size=10),
                   plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
-            ylab("Metabolites")+
+            ylab(x)+
+            xlab(y)+
             # #  labs(color=Plot_SettingsInfo_indi[['color']]) +
             labs(size=Plot_SettingsInfo_indi[['size']])  +
             labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
@@ -2507,7 +2515,7 @@ VizLolipop<- function(Plot_Settings="Standard",
     }
     else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
       Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
-      comb.colnames <- c("Metabolite","Log2FC",stat, "Condition")
+      comb.colnames <- c("Metabolite",paste(x),stat, "Condition")
       colnames(Combined_Input) <- comb.colnames
 
       for (i in 1:length(Input_data)){
@@ -2533,42 +2541,44 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
 
-      # Combined_Input <- Combined_Input %>% filter(abs(Log2FC) >=FCcutoff)
+      # Combined_Input <- Combined_Input %>% filter(abs(get(x)) >=FCcutoff)
       # Combined_Input <- Combined_Input[Combined_Input[stat] <= pCutoff,]
       # Combined_Input<- Combined_Input %>% drop_na()
       Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
 
       # Remove the metabolite with inf in logFC because it messes the plot
-      Combined_Input <- Combined_Input[is.finite(Combined_Input$Log2FC),]
+      Combined_Input <- Combined_Input[is.finite(Combined_Input[[x]]),]
 
 
       if(Flip==TRUE){
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]], label=`p.adj`)) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
           geom_text(color="black", size=2) +
-          ylim(((Reduce(min,Combined_Input$`Log2FC`))-0.5),((Reduce(max,Combined_Input$`Log2FC`))+0.5)) +
+          ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
           geom_hline(yintercept = 0) +
           Theme+
           theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                 plot.subtitle = element_text(color = "black", size=10),
                 plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5),
                 axis.text.x = element_text(angle = 90, hjust = 1))+
-          labs(y="Log2FC", x="Metabolites")+
+          ylab(x)+
+          xlab(y)+
           labs(size=Plot_SettingsInfo[['size']])  +
           labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
 
       }else{
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + `Log2FC`), y=`Log2FC`, label=`p.adj`)) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]], label=`p.adj`)) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
           geom_text(color="black", size=2) +
-          ylim(((Reduce(min,Combined_Input$`Log2FC`))-0.5),((Reduce(max,Combined_Input$`Log2FC`))+0.5)) +
+          ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
           coord_flip()+
           geom_hline(yintercept = 0) +
           Theme+
           theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                 plot.subtitle = element_text(color = "black", size=10),
                 plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))+
-          labs(y="Log2FC", x="Metabolites")+
+          ylab(y)+
+          xlab(x)+
           labs(size=Plot_SettingsInfo[['size']])  +
           labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
       }
@@ -2584,6 +2594,10 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(Plot_Settings=="PEA"){# Code Missing
   }
 }
+
+
+
+
 
 
 
