@@ -184,11 +184,13 @@ As part of the `Preprocessing()` function several plots are generated, returned 
 ```{r}
 #For each Round of HotellinsT2 test three plots will be saved:
 #1.PCA plot
-Outlier_Plots[[1]]
-
+P1 <- Outlier_Plots[[1]]
+plot(P1)
+```
+```{r}
 #2.Screeplot
-Outlier_Plots[[2]]
-
+p2 <- Outlier_Plots[[2]]
+plot(P2)
 #3.Hotellins Outlier
 Outlier_Plots[[3]]
 
@@ -199,10 +201,14 @@ Outlier_Plots[[4]]
 Outlier_Plots[[5]]
 Outlier_Plots[[6]]
 
-
+#grid.arrange(Outlier_Plots, ncol=2)
 ```
 I have a list with 6 elements, each of them being a plot. If I run `Outlier_Plots[[3]]` in the console , I will see the plot. Yet, if I knite the .rmd file I will only see `Outlier_Plots[[1]]`, not the others.
-
+--> Maybe try gridextra:
+library(gridExtra)
+library(grid)
+grid.arrange(Outlier_Plots, ncol=2)
+--> general coding chanel
 \
 The QC plots `QC_Plots` include an PCA plot using the processed data and highlighting the outliers. Moreover, if one has provided information about biological replicates a second plot is generated highlighting the biological replicates, which would highlight if there is a batch effect.\
 ```{r}
@@ -616,4 +622,4 @@ sessioninfo::session_info()
 ```
 
 
-
+daniel, pau, robin (single cell) --> there was someone on a conference Aurelien mentioned 
