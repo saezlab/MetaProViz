@@ -234,11 +234,10 @@ As input we will use the  pre-processed data we have generated using the `Prepro
 `1.` If all values of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= Inf/-Inf and the statistics will be NA\
 `2.` If some values  of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= positive or negative value, but the statistics will be NA\
 \
-In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform mutliple different comparisons:\
+In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons:\
 ```{r}
-
-DMA_HK2v786O <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
-               Experimental_design=Intra_Preprocessed[,c(1:2)],#we only maintain the information columns we need here
+MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
+               Experimental_design=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
                Condition1="HK2",
                Condition2="786-O",
                STAT_pval ="t.test",
@@ -252,10 +251,9 @@ DMA_HK2v786O <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we nee
 # Check how our data looks like:
 knitr::kable(DMA_HK2v786O[1:6,], caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE)
 
-
-#Perform the other comparisons;
-DMA_HK2v786M1A <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
-               Experimental_design=Intra_Preprocessed[,c(1:2)],#we only maintain the information columns we need here
+#Perform the other comparisons:
+MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
+               Experimental_design=Intra_Preprocessed[,c(1:2)],
                Condition1="HK2",
                Condition2="786-M1A",
                STAT_pval ="t.test",
@@ -266,8 +264,8 @@ DMA_HK2v786M1A <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we n
                Plot = TRUE, 
                Save_as = "svg")
 
-DMA_HK2v786M2A <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
-               Experimental_design=Intra_Preprocessed[,c(1:2)],#we only maintain the information columns we need here
+MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
+               Experimental_design=Intra_Preprocessed[,c(1:2)],
                Condition1="HK2",
                Condition2="786-M2A",
                STAT_pval ="t.test",
