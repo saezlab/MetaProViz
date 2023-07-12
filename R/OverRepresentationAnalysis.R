@@ -225,6 +225,7 @@ MC_ORA <- function(Input_data,
       }
     }
   }
+  return <- clusterGoSummary
 }
 
 
@@ -412,6 +413,7 @@ DM_ORA <- function(Input_data,
           plot(UpsetPlot)
         }
       }
-    }
+  }
+  return <- clusterGoSummary
 }
 
