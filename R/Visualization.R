@@ -1837,7 +1837,6 @@ VizAlluvial <- function(Input_data1,
 
 
 
-
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
@@ -2556,8 +2555,9 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
       } else{
         Plot_SettingsInfo= c(Plot_SettingsInfo,size="p.adj")
-        keyvalssize <- Combined_Input$p.adj
+        keyvalssize <- Combined_Input$size
       }
+
 
 
 
@@ -2617,11 +2617,6 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(Plot_Settings=="PEA"){# Code Missing
   }
 }
-
-
-
-
-
 
 
 ###########----------------------
