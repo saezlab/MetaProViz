@@ -348,7 +348,6 @@ ORA_HK2_vs_786O <- MetaProViz::DM_ORA(Input_data=HK2_vs_786O,
 
 ```
 
-
 ## MCA
 Metabolite Clustering Analysis (`MCA`)is a module...
 
