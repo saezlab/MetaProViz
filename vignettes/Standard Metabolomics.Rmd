@@ -293,9 +293,30 @@ Also refer to decoupleR, if the user wants to perform other enrichment analysis!
 Explain what is needed in a pathway file and name some resources the user could scrape.
 
 The pathway file:
+```{r}
+#Pathway file requirements: column `term`, `Metabolite` and `Description`
+KEGG <- KEGG_Pathways[,c(1,3)]%>%
+  dplyr::rename("term"=1,
+                "Metabolite"=2)
+KEGG$Description <- KEGG$term  
+
+#Input data requirements: column `t.val` and column `Metabolite` (needs to match Pathway file)
+#We could use the KEGG-IDs to match, yet we prefer the trivial names
+
+
+```
 
 ```{r}
 
+MetaProViz::DM_ORA(Input_data=DMA_HK2_vs_786M2A,
+                   PathwayFile=,
+                   PathwayName="KEGG",
+                   minGSSize=10,
+                   maxGSSize=1000 ,
+                   Save_as="svg",
+                   pCutoff=0.2,
+                   PercentageCutoff=10
+)
 
 ```
 

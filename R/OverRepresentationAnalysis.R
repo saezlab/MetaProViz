@@ -238,7 +238,7 @@ MC_ORA <- function(Input_data,
 #'
 #' Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
 #'
-#' @param Input_data Input DF with column "t.val" and column Metabolite", which needs to match the identifier type in column "Metabolite" in the PathwayFile.
+#' @param Input_data Input DF with column "t.val" and column "Metabolite", which needs to match the identifier type in column "Metabolite" in the PathwayFile.
 #' @param PathwayFile DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
 #' @param PathwayName \emph{Optional: } Name of the pathway list used \strong{default: ""}
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
