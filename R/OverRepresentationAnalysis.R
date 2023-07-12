@@ -364,9 +364,9 @@ DM_ORA <- function(Input_data,
 
       #Safe file
       if(PathwayName ==""){
-        write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary','.csv', sep=""))#Export the ORA results as .csv
+        write_csv(clusterGoSummary, paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary','.csv', sep=""))#Export the ORA results as .csv
       } else{
-        write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '.csv', sep=""))#Export the ORA results as .csv
+        write_csv(clusterGoSummary, paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.csv', sep=""))#Export the ORA results as .csv
       }
 
       #Make Selection of terms that should be displayed on the plots
@@ -384,9 +384,9 @@ DM_ORA <- function(Input_data,
           Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
             ggtitle(paste("Dotplot: ", PathwayName, sep=" "))
           if(PathwayName ==""){
-            ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot.", Save_as, sep=""), plot=Dotplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot.", Save_as, sep=""), plot=Dotplot, width=10, height=8)
           } else{
-            ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_",PathwayName, ".", Save_as, sep=""), plot=Dotplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot_",PathwayName, ".", Save_as, sep=""), plot=Dotplot, width=10, height=8)
           }
           plot(Dotplot)
 
@@ -395,9 +395,9 @@ DM_ORA <- function(Input_data,
           Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
             ggtitle(paste("Emapplot:", PathwayName, sep=" "))
           if(PathwayName ==""){
-            ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot.", Save_as, sep=""), plot=Emapplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot.", Save_as, sep=""), plot=Emapplot, width=10, height=8)
           } else{
-            ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_",PathwayName, ".", Save_as, sep=""), plot=Emapplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot_",PathwayName, ".", Save_as, sep=""), plot=Emapplot, width=10, height=8)
           }
           plot(Emapplot)
 
@@ -405,9 +405,9 @@ DM_ORA <- function(Input_data,
           UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
             ggtitle(paste("UpsetPlot: ",  PathwayName, sep=" "))
           if(PathwayName ==""){
-            ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot.",  Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot.",  Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
           } else{
-            ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", PathwayName, ".", Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot_", PathwayName, ".", Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
           }
           plot(UpsetPlot)
         }
