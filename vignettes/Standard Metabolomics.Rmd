@@ -281,14 +281,10 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
 Using the DMA results, we can now use the **MetaProViz** visualization module and generate customized Volcano plots `VizVolcano()` or Lollipop graphs `VizLollipop()`. You can see some examples below. 
 
 ### ORA using the DMA results
-Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.
-
-
-
-
-The resulting score, ora, is the minus log10 of the obtained p-value.
-
-Also refer to decoupleR, if the user wants to perform other enrichment analysis!
+Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
+Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites (see MCA below). If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/).\
+\
+Before we can run the ORA on the DMA results, we 
 
 Explain what is needed in a pathway file and name some resources the user could scrape.
 
@@ -302,21 +298,21 @@ KEGG$Description <- KEGG$term
 
 #Input data requirements: column `t.val` and column `Metabolite` (needs to match Pathway file)
 #We could use the KEGG-IDs to match, yet we prefer the trivial names
-
+HK2_vs_786M1A <- merge(`DMA_HK2_vs_786-M1A`[,1:5], Pathways[1:3], by="Metabolite", all=TRUE)
+HK2_vs_786M1A <-HK2_vs_786M1A[complete.cases(HK2_vs_786M1A),-1]%>%
+  dplyr::rename("Metabolite"=6)
 
 ```
 
 ```{r}
-
-MetaProViz::DM_ORA(Input_data=DMA_HK2_vs_786M2A,
-                   PathwayFile=,
+Res <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M1A,
+                   PathwayFile=KEGG,
                    PathwayName="KEGG",
-                   minGSSize=10,
+                   minGSSize=3,
                    maxGSSize=1000 ,
                    Save_as="svg",
-                   pCutoff=0.2,
-                   PercentageCutoff=10
-)
+                   pCutoff=1,
+                   PercentageCutoff=1)
 
 ```
 
