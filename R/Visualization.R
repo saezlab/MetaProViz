@@ -1837,6 +1837,7 @@ VizAlluvial <- function(Input_data1,
 
 
 
+
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
@@ -1913,6 +1914,9 @@ VizLolipop<- function(Plot_Settings="Standard",
   if(is.vector(Plot_SettingsInfo)==TRUE & is.null(Plot_SettingsFile)==TRUE){
     stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
   }
+  if(Plot_Settings=="Compare" & "color" %in% names(Plot_SettingsInfo)==TRUE){
+    stop("When Plot_Settings='Compare' color is used to colorcode the input datasets. Please use only the size option.")
+  }
   if(is.vector(Plot_SettingsInfo)==TRUE){
     if("color" %in% names(Plot_SettingsInfo)==TRUE & "size" %in% names(Plot_SettingsInfo)==TRUE){
       if((Plot_SettingsInfo[["size"]] == Plot_SettingsInfo[["color"]])==TRUE){
@@ -1948,6 +1952,8 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
       }
     }
+
+
     if("individual" %in% names(Plot_SettingsInfo)==TRUE){
       if(length(Plot_SettingsFile_List)==1){
         Plot_SettingsFile <- Plot_SettingsFile%>%
@@ -1978,9 +1984,7 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(is.vector(Plot_SettingsInfo)==FALSE & is.null(Plot_SettingsInfo)==FALSE){
     stop("Plot_SettingsInfo must be named vector or NULL.")
   }
-  if(Plot_Settings=="Compare" & "color" %in% names(Plot_SettingsInfo)==TRUE){
-    stop("Color is used to represent the datastes compared. Please use the size option.")
-  }
+
 
   if(Plot_Settings=="PEA" & is.vector(Plot_SettingsInfo)==FALSE){
     stop("You have chosen Plot_Settings=`PEA` that requires you to provide a vector for Plot_SettingsInfo.")
@@ -2613,6 +2617,10 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(Plot_Settings=="PEA"){# Code Missing
   }
 }
+
+
+
+
 
 
 
