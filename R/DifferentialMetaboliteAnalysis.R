@@ -397,7 +397,7 @@ DMA <-function(Input_data,
   xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
   writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
 
-  if ( Plot == TRUE){ # Make a simple Volcano plot --> implemet plot true or false
+  if(Plot == TRUE){ # Make a simple Volcano plot
     VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
                                    lab = DMA_Output$Metabolite,#Metabolite name
                                    x = "Log2FC",#Log2FC
@@ -411,8 +411,8 @@ DMA <-function(Input_data,
                                    titleLabSize = 16,
                                    # colCustom = c("black", "grey", "grey", "red"),
                                    colAlpha = 0.7,
-                                   title= paste0(toString(Condition1),"-vs-",toString(Condition2)),
-                                   subtitle = bquote(italic("Differential metabolite analysis")),
+                                   title= paste0(toString(Condition1)," versus ",toString(Condition2)),
+                                   subtitle = bquote(italic("Differential Metabolite Analysis")),
                                    caption = paste0("total = ", nrow(DMA_Output), " Metabolites"),
                                    xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2),
                                    ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Output$p.adj))))),
@@ -426,14 +426,14 @@ DMA <-function(Input_data,
                                    gridlines.major = FALSE,
                                    gridlines.minor = FALSE,
                                    drawConnectors = FALSE)
-    OutputPlotName = paste0(OutputName,"_padj_",0.05,"log2FC_",0.5)
+    OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
-  }
 
+    plot(VolcanoPlot)
+  }
   assign(paste0("DMA_",toString(Condition1),"_vs_",toString(Condition2)), DMA_Output, envir=.GlobalEnv)
-  return(DMA_Output)
 }
 
 
