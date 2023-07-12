@@ -1837,7 +1837,6 @@ VizAlluvial <- function(Input_data1,
 
 
 
-
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
@@ -1852,7 +1851,8 @@ VizLolipop<- function(Plot_Settings="Standard",
                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
                       Subtitle= "My subtitle",
                       Theme= NULL,
-                      Save_as = "svg"
+                      Save_as = "svg",
+                      parameter_size="Reverse" #or default "Standard"
 ){
 
 
@@ -2168,6 +2168,9 @@ VizLolipop<- function(Plot_Settings="Standard",
             }
 
             lolipop_plot <-  p2
+            if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+              lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+            }
 
             # Put back the correct name in the data df
             names(loli.data)[position]<- col_var_name
@@ -2184,7 +2187,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
-            scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+            # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
 
             scale_colour_gradient(low = "red", high = "blue")+
             geom_vline(xintercept = 0)+
@@ -2198,6 +2201,9 @@ VizLolipop<- function(Plot_Settings="Standard",
                   plot.subtitle = element_text(color = "black", size=10),
                   plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
 
+          if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+            lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+          }
           if(Flip==TRUE){
             lolipop_plot <- lolipop_plot + coord_flip() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
           }
@@ -2355,6 +2361,9 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2
           }
           lolipop_plot <-  p2
+          if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+            lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+          }
 
           # Put back the correct name in the data df
           names(loli.data)[position]<- col_var_name
@@ -2368,10 +2377,11 @@ VizLolipop<- function(Plot_Settings="Standard",
       }
 
       if(is.null(p2)==TRUE){
+
         lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
           geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
           geom_point(aes(colour = keyvals, size = keyvalssize ))   +
-          scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+          # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
           scale_colour_gradient(low = "red", high = "blue")+
           geom_vline(xintercept = 0)+
           Theme+
@@ -2384,6 +2394,9 @@ VizLolipop<- function(Plot_Settings="Standard",
                 plot.subtitle = element_text(color = "black", size=10),
                 plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
 
+        if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+          lolipop_plot <- lolipop_plot + scale_size(trans = 'reverse')
+        }
         if(Flip==TRUE){
           lolipop_plot <- lolipop_plot + coord_flip() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
         }
@@ -2463,7 +2476,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
-            scale_size_continuous(range = c(1,5))+
+            #scale_size_continuous(range = c(1,5))+
             geom_vline(xintercept = 0) +
             coord_flip()+
             Theme+
@@ -2480,7 +2493,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
-            scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+            # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
             #   scale_colour_gradient(low = "red", high = "blue")+#, limits = c(0, max(loli.data[,stat]))) +
             geom_vline(xintercept = 0) +
             Theme+
@@ -2492,6 +2505,9 @@ VizLolipop<- function(Plot_Settings="Standard",
             # #  labs(color=Plot_SettingsInfo_indi[['color']]) +
             labs(size=Plot_SettingsInfo_indi[['size']])  +
             labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+        }
+        if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+          lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
         }
         lolipop_plot
 
@@ -2582,6 +2598,9 @@ VizLolipop<- function(Plot_Settings="Standard",
           labs(size=Plot_SettingsInfo[['size']])  +
           labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
       }
+      if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+        lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+      }
 
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=lolipop_plot, width=12, height=14)
@@ -2594,14 +2613,6 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(Plot_Settings=="PEA"){# Code Missing
   }
 }
-
-
-
-
-
-
-
-
 
 
 
