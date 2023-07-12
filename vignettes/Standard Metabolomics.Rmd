@@ -308,10 +308,36 @@ HK2_vs_786M1A <- merge(`DMA_HK2_vs_786-M1A`[,1:5], Pathways[1:3], by="Metabolite
 HK2_vs_786M1A <-HK2_vs_786M1A[complete.cases(HK2_vs_786M1A),-1]%>%
   dplyr::rename("Metabolite"=6)
 
+HK2_vs_786M2A <- merge(`DMA_HK2_vs_786-M2A`[,1:5], Pathways[1:3], by="Metabolite", all=TRUE)
+HK2_vs_786M2A <-HK2_vs_786M2A[complete.cases(HK2_vs_786M2A),-1]%>%
+  dplyr::rename("Metabolite"=6)
+
+HK2_vs_786O <- merge(`DMA_HK2_vs_786-O`[,1:5], Pathways[1:3], by="Metabolite", all=TRUE)
+HK2_vs_786O <-HK2_vs_786O[complete.cases(HK2_vs_786O),-1]%>%
+  dplyr::rename("Metabolite"=6)
+
 ```
 
 ```{r}
-Res <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M1A,
+ORA_HK2_vs_786M1A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M1A,
+                   PathwayFile=KEGG,
+                   PathwayName="KEGG",
+                   minGSSize=3,
+                   maxGSSize=1000 ,
+                   Save_as="svg",
+                   pCutoff=1,
+                   PercentageCutoff=1)
+
+ORA_HK2_vs_786M2A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M2A,
+                   PathwayFile=KEGG,
+                   PathwayName="KEGG",
+                   minGSSize=3,
+                   maxGSSize=1000 ,
+                   Save_as="svg",
+                   pCutoff=1,
+                   PercentageCutoff=1)
+
+ORA_HK2_vs_786O <- MetaProViz::DM_ORA(Input_data=HK2_vs_786O,
                    PathwayFile=KEGG,
                    PathwayName="KEGG",
                    minGSSize=3,
@@ -606,7 +632,7 @@ Next we will look at another option we have to display our results from the diff
 Here we will first look into the results from the differential analysis (see above 2.2 DMA) for the comparison of `HK2 versus 786M1A` using a plain graph:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizLolipop(Input_data=DMA_HK2v786M1A,
+MetaProViz::VizLolipop(Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA")
 ```
