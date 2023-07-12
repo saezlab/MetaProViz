@@ -2119,12 +2119,9 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
             #p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = "Significantly changed metabolites and their pathways", size = 4.5)
-            if(OutputPlotName==""){
-              p2 <- p2 + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)
 
-            }else{
-              p2 <- p2 + labs(title = OutputPlotName,subtitle = Subtitle)
-            }
+            p2 <- p2  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+
 
             p2 <- p2+Theme
             p2 <- p2+ labs(color=col_var_name)+
@@ -2152,7 +2149,8 @@ VizLolipop<- function(Plot_Settings="Standard",
             ggtitle(paste(OutputPlotName,": ", i )) +
             theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
             labs(color=Plot_SettingsInfo_indi[['color']]) +
-            labs(size=Plot_SettingsInfo_indi[['size']])
+            labs(size=Plot_SettingsInfo_indi[['size']])+
+            labs(subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
         }
 
         #Add the theme
@@ -2281,11 +2279,13 @@ VizLolipop<- function(Plot_Settings="Standard",
           lab_neg_metab <- loli.data_avg %>% filter(Log2FC<0) %>% select(Metabolite, Metab_name, Log2FC)
           p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab$Log2FC-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
-          p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
+         # p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
 
           p2 <- p2+Theme
           p2 <- p2+ labs(color=col_var_name)+
             labs(size=Plot_SettingsInfo[['size']])
+
+          p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
 
           lolipop_plot <-  p2
 
@@ -2309,7 +2309,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           ggtitle(OutputPlotName) +
           theme(plot.title = element_text(hjust = 0.5)) + ylab("Metabolites")+
           labs(color=Plot_SettingsInfo[['color']]) +
-          labs(size=Plot_SettingsInfo[['size']])
+          labs(size=Plot_SettingsInfo[['size']]) + labs(subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
       }
 
       plot(lolipop_plot)
@@ -2485,8 +2485,9 @@ VizLolipop<- function(Plot_Settings="Standard",
 
     }
   }else if(Plot_Settings=="PEA"){# Code Missing
-    }
+  }
 }
+
 
 
 ###########----------------------
