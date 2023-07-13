@@ -1914,7 +1914,8 @@ VizLolipop<- function(Plot_Settings="Standard",
     stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
   }
   if(Plot_Settings=="Compare" & "color" %in% names(Plot_SettingsInfo)==TRUE){
-    stop("When Plot_Settings='Compare' color is used to colorcode the input datasets. Please use only the size option.")
+    warning("When Plot_Settings='Compare' color is used to colorcode the input datasets. Color was added in the Plot_SettingsInfo but it will be ignored. Please use only the size option.")
+    Plot_SettingsInfo <- Plot_SettingsInfo[!names(Plot_SettingsInfo) == "color"]
   }
   if(is.vector(Plot_SettingsInfo)==TRUE){
     if("color" %in% names(Plot_SettingsInfo)==TRUE & "size" %in% names(Plot_SettingsInfo)==TRUE){
