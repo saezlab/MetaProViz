@@ -21,7 +21,7 @@
 
 #' Imports toy data into environment
 #'
-#' @param data Either "Standard", "CoRe" or "Pathways" depending which data you would like to load
+#' @param data Either "Standard", "CoRe" or "MappingInfo" depending which data you would like to load
 #' @title Toy Data Import
 #' @description Import and process .csv file to create toy data.
 #' @importFrom utils read.csv
@@ -44,8 +44,8 @@ toy_data <- function(data) {
     assign("Intra", Intra, envir=.GlobalEnv)
   } else if(data=="CoRe"){
     assign("Media", Media, envir=.GlobalEnv)
-  } else if(data=="Pathways"){
-    assign("Pathways", Pathways, envir=.GlobalEnv)
+  } else if(data=="MappingInfo"){
+    assign("MappingInfo", Pathways, envir=.GlobalEnv)
   } else{
     warning("Please choose a toy dataset you would like to use: Standard, CoRe, Pathways")
   }
@@ -103,7 +103,7 @@ Load_KEGG<- function(){
 
   # 2. Initialize the result data frame
   KEGG_H <- data.frame(KEGGPathway = character(nrow(Pathways_H)),
-                       PathID = 1:nrow(Pathways_H),
+                       #PathID = 1:nrow(Pathways_H),
                        Compound = 1:nrow(Pathways_H),
                        KEGG_CompoundID = 1:nrow(Pathways_H),
                        stringsAsFactors = FALSE)
@@ -118,7 +118,7 @@ Load_KEGG<- function(){
 
       # Extract the necessary information and store it in the result data frame
       KEGG_H[k, "KEGGPathway"] <- Pathways_H[k,]
-      KEGG_H[k, "PathID"] <- path
+      #KEGG_H[k, "PathID"] <- path
       KEGG_H[k, "Compound"] <- paste(query[[1]]$COMPOUND, collapse = ";")
       KEGG_H[k, "KEGG_CompoundID"] <- paste(names(query[[1]]$COMPOUND), collapse = ";")
     }, error = function(e) {
@@ -143,6 +143,14 @@ Load_KEGG<- function(){
   Remove_Small <- c("Nitric oxide","Hydrogen peroxide", "Superoxide","H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-",  "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
 
   KEGG_Metabolite <- KEGG_Metabolite[!(KEGG_Metabolite$Compound %in% c(Remove_Ions, Remove_Small)), ]
+
+  #Change syntax as required for ORA
+  KEGG_Metabolite <- KEGG_Metabolite%>%
+    dplyr::rename("term"=1,
+                  "Metabolite"=2,
+                  "MetaboliteID"=3)
+  KEGG_Metabolite$Description <- KEGG_Metabolite$term
+
 
   #Return into environment
   assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
