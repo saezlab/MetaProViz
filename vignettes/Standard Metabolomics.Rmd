@@ -109,9 +109,9 @@ SampleInfo <-Intra[c(1:47),c(1:4)]%>%
 
 ```
 \
-`2.` Pathway information mapping the trivial metabolite names to KEGG IDs and selected pathways **(Pathways)** \
+`2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MetaProViz::toy_data(data="Pathways")
+MetaProViz::toy_data(data="MappingInfo")
 
 # Check how our data looks like:
 knitr::kable(Pathways[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
@@ -290,35 +290,26 @@ Using the DMA results, we can now use the **MetaProViz** visualization module an
 Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
 Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites (see MCA below). If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/).\
 \
-Before we can run the ORA on the DMA results, we 
-
-Explain what is needed in a pathway file and name some resources the user could scrape.
-
-The pathway file:
+Here we will use the KEGG pathways. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
 ```{r}
-#Pathway file requirements: column `term`, `Metabolite` and `Description`
-KEGG <- KEGG_Pathways[,c(1,3)]%>%
-  dplyr::rename("term"=1,
-                "Metabolite"=2)
-KEGG$Description <- KEGG$term  
-
-#Input data requirements: column `t.val` and column `Metabolite` (needs to match Pathway file)
-#We could use the KEGG-IDs to match, yet we prefer the trivial names
-HK2_vs_786M1A <- merge(`DMA_HK2_vs_786-M1A`[,1:5], Pathways[1:3], by="Metabolite", all=TRUE)
+############ 1. Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
+#Input data requirements: column `t.val` and column `Metabolite`
+#We use the KEGG-IDs to match, yet we prefer the trivial names
+#Here we use the MappingInfo file
+HK2_vs_786M1A <- merge(`DMA_HK2_vs_786-M1A`[,1:5],MappingInfo[1:3], by="Metabolite", all=TRUE)
 HK2_vs_786M1A <-HK2_vs_786M1A[complete.cases(HK2_vs_786M1A),-1]%>%
   dplyr::rename("Metabolite"=6)
 
-HK2_vs_786M2A <- merge(`DMA_HK2_vs_786-M2A`[,1:5], Pathways[1:3], by="Metabolite", all=TRUE)
+HK2_vs_786M2A <- merge(`DMA_HK2_vs_786-M2A`[,1:5], MappingInfo[1:3], by="Metabolite", all=TRUE)
 HK2_vs_786M2A <-HK2_vs_786M2A[complete.cases(HK2_vs_786M2A),-1]%>%
   dplyr::rename("Metabolite"=6)
 
-HK2_vs_786O <- merge(`DMA_HK2_vs_786-O`[,1:5], Pathways[1:3], by="Metabolite", all=TRUE)
+HK2_vs_786O <- merge(`DMA_HK2_vs_786-O`[,1:5], MappingInfo[1:3], by="Metabolite", all=TRUE)
 HK2_vs_786O <-HK2_vs_786O[complete.cases(HK2_vs_786O),-1]%>%
   dplyr::rename("Metabolite"=6)
 
-```
-
-```{r}
+# Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+#Pathway file requirements: column `term`, `Metabolite` and `Description`
 ORA_HK2_vs_786M1A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M1A,
                    PathwayFile=KEGG,
                    PathwayName="KEGG",
@@ -349,10 +340,14 @@ ORA_HK2_vs_786O <- MetaProViz::DM_ORA(Input_data=HK2_vs_786O,
 ```
 
 ## MCA
-Metabolite Clustering Analysis (`MCA`)is a module...
+Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules or based on kmeans clustering. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
+### MCA-2Cond
 
-Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
+Refer to SiRCle and mention sircle concept that was adapted here! --> add the citation to function?
+
+To Do:
+- Create Figure (alluvial plot) explaining the general concept --> usable for manuscript as well
 ```{r}
 #Example of all possible flows:
 MetaProViz::MCA_rules(data="2Cond")
@@ -370,7 +365,6 @@ easyalluvial::alluvial_wide(MCA_2Cond[,c(1:2,5)], fill_by = 'last_variable' )
 ```
 
 Now let's use the data and do clustering:
-mention sircle concept that was adapted here! --> add the citation to function?
 ```{r}
 MCAres <- MetaProViz::MCA_2Cond(Cond1_File=DMA_HK2v786O,
                       Cond2_File=DMA_HK2v786M1A,
@@ -392,20 +386,21 @@ knitr::kable(Summary_MCA_2Cond , caption = "Summary of MCA: 2 Conditions.", row.
 
 ```
 
+### MCA-Kmeans
 Next lets try kmeans clustering:
 ```{r}
 
 ```
 
 ### ORA on each metabolite cluster
-Over Representation Analyis: Some general information
+As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method. As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites). In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
 
-Also refer to decoupleR, if the user wants to perform other enrichment analysis!
+To Do:
+- (discuss to remove the metabolites that are not in background, which can happen in the two-cond, not for kmeans though)
+- Here change function and just plot emapplot and upset if there is a minimum of two pathways!
 
-Explain what is needed in a pathway file and name some resources the user could scrape.
-
-The pathway file:
 ```{r}
+
 PathwayInput <- Pathways[,c(1,4)]%>%
   rename("term"="Pathway")
 PathwayInput$Description <- PathwayInput$term
@@ -416,9 +411,6 @@ knitr::kable(PathwayInput[1:5,] , caption = "Summary of MCA: 2 Conditions.", row
 ```
 
 
-From the MCA (see section 2.3), we obtain clusters of metabolites. Now we can run ORA on each of those clusters using all metabolites as the background (discuss to remove the metabolites that are not in background, which can happen in the two-cond, not for kmeans though)
-
-Here change function and just plot emapplot and upset if there is a minimum of two pathways!
 ```{r, eval=FALSE}
 MetaProViz::MC_ORA(Input_data=MCAres,
                    MetabCluster_lab="RG2_Significant",
@@ -455,7 +447,7 @@ MetaProViz::MC_ORA(Input_data=MCAres,
 In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,...) have 3 main `Plot_Settings`.\
 `1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.
 `2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
-`3.` `"GSE"` stands for Gene Set Enrichment, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+`3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
 \
 In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots based on those additional information (e.g. one plot for each metabolic pathway).
 
