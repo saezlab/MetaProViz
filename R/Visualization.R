@@ -1414,13 +1414,13 @@ VizAlluvial <- function(Input_data1,
 # Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
 
 
+
+
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
                       Input_data, # a dataframe of list of dataframes
-                      stat = "p.adj",
-                      pCutoff= 0.05 ,
-                      FCcutoff=0.5,
+                      # stat = "p.adj", # this could be used to plot a value on the dot on a plot. For example p.adj
                       # Legend="Standard",
                       x = "Log2FC",
                       y = "Metabolite",
@@ -1596,13 +1596,6 @@ VizLolipop<- function(Plot_Settings="Standard",
   # }
 
   # 4. Check other plot-specific parameters:
-  if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
-    stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
-  }
-  if( is.numeric(FCcutoff)== FALSE  | FCcutoff < 0){
-    stop("Check input. The selected pCutoff value should be numeric and between 0 and +oo.")
-  }
-
   Save_as_options <- c("svg","pdf")
   if(Save_as %in% Save_as_options == FALSE){
     stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
@@ -1636,7 +1629,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           na.omit()
 
         #Select metabolites for the cut offs selected
-        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(get(x)) >=FCcutoff & stat > pCutoff)
+        loli.data <- InputLolipop %>% mutate(names=Metabolite)
 
         if("size" %in% names(Plot_SettingsInfo_indi)==TRUE ){
           if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
@@ -1735,7 +1728,7 @@ VizLolipop<- function(Plot_Settings="Standard",
               p2 <- p2+ labs(color=col_var_name)+
                 labs(size=Plot_SettingsInfo[['size']])
 
-              p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+              p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle)+
                 theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                       plot.subtitle = element_text(color = "black", size=10),
                       plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
@@ -1752,7 +1745,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 
               p2 <- p2+Theme
 
-              p2 <- p2  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change")) +
+              p2 <- p2  + labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle) +
                 theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                       plot.subtitle = element_text(color = "black", size=10),
                       plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
@@ -1795,7 +1788,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             labs(size=Plot_SettingsInfo_indi[['size']]) +
             ylab(y)+
             xlab(x)+
-            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)+
             theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                   plot.subtitle = element_text(color = "black", size=10),
                   plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
@@ -1836,7 +1829,7 @@ VizLolipop<- function(Plot_Settings="Standard",
       InputLolipop<- InputLolipop %>% drop_na()
 
       #Select metabolites for the cut offs selected
-      loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(get(x)) >=FCcutoff & stat > pCutoff)
+      loli.data <- InputLolipop %>% mutate(names=Metabolite)
 
       if("size" %in% names(Plot_SettingsInfo)==TRUE ){
         if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
@@ -1932,7 +1925,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2 <- p2+ labs(color=col_var_name)+
               labs(size=Plot_SettingsInfo[['size']])
 
-            p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+            p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle)+
               theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                     plot.subtitle = element_text(color = "black", size=10),
                     plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
@@ -1955,7 +1948,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2 <- p2+ labs(color=col_var_name)+
               labs(size=Plot_SettingsInfo[['size']])
 
-            p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle, caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+            p2 <- p2  + labs(title = paste(OutputPlotName),subtitle = Subtitle)+
               theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                     plot.subtitle = element_text(color = "black", size=10),
                     plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
@@ -1994,7 +1987,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           labs(size=Plot_SettingsInfo[['size']]) +
           ylab(y)+
           xlab(x)+
-          labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))+
+          labs(title = OutputPlotName,subtitle = Subtitle)+
           theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                 plot.subtitle = element_text(color = "black", size=10),
                 plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
@@ -2062,7 +2055,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
         #Select metabolites for the cut offs selected
-        loli.data <- InputLolipop %>% mutate(names=Metabolite) %>% filter( abs(get(x)) >=FCcutoff & stat > pCutoff)
+        loli.data <- InputLolipop %>% mutate(names=Metabolite)
 
 
 
@@ -2078,7 +2071,7 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
 
         if(Flip==TRUE){
-          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names))+# , label=stat)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
             #scale_size_continuous(range = c(1,5))+
@@ -2092,7 +2085,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             ylab(y)+
             xlab(x)+
             labs(size=Plot_SettingsInfo_indi[['size']])  +
-            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)
 
         }else{
           lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
@@ -2109,7 +2102,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             xlab(y)+
             # #  labs(color=Plot_SettingsInfo_indi[['color']]) +
             labs(size=Plot_SettingsInfo_indi[['size']])  +
-            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+            labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)
         }
         if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
           lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
@@ -2173,9 +2166,9 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
       if(Flip==TRUE){
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]], label=`p.adj`)) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]]))+#, label=stat)) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
-          geom_text(color="black", size=2) +
+          # geom_text(color="black", size=2) +
           ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
           geom_hline(yintercept = 0) +
           Theme+
@@ -2186,12 +2179,12 @@ VizLolipop<- function(Plot_Settings="Standard",
           ylab(x)+
           xlab(y)+
           labs(size=Plot_SettingsInfo[['size']])  +
-          labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+          labs(title = OutputPlotName,subtitle = Subtitle)
 
       }else{
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]], label=`p.adj`)) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]]))+#, label=stat)) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
-          geom_text(color="black", size=2) +
+          #geom_text(color="black", size=2) +
           ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
           coord_flip()+
           geom_hline(yintercept = 0) +
@@ -2202,7 +2195,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           ylab(y)+
           xlab(x)+
           labs(size=Plot_SettingsInfo[['size']])  +
-          labs(title = OutputPlotName,subtitle = Subtitle,caption = paste("Metabolites with > |",FCcutoff,"| logfold change"))
+          labs(title = OutputPlotName,subtitle = Subtitle)
       }
       if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
         lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
@@ -2219,6 +2212,9 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(Plot_Settings=="PEA"){# Code Missing
   }
 }
+
+
+
 
 
 
