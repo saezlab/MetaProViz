@@ -1836,7 +1836,6 @@ VizAlluvial <- function(Input_data1,
 # Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
 
 
-
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
@@ -1913,7 +1912,7 @@ VizLolipop<- function(Plot_Settings="Standard",
     x<-y
     y<- temp
   } else{
-    Flip=FALSE
+    Flip <- FALSE
   }
 
 
@@ -2083,10 +2082,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
             loli.data <- loli.data %>%
-              arrange(plot_color_variable, Metabolite)
+              arrange(plot_color_variable, get(x),Metabolite)
 
             loli.data_avg <- loli.data %>%
-              arrange(plot_color_variable, Metabolite) %>%
+              arrange(plot_color_variable, get(x), Metabolite) %>%
               mutate(Metab_name = row_number()) %>%
               group_by(plot_color_variable) %>%
               mutate(
@@ -2201,6 +2200,11 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
 
         if(is.null(p2)==TRUE){
+
+          loli.data$names <- as.factor(loli.data$names)
+          loli.data[[x]]<- as.numeric(loli.data[[x]])
+          loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
+
           lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
@@ -2278,10 +2282,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
           loli.data <- loli.data %>%
-            arrange(plot_color_variable, Metabolite)
+            arrange(plot_color_variable,get(x), Metabolite)
 
           loli.data_avg <- loli.data %>%
-            arrange(plot_color_variable, Metabolite) %>%
+            arrange(plot_color_variable,get(x), Metabolite) %>%
             mutate(Metab_name = row_number()) %>%
             group_by(plot_color_variable) %>%
             mutate(
@@ -2289,6 +2293,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             ) %>%
             ungroup() %>%
             mutate(plot_color_variable = factor(plot_color_variable))
+
 
 
           loli_lines <-   loli.data_avg %>%
@@ -2395,6 +2400,10 @@ VizLolipop<- function(Plot_Settings="Standard",
       }
 
       if(is.null(p2)==TRUE){
+
+        loli.data$names <- as.factor(loli.data$names)
+        loli.data[[x]]<- as.numeric(loli.data[[x]])
+        loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
 
         lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
           geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
