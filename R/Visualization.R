@@ -1412,7 +1412,6 @@ VizAlluvial <- function(Input_data1,
 # Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
 
 
-
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
@@ -1453,8 +1452,10 @@ VizLolipop<- function(Plot_Settings="Standard",
     Plot_SettingsFile <- Plot_SettingsFile_List[[1]]
   }
 
-  for(data in Input_data){
-    # data <- Input_data[[1]]
+  Flip <- c() # Vector to check if x or y in numeric
+  for(i in 1:length(Input_data)){
+    # i=2
+    data <- Input_data[[i]]
     if(any(duplicated(row.names(data)))==TRUE){
       stop("Duplicated row.names of Input_data, whilst row.names must be unique")
     }
@@ -1471,13 +1472,23 @@ VizLolipop<- function(Plot_Settings="Standard",
       stop("Check your input. The column name of x and/ore y does not exist in Input_data.")
     }
     if (is.numeric(data[[x]]) && is.character(data[[y]])) {
-      Flip=FALSE
+      Flip[i] <-FALSE
     } else if (is.character(data[[x]]) && is.numeric(data[[y]])) {
-      Flip=TRUE
+      Flip[i] <- TRUE
+
     } else {
       stop("One of the x or y must by numeric and the other must be a character")
     }
 
+  }
+
+  if (sum(Flip) == length(Input_data)) {
+    Flip=TRUE
+    temp<- x
+    x<-y
+    y<- temp
+  } else{
+    Flip <- FALSE
   }
 
 
@@ -1490,7 +1501,8 @@ VizLolipop<- function(Plot_Settings="Standard",
     stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
   }
   if(Plot_Settings=="Compare" & "color" %in% names(Plot_SettingsInfo)==TRUE){
-    stop("When Plot_Settings='Compare' color is used to colorcode the input datasets. Please use only the size option.")
+    warning("When Plot_Settings='Compare' color is used to colorcode the input datasets. Color was added in the Plot_SettingsInfo but it will be ignored. Please use only the size option.")
+    Plot_SettingsInfo <- Plot_SettingsInfo[!names(Plot_SettingsInfo) == "color"]
   }
   if(is.vector(Plot_SettingsInfo)==TRUE){
     if("color" %in% names(Plot_SettingsInfo)==TRUE & "size" %in% names(Plot_SettingsInfo)==TRUE){
@@ -1646,10 +1658,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
             loli.data <- loli.data %>%
-              arrange(plot_color_variable, Metabolite)
+              arrange(plot_color_variable, get(x),Metabolite)
 
             loli.data_avg <- loli.data %>%
-              arrange(plot_color_variable, Metabolite) %>%
+              arrange(plot_color_variable, get(x), Metabolite) %>%
               mutate(Metab_name = row_number()) %>%
               group_by(plot_color_variable) %>%
               mutate(
@@ -1710,10 +1722,11 @@ VizLolipop<- function(Plot_Settings="Standard",
             if(Flip == TRUE){
               p2 <- p2 +theme(axis.text.x=element_blank(),
                               axis.ticks.x=element_blank())
-              lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+              lab_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x)
+
               p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
 
-              lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+              lab_neg_metab <-  loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x)
               p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
 
               p2 <- p2+Theme
@@ -1763,6 +1776,11 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
 
         if(is.null(p2)==TRUE){
+
+          loli.data$names <- as.factor(loli.data$names)
+          loli.data[[x]]<- as.numeric(loli.data[[x]])
+          loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
+
           lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
@@ -1840,10 +1858,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
           loli.data <- loli.data %>%
-            arrange(plot_color_variable, Metabolite)
+            arrange(plot_color_variable,get(x), Metabolite)
 
           loli.data_avg <- loli.data %>%
-            arrange(plot_color_variable, Metabolite) %>%
+            arrange(plot_color_variable,get(x), Metabolite) %>%
             mutate(Metab_name = row_number()) %>%
             group_by(plot_color_variable) %>%
             mutate(
@@ -1851,6 +1869,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             ) %>%
             ungroup() %>%
             mutate(plot_color_variable = factor(plot_color_variable))
+
 
 
           loli_lines <-   loli.data_avg %>%
@@ -1901,10 +1920,10 @@ VizLolipop<- function(Plot_Settings="Standard",
             a <- p2
             p2 <- p2 +theme(axis.text.x=element_blank(),
                             axis.ticks.x=element_blank())
-            lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+            lab_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x)
             p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
 
-            lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+            lab_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x)
             p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
 
             p2 <- p2+Theme
@@ -1921,10 +1940,11 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2 <- p2 +theme(axis.text.y=element_blank(),
                             axis.ticks.y=element_blank()
             )
-            lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+            lab_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x)
             p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite, size = 3)
 
-            lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+
+            lab_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x)
             p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
             # p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
@@ -1937,7 +1957,7 @@ VizLolipop<- function(Plot_Settings="Standard",
               theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
                     plot.subtitle = element_text(color = "black", size=10),
                     plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
-            p2
+
           }
           lolipop_plot <-  p2
           if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
@@ -1956,6 +1976,10 @@ VizLolipop<- function(Plot_Settings="Standard",
       }
 
       if(is.null(p2)==TRUE){
+
+        loli.data$names <- as.factor(loli.data$names)
+        loli.data[[x]]<- as.numeric(loli.data[[x]])
+        loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
 
         lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
           geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
