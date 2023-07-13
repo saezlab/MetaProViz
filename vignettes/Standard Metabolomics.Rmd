@@ -455,44 +455,81 @@ In each of those Plot_Settings, the user can label color and/or shape based on a
 Principal component analysis (PCA) is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different prinipal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
 As mentioned above, PCA plots can be quite useful for quality control, but of course it offers us many more oppotunities, which will be showcased here.\
 \
-**1. Standard plot**
+The input data must contain a column called "UniqueID" and otherwise only contain numeric columns with the measurements for each metabolite.\
 ```{r}
+#Make column "UniqueID"
 Input_PCA <- Intra_Preprocessed[,-c(1:3)]%>%
   rownames_to_column("UniqueID")
 
-MetaProViz::VizPCA(Plot_SettingsInfo= NULL,
-                   Plot_SettingsFile= NULL ,
-                   Input_data=Input_PCA,
-                   color_palette= NULL,
-                   shape_palette=NULL,
-                   Show_Loadings = FALSE,
-                   Scaling = TRUE,
-                   Theme=NULL,#theme_classic()
-                   OutputPlotName= '',
-                   Save_as = "svg"
-                  )
+# Check how our data looks like:
+knitr::kable(Input_PCA[,1:6] , caption = "Input_data for VizPCA must contain a column called `UniqueID` and numeric values for metabolites.", row.names=FALSE)
+
+#Plot:
+MetaProViz::VizPCA(Input_data=Input_PCA)
+```
+\
+Of course, now we can interactively choose shape and color using additional information of interest. Especially for complex data such as patient data it can be valuable to use different demographics (e.g. age, gender, medication,...) for this.
+```{r}
+#Make a Settings file:
+Settings_PCA <- Intra_Preprocessed[,c(1:2)]%>%
+  rownames_to_column("UniqueID")%>%
+   mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
+                               Conditions=="786-O" ~ 'Primary Tumour',
+                               TRUE ~ 'Metastatic Tumour'))%>%
+   mutate(Status = case_when(Conditions=="HK2" ~ 'Healthy',
+                               TRUE ~ 'Cancer'))
+# Check how our data looks like:
+knitr::kable(Settings_PCA , caption = "Different information that can be used for colour or shape.", row.names=FALSE)
 ```
 
-```{r}
-Settings_PCA <- Intra_Preprocessed[,c(1:2)]%>%
-  rownames_to_column("UniqueID")
-
+First lets check if we have any batch effect by colour coding for the biological replicates, which would be the case if the replicates cluster together.\
+```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do we have a batch effect?"}
+MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Biological_Replicates"),
+                   Plot_SettingsFile= Settings_PCA ,
+                   Input_data=Input_PCA,
+                   OutputPlotName = "Batch Effect")
+```
+\
+Next, we can colour code for condition and use the replicates in the shape parameter:\
+```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do the samples cluster for the conditions?"}
 MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Conditions", shape="Biological_Replicates"),
                    Plot_SettingsFile= Settings_PCA ,
                    Input_data=Input_PCA,
-                   color_palette= NULL,
-                   shape_palette=NULL,
-                   Show_Loadings = FALSE,
-                   Scaling = TRUE,
-                   Theme=NULL,#theme_classic()
-                   OutputPlotName= '',
-                   Save_as = "svg"
-                  )
+                   OutputPlotName = "Sample Conditions")
+```
+\
+The different cell lines we have are either control or cancerous, so we can display this too. Here is becomes apparent that the cell status is responsible for 64% of the variance (x-axis). \
+```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do the samples cluster for the Cell status?"}
+MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Status"),
+                   Plot_SettingsFile= Settings_PCA ,
+                   Input_data=Input_PCA,
+                   OutputPlotName = "Sample Status")
+```
+\
+We can separate the cancerous cell lines further into metastatic or primary. This shows us that this is separated on the y-axis and accounts for 30%of the variance.\
+```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do the samples cluster for the Cell type?"}
+MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
+                   Plot_SettingsFile= Settings_PCA ,
+                   Input_data=Input_PCA,
+                   OutputPlotName = "Cell type")
+```
+\
+Lastly, its worth mentioning that one can also change many style parameters to customize the plot:\
+```{r, fig.align="left", fig.width=8, fig.height=5}
+MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
+                   Plot_SettingsFile= Settings_PCA ,
+                   Input_data=Input_PCA,
+                   color_palette= NULL,#pass your own colour palette
+                   shape_palette=NULL,#pass your own shape palette
+                   Show_Loadings = TRUE, #show laodings (default=FALSE)
+                   Scaling = TRUE, #use scaling?
+                   Theme=theme_gray(),#theme_classic() is default, use any: https://ggplot2.tidyverse.org/reference/ggtheme.html
+                   OutputPlotName= 'Cell type',
+                   Save_as = "svg")
 ```
 
-
-
 ### Heatmaps
+
 
 ### Bar/Box/Violin plots
 
@@ -749,6 +786,9 @@ VizLolipop(Input_data = list(DMA_HK2v786O,DMA_HK2v786M1A),
            OutputPlotName= "DMA HK2v786O versus DMA HK2v786M1A",
            Subtitle= "Results of DMA for each Metabolite Cluster")
 ```
+
+### Alluvial plots
+This is a rather specific plot that can be particularly useful when clustering with the `MCA` module has been performed. 
 
 
 
