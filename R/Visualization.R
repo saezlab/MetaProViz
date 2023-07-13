@@ -161,12 +161,15 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     #color that will be used
     color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
 
-    #numeric scale or continuous
-    if(is.numeric(InputPCA[row, "color"]) == TRUE | is.integer(InputPCA[row, "color"]) == TRUE){
-      if(length(unique(InputPCA[row, "color"])) > 4){ # change this to change the number after which color becomes from distinct to continuous
-        InputPCA[row, "color"] <- as.numeric(InputPCA[row, "color"])
-      }else(InputPCA[row, "color"] <- as.factor(InputPCA[row, "color"]))
+    # numeric scale or continuous
+    if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
+      if(length(unique(InputPCA$color)) > 4){ # change this to change the number after which color becomes from distinct to continuous
+        InputPCA$color <- as.numeric(InputPCA$color)
+      }else{
+        InputPCA$color <- as.factor(InputPCA$color)
+      }
     }
+
 
     #assign column and legend name
     InputPCA  <- InputPCA%>%
