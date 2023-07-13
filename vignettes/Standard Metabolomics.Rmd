@@ -529,6 +529,23 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
 ```
 
 ### Heatmaps
+```{r}
+#Standard
+Heatmap_data <-  Intra_Preprocessed[,-c(1:3)]
+Heatmap_design <- Intra_Preprocessed[,c(1:2)]
+  #Standard
+VizHeatmap(Input_data = Heatmap_data, Experimental_design = Heatmap_design,  OutputPlotName = "1")
+# col annotation
+VizHeatmap(Input_data = Heatmap_data, Experimental_design = Heatmap_design,   Plot_SettingsInfo = c(col_annotation = list("Conditions","Biological_Replicates")), OutputPlotName = "2")
+# row annotation
+VizHeatmap(Input_data = Heatmap_data, Experimental_design = Heatmap_design,  Plot_SettingsInfo = c(row_annotation = list("Pathway")),   Plot_SettingsFile =  MappingInfo, OutputPlotName = "3")
+# individual
+VizHeatmap(Input_data = Heatmap_data, Experimental_design = Heatmap_design, Plot_SettingsInfo = c(individual = "Pathway"),   Plot_SettingsFile =  MappingInfo, OutputPlotName = "4")
+
+# individual with col and row annotation
+VizHeatmap(Input_data = Heatmap_data, Experimental_design = Heatmap_design,
+           Plot_SettingsInfo = c(individual = "Pathway",col_annotation = list("Conditions","Biological_Replicates"),row_annotation = list("Pathway")), Plot_SettingsFile =  MappingInfo, OutputPlotName = "5")
+```
 
 
 ### Bar/Box/Violin plots
