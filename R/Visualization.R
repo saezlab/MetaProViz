@@ -2248,17 +2248,21 @@ VizLolipop<- function(Plot_Settings="Standard",
 #'
 #'
 
-VizHeatmap <- function(Input_data,
-                       Experimental_design,
-                    Clustering_Condition = "Conditions",
-                    Input_pathways = NULL,
-                    Plot_pathways = "None",# or "Individual" or "Together=
-                    Clustering_method = "single",
-                    OutputPlotName= "",
-                    kMEAN = NA,
-                    SCALE = "row",
-                    Save_as = "svg"
-                    ){
+
+
+
+VizHeatmap <- function(Input_data,                                                 # Input_data = Intra_Preprocessed[,-c(1:3)]
+                       Experimental_design,                                        # Experimental_design = Intra_Preprocessed[,c(1:2)]
+                       #  Plot_SettingsInfo = c(individual, y_annotation)
+                       Plot_SettingsInfo= NULL,                                   #  Plot_SettingsInfo = c(col_annotation = list("Conditions","Biological_Replicates") , row_annotation = "lalala")                                                                     #     Plot_SettingsFile =  MappingInfo
+                       Plot_SettingsFile= NULL, #  Plot_SettingsFile=  MappingInfo
+                       OutputPlotName= "title",
+                       Subtitle= "Subtitle here",
+                       Theme= NULL, # pheatmap has no theme
+                       SCALE = "row",
+                       Save_as = "svg"
+){
+
 
 
   ## ------------ Setup and installs ----------- ##
@@ -2267,67 +2271,6 @@ VizHeatmap <- function(Input_data,
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  if(any(duplicated(row.names(Input_data)))==TRUE){
-    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
-  } else{
-    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
-    if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("Input_data needs to be of class numeric")
-    } else{
-      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
-      if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Experimental_design.")
-      } else(
-        data <- Input_data
-      )
-    }
-    Design <- Experimental_design
-  }
-
-
-
-  if(Clustering_Condition %in% colnames(Experimental_design)==FALSE){
-    stop("Check Inpit. The clustering congitions does not exist in the column names on the Input data.")
-  }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
-  }
-  Plot_pathways_options <- c("None", "Individual", "Together")
-  if (Plot_pathways %in% Plot_pathways_options == FALSE){
-    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Plot_pathways_options,collapse = ", "),"." )
-  }
-  if(is.null(Input_pathways) == TRUE){
-    if (Plot_pathways != "None"){
-      warning("No Input_pathways were added. Yet the Plot_pathways option was changed. This will have no effect on the plot")
-      Plot_pathways = "None"
-    }
-  }
-  if(is.null(Input_pathways) == FALSE){
-    if("Metabolite" %in% colnames(Input_pathways) == FALSE){
-      stop("Check Input. Metabolite column is missing from Input_pathways")
-    }
-    if("Pathway" %in% colnames(Input_pathways) == FALSE){
-      stop("Check Input. Pathway column is missing from Input_pathways")
-    }
-    if (sum(duplicated(Input_pathways$Metabolite)) > 0){
-      stop("Duplicated Metabolites found in the Input_Pathways. The Metabolites must be unique.")
-    }
-    if(identical(sort(colnames(data)), sort(Input_pathways$Metabolite)) == FALSE){
-      warning("The Metabolite column in the Input_data is not the same as the Metabolite column in the Input_pathways. We will take into consideration only the common Metabolites.")
-      # find common metabolites
-      common_metabolites <- colnames(data)[ colnames(data) %in% Input_pathways$Metabolite]
-      # Take the data that have both pval reslults and pathwayss
-      data <- data %>% select(common_metabolites)
-      Input_pathways <- Input_pathways %>% filter(Metabolite %in% common_metabolites)
-    }
-    Input_pathways <- Input_pathways %>% select(all_of(c("Metabolite", "Pathway")))
-  }
 
 
   ## ------------ Create Output folders ----------- ##
@@ -2339,177 +2282,122 @@ VizHeatmap <- function(Input_data,
   if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}  # check and create folder
 
 
-  if(Plot_pathways == "Individual"){
+  data <- Input_data
+
+  if("individual" %in% names(Plot_SettingsInfo)==TRUE){
 
 
-    my_annot<- NULL
-    for (i in Clustering_Condition){
-      my_annot[i] <- Experimental_design %>% select(i) %>% as.data.frame()
-    }
-    my_annot<- as.data.frame(my_annot)
-    rownames(my_annot) <- rownames(data)
+    individual_selection <-  Plot_SettingsInfo[["individual"]]
+    # Create the list of individual plots that should be made:
+    IndividualPlots <- Plot_SettingsFile[!duplicated(Plot_SettingsFile[individual_selection]),]
+    IndividualPlots <- IndividualPlots[individual_selection]%>% unlist() %>% as.vector
 
-    # my_paths<- Input_pathways
-    # my_paths <- column_to_rownames(my_paths,"Metabolite" )
+    PlotList <- list()#Empty list to store all the plots
 
-
-    for (path in unique(Input_pathways$Pathway)){
-
-      #  path = unique(Input_pathways$Pathway)[1]
-      selected_path <- Input_pathways %>% filter(Pathway == path)
+    for (i in IndividualPlots){
+      # i = IndividualPlots[1]
+      # Select the data
+      selected_path <- Plot_SettingsFile %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
       data_path <- data %>% select(all_of(selected_path_metabs))
 
 
-      for (k in kMEAN){
-        set.seed(1234)
-        out <-pheatmap::pheatmap(t(data_path),
-                       clustering_method =  "complete",
-                       scale = SCALE,
-                       kmeans_k = k,
-                       clustering_distance_rows = "correlation",
-                       annotation_col = my_annot,
-                     #annotation_row = my_paths,
-                       main = paste(path, " pathway", sep = ""))
 
-        if(is.na(k)==FALSE){
-          Metabolite_clusters <- out[["kmeans"]][["cluster"]] %>% as.data.frame()
-          names(Metabolite_clusters) <- "Clusters"
-          Mouse_Cluster_Analysis <- merge(t(data), Metabolite_clusters, by = 'row.names' )
-          names(Mouse_Cluster_Analysis)[1] <- "Metabolite"
-          Mouse_Cluster_Analysis <- column_to_rownames(Mouse_Cluster_Analysis,"Metabolite" )
-          Mouse_Cluster_Analysis_selectec <- Mouse_Cluster_Analysis %>% t() %>% as.data.frame()
-          Mouse_Cluster_Analysis_selectec <- rownames_to_column(Mouse_Cluster_Analysis_selectec, "Sample")
+      # Column annotation
+      col_annot_vars <- Plot_SettingsInfo[grepl("col_annotation", names(Plot_SettingsInfo))]
+      col_annot<- NULL
+      if(length(col_annot_vars)>0){
+        for (i in 1:length(col_annot_vars)){
+          annot_sel <- col_annot_vars[[i]]
+
+          col_annot[i] <- Experimental_design %>% select(annot_sel) %>% as.data.frame()
+          names(col_annot)[i] <- annot_sel
         }
-
-
-        if(is.na(k)==FALSE){
-
-          if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path,"_kmeans=",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
-          }else{
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path, "_kmeans=",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
-          }
-          writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/Heatmap_",path,"Clustering_k=",k,"_data.xlsx", sep=""),col_names = TRUE)
-        }else{
-
-          if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path, ".",Save_as, sep=""), plot=out, width=10, height=12)
-          }else{
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",path,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
-          }
-        }
+        col_annot<- as.data.frame(col_annot)
+        rownames(col_annot) <- rownames(data)
       }
-    }
 
 
-  }
-  else if(Plot_pathways == "Together"){
+      # Row annotation
+      row_annot_vars <- Plot_SettingsInfo[grepl("row_annotation", names(Plot_SettingsInfo))]
+      row_annot<- NULL
+      if(length(row_annot_vars)>0){
+        for (i in 1:length(row_annot_vars)){
+          annot_sel <- row_annot_vars[[i]]
+          row_annot[i] <- Plot_SettingsFile %>% select(all_of(annot_sel))
+          row_annot <- row_annot %>% as.data.frame()
+          names(row_annot)[i] <- annot_sel
+        }
+        rownames(row_annot) <- Plot_SettingsFile[["Metabolite"]]
+      }
 
 
 
-    my_annot<- NULL
-    for (i in Clustering_Condition){
-      my_annot[i] <- Experimental_design %>% select(i) %>% as.data.frame()
-    }
-    my_annot<- as.data.frame(my_annot)
-    rownames(my_annot) <- rownames(data)
-
-    my_paths<- Input_pathways
-    my_paths <- column_to_rownames(my_paths,"Metabolite" )
-
-
-    for (k in kMEAN){
+      # Make the plot
       set.seed(1234)
-      out <-pheatmap::pheatmap(t(data),
-                     clustering_method =  "complete",
-                     scale = SCALE,
-                     kmeans_k = k,
-                     clustering_distance_rows = "correlation",
-                     annotation_col = my_annot,
-                     annotation_row = my_paths)
+      heatmap <- pheatmap::pheatmap(t(data_path),
+                                    clustering_method =  "complete",
+                                    scale = SCALE,
+                                    clustering_distance_rows = "correlation",
+                                    annotation_col = col_annot,
+                                    annotation_row = row_annot,
+                                    main = OutputPlotName)
 
-      if(is.na(k)==FALSE){
-        Metabolite_clusters <- out[["kmeans"]][["cluster"]] %>% as.data.frame()
-        names(Metabolite_clusters) <- "Clusters"
-        Mouse_Cluster_Analysis <- merge(t(data), Metabolite_clusters, by = 'row.names' )
-        names(Mouse_Cluster_Analysis)[1] <- "Metabolite"
-        Mouse_Cluster_Analysis <- column_to_rownames(Mouse_Cluster_Analysis,"Metabolite" )
-        Mouse_Cluster_Analysis_selectec <- Mouse_Cluster_Analysis %>% t() %>% as.data.frame()
-        Mouse_Cluster_Analysis_selectec <- rownames_to_column(Mouse_Cluster_Analysis_selectec, "Sample")
-      }
+      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
 
-
-      if(is.na(k)==FALSE){
-
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap","_kmeans=",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_", "kmeans=",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }
-        writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/","Clustering_k=",k,"_t(data).xlsx", sep=""),col_names = TRUE)
-      }else{
-
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap", ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }
-      }
     }
+
+  }else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
+
+    # Column annotation
+    col_annot_vars <- Plot_SettingsInfo[grepl("col_annotation", names(Plot_SettingsInfo))]
+    col_annot<- NULL
+    if(length(col_annot_vars)>0){
+      for (i in 1:length(col_annot_vars)){
+        annot_sel <- col_annot_vars[[i]]
+
+        col_annot[i] <- Experimental_design %>% select(annot_sel) %>% as.data.frame()
+        names(col_annot)[i] <- annot_sel
+      }
+      col_annot<- as.data.frame(col_annot)
+      rownames(col_annot) <- rownames(data)
+    }
+
+    # Row annotation
+    row_annot_vars <- Plot_SettingsInfo[grepl("row_annotation", names(Plot_SettingsInfo))]
+    row_annot<- NULL
+    if(length(row_annot_vars)>0){
+      for (i in 1:length(row_annot_vars)){
+        annot_sel <- row_annot_vars[[i]]
+        row_annot[i] <- Plot_SettingsFile %>% select(all_of(annot_sel))
+        row_annot <- row_annot %>% as.data.frame()
+        names(row_annot)[i] <- annot_sel
+      }
+      rownames(row_annot) <- Plot_SettingsFile[["Metabolite"]]
+    }
+
+    set.seed(1234)
+    heatmap <- pheatmap::pheatmap(t(data),
+                                  clustering_method =  "complete",
+                                  scale = SCALE,
+                                  clustering_distance_rows = "correlation",
+                                  annotation_col = col_annot,
+                                  annotation_row = row_annot,
+                                  main = OutputPlotName)
+
+    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
+
 
   }
-  else if(Plot_pathways == "None"){
-
-
-    my_annot<- NULL
-    for (i in Clustering_Condition){
-      my_annot[i] <- Experimental_design %>% select(i) %>% as.data.frame()
-    }
-
-    my_annot<- as.data.frame(my_annot)
-    rownames(my_annot) <- rownames(data)
-
-    for (k in kMEAN){
-      set.seed(1234)
-      out <-pheatmap::pheatmap(t(data),
-                     clustering_method =  "complete",
-                     scale = SCALE,
-                     kmeans_k = k,
-                     clustering_distance_rows = "correlation",
-                     annotation_col = my_annot)
-
-      if(is.na(k)==FALSE){
-        Metabolite_clusters <- out[["kmeans"]][["cluster"]] %>% as.data.frame()
-        names(Metabolite_clusters) <- "Clusters"
-        Mouse_Cluster_Analysis <- merge(t(data), Metabolite_clusters, by = 'row.names' )
-        names(Mouse_Cluster_Analysis)[1] <- "Metabolite"
-        Mouse_Cluster_Analysis <- column_to_rownames(Mouse_Cluster_Analysis,"Metabolite" )
-        Mouse_Cluster_Analysis_selectec <- Mouse_Cluster_Analysis %>% t() %>% as.data.frame()
-        Mouse_Cluster_Analysis_selectec <- rownames_to_column(Mouse_Cluster_Analysis_selectec, "Sample")
-      }
-
-
-      if(is.na(k)==FALSE){
-
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap","_kmeans=",k, ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_", "kmeans=",k,"_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }
-        writexl::write_xlsx(Mouse_Cluster_Analysis_selectec, paste(Results_folder_plots_Heatmaps_folder,"/","Clustering_k=",k,"_t(data).xlsx", sep=""),col_names = TRUE)
-      }else{
-
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap", ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
-        }
-      }
-    }
-  }
-
 }
+
+
+
+
+
+
+
+
 
 ###########----------------------
 # Use function
