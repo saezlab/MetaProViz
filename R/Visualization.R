@@ -1811,16 +1811,16 @@ VizLolipop<- function(Plot_Settings="Standard",
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
         }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- lolipop_plot
         plot(lolipop_plot)
       }
       # Return PlotList into the environment to enable the user to view the plots directly
-      #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
+      #assign("LolipopPlots", PlotList, envir=.GlobalEnv)
       # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
       Return <- PlotList
     }
@@ -2120,16 +2120,16 @@ VizLolipop<- function(Plot_Settings="Standard",
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
         }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- lolipop_plot
         plot(lolipop_plot)
       }
       # Return PlotList into the environment to enable the user to view the plots directly
-      #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
+      #assign("LolipopPlots", PlotList, envir=.GlobalEnv)
       # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
       Return <- PlotList
 
@@ -2219,6 +2219,7 @@ VizLolipop<- function(Plot_Settings="Standard",
   }else if(Plot_Settings=="PEA"){# Code Missing
   }
 }
+
 
 
 ###########----------------------
