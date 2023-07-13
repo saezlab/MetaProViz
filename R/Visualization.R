@@ -237,17 +237,16 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   # Save output
   if(OutputPlotName ==""){
-    write.csv(loading_data_table, paste(Results_folder_plots_PCA_folder,"/Loadings.csv", sep=""), col_names = TRUE)
+    write.csv(loading_data_table, paste(Results_folder_plots_PCA_folder,"/Loadings.csv", sep=""))
   }else{
-    write.csv(loading_data_table, paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.csv", sep=""), col_names = TRUE)
+    write.csv(loading_data_table, paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.csv", sep=""))
   }
 
   if(OutputPlotName ==""){
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=8)
   }else{
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=10)
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=8)
   }
-
 }
 
 

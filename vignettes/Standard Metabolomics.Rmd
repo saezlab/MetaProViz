@@ -366,8 +366,8 @@ easyalluvial::alluvial_wide(MCA_2Cond[,c(1:2,5)], fill_by = 'last_variable' )
 
 Now let's use the data and do clustering:
 ```{r}
-MCAres <- MetaProViz::MCA_2Cond(Cond1_File=DMA_HK2v786O,
-                      Cond2_File=DMA_HK2v786M1A,
+MCAres <- MetaProViz::MCA_2Cond(Cond1_File=`DMA_HK2_vs_786-O`,
+                      Cond2_File=`DMA_HK2_vs_786-M1A`,
                       MetaboliteID= "Metabolite",
                       Cond1ValueCol="Log2FC",
                       Cond1PadjCol="p.adj",
@@ -449,7 +449,55 @@ In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,
 `2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
 \
-In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots based on those additional information (e.g. one plot for each metabolic pathway).
+In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots where applicable based on additional information (e.g. one plot for each metabolic pathway).
+
+### PCA plots
+Principal component analysis (PCA) is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different prinipal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+As mentioned above, PCA plots can be quite useful for quality control, but of course it offers us many more oppotunities, which will be showcased here.\
+\
+**1. Standard plot**
+```{r}
+Input_PCA <- Intra_Preprocessed[,-c(1:3)]%>%
+  rownames_to_column("UniqueID")
+
+MetaProViz::VizPCA(Plot_SettingsInfo= NULL,
+                   Plot_SettingsFile= NULL ,
+                   Input_data=Input_PCA,
+                   color_palette= NULL,
+                   shape_palette=NULL,
+                   Show_Loadings = FALSE,
+                   Scaling = TRUE,
+                   Theme=NULL,#theme_classic()
+                   OutputPlotName= '',
+                   Save_as = "svg"
+                  )
+```
+
+```{r}
+Settings_PCA <- Intra_Preprocessed[,c(1:2)]%>%
+  rownames_to_column("UniqueID")
+
+MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Conditions", shape="Biological_Replicates"),
+                   Plot_SettingsFile= Settings_PCA ,
+                   Input_data=Input_PCA,
+                   color_palette= NULL,
+                   shape_palette=NULL,
+                   Show_Loadings = FALSE,
+                   Scaling = TRUE,
+                   Theme=NULL,#theme_classic()
+                   OutputPlotName= '',
+                   Save_as = "svg"
+                  )
+```
+
+
+
+### Heatmaps
+
+### Bar/Box/Violin plots
+
+
+
 
 ### Volcano plot
 Here we will look at all the different options we have to display our results from the different analysis (DMA, MCA, GSE), which will help us to interpret our results as this can be sometimes difficult from the many data tables.
@@ -617,12 +665,13 @@ If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we 
 \
 
 ### Lollipop graphs
-Next we will look at another option we have to display our results from the different analysis (DMA, MCA, GSE) and that would be with Lolipop graphs.
+
+Lollipop graphs are another option to visualize the results from the different **MetaProViz** analysis.
 
 #### **Standard**
-Here we will first look into the results from the differential analysis (see above 2.2 DMA) for the comparison of `HK2 versus 786M1A` using a plain graph:
+Here we will first look into the results from DMA (see above 2.2 DMA) for the comparison of `HK2 versus 786M1A` using a plain graph:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
-# Run with default parameter --> only need to provide Input_data and the title we like
+# Run with default parameter --> only need to provide Input_data
 MetaProViz::VizLolipop(Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA")
@@ -702,12 +751,6 @@ VizLolipop(Input_data = list(DMA_HK2v786O,DMA_HK2v786M1A),
 ```
 
 
-
-### Heatmaps
-
-### PCA plots
-
-### Bar/Box/Violin plots
 
 
 Generally: Do a vignette just for visuals? --> use bigger dataset, which will showcase better the usability of the visuals (e.g. from CCLE).

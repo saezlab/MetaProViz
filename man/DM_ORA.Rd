@@ -16,7 +16,7 @@ DM_ORA(
 )
 }
 \arguments{
-\item{Input_data}{Input DF with column "t.val" and column Metabolite", which needs to match the identifier type in column "Metabolite" in the PathwayFile.}
+\item{Input_data}{Input DF with column "t.val" and column "Metabolite", which needs to match the identifier type in column "Metabolite" in the PathwayFile.}
 
 \item{PathwayFile}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
 

@@ -5,33 +5,36 @@
 \title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis}
 \usage{
 VizPCA(
+  Plot_SettingsInfo = NULL,
+  Plot_SettingsFile = NULL,
   Input_data,
-  Experimental_design,
-  Color = FALSE,
-  Shape = FALSE,
+  color_palette = NULL,
+  shape_palette = NULL,
   Show_Loadings = FALSE,
   Scaling = TRUE,
-  Theme = theme_classic(),
+  Theme = NULL,
   OutputPlotName = "",
   Save_as = "svg"
 )
 }
 \arguments{
-\item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
+\item{Plot_SettingsInfo}{\emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}}
 
-\item{Experimental_design}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
+\item{Plot_SettingsFile}{\emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}}
 
-\item{Color}{\emph{Optional: }String which contains the name of the output file of the Metabolic Clusters}
+\item{Input_data}{DF with a column "UniqueID" with unique sample identifiers  and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
 
-\item{Shape}{\emph{Optional: }String which contains the name of the output file of the Metabolic Clusters}
+\item{color_palette}{\emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}}
+
+\item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 
 \item{Show_Loadings}{\emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}}
 
 \item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = theme_classic} ??}
+\item{Theme}{\emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}}
 
-\item{OutputPlotName}{\emph{Optional: } String which is added to the output files of the PCA}
+\item{OutputPlotName}{\emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}}
 
 \item{Save_as}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}}
 }
