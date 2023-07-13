@@ -2235,12 +2235,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Clustering_Condition String vector with the name/s of the Clustering conditions to be used from the Experimental Design.  \strong{Default = Conditions}
-#' @param Input_pathways \emph{Optional: } DF which contains a 'Metabolite' and a 'Pathway' columns, with pathway information for each metabolite. \strong{Default = NULL}
-#' @param Plot_pathways \emph{Optional: } String with plotting information about Metabolite pathways. Available only when the Input_pathways parameter has a file. Options are "None" if no pathways are to be plotted, "Individual" for plots of each Individual pathway and "Together" for metabolite pathways color-coded on a single volcano plot \strong{Default = "Together"}
+#' @param Plot_SettingsInfo  \emph{Optional: } NULL or Named vector  including  individual="ColumnName_Plot_SettingsFile", optionally you can additionally include vectors or lists for annotation c(row_annotation="ColumnName_Plot_SettingsFile", col_annotation= "ColumnName_Plot_Experimental_Design").\strong{Default = NULL}
+#' @param Plot_SettingsFile  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot
-#' @param kMEAN \emph{Optional: } Vector of values for the values of k for k-means clustering of rows (Metabolites). \strong{Default = NA}
-#' @param SCALE \emph{Optional: } String with the ??? \strong{Default = row}
+#' @param SCALE \emph{Optional: } String with the information for scale row or column. \strong{Default = row}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
 #'
 #' @keywords Volcano plot, pathways
@@ -2251,14 +2249,13 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
 
-VizHeatmap <- function(Input_data,                                                 # Input_data = Intra_Preprocessed[,-c(1:3)]
-                       Experimental_design,                                        # Experimental_design = Intra_Preprocessed[,c(1:2)]
-                       #  Plot_SettingsInfo = c(individual, y_annotation)
-                       Plot_SettingsInfo= NULL,                                   #  Plot_SettingsInfo = c(col_annotation = list("Conditions","Biological_Replicates") , row_annotation = "lalala")                                                                     #     Plot_SettingsFile =  MappingInfo
-                       Plot_SettingsFile= NULL, #  Plot_SettingsFile=  MappingInfo
+VizHeatmap <- function(Input_data,
+                       Experimental_design,
+                       Plot_SettingsInfo= NULL,
+                       Plot_SettingsFile= NULL,
                        OutputPlotName= "title",
                        Subtitle= "Subtitle here",
-                       Theme= NULL, # pheatmap has no theme
+                     #  Theme= NULL, # pheatmap has no theme, I couldnt make it work
                        SCALE = "row",
                        Save_as = "svg"
 ){
