@@ -2259,7 +2259,6 @@ VizHeatmap <- function(Input_data,
                     Save_as = "svg"
                     ){
 
-
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "writexl","pheatmap")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
