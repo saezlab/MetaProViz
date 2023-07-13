@@ -2246,16 +2246,14 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
 VizHeatmap <- function(Input_data,
-                       Experimental_design,
-                       Plot_SettingsInfo= NULL,
-                       Plot_SettingsFile= NULL,
+                       Experimental_design,#Plot_SettingsFile_Sample
+                       Plot_SettingsInfo= NULL,#individual, color_samples =info from ExperimentalDesign, color_metabolites =info from PlotSettingsFile
+                       Plot_SettingsFile_Metab= NULL,
                        OutputPlotName= "title",
                        Subtitle= "Subtitle here",
-                     #  Theme= NULL, # pheatmap has no theme, I couldnt make it work
                        SCALE = "row",
                        Save_as = "svg"
 ){
-
 
 
   ## ------------ Setup and installs ----------- ##
