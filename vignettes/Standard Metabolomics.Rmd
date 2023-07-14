@@ -114,7 +114,7 @@ SampleInfo <-Intra[c(1:47),c(1:4)]%>%
 MetaProViz::toy_data(data="MappingInfo")
 
 # Check how our data looks like:
-knitr::kable(Pathways[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
+knitr::kable(MappingInfo[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
 ```
 \
 `3.` KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis. **(KEGG_Pathways)**\
@@ -185,23 +185,24 @@ As part of the `Preprocessing()` function several plots are generated, returned 
 #For each Round of HotellinsT2 test three plots will be saved:
 #1.PCA plot
 P1 <- Outlier_Plots[[1]]
-plot(P1)
-```
-```{r}
+P1
+
 #2.Screeplot
-p2 <- Outlier_Plots[[2]]
-plot(P2)
+P2 <- Outlier_Plots[[2]]
+P2
 #3.Hotellins Outlier
-Outlier_Plots[[3]]
+P3 <- Outlier_Plots[[3]]
+P3
 
 ################### 
 #If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
 #Here a second round was performed and the plots saved:
-Outlier_Plots[[4]]
-Outlier_Plots[[5]]
-Outlier_Plots[[6]]
-
-#grid.arrange(Outlier_Plots, ncol=2)
+P4<- Outlier_Plots[[4]]
+P4
+P5<- Outlier_Plots[[5]]
+P5
+P6<- Outlier_Plots[[6]]
+P6
 ```
 I have a list with 6 elements, each of them being a plot. If I run `Outlier_Plots[[3]]` in the console , I will see the plot. Yet, if I knite the .rmd file I will only see `Outlier_Plots[[1]]`, not the others.
 --> Maybe try gridextra:
@@ -214,10 +215,12 @@ The QC plots `QC_Plots` include an PCA plot using the processed data and highlig
 ```{r}
 # PCA plot
 # 1. Marked Outliers:
-QC_Plots[[1]]
+Q1 <- QC_Plots[[1]]
+Q1
 
 #2. Marked Biological replicates:
-QC_Plots[[2]]
+Q2 <- QC_Plots[[2]]
+Q2
 ```
 \
 As part of the **MetaProViz** visualization module one can easily customize the PCA plot and adapt color and shape for the information of interest. You can see more below for the `VizPCA()` function.
@@ -246,16 +249,16 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove colu
                Experimental_design=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
                Condition1="HK2",
                Condition2="786-O",
-               STAT_pval ="t.test",
+               STAT_pval ="t.test",#ProDA is another test! --> estimates missing information
                STAT_padj="fdr",
-               Input_Pathways = Pathways[,c(1,4)], 
+               Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786O', 
                CoRe=FALSE, 
                Plot = TRUE, 
                Save_as = "svg")
 
 # Check how our data looks like:
-knitr::kable(DMA_HK2v786O[1:6,], caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE)
+knitr::kable(`DMA_HK2_vs_786-O`[1:6,], caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE)
 
 #Perform the other comparisons:
 MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
@@ -264,7 +267,7 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                Condition2="786-M1A",
                STAT_pval ="t.test",
                STAT_padj="fdr",
-               Input_Pathways = Pathways[,c(1,4)], 
+               Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786M1A', 
                CoRe=FALSE, 
                Plot = TRUE, 
@@ -276,11 +279,14 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                Condition2="786-M2A",
                STAT_pval ="t.test",
                STAT_padj="fdr",
-               Input_Pathways = Pathways[,c(1,4)], 
+               Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786M2A', 
                CoRe=FALSE, 
                Plot = TRUE, 
                Save_as = "svg")
+
+
+# For timeseries: anova test, cruckal walles.--> multiple groups! pearson correlation (use limma)
 
 ```
 \
@@ -311,7 +317,7 @@ HK2_vs_786O <-HK2_vs_786O[complete.cases(HK2_vs_786O),-1]%>%
 # Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
 #Pathway file requirements: column `term`, `Metabolite` and `Description`
 ORA_HK2_vs_786M1A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M1A,
-                   PathwayFile=KEGG,
+                   PathwayFile=KEGG_Pathways[,-3],
                    PathwayName="KEGG",
                    minGSSize=3,
                    maxGSSize=1000 ,
@@ -320,7 +326,7 @@ ORA_HK2_vs_786M1A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M1A,
                    PercentageCutoff=1)
 
 ORA_HK2_vs_786M2A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M2A,
-                   PathwayFile=KEGG,
+                   PathwayFile=KEGG_Pathways[,-3],
                    PathwayName="KEGG",
                    minGSSize=3,
                    maxGSSize=1000 ,
@@ -329,7 +335,7 @@ ORA_HK2_vs_786M2A <- MetaProViz::DM_ORA(Input_data=HK2_vs_786M2A,
                    PercentageCutoff=1)
 
 ORA_HK2_vs_786O <- MetaProViz::DM_ORA(Input_data=HK2_vs_786O,
-                   PathwayFile=KEGG,
+                   PathwayFile=KEGG_Pathways[,-3],
                    PathwayName="KEGG",
                    minGSSize=3,
                    maxGSSize=1000 ,
@@ -401,7 +407,7 @@ To Do:
 
 ```{r}
 
-PathwayInput <- Pathways[,c(1,4)]%>%
+PathwayInput <- MappingInfo[,c(1,4)]%>%
   rename("term"="Pathway")
 PathwayInput$Description <- PathwayInput$term
 
@@ -597,7 +603,7 @@ Here we will look at all the different options we have to display our results fr
 Here we will first look into the results from the differential analysis (see above 2.2 DMA) for the comparison of `HK2 versus 786M1A`:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(Input_data=DMA_HK2v786M1A,
+MetaProViz::VizVolcano(Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA")
 ```
@@ -614,7 +620,7 @@ knitr::kable(Settings[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(color="RG3_SignificantChange"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA colour coded for metabolic clusters" )
 
@@ -622,7 +628,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(shape="RG3_SignificantChange"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters" )
 
@@ -630,14 +636,14 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(shape="RG3_SignificantChange", color="RG3_SignificantChange"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters" )
 ```
 \
 Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot too. \
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results."}
-Settings <- merge(Settings, Pathways, by="Metabolite", all.x=TRUE)
+Settings <- merge(Settings, MappingInfo, by="Metabolite", all.x=TRUE)
 
 # Check our settings:
 knitr::kable(Settings[1:4,] , caption = "Settings for plots.", row.names=FALSE)
@@ -646,7 +652,7 @@ knitr::kable(Settings[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(shape="RG3_SignificantChange", color="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters" )
 ```
@@ -657,7 +663,7 @@ We immediately see that there are many pathways displayed on the plot, which can
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters" )
 ```
@@ -668,7 +674,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters" )
 ```
@@ -681,7 +687,7 @@ If we have multiple clusters on one plot, we can also switch the colour legend t
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters",
                        Legend="Pie")
@@ -693,7 +699,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA shape for metabolic clusters",
                        Legend="Pie")
@@ -709,8 +715,8 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 MetaProViz::VizVolcano(Plot_Settings="Compare",
                        #Plot_SettingsInfo= c(color="RG3_SignificantChange", individual="Pathway"),
                        #Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
-                       AdditionalInput_data=DMA_HK2v786M2A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
+                       AdditionalInput_data=`DMA_HK2_vs_786-M2A`,
                        OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
                        Subtitle= "Results of DMA" )
 ```
@@ -721,8 +727,8 @@ Now we do individual plots again:
 MetaProViz::VizVolcano(Plot_Settings="Compare",
                        Plot_SettingsInfo= c(individual="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
-                       AdditionalInput_data=DMA_HK2v786M2A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
+                       AdditionalInput_data=`DMA_HK2_vs_786-M2A`,
                        OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
                        Subtitle= "Results of DMA" )
 ```
@@ -732,8 +738,8 @@ MetaProViz::VizVolcano(Plot_Settings="Compare",
 MetaProViz::VizVolcano(Plot_Settings="Compare",
                        Plot_SettingsInfo= c(individual="Pathway"),
                        Plot_SettingsFile= Settings,
-                       Input_data=DMA_HK2v786M1A,
-                       AdditionalInput_data=DMA_HK2v786M2A,
+                       Input_data=`DMA_HK2_vs_786-M1A`,
+                       AdditionalInput_data=`DMA_HK2_vs_786-M2A`,
                        OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
                        Subtitle= "Results of DMA" )
 ```
@@ -772,7 +778,7 @@ Next we may want to show additional information about the metabolites on the plo
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying color and size option."}
 MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`, 
                        Plot_SettingsInfo= c(color="t.val", size="p.adj"), 
-                       Plot_SettingsFile= DMA_HK2v786O,
+                       Plot_SettingsFile= `DMA_HK2_vs_786-O`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA")
 ```
@@ -802,7 +808,7 @@ MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`,
 ```
 \
 We can also use lolipop plots to compare 2 or more DMA results by setting the value in Plot_Settings to "Compare". Here, we have to add a list of dataframes in the Input_data as well as a list of the names of the datasets to be used for displaying the data. Colorcoding is used for the datasets. 
-```{r}
+```{r, eval=FALSE}
 ## Compare
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_Settings="Compare", 
@@ -813,7 +819,7 @@ MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`
 ```
 \
 Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
-```{r}
+```{r, eval=FALSE}
 #  When  Plot_Settings="Compare" colorcoding of hte different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
            Plot_SettingsInfo= c(size = "t.val"),  
@@ -831,7 +837,7 @@ SettingsM1A <- merge(Settings,`DMA_HK2_vs_786-M1A`, by="Metabolite" )
 knitr::kable(SettingsO[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 ```
 
-```{r}
+```{r, eval=FALSE}
 VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
            Plot_Settings="Compare", 
