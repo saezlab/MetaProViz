@@ -2230,9 +2230,9 @@ VizLolipop<- function(Plot_Settings="Standard",
 ###############################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
+#' @param Plot_SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
 #' @param Plot_SettingsInfo  \emph{Optional: } NULL or Named vector  including  individual="ColumnName_Plot_SettingsFile", optionally you can additionally include vectors or lists for annotation c(row_annotation="ColumnName_Plot_SettingsFile", col_annotation= "ColumnName_Plot_Experimental_Design").\strong{Default = NULL}
-#' @param Plot_SettingsFile  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
+#' @param Plot_SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot
 #' @param SCALE \emph{Optional: } String with the information for scale row or column. \strong{Default = row}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
@@ -2242,19 +2242,15 @@ VizLolipop<- function(Plot_Settings="Standard",
 #'
 #'
 
-
-
-
 VizHeatmap <- function(Input_data,
-                       Experimental_design,#Plot_SettingsFile_Sample
-                       Plot_SettingsInfo= NULL,#individual, color_samples =info from ExperimentalDesign, color_metabolites =info from PlotSettingsFile
+                       Plot_SettingsFile_Sample,#Plot_SettingsFile_Sample
+                       Plot_SettingsInfo= NULL,#individual, color_samples =info from ExperimentalDesign, color_metabolites =info from PlotSettingsFile, individual_metabolites
                        Plot_SettingsFile_Metab= NULL,
-                       OutputPlotName= "title",
-                       Subtitle= "Subtitle here",
+                       OutputPlotName= "",
+                       Subtitle= "",
                        SCALE = "row",
                        Save_as = "svg"
 ){
-
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "writexl","pheatmap")
@@ -2262,6 +2258,8 @@ VizHeatmap <- function(Input_data,
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
+  ## ------------ Check Input ------------- ##
+  data <- Input_data
 
 
   ## ------------ Create Output folders ----------- ##
@@ -2273,14 +2271,13 @@ VizHeatmap <- function(Input_data,
   if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}  # check and create folder
 
 
-  data <- Input_data
+  #####################################################
+  ## -------------- Plot --------------- ##
 
   if("individual" %in% names(Plot_SettingsInfo)==TRUE){
-
-
     individual_selection <-  Plot_SettingsInfo[["individual"]]
     # Create the list of individual plots that should be made:
-    IndividualPlots <- Plot_SettingsFile[!duplicated(Plot_SettingsFile[individual_selection]),]
+    IndividualPlots <- Plot_SettingsFile_Metab[!duplicated(Plot_SettingsFile_Metab[individual_selection]),]
     IndividualPlots <- IndividualPlots[individual_selection]%>% unlist() %>% as.vector
 
     PlotList <- list()#Empty list to store all the plots
@@ -2288,7 +2285,7 @@ VizHeatmap <- function(Input_data,
     for (i in IndividualPlots){
       # i = IndividualPlots[1]
       # Select the data
-      selected_path <- Plot_SettingsFile %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
+      selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
       data_path <- data %>% select(all_of(selected_path_metabs))
 
@@ -2301,7 +2298,7 @@ VizHeatmap <- function(Input_data,
         for (i in 1:length(col_annot_vars)){
           annot_sel <- col_annot_vars[[i]]
 
-          col_annot[i] <- Experimental_design %>% select(annot_sel) %>% as.data.frame()
+          col_annot[i] <- Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
           names(col_annot)[i] <- annot_sel
         }
         col_annot<- as.data.frame(col_annot)
@@ -2315,11 +2312,11 @@ VizHeatmap <- function(Input_data,
       if(length(row_annot_vars)>0){
         for (i in 1:length(row_annot_vars)){
           annot_sel <- row_annot_vars[[i]]
-          row_annot[i] <- Plot_SettingsFile %>% select(all_of(annot_sel))
+          row_annot[i] <- Plot_SettingsFile_Metab %>% select(all_of(annot_sel))
           row_annot <- row_annot %>% as.data.frame()
           names(row_annot)[i] <- annot_sel
         }
-        rownames(row_annot) <- Plot_SettingsFile[["Metabolite"]]
+        rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
       }
 
 
@@ -2334,7 +2331,7 @@ VizHeatmap <- function(Input_data,
                                     annotation_row = row_annot,
                                     main = OutputPlotName)
 
-      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
+      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=10, height=12)
 
     }
 
@@ -2346,8 +2343,7 @@ VizHeatmap <- function(Input_data,
     if(length(col_annot_vars)>0){
       for (i in 1:length(col_annot_vars)){
         annot_sel <- col_annot_vars[[i]]
-
-        col_annot[i] <- Experimental_design %>% select(annot_sel) %>% as.data.frame()
+        col_annot[i] <- Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
         names(col_annot)[i] <- annot_sel
       }
       col_annot<- as.data.frame(col_annot)
@@ -2360,11 +2356,11 @@ VizHeatmap <- function(Input_data,
     if(length(row_annot_vars)>0){
       for (i in 1:length(row_annot_vars)){
         annot_sel <- row_annot_vars[[i]]
-        row_annot[i] <- Plot_SettingsFile %>% select(all_of(annot_sel))
+        row_annot[i] <- Plot_SettingsFile_Metab %>% select(all_of(annot_sel))
         row_annot <- row_annot %>% as.data.frame()
         names(row_annot)[i] <- annot_sel
       }
-      rownames(row_annot) <- Plot_SettingsFile[["Metabolite"]]
+      rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
     }
 
     set.seed(1234)
@@ -2376,24 +2372,11 @@ VizHeatmap <- function(Input_data,
                                   annotation_row = row_annot,
                                   main = OutputPlotName)
 
-    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=out, width=10, height=12)
+    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=10, height=12)
 
 
   }
 }
-
-
-
-
-
-
-
-
-
-###########----------------------
-# Use function
-# Heatmap(Input_data = preprocessing_output_Intra$Processed_data,  Input_pathways = pathwaysdf, Plot_pathways = "Individual")
-######---------------------------
 
 
 ################################
