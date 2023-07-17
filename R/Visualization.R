@@ -2230,10 +2230,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 ###############################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Plot_SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Plot_SettingsInfo  \emph{Optional: } NULL or Named vector  including  individual="ColumnName_Plot_SettingsFile", optionally you can additionally include vectors or lists for annotation c(row_annotation="ColumnName_Plot_SettingsFile", col_annotation= "ColumnName_Plot_Experimental_Design").\strong{Default = NULL}
+#' @param Plot_SettingsInfo  \emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual= "", color_Metab="ColumnName_Plot_SettingsFile_Metab", color_Sample= list("ColumnName_Plot_SettingsFile_Sample", "ColumnName_Plot_SettingsFile_Sample",...)).\strong{Default = NULL}
+#' @param Plot_SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}
 #' @param Plot_SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
-#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot
+#' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot
 #' @param SCALE \emph{Optional: } String with the information for scale row or column. \strong{Default = row}
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
 #'
@@ -2243,11 +2243,10 @@ VizLolipop<- function(Plot_Settings="Standard",
 #'
 
 VizHeatmap <- function(Input_data,
-                       Plot_SettingsFile_Sample,#Plot_SettingsFile_Sample
-                       Plot_SettingsInfo= NULL,#individual, color_samples =info from ExperimentalDesign, color_metabolites =info from PlotSettingsFile, individual_metabolites
+                       Plot_SettingsInfo= NULL,
+                       Plot_SettingsFile_Sample=NULL,
                        Plot_SettingsFile_Metab= NULL,
                        OutputPlotName= "",
-                       Subtitle= "",
                        SCALE = "row",
                        Save_as = "svg"
 ){
@@ -2283,17 +2282,14 @@ VizHeatmap <- function(Input_data,
     PlotList <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
-      # i = IndividualPlots[1]
       # Select the data
       selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
       data_path <- data %>% select(all_of(selected_path_metabs))
 
-
-
       # Column annotation
-      col_annot_vars <- Plot_SettingsInfo[grepl("col_annotation", names(Plot_SettingsInfo))]
-      col_annot<- NULL
+      col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
+
       if(length(col_annot_vars)>0){
         for (i in 1:length(col_annot_vars)){
           annot_sel <- col_annot_vars[[i]]
@@ -2303,12 +2299,13 @@ VizHeatmap <- function(Input_data,
         }
         col_annot<- as.data.frame(col_annot)
         rownames(col_annot) <- rownames(data)
+      }else{
+        col_annot<- NULL
       }
 
-
       # Row annotation
-      row_annot_vars <- Plot_SettingsInfo[grepl("row_annotation", names(Plot_SettingsInfo))]
-      row_annot<- NULL
+      row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
+
       if(length(row_annot_vars)>0){
         for (i in 1:length(row_annot_vars)){
           annot_sel <- row_annot_vars[[i]]
@@ -2317,29 +2314,51 @@ VizHeatmap <- function(Input_data,
           names(row_annot)[i] <- annot_sel
         }
         rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
+      }else{
+         row_annot<- NULL
       }
 
-
+      #Check number of features:
+      Features <- as.data.frame(t(data_path ))
+      if(nrow(Features)>200){
+        show_rownames <- FALSE
+      }else{
+        show_rownames <- TRUE
+      }
 
       # Make the plot
       set.seed(1234)
       heatmap <- pheatmap::pheatmap(t(data_path),
+                                    show_rownames = as.logical(show_rownames),
                                     clustering_method =  "complete",
                                     scale = SCALE,
                                     clustering_distance_rows = "correlation",
                                     annotation_col = col_annot,
                                     annotation_row = row_annot,
-                                    main = OutputPlotName)
+                                    main = paste(OutputPlotName, i, sep=" " ))
 
-      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=10, height=12)
+      #Width and height according to Sample and metabolite number
+      # 1. Get the legend dimensions from the pheatmap object
+      legend_width <- as.numeric(regmatches(heatmap$gtable$widths[4], gregexpr("[0-9.]+", heatmap$gtable$widths[4]))[[1]])
+      width_cm <- sum((grid::convertX(unit(legend_width[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_width[2], "bigpts"), "cm", valueOnly = TRUE)))
+      legend_height <- as.numeric(regmatches(heatmap$gtable$heights[5], gregexpr("[0-9.]+", heatmap$gtable$heights[5]))[[1]])
+      height_cm <- sum((grid::convertX(unit(legend_height[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_height[2], "bigpts"), "cm", valueOnly = TRUE)))/2
+
+      #2. Give value to width and heights
+      plot_width <- (nrow(data_path ) * 0.2) + width_cm
+      plot_height <- (nrow(Features) * 0.3) + height_cm
+
+      #Save
+      cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
 
     }
 
   }else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
 
     # Column annotation
-    col_annot_vars <- Plot_SettingsInfo[grepl("col_annotation", names(Plot_SettingsInfo))]
-    col_annot<- NULL
+    col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
+
     if(length(col_annot_vars)>0){
       for (i in 1:length(col_annot_vars)){
         annot_sel <- col_annot_vars[[i]]
@@ -2348,11 +2367,13 @@ VizHeatmap <- function(Input_data,
       }
       col_annot<- as.data.frame(col_annot)
       rownames(col_annot) <- rownames(data)
+    }else{
+       col_annot<- NULL
     }
 
     # Row annotation
-    row_annot_vars <- Plot_SettingsInfo[grepl("row_annotation", names(Plot_SettingsInfo))]
-    row_annot<- NULL
+    row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
+
     if(length(row_annot_vars)>0){
       for (i in 1:length(row_annot_vars)){
         annot_sel <- row_annot_vars[[i]]
@@ -2361,10 +2382,22 @@ VizHeatmap <- function(Input_data,
         names(row_annot)[i] <- annot_sel
       }
       rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
+    }else{
+      row_annot<- NULL
     }
 
+    #Check number of features:
+    Features <- as.data.frame(t(data))
+    if(nrow(Features)>200){
+      show_rownames <- FALSE
+    }else{
+      show_rownames <- TRUE
+    }
+
+    #Make the plot:
     set.seed(1234)
     heatmap <- pheatmap::pheatmap(t(data),
+                                  show_rownames = as.logical(show_rownames),
                                   clustering_method =  "complete",
                                   scale = SCALE,
                                   clustering_distance_rows = "correlation",
@@ -2372,9 +2405,19 @@ VizHeatmap <- function(Input_data,
                                   annotation_row = row_annot,
                                   main = OutputPlotName)
 
-    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=10, height=12)
+    #Width and height according to Sample and metabolite number
+    # 1. Get the legend dimensions from the pheatmap object
+    legend_width <- as.numeric(regmatches(heatmap$gtable$widths[4], gregexpr("[0-9.]+", heatmap$gtable$widths[4]))[[1]])
+    width_cm <- sum((grid::convertX(unit(legend_width[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_width[2], "bigpts"), "cm", valueOnly = TRUE)))
+    legend_height <- as.numeric(regmatches(heatmap$gtable$heights[5], gregexpr("[0-9.]+", heatmap$gtable$heights[5]))[[1]])
+    height_cm <- sum((grid::convertX(unit(legend_height[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_height[2], "bigpts"), "cm", valueOnly = TRUE)))/2
 
+    #2. Give value to width and heights
+    plot_width <- (nrow(data) * 0.2) + width_cm
+    plot_height <- (nrow(Features) * 0.3) + height_cm
 
+    #Save
+    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as ,sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
   }
 }
 
