@@ -2289,7 +2289,7 @@ VizHeatmap <- function(Input_data,
 
       # Column annotation
       col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
-
+      col_annot<- NULL
       if(length(col_annot_vars)>0){
         for (i in 1:length(col_annot_vars)){
           annot_sel <- col_annot_vars[[i]]
@@ -2299,13 +2299,11 @@ VizHeatmap <- function(Input_data,
         }
         col_annot<- as.data.frame(col_annot)
         rownames(col_annot) <- rownames(data)
-      }else{
-        col_annot<- NULL
       }
 
       # Row annotation
       row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
-
+      row_annot<- NULL
       if(length(row_annot_vars)>0){
         for (i in 1:length(row_annot_vars)){
           annot_sel <- row_annot_vars[[i]]
@@ -2314,8 +2312,6 @@ VizHeatmap <- function(Input_data,
           names(row_annot)[i] <- annot_sel
         }
         rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
-      }else{
-         row_annot<- NULL
       }
 
       #Check number of features:
@@ -2358,7 +2354,7 @@ VizHeatmap <- function(Input_data,
 
     # Column annotation
     col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
-
+    col_annot<- NULL
     if(length(col_annot_vars)>0){
       for (i in 1:length(col_annot_vars)){
         annot_sel <- col_annot_vars[[i]]
@@ -2367,13 +2363,11 @@ VizHeatmap <- function(Input_data,
       }
       col_annot<- as.data.frame(col_annot)
       rownames(col_annot) <- rownames(data)
-    }else{
-       col_annot<- NULL
     }
 
     # Row annotation
     row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
-
+    row_annot<- NULL
     if(length(row_annot_vars)>0){
       for (i in 1:length(row_annot_vars)){
         annot_sel <- row_annot_vars[[i]]
@@ -2382,8 +2376,6 @@ VizHeatmap <- function(Input_data,
         names(row_annot)[i] <- annot_sel
       }
       rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
-    }else{
-      row_annot<- NULL
     }
 
     #Check number of features:
