@@ -581,7 +581,7 @@ MetaProViz::VizHeatmap(Input_data = Heatmap_data,
 # individual with col and row annotation
 MetaProViz::VizHeatmap(Input_data = Heatmap_data, 
                        Plot_SettingsFile_Sample = Heatmap_design,
-                       Plot_SettingsInfo = c(individual = "Pathway",color_Sample = list("Conditions","Biological_Replicates")),
+                       Plot_SettingsInfo = c(individual = "Pathway", color_Sample = list("Conditions","Biological_Replicates")),
                        Plot_SettingsFile_Metab =  MappingInfo,
                        OutputPlotName = "All")
 
@@ -824,7 +824,7 @@ MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`
 ```
 \
 Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
-```{r, eval=FALSE}
+```{r}
 #  When  Plot_Settings="Compare" colorcoding of hte different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
            Plot_SettingsInfo= c(size = "t.val"),  
@@ -842,7 +842,7 @@ SettingsM1A <- merge(Settings,`DMA_HK2_vs_786-M1A`, by="Metabolite" )
 knitr::kable(SettingsO[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 ```
 
-```{r, eval=FALSE}
+```{r}
 VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
            Plot_Settings="Compare", 

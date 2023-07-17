@@ -1424,9 +1424,9 @@ VizLolipop<- function(Plot_Settings="Standard",
                       # Legend="Standard",
                       x = "Log2FC",
                       y = "Metabolite",
-                      OutputPlotName= "My title",
+                      OutputPlotName= "",
                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                      Subtitle= "My subtitle",
+                      Subtitle= "",
                       Theme= NULL,
                       Save_as = "svg",
                       parameter_size="Reverse" #or default "Standard"
@@ -2015,7 +2015,7 @@ VizLolipop<- function(Plot_Settings="Standard",
     if("individual" %in% names(Plot_SettingsInfo)==TRUE){
 
       Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
-      comb.colnames <- c("Metabolite",paste(x),stat, "Condition")
+      comb.colnames <- c("Metabolite",paste(x), "Condition")
       colnames(Combined_Input) <- comb.colnames
 
       for (i in 1:length(Input_data)){
@@ -2032,7 +2032,7 @@ VizLolipop<- function(Plot_Settings="Standard",
       # Combined_Input <- Combined_Input %>% filter(abs(get(x)) >=FCcutoff)
       # Combined_Input <- Combined_Input[Combined_Input[stat] <= pCutoff,]
       # Combined_Input<- Combined_Input %>% drop_na()
-      Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
+      #Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
 
       # Remove the metabolite with inf in logFC because it messes the plot
       Combined_Input <- Combined_Input[is.finite(Combined_Input[[x]]),]
@@ -2129,7 +2129,7 @@ VizLolipop<- function(Plot_Settings="Standard",
     }
     else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
       Combined_Input <- data.frame(matrix(ncol = 4, nrow = 0))
-      comb.colnames <- c("Metabolite",paste(x),stat, "Condition")
+      comb.colnames <- c("Metabolite",paste(x), "Condition")
       colnames(Combined_Input) <- comb.colnames
 
       for (i in 1:length(Input_data)){
@@ -2159,7 +2159,7 @@ VizLolipop<- function(Plot_Settings="Standard",
       # Combined_Input <- Combined_Input %>% filter(abs(get(x)) >=FCcutoff)
       # Combined_Input <- Combined_Input[Combined_Input[stat] <= pCutoff,]
       # Combined_Input<- Combined_Input %>% drop_na()
-      Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
+      #Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
 
       # Remove the metabolite with inf in logFC because it messes the plot
       Combined_Input <- Combined_Input[is.finite(Combined_Input[[x]]),]
