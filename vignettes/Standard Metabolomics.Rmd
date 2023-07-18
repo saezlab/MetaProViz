@@ -59,12 +59,12 @@ A standard metabolomics experiment refers to intracellular extracts (e.g. cell o
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
 `-` To process raw peak data and identify outliers.\
 `-` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
-`-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviours and perform pathway analysis using ORA on each cluster.\
-`-` To use specific visualisations to aid biological interpretation of the results.\
+`-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
+`-` To use specific visualizations to aid biological interpretation of the results.\
 \
 \
 First if you have not done yet, install the required dependencies and load the libraries:
-```{r, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 #MetaProViz
 
 #library(MetaProViz)
@@ -154,7 +154,11 @@ Notes on MVI:
 \
 Since our example data contains pool samples, we will do `Pool_Estimation()` before applying the `Preprocessing()` function. This is important, since one should remove the features (=metabolites) that are too variable prior to performing any data transformations such as TIC as part of the `Preprocessing()` function.\
 ```{r}
-#Do the pool control first!
+#Get the Pool data
+PoolData <- MetaProViz::toy_data(data="Standard")%>%
+  subset(Conditions=="Pool", select = -c(2:4))# we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
+
+  
 
 #--> remove features if needed.
 ```

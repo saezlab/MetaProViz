@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='576.00pt' height='432.00pt' viewBox='0 0 576.00 432.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw1NzYuMDB8MC4wMHw0MzIuMDA='>
+    <rect x='0.00' y='0.00' width='576.00' height='432.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw0MzIuMDA=)'>
+<rect x='0.00' y='0.000000000000057' width='576.00' height='432.00' style='stroke-width: 2.33; stroke: #FFFFFF; fill: #FFFFFF;' />
+<circle cx='167.36' cy='223.20' r='3.56' style='stroke-width: 0.71; stroke: #88CCEE; fill: #88CCEE;' />
+<circle cx='216.12' cy='132.86' r='3.56' style='stroke-width: 0.71; stroke: #88CCEE; fill: #88CCEE;' />
+<circle cx='125.28' cy='274.99' r='3.56' style='stroke-width: 0.71; stroke: #88CCEE; fill: #88CCEE;' />
+<line x1='228.50' y1='341.00' x2='228.50' y2='63.66' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+<line x1='47.73' y1='164.38' x2='564.04' y2='164.38' style='stroke-width: 1.07; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+</g>
+<defs>
+  <clipPath id='cpMzE5Ljg4fDU3Mi4wMXwxMy4yM3wyNjUuMzY='>
+    <rect x='319.88' y='13.23' width='252.13' height='252.13' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzE5Ljg4fDU3Mi4wMXwxMy4yM3wyNjUuMzY=)'>
+<polygon points='445.94,139.30 445.94,135.76 445.94,132.22 445.94,128.68 445.94,125.14 445.94,121.60 445.94,118.06 445.94,114.53 445.94,110.99 445.94,107.45 445.94,103.91 445.94,100.37 445.94,96.83 445.94,93.29 445.94,89.76 445.94,86.22 445.94,82.68 445.94,79.14 445.94,75.60 445.94,72.06 442.51,72.15 439.09,72.41 435.68,72.85 432.30,73.46 428.96,74.24 425.66,75.20 422.41,76.31 419.23,77.60 416.11,79.04 413.07,80.65 410.12,82.40 407.26,84.30 404.51,86.35 401.86,88.54 399.32,90.85 396.91,93.30 394.62,95.86 392.47,98.54 390.46,101.32 388.59,104.20 386.88,107.18 385.31,110.24 383.91,113.37 382.67,116.57 381.59,119.83 380.68,123.14 379.94,126.50 379.37,129.88 378.98,133.29 378.76,136.72 378.71,140.16 378.85,143.59 379.15,147.01 379.63,150.41 380.29,153.78 381.11,157.11 382.11,160.40 383.27,163.63 384.59,166.80 386.08,169.90 387.72,172.91 389.51,175.84 391.45,178.68 393.53,181.41 395.75,184.03 398.10,186.54 400.57,188.92 403.17,191.17 405.87,193.28 408.68,195.26 411.59,197.09 414.58,198.77 417.66,200.29 420.81,201.66 424.03,202.86 427.30,203.90 430.62,204.76 433.99,205.46 437.38,205.98 440.80,206.34 444.23,206.51 447.66,206.51 451.09,206.34 454.51,205.98 457.90,205.46 461.26,204.76 464.59,203.90 467.86,202.86 471.08,201.66 474.23,200.29 477.31,198.77 480.30,197.09 483.21,195.26 486.02,193.28 488.72,191.17 491.31,188.92 493.79,186.54 496.14,184.03 498.36,181.41 500.44,178.68 502.38,175.84 504.17,172.91 505.81,169.90 507.30,166.80 508.62,163.63 509.78,160.40 510.78,157.11 511.60,153.78 512.26,150.41 512.74,147.01 513.04,143.59 513.17,140.16 513.13,136.72 512.91,133.29 512.52,129.88 511.95,126.50 511.21,123.14 510.30,119.83 509.22,116.57 507.98,113.37 506.57,110.24 505.01,107.18 503.29,104.20 501.43,101.32 499.42,98.54 497.27,95.86 494.98,93.30 492.57,90.85 490.03,88.54 487.38,86.35 484.63,84.30 481.77,82.40 478.82,80.65 475.78,79.04 472.66,77.60 469.48,76.31 466.23,75.20 462.93,74.24 459.59,73.46 456.21,72.85 452.80,72.41 449.38,72.15 445.94,72.06 445.94,75.60 445.94,79.14 445.94,82.68 445.94,86.22 445.94,89.76 445.94,93.29 445.94,96.83 445.94,100.37 445.94,103.91 445.94,107.45 445.94,110.99 445.94,114.53 445.94,118.06 445.94,121.60 445.94,125.14 445.94,128.68 445.94,132.22 445.94,135.76 445.94,139.30 445.94,139.30 ' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #88CCEE; fill-opacity: 0.70;' />
+<line x1='445.94' y1='232.99' x2='445.94' y2='174.02' style='stroke-width: 1.07;' />
+<polygon points='415.18,247.31 476.71,247.31 476.62,247.31 476.97,247.30 477.31,247.23 477.63,247.11 477.93,246.93 478.20,246.71 478.43,246.45 478.62,246.16 478.76,245.84 478.84,245.50 478.87,245.15 478.87,245.15 478.87,235.15 478.87,235.15 478.84,234.80 478.76,234.46 478.62,234.14 478.43,233.85 478.20,233.59 477.93,233.37 477.63,233.19 477.31,233.07 476.97,233.00 476.71,232.99 415.18,232.99 415.44,233.00 415.10,232.99 414.75,233.03 414.42,233.13 414.10,233.28 413.82,233.47 413.57,233.71 413.36,233.99 413.20,234.30 413.09,234.63 413.03,234.97 413.02,235.15 413.02,245.15 413.03,244.98 413.03,245.33 413.09,245.67 413.20,246.00 413.36,246.31 413.57,246.59 413.82,246.83 414.10,247.02 414.42,247.17 414.75,247.27 415.10,247.31 ' style='stroke-width: 0.53; fill: #FFFFFF;' />
+<text x='445.94' y='243.71' text-anchor='middle' style='font-size: 9.96px; font-family: "Arial";' textLength='58.64px' lengthAdjust='spacingAndGlyphs'>None (100%)</text>
+</g>
+<g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw0MzIuMDA=)'>
+<polyline points='47.73,341.00 47.73,63.66 ' style='stroke-width: 1.71; stroke-linecap: butt;' />
+<text x='36.98' y='334.84' text-anchor='end' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='36.98' y='271.81' text-anchor='end' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text x='36.98' y='208.77' text-anchor='end' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text x='36.98' y='145.74' text-anchor='end' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text x='36.98' y='82.71' text-anchor='end' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>2.0</text>
+<polyline points='41.76,328.40 47.73,328.40 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='41.76,265.36 47.73,265.36 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='41.76,202.33 47.73,202.33 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='41.76,139.30 47.73,139.30 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='41.76,76.26 47.73,76.26 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='47.73,341.00 564.04,341.00 ' style='stroke-width: 1.71; stroke-linecap: butt;' />
+<polyline points='93.31,346.98 93.31,341.00 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='228.50,346.98 228.50,341.00 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='363.69,346.98 363.69,341.00 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='498.88,346.98 498.88,341.00 ' style='stroke-width: 2.33; stroke: #333333; stroke-linecap: butt;' />
+<text x='93.31' y='364.65' text-anchor='middle' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='228.50' y='364.65' text-anchor='middle' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text x='363.69' y='364.65' text-anchor='middle' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text x='498.88' y='364.65' text-anchor='middle' style='font-size: 18.00px;fill: #4D4D4D; font-family: "Arial";' textLength='25.02px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text x='273.88' y='387.53' style='font-size: 18.00px; font-family: "Arial";' textLength='10.01px' lengthAdjust='spacingAndGlyphs'>L</text>
+<text x='283.89' y='387.53' style='font-size: 18.00px; font-family: "Arial";' textLength='10.01px' lengthAdjust='spacingAndGlyphs'>o</text>
+<text x='293.89' y='387.53' style='font-size: 18.00px; font-family: "Arial";' textLength='10.01px' lengthAdjust='spacingAndGlyphs'>g</text>
+<text x='303.90' y='387.53' style='font-size: 18.00px; font-family: "Arial";' textLength='10.01px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='313.91' y='387.53' style='font-size: 18.00px; font-family: "Arial";' textLength='10.99px' lengthAdjust='spacingAndGlyphs'>F</text>
+<text x='324.91' y='387.53' style='font-size: 18.00px; font-family: "Arial";' textLength='13.00px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text x='47.73' y='48.76' style='font-size: 14.00px; font-family: "Arial";' textLength='274.58px' lengthAdjust='spacingAndGlyphs'>Results of DMA shape for metabolic clusters</text>
+<text x='47.73' y='23.41' style='font-size: 16.00px; font-weight: bold; font-family: "Arial";' textLength='490.78px' lengthAdjust='spacingAndGlyphs'>HK2 versus 786M1A: Valine, leucine and isoleucine biosynthesis</text>
+<text x='564.04' y='417.10' text-anchor='end' style='font-size: 14.00px; font-family: "Arial";' textLength='125.64px' lengthAdjust='spacingAndGlyphs'>total = 3 Metabolites</text>
+</g>
+</svg>

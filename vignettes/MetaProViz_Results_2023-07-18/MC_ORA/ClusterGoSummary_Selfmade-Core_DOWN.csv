@@ -1,0 +1,17 @@
+ID,Description,GeneRatio,BgRatio,pvalue,p.adjust,qvalue,MetaboliteIDs_in_pathway,Count,Metabolites_in_Pathway,Percentage_of_Pathway_detected
+Fatty acyl carnitines,Fatty acyl carnitines,3/13,7/176,0.009382387448375011,0.05629432469025007,0.0493809865703948,isovalerylcarnitine/malonylcarnitine C3-DC/methylmalonylcarnitine C3-DC-M/succinylcarnitine C4-DC,3,8,37.5
+Citrate cycle (TCA cycle),Citrate cycle (TCA cycle),2/13,9/176,0.13507129461575665,0.2701425892315133,0.2369671835364152,2-ketoglutarate/mesaconate,2,9,22.22
+Not assigned,Not assigned,5/13,39/176,0.13202996404992856,0.2701425892315133,0.2369671835364152,cysteic acid/hypotaurine/myo-inositol/N-acetylneuramic acid/taurine,5,52,9.62
+Cysteine and methionine metabolism,Cysteine and methionine metabolism,1/13,5/176,0.3217792275818241,0.3861350730981889,0.3387149764019201,S-adenosylmethionine,1,6,16.67
+Pentose phosphate pathway,Pentose phosphate pathway,1/13,4/176,0.26632721474260246,0.3861350730981889,0.3387149764019201,deoxyribose 5-phosphate,1,4,25
+Pyrimidine metabolism,Pyrimidine metabolism,1/13,18/176,0.7667684643434707,0.7667684643434707,0.6726039160907638,orotidine,1,18,5.56
+"Alanine, aspartate and glutamate metabolism","Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,0,3,0
+Arginine and proline metabolism,Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,0,7,0
+D-Amino acid metabolism,D-Amino acid metabolism,NA,NA,NA,NA,NA,NA,0,35,0
+Glutathione metabolism,Glutathione metabolism,NA,NA,NA,NA,NA,NA,0,9,0
+Glycerophospholipid metabolism,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,0,9,0
+Glycolysis / Gluconeogenesis,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,0,8,0
+Oxidative phosphorylation,Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,0,2,0
+Purine metabolism,Purine metabolism,NA,NA,NA,NA,NA,NA,0,21,0
+"Valine, leucine and isoleucine biosynthesis","Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,0,6,0
+Vitamin digestion and absorption,Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,0,3,0
