@@ -1506,6 +1506,32 @@ VizLolipop<- function(Plot_Settings="Standard",
     warning("When Plot_Settings='Compare' color is used to colorcode the input datasets. Color was added in the Plot_SettingsInfo but it will be ignored. Please use only the size option.")
     Plot_SettingsInfo <- Plot_SettingsInfo[!names(Plot_SettingsInfo) == "color"]
   }
+
+  if("color" %in% names(Plot_SettingsInfo)==TRUE){
+    for(i in 1:length(Input_data)){
+      data <- Input_data[[i]]
+      if (Plot_SettingsInfo[["color"]] %in% colnames(Plot_SettingsFile) == FALSE) {
+        stop("You have chosen color = ",paste(Plot_SettingsInfo[["color"]]), ", ", paste(Plot_SettingsInfo[["color"]])," does not exist in the PlotSettingsFile."   )
+      }
+    }
+  }
+  if("size" %in% names(Plot_SettingsInfo)==TRUE){
+    for(i in 1:length(Input_data)){
+      data <- Input_data[[i]]
+      if (Plot_SettingsInfo[["size"]] %in% colnames(Plot_SettingsFile) == FALSE) {
+        stop("You have chosen size = ",paste(Plot_SettingsInfo[["size"]]), ", ", paste(Plot_SettingsInfo[["size"]])," does not exist in the PlotSettingsFile."   )
+      }
+    }
+  }
+  if("label_dot" %in% names(Plot_SettingsInfo)==TRUE){
+    for(i in 1:length(Input_data)){
+      data <- Input_data[[i]]
+      if (Plot_SettingsInfo[["label_dot"]] %in% colnames(Plot_SettingsFile) == FALSE) {
+        stop("You have chosen label_dot = ",paste(Plot_SettingsInfo[["label_dot"]]), ", ", paste(Plot_SettingsInfo[["label_dot"]])," does not exist in the PlotSettingsFile."   )
+      }
+    }
+  }
+
   if(is.vector(Plot_SettingsInfo)==TRUE){
     if("color" %in% names(Plot_SettingsInfo)==TRUE & "size" %in% names(Plot_SettingsInfo)==TRUE){
       if((Plot_SettingsInfo[["size"]] == Plot_SettingsInfo[["color"]])==TRUE){
@@ -1642,6 +1668,14 @@ VizLolipop<- function(Plot_Settings="Standard",
           keyvalssize <- loli.data$size
         }
 
+
+        if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+          label <-  Plot_SettingsInfo[["label_dot"]]
+          loli.data[ Plot_SettingsInfo[["label_dot"]]] <- round(loli.data[[label]], digits = 3)
+        }else{
+          label <-  ""
+        }
+
         p2 <- NULL
         if("color" %in% names(Plot_SettingsInfo_indi)==TRUE ){
           if(is.numeric(loli.data$color)==FALSE){ # run if color is discrete
@@ -1724,6 +1758,15 @@ VizLolipop<- function(Plot_Settings="Standard",
               lab_neg_metab <-  loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x)
               p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
 
+              if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+                dot_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x, label)
+                p2<- p2+ annotate("text", x = dot_pos_metab$Metab_name, y = dot_pos_metab[[x]], label = dot_pos_metab[[label]], size = 3)
+
+                dot_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x,label)
+                p2<- p2+ annotate("text", x = dot_neg_metab$Metab_name, y = dot_neg_metab[[x]], label = dot_neg_metab[[label]], size = 3)
+
+              }
+
               p2 <- p2+Theme
               p2 <- p2+ labs(color=col_var_name)+
                 labs(size=Plot_SettingsInfo[['size']])
@@ -1742,6 +1785,15 @@ VizLolipop<- function(Plot_Settings="Standard",
 
               lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
               p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, size = 3)
+
+              if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+                dot_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x, label)
+                p2<- p2+ annotate("text", x = dot_pos_metab$Metab_name, y = dot_pos_metab[[x]], label = dot_pos_metab[[label]], size = 3)
+
+                dot_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x,label)
+                p2<- p2+ annotate("text", x = dot_neg_metab$Metab_name, y = dot_neg_metab[[x]], label = dot_neg_metab[[label]], size = 3)
+
+              }
 
               p2 <- p2+Theme
 
@@ -1776,7 +1828,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           loli.data[[x]]<- as.numeric(loli.data[[x]])
           loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
 
-          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=get(label))) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
             # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
@@ -1798,6 +1850,9 @@ VizLolipop<- function(Plot_Settings="Standard",
           }
           if(Flip==TRUE){
             lolipop_plot <- lolipop_plot + coord_flip() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+            lolipop_plot <-   lolipop_plot + geom_text(color="black", size=2)
           }
         }
 
@@ -1841,6 +1896,15 @@ VizLolipop<- function(Plot_Settings="Standard",
         Plot_SettingsInfo= c(Plot_SettingsInfo,size="p.adj")
         keyvalssize <- loli.data$size
       }
+
+
+      if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+        label <-  Plot_SettingsInfo[["label_dot"]]
+        loli.data[ Plot_SettingsInfo[["label_dot"]]] <- round(loli.data[[label]], digits = 3)
+      }else{
+        label <-  ""
+      }
+
 
       p2 <- NULL
       if("color" %in% names(Plot_SettingsInfo)==TRUE ){
@@ -1912,7 +1976,6 @@ VizLolipop<- function(Plot_Settings="Standard",
               )
 
           if(Flip == TRUE){
-            a <- p2
             p2 <- p2 +theme(axis.text.x=element_blank(),
                             axis.ticks.x=element_blank())
             lab_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x)
@@ -1920,6 +1983,15 @@ VizLolipop<- function(Plot_Settings="Standard",
 
             lab_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x)
             p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
+
+            if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+              dot_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x, label)
+              p2<- p2+ annotate("text", x = dot_pos_metab$Metab_name, y = dot_pos_metab[[x]], label = dot_pos_metab[[label]], size = 3)
+
+              dot_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x,label)
+              p2<- p2+ annotate("text", x = dot_neg_metab$Metab_name, y = dot_neg_metab[[x]], label = dot_neg_metab[[label]], size = 3)
+
+            }
 
             p2 <- p2+Theme
             p2 <- p2+ labs(color=col_var_name)+
@@ -1943,6 +2015,16 @@ VizLolipop<- function(Plot_Settings="Standard",
             p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, size = 3)
 
             # p2 <- p2+ annotate("text", x = max(lab_neg_metab$Metab_name)+ 7, y = 0, label = OutputPlotName, size = 5)
+
+            if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+              dot_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x, label)
+              p2<- p2+ annotate("text", x = dot_pos_metab$Metab_name, y = dot_pos_metab[[x]], label = dot_pos_metab[[label]], size = 3)
+
+              dot_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x,label)
+              p2<- p2+ annotate("text", x = dot_neg_metab$Metab_name, y = dot_neg_metab[[x]], label = dot_neg_metab[[label]], size = 3)
+
+            }
+
 
             p2 <- p2+Theme
             p2 <- p2+ labs(color=col_var_name)+
@@ -1976,7 +2058,7 @@ VizLolipop<- function(Plot_Settings="Standard",
         loli.data[[x]]<- as.numeric(loli.data[[x]])
         loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
 
-        lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+        lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=get(label))) +
           geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
           geom_point(aes(colour = keyvals, size = keyvalssize ))   +
           # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
@@ -1997,6 +2079,9 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
         if(Flip==TRUE){
           lolipop_plot <- lolipop_plot + coord_flip() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        }
+        if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+          lolipop_plot <-   lolipop_plot + geom_text(color="black", size=2)
         }
       }
 
@@ -2028,15 +2113,11 @@ VizLolipop<- function(Plot_Settings="Standard",
 
       }
 
-
-      # Combined_Input <- Combined_Input %>% filter(abs(get(x)) >=FCcutoff)
-      # Combined_Input <- Combined_Input[Combined_Input[stat] <= pCutoff,]
-      # Combined_Input<- Combined_Input %>% drop_na()
-      #Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
-
-      # Remove the metabolite with inf in logFC because it messes the plot
+      if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+        Plot_SettingsInfo[["label_dot"]]
+        Combined_Input[ Plot_SettingsInfo[["label_dot"]]] <- round(Combined_Input[stat], digits = 4)
+      }
       Combined_Input <- Combined_Input[is.finite(Combined_Input[[x]]),]
-
 
 
       # Create the list of individual plots that should be made:
@@ -2070,8 +2151,15 @@ VizLolipop<- function(Plot_Settings="Standard",
           keyvalssize <- loli.data$size
         }
 
+        if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+          Combined_Input[ Plot_SettingsInfo[["label_dot"]]] <- round(Combined_Input[stat], digits = 4)
+          label <-  Plot_SettingsInfo[["label_dot"]]
+        }else{
+          label <-  ""
+        }
+
         if(Flip==TRUE){
-          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names))+# , label=stat)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names , label=get(label))) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
             #scale_size_continuous(range = c(1,5))+
@@ -2088,7 +2176,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)
 
         }else{
-          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names)) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names , label=get(label))) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
             # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
@@ -2106,6 +2194,9 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
         if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
           lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+        }
+        if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+          lolipop_plot <-   lolipop_plot + geom_text(color="black", size=2)
         }
         lolipop_plot
 
@@ -2153,22 +2244,21 @@ VizLolipop<- function(Plot_Settings="Standard",
         keyvalssize <- Combined_Input$size
       }
 
-
-
-
-      # Combined_Input <- Combined_Input %>% filter(abs(get(x)) >=FCcutoff)
-      # Combined_Input <- Combined_Input[Combined_Input[stat] <= pCutoff,]
-      # Combined_Input<- Combined_Input %>% drop_na()
-      #Combined_Input[stat] <- round(Combined_Input[stat], digits = 5)
+      if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+        Combined_Input[ Plot_SettingsInfo[["label_dot"]]] <- round(Combined_Input[stat], digits = 4)
+        label <-  Plot_SettingsInfo[["label_dot"]]
+      }else{
+        label <-  ""
+      }
 
       # Remove the metabolite with inf in logFC because it messes the plot
       Combined_Input <- Combined_Input[is.finite(Combined_Input[[x]]),]
 
 
       if(Flip==TRUE){
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]]))+#, label=stat)) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]], label=get(label))) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
-          # geom_text(color="black", size=2) +
+          #   geom_text(color="black", size=2) +
           ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
           geom_hline(yintercept = 0) +
           Theme+
@@ -2182,7 +2272,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           labs(title = OutputPlotName,subtitle = Subtitle)
 
       }else{
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]]))+#, label=stat)) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]], label=get(label))) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
           #geom_text(color="black", size=2) +
           ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
@@ -2200,6 +2290,13 @@ VizLolipop<- function(Plot_Settings="Standard",
       if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
         lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
       }
+
+      if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+        lolipop_plot <-   lolipop_plot + geom_text(color="black", size=2)
+      }
+
+
+
 
       if(OutputPlotName ==""){
         ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=lolipop_plot, width=12, height=14)
