@@ -171,6 +171,7 @@ Preprocessing <- function(Input_data,
   #message("Feature filtering is performed to reduce missing values that can bias the analysis and cause methods to underperform, which leads to low precision in the statistical analysis. REF: Steuer et. al. (2007), Methods Mol Biol. 358:105-26., doi:10.1007/978-1-59745-244-1_7.")
   #Prepare data:
   Input_data <- replace(Input_data, Input_data==0, NA)
+  original_Experimental_design<-Experimental_design
 
   #Perfrom filtering as selected
   if (Feature_Filtering ==  "Modified"){
@@ -315,6 +316,9 @@ Preprocessing <- function(Input_data,
     if (var(CoRe_norm_factor) ==  0){
       warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
     }
+    # Remove blank samples from the data
+    Data_TIC <- Data_TIC[Experimental_design$Conditions!="blank",]
+    Experimental_design <- Experimental_design[Experimental_design$Conditions!="blank",]
   }
   data_norm <- Data_TIC %>% as.data.frame()
 
@@ -607,7 +611,7 @@ Preprocessing <- function(Input_data,
   ### ### ###  Make list with output dataframes ### ### ###
 
   output_list <- list()  #Here we make a list in which we will save the output
-  preprocessing_output_list <- list(Experimental_design = Experimental_design, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
+  preprocessing_output_list <- list(Experimental_design = original_Experimental_design, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
 
   ##Write to file
   preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe
