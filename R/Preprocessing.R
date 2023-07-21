@@ -26,7 +26,8 @@
 #' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}
 #' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
-#' @param MVI \emph{Optional: } If TRUE, Mivving Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
+#' @param MVI \emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
+#' @param MVI_Percentage \emph(Optional: ) Percentage (0 to 100)of imputed value based on the minimum value. \strong{Default = 50}
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}
@@ -176,27 +177,31 @@ Preprocessing <- function(Input_data,
     message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
     message(paste("filtering value selected:", Feature_Filt_Value))
 
-    Input_data <- as.data.frame(Input_data)
-    unique_conditions <- unique(Conditions) # saves the different conditions
+    feat_filt_data <- as.data.frame(Input_data)
+    feat_filt_Conditions <- Conditions[!Experimental_design$Conditions=="blank"]
 
-    if(is.null(unique(Conditions)) ==  TRUE){
+    if(CoRe== TRUE){ # remove blank samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Experimental_design$Conditions=="blank")
+    }
+
+    if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
       stop("Condition information is missing from the Experimental design.")
     }
-    if(length(unique(Conditions)) ==  1){
+    if(length(unique(feat_filt_Conditions)) ==  1){
       stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
     }
 
     miss <- c()
     # for (i in unique_conditions){
-      split_Input <- split(Input_data, Conditions) # splits data frame into a list of dataframes by condition
+    split_Input <- split(feat_filt_data, feat_filt_Conditions) # splits data frame into a list of dataframes by condition
 
-      for (m in split_Input){ # Select metabolites to be filtered for different conditions
-        for(i in 1:ncol(m)) {
-          if(length(which(is.na(m[,i]))) > (1-Feature_Filt_Value)*nrow(m))
-            miss <- append(miss,i)
-        }
+    for (m in split_Input){ # Select metabolites to be filtered for different conditions
+      for(i in 1:ncol(m)) {
+        if(length(which(is.na(m[,i]))) > (1-Feature_Filt_Value)*nrow(m))
+          miss <- append(miss,i)
       }
- #   }
+    }
+    #   }
 
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
@@ -213,7 +218,14 @@ Preprocessing <- function(Input_data,
   if (Feature_Filtering ==  "Standard"){
     message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
     message(paste("filtering value selected:", Feature_Filt_Value))
-    split_Input <- Input_data
+
+    feat_filt_data <- as.data.frame(Input_data)
+
+    if(CoRe== TRUE){ # remove blank samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Experimental_design$Conditions=="blank")
+    }
+
+    split_Input <- feat_filt_data
 
     miss <- c()
     message("***Performing standard feature filtering***")
