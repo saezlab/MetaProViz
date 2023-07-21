@@ -179,7 +179,7 @@ MetaProViz::Preprocessing(Input_data=Intra_M,
 # Now we can have a look at the results table:
 Intra_Preprocessed <- PreProcessing_res[["Processed_data"]]
 
-knitr::kable(Intra_Preprocessed[29:32, 1:7]%>%rownames_to_column("Code"), caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.", row.names=FALSE)
+knitr::kable(Intra_Preprocessed[29:32, 1:9]%>%rownames_to_column("Code"), caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.", row.names=FALSE)
 
 ```
 \
@@ -757,6 +757,17 @@ MetaProViz::VizVolcano(Plot_Settings="Compare",
 #### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
 
+```{r, eval=FALSE}
+
+MetaProViz::VizVolcano(Plot_Settings="PEA",
+                       Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
+                       Plot_SettingsFile= KEGG_Pathways[,-3],#Must be the pathways used for pathway analysis
+                       Input_data= HK2_vs_786M1A,# Must be the data you have used as an input for the pathway analysis
+                       AdditionalInput_data=ORA_HK2_vs_786M1A,#Must be the results of the pathway analysis
+                       OutputPlotName= "test",
+                       Subtitle= "PEA" )
+
+```
 
 
 1. Plot_SettingsFile = Pathway file used for e.g. ORA. --> column term or pathway = individual
@@ -876,6 +887,3 @@ Generally: Do a vignette just for visuals? --> use bigger dataset, which will sh
 options(width = 120)
 sessioninfo::session_info()
 ```
-
-
-daniel, pau, robin (single cell) --> there was someone on a conference Aurelien mentioned 

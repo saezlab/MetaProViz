@@ -971,18 +971,11 @@ VizVolcano <- function(Plot_Settings="Standard",
             names(col) <- InputVolcano$color[row]
             keyvals <- c(keyvals, col)
           }
-        } else{#here we will use the conditions if no other color is provided!
-          color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$comparison))]
-
-          keyvals <- c()
-          for(row in 1:nrow(InputVolcano)){
-            col <- color_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
-            names(col) <- InputVolcano$comparison[row]
-            keyvals <- c(keyvals, col)
-          }
+        } else{
+          keyvals <-NULL
         }
         #Prepare the shape scheme:
-        if("shape" %in% names(Plot_SettingsInfo)==TRUE & "color" %in% names(Plot_SettingsInfo)==FALSE){
+        if("shape" %in% names(Plot_SettingsInfo)==TRUE){
           shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
 
           keyvalsshape <- c()
@@ -991,27 +984,10 @@ VizVolcano <- function(Plot_Settings="Standard",
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
           }
-        } else if("shape" %in% names(Plot_SettingsInfo)==TRUE & "color" %in% names(Plot_SettingsInfo)==TRUE){
-          #Here we have already used color from Plot_SettingsInfo and we need to use shape for the conditions
-          message("For Plot_setting= `Consitions`we can only use colour or shape from Plot_SettingsFile. We ignore shape and use it to label the Comparison_name.")
-          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
-
-          keyvalsshape <- c()
-          for(row in 1:nrow(InputVolcano)){
-            sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
-            names(sha) <- InputVolcano$comparison[row]
-            keyvalsshape <- c(keyvalsshape, sha)
-          }
-        } else if("shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==FALSE){
-          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
-
-          keyvalsshape <- c()
-          for(row in 1:nrow(InputVolcano)){
-            sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
-            names(sha) <- InputVolcano$comparison[row]
-            keyvalsshape <- c(keyvalsshape, sha)
-          }
+        } else{
+          keyvalsshape <-NULL
         }
+
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$Metabolite,#Metabolite name
