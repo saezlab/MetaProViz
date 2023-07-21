@@ -1391,13 +1391,11 @@ VizAlluvial <- function(Input_data1,
 
 
 
-
 VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
                       Input_data, # a dataframe of list of dataframes
-                      # stat = "p.adj", # this could be used to plot a value on the dot on a plot. For example p.adj
-                      # Legend="Standard",
+                      AdditionalInput_data= NULL, # unsd only for PEA
                       x = "Log2FC",
                       y = "Metabolite",
                       OutputPlotName= "",
@@ -1596,6 +1594,17 @@ VizLolipop<- function(Plot_Settings="Standard",
   #                   "PEA_stat"=paste(Plot_SettingsInfo[["PEA_stat"]]),
   #                   "PEA_Pathway"=paste(Plot_SettingsInfo[["PEA_Pathway"]]))
   # }
+
+  # The next lines need checks/corrections
+  if(Plot_Settings=="PEA" & is.null(AdditionalInput_data)==TRUE){
+    stop("If Plot_Settings=`PEA` you have to provide a DF for AdditionalInput_data including the results of an enrichment analysis.")
+  } else if(Plot_Settings=="PEA" & is.null(AdditionalInput_data)==FALSE){
+    AdditionalInput_data <- AdditionalInput_data%>%
+      dplyr::rename("PEA_score"=paste(Plot_SettingsInfo[["PEA_score"]]),
+                    "PEA_stat"=paste(Plot_SettingsInfo[["PEA_stat"]]),
+                    "PEA_Pathway"=paste(Plot_SettingsInfo[["PEA_Pathway"]]))
+  }
+
 
   # 4. Check other plot-specific parameters:
   Save_as_options <- c("svg","pdf")
@@ -2282,9 +2291,256 @@ VizLolipop<- function(Plot_Settings="Standard",
       plot(lolipop_plot)
 
     }
+
+
   }else if(Plot_Settings=="PEA"){# Code Missing
+    Input_data <- Input_data[[1]]
+
+    # Create the list of individual plots that should be made:
+    IndividualPlots <- Plot_SettingsFile[!duplicated(Plot_SettingsFile$individual),]
+    IndividualPlots <- IndividualPlots$individual
+
+    PlotList <- list()#Empty list to store all the plots
+
+    for (i in IndividualPlots){
+      # i <- IndividualPlots[1]
+      Plot_SettingsInfo_indi <- Plot_SettingsInfo
+      Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
+      InputLolipop  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+        na.omit()
+
+      AdditionalInput_data_Select<- subset(AdditionalInput_data, PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
+
+      #Select metabolites for the cut offs selected
+      loli.data <- InputLolipop %>% mutate(names=Metabolite)
+
+
+      if("size" %in% names(Plot_SettingsInfo_indi)==TRUE ){
+        if(is.numeric(loli.data$size)==FALSE){ # run is color is discrete
+          stop("Size can take only numeric values")
+        }else{# color = continuous
+          keyvalssize <- loli.data$size
+        }
+      } else{
+        Plot_SettingsInfo_indi= c(Plot_SettingsInfo_indi,size="p.adj")
+        keyvalssize <- loli.data$size
+      }
+
+
+      if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+        label <-  Plot_SettingsInfo[["label_dot"]]
+        loli.data[ Plot_SettingsInfo[["label_dot"]]] <- round(loli.data[[label]], digits = 3)
+      }else{
+        label <-  ""
+      }
+
+      p2 <- NULL
+      # add color here
+      if("color" %in% names(Plot_SettingsInfo_indi)==TRUE ){
+        if(is.numeric(loli.data$color)==FALSE){ # run if color is discrete
+
+          col_var_name <- Plot_SettingsInfo_indi[['color']]
+
+          position <- which(names(loli.data)=="color" )
+          names(loli.data)[position]<-"plot_color_variable"
+
+
+          loli.data <- loli.data %>%
+            arrange(plot_color_variable, get(x),Metabolite)
+
+          loli.data_avg <- loli.data %>%
+            arrange(plot_color_variable, get(x), Metabolite) %>%
+            mutate(Metab_name = row_number()) %>%
+            group_by(plot_color_variable) %>%
+            mutate(
+              avg = mean(get(x))
+            ) %>%
+            ungroup() %>%
+            mutate(plot_color_variable = factor(plot_color_variable))
+
+
+          loli_lines <-   loli.data_avg %>%
+            arrange(plot_color_variable, Metabolite) %>%
+            group_by(plot_color_variable) %>%
+            summarize(
+              start_x = min(Metab_name) -0.5,
+              end_x = max(Metab_name) + 0.5,
+              y = 0#unique(avg)
+            ) %>%
+            pivot_longer(
+              cols = c(start_x, end_x),
+              names_to = "type",
+              values_to = "x"
+            ) %>%
+            mutate(
+              x_group = if_else(type == "start_x", x + .1, x - .1),
+              x_group = if_else(type == "start_x" & x == min(x), x_group - .1, x_group),
+              x_group = if_else(type == "end_x" & x == max(x), x_group + .1, x_group) )
+
+          #rm(p2)
+          p2 <- loli.data_avg %>%
+            ggplot(aes(Metab_name, get(x))) + # names in aes ro Metab_name
+            geom_hline(
+              data = tibble(y = -5:5),
+              aes(yintercept = y),
+              color = "grey82",
+              size = .5 )
+
+          p2 <- p2 + geom_segment(
+            aes(
+              xend = Metab_name,          # names
+              yend = 0,#avg,
+              color = plot_color_variable,
+              #color = after_scale(colorspace::lighten(color, .2))
+            ))
+
+          p2 <- p2 + # geom_line( data = loli_lines, aes(x, y),  color = "grey40"  ) +
+            geom_line(
+              data = loli_lines,
+              aes( x_group, y,
+                   color = plot_color_variable,
+                   #  color = after_scale(colorspace::darken(color, .2))
+              ), size = 2.5) +  geom_point(aes(size = keyvalssize, color = plot_color_variable)
+              )
+
+          p2 <- p2 +theme(axis.text.y=element_blank(),
+                          axis.ticks.y=element_blank()
+          )
+
+          if(Flip == TRUE){
+            p2 <- p2 +theme(axis.text.x=element_blank(),
+                            axis.ticks.x=element_blank())
+            lab_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x)
+
+            p2 <- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite,angle = 90, size = 3)
+
+            lab_neg_metab <-  loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x)
+            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, angle = 90,size = 3)
+
+            if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+              dot_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x, label)
+              p2<- p2+ annotate("text", x = dot_pos_metab$Metab_name, y = dot_pos_metab[[x]], label = dot_pos_metab[[label]], size = 3)
+
+              dot_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x,label)
+              p2<- p2+ annotate("text", x = dot_neg_metab$Metab_name, y = dot_neg_metab[[x]], label = dot_neg_metab[[label]], size = 3)
+
+            }
+
+            p2 <- p2+Theme
+            p2 <- p2+ labs(color=col_var_name)+
+              labs(size=Plot_SettingsInfo[['size']])
+
+            p2 <- p2  +  labs(title = paste(OutputPlotName, ": ", i, sep=""),
+                              subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
+                              caption = paste0("total = ", nrow(InputLolipop), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"))+
+              theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                    plot.subtitle = element_text(color = "black", size=10),
+                    plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
+
+          }else{
+            p2<- p2 + coord_flip()
+            p2 <- p2 +theme(axis.text.x=element_blank(),
+                            axis.ticks.x=element_blank())
+            lab_pos_metab <- loli.data_avg %>% filter(get(x)>0) %>% select(Metabolite, Metab_name, get(x))
+            p2<- p2+ annotate("text", x = lab_pos_metab$Metab_name, y = lab_pos_metab[[x]]+1.5, label = lab_pos_metab$Metabolite, size = 3)
+
+            lab_neg_metab <- loli.data_avg %>% filter(get(x)<0) %>% select(Metabolite, Metab_name, get(x))
+            p2<- p2+ annotate("text", x = lab_neg_metab$Metab_name, y = lab_neg_metab[[x]]-1.5, label = lab_neg_metab$Metabolite, size = 3)
+
+            if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+              dot_pos_metab <- loli.data_avg[loli.data_avg[x]>0,]  %>% select(Metabolite, Metab_name, x, label)
+              p2<- p2+ annotate("text", x = dot_pos_metab$Metab_name, y = dot_pos_metab[[x]], label = dot_pos_metab[[label]], size = 3)
+
+              dot_neg_metab <- loli.data_avg[loli.data_avg[x]<0,]  %>% select(Metabolite, Metab_name, x,label)
+              p2<- p2+ annotate("text", x = dot_neg_metab$Metab_name, y = dot_neg_metab[[x]], label = dot_neg_metab[[label]], size = 3)
+
+            }
+
+            p2 <- p2+Theme
+
+            p2 <- p2  +  labs(title = paste(OutputPlotName, ": ", i, sep=""),
+                              subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
+                              caption = paste0("total = ", nrow(InputLolipop), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"))+
+              theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                    plot.subtitle = element_text(color = "black", size=10),
+                    plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
+
+            p2 <- p2+ labs(color=col_var_name)+
+              labs(size=Plot_SettingsInfo_indi[['size']])
+          }
+
+          lolipop_plot <-  p2
+          if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+            lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+          }
+
+          # Put back the correct name in the data df
+          names(loli.data)[position]<- col_var_name
+
+        }else{# color = continuous
+          keyvals <- loli.data$color
+        }
+      }else{
+        Plot_SettingsInfo_indi= c(Plot_SettingsInfo_indi, color="p.adj")
+        keyvals <- loli.data$color
+      }
+
+      if(is.null(p2)==TRUE){
+
+        loli.data$names <- as.factor(loli.data$names)
+        loli.data[[x]]<- as.numeric(loli.data[[x]])
+        loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
+
+        lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=!!label)) +
+          geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
+          geom_point(aes(colour = keyvals, size = keyvalssize ))   +
+          # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
+
+          scale_colour_gradient(low = "red", high = "blue")+
+          geom_vline(xintercept = 0)+
+          Theme+
+          labs(color=Plot_SettingsInfo_indi[['color']])+
+          labs(size=Plot_SettingsInfo_indi[['size']]) +
+          ylab(y)+
+          xlab(x)+
+          labs(title = paste(OutputPlotName, ": ", i, sep=""),
+               subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
+               caption = paste0("total = ", nrow(InputLolipop), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"))+
+          theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+                plot.subtitle = element_text(color = "black", size=10),
+                plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
+
+        if(parameter_size=="Reverse" & is.null(keyvalssize)==FALSE){
+          lolipop_plot <-   lolipop_plot + scale_size(trans = 'reverse')
+        }
+        if(Flip==TRUE){
+          lolipop_plot <- lolipop_plot + coord_flip() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        }
+        if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
+          lolipop_plot <-   lolipop_plot + geom_text(color="black", size=2)
+        }
+        plot(lolipop_plot)
+      }
+
+      #save plot and get rid of extra signs before saving
+      cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+      if(OutputPlotName ==""){
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+      }else{
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+      }
+      ## Store the plot in the 'plots' list
+      PlotList[[cleaned_i]] <- lolipop_plot
+      plot(lolipop_plot)
+    }
+    # Return PlotList into the environment to enable the user to view the plots directly
+    #assign("LolipopPlots", PlotList, envir=.GlobalEnv)
+    # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
+    Return <- PlotList
+
   }
 }
+
 
 
 
