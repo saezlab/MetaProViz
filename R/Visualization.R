@@ -1804,7 +1804,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           loli.data[[x]]<- as.numeric(loli.data[[x]])
           loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
 
-          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=get(label))) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=!!label)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = keyvals, size = keyvalssize ))   +
             # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
@@ -2034,7 +2034,7 @@ VizLolipop<- function(Plot_Settings="Standard",
         loli.data[[x]]<- as.numeric(loli.data[[x]])
         loli.data$names <- reorder(loli.data$names, -loli.data[[x]])
 
-        lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=get(label))) +
+        lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names,label=!!label)) +
           geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
           geom_point(aes(colour = keyvals, size = keyvalssize ))   +
           # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
@@ -2152,7 +2152,7 @@ VizLolipop<- function(Plot_Settings="Standard",
             labs(title = paste(OutputPlotName,": ", i ),subtitle = Subtitle)
 
         }else{
-          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names , label=get(label))) +
+          lolipop_plot <- ggplot(loli.data , aes(x = get(x), y = names , label=!!label)) +
             geom_segment(aes(x = 0, xend = get(x), y = names, yend = names)) +
             geom_point(aes(colour = Condition, size = keyvalssize ))   +
             # scale_size_continuous(range = c(1,5))+# , trans = 'reverse') +
@@ -2232,7 +2232,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
       if(Flip==TRUE){
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]], label=get(label))) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite, + get(x)), y=.data[[x]], label=!!label)) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
           #   geom_text(color="black", size=2) +
           ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
@@ -2248,7 +2248,7 @@ VizLolipop<- function(Plot_Settings="Standard",
           labs(title = OutputPlotName,subtitle = Subtitle)
 
       }else{
-        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]], label=get(label))) +
+        lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(Metabolite,+ get(x)), y=.data[[x]], label=!!label)) +
           geom_point(stat = 'identity', aes(size = keyvalssize, col = Condition))  +
           #geom_text(color="black", size=2) +
           ylim(((Reduce(min,Combined_Input[[x]]))-0.5),((Reduce(max,Combined_Input[[x]]))+0.5)) +
