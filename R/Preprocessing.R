@@ -248,20 +248,24 @@ Preprocessing <- function(Input_data,
   if (MVI ==  TRUE){
   message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
 
-    for (feature  in colnames(filtered_matrix)){
-      feature_data <- merge(filtered_matrix[feature] , Experimental_design %>% select(Conditions), by= 0)
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      # feature  <- colnames(NA_removed_matrix)[1]
+      feature_data <- merge(NA_removed_matrix[feature] , Experimental_design %>% select(Conditions), by= 0)
       feature_data <-column_to_rownames(feature_data, "Row.names")
 
       imputed_feature_data <- feature_data %>%
         group_by(Conditions) %>%
         mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
 
-      filtered_matrix[[feature]] <- imputed_feature_data[[feature]]
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
     }
 
-    NA_removed_matrix <- filtered_matrix
+
   } else if(MVI == FALSE){
   message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
   }
 
 
@@ -507,6 +511,10 @@ Preprocessing <- function(Input_data,
   }
 
   data_norm_filtered_full <- as.data.frame(Data_TIC)
+
+  if(MVI == FALSE){ # if no MVI is selected put back the NAs in the dataframe
+    data_norm_filtered_full[stored_NA_positions] <- NA
+  }
 
   if(length(total_outliers) > 0){  # add outlier information to the full output dataframe
     data_norm_filtered_full$Outliers <- "no"
