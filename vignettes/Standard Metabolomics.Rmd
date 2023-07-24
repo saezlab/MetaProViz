@@ -840,7 +840,7 @@ MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`
 \
 Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
 ```{r}
-#  When  Plot_Settings="Compare" colorcoding of hte different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
+#  When  Plot_Settings="Compare" colorcoding of the different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
            Plot_SettingsInfo= c(size = "t.val"),  
            Plot_Settings="Compare", 
