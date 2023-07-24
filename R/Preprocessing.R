@@ -26,7 +26,8 @@
 #' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}
 #' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
-#' @param MVI \emph{Optional: } If TRUE, Mivving Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
+#' @param MVI \emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
+#' @param MVI_Percentage \emph(Optional: ) Percentage (0 to 100)of imputed value based on the minimum value. \strong{Default = 50}
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}
@@ -47,6 +48,7 @@ Preprocessing <- function(Input_data,
                           Feature_Filt_Value = 0.8,
                           TIC_Normalization = TRUE,
                           MVI= TRUE,
+                          MVI_Percentage=50,
                           HotellinsConfidence = 0.99,
                           ExportQCPlots = TRUE,
                           CoRe = FALSE,
@@ -127,6 +129,9 @@ Preprocessing <- function(Input_data,
   if(is.logical(MVI) == FALSE){
     stop("Check input. MVI value should be either =TRUE if mising value imputation should be performed or =FALSE if not.")
   }
+  if( is.numeric(MVI_Percentage)== FALSE |HotellinsConfidence > 100 | HotellinsConfidence < 0){
+    stop("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
+  }
   if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
     stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
   }
@@ -166,33 +171,38 @@ Preprocessing <- function(Input_data,
   #message("Feature filtering is performed to reduce missing values that can bias the analysis and cause methods to underperform, which leads to low precision in the statistical analysis. REF: Steuer et. al. (2007), Methods Mol Biol. 358:105-26., doi:10.1007/978-1-59745-244-1_7.")
   #Prepare data:
   Input_data <- replace(Input_data, Input_data==0, NA)
+  Original_Experimental_design<-Experimental_design
 
   #Perfrom filtering as selected
   if (Feature_Filtering ==  "Modified"){
     message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
     message(paste("filtering value selected:", Feature_Filt_Value))
 
-    Input_data <- as.data.frame(Input_data)
-    unique_conditions <- unique(Conditions) # saves the different conditions
+    feat_filt_data <- as.data.frame(Input_data)
+    feat_filt_Conditions <- Conditions[!Experimental_design$Conditions=="blank"]
 
-    if(is.null(unique(Conditions)) ==  TRUE){
+    if(CoRe== TRUE){ # remove blank samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Experimental_design$Conditions=="blank")
+    }
+
+    if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
       stop("Condition information is missing from the Experimental design.")
     }
-    if(length(unique(Conditions)) ==  1){
+    if(length(unique(feat_filt_Conditions)) ==  1){
       stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
     }
 
     miss <- c()
     # for (i in unique_conditions){
-      split_Input <- split(Input_data, Conditions) # splits data frame into a list of dataframes by condition
+    split_Input <- split(feat_filt_data, feat_filt_Conditions) # splits data frame into a list of dataframes by condition
 
-      for (m in split_Input){ # Select metabolites to be filtered for different conditions
-        for(i in 1:ncol(m)) {
-          if(length(which(is.na(m[,i]))) > (1-Feature_Filt_Value)*nrow(m))
-            miss <- append(miss,i)
-        }
+    for (m in split_Input){ # Select metabolites to be filtered for different conditions
+      for(i in 1:ncol(m)) {
+        if(length(which(is.na(m[,i]))) > (1-Feature_Filt_Value)*nrow(m))
+          miss <- append(miss,i)
       }
- #   }
+    }
+    #   }
 
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
@@ -209,7 +219,14 @@ Preprocessing <- function(Input_data,
   if (Feature_Filtering ==  "Standard"){
     message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
     message(paste("filtering value selected:", Feature_Filt_Value))
-    split_Input <- Input_data
+
+    feat_filt_data <- as.data.frame(Input_data)
+
+    if(CoRe== TRUE){ # remove blank samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Experimental_design$Conditions=="blank")
+    }
+
+    split_Input <- feat_filt_data
 
     miss <- c()
     message("***Performing standard feature filtering***")
@@ -241,11 +258,27 @@ Preprocessing <- function(Input_data,
   ################################################
   ### ### ### Missing value Imputation ### ### ###
 
-  if (TIC_Normalization ==  TRUE){
+  if (MVI ==  TRUE){
   message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
-  NA_removed_matrix <- replace(filtered_matrix, filtered_matrix %in% NA, ((min(filtered_matrix, na.rm =  TRUE))/2))
-  } else if(TIC_Normalization == FALSE){
+
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      # feature  <- colnames(NA_removed_matrix)[1]
+      feature_data <- merge(NA_removed_matrix[feature] , Experimental_design %>% select(Conditions), by= 0)
+      feature_data <-column_to_rownames(feature_data, "Row.names")
+
+      imputed_feature_data <- feature_data %>%
+        group_by(Conditions) %>%
+        mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+    }
+
+
+  } else if(MVI == FALSE){
   message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
   }
 
 
@@ -283,6 +316,9 @@ Preprocessing <- function(Input_data,
     if (var(CoRe_norm_factor) ==  0){
       warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
     }
+    # Remove blank samples from the data
+    Data_TIC <- Data_TIC[Experimental_design$Conditions!="blank",]
+    Experimental_design <- Experimental_design[Experimental_design$Conditions!="blank",]
   }
   data_norm <- Data_TIC %>% as.data.frame()
 
@@ -492,6 +528,10 @@ Preprocessing <- function(Input_data,
 
   data_norm_filtered_full <- as.data.frame(Data_TIC)
 
+  if(MVI == FALSE){ # if no MVI is selected put back the NAs in the dataframe
+    data_norm_filtered_full[stored_NA_positions] <- NA
+  }
+
   if(length(total_outliers) > 0){  # add outlier information to the full output dataframe
     data_norm_filtered_full$Outliers <- "no"
     for (i in 1:length(total_outliers)){
@@ -571,7 +611,7 @@ Preprocessing <- function(Input_data,
   ### ### ###  Make list with output dataframes ### ### ###
 
   output_list <- list()  #Here we make a list in which we will save the output
-  preprocessing_output_list <- list(Experimental_design = Experimental_design, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
+  preprocessing_output_list <- list(Experimental_design = Original_Experimental_design, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
 
   ##Write to file
   preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe

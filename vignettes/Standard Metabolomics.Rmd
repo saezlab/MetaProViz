@@ -867,7 +867,17 @@ VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
            Subtitle= "Results of DMA for each Metabolite Cluster")
 ```
 
-
+#### **PathwayEnrichmentAnalysis**
+If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
+```{r}
+MetaProViz::VizLolipop(Plot_Settings="PEA",
+                       Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
+                       Plot_SettingsFile= KEGG_Pathways[,-3],#Must be the pathways used for pathway analysis
+                       Input_data= HK2_vs_786M1A,# Must be the data you have used as an input for the pathway analysis
+                       AdditionalInput_data=ORA_HK2_vs_786M1A,#Must be the results of the pathway analysis
+                       OutputPlotName= "test",
+                       Subtitle= "PEA" )
+```
 
 ### Alluvial plots
 This is a rather specific plot that can be particularly useful to visulaise the output of the `MCA` module. 
