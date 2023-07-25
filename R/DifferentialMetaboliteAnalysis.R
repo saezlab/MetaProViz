@@ -53,7 +53,7 @@ DMA <-function(Input_data,
                Save_as = "svg"){
 
   ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "EnhancedVolcano")
+  RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0){
     install.packages(new.packages)
@@ -236,9 +236,9 @@ DMA <-function(Input_data,
                                     C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                     C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                    TRUE ~ 'NA'))
-    Mean_Merge$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted))
-    Mean_Merge$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted))
+                                    TRUE ~ 'NA'))%>%
+      mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
+      mutate(C2_Adapted = as.numeric(C2_Adapted))
 
     if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
       X <- Mean_Merge%>%
@@ -272,10 +272,9 @@ DMA <-function(Input_data,
                                       C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C2)))
-
-      Mean_Merge$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted))
-      Mean_Merge$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted))
+                                      TRUE ~ paste(C2)))%>%
+        mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
+        mutate(C2_Adapted = as.numeric(C2_Adapted))
 
       if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
         X <- Mean_Merge%>%
