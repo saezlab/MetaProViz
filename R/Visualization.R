@@ -2571,6 +2571,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 #'
 #'
 
+
 VizHeatmap <- function(Input_data,
                        Plot_SettingsInfo= NULL,
                        Plot_SettingsFile_Sample=NULL,
@@ -2580,13 +2581,96 @@ VizHeatmap <- function(Input_data,
                        Save_as = "svg"
 ){
 
+
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "writexl","pheatmap")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
-  ## ------------ Check Input ------------- ##
+  ## ------------ Check Input files ----------- ##
+  # 1. The input data:
+  if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else(
+      Input_data <- Input_data
+    )
+
+    # Check if the next lines work correctly in case of duplicated metabolties (colnames)
+
+    if(sum( duplicated(colnames(Input_data))) > 0){
+      doublons <- as.character(colnames(Input_data)[duplicated(colnames(Input_data))])#number of duplications
+      data <-data[!duplicated(colnames(Input_data)),]#remove duplications
+      warning("Input_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running VizLolipop.")
+    }
+  }
+
+  #2. Plot_settings
+  if(is.null(Plot_SettingsInfo) == FALSE){
+    if("individual" %in% names(Plot_SettingsInfo)==TRUE){
+      if(Plot_SettingsInfo[["individual"]] %in% colnames(Plot_SettingsFile_Metab)== FALSE){
+        stop("You have chosen individual = ",paste(Plot_SettingsInfo$individual), ", ", paste(Plot_SettingsInfo$individual)," does not exist in the Plot_SettingsFile_Metab"   )
+      }
+      # Check pathways with 1 metabolite
+      unique_paths <- unique(Plot_SettingsFile_Metab[[Plot_SettingsInfo[["individual"]]]])
+
+      for (i in unique_paths){
+        selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
+        selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+
+        if(length(selected_path_metabs)==1 ){
+          warning("The pathway ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+          unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
+        }
+      }
+    }
+
+    if(sum(grepl("color_Metab", names(Plot_SettingsInfo)))>0){ # If color metab exists
+      if(is.null(Plot_SettingsFile_Metab)==TRUE){ # Check if Plot_SettingsFile_Metab also exists
+        stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile_Metab.")
+      }else{
+        if("Metabolite" %in% colnames(Plot_SettingsFile_Metab) == FALSE){  # Check if Metabolite column exists in  Plot_SettingsFile_Metab
+          stop("Check input. Plot_SettingsFile_Metab must contain a column named `Metabolite` including the metabolite names.")
+        }
+        if(sum(colnames(Input_data) %in% Plot_SettingsFile_Metab$Metabolite) != length(Input_data)  ){
+          warning("The Input data contains metabolites not found in Plot_SettingsFile_Metab.")
+        }
+        # Check if color_metab exists in file
+        for (metab_color in Plot_SettingsInfo[ grepl("color_Metab", names(Plot_SettingsInfo))]){
+          if( metab_color %in% colnames(Plot_SettingsFile_Metab)== FALSE){
+            stop("You have chosen color_Metab = ",paste(metab_color), ", ", paste(metab_color)," does not exist in the Plot_SettingsFile_Metab"   )
+          }
+        }
+      }
+    }
+
+    if(sum(grepl("color_Sample", names(Plot_SettingsInfo)))>0){
+      if(is.null(Plot_SettingsFile_Sample)==TRUE){ # Check if Plot_SettingsFile_Metab also exists
+        stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile_Sample.")
+      }else{
+        if(sum(rownames(Input_data) %in% rownames(Plot_SettingsFile_Sample)) != length(rownames(Input_data))){  # Check if all samples exists in the Info_Sample
+          stop("Check input. Plot_SettingsFile_Sample must contain the same rownames representing the samples as the Input data.")
+        }
+        for (samp_color in Plot_SettingsInfo[ grepl("color_Sample", names(Plot_SettingsInfo))]){
+          if( samp_color %in% colnames(Plot_SettingsFile_Sample)== FALSE){
+            stop("You have chosen color_Sample = ",paste(samp_color), ", ", paste(samp_color)," does not exist in the Plot_SettingsFile_Sample"   )
+          }
+        }
+      }
+    }
+  }
+
+
+
+
+
+
+
+
   data <- Input_data
 
 
@@ -2603,11 +2687,11 @@ VizHeatmap <- function(Input_data,
   ## -------------- Plot --------------- ##
 
   if("individual" %in% names(Plot_SettingsInfo)==TRUE){
-    individual_selection <-  Plot_SettingsInfo[["individual"]]
+    #individual_selection <-  Plot_SettingsInfo[["individual"]]
     # Create the list of individual plots that should be made:
-    IndividualPlots <- Plot_SettingsFile_Metab[!duplicated(Plot_SettingsFile_Metab[individual_selection]),]
-    IndividualPlots <- IndividualPlots[individual_selection]%>% unlist() %>% as.vector
-
+    #IndividualPlots <- Plot_SettingsFile_Metab[!duplicated(Plot_SettingsFile_Metab[individual_selection]),]
+    #IndividualPlots <- IndividualPlots[individual_selection]%>% unlist() %>% as.vector
+    IndividualPlots <-unique_paths
     PlotList <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
@@ -2741,6 +2825,7 @@ VizHeatmap <- function(Input_data,
     ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as ,sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
   }
 }
+
 
 
 ################################
