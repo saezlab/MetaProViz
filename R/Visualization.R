@@ -2828,12 +2828,14 @@ VizHeatmap <- function(Input_data,
 
 
 
-################################
-### ### ### Barplot  ### ### ###
-################################
+##############################
+### ### ### Plots  ### ### ###
+##############################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
+#' @param Graprh_Style String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
+#' @param Superplot \emph{Optional: } String with a Column name of the Experimental_design as string which is used to make the plots Superplots.
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
 #' @param Output_plots String with plot save information. Available options are "Individual" for plots of each Individual metabolite and "Together" for a pdf containing all the plots. \strong{Default = Together}
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
@@ -2841,557 +2843,19 @@ VizHeatmap <- function(Input_data,
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
 #' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
 #'
-#' @keywords Barplot
+#' @keywords Barplot, Boxplot, Violinplot, Superplot
 #' @export
 
-VizBarplot <- function(Input_data,
-                       Experimental_design,
-                    OutputPlotName = "",
-                    Output_plots = "Together",
-                    Selected_Conditions = NULL,
-                    Selected_Comparisons = NULL,
-                    Theme = theme_classic(),
-                    Save_as = "svg"
-){
-
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  if(any(duplicated(row.names(Input_data)))==TRUE){
-    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
-  } else{
-    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
-    if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("Input_data needs to be of class numeric")
-    } else{
-      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
-      if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Experimental_design.")
-      } else(
-        data <- Input_data
-      )
-    }
-    Experimental_design <- Experimental_design
-  }
-
-
-
-
-  Output_plots_options <- c("Individual", "Together")
-  if (Output_plots %in% Output_plots_options == FALSE){
-    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Output_plots_options,collapse = ", "),"." )
-  }
-  if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Input_data.")
-  }
-  if(is.null(Selected_Conditions)==FALSE){
-    for (Conditions in Selected_Conditions){
-      if(Conditions %in% Experimental_design$Conditions==FALSE){
-        stop("Check Input. The Selected_Conditions were not found in the Conditions Column.")
-      }
-    }
-  }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
-  }
-
-  ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Barplots_folder = file.path(Results_folder, "Barplot")
-  if (!dir.exists(Results_folder_plots_Barplots_folder)) {dir.create(Results_folder_plots_Barplots_folder)}  # check and create folder
-
-
-  Metabolite_Names <- colnames(data)
-
-  # make a list for plotting all plots together
-  outlier_plot_list <- list()
-  k=1
-
-  for (i in Metabolite_Names){
-    # i = Metabolite_Names[1]
-
-    barplotdataMeans <- data %>%  select(all_of(i)) %>%  # Get mean & standard deviation by group
-      group_by(Conditions=Experimental_design$Conditions) %>%
-      summarise_at(vars(i), list(mean = mean, sd = sd)) %>%
-      as.data.frame()
-
-    barplotdata <- data %>%  select(i) %>%  group_by(Conditions=Experimental_design$Conditions)  %>%
-      as.data.frame()
-    names(barplotdata) <- c("Intensity", "Conditions")
-
-    if (is.null(Selected_Conditions) == "FALSE"){
-      barplotdataMeans <- barplotdataMeans %>% filter(Conditions %in% Selected_Conditions)
-      barplotdata <- barplotdata %>% filter(Conditions %in% Selected_Conditions)
-    }
-    names(barplotdataMeans)[2] <- "Intensity"
-
-
-    if(is.null(Selected_Comparisons)== TRUE){
-      # names(barplotdataMeans)[2] <- "Intensity"
-      # a <- max(barplotdataMeans$Intensity)
-      barplot <- ggplot(barplotdata, aes(x = factor(Conditions), y = Intensity)) +
-        geom_bar(stat = "summary", fun = "mean", fill = "skyblue") +
-        geom_errorbar(data = barplotdataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)+
-        theme(legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
-
-    }else{
-
-      # names(barplotdataMeans)[2] <- "Intensity"
-      # a <- max(barplotdataMeans$Intensity)
-      barplot <- ggplot(barplotdata, aes(x = factor(Conditions), y = Intensity)) +
-        geom_bar(stat = "summary", fun = "mean", fill = "skyblue") +
-        geom_errorbar(data = barplotdataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)+
-        ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
-                                   label = "p.format", method = "t.test", hide.ns = TRUE, position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE) +
-        theme(legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
-    }
-
-
-    barplot <- barplot + Theme
-    barplot <- barplot + theme(axis.text.x=element_text(angle = 45, vjust = 1, hjust = 1))
-    barplot <- barplot + ggtitle(paste(i))
-
-
-
-    if(Output_plots=="Individual"){
-
-      i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
-      i <- (gsub(":","_",i))
-
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as, sep=""), plot=barplot, width=10, height=8)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=barplot, width=10, height=8)
-      }
-
-
-    } else if(Output_plots=="Together"){
-
-      plot(barplot)
-      outlier_plot_list[[k]] <- recordPlot()
-      dev.off()
-      k=k+1
-    }
-  }
-
-  if(Output_plots=="Together"){
-    if(OutputPlotName ==""){
-      pdf(file= paste(Results_folder_plots_Barplots_folder,"/Barplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
-    }else{
-      pdf(file= paste(Results_folder_plots_Barplots_folder,"/Barplots_", OutputPlotName,".pdf", sep = ""), onefile = TRUE ) # or multivariate quality control chart
-    }
-    for (plot in outlier_plot_list){
-      replayPlot(plot)
-    }
-    dev.off()
-  }
-}
-
-###--------------------------------
-# Use function
-#Barplot(Input_data = preprocessing_output_Intra$Processed_data)
-#Barplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"),  Output_plots = "Individual")
-#Barplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),  Output_plots = "Individual")
-###-----------------------------------
-
-################################
-### ### ### Boxplots ### ### ###
-################################
-
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
-#' @param Output_plots String with plot save information. Available options are "Individual" for plots of each Individual metabolite and "Together" for a pdf containing all the plots. \strong{Default = Together}
-#' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
-#' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
-#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
-#'
-#' @keywords Boxplot
-#' @export
-#'
-VizBoxplot <- function(Input_data,
-                       Experimental_design,
-                    OutputPlotName = "",
-                    Output_plots = "Together",
-                    Selected_Conditions = NULL,
-                    Selected_Comparisons = NULL,
-                    Theme = theme_classic(),
-                    Save_as = "svg"
-){
-
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  if(any(duplicated(row.names(Input_data)))==TRUE){
-    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
-  } else{
-    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
-    if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("Input_data needs to be of class numeric")
-    } else{
-      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
-      if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Experimental_design.")
-      } else(
-        data <- Input_data
-      )
-    }
-    Experimental_design <- Experimental_design
-  }
-
-  Output_plots_options <- c("Individual", "Together")
-  if (Output_plots %in% Output_plots_options == FALSE){
-    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Output_plots_options,collapse = ", "),"." )
-  }
-  if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Input_data.")
-  }
-  if(is.null(Selected_Conditions)==FALSE){
-    for (Conditions in Selected_Conditions){
-      if(Conditions %in% Experimental_design$Conditions==FALSE){
-        stop("Check Input. The Selected_Conditions were not found in the Conditions Column.")
-      }
-    }
-  }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
-  }
-
-  ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Boxplots_folder = file.path(Results_folder, "Boxplot")
-  if (!dir.exists(Results_folder_plots_Boxplots_folder)) {dir.create(Results_folder_plots_Boxplots_folder)}  # check and create folder
-
-
-  Metabolite_Names <- colnames(data)
-
-  # make a list for plotting all plots together
-  box_plot_list <- list()
-  k=1
-
-  for (i in Metabolite_Names){
-    # i = Metabolite_Names[2]
-
-    boxplotdata <- data %>%  select(all_of(i)) %>%                        # Get mean & standard deviation by group
-      group_by(Conditions=Experimental_design$Conditions)
-    names(boxplotdata) <- c("Intensity", "Conditions")
-
-    if (is.null(Selected_Conditions) == "FALSE"){
-      boxplotdata <- boxplotdata %>% filter(Conditions %in% Selected_Conditions)
-    }
-
-
-
-
-    #names(barplotdataMeans)[2] <- "Intensity"
-    if(is.null(Selected_Comparisons)== TRUE){
-      # names(barplotdataMeans)[2] <- "Intensity"
-      # a <- max(barplotdataMeans$Intensity)
-      boxplot <- ggplot(boxplotdata, aes(x=Conditions, y=Intensity)) +
-        geom_boxplot(fill="skyblue") +
-        geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.7)+xlab("Conditions")+ ylab("Mean Intensity")
-
-    }else{
-
-      # names(barplotdataMeans)[2] <- "Intensity"
-      # a <- max(barplotdataMeans$Intensity)
-      boxplot <- ggplot(boxplotdata, aes(x=Conditions, y=Intensity)) +
-        geom_boxplot(fill="skyblue") +
-        geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.7)+xlab("Conditions")+ ylab("Mean Intensity")+
-        ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
-                                   label = "p.format", method = "t.test", hide.ns = TRUE, position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE) +
-        theme(legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
-    }
-
-
-
-
-    boxplot <- boxplot + Theme
-    boxplot <- boxplot + theme(axis.text.x=element_text(angle = 45, vjust = 1, hjust = 1))
-    boxplot <- boxplot + ggtitle(paste(i))
-
-
-    if(Output_plots=="Individual"){
-
-      i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
-      i <- (gsub(":","_",i))
-
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Boxplots_folder, "/",i, ".",Save_as, sep=""), plot=boxplot, width=10, height=8)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Boxplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=boxplot, width=10, height=8)
-      }
-
-    } else if(Output_plots=="Together"){
-
-      plot(boxplot)
-      box_plot_list[[k]] <- recordPlot()
-      dev.off()
-      k=k+1
-    }
-  }
-
-
-  if(Output_plots=="Together"){
-    if(OutputPlotName ==""){
-      pdf(file= paste(Results_folder_plots_Boxplots_folder,"/Boxplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
-    }else{
-      pdf(file= paste(Results_folder_plots_Boxplots_folder,"/Boxplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
-    }
-    for (plot in box_plot_list){
-      replayPlot(plot)
-    }
-    dev.off()
-  }
-
-}
-
-###--------------------------------
-# Use function
-#Boxplot(Input_data = preprocessing_output_Intra$Processed_data)
-#Boxplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"),  Output_plots = "Individual")
-#Boxplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),  Output_plots = "Together")
-###-----------------------------------d_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3)) )
-#####----
-
-####################################
-### ### ### Violin Plots ### ### ###
-#####################################
-
-################################
-### ### ### Violin ### ### ###
-################################
-
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
-#' @param Output_plots String with plot save information. Available options are "Individual" for plots of each Individual metabolite and "Together" for a pdf containing all the plots. \strong{Default = Together}
-#' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
-#' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
-#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
-#'
-#' @keywords Violinplot
-#' @export
-#'
-VizViolinplot <- function(Input_data,
-                          Experimental_design,
-                       OutputPlotName = "",
-                       Output_plots = "Together",
-                       Selected_Conditions = NULL,
-                       Selected_Comparisons = NULL,
-                       Theme = theme_classic(),
-                       Save_as = "svg"
-                       ){
-
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  if(any(duplicated(row.names(Input_data)))==TRUE){
-    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
-  } else{
-    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
-    if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("Input_data needs to be of class numeric")
-    } else{
-      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
-      if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Experimental_design.")
-      } else(
-        data <- Input_data
-      )
-    }
-    Experimental_design <- Experimental_design
-  }
-
-  Output_plots_options <- c("Individual", "Together")
-  if (Output_plots %in% Output_plots_options == FALSE){
-    stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Output_plots_options,collapse = ", "),"." )
-  }
-  if("Conditions" %in% colnames(Experimental_design)==FALSE){
-    stop("There is no column named `Conditions` in Input_data.")
-  }
-  if(is.null(Selected_Conditions)==FALSE){
-    for (Conditions in Selected_Conditions){
-      if(Conditions %in% Experimental_design$Conditions==FALSE){
-        stop("Check Input. The Selected_Conditions were not found in the Conditions Column.")
-      }
-    }
-  }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
-  }
-
-  ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Violinplots_folder = file.path(Results_folder, "Violinplot")
-  if (!dir.exists(Results_folder_plots_Violinplots_folder)) {dir.create(Results_folder_plots_Violinplots_folder)}  # check and create folder
-
-
-  Metabolite_Names <- colnames(data)
-
-  # make a list for plotting all plots together
-  violin_plot_list <- list()
-  k=1
-
-  for (i in Metabolite_Names){
-    # i = Metabolite_Names[2]
-
-    violinplotdata <- data %>%  select(all_of(i)) %>%                        # Get mean & standard deviation by group
-      group_by(Conditions=Experimental_design$Conditions)
-    names(violinplotdata) <- c("Intensity", "Conditions")
-
-    if (is.null(Selected_Conditions) == "FALSE"){
-      violinplotdata <- violinplotdata %>% filter(Conditions %in% Selected_Conditions)
-    }
-
-    if(is.null(Selected_Comparisons)== TRUE){
-      violinplot <- ggplot(violinplotdata, aes(x=Conditions, y=Intensity)) +
-        geom_violin(fill="skyblue",width = 1)  +
-        geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.7)+xlab("Conditions")+ ylab("Mean Intensity")
-
-    }else{
-
-      # names(barplotdataMeans)[2] <- "Intensity"
-      # a <- max(barplotdataMeans$Intensity)
-      violinplot <- ggplot(violinplotdata, aes(x=Conditions, y=Intensity)) +
-        geom_violin(fill="skyblue") +
-        geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.7)+xlab("Conditions")+ ylab("Mean Intensity")+
-        ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
-                                   label = "p.format", method = "t.test", hide.ns = TRUE, position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE) +
-        theme(legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
-    }
-
-
-
-
-    violinplot <- violinplot + Theme
-    violinplot <- violinplot + theme(axis.text.x=element_text(angle = 45, vjust = 1, hjust = 1))
-    violinplot <- violinplot + ggtitle(paste(i))
-
-
-    if(Output_plots=="Individual"){
-
-      i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
-      i <- (gsub(":","_",i))
-
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Violinplots_folder, "/",i, ".",Save_as, sep=""), plot=violinplot, width=10, height=8)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Violinplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=violinplot, width=10, height=8)
-      }
-
-    } else if(Output_plots=="Together"){
-
-      plot(violinplot)
-      violin_plot_list[[k]] <- recordPlot()
-      dev.off()
-      k=k+1
-    }
-  }
-
-
-  if(Output_plots=="Together"){
-    if(OutputPlotName ==""){
-      pdf(file= paste(Results_folder_plots_violinplots_folder,"/Violinplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
-    }else{
-      pdf(file= paste(Results_folder_plots_violinplots_folder,"/Violinplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
-    }
-    for (plot in violin_plot_list){
-      replayPlot(plot)
-    }
-    dev.off()
-  }
-
-}
-
-###--------------------------------
-# Use function
-#Violinplot(Input_data = preprocessing_output_Intra$Processed_data)
-#Violinplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"),  Output_plots = "Individual")
-#Violinplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),  Output_plots = "Together")
-###-----------------------------------d_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3)) )
-#####----
-
-
-
-###################################
-### ### ### super plots ### ### ###
-###################################
-
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
-#' @param Output_plots String with plot save information. Available options are "Individual" for plots of each Individual metabolite and "Together" for a pdf containing all the plots. \strong{Default = Together}
-#' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
-#' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
-#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
-#'
-#' @keywords Barplot
-#' @export
-#'
-VizSuperplot <- function(Input_data,
-                         Experimental_design,
-                      OutputPlotName = "",
-                      Output_plots = "Together",
-                      Selected_Conditions = NULL,
-                      Selected_Comparisons = NULL,
-                      Theme = theme_classic(),
-                      Save_as = "svg"
+VizPlots <- function(Input_data,
+                     Experimental_design,
+                     Graprh_Style = "Box", # Bar, Box, Violin
+                     Superplot = NULL,
+                     OutputPlotName = "",
+                     Output_plots = "Together",
+                     Selected_Conditions = NULL,
+                     Selected_Comparisons = NULL,
+                     Theme = theme_classic(),
+                     Save_as = "svg"
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -3403,14 +2867,6 @@ VizSuperplot <- function(Input_data,
 
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-
-  ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
   } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
@@ -3430,6 +2886,16 @@ VizSuperplot <- function(Input_data,
     Experimental_design <- Experimental_design
   }
 
+  #2. Plot options
+  if(Graprh_Style %in% c("Box", "Bar", "Violin") == FALSE){
+    stop("Graprh_Style must be either Box, Bar ot Violin.")
+  }
+  if(is.null(Superplot)==FALSE){
+    if(Superplot %in% colnames(Experimental_design) == FALSE){
+      stop("Superplot is active. However, the column ", paste(Superplot), " is not the in Experimental_design." )
+    }
+  }
+
   Output_plots_options <- c("Individual", "Together")
   if (Output_plots %in% Output_plots_options == FALSE){
     stop("Check Input the Plot_pathways option is incorrect. The Allowed options are the following: ",paste(Output_plots_options,collapse = ", "),"." )
@@ -3437,6 +2903,8 @@ VizSuperplot <- function(Input_data,
   if("Conditions" %in% colnames(Experimental_design)==FALSE){
     stop("There is no column named `Conditions` in Input_data.")
   }
+
+  #3. Comparison options
   if(is.null(Selected_Conditions)==FALSE){
     for (Conditions in Selected_Conditions){
       if(Conditions %in% Experimental_design$Conditions==FALSE){
@@ -3444,108 +2912,130 @@ VizSuperplot <- function(Input_data,
       }
     }
   }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+
+  if(is.null(Selected_Comparisons)==FALSE){
+    for (Comp in Selected_Comparisons){
+      if(Comp[1] %in% Experimental_design$Conditions ==FALSE){
+        stop("Check Input. The Selected_Comparisons condition ",paste(Comp[1]), " is not found in the Conditions Column of the Experimental_design.")
+      }
+      if(Comp[2] %in% Experimental_design$Conditions ==FALSE){
+        stop("Check Input. The Selected_Comparisons condition ",paste(Comp[2]), " is not found in the Conditions Column of the Experimental_design.")
+      }
+    }
   }
+
+
+  # 4. Check other plot-specific parameters:
+  Save_as_options <- c("svg","pdf")
+  if(Save_as %in% Save_as_options == FALSE){
+    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  }
+
+
+  data <- Input_data
 
   ## ------------ Create Output folders ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
   Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Superplots_folder = file.path(Results_folder, "superplot")
-  if (!dir.exists(Results_folder_plots_Superplots_folder)) {dir.create(Results_folder_plots_Superplots_folder)}  # check and create folder
+  Results_folder_plots_Barplots_folder = file.path(Results_folder, paste(Graprh_Style, "plots", sep=""))
+  if (!dir.exists(Results_folder_plots_Barplots_folder)) {dir.create(Results_folder_plots_Barplots_folder)}  # check and create folder
+
 
 
   Metabolite_Names <- colnames(data)
+  data <- merge( Experimental_design[c("Conditions",Superplot)] ,data,, by=0)
+  data <- column_to_rownames(data, "Row.names")
 
   # make a list for plotting all plots together
-  super_plot_list <- list()
+  outlier_plot_list <- list()
   k=1
 
   for (i in Metabolite_Names){
-    # i = Metabolite_Names[2]
-    # superplotdata <- data %>%  select(all_of(i)) %>%                        # Get mean & standard deviation by group
-    #   group_by(Conditions=Experimental_design$Conditions)
-    # names(superplotdata) <- c("Intensity", "Conditions")
+    # i = Metabolite_Names[1]
 
-    # if (is.null(Selected_Conditions) == "FALSE"){
-    #   superplotdata <- superplotdata %>% filter(Conditions %in% Selected_Conditions)
-    # }
+    dataMeans <- data %>%  select(i, Conditions) %>% group_by(Conditions) %>% summarise_at(vars(i), list(mean = mean, sd = sd)) %>% as.data.frame()
+    names(dataMeans)[2] <- "Intensity"
+    plotdata <- data %>%  select(i,Conditions, Superplot) %>%  group_by(Conditions)  %>% as.data.frame()
+    names(plotdata)[1] <- c("Intensity")
 
-
-    cond_selected <- data %>% select(i)
-    names(cond_selected) <- "metabolite"
-    cond_selected$Conditions <-  Experimental_design$Conditions
-    cond_selected$Biological_Replicates <- Experimental_design$Biological_Replicates
-
+    # Take only selected conditions
     if (is.null(Selected_Conditions) == "FALSE"){
-      cond_selected <- cond_selected %>% filter(Conditions %in% Selected_Conditions)
+      dataMeans <- dataMeans %>% filter(Conditions %in% Selected_Conditions)
+      plotdata <- plotdata %>% filter(Conditions %in% Selected_Conditions)
     }
 
 
-    ReplicateAverages <- cond_selected %>%
-      group_by(Conditions, Biological_Replicates) %>% summarise_each(list(mean))
+    # Make the Plot
+    Plot <- ggplot(plotdata, aes(x = factor(Conditions), y = Intensity))#,fill = Superplot)
+
+    # Add graph style
+    if (Graprh_Style == "Bar"){
+      Plot <- Plot+
+        geom_bar(stat = "summary", fun = "mean", fill = "skyblue") +
+        geom_errorbar(data = dataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)
+    } else if (Graprh_Style == "Violin"){
+      Plot <- Plot+
+        geom_violin(fill = "skyblue")  +
+        geom_errorbar(data = dataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)
+    } else if (Graprh_Style == "Box"){
+      Plot <- Plot +
+        geom_boxplot(fill="skyblue")
+    }
+
+    # Add superplot
+    if(is.null(Superplot)==FALSE){
+      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(get(Superplot))),size=3)
+    }
+
 
     if(is.null(Selected_Comparisons)== TRUE){
-      superplot<- ggplot(cond_selected, aes(x=Conditions,y=metabolite,color=factor(Biological_Replicates))) +
-        ggbeeswarm::geom_beeswarm(cex=1) + scale_colour_brewer(palette = "Set1") +
-        ggbeeswarm::geom_beeswarm(data=ReplicateAverages, size=4)
-
+      Plot <- Plot + geom_errorbar(data = dataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)
     }else{
-      superplot<- ggplot(cond_selected, aes(x=Conditions,y=metabolite,color=factor(Biological_Replicates))) +
-        ggbeeswarm::geom_beeswarm(cex=1) + scale_colour_brewer(palette = "Set1") +
-        ggbeeswarm::geom_beeswarm(data=ReplicateAverages, size=4)+
-        ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
-                                   label = "p.format", method = "t.test", hide.ns = TRUE, position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE) +
-        theme(legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
+      Plot <- Plot+ ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
+                                               label = "p.format", method = "t.test", hide.ns = TRUE, position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
     }
 
-    superplot<-  superplot+ theme(legend.position="right")
-    superplot <- superplot + Theme
-    superplot <- superplot + theme(axis.text.x=element_text(angle = 45, vjust = 1, hjust = 1))
-    superplot <- superplot + ggtitle(paste(i)) +ylab(NULL)
 
+
+    Plot <- Plot + theme(axis.text.x=element_text(angle = 45, vjust = 1, hjust = 1), legend.position = "right")+xlab("Conditions")+ ylab("Mean Intensity")
+    Plot <- Plot + Theme
+    Plot <- Plot + ggtitle(paste(i))
+
+    Plot
 
     if(Output_plots=="Individual"){
 
       i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
       i <- (gsub(":","_",i))
+      i <-(gsub("\\*","",i))
 
       if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Superplots_folder, "/",i, ".",Save_as, sep=""), plot=superplot, width=10, height=8)
+        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as, sep=""), plot=Plot, width=10, height=8)
       }else{
-        ggsave(file=paste(Results_folder_plots_Superplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=superplot, width=10, height=8)
+        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=Plot, width=10, height=8)
       }
+
 
     } else if(Output_plots=="Together"){
 
-      plot(superplot)
-      super_plot_list[[k]] <- recordPlot()
+      plot(Plot)
+      outlier_plot_list[[k]] <- recordPlot()
       dev.off()
       k=k+1
     }
   }
 
-
   if(Output_plots=="Together"){
     if(OutputPlotName ==""){
-      pdf(file= paste(Results_folder_plots_Superplots_folder,"/Superplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+      pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graprh_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
     }else{
-      pdf(file= paste(Results_folder_plots_Superplots_folder,"/Superplots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+      pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graprh_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+      for (plot in outlier_plot_list){
+        replayPlot(plot)
+      }
+      dev.off()
     }
-    for (plot in super_plot_list){
-      replayPlot(plot)
-    }
-    dev.off()
   }
-
 }
-
-###--------------------------------
-# Use function
-#superplot(Input_data = preprocessing_output_Intra$Processed_data)
-#superplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"),  Output_plots = "Individual")
-#superplot(Input_data = preprocessing_output_Intra$Processed_data, Selected_Conditions = c("Control", "Rot", "3NPA"), Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),  Output_plots = "Individual")
-###-----------------------------------
