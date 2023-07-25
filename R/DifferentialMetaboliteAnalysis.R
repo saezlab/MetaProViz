@@ -227,7 +227,7 @@ DMA <-function(Input_data,
 
     Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
       mutate(C1_Adapted = case_when(C1 < 0 & C2 > 0 ~ paste(C1*-1),#Here we have a negative value and transform it into a positive value
-                                    C1 > 0 & C2 < 0 ~ paste(C1+(C2*2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
+                                    C1 > 0 & C2 < 0 ~ paste(C1+(C2*-2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
                                     C1 > 0 & C2 > 0 ~ paste(C1),#Both values are positive, so no action needed
                                     C1 < 0 & C2 < 0 ~ paste(C1),#Both values are negative, so no action needed
                                     C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
@@ -236,14 +236,16 @@ DMA <-function(Input_data,
                                     C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     TRUE ~ 'NA'))%>%
       mutate(C2_Adapted = case_when(C2 < 0 & C1 > 0 ~ paste(C2*-1),#Here we have a negative value and transform it into a positive value
-                                    C2 > 0 & C1 < 0 ~ paste(C2+(C1*2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
+                                    C2 > 0 & C1 < 0 ~ paste(C2+(C1*-2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
                                     C2 > 0 & C1 > 0 ~ paste(C2),#Both values are positive, so no action needed
                                     C2 < 0 & C1 < 0 ~ paste(C2),#Both values are negative, so no action needed
                                     C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                     C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                     C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                     C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                    TRUE ~ 'NA'))
+                                    TRUE ~ 'NA'))%>%
+      mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
+      mutate(C2_Adapted = as.numeric(C2_Adapted))
 
     if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
       X <- Mean_Merge%>%
@@ -251,19 +253,11 @@ DMA <-function(Input_data,
       message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
     }
 
-    Mean_C1_Ad <-Mean_Merge[,c(1,5)]%>%
-      column_to_rownames("Metabolite")
-    Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted))
-    Mean_C2_Ad <-Mean_Merge[,c(1,6)]%>%
-      column_to_rownames("Metabolite")
-    Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted))
-
     #Calculate the Log2FC
-    FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1_Ad, Mean_C2_Ad)
-    Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
-    Log2FC_C1vC2 <- cbind(rownames(Log2FC_C1vC2), data.frame(Log2FC_C1vC2, row.names=NULL))
-    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
-    names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
+    Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
+    Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
+    Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
+
     }else if(CoRe==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
@@ -285,7 +279,9 @@ DMA <-function(Input_data,
                                       C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C2)))
+                                      TRUE ~ paste(C2)))%>%
+        mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
+        mutate(C2_Adapted = as.numeric(C2_Adapted))
 
       if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
         X <- Mean_Merge%>%
@@ -293,19 +289,11 @@ DMA <-function(Input_data,
         message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
       }
 
-      Mean_C1_Ad <-Mean_Merge[,c(1,5)]%>%
-        column_to_rownames("Metabolite")
-      Mean_C1_Ad$C1_Adapted = as.numeric(as.character(Mean_C1_Ad$C1_Adapted))
-      Mean_C2_Ad <-Mean_Merge[,c(1,6)]%>%
-        column_to_rownames("Metabolite")
-      Mean_C2_Ad$C2_Adapted = as.numeric(as.character(Mean_C2_Ad$C2_Adapted))
-
       #Calculate the Log2FC
-      FC_C1vC2 <- mapply(gtools::foldchange,Mean_C1, Mean_C2)
-      Log2FC_C1vC2 <- as.data.frame(gtools::foldchange2logratio(FC_C1vC2, base=2))
-      Log2FC_C1vC2 <- cbind(rownames(Log2FC_C1vC2), data.frame(Log2FC_C1vC2, row.names=NULL))
-      names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "rownames(Log2FC_C1vC2)"] <- "Metabolite"
-      names(Log2FC_C1vC2)[names(Log2FC_C1vC2) == "gtools..foldchange2logratio.FC_C1vC2..base...2."] <- "Log2FC"
+      Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
+      Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
+      Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
+
       }else{
         stop("Please choose CoRe= TRUE or CoRe=FALSE.")
         }
