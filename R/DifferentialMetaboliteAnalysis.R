@@ -50,7 +50,9 @@ DMA <-function(Input_data,
                OutputName='',
                CoRe=FALSE,
                Plot = TRUE,
-               Save_as = "svg"){
+               Save_as_Plot = "svg",
+               Save_as_Results = "xlsx" # txt or csv
+                 ){
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
@@ -114,10 +116,15 @@ DMA <-function(Input_data,
   if(is.logical(Plot) == FALSE){
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
+  Save_as_Results_options <- c("txt","csv", "xlsx" )
+  if(Save_as_Results %in% Save_as_Results_options == FALSE){
+    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+  }
+
 
   #3. Input_Pathways
   if(is.null(Input_Pathways) == FALSE){
@@ -381,9 +388,18 @@ DMA <-function(Input_data,
     }
   DMA_Output <- STAT_C1vC2
 
-
+  if (Save_as_Results == "xlsx"){
   xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
   writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
+  }else if (Save_as_Results == "csv"){
+    csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".csv"))
+    write.csv(DMA_Output,csvDMA) # save the DMA result DF
+  }else if (Save_as_Results == "txt"){
+    txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".txt"))
+    write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  }
+
+
 
   if(Plot == TRUE){ # Make a simple Volcano plot
     VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
@@ -416,7 +432,7 @@ DMA <-function(Input_data,
                                    drawConnectors = FALSE)
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
-    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as))
+    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as_Plot))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
 
     plot(VolcanoPlot)

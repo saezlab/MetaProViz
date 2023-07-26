@@ -55,6 +55,7 @@ MCA_2Cond <- function(Cond1_File,
                       Cond2_padj_cutoff = 0.05,
                       Cond1_FC_cutoff= 1,
                       Cond2_FC_cutoff = 1,
+                      Save_as_Results = "xlsx", # txt or csv
                       backgroundMethod="C1&C2",
                       OutputFileName = "MCA_2Cond_"){
   ## ------------ Setup and installs ----------- ##
@@ -402,6 +403,18 @@ MCA_2Cond <- function(Cond1_File,
 
   writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""))
 
+
+  if (Save_as_Results == "xlsx"){
+    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = "") # Save the DMA results table
+    writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
+  }else if (Save_as_Results == "csv"){
+    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.csv", sep = "")
+    write.csv(ClusterSummary,csvMCA) # save the DMA result DF
+  }else if (Save_as_Results == "txt"){
+    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.txt", sep = "")
+    write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  }
+
   #Return:
   assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
   assign(paste("MCA2Cond_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
@@ -436,7 +449,7 @@ MCA_2Cond <- function(Cond1_File,
 ### ### ### Metabolite Clustering Analysis ### ### ###
 ##################################################
 
-MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraValueCol="Log2FC",IntraPadjCol="p.adj", CoReValueCol="Log2FC", CoReDirectionCol="CoRe_info", CoRePadjCol="p.adj",Intra_padj_cutoff= 0.05, CoRe_padj_cutoff = 0.05,Intra_FC_cutoff= 1, CoRe_FC_cutoff = 1, backgroundMethod="Intra&CoRe", OutputFileName = "MCA_CoRe_"){
+MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraValueCol="Log2FC",IntraPadjCol="p.adj", CoReValueCol="Log2FC", CoReDirectionCol="CoRe_info", CoRePadjCol="p.adj",Intra_padj_cutoff= 0.05, CoRe_padj_cutoff = 0.05,Intra_FC_cutoff= 1,Save_as_Results = "xlsx", CoRe_FC_cutoff = 1, backgroundMethod="Intra&CoRe", OutputFileName = "MCA_CoRe_"){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -998,8 +1011,17 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
 
-  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""))
 
+  if (Save_as_Results == "xlsx"){
+    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = "") # Save the DMA results table
+    writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
+  }else if (Save_as_Results == "csv"){
+    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.csv", sep = "")
+    write.csv(ClusterSummary,csvMCA) # save the DMA result DF
+  }else if (Save_as_Results == "txt"){
+    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.txt", sep = "")
+    write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  }
 
   #Return:
   assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
