@@ -35,9 +35,9 @@
 #' @param PathwayName \emph{Optional: } Name of the pathway list used \strong{default: ""}
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param Save_as \emph{Optional: } If Save_as=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
-#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 0.2}
-#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 10}
+#' @param Save_as_Plot \emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
+#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}
+#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}
 #'
 #' @return Saves results as individual .csv files.
 #' @export
@@ -49,7 +49,7 @@ MC_ORA <- function(Input_data,
                    PathwayName="",
                    minGSSize=10,
                    maxGSSize=1000 ,
-                   Save_as="svg",
+                   Save_as_Plot="svg",
                    pCutoff=0.2,
                    PercentageCutoff=10
                    ){
@@ -102,9 +102,9 @@ MC_ORA <- function(Input_data,
   if(is.numeric(maxGSSize)== FALSE){
     stop("Check input. The selected maxGSSize value should be numeric.")
   }
-  Save_as_options <- c("svg","png", "pdf")
-  if(Save_as %in% Save_as_options == FALSE & is.null(Save_as)==FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please set Save_as=NULL or select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","png", "pdf")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE & is.null(Save_as_Plot)==FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please set Save_as_Plot=NULL or select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
   if( is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
     stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
@@ -188,16 +188,16 @@ MC_ORA <- function(Input_data,
         dplyr::rename("geneID"="MetaboliteIDs_in_pathway")
 
       ## ------------ Plots ----------- ##
-      if(is.null(Save_as)==FALSE){
+      if(is.null(Save_as_Plot)==FALSE){
         if (!(dim(clusterGoSummary_Select)[1] == 0)) {#exclude df's that have no observations
         clusterGo@result <- clusterGoSummary_Select[,1:9]
         #1. Dotplot:
         Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
           ggtitle(paste("Dotplot:", g, PathwayName, sep=" "))
         if(PathwayName ==""){
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g, ".", Save_as, sep=""), plot=Dotplot, width=10, height=8)
+          ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
         } else{
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g,"_" ,PathwayName, ".", Save_as, sep=""), plot=Dotplot, width=10, height=8)
+          ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
         }
         plot(Dotplot)
 
@@ -206,9 +206,9 @@ MC_ORA <- function(Input_data,
         Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
           ggtitle(paste("Emapplot:", g, PathwayName, sep=" "))
         if(PathwayName ==""){
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g, ".", Save_as, sep=""), plot=Emapplot, width=10, height=8)
+          ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
         } else{
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g,"_" ,PathwayName, ".", Save_as, sep=""), plot=Emapplot, width=10, height=8)
+          ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
         }
         plot(Emapplot)
 
@@ -216,9 +216,9 @@ MC_ORA <- function(Input_data,
         UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
           ggtitle(paste("UpsetPlot", g, PathwayName, sep=" "))
         if(PathwayName ==""){
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g, ".", Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
+          ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
         } else{
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g,"_" ,PathwayName, ".", Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
+          ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
         }
         plot(UpsetPlot)
         }
@@ -244,9 +244,9 @@ MC_ORA <- function(Input_data,
 #' @param PathwayName \emph{Optional: } Name of the pathway list used \strong{default: ""}
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param Save_as \emph{Optional: } If Save_as=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
-#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 0.2}
-#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 10}
+#' @param Save_as_Plot \emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
+#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}
+#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}
 #'
 #' @return Saves results as individual .csv files.
 #' @export
@@ -256,7 +256,7 @@ DM_ORA <- function(Input_data,
                    PathwayName="",
                    minGSSize=10,
                    maxGSSize=1000 ,
-                   Save_as="svg",
+                   Save_as_Plot="svg",
                    pCutoff=0.2,
                    PercentageCutoff=10
 ){
@@ -300,9 +300,9 @@ DM_ORA <- function(Input_data,
   if(is.numeric(maxGSSize)== FALSE){
     stop("Check input. The selected maxGSSize value should be numeric.")
   }
-  Save_as_options <- c("svg","png", "pdf")
-  if(Save_as %in% Save_as_options == FALSE & is.null(Save_as)==FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please set Save_as=NULL or select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","png", "pdf")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE & is.null(Save_as_Plot)==FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please set Save_as_Plot=NULL or select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
   if( is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
     stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
@@ -378,16 +378,16 @@ DM_ORA <- function(Input_data,
         dplyr::rename("geneID"="MetaboliteIDs_in_pathway")
 
       ## ------------ Plots ----------- ##
-      if(is.null(Save_as)==FALSE){
+      if(is.null(Save_as_Plot)==FALSE){
         if (!(dim(clusterGoSummary_Select)[1] == 0)) {#exclude df's that have no observations
           clusterGo@result <- clusterGoSummary_Select[,1:9]
           #1. Dotplot:
           Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
             ggtitle(paste("Dotplot: ", PathwayName, sep=" "))
           if(PathwayName ==""){
-            ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot.", Save_as, sep=""), plot=Dotplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot.", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
           } else{
-            ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot_",PathwayName, ".", Save_as, sep=""), plot=Dotplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot_",PathwayName, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
           }
           plot(Dotplot)
 
@@ -396,9 +396,9 @@ DM_ORA <- function(Input_data,
           Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
             ggtitle(paste("Emapplot:", PathwayName, sep=" "))
           if(PathwayName ==""){
-            ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot.", Save_as, sep=""), plot=Emapplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot.", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
           } else{
-            ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot_",PathwayName, ".", Save_as, sep=""), plot=Emapplot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot_",PathwayName, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
           }
           plot(Emapplot)
 
@@ -406,9 +406,9 @@ DM_ORA <- function(Input_data,
           UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
             ggtitle(paste("UpsetPlot: ",  PathwayName, sep=" "))
           if(PathwayName ==""){
-            ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot.",  Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot.",  Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
           } else{
-            ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot_", PathwayName, ".", Save_as, sep=""), plot=UpsetPlot, width=10, height=8)
+            ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot_", PathwayName, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
           }
           plot(UpsetPlot)
         }

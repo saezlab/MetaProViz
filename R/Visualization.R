@@ -34,7 +34,7 @@
 #' @param Scaling  \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
 #' @param Theme \emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #'
 #' @keywords PCA
 #' @export
@@ -48,7 +48,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                    Scaling = TRUE,
                    Theme=NULL,#theme_classic()
                    OutputPlotName= '',
-                   Save_as = "svg"
+                   Save_as_Plot = "svg"
                   ){
 
   ## ------------ Setup and installs ----------- ##
@@ -133,9 +133,9 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
   # Theme check
 
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowing: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","pdf", "png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
   ## ------------ Create Output folders ----------- ##
@@ -246,9 +246,9 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
 
   if(OutputPlotName ==""){
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=8)
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=10, height=8)
   }else{
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as, sep=""), plot=PCA, width=10, height=8)
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=10, height=8)
   }
 }
 
@@ -278,7 +278,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = NULL}
 #'
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = "svg"}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
 #'
 #' @keywords Volcano plot, pathways
 #' @export
@@ -303,7 +303,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                        Connectors=  FALSE,
                        Subtitle= "",
                        Theme= NULL,
-                       Save_as= "svg"
+                       Save_as_Plot= "svg"
                        #add assign=TRUE/FALSE if the user wants the plotlist returned
                        #add parameter for margins that the plot should be saved in
                        ){
@@ -435,9 +435,9 @@ VizVolcano <- function(Plot_Settings="Standard",
     if(is.logical(Connectors) == FALSE){
       stop("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
     }
-    Save_as_options <- c("svg","pdf")
-    if(Save_as %in% Save_as_options == FALSE){
-      stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+    Save_as_Plot_options <- c("svg","pdf", "png")
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
     }
 
   #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change parameter and give warning!
@@ -591,9 +591,9 @@ VizVolcano <- function(Plot_Settings="Standard",
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
           if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
           }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
           }
           ## Store the plot in the 'plots' list
           PlotList[[cleaned_i]] <- Plot
@@ -717,9 +717,9 @@ VizVolcano <- function(Plot_Settings="Standard",
 
           #save plot and get rid of extra signs before saving
           if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
           }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
           }
           #Plot
           plot(Plot)
@@ -828,9 +828,9 @@ VizVolcano <- function(Plot_Settings="Standard",
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
           if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
           }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
           }
           ## Store the plot in the 'plots' list
           PlotList[[cleaned_i]] <- Plot
@@ -937,9 +937,9 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
         #save plot and get rid of extra signs before saving i
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as, sep=""), plot=Plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
         }else{
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
         }
         #Plot
         plot(Plot)
@@ -1025,9 +1025,9 @@ VizVolcano <- function(Plot_Settings="Standard",
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
         }else{
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=Plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- Plot
@@ -1062,7 +1062,7 @@ VizAlluvial <- function(Input_data1,
                      safe_colorblind_palette = c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882255",  "#6699CC", "#117733", "#888888","#CC6677", "#FFF", "#000"), # https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible
                      plot_color_variable = "Overall_Change",
                      plot_color_remove_variable = "SameDirection_NoChange",
-                     Save_as = pdf
+                     Save_as_Plot = pdf
                      ){
 
 
@@ -1085,9 +1085,9 @@ VizAlluvial <- function(Input_data1,
 
 
   #####################################################
-  ### ### ### make output plot save_as name ### ### ###
-  Save_as_var <- Save_as
-  Save_as= deparse(substitute(Save_as))
+  ### ### ### make output plot Save_as_Plot name ### ### ###
+  Save_as_Plot_var <- Save_as_Plot
+  Save_as_Plot= deparse(substitute(Save_as_Plot))
 
 
   C1 <- Input_data1
@@ -1283,7 +1283,7 @@ VizAlluvial <- function(Input_data1,
   }
 
 
-  Save_as_var(paste(Results_folder_plots_MetabolicCluster_folder,"/Metabolic_Clusters_",Condition1,"-versus-",Condition2,"_", Output_Name,  ".",Save_as, sep=""), width=12, height=9)
+  Save_as_Plot_var(paste(Results_folder_plots_MetabolicCluster_folder,"/Metabolic_Clusters_",Condition1,"-versus-",Condition2,"_", Output_Name,  ".",Save_as_Plot, sep=""), width=12, height=9)
   par(oma=c(2,2,8,2), mar = c(2, 2, 0.1, 2)+0.1)#https://www.r-graph-gallery.com/74-margin-and-oma-cheatsheet.html
   alluvial::alluvial( Alluvial_Plot %>% select(all_of(plot_column_names)), freq=Alluvial_Plot$Frequency,
             col = case_when(Alluvial_Plot[,plot_color_variable] == unique( Alluvial_Plot[,plot_color_variable])[1] ~ safe_colorblind_palette[1],
@@ -1382,7 +1382,7 @@ VizAlluvial <- function(Input_data1,
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = NULL}
 #'
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = "svg"}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
 #'
 #' @keywords Lolipop plot, pathways
 #' @export
@@ -1402,7 +1402,7 @@ VizLolipop<- function(Plot_Settings="Standard",
                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
                       Subtitle= "",
                       Theme= NULL,
-                      Save_as = "svg",
+                      Save_as_Plot = "svg",
                       parameter_size="Reverse" #or default "Standard"
 ){
 
@@ -1482,25 +1482,25 @@ VizLolipop<- function(Plot_Settings="Standard",
   }
 
   if("color" %in% names(Plot_SettingsInfo)==TRUE){
-    for(i in 1:length(Input_data)){
-      data <- Input_data[[i]]
-      if (Plot_SettingsInfo[["color"]] %in% colnames(Plot_SettingsFile) == FALSE) {
+    for(i in 1:length(Plot_SettingsFile_List)){
+      data <- Plot_SettingsFile_List[[i]]
+      if (Plot_SettingsInfo[["color"]] %in% colnames(data) == FALSE) {
         stop("You have chosen color = ",paste(Plot_SettingsInfo[["color"]]), ", ", paste(Plot_SettingsInfo[["color"]])," does not exist in the PlotSettingsFile."   )
       }
     }
   }
   if("size" %in% names(Plot_SettingsInfo)==TRUE){
-    for(i in 1:length(Input_data)){
-      data <- Input_data[[i]]
-      if (Plot_SettingsInfo[["size"]] %in% colnames(Plot_SettingsFile) == FALSE) {
+    for(i in 1:length(Plot_SettingsFile_List)){
+      data <- Plot_SettingsFile_List[[i]]
+      if (Plot_SettingsInfo[["size"]] %in% colnames(data) == FALSE) {
         stop("You have chosen size = ",paste(Plot_SettingsInfo[["size"]]), ", ", paste(Plot_SettingsInfo[["size"]])," does not exist in the PlotSettingsFile."   )
       }
     }
   }
   if("label_dot" %in% names(Plot_SettingsInfo)==TRUE){
-    for(i in 1:length(Input_data)){
-      data <- Input_data[[i]]
-      if (Plot_SettingsInfo[["label_dot"]] %in% colnames(Plot_SettingsFile) == FALSE) {
+    for(i in 1:length(Plot_SettingsFile_List)){
+      data <- Plot_SettingsFile_List[[i]]
+      if (Plot_SettingsInfo[["label_dot"]] %in% colnames(data) == FALSE) {
         stop("You have chosen label_dot = ",paste(Plot_SettingsInfo[["label_dot"]]), ", ", paste(Plot_SettingsInfo[["label_dot"]])," does not exist in the PlotSettingsFile."   )
       }
     }
@@ -1607,9 +1607,9 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
   # 4. Check other plot-specific parameters:
-  Save_as_options <- c("svg","pdf")
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","pdf","png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
 
@@ -1844,9 +1844,9 @@ VizLolipop<- function(Plot_Settings="Standard",
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
         }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- lolipop_plot
@@ -2076,9 +2076,9 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
       if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=10, height=10)
       }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=10, height=10)
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=10, height=10)
       }
     }
   }else if(Plot_Settings=="Compare"){
@@ -2189,9 +2189,9 @@ VizLolipop<- function(Plot_Settings="Standard",
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
         }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- lolipop_plot
@@ -2284,9 +2284,9 @@ VizLolipop<- function(Plot_Settings="Standard",
 
 
       if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as, sep=""), plot=lolipop_plot, width=12, height=14)
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=12, height=14)
       }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as, sep=""), plot=lolipop_plot, width=12, height=14)
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=12, height=14)
       }
       plot(lolipop_plot)
 
@@ -2525,9 +2525,9 @@ VizLolipop<- function(Plot_Settings="Standard",
       #save plot and get rid of extra signs before saving
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
       if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
       }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as, sep=""), plot=lolipop_plot, width=8, height=6)
+        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
       }
       ## Store the plot in the 'plots' list
       PlotList[[cleaned_i]] <- lolipop_plot
@@ -2564,7 +2564,7 @@ VizLolipop<- function(Plot_Settings="Standard",
 #' @param Plot_SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot
 #' @param SCALE \emph{Optional: } String with the information for scale row or column. \strong{Default = row}
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
 #'
 #' @keywords Volcano plot, pathways
 #' @export
@@ -2578,7 +2578,7 @@ VizHeatmap <- function(Input_data,
                        Plot_SettingsFile_Metab= NULL,
                        OutputPlotName= "",
                        SCALE = "row",
-                       Save_as = "svg"
+                       Save_as_Plot = "svg"
 ){
 
 
@@ -2664,12 +2664,11 @@ VizHeatmap <- function(Input_data,
     }
   }
 
-
-
-
-
-
-
+  # 4. Check other plot-specific parameters:
+  Save_as_Plot_options <- c("svg","pdf","png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  }
 
   data <- Input_data
 
@@ -2759,7 +2758,7 @@ VizHeatmap <- function(Input_data,
 
       #Save
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as, sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
+      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
 
     }
 
@@ -2822,7 +2821,7 @@ VizHeatmap <- function(Input_data,
     plot_height <- (nrow(Features) * 0.3) + height_cm
 
     #Save
-    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as ,sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
+    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
   }
 }
 
@@ -2841,7 +2840,7 @@ VizHeatmap <- function(Input_data,
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
 #' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg or pdf. \strong{Default = svg}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = svg}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #' @export
@@ -2855,7 +2854,7 @@ VizPlots <- function(Input_data,
                      Selected_Conditions = NULL,
                      Selected_Comparisons = NULL,
                      Theme = theme_classic(),
-                     Save_as = "svg"
+                     Save_as_Plot = "svg"
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -2926,9 +2925,9 @@ VizPlots <- function(Input_data,
 
 
   # 4. Check other plot-specific parameters:
-  Save_as_options <- c("svg","pdf")
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the following: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","pdf","png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
 
@@ -3012,9 +3011,9 @@ VizPlots <- function(Input_data,
       i <-(gsub("\\*","",i))
 
       if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as, sep=""), plot=Plot, width=10, height=8)
+        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
       }else{
-        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",OutputPlotName,"_",i, ".",Save_as, sep=""), plot=Plot, width=10, height=8)
+        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",OutputPlotName,"_",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
       }
 
 
@@ -3039,3 +3038,6 @@ VizPlots <- function(Input_data,
     }
   }
 }
+
+
+
