@@ -35,6 +35,7 @@
 #' @param Theme \emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #'
 #' @keywords PCA
 #' @export
@@ -48,7 +49,8 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                    Scaling = TRUE,
                    Theme=NULL,#theme_classic()
                    OutputPlotName= '',
-                   Save_as_Plot = "svg"
+                   Save_as_Plot = "svg",
+                   Save_as_Results = "csv"
                   ){
 
   ## ------------ Setup and installs ----------- ##
@@ -243,6 +245,32 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     write.csv(loading_data_table, paste(Results_folder_plots_PCA_folder,"/Loadings.csv", sep=""))
   }else{
     write.csv(loading_data_table, paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.csv", sep=""))
+  }
+
+  if (Save_as_Results == "xlsx"){
+    if(OutputPlotName ==""){
+      xlsPCA <-  paste(Results_folder_plots_PCA_folder,"/Loadings.xlsx", sep="")
+      writexl::write_xlsx(loading_data_table,xlsPCA, col_names = TRUE)
+    }else{
+      xlsPCA <-  paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.xlsx", sep="")
+      writexl::write_xlsx(loading_data_table,xlsPCA, col_names = TRUE)
+    }
+  }else if (Save_as_Results == "csv"){
+    if(OutputPlotName ==""){
+      csvPCA <-  paste(Results_folder_plots_PCA_folder,"/Loadings.csv", sep="")
+      write.csv(loading_data_table,csvPCA)
+    }else{
+      csvPCA <-  paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.csv", sep="")
+      write.csv(loading_data_table,csvPCA)
+    }
+  }else if (Save_as_Results == "txt"){
+    if(OutputPlotName ==""){
+      txtPCA <-  paste(Results_folder_plots_PCA_folder,"/Loadings.txt", sep="")
+      write.csv(loading_data_table,txtPCA)
+    }else{
+      txtPCA <-  paste(Results_folder_plots_PCA_folder,"/", OutputPlotName, "_Loadings.txt", sep="")
+      write.csv(loading_data_table,txtPCA)
+    }
   }
 
   if(OutputPlotName ==""){

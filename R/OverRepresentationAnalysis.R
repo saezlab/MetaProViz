@@ -36,6 +36,7 @@
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param Save_as_Plot \emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}
 #' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}
 #'
@@ -50,6 +51,7 @@ MC_ORA <- function(Input_data,
                    minGSSize=10,
                    maxGSSize=1000 ,
                    Save_as_Plot="svg",
+                   Save_as_Results= "csv",
                    pCutoff=0.2,
                    PercentageCutoff=10
                    ){
@@ -105,6 +107,10 @@ MC_ORA <- function(Input_data,
   Save_as_Plot_options <- c("svg","png", "pdf")
   if(Save_as_Plot %in% Save_as_Plot_options == FALSE & is.null(Save_as_Plot)==FALSE){
     stop("Check input. The selected Save_as_Plot option is not valid. Please set Save_as_Plot=NULL or select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  }
+  Save_as_Results_options <- c("txt","csv", "xlsx" )
+  if(Save_as_Results %in% Save_as_Results_options == FALSE){
+    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
   }
   if( is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
     stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
@@ -173,12 +179,44 @@ MC_ORA <- function(Input_data,
       clusterGoSummary <- clusterGoSummary[,c(1,9,2:8, 10:11)]%>%
         dplyr::rename("MetaboliteIDs_in_pathway"="geneID")
 
-      #Safe file
-      if(PathwayName ==""){
-        write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.csv', sep=""))#Export the ORA results as .csv
+      #Save file
+      # if(PathwayName ==""){
+      #   write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.csv', sep=""))#Export the ORA results as .csv
+      #   } else{
+      #     write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.csv', sep=""))#Export the ORA results as .csv
+      #   }
+
+
+      if (Save_as_Results == "xlsx"){
+        if(PathwayName ==""){
+          xlsORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.xlsx', sep="")
+          writexl::write_xlsx(clusterGoSummary,xlsORA , col_names = TRUE) #Export the ORA results as .csv
         } else{
-          write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.csv', sep=""))#Export the ORA results as .csv
+          xlsORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.xlsx', sep="")#Export the ORA results as .csv
+          writexl::write_xlsx(clusterGoSummary,xlsORA , col_names = TRUE) #Export the ORA results as .csv
         }
+      }else if (Save_as_Results == "csv"){
+        if(PathwayName ==""){
+          csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.csv', sep="")
+          write_csv(clusterGoSummary,csvORA )#Export the ORA results as .csv
+        } else{
+          csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.csv', sep="")#Export the ORA results as .csv
+          write_csv(clusterGoSummary,csvORA )
+        }
+      }else if (Save_as_Results == "txt"){
+      if(PathwayName ==""){
+        txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.txt', sep="")
+        write.table(clusterGoSummary,txtORA, col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
+      } else{
+        txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.txt', sep="")#Export the ORA results as .csv
+        write.table(clusterGoSummary,txtORA , col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
+      }
+
+
+      }
+
+
+
 
       #Make Selection of terms that should be displayed on the plots
       clusterGoSummary_Select <- clusterGoSummary %>%
@@ -245,6 +283,7 @@ MC_ORA <- function(Input_data,
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param Save_as_Plot \emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}
 #' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}
 #'
@@ -258,7 +297,8 @@ DM_ORA <- function(Input_data,
                    maxGSSize=1000 ,
                    Save_as_Plot="svg",
                    pCutoff=0.2,
-                   PercentageCutoff=10
+                   PercentageCutoff=10,
+                   Save_as_Results="csv"
 ){
   ## ------------ Setup and installs ----------- ##
   packages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
@@ -303,6 +343,10 @@ DM_ORA <- function(Input_data,
   Save_as_Plot_options <- c("svg","png", "pdf")
   if(Save_as_Plot %in% Save_as_Plot_options == FALSE & is.null(Save_as_Plot)==FALSE){
     stop("Check input. The selected Save_as_Plot option is not valid. Please set Save_as_Plot=NULL or select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  }
+  Save_as_Results_options <- c("txt","csv", "xlsx" )
+  if(Save_as_Results %in% Save_as_Results_options == FALSE){
+    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
   }
   if( is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
     stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
@@ -369,6 +413,32 @@ DM_ORA <- function(Input_data,
       } else{
         write_csv(clusterGoSummary, paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.csv', sep=""))#Export the ORA results as .csv
       }
+
+      if (Save_as_Results == "xlsx"){
+        if(PathwayName ==""){
+          xlsORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary','.xlsx', sep="")
+          writexl::write_xlsx(clusterGoSummary,xlsORA , col_names = TRUE) #Export the ORA results as .csv
+        } else{
+          xlsORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.xlsx', sep="")#Export the ORA results as .csv
+          writexl::write_xlsx(clusterGoSummary,xlsORA , col_names = TRUE) #Export the ORA results as .csv
+        }
+      }else if (Save_as_Results == "csv"){
+        if(PathwayName ==""){
+          csvORA <- paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary',',csv', sep="")
+          write_csv(clusterGoSummary,csvORA )#Export the ORA results as .csv
+        } else{
+          csvORA <- paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.csv', sep="")#Export the ORA results as .csv
+          write_csv(clusterGoSummary,csvORA )
+        }
+      }else if (Save_as_Results == "txt"){
+        if(PathwayName ==""){
+          txtORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary','.txt', sep="")
+          write.table(clusterGoSummary,txtORA, col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
+        } else{
+          txtORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.txt', sep="")#Export the ORA results as .csv
+          write.table(clusterGoSummary,txtORA , col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
+        }
+
 
       #Make Selection of terms that should be displayed on the plots
       clusterGoSummary_Select <- clusterGoSummary %>%
