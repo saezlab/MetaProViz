@@ -180,13 +180,6 @@ MC_ORA <- function(Input_data,
         dplyr::rename("MetaboliteIDs_in_pathway"="geneID")
 
       #Save file
-      # if(PathwayName ==""){
-      #   write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.csv', sep=""))#Export the ORA results as .csv
-      #   } else{
-      #     write_csv(clusterGoSummary, paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.csv', sep=""))#Export the ORA results as .csv
-      #   }
-
-
       if (Save_as_Results == "xlsx"){
         if(PathwayName ==""){
           xlsORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.xlsx', sep="")
@@ -408,12 +401,6 @@ DM_ORA <- function(Input_data,
         dplyr::rename("MetaboliteIDs_in_pathway"="geneID")
 
       #Safe file
-      if(PathwayName ==""){
-        write_csv(clusterGoSummary, paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary','.csv', sep=""))#Export the ORA results as .csv
-      } else{
-        write_csv(clusterGoSummary, paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.csv', sep=""))#Export the ORA results as .csv
-      }
-
       if (Save_as_Results == "xlsx"){
         if(PathwayName ==""){
           xlsORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary','.xlsx', sep="")
@@ -438,6 +425,7 @@ DM_ORA <- function(Input_data,
           txtORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary_', PathwayName, '.txt', sep="")#Export the ORA results as .csv
           write.table(clusterGoSummary,txtORA , col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
         }
+      }
 
 
       #Make Selection of terms that should be displayed on the plots
