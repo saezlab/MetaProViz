@@ -36,6 +36,7 @@
 #' @param Cond2_FC_cutoff \emph{Optional: } Log2FC cutoff for Cond2File. \strong{Default=0.5}
 #' @param backgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
 #' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}
 #' @return MCA an instance of the MetaProViz package
 #' @export
 #'

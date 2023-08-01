@@ -31,7 +31,7 @@
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}
-#' @param Save_as \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
 #' @export
@@ -52,8 +52,8 @@ Preprocessing <- function(Input_data,
                           HotellinsConfidence = 0.99,
                           ExportQCPlots = TRUE,
                           CoRe = FALSE,
-                          Save_as = "svg"
-                          ){
+                          Save_as_Plot = "svg"
+){
 
 
   ## ------------ Setup and installs ----------- ##
@@ -141,9 +141,9 @@ Preprocessing <- function(Input_data,
   if(is.logical(CoRe) == FALSE){
     stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
   }
-  Save_as_options <- c("svg","pdf", "jpeg", "tiff", "png", "bmp", "wmf","eps", "ps", "tex" )
-  if(Save_as %in% Save_as_options == FALSE){
-    stop("Check input. The selected Save_as option is not valid. Please select one of the folowwing: ",paste(Save_as_options,collapse = ", "),"." )
+  Save_as_Plot_options <- c("svg","pdf", "png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
   Input_data <- as.matrix(mutate_all(as.data.frame(Input_data), function(x) as.numeric(as.character(x))))
@@ -259,11 +259,12 @@ Preprocessing <- function(Input_data,
   ### ### ### Missing value Imputation ### ### ###
 
   if (MVI ==  TRUE){
-  message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
 
     NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    global_min_value <- min(filtered_matrix, na.rm = TRUE)/2
     for (feature  in colnames(NA_removed_matrix)){
-      # feature  <- colnames(NA_removed_matrix)[1]
+      # feature  <- colnames(NA_removed_matrix)[32]
       feature_data <- merge(NA_removed_matrix[feature] , Experimental_design %>% select(Conditions), by= 0)
       feature_data <-column_to_rownames(feature_data, "Row.names")
 
@@ -271,12 +272,15 @@ Preprocessing <- function(Input_data,
         group_by(Conditions) %>%
         mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
 
+      # Replace all inf valus with half min of the whole dataset
+      imputed_feature_data[ is.infinite( imputed_feature_data[[feature]]),feature] <- global_min_value
+
       NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
     }
 
 
   } else if(MVI == FALSE){
-  message("Missing value imputation is not performed.")
+    message("Missing value imputation is not performed.")
     stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
     NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
   }
@@ -292,23 +296,70 @@ Preprocessing <- function(Input_data,
     Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
     Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
     Data_TIC <- as.data.frame(Data_TIC)
-    } else {  # TIC_Normalization == FALSE
-      Data_TIC <- as.data.frame(NA_removed_matrix)
-      warning("***Total Ion Count normalization is not performed***")
-      message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
-    }
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
 
   if (CoRe ==  TRUE){
+    blanks <-  Data_TIC[grep("blank", Conditions),]
+    if(dim(blanks)[1]==1){
+      warning("Only 1 blank sample was found. Thus the consistency of the blank samples cannot be checked. We assume this was done beforehand and the blank samples were summed ")
+      blank_df <- blanks %>% t() %>% as.data.frame()
+      colnames(blanks) <- "blankMeans"
 
-    blankMeans <- colMeans( Data_TIC[grep("blank", Conditions),])
-    blankSd <- as.data.frame( apply(Data_TIC[grep("blank", Conditions),], 2, sd) )
+    }else{
 
-    blank_df <- as.data.frame(data.frame(blankMeans, blankSd))
-    names(blank_df) <- c("blankMeans", "blankSd")
-    blank_df$CV <- blank_df$blankSd / blank_df$blankMeans
+      ## Check metabolite variance
+      # Thresholds
+      Therhold_cv = 1
+      Threshold_SEMean = 0.1
 
-    CV <- (sum(blank_df[blank_df$blankMeans !=  0,]$CV > 1)/length(blank_df[blank_df$blankMeans !=  0,]$CV))*100     # CV is the sd/mean and it sa measure of variability. above 1 is high and below is ok.
-    message(paste0(CV, " of variables have very high variability in the blank samples"))
+      ## Coefficient of Variation
+      CV_data <- blanks
+      result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
+      rownames(result_df)[1] <- "CV"
+
+      ## Standard Error of Mean/median
+      SE_data <- log10(blanks) %>% as.data.frame()
+
+      # remove zero variance and non mumerix
+      zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
+      SE_data <- SE_data[,!zero_var_features]
+      # make shapiro test
+      shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
+      shaptestres <- as.data.frame(t(shaptestres))
+
+      # Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+      # NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+      # # Do we need to report this again ?
+      # message(Norm, " % of the blank samples metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+
+      # Mean
+      SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
+      result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+      rownames(result_df)[2] <- "SEMean"
+
+      result_df_final <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(CV_high_var = CV > Therhold_cv,
+               SEMean_high_var = SEMean > Threshold_SEMean) %>%
+        mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
+                                           TRUE ~ FALSE)) %>% as.data.frame()
+      rownames(result_df_final)<- colnames(blanks)
+
+      high_var_metabs <- sum(result_df_final$High_var_Metabs == TRUE)
+      if(high_var_metabs>0){
+        message(paste0(high_var_metabs, " of variables have high variability in the blank samples. Please  consider checking the pooled samples to decide whether to remove these metabolites or not."))
+      }
+      blank_df <- as.data.frame(data.frame("blankMeans"=  colMeans( blanks)))
+    }
+
+    # Do sample outlier testing  #### MISSING STILL
+    # if(dim(blanks)[1]>3){
+    #   # We use anova to see if any wample i
+    # }
+
     Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-blank_df$blankMeans)))  #Subtract from each sample the blank mean
     message("CoRe data are normalised using CoRe_norm_factor")
     Data_TIC <- apply(Data_TIC_CoRe, 2, function(i) i*CoRe_norm_factor)
@@ -319,6 +370,7 @@ Preprocessing <- function(Input_data,
     # Remove blank samples from the data
     Data_TIC <- Data_TIC[Experimental_design$Conditions!="blank",]
     Experimental_design <- Experimental_design[Experimental_design$Conditions!="blank",]
+    Conditions <- Conditions[!Conditions=="blank"]
   }
   data_norm <- Data_TIC %>% as.data.frame()
 
@@ -347,8 +399,8 @@ Preprocessing <- function(Input_data,
     if(sum(metabolite_var[1,]==0)==0){
       metabolite_zero_var_total_list[loop] <- 0
     } else if(sum(metabolite_var[1,]==0)>0){
-    metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
-    zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
+      metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
+      zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
     }
 
     for (metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
@@ -388,12 +440,12 @@ Preprocessing <- function(Input_data,
 
     # Make a scree plot with the selected component cut-off for HotellingT2 test
     screeplot <- factoextra::fviz_screeplot(PCA.res, main = paste("PCA Explained variance plot filtering round ",loop, sep = ""),
-                               addlabels = TRUE,
-                               ncp = 20,
-                               geom = c("bar", "line"),
-                               barfill = "grey",
-                               barcolor = "grey",
-                               linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
+                                            addlabels = TRUE,
+                                            ncp = 20,
+                                            geom = c("bar", "line"),
+                                            barfill = "grey",
+                                            barcolor = "grey",
+                                            linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
       annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 3)
 
     plot.new()
@@ -441,11 +493,11 @@ Preprocessing <- function(Input_data,
     k = k+1
 
     ### Save the outlier detection plots in the outlier detection folder
-    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as, sep = ""),
+    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
            plot = pca_outlier, width = 10,height = 8)
-    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "//Scree_plot_OD_round_" ,a ,".",Save_as, sep = ""),
+    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "//Scree_plot_OD_round_" ,a ,".",Save_as_Plot, sep = ""),
            plot = screeplot, width = 10,height = 8)
-    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as, sep = ""),
+    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
            plot = HotellingT2plot, width = 10,height = 8)
     a = a+1
 
@@ -560,11 +612,11 @@ Preprocessing <- function(Input_data,
 
   dtp <- merge(data_norm_filtered_full %>% select(Conditions, Outliers), pca.obj$x[,1:2],by = 0)
   dtp <- dtp%>%  mutate(Outliers = case_when(Outliers == "no" ~ 'no',
-                                  Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
-                                  Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
-                                  Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
-                                  Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
-                                  TRUE ~ 'Outlier_filtering_round = or > 5'))
+                                             Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
+                                             Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
+                                             Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
+                                             Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
+                                             TRUE ~ 'Outlier_filtering_round = or > 5'))
 
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
@@ -583,7 +635,7 @@ Preprocessing <- function(Input_data,
   qc_plot_list[[1]] <- pca_QC
 
   if (ExportQCPlots == TRUE){
-   ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as), plot = pca_QC, width = 10,  height = 8)
+    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
   }
 
   if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
@@ -600,7 +652,7 @@ Preprocessing <- function(Input_data,
     qc_plot_list[[2]] <- pca_QC_repl
 
     if (ExportQCPlots == TRUE){
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as), plot = pca_QC_repl, width = 10,  height = 8)
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
     }
   }
 
@@ -719,10 +771,171 @@ ReplicateSum <- function(Input_data){
 
 #' Description
 #'
-#' @param Input
+#' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with just the pooled samples.
+#' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), exist.\strong{Default = NULL}
+#' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
+#' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
+#' @param Therhold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
+#' @param Threshold_SEMean \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Mean ration to the Mean. \strong{Default = 0.1}
+#' @param Threshold_SEMedian \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Median ration to the Mean. \strong{Default = 0.1}
 #'
-#' @keywords
+#' @keywords Coefficient of Variation, Standard Error of the Mean, high variance metabolites
 #' @export
 
 
-#Pool_Estimation <- function(Input_data)
+Pool_Estimation <- function(Input_data,
+                            Input_SettingsFile = NULL,
+                            Input_SettingsInfo = NULL,
+                            Unstable_feature_remove = FALSE,
+                            Therhold_cv = 1,
+                            Threshold_SEMean = 0.1,
+                            Threshold_SEMedian = 0.1 ){
+
+
+  ## ------------ Check Input files ----------- ##
+  # 1. The input data:
+  if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Input_data <- Input_data
+    }
+  }
+  # Check if the next lines work correctly in case of duplicated metabolties (colnames)
+  if(sum( duplicated(colnames(Input_data))) > 0){
+    doublons <- as.character(colnames(Input_data)[duplicated(colnames(Input_data))])#number of duplications
+    data <-data[!duplicated(colnames(Input_data)),]#remove duplications
+    warning("Input_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
+  }
+
+  if(is.null(Input_SettingsFile)==FALSE){
+    Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+    if(nrow(Test_match) ==  0){
+      stop("row.names Input_data need to match row.names Input_SettingsFile")
+    } else{
+      Input_data <- Input_data
+    }
+
+    # 2. Input_Settings
+    if("Conditions" %in% names(Input_SettingsInfo)==TRUE){
+      if(Input_SettingsInfo[["Conditions"]] %in% Input_SettingsFile[["Conditions"]]== FALSE ){
+        stop("You have chosen Conditions = ",paste(Input_SettingsInfo[["Conditions"]]), ", ", paste(Input_SettingsInfo[["Conditions"]])," was not found in Plot_SettingsFile as sample Condition. Please insert the name of the pooled samples as stated in the Conditions column of the Input_SettingsFile."   )
+      }
+    }else{
+      stop("The Conditions column was not found in the Input_SettingsFile. Either input a correct Input_SettingsFile or use a DF containing only yhe pooled samples as Input_data.")
+    }
+  }
+
+  # 3. General parameters
+  if(is_bare_logical(Unstable_feature_remove)==FALSE){
+    stop("Check input. The Unstable_feature_remove value should be either =TRUE if metabolites with high variance are to be removed or =FALSE if not.")
+  }
+  if( is.numeric(Therhold_cv)== FALSE | Therhold_cv < 0){
+    stop("Check input. The selected Therhold_cv value should be a positive numeric value.")
+  }
+  if( is.numeric(Threshold_SEMean)== FALSE | Threshold_SEMean < 0){
+    stop("Check input. The selected Threshold_SEMean value should be a positive numeric value.")
+  }
+  if( is.numeric(Threshold_SEMedian)== FALSE | Threshold_SEMedian < 0){
+    stop("Check input. The selected Threshold_SEMedian value should be a positive numeric value.")
+  }
+
+
+
+  # This is to take only the numeric data but its not needed since the input has to be numeric or it stops at the checks in the beginning.
+  # if(is.null(Input_SettingsFile)==TRUE){
+  #   Input_numeric <- apply(Input_data, 2, as.numeric  )  %>% as.data.frame()
+  #   non_numeric_cols <- which(colSums(Input_numeric, na.rm = T)==0) %>% as.vector()
+  #   if(length(non_numeric_cols) >0 ){
+  #     Input_numeric <- Input_numeric[,-c(non_numeric_cols )]
+  #   }
+  # }else{
+  #   # Get only pool sample data from Input data
+  #   pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
+  #   pool_data_numeric <- apply(pool_data, 2, as.numeric  ) %>% as.data.frame()
+  #   non_numeric_cols <-  which(colSums(pool_data_numeric, na.rm = T)==0) %>% as.vector()
+  #   if(length(non_numeric_cols) >0 ){
+  #     pool_data_numeric <- pool_data_numeric[,-c(non_numeric_cols ) ]
+  #   }
+  #   Input_numeric <- pool_data_numeric
+  # }
+
+  if(is.null(Input_SettingsFile)==TRUE){
+    Input_numeric <- Input_data
+  }else{
+    pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
+    Input_numeric <- pool_data
+  }
+
+
+  ## Coefficient of Variation
+  CV_data <- Input_numeric
+  result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
+  rownames(result_df)[1] <- "CV"
+  # Since we expect the pool samples to have very small variation since they "are the same sample" we go for CV=1 as threshold
+  #which(result_df[1,]>Therhold_cv)
+
+  ## Standard Error of Mean/median
+  SE_data <- log10(Input_numeric) %>% as.data.frame()
+
+  # remove zero variance and non mumerix
+  zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
+  SE_data <- SE_data[,!zero_var_features]
+  # make shapiro test
+  shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
+  shaptestres <- as.data.frame(t(shaptestres))
+
+  Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+  NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+  # Do we need to report this again ?
+  #message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+
+  # Mean
+  SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
+  result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+  rownames(result_df)[2] <- "SEMean"
+
+  ##Median
+  SEMedian <- apply(SE_data, 2,  function(x) { 1.253 *sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
+  result_df[3,]<-  SEMedian# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+  rownames(result_df)[3] <- "SEMedian"
+
+  result_df_final <- result_df %>%
+    t()%>%
+    as.data.frame() %>%
+    rowwise() %>%
+    mutate(CV_high_var = CV > Therhold_cv,
+           SEMean_high_var = SEMean > Threshold_SEMean,
+           SEMedian_high_var = SEMedian > Threshold_SEMedian) %>%
+    mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var, SEMedian_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
+                                       TRUE ~ FALSE)) %>% as.data.frame()
+
+  rownames(result_df_final)<- colnames(Input_numeric)
+
+  if(is.null(Input_SettingsFile)==FALSE){
+    if(Unstable_feature_remove ==TRUE){
+
+      unstable_metabs <- rownames(result_df_final)[result_df_final[["High_var_Metabs"]]]
+      if(length(unstable_metabs)>0){
+        filtered_Input_data <- Input_data %>% select(!unstable_metabs)
+      }else{
+        filtered_Input_data <- Input_data
+      }
+
+    }
+  }
+
+  # List <- list("Pool_Estimation_result"= result_df_final, "filtered_Input_data"= filtered_Input_data)
+  # list2env(List, envir = .GlobalEnv)
+  assign("Pool_Estimation_result", result_df_final, envir=.GlobalEnv)
+
+  if(is.null(Input_SettingsFile)==FALSE){
+    if(Unstable_feature_remove ==TRUE){
+      assign("filtered_Input_data", filtered_Input_data, envir=.GlobalEnv)
+    }
+  }
+
+}
