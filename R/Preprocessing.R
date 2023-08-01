@@ -53,7 +53,7 @@ Preprocessing <- function(Input_data,
                           ExportQCPlots = TRUE,
                           CoRe = FALSE,
                           Save_as_Plot = "svg"
-                          ){
+){
 
 
   ## ------------ Setup and installs ----------- ##
@@ -259,11 +259,12 @@ Preprocessing <- function(Input_data,
   ### ### ### Missing value Imputation ### ### ###
 
   if (MVI ==  TRUE){
-  message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
 
     NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    global_min_value <- min(filtered_matrix, na.rm = TRUE)/2
     for (feature  in colnames(NA_removed_matrix)){
-      # feature  <- colnames(NA_removed_matrix)[1]
+      # feature  <- colnames(NA_removed_matrix)[32]
       feature_data <- merge(NA_removed_matrix[feature] , Experimental_design %>% select(Conditions), by= 0)
       feature_data <-column_to_rownames(feature_data, "Row.names")
 
@@ -271,12 +272,15 @@ Preprocessing <- function(Input_data,
         group_by(Conditions) %>%
         mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
 
+      # Replace all inf valus with half min of the whole dataset
+      imputed_feature_data[ is.infinite( imputed_feature_data[[feature]]),feature] <- global_min_value
+
       NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
     }
 
 
   } else if(MVI == FALSE){
-  message("Missing value imputation is not performed.")
+    message("Missing value imputation is not performed.")
     stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
     NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
   }
@@ -292,23 +296,70 @@ Preprocessing <- function(Input_data,
     Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
     Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
     Data_TIC <- as.data.frame(Data_TIC)
-    } else {  # TIC_Normalization == FALSE
-      Data_TIC <- as.data.frame(NA_removed_matrix)
-      warning("***Total Ion Count normalization is not performed***")
-      message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
-    }
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
 
   if (CoRe ==  TRUE){
+    blanks <-  Data_TIC[grep("blank", Conditions),]
+    if(dim(blanks)[1]==1){
+      warning("Only 1 blank sample was found. Thus the consistency of the blank samples cannot be checked. We assume this was done beforehand and the blank samples were summed ")
+      blank_df <- blanks %>% t() %>% as.data.frame()
+      colnames(blanks) <- "blankMeans"
 
-    blankMeans <- colMeans( Data_TIC[grep("blank", Conditions),])
-    blankSd <- as.data.frame( apply(Data_TIC[grep("blank", Conditions),], 2, sd) )
+    }else{
 
-    blank_df <- as.data.frame(data.frame(blankMeans, blankSd))
-    names(blank_df) <- c("blankMeans", "blankSd")
-    blank_df$CV <- blank_df$blankSd / blank_df$blankMeans
+      ## Check metabolite variance
+      # Thresholds
+      Therhold_cv = 1
+      Threshold_SEMean = 0.1
 
-    CV <- (sum(blank_df[blank_df$blankMeans !=  0,]$CV > 1)/length(blank_df[blank_df$blankMeans !=  0,]$CV))*100     # CV is the sd/mean and it sa measure of variability. above 1 is high and below is ok.
-    message(paste0(CV, " of variables have very high variability in the blank samples"))
+      ## Coefficient of Variation
+      CV_data <- blanks
+      result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
+      rownames(result_df)[1] <- "CV"
+
+      ## Standard Error of Mean/median
+      SE_data <- log10(blanks) %>% as.data.frame()
+
+      # remove zero variance and non mumerix
+      zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
+      SE_data <- SE_data[,!zero_var_features]
+      # make shapiro test
+      shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
+      shaptestres <- as.data.frame(t(shaptestres))
+
+      # Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+      # NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+      # # Do we need to report this again ?
+      # message(Norm, " % of the blank samples metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+
+      # Mean
+      SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
+      result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+      rownames(result_df)[2] <- "SEMean"
+
+      result_df_final <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(CV_high_var = CV > Therhold_cv,
+               SEMean_high_var = SEMean > Threshold_SEMean) %>%
+        mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
+                                           TRUE ~ FALSE)) %>% as.data.frame()
+      rownames(result_df_final)<- colnames(blanks)
+
+      high_var_metabs <- sum(result_df_final$High_var_Metabs == TRUE)
+      if(high_var_metabs>0){
+        message(paste0(high_var_metabs, " of variables have high variability in the blank samples. Please  consider checking the pooled samples to decide whether to remove these metabolites or not."))
+      }
+      blank_df <- as.data.frame(data.frame("blankMeans"=  colMeans( blanks)))
+    }
+
+    # Do sample outlier testing  #### MISSING STILL
+    # if(dim(blanks)[1]>3){
+    #   # We use anova to see if any wample i
+    # }
+
     Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-blank_df$blankMeans)))  #Subtract from each sample the blank mean
     message("CoRe data are normalised using CoRe_norm_factor")
     Data_TIC <- apply(Data_TIC_CoRe, 2, function(i) i*CoRe_norm_factor)
@@ -319,6 +370,7 @@ Preprocessing <- function(Input_data,
     # Remove blank samples from the data
     Data_TIC <- Data_TIC[Experimental_design$Conditions!="blank",]
     Experimental_design <- Experimental_design[Experimental_design$Conditions!="blank",]
+    Conditions <- Conditions[!Conditions=="blank"]
   }
   data_norm <- Data_TIC %>% as.data.frame()
 
@@ -347,8 +399,8 @@ Preprocessing <- function(Input_data,
     if(sum(metabolite_var[1,]==0)==0){
       metabolite_zero_var_total_list[loop] <- 0
     } else if(sum(metabolite_var[1,]==0)>0){
-    metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
-    zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
+      metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
+      zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
     }
 
     for (metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
@@ -388,12 +440,12 @@ Preprocessing <- function(Input_data,
 
     # Make a scree plot with the selected component cut-off for HotellingT2 test
     screeplot <- factoextra::fviz_screeplot(PCA.res, main = paste("PCA Explained variance plot filtering round ",loop, sep = ""),
-                               addlabels = TRUE,
-                               ncp = 20,
-                               geom = c("bar", "line"),
-                               barfill = "grey",
-                               barcolor = "grey",
-                               linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
+                                            addlabels = TRUE,
+                                            ncp = 20,
+                                            geom = c("bar", "line"),
+                                            barfill = "grey",
+                                            barcolor = "grey",
+                                            linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
       annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 3)
 
     plot.new()
@@ -560,11 +612,11 @@ Preprocessing <- function(Input_data,
 
   dtp <- merge(data_norm_filtered_full %>% select(Conditions, Outliers), pca.obj$x[,1:2],by = 0)
   dtp <- dtp%>%  mutate(Outliers = case_when(Outliers == "no" ~ 'no',
-                                  Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
-                                  Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
-                                  Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
-                                  Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
-                                  TRUE ~ 'Outlier_filtering_round = or > 5'))
+                                             Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
+                                             Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
+                                             Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
+                                             Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
+                                             TRUE ~ 'Outlier_filtering_round = or > 5'))
 
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
@@ -583,7 +635,7 @@ Preprocessing <- function(Input_data,
   qc_plot_list[[1]] <- pca_QC
 
   if (ExportQCPlots == TRUE){
-   ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
+    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
   }
 
   if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
