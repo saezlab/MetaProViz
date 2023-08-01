@@ -15,18 +15,9 @@ output:
     code_folding: show
 #vignette: >
 #  %\VignetteEngine{knitr::rmarkdown}
-#  %\VignetteIndexEntry{MetaProViz}
-#  %\VignetteEncoding{UTF-8}
 editor_options: 
   chunk_output_type: console
 ---
-
-\
-<a href="#" class="btn btn-link">[**Browse source code**](https://github.com/ChristinaSchmidt1)</a>
-<a href="#" class="btn btn-link">[**View on Bioconductor**](https://github.com/ChristinaSchmidt1)</a>
-<a href="#" class="btn btn-link">[**Citing MetaProViz**](https://github.com/ChristinaSchmidt1)</a>
-<a href="#" class="btn btn-link">[**FrezzaLab**](https://twitter.com/FrezzaLab)</a>
-<a href="#" class="btn btn-link">[**SaezLab**](https://twitter.com/saezlab)</a>
 
 <style>
 .vscroll-plot {
@@ -43,6 +34,8 @@ knitr::opts_chunk$set(
     comment = "#>"
 )
 ```
+
+# MetaProViz <img src="Hexagon_MetaProViz.png" align="right" width="200" />
 
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
@@ -258,8 +251,7 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove colu
                Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786O', 
                CoRe=FALSE, 
-               Plot = TRUE, 
-               Save_as = "svg")
+               Plot = TRUE)
 
 # Check how our data looks like:
 knitr::kable(`DMA_HK2_vs_786-O`[1:6,], caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE)
@@ -274,8 +266,7 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786M1A', 
                CoRe=FALSE, 
-               Plot = TRUE, 
-               Save_as = "svg")
+               Plot = TRUE)
 
 MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
                Experimental_design=Intra_Preprocessed[,c(1:2)],
@@ -286,8 +277,7 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786M2A', 
                CoRe=FALSE, 
-               Plot = TRUE, 
-               Save_as = "svg")
+               Plot = TRUE)
 
 
 # For timeseries: anova test, cruckal walles.--> multiple groups! pearson correlation (use limma)
@@ -839,7 +829,7 @@ MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`
 ```
 \
 Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
-```{r}
+```{r, eval=FALSE}
 #  When  Plot_Settings="Compare" colorcoding of the different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
            Plot_SettingsInfo= c(size = "t.val"),  
@@ -857,7 +847,7 @@ SettingsM1A <- merge(Settings,`DMA_HK2_vs_786-M1A`, by="Metabolite" )
 knitr::kable(SettingsO[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 ```
 
-```{r}
+```{r, eval=FALSE}
 VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
            Plot_Settings="Compare", 
@@ -869,7 +859,7 @@ VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
 
 #### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
-```{r}
+```{r, eval=FALSE}
 MetaProViz::VizLolipop(Plot_Settings="PEA",
                        Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
                        Plot_SettingsFile= KEGG_Pathways[,-3],#Must be the pathways used for pathway analysis

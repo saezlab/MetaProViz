@@ -7,19 +7,12 @@
 
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![BioC
-status](http://www.bioconductor.org/shields/build/release/bioc/decoupleR.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/decoupleR)
-[![BioC dev
-status](http://www.bioconductor.org/shields/build/devel/bioc/decoupleR.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/decoupleR)
-[![R build
-status](https://github.com/saezlab/decoupleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/saezlab/decoupleR/actions)
-[![Codecov test
-coverage](https://codecov.io/gh/saezlab/decoupleR/branch/master/graph/badge.svg)](https://codecov.io/gh/saezlab/decoupleR?branch=master)
-[![GitHub
+[![BioC status]()]() [![BioC dev status]()]() [![R build status]()]()
+[![Codecov test coverage]()]() [![GitHub
 issues](https://img.shields.io/github/issues/ChristinaSchmidt1/MetaProViz)](https://github.com/ChristinaSchmidt1/MetaProViz/issues)
 <!-- badges: end -->
 
-# **Introduction**
+## **Short Introduction**
 
 **MetaProViz** (Authors. 2023. Journal. DOI: ) enables the user to
 pre-process metabolomics data including consumption-release (CoRe) data,
@@ -47,7 +40,7 @@ media](CoRe-Metabolomics.html)
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
 
-# Installation
+## Installation
 
 [MetaProViz](Link%20to%20bioconductor) is an R package distributed as
 part of the Bioconductor project. To install the package, start R and
@@ -75,9 +68,10 @@ library(dplyr)
 library(tidyverse)
 #> Warning: package 'tidyverse' was built under R version 4.2.3
 #> Warning: package 'ggplot2' was built under R version 4.2.3
+#> Warning: package 'tibble' was built under R version 4.2.3
 ```
 
-## Dependencies
+### Dependencies
 
 If you are using the visualisations you will need to install the
 following tools and cite them.  
@@ -90,7 +84,7 @@ While we have done our best to ensure all the dependencies are
 documented, if they aren’t please let us know and we will try to resolve
 them.
 
-## Windows specifications
+### Windows specifications
 
 Note if you are running Windows you might have an issue with long paths,
 which you can resolve in the registry on Windows 10: Computer

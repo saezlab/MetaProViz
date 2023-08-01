@@ -1,28 +1,24 @@
 ---
-output:
-   html_document:
-     yml: _site.yml
-    #css: style.css
-    #theme: flatly
-    #highlight: tango #`default`, `tango`, `pygments`, `kate`, `monochrome`, `espresso`, `zenburn`, `haddock`, `breezedark`, `textmate`, `arrow`, or `rstudio`
-    #self_contained: true
-    #toc: true
-   # toc_float: true
-    #toc_depth: 2
-    #code_folding: show
-#vignette: >
-#  %\VignetteEngine{knitr::rmarkdown}
-#  %\VignetteIndexEntry{MetaProViz}
-#  %\VignetteEncoding{UTF-8}
-#editor_options: 
-#  chunk_output_type: console
+title: "Introduction"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg Universiy
+  - name: Dimitrios
+    affiliation:
+    - Cologne University
+output: 
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-\
-<a href="#" class="btn btn-link">[**Browse source code**](https://github.com/ChristinaSchmidt1)</a>
-<a href="#" class="btn btn-link">[**View on Bioconductor**](https://github.com/ChristinaSchmidt1)</a>
-<a href="#" class="btn btn-link">[**Citing MetaProViz**](https://github.com/ChristinaSchmidt1)</a>
-<a href="#" class="btn btn-link">[**FrezzaLab**](https://twitter.com/FrezzaLab)</a>
-<a href="#" class="btn btn-link">[**SaezLab**](https://twitter.com/saezlab)</a>
 
 ```{r chunk_setup, include = FALSE}
 #https://bootswatch.com/3/flatly/
@@ -46,14 +42,7 @@ bib <- c(
 )
 ```
 
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
-# **Introduction**
-
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
 
 **MetaProViz** (Authors. 2023. Journal. DOI: ) enables the user to pre-process metabolomics data including consumption-release (CoRe) data, perform differential analysis (DMA), do clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs. Currently, **MetaProViz** contains four different modules, which include different methods and can be used independently from each other or in combination (**Fig.1**). The first module of **MetaProViz**, `Preprocessing`, allows the customized processing of raw peak metabolomics data from different experimental setups, including options to perform feature filtering due to missingness, Total Ion Count (TIC) normalisation, Missing Value Imputation (MVI) based on half-minimum and outlier detection based on Hotellin's T2. All of these pre-processing parameters can be customized and combined as needed. The second module of **MetaProViz**, `Differential Metabolite Analysis (DMA)`, allows the user to perform differential analysis between two conditions (e.g. Tumour versus Healthy) calculating the Log2FC, p-value, adjusted p-value and t-value, whereby the user can choose all the test statistics. The input can either be the output of the `Preprocessing` module or any DF including metabolite values and information about the conditions that should be compared. The third module of **MetaProViz**, `Metabolite Clustering Analysis (MCA)`, includes different methods to create clusters of metabolites based on their distribution across the data. This clustering is either based on k-means or based on logical regulatory rules. Here, the user can either input the output of the `Preprocessing` or `Differential Metabolite Analysis (DMA)` module, or any other DF including Log2FC and statistics or metabolite values. The fourth module of **MetaProViz**, `Visualization`, can easily create customized visualizations of the output results of each of the other **MetaProViz** modules or custom files. Here we not only enable overview plots such as PCA, heatmap, Volcano plot, but also individual graphs of each metabolite as bar graphs, box plots or violin plots. Moreover, the user can provide additional information such as pathways the metabolites correspond to, the clusters the metabolites where assigned to or any other meta-information to customize the plots for color, shape or selections, thus enabling biological interpretation of the results otherwise missed in the data.
 
@@ -68,15 +57,15 @@ bib <- c(
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
-# Tutorials
+## Tutorials
 
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
 We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within **MetaProViz**. You can find those tutorial on the top under the "Tutorial" button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:\
-- [Standard metabolomics data](Standard-Metabolomics.html)
-- [Consumption-Release (CoRe) metabolomics data from cell culture media](CoRe-Metabolomics.html)
+- [Standard metabolomics data](Standard-Metabolomics.html)\
+- [Consumption-Release (CoRe) metabolomics data from cell culture media](CoRe-Metabolomics.html)\
 \
 Here you will find a brief overview and information about the installation of the package and its dependencies.
 
@@ -84,7 +73,7 @@ Here you will find a brief overview and information about the installation of th
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
-# Installation
+### Installation
 
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
@@ -114,16 +103,16 @@ library(tidyverse)
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
-# References
+## References
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
-## Citation
+### Citation
 Text
 
 
-## Bibliography
+### Bibliography
 Text
 ```{r vignetteBiblio, results = "asis", echo = FALSE, warning = FALSE, message = FALSE}
 ## Print bibliography
