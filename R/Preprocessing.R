@@ -719,10 +719,171 @@ ReplicateSum <- function(Input_data){
 
 #' Description
 #'
-#' @param Input
+#' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with just the pooled samples.
+#' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), exist.\strong{Default = NULL}
+#' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
+#' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
+#' @param Therhold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
+#' @param Threshold_SEMean \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Mean ration to the Mean. \strong{Default = 0.1}
+#' @param Threshold_SEMedian \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Median ration to the Mean. \strong{Default = 0.1}
 #'
-#' @keywords
+#' @keywords Coefficient of Variation, Standard Error of the Mean, high variance metabolites
 #' @export
 
 
-#Pool_Estimation <- function(Input_data)
+Pool_Estimation <- function(Input_data,
+                            Input_SettingsFile = NULL,
+                            Input_SettingsInfo = NULL,
+                            Unstable_feature_remove = FALSE,
+                            Therhold_cv = 1,
+                            Threshold_SEMean = 0.1,
+                            Threshold_SEMedian = 0.1 ){
+
+
+  ## ------------ Check Input files ----------- ##
+  # 1. The input data:
+  if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Input_data <- Input_data
+    }
+  }
+  # Check if the next lines work correctly in case of duplicated metabolties (colnames)
+  if(sum( duplicated(colnames(Input_data))) > 0){
+    doublons <- as.character(colnames(Input_data)[duplicated(colnames(Input_data))])#number of duplications
+    data <-data[!duplicated(colnames(Input_data)),]#remove duplications
+    warning("Input_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
+  }
+
+  if(is.null(Input_SettingsFile)==FALSE){
+    Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+    if(nrow(Test_match) ==  0){
+      stop("row.names Input_data need to match row.names Input_SettingsFile")
+    } else{
+      Input_data <- Input_data
+    }
+
+    # 2. Input_Settings
+    if("Conditions" %in% names(Input_SettingsInfo)==TRUE){
+      if(Input_SettingsInfo[["Conditions"]] %in% Input_SettingsFile[["Conditions"]]== FALSE ){
+        stop("You have chosen Conditions = ",paste(Input_SettingsInfo[["Conditions"]]), ", ", paste(Input_SettingsInfo[["Conditions"]])," was not found in Plot_SettingsFile as sample Condition. Please insert the name of the pooled samples as stated in the Conditions column of the Input_SettingsFile."   )
+      }
+    }else{
+      stop("The Conditions column was not found in the Input_SettingsFile. Either input a correct Input_SettingsFile or use a DF containing only yhe pooled samples as Input_data.")
+    }
+  }
+
+  # 3. General parameters
+  if(is_bare_logical(Unstable_feature_remove)==FALSE){
+    stop("Check input. The Unstable_feature_remove value should be either =TRUE if metabolites with high variance are to be removed or =FALSE if not.")
+  }
+  if( is.numeric(Therhold_cv)== FALSE | Therhold_cv < 0){
+    stop("Check input. The selected Therhold_cv value should be a positive numeric value.")
+  }
+  if( is.numeric(Threshold_SEMean)== FALSE | Threshold_SEMean < 0){
+    stop("Check input. The selected Threshold_SEMean value should be a positive numeric value.")
+  }
+  if( is.numeric(Threshold_SEMedian)== FALSE | Threshold_SEMedian < 0){
+    stop("Check input. The selected Threshold_SEMedian value should be a positive numeric value.")
+  }
+
+
+
+  # This is to take only the numeric data but its not needed since the input has to be numeric or it stops at the checks in the beginning.
+  # if(is.null(Input_SettingsFile)==TRUE){
+  #   Input_numeric <- apply(Input_data, 2, as.numeric  )  %>% as.data.frame()
+  #   non_numeric_cols <- which(colSums(Input_numeric, na.rm = T)==0) %>% as.vector()
+  #   if(length(non_numeric_cols) >0 ){
+  #     Input_numeric <- Input_numeric[,-c(non_numeric_cols )]
+  #   }
+  # }else{
+  #   # Get only pool sample data from Input data
+  #   pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
+  #   pool_data_numeric <- apply(pool_data, 2, as.numeric  ) %>% as.data.frame()
+  #   non_numeric_cols <-  which(colSums(pool_data_numeric, na.rm = T)==0) %>% as.vector()
+  #   if(length(non_numeric_cols) >0 ){
+  #     pool_data_numeric <- pool_data_numeric[,-c(non_numeric_cols ) ]
+  #   }
+  #   Input_numeric <- pool_data_numeric
+  # }
+
+  if(is.null(Input_SettingsFile)==TRUE){
+    Input_numeric <- Input_data
+  }else{
+    pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
+    Input_numeric <- pool_data
+  }
+
+
+  ## Coefficient of Variation
+  CV_data <- Input_numeric
+  result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
+  rownames(result_df)[1] <- "CV"
+  # Since we expect the pool samples to have very small variation since they "are the same sample" we go for CV=1 as threshold
+  #which(result_df[1,]>Therhold_cv)
+
+  ## Standard Error of Mean/median
+  SE_data <- log10(Input_numeric) %>% as.data.frame()
+
+  # remove zero variance and non mumerix
+  zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
+  SE_data <- SE_data[,!zero_var_features]
+  # make shapiro test
+  shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
+  shaptestres <- as.data.frame(t(shaptestres))
+
+  Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+  NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+  # Do we need to report this again ?
+  #message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+
+  # Mean
+  SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
+  result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+  rownames(result_df)[2] <- "SEMean"
+
+  ##Median
+  SEMedian <- apply(SE_data, 2,  function(x) { 1.253 *sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
+  result_df[3,]<-  SEMedian# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+  rownames(result_df)[3] <- "SEMedian"
+
+  result_df_final <- result_df %>%
+    t()%>%
+    as.data.frame() %>%
+    rowwise() %>%
+    mutate(CV_high_var = CV > Therhold_cv,
+           SEMean_high_var = SEMean > Threshold_SEMean,
+           SEMedian_high_var = SEMedian > Threshold_SEMedian) %>%
+    mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var, SEMedian_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
+                                       TRUE ~ FALSE)) %>% as.data.frame()
+
+  rownames(result_df_final)<- colnames(Input_numeric)
+
+  if(is.null(Input_SettingsFile)==FALSE){
+    if(Unstable_feature_remove ==TRUE){
+
+      unstable_metabs <- rownames(result_df_final)[result_df_final[["High_var_Metabs"]]]
+      if(length(unstable_metabs)>0){
+        filtered_Input_data <- Input_data %>% select(!unstable_metabs)
+      }else{
+        filtered_Input_data <- Input_data
+      }
+
+    }
+  }
+
+  # List <- list("Pool_Estimation_result"= result_df_final, "filtered_Input_data"= filtered_Input_data)
+  # list2env(List, envir = .GlobalEnv)
+  assign("Pool_Estimation_result", result_df_final, envir=.GlobalEnv)
+
+  if(is.null(Input_SettingsFile)==FALSE){
+    if(Unstable_feature_remove ==TRUE){
+      assign("filtered_Input_data", filtered_Input_data, envir=.GlobalEnv)
+    }
+  }
+
+}

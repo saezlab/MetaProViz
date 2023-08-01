@@ -155,10 +155,23 @@ Notes on MVI:
 Since our example data contains pool samples, we will do `Pool_Estimation()` before applying the `Preprocessing()` function. This is important, since one should remove the features (=metabolites) that are too variable prior to performing any data transformations such as TIC as part of the `Preprocessing()` function.\
 ```{r}
 #Get the Pool data
-PoolData <- MetaProViz::toy_data(data="Standard")%>%
-  subset(Conditions=="Pool", select = -c(2:4))# we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
+PoolData <- MetaProViz::toy_data(data="Standard") %>%
+  subset(Conditions=="Pool", select = -c(2:4)) %>% # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
+  remove_rownames() %>% 
+  column_to_rownames("Code")
 
-  
+
+# Check the metabolite variability
+Pool_Estimation(Input_data = PoolData,
+                Input_SettingsFile = NULL,
+                Input_SettingsInfo = NULL,
+                Unstable_feature_remove = FALSE, 
+                Therhold_cv = 1, 
+                Threshold_SEMean = 0.1,
+                Threshold_SEMedian = 0.1)
+
+# Check out how this looks:
+knitr::kable(Pool_Estimation_result[1:5,], caption = "Preview of the Pool_Estimation result.")
 
 #--> remove features if needed.
 ```
