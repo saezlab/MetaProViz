@@ -2664,13 +2664,6 @@ VizHeatmap <- function(Input_data,
     }
   }
 
-
-
-
-
-
-
-
   data <- Input_data
 
 
