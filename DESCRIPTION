@@ -1,12 +1,26 @@
 Package: MetaProViz
-Title: What the Package Does (One Line, Title Case)
+Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Authors@R: c(
+    person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3867-0881")),
+    person("Dimitrios", "Prymidis", role = "aut"),
+    person("Julio", "Saez-Rodriguez", role = "aut",
+           comment = c(ORCID = "0000-0002-8552-8976")),
+    person("Christian", "Frezza", role = "aut",
+           comment = c(ORCID = "0000-0002-3293-7397"))
+  )
+Description: MetaProViz can analyse standard metabolomics and
+    exometabolomics data (CoRe).It performs pre-processing including
+    feature filtering, missimg value imputation, normalisation and outlier
+    detection. It perform functional analysis including differential
+    metabolite analysis (DMA), clustering based on regulatory rules (MCA)
+    and contains different visualisation methods to extract biological
+    interpretable graphs and saves them in a publication ready format.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Imports: 
+    ggplot2,
+    tidyr

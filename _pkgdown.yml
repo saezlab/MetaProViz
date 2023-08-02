@@ -6,7 +6,7 @@ output_dir: docs
 
 template:
   bootstrap: 5
-  bootswatch: journal #https://bootswatch.com/ has different themes you can use
+  bootswatch: journal #https://bootswatch.com/ has different themes you can use #solar
   #bslib:
   #  bg: "#f1f4f1" # colour of page background
   #  fg: "black" # colour of text
