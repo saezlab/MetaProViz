@@ -264,12 +264,7 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove colu
                Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786O', 
                CoRe=FALSE, 
-<<<<<<< HEAD
                Plot = TRUE)
-=======
-               Plot = TRUE, 
-               Save_as_Plot = "svg")
->>>>>>> 8350d1eb04353fa3a28581f9478e5a968b19445d
 
 # Check how our data looks like:
 knitr::kable(`DMA_HK2_vs_786-O`[1:6,], caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE)
@@ -283,13 +278,8 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                STAT_padj="fdr",
                Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786M1A', 
-               CoRe=FALSE, 
-<<<<<<< HEAD
+               CoRe=FALSE,
                Plot = TRUE)
-=======
-               Plot = TRUE, 
-               Save_as_Plot = "svg")
->>>>>>> 8350d1eb04353fa3a28581f9478e5a968b19445d
 
 MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
                Experimental_design=Intra_Preprocessed[,c(1:2)],
@@ -300,13 +290,7 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                Input_Pathways = MappingInfo[,c(1,4)], 
                OutputName='DMA_HK2v786M2A', 
                CoRe=FALSE, 
-<<<<<<< HEAD
                Plot = TRUE)
-=======
-               Plot = TRUE, 
-               Save_as_Plot = "svg")
->>>>>>> 8350d1eb04353fa3a28581f9478e5a968b19445d
-
 
 # For timeseries: anova test, cruckal walles.--> multiple groups! pearson correlation (use limma)
 
@@ -591,6 +575,7 @@ MetaProViz::VizHeatmap(Input_data = Heatmap_data,
                        Plot_SettingsFile_Metab =  MappingInfo, 
                        OutputPlotName = "Colour Metabolites")
 ```
+
 ```{r}
 # individual
 MetaProViz::VizHeatmap(Input_data = Heatmap_data,
@@ -775,7 +760,7 @@ MetaProViz::VizVolcano(Plot_Settings="Compare",
 #### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
 
-```{r, eval=FALSE}
+```{r}
 
 MetaProViz::VizVolcano(Plot_Settings="PEA",
                        Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
@@ -846,7 +831,7 @@ MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`,
 ```
 \
 We can also use lolipop plots to compare 2 or more DMA results by setting the value in Plot_Settings to "Compare". Here, we have to add a list of dataframes in the Input_data as well as a list of the names of the datasets to be used for displaying the data. Colorcoding is used for the datasets. 
-```{r, eval=FALSE}
+```{r}
 ## Compare
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_Settings="Compare", 
@@ -857,7 +842,7 @@ MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`
 ```
 \
 Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
-```{r, eval=FALSE}
+```{r}
 #  When  Plot_Settings="Compare" colorcoding of the different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
 MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
            Plot_SettingsInfo= c(size = "t.val"),  
@@ -875,7 +860,7 @@ SettingsM1A <- merge(Settings,`DMA_HK2_vs_786-M1A`, by="Metabolite" )
 knitr::kable(SettingsO[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 ```
 
-```{r, eval=FALSE}
+```{r}
 VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
            Plot_Settings="Compare", 
@@ -887,7 +872,7 @@ VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`),
 
 #### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
-```{r, eval=FALSE}
+```{r}
 MetaProViz::VizLolipop(Plot_Settings="PEA",
                        Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
                        Plot_SettingsFile= KEGG_Pathways[,-3],#Must be the pathways used for pathway analysis
