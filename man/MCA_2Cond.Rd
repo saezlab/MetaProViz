@@ -19,6 +19,7 @@ MCA_2Cond(
   Cond2_padj_cutoff = 0.05,
   Cond1_FC_cutoff = 1,
   Cond2_FC_cutoff = 1,
+  Save_as_Results = "xlsx",
   backgroundMethod = "C1&C2",
   OutputFileName = "MCA_2Cond_"
 )
@@ -45,6 +46,8 @@ MCA_2Cond(
 \item{Cond1_FC_cutoff}{\emph{Optional: } Log2FC cutoff for Cond1File. \strong{Default=0.5}}
 
 \item{Cond2_FC_cutoff}{\emph{Optional: } Log2FC cutoff for Cond2File. \strong{Default=0.5}}
+
+\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}}
 
 \item{backgroundMethod}{\emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}}
 

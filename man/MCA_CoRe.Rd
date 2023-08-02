@@ -16,6 +16,7 @@ MCA_CoRe(
   Intra_padj_cutoff = 0.05,
   CoRe_padj_cutoff = 0.05,
   Intra_FC_cutoff = 1,
+  Save_as_Results = "xlsx",
   CoRe_FC_cutoff = 1,
   backgroundMethod = "Intra&CoRe",
   OutputFileName = "MCA_CoRe_"

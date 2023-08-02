@@ -14,7 +14,8 @@ VizPCA(
   Scaling = TRUE,
   Theme = NULL,
   OutputPlotName = "",
-  Save_as = "svg"
+  Save_as_Plot = "svg",
+  Save_as_Results = "csv"
 )
 }
 \arguments{
@@ -36,7 +37,9 @@ VizPCA(
 
 \item{OutputPlotName}{\emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}}
 
-\item{Save_as}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
+
+\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis

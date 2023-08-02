@@ -10,9 +10,10 @@ DM_ORA(
   PathwayName = "",
   minGSSize = 10,
   maxGSSize = 1000,
-  Save_as = "svg",
+  Save_as_Plot = "svg",
   pCutoff = 0.2,
-  PercentageCutoff = 10
+  PercentageCutoff = 10,
+  Save_as_Results = "csv"
 )
 }
 \arguments{
@@ -26,11 +27,13 @@ DM_ORA(
 
 \item{maxGSSize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{Save_as}{\emph{Optional: } If Save_as=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}}
+\item{Save_as_Plot}{\emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}}
 
-\item{pCutoff}{\emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 0.2}}
+\item{pCutoff}{\emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}}
 
-\item{PercentageCutoff}{\emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as=NULL, this is ignored. \strong{default: 10}}
+\item{PercentageCutoff}{\emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}}
+
+\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 }
 \value{
 Saves results as individual .csv files.

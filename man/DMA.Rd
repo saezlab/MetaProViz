@@ -15,7 +15,8 @@ DMA(
   OutputName = "",
   CoRe = FALSE,
   Plot = TRUE,
-  Save_as = "svg"
+  Save_as_Plot = "svg",
+  Save_as_Results = "xlsx"
 )
 }
 \arguments{
@@ -33,7 +34,9 @@ DMA(
 
 \item{CoRe}{\emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}}
 
-\item{Save_as}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
+
+\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}}
 
 \item{Conditon1}{Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".}
 

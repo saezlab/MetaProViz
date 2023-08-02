@@ -11,13 +11,16 @@ Preprocessing(
   Feature_Filt_Value = 0.8,
   TIC_Normalization = TRUE,
   MVI = TRUE,
+  MVI_Percentage = 50,
   HotellinsConfidence = 0.99,
   ExportQCPlots = TRUE,
   CoRe = FALSE,
-  Save_as = "svg"
+  Save_as_Plot = "svg"
 )
 }
 \arguments{
+\item{Input_data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
+
 \item{Experimental_design}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
 
 \item{Feature_Filtering}{\emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80\%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}}
@@ -26,7 +29,9 @@ Preprocessing(
 
 \item{TIC_Normalization}{\emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}}
 
-\item{MVI}{\emph{Optional: } If TRUE, Mivving Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}}
+\item{MVI}{\emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}}
+
+\item{MVI_Percentage}{\emph(Optional: ) Percentage (0 to 100)of imputed value based on the minimum value. \strong{Default = 50}}
 
 \item{HotellinsConfidence}{\emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}}
 
@@ -34,9 +39,7 @@ Preprocessing(
 
 \item{CoRe}{\emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}}
 
-\item{Save_as}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf, jpeg, tiff, bmp. \strong{Default = svg}}
-
-\item{Input}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
 }
 \description{
 Applies 80\%-filtering rule, total-ion count normalisation, missing value imputation and HotellingT2 outlier detection

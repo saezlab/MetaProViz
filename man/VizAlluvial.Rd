@@ -20,7 +20,7 @@ VizAlluvial(
     "#000"),
   plot_color_variable = "Overall_Change",
   plot_color_remove_variable = "SameDirection_NoChange",
-  Save_as = pdf
+  Save_as_Plot = pdf
 )
 }
 \description{
