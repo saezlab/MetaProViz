@@ -2692,15 +2692,12 @@ VizHeatmap <- function(Input_data,
     }
   }
 
-<<<<<<< HEAD
-=======
   # 4. Check other plot-specific parameters:
   Save_as_Plot_options <- c("svg","pdf","png")
   if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
     stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
->>>>>>> 8350d1eb04353fa3a28581f9478e5a968b19445d
   data <- Input_data
 
 
