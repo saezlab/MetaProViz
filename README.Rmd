@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 <img src="inst/figures/Fig.1.png" align="center" width="45%">
 </p>
 
-# Tutorials
+## Tutorials
 We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within **MetaProViz**. You can find those tutorial on the top under the "Tutorial" button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:\
 - [Standard metabolomics data](https://saezlab.github.io/decoupleR/articles/decoupleR.html)\
 - [Consumption-Release (CoRe) metabolomics data from cell culture media](CoRe-Metabolomics.html)\
