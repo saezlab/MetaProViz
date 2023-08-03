@@ -4,9 +4,6 @@ author:
   - name: Christina Schmidt
     affiliation:
     - Heidelberg Universiy
-  - name: Dimitrios
-    affiliation:
-    - Cologne University
 output: 
   html_document:
     self_contained: true

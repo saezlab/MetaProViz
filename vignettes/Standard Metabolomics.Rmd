@@ -1,22 +1,23 @@
 ---
-#title: "**MetaProViz**"
-#author: "Authors: Christina Schmidt, Dimitrios"
-#date: "24 November 2022"
-output:
-   html_document:
-    #yml: _site.yml
-    css: style.css
-    theme: flatly
-    highlight: tango #`default`, `tango`, `pygments`, `kate`, `monochrome`, `espresso`, `zenburn`, `haddock`, `breezedark`, `textmate`, `arrow`, or `rstudio`
+title: "Standard Metabolomics"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg Universiy
+  - name: Dimitrios Prymidis
+    affiliation:
+    - Heidelberg Universiy
+output: 
+  html_document:
     self_contained: true
     toc: true
     toc_float: true
-    toc_depth: 4
+    toc_depth: 5
     code_folding: show
-#vignette: >
-#  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: console
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 <style>
@@ -36,24 +37,14 @@ knitr::opts_chunk$set(
 ```
 
 # MetaProViz <img src="Hexagon_MetaProViz.png" align="right" width="200" />
-
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
-
-# Standard metabolomics
-
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
-
+\
 A standard metabolomics experiment refers to intracellular extracts (e.g. cell or bacteria culture), to tissue samples (e.g. from animals or patients), to plasma samples (e.g. blood) and many other types of experimental setups.\
 \
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
-`-` To process raw peak data and identify outliers.\
-`-` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
-`-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
-`-` To use specific visualizations to aid biological interpretation of the results.\
+- To process raw peak data and identify outliers.\
+- To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+- To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
+- To use specific visualizations to aid biological interpretation of the results.\
 \
 \
 First if you have not done yet, install the required dependencies and load the libraries:

@@ -9,7 +9,7 @@ output: github_document
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
-    fig.path = "vignettes",
+    fig.path = "inst/figures",
     out.width = "100%"
 )
 ```
@@ -19,10 +19,6 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![BioC status]()]()
-[![BioC dev status]()]()
-[![R build status]()]()
-[![Codecov test coverage]()]()
 [![GitHub issues](https://img.shields.io/github/issues/ChristinaSchmidt1/MetaProViz)](https://github.com/ChristinaSchmidt1/MetaProViz/issues)
 <!-- badges: end -->
 
