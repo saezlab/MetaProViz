@@ -18,6 +18,7 @@ vignette: >
   %\VignetteIndexEntry{Standard Metabolomics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: bibliography.bib
 ---
 
 <style>
@@ -34,6 +35,13 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+```
+
+```{r, eval=FALSE}
+# Bib setup.
+library(RefManageR)
+my_bibliography <- ReadBib("bibliography.bib")
+
 ```
 
 # MetaProViz <img src="Hexagon_MetaProViz.png" align="right" width="200" />
@@ -125,7 +133,7 @@ Currently, **MetaProViz** contains four different modules, which include differe
 
 ## Pre-processing
 **MetaProViz** includes a pre-processing module with the function `Preprocessing()` that has multiple parameters to perform customize data processing.\
-`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") (Bijlsma S. et al., 2006) or per condition (="Modified") (Yang, J et al., 2015). This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is pool and hence the metabolite should be removed from the data.\
+`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") [@Bijlsma2006] or per condition (="Modified") [@Wei2018].  This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is pool and hence the metabolite should be removed from the data.\
 The paramteter `TIC_Normalization` refers to Total Ion Count (TIC) normalisation, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalisation should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects (Wulff et. al., (2018)).\
 The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) (Wei et. al., 2018 ,https://www.nature.com/articles/s41598-017-19120-0).\
 Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test (Hotelling, H., 1931, doi:https://doi.org/10.1214/aoms/1177732979.).\
@@ -885,9 +893,13 @@ Generally: Do a vignette just for visuals? --> use bigger dataset, which will sh
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
+
 # Session information
 
 ```{r session_info, echo=FALSE}
 options(width = 120)
 sessioninfo::session_info()
 ```
+
+# Bibliography
+
