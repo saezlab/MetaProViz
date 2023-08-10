@@ -37,23 +37,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, eval=FALSE}
-# Bib setup.
-library(RefManageR)
-my_bibliography <- ReadBib("bibliography.bib")
-
-```
-
-# MetaProViz <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
 \
 A standard metabolomics experiment refers to intracellular extracts (e.g. cell or bacteria culture), to tissue samples (e.g. from animals or patients), to plasma samples (e.g. blood) and many other types of experimental setups.\
 \
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
-- To process raw peak data and identify outliers.\
-- To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
-- To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
-- To use specific visualizations to aid biological interpretation of the results.\
-\
+
+* To process raw peak data and identify outliers.\
+* To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+* To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
+* To use specific visualizations to aid biological interpretation of the results.\
 \
 First if you have not done yet, install the required dependencies and load the libraries:
 ```{r message=FALSE, warning=FALSE}
@@ -77,18 +70,22 @@ library(tidyverse)
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
-
-Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+\
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
 \
 <span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
-\
 `1.` Intracellular experiment **(Intra)** \
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 ```{r}
 MetaProViz::toy_data(data="Standard")
-
+```
+```{r, echo=FALSE}
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 # Check how our data looks like:
-knitr::kable(Intra[1:5, 1:7], caption = "Preview of the DF `Intra` including columns with sample information and metabolite ids with their measured values.")
+Intra[1:5, c(1:4,21,44)]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Intra` including columns with sample information and metabolite ids with their measured values.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 We will split the experimental data into the sample information and the metabolites values using the the column "Code" as the unique identifier:
@@ -104,18 +101,26 @@ SampleInfo <-Intra[c(1:47),c(1:4)]%>%
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
 MetaProViz::toy_data(data="MappingInfo")
-
+```
+```{r, echo=FALSE}
 # Check how our data looks like:
-knitr::kable(MappingInfo[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
+MappingInfo[1:5,]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
-`3.` KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis. **(KEGG_Pathways)**\
+`3.` KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000]. **(KEGG_Pathways)**\
 ```{r}
 #This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::Load_KEGG()
-
-# Check out how this looks:
-knitr::kable(KEGG_Pathways[1:5,], caption = "Preview of the DF `KEGG_Pathways`.")
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+KEGG_Pathways[c(1:3,52:54),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 \
@@ -133,10 +138,10 @@ Currently, **MetaProViz** contains four different modules, which include differe
 
 ## Pre-processing
 **MetaProViz** includes a pre-processing module with the function `Preprocessing()` that has multiple parameters to perform customize data processing.\
-`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") [@Bijlsma2006] or per condition (="Modified") [@Wei2018].  This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is pool and hence the metabolite should be removed from the data.\
-The paramteter `TIC_Normalization` refers to Total Ion Count (TIC) normalisation, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalisation should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects (Wulff et. al., (2018)).\
-The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) (Wei et. al., 2018 ,https://www.nature.com/articles/s41598-017-19120-0).\
-Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test (Hotelling, H., 1931, doi:https://doi.org/10.1214/aoms/1177732979.).\
+`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") [@Bijlsma2006] or per condition (="Modified") [@Wei2018].  This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool measurements (pool = mixture of all experimental samples measured several times during the LC-MS run) . Variable metabolite in the pool sample should be removed from the data.\
+The parameter `TIC_Normalization` refers to Total Ion Count (TIC) normalisation, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalisation should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects [@Wulff2018].\
+The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) [@Wei2018].\
+Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test [@Hotelling1931].\
 
 Notes on MVI: 
 - Wei quantile regression imputation of left-censored data (QRILC) as performing best even though HM performs better in some of their tests and quantile normalisation would not work well for normal distribution!
@@ -161,12 +166,16 @@ Pool_Estimation(Input_data = PoolData,
                 Therhold_cv = 1, 
                 Threshold_SEMean = 0.1,
                 Threshold_SEMedian = 0.1)
-
-# Check out how this looks:
-knitr::kable(Pool_Estimation_result[1:5,], caption = "Preview of the Pool_Estimation result.")
-
-#--> remove features if needed.
 ```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Pool_Estimation_result[1:5,]%>%
+  kableExtra::kbl(caption = "Preview of the Pool_Estimation result.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+\
+The results from the `Pool_Estimation()` is a table that has the Coefficient of variation (CV), Standard Error of the Mean (SEMean) and the Standard Error of the Median (SEMedian). If there is a high variability for those parameters (=TRUE), one should consider to remove those features from the data. For the example data nothing needs to be removed.\
 \
 Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned to the global environment and can be easily viewed.\
 ```{r}
@@ -181,11 +190,16 @@ MetaProViz::Preprocessing(Input_data=Intra_M,
                           CoRe = FALSE,# as we have a standard experiment and not a Consumption-Release (CoRe) experiment we set this to FALSE
                           Save_as_Plot = "svg") 
 
-# Now we can have a look at the results table:
+# This is the results table:
 Intra_Preprocessed <- PreProcessing_res[["Processed_data"]]
-
-knitr::kable(Intra_Preprocessed[29:32, 1:9]%>%rownames_to_column("Code"), caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.", row.names=FALSE)
-
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Intra_Preprocessed[29:32, 1:9]%>%
+  rownames_to_column("Code")%>%
+  kableExtra::kbl(caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an outlier in the first round of filtering.\
@@ -195,14 +209,18 @@ As part of the `Preprocessing()` function several plots are generated, returned 
 #1.PCA plot
 P1 <- Outlier_Plots[[1]]
 P1
-
+```
+```{r}
 #2.Screeplot
 P2 <- Outlier_Plots[[2]]
 P2
+```
+```{r}
 #3.Hotellins Outlier
 P3 <- Outlier_Plots[[3]]
 P3
-
+```
+```{r}
 ################### 
 #If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
 #Here a second round was performed and the plots saved:
@@ -213,12 +231,6 @@ P5
 P6<- Outlier_Plots[[6]]
 P6
 ```
-I have a list with 6 elements, each of them being a plot. If I run `Outlier_Plots[[3]]` in the console , I will see the plot. Yet, if I knite the .rmd file I will only see `Outlier_Plots[[1]]`, not the others.
---> Maybe try gridextra:
-library(gridExtra)
-library(grid)
-grid.arrange(Outlier_Plots, ncol=2)
---> general coding chanel
 \
 The QC plots `QC_Plots` include an PCA plot using the processed data and highlighting the outliers. Moreover, if one has provided information about biological replicates a second plot is generated highlighting the biological replicates, which would highlight if there is a batch effect.\
 ```{r}
@@ -265,9 +277,6 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove colu
                CoRe=FALSE, 
                Plot = TRUE)
 
-# Check how our data looks like:
-knitr::kable(`DMA_HK2_vs_786-O`[1:6,], caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE)
-
 #Perform the other comparisons:
 MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
                Experimental_design=Intra_Preprocessed[,c(1:2)],
@@ -291,17 +300,22 @@ MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)],
                CoRe=FALSE, 
                Plot = TRUE)
 
-# For timeseries: anova test, cruckal walles.--> multiple groups! pearson correlation (use limma)
-
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+`DMA_HK2_vs_786-O`[1:6,]%>%
+  kableExtra::kbl(caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 Using the DMA results, we can now use the **MetaProViz** visualization module and generate customized Volcano plots `VizVolcano()` or Lollipop graphs `VizLollipop()`. You can see some examples below. 
 
 ### ORA using the DMA results
 Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
-Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites (see MCA below). If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/).\
+Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites (see MCA below). If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
 \
-Here we will use the KEGG pathways. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
 ```{r}
 ############ 1. Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
 #Input data requirements: column `t.val` and column `Metabolite`
@@ -354,6 +368,7 @@ ORA_HK2_vs_786O <- MetaProViz::DM_ORA(Input_data=HK2_vs_786O,
 Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules or based on kmeans clustering. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
 ### MCA-2Cond
+
 
 Refer to SiRCle and mention sircle concept that was adapted here! --> add the citation to function?
 
@@ -463,8 +478,8 @@ In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,
 In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots where applicable based on additional information (e.g. one plot for each metabolic pathway).
 
 ### PCA plots
-Principal component analysis (PCA) is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different prinipal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
-As mentioned above, PCA plots can be quite useful for quality control, but of course it offers us many more oppotunities, which will be showcased here.\
+Principal component analysis (PCA) is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+As mentioned above, PCA plots can be quite useful for quality control, but of course it offers us many more opportunities, which will be showcased here.\
 \
 The input data must contain a column called "UniqueID" and otherwise only contain numeric columns with the measurements for each metabolite.\
 ```{r}
@@ -540,8 +555,7 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
 ```
 
 ### Heatmaps
-
-```{r}
+```{r, fig.align="left", fig.width=8, fig.height=5}
 #Standard
 Heatmap_data <-  Intra_Preprocessed[,-c(1:3)]
 Heatmap_design <- Intra_Preprocessed[,c(1:2)]%>%
@@ -565,14 +579,16 @@ MetaProViz::VizHeatmap(Input_data = Heatmap_data,
 MetaProViz::VizHeatmap(Input_data = Heatmap_data,
                        Plot_SettingsFile_Sample = Heatmap_design,
                        Plot_SettingsInfo = c(color_Sample = list("Conditions","Biological_Replicates", "Celltype", "Status")),
-                       OutputPlotName = "Colour Samples")
+                       OutputPlotName = "Colour Samples",
+                       Save_as_Plot = "pdf")
 
 # row annotation
 MetaProViz::VizHeatmap(Input_data = Heatmap_data,
                        Plot_SettingsFile_Sample = Heatmap_design,
                        Plot_SettingsInfo = c(color_Metab = list("Pathway")),
                        Plot_SettingsFile_Metab =  MappingInfo, 
-                       OutputPlotName = "Colour Metabolites")
+                       OutputPlotName = "Colour Metabolites",
+                       Save_as_Plot = "pdf")
 ```
 
 ```{r}
@@ -581,7 +597,8 @@ MetaProViz::VizHeatmap(Input_data = Heatmap_data,
                        Plot_SettingsFile_Sample= Heatmap_design,
                        Plot_SettingsInfo = c(individual = "Pathway"),
                        Plot_SettingsFile_Metab =  MappingInfo,
-                       OutputPlotName = "Pathways")
+                       OutputPlotName = "Pathways",
+                       Save_as_Plot = "pdf")
 
 
 # individual with col and row annotation
@@ -774,10 +791,7 @@ MetaProViz::VizVolcano(Plot_Settings="PEA",
 
 1. Plot_SettingsFile = Pathway file used for e.g. ORA. --> column term or pathway = individual
 2. Additional_File = Results of ORA or GSEA
-3. Rename setting GSE to something else as this could also be more unspecific and we don't do gene set enrichment, but metabolite!
 4. Use subtitle to display the performed tests information --> this can be passed by the user by adding another column into Plot_SettingsInfo --> need to ensure that this column exists in Additional_File of ORA/GSEA --> this could e.g. NES score and p.adj of this pathway --> Here this would need to be combined before!
-
-
 
 \
 \
@@ -882,7 +896,7 @@ MetaProViz::VizLolipop(Plot_Settings="PEA",
 ```
 
 ### Alluvial plots
-This is a rather specific plot that can be particularly useful to visulaise the output of the `MCA` module. 
+This is a rather specific plot that can be particularly useful to visualize the output of the `MCA` module. 
 
 
 
