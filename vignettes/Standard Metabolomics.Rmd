@@ -16,9 +16,11 @@ output:
     code_folding: show
 vignette: >
   %\VignetteIndexEntry{Standard Metabolomics}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
 ---
 
 <style>
@@ -475,7 +477,24 @@ In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,
 `2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
 \
-In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots where applicable based on additional information (e.g. one plot for each metabolic pathway).
+In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots where applicable based on additional information (e.g. one plot for each metabolic pathway).\
+For this we need a metadata table including information about our samples that could be relevant to e.g. color code:\
+```{r}
+#Metadata:
+MetaData <- Intra_Preprocessed[,c(1:2)]%>%
+   mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
+                               Conditions=="786-O" ~ 'Primary Tumour',
+                               TRUE ~ 'Metastatic Tumour'))%>%
+   mutate(Status = case_when(Conditions=="HK2" ~ 'Healthy',
+                               TRUE ~ 'Cancer'))
+
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetaData%>%
+  kableExtra::kbl(caption = "Metadata table including additional information about our Samples.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
 
 ### PCA plots
 Principal component analysis (PCA) is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
@@ -484,34 +503,22 @@ As mentioned above, PCA plots can be quite useful for quality control, but of co
 The input data must contain a column called "UniqueID" and otherwise only contain numeric columns with the measurements for each metabolite.\
 ```{r}
 #Make column "UniqueID"
-Input_PCA <- Intra_Preprocessed[,-c(1:3)]%>%
-  rownames_to_column("UniqueID")
-
+Input_PCA <- Intra_Preprocessed[,-c(1:3)]
+```
+```{r}
 # Check how our data looks like:
 knitr::kable(Input_PCA[,1:6] , caption = "Input_data for VizPCA must contain a column called `UniqueID` and numeric values for metabolites.", row.names=FALSE)
+```
 
+```{r}
 #Plot:
 MetaProViz::VizPCA(Input_data=Input_PCA)
 ```
 \
-Of course, now we can interactively choose shape and color using additional information of interest. Especially for complex data such as patient data it can be valuable to use different demographics (e.g. age, gender, medication,...) for this.
-```{r}
-#Make a Settings file:
-Settings_PCA <- Intra_Preprocessed[,c(1:2)]%>%
-  rownames_to_column("UniqueID")%>%
-   mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
-                               Conditions=="786-O" ~ 'Primary Tumour',
-                               TRUE ~ 'Metastatic Tumour'))%>%
-   mutate(Status = case_when(Conditions=="HK2" ~ 'Healthy',
-                               TRUE ~ 'Cancer'))
-# Check how our data looks like:
-knitr::kable(Settings_PCA , caption = "Different information that can be used for colour or shape.", row.names=FALSE)
-```
-
-First lets check if we have any batch effect by colour coding for the biological replicates, which would be the case if the replicates cluster together.\
+Of course, now we can interactively choose shape and color using additional information of interest from our Metadata. Especially for complex data such as patient data it can be valuable to use different demographics (e.g. age, gender, medication,...) for this. First lets check if we have any batch effect by colour coding for the biological replicates, which would be the case if the replicates cluster together.\
 ```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do we have a batch effect?"}
 MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Biological_Replicates"),
-                   Plot_SettingsFile= Settings_PCA ,
+                   Plot_SettingsFile= MetaData ,
                    Input_data=Input_PCA,
                    OutputPlotName = "Batch Effect")
 ```
@@ -519,7 +526,7 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Biological_Replicates"),
 Next, we can colour code for condition and use the replicates in the shape parameter:\
 ```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do the samples cluster for the conditions?"}
 MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Conditions", shape="Biological_Replicates"),
-                   Plot_SettingsFile= Settings_PCA ,
+                   Plot_SettingsFile= MetaData ,
                    Input_data=Input_PCA,
                    OutputPlotName = "Sample Conditions")
 ```
@@ -527,7 +534,7 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Conditions", shape="Biological_Re
 The different cell lines we have are either control or cancerous, so we can display this too. Here is becomes apparent that the cell status is responsible for 64% of the variance (x-axis). \
 ```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do the samples cluster for the Cell status?"}
 MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Status"),
-                   Plot_SettingsFile= Settings_PCA ,
+                   Plot_SettingsFile= MetaData ,
                    Input_data=Input_PCA,
                    OutputPlotName = "Sample Status")
 ```
@@ -535,7 +542,7 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Status"),
 We can separate the cancerous cell lines further into metastatic or primary. This shows us that this is separated on the y-axis and accounts for 30%of the variance.\
 ```{r, fig.align="left", fig.width=8, fig.height=5, fig.cap="Figure: Do the samples cluster for the Cell type?"}
 MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
-                   Plot_SettingsFile= Settings_PCA ,
+                   Plot_SettingsFile= MetaData,
                    Input_data=Input_PCA,
                    OutputPlotName = "Cell type")
 ```
@@ -543,7 +550,7 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
 Lastly, its worth mentioning that one can also change many style parameters to customize the plot:\
 ```{r, fig.align="left", fig.width=8, fig.height=5}
 MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
-                   Plot_SettingsFile= Settings_PCA ,
+                   Plot_SettingsFile= MetaData,
                    Input_data=Input_PCA,
                    color_palette= NULL,#pass your own colour palette
                    shape_palette=NULL,#pass your own shape palette
@@ -555,21 +562,35 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Celltype", shape="Status"),
 ```
 
 ### Heatmaps
+Clustered heatmaps can be useful to understand the patterns in the data, which will be showcased on different examples.\
+As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
+```{r}
+Heatmap_data <-  Intra_Preprocessed[,-c(1:3)]#remove columns that include Metadata such as cell type,...
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Heatmap_data[,1:7]%>%
+  kableExtra::kbl(caption = "Inoput for MetaProViz::VizHeatmap(), with samples as rownames and metabolites as column names.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+Now we can generate an overview heatmap. Since we plot all metabolites the metabolite names are not plotted since this would get too crowded (You can enforce this by changing the parameter `enforce_FeatureNames` to `TRUE`).
 ```{r, fig.align="left", fig.width=8, fig.height=5}
 #Standard
-Heatmap_data <-  Intra_Preprocessed[,-c(1:3)]
+MetaProViz::VizHeatmap(Input_data = Heatmap_data, 
+                       OutputPlotName = "Standard")
+```
+\
+
+
+
+```{r}
 Heatmap_design <- Intra_Preprocessed[,c(1:2)]%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
                                Conditions=="786-O" ~ 'Primary Tumour',
                                TRUE ~ 'Metastatic Tumour'))%>%
    mutate(Status = case_when(Conditions=="HK2" ~ 'Healthy',
                                TRUE ~ 'Cancer'))
-
-#Standard
-MetaProViz::VizHeatmap(Input_data = Heatmap_data, 
-                       OutputPlotName = "Standard",
-                       Save_as_Plot = "pdf")
-
 
 ```
 
@@ -610,6 +631,8 @@ MetaProViz::VizHeatmap(Input_data = Heatmap_data,
 
 ```
 
+
+Sometimes it can be advantageous to split the samples onto individual plots:
 To do:
 2. Can individual also be used for samples? --> If not change this
 

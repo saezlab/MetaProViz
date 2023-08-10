@@ -27,7 +27,7 @@
 
 #' @param Plot_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param Plot_SettingsFile \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
-#' @param Input_data DF with a column "UniqueID" with unique sample identifiers  and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param Show_Loadings  \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
@@ -64,16 +64,13 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
-  if("UniqueID" %in% names(Input_data)==FALSE){
-    stop("Check input. Input_data must contain a column named `UniqueID` including unique sample names.")
-  }else if(length(Input_data[duplicated(Input_data$UniqueID), "UniqueID"]) > 0){
-    stop("Input_data contained duplicates based on UniqueID!")
-  } else{
-    Input_data_m<- Input_data%>%
-      column_to_rownames("UniqueID")
+  if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  }else{
+    Input_data_m<- Input_data
     Test_num <- apply(Input_data_m, 2, function(x) is.numeric(x))
     if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("Input_data needs to be of class numeric in all columns (except column `UniqueID`).")
+      stop("Input_data needs to be of class numeric in all columns.")
     }
   }
 
@@ -151,11 +148,11 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   ############################################################################################################
   ## ----------- Make the  plot based on the choosen parameters ------------ ##
   if(is.null(Plot_SettingsFile)==FALSE){
-    InputPCA  <- merge(x=Plot_SettingsFile, y=Input_data, by="UniqueID", all.y=TRUE)%>%
+
+    InputPCA  <- merge(x=Plot_SettingsFile%>%rownames_to_column("UniqueID") , y=Input_data%>%rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
       column_to_rownames("UniqueID")
   }else{
-    InputPCA  <- Input_data%>%
-      column_to_rownames("UniqueID")
+    InputPCA  <- Input_data
   }
 
   #Prepare the color scheme:
@@ -2647,8 +2644,7 @@ VizHeatmap <- function(Input_data,
       Input_data <- Input_data
     )
 
-    # Check if the next lines work correctly in case of duplicated metabolties (colnames)
-
+    # Check if the next lines work correctly in case of duplicated metabolites (colnames)
     if(sum( duplicated(colnames(Input_data))) > 0){
       doublons <- as.character(colnames(Input_data)[duplicated(colnames(Input_data))])#number of duplications
       data <-data[!duplicated(colnames(Input_data)),]#remove duplications
@@ -2688,7 +2684,7 @@ VizHeatmap <- function(Input_data,
         }
         # Check if color_metab exists in file
         for (metab_color in Plot_SettingsInfo[ grepl("color_Metab", names(Plot_SettingsInfo))]){
-          if( metab_color %in% colnames(Plot_SettingsFile_Metab)== FALSE){
+          if(metab_color %in% colnames(Plot_SettingsFile_Metab)== FALSE){
             stop("You have chosen color_Metab = ",paste(metab_color), ", ", paste(metab_color)," does not exist in the Plot_SettingsFile_Metab"   )
           }
         }
@@ -2703,7 +2699,7 @@ VizHeatmap <- function(Input_data,
           stop("Check input. Plot_SettingsFile_Sample must contain the same rownames representing the samples as the Input data.")
         }
         for (samp_color in Plot_SettingsInfo[ grepl("color_Sample", names(Plot_SettingsInfo))]){
-          if( samp_color %in% colnames(Plot_SettingsFile_Sample)== FALSE){
+          if(samp_color %in% colnames(Plot_SettingsFile_Sample)== FALSE){
             stop("You have chosen color_Sample = ",paste(samp_color), ", ", paste(samp_color)," does not exist in the Plot_SettingsFile_Sample"   )
           }
         }
