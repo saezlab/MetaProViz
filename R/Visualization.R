@@ -710,7 +710,10 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
                                                   pointSize = 3,
                                                   labSize = 3,
-                                                  titleLabSize = 16,
+                                                  axisLabSize = 10,
+                                                  titleLabSize = 12,
+                                                  subtitleLabSize = 11,
+                                                  captionLabSize = 11,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
@@ -733,6 +736,19 @@ VizVolcano <- function(Plot_Settings="Standard",
           if(is.null(Theme)==FALSE){
             Plot <- Plot+Theme
           }
+
+          # Extract the legend. Returns a gtable
+          #leg <- ggpubr::get_legend(Plot)
+
+          # Convert to a ggplot and print
+          #ggpubr::as_ggplot(leg)
+
+          # Convert the plot to a gtable to extract the legend grob
+          #tmp_gtable <- ggplotGrob(Plot)
+
+          # Find the width and height of the legend grob
+          #legend_width <- sum(tmp_gtable$widths[tmp_gtable$layout$name == "guide-box"])
+          #legend_height <- sum(tmp_gtable$heights[tmp_gtable$layout$name == "guide-box"])
 
           #Add PieChart
           if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
@@ -2593,6 +2609,8 @@ VizLolipop<- function(Plot_Settings="Standard",
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot
 #' @param SCALE \emph{Optional: } String with the information for scale row or column. \strong{Default = row}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
+#' @param enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
+#' @param enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #'
 #' @keywords Volcano plot, pathways
 #' @export
@@ -2606,9 +2624,10 @@ VizHeatmap <- function(Input_data,
                        Plot_SettingsFile_Metab= NULL,
                        OutputPlotName= "",
                        SCALE = "row",
-                       Save_as_Plot = "svg"
+                       Save_as_Plot = "svg",
+                       enforce_FeatureNames= FALSE,
+                       enforce_SampleNames=FALSE
 ){
-
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "writexl","pheatmap")
@@ -2700,7 +2719,6 @@ VizHeatmap <- function(Input_data,
 
   data <- Input_data
 
-
   ## ------------ Create Output folders ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
@@ -2708,7 +2726,6 @@ VizHeatmap <- function(Input_data,
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
   Results_folder_plots_Heatmaps_folder = file.path(Results_folder, "Heatmap")
   if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}  # check and create folder
-
 
   #####################################################
   ## -------------- Plot --------------- ##
@@ -2731,60 +2748,145 @@ VizHeatmap <- function(Input_data,
       col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
       col_annot<- NULL
       if(length(col_annot_vars)>0){
-        for (i in 1:length(col_annot_vars)){
-          annot_sel <- col_annot_vars[[i]]
+        for (x in 1:length(col_annot_vars)){
+          annot_sel <- col_annot_vars[[x]]
 
-          col_annot[i] <- Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
-          names(col_annot)[i] <- annot_sel
+          col_annot[x] <- Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
+          names(col_annot)[x] <- annot_sel
         }
         col_annot<- as.data.frame(col_annot)
-        rownames(col_annot) <- rownames(data)
+        rownames(col_annot) <- rownames(data_path)
       }
 
       # Row annotation
       row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
       row_annot<- NULL
       if(length(row_annot_vars)>0){
-        for (i in 1:length(row_annot_vars)){
-          annot_sel <- row_annot_vars[[i]]
-          row_annot[i] <- Plot_SettingsFile_Metab %>% select(all_of(annot_sel))
+        for (y in 1:length(row_annot_vars)){
+          annot_sel <- row_annot_vars[[y]]
+          row_annot[y] <- Plot_SettingsFile_Metab %>% select(all_of(annot_sel))
           row_annot <- row_annot %>% as.data.frame()
-          names(row_annot)[i] <- annot_sel
+          names(row_annot)[y] <- annot_sel
         }
         rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
       }
 
       #Check number of features:
-      Features <- as.data.frame(t(data_path ))
-      if(nrow(Features)>200){
+      Features <- as.data.frame(t(data_path))
+      if(enforce_FeatureNames==TRUE){
+        show_rownames <- TRUE
+        cellheight_Feature <- 9
+      }else if(nrow(Features)>100){
         show_rownames <- FALSE
+        cellheight_Feature <- 1
       }else{
         show_rownames <- TRUE
+        cellheight_Feature <- 9
+      }
+
+      #Check number of samples
+      if(enforce_SampleNames==TRUE){
+        show_colnames <- TRUE
+        cellwidth_Sample <- 9
+      }else if(nrow(data_path)>50){
+        show_colnames <- FALSE
+        cellwidth_Sample <- 1
+      }else{
+        show_colnames <- TRUE
+        cellwidth_Sample <- 9
       }
 
       # Make the plot
       set.seed(1234)
       heatmap <- pheatmap::pheatmap(t(data_path),
                                     show_rownames = as.logical(show_rownames),
+                                    show_colnames = as.logical(show_colnames),
                                     clustering_method =  "complete",
                                     scale = SCALE,
                                     clustering_distance_rows = "correlation",
                                     annotation_col = col_annot,
                                     annotation_row = row_annot,
+                                    legend = T,
+                                    cellwidth = cellwidth_Sample,
+                                    cellheight = cellheight_Feature,
+                                    fontsize_row= 10,
+                                    fontsize_col = 10,
+                                    fontsize=9,
                                     main = paste(OutputPlotName, i, sep=" " ))
 
       #Width and height according to Sample and metabolite number
-      # 1. Get the legend dimensions from the pheatmap object
-      legend_width <- as.numeric(regmatches(heatmap$gtable$widths[4], gregexpr("[0-9.]+", heatmap$gtable$widths[4]))[[1]])
-      width_cm <- sum((grid::convertX(unit(legend_width[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_width[2], "bigpts"), "cm", valueOnly = TRUE)))
-      legend_height <- as.numeric(regmatches(heatmap$gtable$heights[5], gregexpr("[0-9.]+", heatmap$gtable$heights[5]))[[1]])
-      height_cm <- sum((grid::convertX(unit(legend_height[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_height[2], "bigpts"), "cm", valueOnly = TRUE)))/2
+      #Helper function to understand our plots parameters: gtable::gtable_show_layout(heatmap$gtable)
+      #-------- Height
+      heights <- heatmap[["gtable"]][["heights"]]
 
-      #2. Give value to width and heights
-      plot_width <- (nrow(data_path ) * 0.2) + width_cm
-      plot_height <- (nrow(Features) * 0.3) + height_cm
+      mylist <- list() #create an empty list
+      for (n in 1:length(heights)) {
+        x <-as.character(heights[[n]])
+        y <-regmatches(x, gregexpr("[0-9.]+",x))
+        y <- paste(y[[1]], collapse = ", ")
+        mylist[[n]] <-c(x,y)
+      }
 
-      #Save
+      height_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
+      height_DF$Original <- height_DF$V1
+      height_DF <- height_DF%>%
+        mutate(V2 = strsplit(as.character(V2), ", ")) %>%
+        unnest(V2) %>%
+        mutate(V1 = strsplit(as.character(V1), ",")) %>%
+        unnest(V1)
+      height_DF$keep <- apply(height_DF, 1, function(row){
+        grepl(row["V2"], row["V1"])
+      })
+      height_DF <- height_DF%>%
+        mutate(Unit= case_when(grepl("bigpts", height_DF$V1)  ~ 'bigpts',
+                               grepl("grobheight", height_DF$V1)  ~ 'grobheight',
+                               TRUE ~ 'NA'))%>%
+        subset(keep==TRUE, select = c(2,5))
+      height_DF$Value <- as.numeric(height_DF$V2)
+      height_DF<- height_DF[,c(3,2)] %>%
+        group_by(Unit) %>%
+        summarize(total_value = sum(Value))
+
+      as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2)))
+
+      plot_height <- (grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2) #grobheight*3 (for annotation_row=TRUE), otherwise 1.2
+
+      #-------- Width
+      widths <- heatmap[["gtable"]][["widths"]]
+
+      mylist <- list() #create an empty list
+      for (m in 1:length(widths)) {
+        x <-as.character(widths[[m]])
+        y <-regmatches(x, gregexpr("[0-9.]+",x))
+        y <- paste(y[[1]], collapse = ", ")
+        mylist[[m]] <-c(x,y)
+      }
+
+      width_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
+      width_DF$Original <- width_DF$V1
+      width_DF <- width_DF%>%
+        mutate(V2 = strsplit(as.character(V2), ", ")) %>%
+        unnest(V2) %>%
+        mutate(V1 = strsplit(as.character(V1), ",")) %>%
+        unnest(V1)
+      width_DF$keep <- apply(width_DF, 1, function(row){
+        grepl(row["V2"], row["V1"])
+      })
+      width_DF <- width_DF%>%
+        mutate(Unit= case_when(grepl("bigpts", width_DF$V1)  ~ 'bigpts',
+                               grepl("grobwidth", width_DF$V1)  ~ 'grobwidth',
+                               TRUE ~ 'NA'))%>%
+        subset(keep==TRUE, select = c(2,5))
+      width_DF$Value <- as.numeric(width_DF$V2)
+      width_DF<- width_DF[,c(3,2)] %>%
+        group_by(Unit) %>%
+        summarize(total_value = sum(Value))
+
+      as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2)))
+
+      plot_width <- (grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2)
+
+      #--------Save
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
       ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
 
@@ -2820,35 +2922,120 @@ VizHeatmap <- function(Input_data,
 
     #Check number of features:
     Features <- as.data.frame(t(data))
-    if(nrow(Features)>200){
+    if(enforce_FeatureNames==TRUE){
+      show_rownames <- TRUE
+      cellheight_Feature <- 9
+    }else if(nrow(Features)>100){
       show_rownames <- FALSE
+      cellheight_Feature <- 1
     }else{
       show_rownames <- TRUE
+      cellheight_Feature <- 9
+    }
+
+    #Check number of samples
+    if(enforce_SampleNames==TRUE){
+      show_colnames <- TRUE
+      cellwidth_Sample <- 9
+    }else if(nrow(data)>50){
+      show_colnames <- FALSE
+      cellwidth_Sample <- 1
+    }else{
+      show_colnames <- TRUE
+      cellwidth_Sample <- 9
     }
 
     #Make the plot:
     set.seed(1234)
     heatmap <- pheatmap::pheatmap(t(data),
                                   show_rownames = as.logical(show_rownames),
+                                  show_colnames = as.logical(show_colnames),
                                   clustering_method =  "complete",
                                   scale = SCALE,
                                   clustering_distance_rows = "correlation",
                                   annotation_col = col_annot,
                                   annotation_row = row_annot,
+                                  legend = T,
+                                  cellwidth = cellwidth_Sample,
+                                  cellheight = cellheight_Feature,
+                                  fontsize_row= 10,
+                                  fontsize_col = 10,
+                                  fontsize=9,
                                   main = OutputPlotName)
 
     #Width and height according to Sample and metabolite number
-    # 1. Get the legend dimensions from the pheatmap object
-    legend_width <- as.numeric(regmatches(heatmap$gtable$widths[4], gregexpr("[0-9.]+", heatmap$gtable$widths[4]))[[1]])
-    width_cm <- sum((grid::convertX(unit(legend_width[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_width[2], "bigpts"), "cm", valueOnly = TRUE)))
-    legend_height <- as.numeric(regmatches(heatmap$gtable$heights[5], gregexpr("[0-9.]+", heatmap$gtable$heights[5]))[[1]])
-    height_cm <- sum((grid::convertX(unit(legend_height[1], "npc"), "cm", valueOnly = TRUE)),(grid::convertX(unit(legend_height[2], "bigpts"), "cm", valueOnly = TRUE)))/2
+    #Helper function to understand our plots parameters: gtable::gtable_show_layout(heatmap$gtable)
+    #-------- Height
+    heights <- heatmap[["gtable"]][["heights"]]
 
-    #2. Give value to width and heights
-    plot_width <- (nrow(data) * 0.2) + width_cm
-    plot_height <- (nrow(Features) * 0.3) + height_cm
+    mylist <- list() #create an empty list
+    for (i in 1:length(heights)) {
+      x <-as.character(heights[[i]])
+      y <-regmatches(x, gregexpr("[0-9.]+",x))
+      y <- paste(y[[1]], collapse = ", ")
+      mylist[[i]] <-c(x,y)
+    }
 
-    #Save
+    height_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
+    height_DF$Original <- height_DF$V1
+    height_DF <- height_DF%>%
+      mutate(V2 = strsplit(as.character(V2), ", ")) %>%
+      unnest(V2) %>%
+      mutate(V1 = strsplit(as.character(V1), ",")) %>%
+      unnest(V1)
+    height_DF$keep <- apply(height_DF, 1, function(row){
+      grepl(row["V2"], row["V1"])
+    })
+    height_DF <- height_DF%>%
+      mutate(Unit= case_when(grepl("bigpts", height_DF$V1)  ~ 'bigpts',
+                             grepl("grobheight", height_DF$V1)  ~ 'grobheight',
+                             TRUE ~ 'NA'))%>%
+      subset(keep==TRUE, select = c(2,5))
+    height_DF$Value <- as.numeric(height_DF$V2)
+    height_DF<- height_DF[,c(3,2)] %>%
+      group_by(Unit) %>%
+      summarize(total_value = sum(Value))
+
+    as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2)))
+
+    plot_height <- (grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2) #grobheight*3 (for annotation_row=TRUE), otherwise 1.2
+
+    #-------- Width
+    widths <- heatmap[["gtable"]][["widths"]]
+
+    mylist <- list() #create an empty list
+    for (i in 1:length(widths)) {
+      x <-as.character(widths[[i]])
+      y <-regmatches(x, gregexpr("[0-9.]+",x))
+      y <- paste(y[[1]], collapse = ", ")
+      mylist[[i]] <-c(x,y)
+    }
+
+    width_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
+    width_DF$Original <- width_DF$V1
+    width_DF <- width_DF%>%
+      mutate(V2 = strsplit(as.character(V2), ", ")) %>%
+      unnest(V2) %>%
+      mutate(V1 = strsplit(as.character(V1), ",")) %>%
+      unnest(V1)
+    width_DF$keep <- apply(width_DF, 1, function(row){
+      grepl(row["V2"], row["V1"])
+    })
+    width_DF <- width_DF%>%
+      mutate(Unit= case_when(grepl("bigpts", width_DF$V1)  ~ 'bigpts',
+                             grepl("grobwidth", width_DF$V1)  ~ 'grobwidth',
+                             TRUE ~ 'NA'))%>%
+      subset(keep==TRUE, select = c(2,5))
+    width_DF$Value <- as.numeric(width_DF$V2)
+    width_DF<- width_DF[,c(3,2)] %>%
+      group_by(Unit) %>%
+      summarize(total_value = sum(Value))
+
+    as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2)))
+
+    plot_width <- (grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2)
+
+    #--------Save
     ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
   }
 }
