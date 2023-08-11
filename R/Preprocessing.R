@@ -777,7 +777,7 @@ ReplicateSum <- function(Input_data){
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
 #' @param Therhold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
 #' @param Threshold_SEMean \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Mean ration to the Mean. \strong{Default = 0.1}
-#' @param Threshold_SEMedian \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Median ration to the Mean. \strong{Default = 0.1}
+#' @param Threshold_CQV \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Quantile variation. \strong{Default = 0.1}
 #'
 #' @keywords Coefficient of Variation, Standard Error of the Mean, high variance metabolites
 #' @export
@@ -839,8 +839,8 @@ Pool_Estimation <- function(Input_data,
   if( is.numeric(Threshold_SEMean)== FALSE | Threshold_SEMean < 0){
     stop("Check input. The selected Threshold_SEMean value should be a positive numeric value.")
   }
-  if( is.numeric(Threshold_SEMedian)== FALSE | Threshold_SEMedian < 0){
-    stop("Check input. The selected Threshold_SEMedian value should be a positive numeric value.")
+  if( is.numeric(Threshold_CQV)== FALSE | Threshold_CQV < 0){
+    stop("Check input. The selected Threshold_CQV value should be a positive numeric value.")
   }
 
 
