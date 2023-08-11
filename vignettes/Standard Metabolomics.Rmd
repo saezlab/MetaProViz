@@ -181,8 +181,10 @@ The results from the `Pool_Estimation()` is a table that has the Coefficient of 
 \
 Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned to the global environment and can be easily viewed.\
 ```{r}
-MetaProViz::Preprocessing(Input_data=Intra_M,
-                          Experimental_design=SampleInfo,
+MetaProViz::Preprocessing(Input_data=Intra_M, 
+                          Input_SettingsFile=SampleInfo,
+                          Input_SettingsInfo = c(Conditions = "Conditions",
+                                     Biological_Replicates = "Biological_Replicates"),
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value = 0.8,
                           TIC_Normalization = TRUE,# As we have raw data we will perform total ion count normalisation

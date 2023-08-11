@@ -22,15 +22,16 @@
 #' Applies 80%-filtering rule, total-ion count normalisation, missing value imputation and HotellingT2 outlier detection
 #'
 #' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Experimental_design input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}
+#' @param Input_SettingsFile DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
+#' @param Input_SettingsInfo  NULL or Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For CoRe = TRUE a CoRe_norm_factor = "Columnname_Input_SettingsFile" and CoRe_media = "Columnname_Input_SettingsFile", have to also be added. Column CoRe_norm_factor is used for normalization and CoRe_media is used to specify the name of the media controls in the Conditions.
+#' @param Feature_Filtering \emph{Optional: }If set to "None" then no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}
 #' @param Feature_Filt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
 #' @param TIC_Normalization \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
 #' @param MVI \emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
 #' @param MVI_Percentage \emph(Optional: ) Percentage (0 to 100)of imputed value based on the minimum value. \strong{Default = 50}
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
-#' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Experimental_design" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "blank" samples in the "Conditions" column in the "Experimental_design" DF. \strong{Default = FALSE}
+#' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
@@ -43,7 +44,8 @@
 
 
 Preprocessing <- function(Input_data,
-                          Experimental_design,
+                          Input_SettingsFile,
+                          Input_SettingsInfo,
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value = 0.8,
                           TIC_Normalization = TRUE,
@@ -62,6 +64,7 @@ Preprocessing <- function(Input_data,
                         "qcc", # for hotelling plots
                         "ggplot2", # For visualization PCA
                         "hash", # Dictionary in R for making column of outliers
+                        "reshape", # for melting df for anova
                         "inflection")# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -71,7 +74,7 @@ Preprocessing <- function(Input_data,
   ## ------------------ Run ------------------- ##
 
   #######################################################################################
-  ### ### ### Check Input Information and add Experimental_design information ### ### ###
+  ### ### ### Check Input Information and add Input_SettingsFile information ### ### ###
 
   #1.  Input data
   if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
@@ -81,41 +84,77 @@ Preprocessing <- function(Input_data,
     if((any(Test_num) ==  FALSE) ==  TRUE){
       stop("Input_data needs to be of class numeric")
     } else{
-      Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
+      Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
       if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Experimental_design.")
+        stop("row.names Input_data need to match row.names Input_SettingsFile.")
       } else(
         Input_data <- Input_data
       )
     }
   }
 
-  #2. Conditions
-  if ( "Conditions" %in% colnames(Experimental_design)){   # Parse Condition and Replicate information
-    Conditions <- Experimental_design$Conditions
-  }else{
-    Conditions <- NULL
+  #2. The Input_settings: Input_SettingInfo and Input_SettingFile
+  if(is.vector(Input_SettingsInfo)==TRUE & is.null(Input_SettingsFile)==TRUE){
+    stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
+  }
+  if(is.null(Input_SettingsInfo)==TRUE & is.null(Input_SettingsFile)==FALSE){
+    warning("You have added a Plot_SettingsFile DF but the Plot_SettingsInfo option is empty. If you want to preprocess based some experimental condition please specify it in the Input_SettingsInfo.")
+  }
+  if(is.null(Input_SettingsInfo)==TRUE & is.null(Input_SettingsFile)==TRUE){
+    message("No Input_Settings have been added.")
+  }
+
+  if(is.vector(Input_SettingsInfo)==TRUE){
+    if ( "Conditions" %in% names(Input_SettingsInfo)){
+      if(Input_SettingsInfo[["Conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
+        stop("The ",Input_SettingsInfo[["Conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      }else{# if true rename to Conditions
+        Input_SettingsFile<- Input_SettingsFile%>%
+          dplyr::rename("Conditions"= paste(Input_SettingsInfo[["Conditions"]]) )
+      }
+    }
+
+    if ( "Biological_Replicates" %in% names(Input_SettingsInfo)){
+      if(Input_SettingsInfo[["Biological_Replicates"]] %in% colnames(Input_SettingsFile)== FALSE){
+        stop("The ",Input_SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      }else{# if true rename to Conditions
+        Input_SettingsFile<- Input_SettingsFile%>%
+          dplyr::rename("Biological_Replicates"= paste(Input_SettingsInfo[["Biological_Replicates"]]) )
+      }
+    }
   }
 
   #3. Core parameters
   if (CoRe ==  TRUE){   # parse CoRe normalisation factor
     message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
-    if ("CoRe_norm_factor" %in% colnames(Experimental_design)){
-      CoRe_norm_factor <- Experimental_design$CoRe_norm_factor
+    if ("CoRe_media" %in% names(Input_SettingsInfo)){
+      Input_SettingsFile <- Input_SettingsFile %>%
+        mutate(Conditions = ifelse(Conditions == paste(Input_SettingsInfo[["CoRe_media"]]), "CoRe_media", Conditions))
+      }
+
+    if(length(grep("CoRe_media", Input_SettingsFile$Conditions)) < 1){     # Check for CoRe_media samples
+      stop("No CoRe_media samples were provided in the 'Conditions' in the Experimental design'. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
+           column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = FALSE for your analysis")
+    }
+    if ("CoRe_norm_factor" %in% names(Input_SettingsInfo)){
+      Input_SettingsFile<- Input_SettingsFile%>%
+        dplyr::rename("CoRe_norm_factor"= paste(Input_SettingsInfo[["CoRe_norm_factor"]]) )
+      CoRe_norm_factor <-   Input_SettingsFile %>% filter(Conditions!="CoRe_media") %>% select(CoRe_norm_factor) %>%pull()
+
     }else{
       warning("No growth rate or growth factor provided for normalising the CoRe result, hence CoRe_norm_factor set to 1 for each sample")
-      CoRe_norm_factor <- as.numeric(rep(1,length(Experimental_design$Conditions)))
-    }
-    if (length(CoRe_norm_factor) !=  length(Experimental_design$Conditions)){ # Check is the length of normalization factor and conditions in 1 to 1
-      stop("The CoRe_norm_factor length is different from the amount of samples. Please input a vector with a value for each sample. Blanks should take a value of 1.")
-    }
-    if(length(grep("blank", Conditions)) < 1){     # Check for blank samples
-      stop("No blank samples were provided in the 'Conditions' in the Experimental design'. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
-           column labeled as 'blank' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = FALSE for your analysis")
+      CoRe_norm_factor <- as.numeric(rep(1,dim(Input_SettingsFile %>% filter(Conditions!="CoRe_media"))[1]))
     }
   }
 
-  #4. General parameters
+  #4. Parse Conditions
+  if ( "Conditions" %in% colnames(Input_SettingsFile)){   # Parse Condition and Replicate information
+    Conditions <- Input_SettingsFile$Conditions
+  }else{
+    Conditions <- NULL
+  }
+
+  #5. General parameters
   Feature_Filtering_options <- c("Standard","Modified", "none")
   if(Feature_Filtering %in% Feature_Filtering_options == FALSE ){
     stop("Check input. The selected Feature_Filtering option is not valid. Please select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
@@ -171,7 +210,7 @@ Preprocessing <- function(Input_data,
   #message("Feature filtering is performed to reduce missing values that can bias the analysis and cause methods to underperform, which leads to low precision in the statistical analysis. REF: Steuer et. al. (2007), Methods Mol Biol. 358:105-26., doi:10.1007/978-1-59745-244-1_7.")
   #Prepare data:
   Input_data <- replace(Input_data, Input_data==0, NA)
-  Original_Experimental_design<-Experimental_design
+  Original_Input_SettingsFile<-Input_SettingsFile
 
   #Perfrom filtering as selected
   if (Feature_Filtering ==  "Modified"){
@@ -179,10 +218,10 @@ Preprocessing <- function(Input_data,
     message(paste("filtering value selected:", Feature_Filt_Value))
 
     feat_filt_data <- as.data.frame(Input_data)
-    feat_filt_Conditions <- Conditions[!Experimental_design$Conditions=="blank"]
+    feat_filt_Conditions <- Conditions[!Input_SettingsFile$Conditions=="CoRe_media"]
 
-    if(CoRe== TRUE){ # remove blank samples for feature filtering
-      feat_filt_data <- feat_filt_data %>% filter(!Experimental_design$Conditions=="blank")
+    if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Input_SettingsFile$Conditions=="CoRe_media")
     }
 
     if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
@@ -222,8 +261,8 @@ Preprocessing <- function(Input_data,
 
     feat_filt_data <- as.data.frame(Input_data)
 
-    if(CoRe== TRUE){ # remove blank samples for feature filtering
-      feat_filt_data <- feat_filt_data %>% filter(!Experimental_design$Conditions=="blank")
+    if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Input_SettingsFile$Conditions=="CoRe_media")
     }
 
     split_Input <- feat_filt_data
@@ -252,39 +291,60 @@ Preprocessing <- function(Input_data,
     filtered_matrix <- as.data.frame(Input_data)
   }
 
-  filtered_matrix <- as.matrix(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
+  filtered_matrix <- as.data.frame(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
+
 
 
   ################################################
   ### ### ### Missing value Imputation ### ### ###
 
+  # Do MVI for control media samples
+  if(CoRe==TRUE){
+    replaceNAdf <- filtered_matrix%>% filter( Input_SettingsFile$Conditions=="CoRe_media")
+
+    # find metabolites with NA
+    na_percentage <- colMeans(is.na(replaceNAdf)) * 100
+    highNA_metabs <- na_percentage[na_percentage>20]
+
+    # report metabolites with NA
+    if(sum(na_percentage)>0){
+      message("NA values were found in Control_media samples for metabolites.")
+      if(sum(na_percentage>20)>0){
+        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+    }
+    # if all values are NA set to 0
+    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    # If there is at least 1 value use the half minimum per feature
+    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    return(x)
+    }) %>% as.data.frame()
+
+    # replace the samples in the original dataframe
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+  }
+
+  # Do MVI for the samples
   if (MVI ==  TRUE){
     message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
 
     NA_removed_matrix <- filtered_matrix %>% as.data.frame()
-    global_min_value <- min(filtered_matrix, na.rm = TRUE)/2
     for (feature  in colnames(NA_removed_matrix)){
-      # feature  <- colnames(NA_removed_matrix)[32]
-      feature_data <- merge(NA_removed_matrix[feature] , Experimental_design %>% select(Conditions), by= 0)
+      feature_data <- merge(NA_removed_matrix[feature] , Input_SettingsFile %>% select(Conditions), by= 0)
       feature_data <-column_to_rownames(feature_data, "Row.names")
 
       imputed_feature_data <- feature_data %>%
         group_by(Conditions) %>%
         mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
 
-      # Replace all inf valus with half min of the whole dataset
-      imputed_feature_data[ is.infinite( imputed_feature_data[[feature]]),feature] <- global_min_value
-
       NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
     }
-
 
   } else if(MVI == FALSE){
     message("Missing value imputation is not performed.")
     stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
     NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
   }
-
 
   #######################################################
   ### ### ### Total Ion Current Normalization ### ### ###
@@ -303,11 +363,11 @@ Preprocessing <- function(Input_data,
   }
 
   if (CoRe ==  TRUE){
-    blanks <-  Data_TIC[grep("blank", Conditions),]
-    if(dim(blanks)[1]==1){
-      warning("Only 1 blank sample was found. Thus the consistency of the blank samples cannot be checked. We assume this was done beforehand and the blank samples were summed ")
-      blank_df <- blanks %>% t() %>% as.data.frame()
-      colnames(blanks) <- "blankMeans"
+    CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+    if(dim(CoRe_medias)[1]==1){
+      warning("Only 1 CoRe_media sample was found. Thus, the consistency of the CoRe_media samples cannot be checked. We assume this was done beforehand and the CoRe_media samples are already summed.")
+      CoRe_media_df <- CoRe_medias %>% t() %>% as.data.frame()
+      colnames(CoRe_medias) <- "CoRe_mediaMeans"
 
     }else{
 
@@ -317,24 +377,25 @@ Preprocessing <- function(Input_data,
       Threshold_SEMean = 0.1
 
       ## Coefficient of Variation
-      CV_data <- blanks
-      result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
+      CV_data <- CoRe_medias
+      result_df <- apply(CV_data, 2,  function(x) { sd(x)/  mean(x) }  ) %>% t()%>% as.data.frame()
       rownames(result_df)[1] <- "CV"
 
-      ## Standard Error of Mean/median
-      SE_data <- log10(blanks) %>% as.data.frame()
-
-      # remove zero variance and non mumerix
-      zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
-      SE_data <- SE_data[,!zero_var_features]
+      ## Standard Error of Mean
+      SE_data <- log10(CoRe_medias) %>% as.data.frame()
+      # remove zero variance and non mumeric values
+      zero_var_features<- as.vector(sapply(SE_data, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
+      zero_var_features[is.na(zero_var_features)] <- TRUE
+      if( sum(zero_var_features)>0){
+        SE_data <- SE_data[,!zero_var_features]
+      }
       # make shapiro test
       shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
       shaptestres <- as.data.frame(t(shaptestres))
-
-      # Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
-      # NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
-      # # Do we need to report this again ?
-      # message(Norm, " % of the blank samples metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+      Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+      NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+      # Do we need to report this again ?
+      message(Norm, " % of the CoRe_media samples metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
 
       # Mean
       SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
@@ -346,31 +407,31 @@ Preprocessing <- function(Input_data,
                SEMean_high_var = SEMean > Threshold_SEMean) %>%
         mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
                                            TRUE ~ FALSE)) %>% as.data.frame()
-      rownames(result_df_final)<- colnames(blanks)
+      rownames(result_df_final)<- colnames(CoRe_medias)
 
       high_var_metabs <- sum(result_df_final$High_var_Metabs == TRUE)
       if(high_var_metabs>0){
-        message(paste0(high_var_metabs, " of variables have high variability in the blank samples. Please  consider checking the pooled samples to decide whether to remove these metabolites or not."))
+        message(paste0(high_var_metabs, " of variables have high variability in the CoRe_media samples. Please  consider checking the pooled samples to decide whether to remove these metabolites or not."))
       }
-      blank_df <- as.data.frame(data.frame("blankMeans"=  colMeans( blanks)))
+      CoRe_media_df <- as.data.frame(data.frame("CoRe_mediaMeans"=  colMeans( CoRe_medias)))
     }
 
     # Do sample outlier testing  #### MISSING STILL
-    # if(dim(blanks)[1]>3){
+    # if(dim(CoRe_medias)[1]>3){
     #   # We use anova to see if any wample i
     # }
 
-    Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-blank_df$blankMeans)))  #Subtract from each sample the blank mean
+    Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-CoRe_media_df$CoRe_mediaMeans)))  #Subtract from each sample the CoRe_media mean
     message("CoRe data are normalised using CoRe_norm_factor")
     Data_TIC <- apply(Data_TIC_CoRe, 2, function(i) i*CoRe_norm_factor)
 
     if (var(CoRe_norm_factor) ==  0){
       warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
     }
-    # Remove blank samples from the data
-    Data_TIC <- Data_TIC[Experimental_design$Conditions!="blank",]
-    Experimental_design <- Experimental_design[Experimental_design$Conditions!="blank",]
-    Conditions <- Conditions[!Conditions=="blank"]
+    # Remove CoRe_media samples from the data
+    Data_TIC <- Data_TIC[Input_SettingsFile$Conditions!="CoRe_media",]
+    Input_SettingsFile <- Input_SettingsFile[Input_SettingsFile$Conditions!="CoRe_media",]
+    Conditions <- Conditions[!Conditions=="CoRe_media"]
   }
   data_norm <- Data_TIC %>% as.data.frame()
 
@@ -596,7 +657,7 @@ Preprocessing <- function(Input_data,
   }
 
   data_norm_filtered_full <- data_norm_filtered_full %>% relocate(Outliers) #Put Outlier columns in the front
-  data_norm_filtered_full <- merge(Experimental_design, data_norm_filtered_full,  by = 0) # add the design in the output df (merge by rownames/sample names)
+  data_norm_filtered_full <- merge(Input_SettingsFile, data_norm_filtered_full,  by = 0) # add the design in the output df (merge by rownames/sample names)
   rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
   data_norm_filtered_full$Row.names <- c()
 
@@ -604,9 +665,9 @@ Preprocessing <- function(Input_data,
   ### ### ### Quality Control (QC) PCA ### ### ###
 
   QC_PCA_data <- Data_TIC %>% as.data.frame()
-  QC_PCA_data$Conditions <- Experimental_design$Conditions
-  if (is.null(Experimental_design$Biological_Replicates) != TRUE){
-    QC_PCA_data$Biological_Replicates <-  as.character(Experimental_design$Biological_Replicates)
+  QC_PCA_data$Conditions <- Input_SettingsFile$Conditions
+  if (is.null(Input_SettingsFile$Biological_Replicates) != TRUE){
+    QC_PCA_data$Biological_Replicates <-  as.character(Input_SettingsFile$Biological_Replicates)
   }
   pca.obj <- prcomp(Data_TIC, center = TRUE, scale. = TRUE)
 
@@ -638,10 +699,10 @@ Preprocessing <- function(Input_data,
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
   }
 
-  if(is.null(Experimental_design$Biological_Replicates)!= TRUE){
+  if(is.null(Input_SettingsFile$Biological_Replicates)!= TRUE){
     ### ### QC PCA color for replicates
     pca_QC_repl <- ggplot(data = dtp) +
-      geom_point(aes(x = PC1, y = PC2, colour = Experimental_design$Conditions, shape = as.factor(Experimental_design$Biological_Replicates)), size = 4, alpha = 0.8) +
+      geom_point(aes(x = PC1, y = PC2, colour = Input_SettingsFile$Conditions, shape = as.factor(Input_SettingsFile$Biological_Replicates)), size = 4, alpha = 0.8) +
       ggtitle("Quality Control PCA replicate spread check")+
       theme_classic()+
       geom_hline(yintercept = 0,  color = "black", linewidth = 0.1)+
@@ -663,7 +724,7 @@ Preprocessing <- function(Input_data,
   ### ### ###  Make list with output dataframes ### ### ###
 
   output_list <- list()  #Here we make a list in which we will save the output
-  preprocessing_output_list <- list(Experimental_design = Original_Experimental_design, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
+  preprocessing_output_list <- list(Input_SettingsFile = Original_Input_SettingsFile, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
 
   ##Write to file
   preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe
@@ -742,8 +803,8 @@ ReplicateSum <- function(Input_data){
 
   # Make the replicate Sums
   Input_data_numeric_summed <- as.data.frame( Input_data_numeric %>%
-                                             group_by(Biological_Replicates, Conditions) %>%
-                                             summarise_all("mean") %>% select(-Analytical_Replicates))
+                                                group_by(Biological_Replicates, Conditions) %>%
+                                                summarise_all("mean") %>% select(-Analytical_Replicates))
 
   # Make a number of merged replicates column
   nReplicates <-  Input_data_numeric %>%
@@ -870,7 +931,6 @@ Pool_Estimation <- function(Input_data,
     Input_numeric <- pool_data
   }
 
-
   ## Coefficient of Variation
   CV_data <- Input_numeric
   result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
@@ -883,7 +943,10 @@ Pool_Estimation <- function(Input_data,
 
   # remove zero variance and non mumerix
   zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
-  SE_data <- SE_data[,!zero_var_features]
+  zero_var_features[is.na(zero_var_features)] <- TRUE
+  if( sum(zero_var_features)>0){
+    SE_data <- SE_data[,!zero_var_features]
+  }
   # make shapiro test
   shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
   shaptestres <- as.data.frame(t(shaptestres))

@@ -163,7 +163,10 @@ Now we will apply the `Preprocessing()` function to example data and have a look
 \
 ```{r, eval=FALSE}
 MetaProViz::Preprocessing(Input_data=Media_M,
-                          Experimental_design=SampleInfo,
+              Input_SettingsFile=SampleInfo,
+              Input_SettingsInfo = c(Conditions = "Conditions",
+                                     Biological_Replicates = "Biolgical_Replicates",
+                                     CoRe_media = "blank"),
                           Feature_Filtering = "Modified",
                           Feature_Filt_Value = 0.8,
                           TIC_Normalization = TRUE,# As we have raw data we will perform total ion count normalisation
