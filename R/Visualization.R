@@ -296,7 +296,6 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
 #' @param pCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
 #' @param FCcutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param Legend \emph{Optional: } Legend=="Pie" will plot a PieChart as the legend for color or Legend="Standard, plot the standard legend for color. \strong{Default = "Standard"}
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
@@ -322,7 +321,6 @@ VizVolcano <- function(Plot_Settings="Standard",
                        ylab= NULL,#"~-Log[10]~p.adj"
                        pCutoff= 0.05,
                        FCcutoff= 0.5,
-                       Legend="Standard",
                        color_palette= NULL,
                        shape_palette=NULL,
                        Connectors=  FALSE,
@@ -476,7 +474,7 @@ VizVolcano <- function(Plot_Settings="Standard",
     xlab <- bquote(.(as.symbol(xlab)))
     }
 
-  if(is.null(xlab)==TRUE){#use column name of x provided by user
+  if(is.null(ylab)==TRUE){#use column name of x provided by user
     ylab <- bquote(.(as.symbol(y)))
     }else if(is.null(ylab)==FALSE){
       ylab <- bquote(.(as.symbol(ylab)))
@@ -510,39 +508,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
         if(nrow(InputVolcano)>=1){
 
-          #Prepare the colour scheme:
-          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
-            #Prepare Summary to make PieChart
-            color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
-
-            Summary <- InputVolcano %>%
-              group_by(InputVolcano$color) %>%
-              summarise(percent = round(100 * n() / nrow(InputVolcano))) %>%
-              mutate(csum = rev(cumsum(rev(percent))),
-                     pos = percent/2 + lead(csum, 1),
-                     pos = if_else(is.na(pos), percent/2, pos))%>%
-              rename("Group"=1)
-            Summary$Label <- paste(Summary$Group, " (", Summary$percent, "%)")
-            Summary$Palette <- color_select
-
-            #Make PieChart
-            PieChart <- ggplot(Summary, aes(x="", y=percent, fill=Label))+
-              geom_col(width = 1, color = 1, alpha=0.7) +
-              coord_polar(theta = "y") +
-              scale_fill_manual(values=Summary$Palette)+
-              ggrepel::geom_label_repel(data = Summary,
-                               aes(y = pos, label = paste0(Group, " (", percent, "%)")),
-                               size = 3.5, nudge_x = 1, show.legend = FALSE, fill = "white") +
-              guides(fill = guide_legend(title = "Group")) +
-              theme_void()+
-              theme(legend.position = "none")
-
-            #Assign LegendParameter for EnahncedVolcano:
-            LegendPos<- "none"
-          } else if(Legend=="Standard"){
-            LegendPos<- "right"
-          }
-          if("color" %in% names(Plot_SettingsInfo)==TRUE){
+          if("color" %in% names(Plot_SettingsInfo)==TRUE ){
             color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -551,6 +517,8 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(col) <- InputVolcano$color[row]
               keyvals <- c(keyvals, col)
             }
+
+            LegendPos<- "right"
           } else{
             keyvals <-NULL
           }
@@ -564,11 +532,16 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(sha) <- InputVolcano$shape[row]
               keyvalsshape <- c(keyvalsshape, sha)
             }
-            #Assign LegendParameter for EnahncedVolcano:
+
             LegendPos<- "right"
           } else{
             keyvalsshape <-NULL
           }
+
+          if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
+            LegendPos<- "none"
+          }
+
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                   lab = InputVolcano$Metabolite,#Metabolite name
@@ -580,13 +553,16 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
                                                   pointSize = 3,
                                                   labSize = 3,
-                                                  titleLabSize = 16,
+                                                  axisLabSize = 10,
+                                                  titleLabSize = 12,
+                                                  subtitleLabSize = 11,
+                                                  captionLabSize = 10,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
-                                                  caption = paste0("total = ", nrow(InputVolcano), " Metabolites"),
+                                                  caption = paste0("Total = ", nrow(InputVolcano), " Metabolites"),
                                                   xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                   cutoffLineType = "dashed",
@@ -604,25 +580,146 @@ VizVolcano <- function(Plot_Settings="Standard",
             Plot <- Plot+Theme
           }
 
-          #Add PieChart
-          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
-            Plot <- Plot+ annotation_custom(
-              grob = ggplotGrob(PieChart),
-              xmin = (max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+0.2), xmax =(max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.5),
-              ymin = ((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))+0.5), ymax =((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))-1.5)
-            )
+          #------- Set the total heights and widths
+          #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
+          plottable<- ggplot2::ggplotGrob(Plot) # Convert the plot to a gtable
+
+          if(is.null(keyvals)==TRUE & is.null(keyvalsshape)==TRUE){
+            #-----widths
+            plottable$widths[5] <- unit(6, "cm")#controls x-axis
+            plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+            plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+            plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+            plottable$widths[c(10)] <- unit(5,"cm")#controls margins --> Figure legend
+            plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
+            plot_widths <- 15.5
+
+            #-----heigths
+            plottable$heights[7] <- unit(8, "cm")#controls x-axis
+            plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+            plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+            plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+
+            if(OutputPlotName=="" & Subtitle==""){
+              plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+              plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+              plot_heights <- 10.5
+            } else{
+              plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+              plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+              plot_heights <-11
+            }
+          }else if(is.null(keyvals)==FALSE & is.null(keyvalsshape)==FALSE){
+            #------- Legend heights
+            Legend <- ggpubr::get_legend(Plot) # Extract legend to adjust separately
+            Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
+
+            #-----Plot widths
+            plottable$widths[5] <- unit(6, "cm")#controls x-axis
+            plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+            plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+            plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+            plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+            Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+            plot_widths <- 10.5+Value
+
+            #-----Plot heigths
+            plottable$heights[7] <- unit(8, "cm")#controls x-axis
+            plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+            plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+            plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+            if(OutputPlotName=="" & Subtitle==""){
+              plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+              plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+              if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-10.5)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 10.5
+              }
+            } else{#If we do have Title and or subtitle
+              plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+              plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+              if(Legend_heights>11){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-11)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 11
+              }
+            }
+          }else if(is.null(keyvals)==FALSE | is.null(keyvalsshape)==FALSE){
+            #------- Legend heights
+            Legend <- ggpubr::get_legend(Plot) # Extract legend to adjust separately
+            Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
+
+            #----- Plot widths
+            plottable$widths[5] <- unit(6, "cm")#controls x-axis
+            plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+            plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+            plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+            plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+            Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+            plot_widths <- 10.5+Value
+
+            #-----Plot heigths
+            plottable$heights[7] <- unit(8, "cm")#controls x-axis
+            plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+            plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+            plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+            if(OutputPlotName=="" & Subtitle==""){
+              plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+              plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+              if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-10.5)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 10.5
+              }
+            }else{#If we do have Title and or subtitle
+              plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+              plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+              if(Legend_heights>11){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-11)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 11
+              }
+            }
           }
+
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
           if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=plottable, width=plot_widths, height=plot_heights, unit="cm")
           }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=plottable, width=plot_widths, height=plot_heights, unit="cm")
           }
           ## Store the plot in the 'plots' list
-          PlotList[[cleaned_i]] <- Plot
-          plot(Plot)
+          PlotList[[cleaned_i]] <- plottable
+          plot(plottable)
         }
       }
       # Return PlotList into the environment to enable the user to view the plots directly
@@ -638,37 +735,6 @@ VizVolcano <- function(Plot_Settings="Standard",
             }
 
         if(nrow(InputVolcano)>=1){
-          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
-            #Prepare Summary to make PieChart
-            color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
-
-            Summary <- InputVolcano %>%
-              group_by(InputVolcano$color) %>%
-              summarise(percent = round(100 * n() / nrow(InputVolcano))) %>%
-              mutate(csum = rev(cumsum(rev(percent))),
-                     pos = percent/2 + lead(csum, 1),
-                     pos = if_else(is.na(pos), percent/2, pos))%>%
-              rename("Group"=1)
-            Summary$Label <- paste(Summary$Group, " (", Summary$percent, "%)")
-            Summary$Palette <- color_select
-
-            #Make PieChart
-            PieChart <- ggplot(Summary, aes(x="", y=percent, fill=Label))+
-              geom_col(width = 1, color = 1, alpha=0.7) +
-              coord_polar(theta = "y") +
-              scale_fill_manual(values=Summary$Palette)+
-              ggrepel::geom_label_repel(data = Summary,
-                                        aes(y = pos, label = paste0(Group, " (", percent, "%)")),
-                                        size = 3.5, nudge_x = 1, show.legend = FALSE, fill = "white") +
-              guides(fill = guide_legend(title = "Group")) +
-              theme_void()+
-              theme(legend.position = "none")
-
-            #Assign LegendParameter for EnahncedVolcano:
-            LegendPos<- "none"
-          } else if(Legend=="Standard"){
-            LegendPos<- "right"
-          }
           if("color" %in% names(Plot_SettingsInfo)==TRUE ){
             color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
 
@@ -678,6 +744,8 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(col) <- InputVolcano$color[row]
               keyvals <- c(keyvals, col)
             }
+
+            LegendPos<- "right"
           } else{
             keyvals <-NULL
           }
@@ -691,11 +759,16 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(sha) <- InputVolcano$shape[row]
               keyvalsshape <- c(keyvalsshape, sha)
             }
-            #Assign LegendParameter for EnahncedVolcano:
-            LegendPos<- "top"
+
+            LegendPos<- "right"
           } else{
             keyvalsshape <-NULL
           }
+
+          if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
+            LegendPos<- "none"
+          }
+
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                   lab = InputVolcano$Metabolite,#Metabolite name
@@ -710,13 +783,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   axisLabSize = 10,
                                                   titleLabSize = 12,
                                                   subtitleLabSize = 11,
-                                                  captionLabSize = 11,
+                                                  captionLabSize = 10,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
                                                   title= paste(OutputPlotName),
                                                   subtitle = Subtitle,
-                                                  caption = paste0("total = ", nrow(InputVolcano), " Metabolites"),
+                                                  caption = paste0("Total = ", nrow(InputVolcano), " Metabolites"),
                                                   xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                   cutoffLineType = "dashed",
@@ -724,7 +797,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   cutoffLineWidth = 0.5,
                                                   legendLabels=c(paste(x," < |", FCcutoff, "|"), paste(x," > |", FCcutoff, "|"), paste(y, ' < ', pCutoff) , paste(y, ' < ', pCutoff,' & ',x," < |", FCcutoff, "|")),
                                                   legendPosition = LegendPos,
-                                                  legendLabSize = 7,
+                                                  legendLabSize = 9,
                                                   legendIconSize =4,
                                                   gridlines.major = FALSE,
                                                   gridlines.minor = FALSE,
@@ -734,36 +807,143 @@ VizVolcano <- function(Plot_Settings="Standard",
             Plot <- Plot+Theme
           }
 
-          # Extract the legend. Returns a gtable
-          #leg <- ggpubr::get_legend(Plot)
+          #------- Set the total heights and widths
+          #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
+          plottable<- ggplot2::ggplotGrob(Plot) # Convert the plot to a gtable
 
-          # Convert to a ggplot and print
-          #ggpubr::as_ggplot(leg)
+          if(is.null(keyvals)==TRUE & is.null(keyvalsshape)==TRUE){
+            #-----widths
+            plottable$widths[5] <- unit(6, "cm")#controls x-axis
+            plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+            plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+            plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+            plottable$widths[c(10)] <- unit(5,"cm")#controls margins --> Figure legend
+            plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
+            plot_widths <- 15.5
 
-          # Convert the plot to a gtable to extract the legend grob
-          #tmp_gtable <- ggplotGrob(Plot)
+            #-----heigths
+            plottable$heights[7] <- unit(8, "cm")#controls x-axis
+            plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+            plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+            plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
 
-          # Find the width and height of the legend grob
-          #legend_width <- sum(tmp_gtable$widths[tmp_gtable$layout$name == "guide-box"])
-          #legend_height <- sum(tmp_gtable$heights[tmp_gtable$layout$name == "guide-box"])
+            if(OutputPlotName=="" & Subtitle==""){
+              plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+              plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+              plot_heights <- 10.5
+            } else{
+              plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+              plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+              plot_heights <-11
+              }
+          }else if(is.null(keyvals)==FALSE & is.null(keyvalsshape)==FALSE){
+            #------- Legend heights
+            Legend <- ggpubr::get_legend(Plot) # Extract legend to adjust separately
+            Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
 
-          #Add PieChart
-          if("color" %in% names(Plot_SettingsInfo)==TRUE & Legend=="Pie"){
-            Plot <- Plot+ annotation_custom(
-              grob = ggplotGrob(PieChart),
-              xmin = (max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC)])+0.2), xmax =(max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC)])+1.5),
-              ymin = ((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))+0.5), ymax =((ceiling(-log10(Reduce(min,InputVolcano$p.adj))))-1.5)
-            )
-          }
+            #-----Plot widths
+            plottable$widths[5] <- unit(6, "cm")#controls x-axis
+            plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+            plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+            plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+            plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+            Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+            plot_widths <- 10.5+Value
+
+            #-----Plot heigths
+            plottable$heights[7] <- unit(8, "cm")#controls x-axis
+            plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+            plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+            plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+            if(OutputPlotName=="" & Subtitle==""){
+              plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+              plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+              if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-10.5)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 10.5
+              }
+              } else{#If we do have Title and or subtitle
+              plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+              plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+              if(Legend_heights>11){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-11)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 11
+              }
+            }
+            }else if(is.null(keyvals)==FALSE | is.null(keyvalsshape)==FALSE){
+              #------- Legend heights
+              Legend <- ggpubr::get_legend(Plot) # Extract legend to adjust separately
+              Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
+
+              #----- Plot widths
+              plottable$widths[5] <- unit(6, "cm")#controls x-axis
+              plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+              plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+              plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+              plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+              Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+              plot_widths <- 10.5+Value
+
+              #-----Plot heigths
+              plottable$heights[7] <- unit(8, "cm")#controls x-axis
+              plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+              plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+              plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+             if(OutputPlotName=="" & Subtitle==""){
+              plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+              plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+              if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-10.5)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 10.5
+              }
+            }else{#If we do have Title and or subtitle
+              plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+              plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+              if(Legend_heights>11){#If the legend requires more heights than the Plot
+                Add <- (Legend_heights-11)/2
+                plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- Legend_heights
+              }else{
+                plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+                plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+                plot_heights <- 11
+              }
+            }
+            }
 
           #save plot and get rid of extra signs before saving
           if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=plottable, width=plot_widths, height=plot_heights, unit="cm")
           }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot, width=8, height=6)
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=plottable, width=plot_widths, height=plot_heights, unit="cm")
           }
           #Plot
-          plot(Plot)
+          plot(plottable)
         }
       }
   #####--- 2. Condition
@@ -843,13 +1023,16 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
                                                   pointSize = 3,
                                                   labSize = 3,
-                                                  titleLabSize = 16,
+                                                  axisLabSize = 10,
+                                                  titleLabSize = 12,
+                                                  subtitleLabSize = 11,
+                                                  captionLabSize = 10,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
-                                                  caption = paste0("total = ", (nrow(InputVolcano)/2), " Metabolites"),
+                                                  caption = paste0("Total = ", (nrow(InputVolcano)/2), " Metabolites"),
                                                   xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                   cutoffLineType = "dashed",
@@ -953,13 +1136,16 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
-                                                titleLabSize = 16,
+                                                axisLabSize = 10,
+                                                titleLabSize = 12,
+                                                subtitleLabSize = 11,
+                                                captionLabSize = 10,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
                                                 title= paste(OutputPlotName),
                                                 subtitle = Subtitle,
-                                                caption = paste0("total = ", (nrow(InputVolcano)/2), " Metabolites"),
+                                                caption = paste0("Total = ", (nrow(InputVolcano)/2), " Metabolites"),
                                                 xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                 cutoffLineType = "dashed",
@@ -1040,13 +1226,16 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 FCcutoff = FCcutoff,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
-                                                titleLabSize = 16,
+                                                axisLabSize = 10,
+                                                titleLabSize = 12,
+                                                subtitleLabSize = 11,
+                                                captionLabSize = 10,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
                                                 title= paste(OutputPlotName, ": ", i, sep=""),
                                                 subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
-                                                caption = paste0("total = ", nrow(InputVolcano), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
+                                                caption = paste0("Total = ", nrow(InputVolcano), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
                                                 xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                 cutoffLineType = "dashed",
