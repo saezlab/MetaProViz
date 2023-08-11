@@ -167,7 +167,7 @@ Pool_Estimation(Input_data = PoolData,
                 Unstable_feature_remove = FALSE, 
                 Therhold_cv = 1, 
                 Threshold_SEMean = 0.1,
-                Threshold_SEMedian = 0.1)
+                Threshold_CQV = 0.1)
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
