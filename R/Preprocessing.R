@@ -772,12 +772,12 @@ ReplicateSum <- function(Input_data){
 #' Description
 #'
 #' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with just the pooled samples.
-#' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), exist.\strong{Default = NULL}
+#' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}
 #' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
 #' @param Therhold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
 #' @param Threshold_SEMean \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Mean ration to the Mean. \strong{Default = 0.1}
-#' @param Threshold_SEMedian \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Median ration to the Mean. \strong{Default = 0.1}
+#' @param Threshold_CQV \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Quantile variation. \strong{Default = 0.1}
 #'
 #' @keywords Coefficient of Variation, Standard Error of the Mean, high variance metabolites
 #' @export
@@ -789,7 +789,7 @@ Pool_Estimation <- function(Input_data,
                             Unstable_feature_remove = FALSE,
                             Therhold_cv = 1,
                             Threshold_SEMean = 0.1,
-                            Threshold_SEMedian = 0.1 ){
+                            Threshold_CQV = 0.1 ){
 
 
   ## ------------ Check Input files ----------- ##
@@ -839,8 +839,8 @@ Pool_Estimation <- function(Input_data,
   if( is.numeric(Threshold_SEMean)== FALSE | Threshold_SEMean < 0){
     stop("Check input. The selected Threshold_SEMean value should be a positive numeric value.")
   }
-  if( is.numeric(Threshold_SEMedian)== FALSE | Threshold_SEMedian < 0){
-    stop("Check input. The selected Threshold_SEMedian value should be a positive numeric value.")
+  if( is.numeric(Threshold_CQV)== FALSE | Threshold_CQV < 0){
+    stop("Check input. The selected Threshold_CQV value should be a positive numeric value.")
   }
 
 
@@ -878,7 +878,7 @@ Pool_Estimation <- function(Input_data,
   # Since we expect the pool samples to have very small variation since they "are the same sample" we go for CV=1 as threshold
   #which(result_df[1,]>Therhold_cv)
 
-  ## Standard Error of Mean/median
+  ## Standard Error of Mean
   SE_data <- log10(Input_numeric) %>% as.data.frame()
 
   # remove zero variance and non mumerix
@@ -891,17 +891,22 @@ Pool_Estimation <- function(Input_data,
   Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
   NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
   # Do we need to report this again ?
-  #message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+  message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
 
-  # Mean
   SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
   result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
   rownames(result_df)[2] <- "SEMean"
 
-  ##Median
-  SEMedian <- apply(SE_data, 2,  function(x) { 1.253 *sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
-  result_df[3,]<-  SEMedian# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
-  rownames(result_df)[3] <- "SEMedian"
+  ## Quartile coefficient of dispersion
+  QC_data <- Input_numeric %>% as.data.frame()
+
+  CQV <- apply(SE_data, 2, function(x){
+    q1=quantile(x,0.25)
+    q3=quantile(x,0.75)
+    as.numeric((q3-q1)/(q3+q1))}  ) %>% t()%>% as.data.frame()
+
+  result_df[3,]<-  CQV # /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
+  rownames(result_df)[3] <- "CQV"
 
   result_df_final <- result_df %>%
     t()%>%
@@ -909,8 +914,8 @@ Pool_Estimation <- function(Input_data,
     rowwise() %>%
     mutate(CV_high_var = CV > Therhold_cv,
            SEMean_high_var = SEMean > Threshold_SEMean,
-           SEMedian_high_var = SEMedian > Threshold_SEMedian) %>%
-    mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var, SEMedian_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
+           CQV_high_var = CQV > Threshold_CQV) %>%
+    mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var, CQV_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
                                        TRUE ~ FALSE)) %>% as.data.frame()
 
   rownames(result_df_final)<- colnames(Input_numeric)
