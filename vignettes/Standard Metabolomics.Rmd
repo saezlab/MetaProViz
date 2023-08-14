@@ -623,7 +623,7 @@ MetaProViz::VizHeatmap(Input_data = Input_Heatmap,
                        Save_as_Plot = "pdf")
 ```
 
-```{r}
+```{r, eval=FALSE}
 # individual: One individual plot for each pathway
 MetaProViz::VizHeatmap(Input_data = Input_Heatmap,
                        Plot_SettingsFile_Sample= MetaData_Sample,
@@ -631,6 +631,11 @@ MetaProViz::VizHeatmap(Input_data = Input_Heatmap,
                        Plot_SettingsFile_Metab =  MetaData_Metab,
                        OutputPlotName = "Pathways",
                        Save_as_Plot = "pdf")
+
+#Error: Error in seq.default(-m, m, length.out = n + 1) : 'from' must be a finite number
+#In addition: Warning messages:
+#1: In min(x, na.rm = T) : no non-missing arguments to min; returning Inf
+#2: In max(x, na.rm = T) : no non-missing arguments to max; returning -Inf
 ```
 
 ```{r}
@@ -751,7 +756,7 @@ Now we do individual plots again:
 ```{r, eval=FALSE}
 MetaProViz::VizVolcano(Plot_Settings="Compare",
                        Plot_SettingsInfo= c(individual="Pathway"),
-                       Plot_SettingsFile= Settings,
+                       Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_HK2_vs_786-M1A`,
                        AdditionalInput_data=`DMA_HK2_vs_786-M2A`,
                        OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
@@ -762,7 +767,7 @@ MetaProViz::VizVolcano(Plot_Settings="Compare",
 ```{r, echo=FALSE, fig.align="left", fig.width=7, fig.height=5}
 MetaProViz::VizVolcano(Plot_Settings="Compare",
                        Plot_SettingsInfo= c(individual="Pathway"),
-                       Plot_SettingsFile= Settings,
+                       Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_HK2_vs_786-M1A`,
                        AdditionalInput_data=`DMA_HK2_vs_786-M2A`,
                        OutputPlotName= "HK2 vs. 786M1A compared to HK2 vs. 786M2A",
@@ -790,6 +795,11 @@ MetaProViz::VizVolcano(Plot_Settings="PEA",
 2. Additional_File = Results of ORA or GSEA
 4. Use subtitle to display the performed tests information --> this can be passed by the user by adding another column into Plot_SettingsInfo --> need to ensure that this column exists in Additional_File of ORA/GSEA --> this could e.g. NES score and p.adj of this pathway --> Here this would need to be combined before!
 
+We should enable a pre-selection (Which pathways should be plotted) either with a helper function or within the VizVolcano function. 
+
+We should rename AdditionalInput_data
+
+If the title of the figure is too long (often when opathway name is long) it is cut-off. This should also be fixed if possible.
 \
 \
 \
@@ -818,15 +828,13 @@ MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`,
 \
 We can also use the metabolite cluster information of our MCA to colorcode the metabolites while showing another information using the dot size. First we need to put the displaying information together in the Settings file.
 ```{r, fig.cap="Figure: Lolipop displaying metabolite clusters together."}
-SettingsO <- merge(Settings,`DMA_HK2_vs_786-O`, by="Metabolite" )
-# Check our settings:
-knitr::kable(Settings[1:4,] , caption = "Settings for plots.", row.names=FALSE)
+MetaData_Metab <- merge(MetaData_Metab,`DMA_HK2_vs_786-O`[,-6], by="Metabolite" )
 ```
 
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying metabolite clusters together."}
 MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`, 
-           Plot_SettingsInfo= c(color="RG3_SignificantChange", size = "p.adj"), 
-           Plot_SettingsFile= SettingsO,
+           Plot_SettingsInfo= c(color="RG2_Significant", size = "p.adj"), 
+           Plot_SettingsFile= MetaData_Metab,
            OutputPlotName= "HK2 versus 786O",
            Subtitle= "Results of DMA with MCA")
 ```
@@ -834,8 +842,8 @@ MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`,
 Alternatively we can make individual plot of each metabolite cluster
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying metabolite clusters individually"}
 MetaProViz::VizLolipop(Input_data = `DMA_HK2_vs_786-O`, 
-                       Plot_SettingsInfo= c(color = "t.val", size = "p.val", individual= "RG3_SignificantChange"),
-                       Plot_SettingsFile= SettingsO,
+                       Plot_SettingsInfo= c(color = "t.val", size = "p.val", individual= "RG2_Significant"),
+                       Plot_SettingsFile=  MetaData_Metab,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA with MCA")
 ```
@@ -865,12 +873,12 @@ MetaProViz::VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`
 ```
 \
 Finally we can compare the DMA results and make individual plots each cluster of the MCA.
-```{r}
+```{r, eval=FALSE}
 SettingsM1A <- merge(Settings,`DMA_HK2_vs_786-M1A`, by="Metabolite" )
 knitr::kable(SettingsO[1:4,] , caption = "Settings for plots.", row.names=FALSE)
 ```
 
-```{r}
+```{r, eval=FALSE}
 VizLolipop(Input_data = list(`DMA_HK2_vs_786-O`,`DMA_HK2_vs_786-M1A`), 
            Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
            Plot_Settings="Compare", 
