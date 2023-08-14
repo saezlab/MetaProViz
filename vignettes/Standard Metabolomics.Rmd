@@ -797,7 +797,7 @@ MetaProViz::VizVolcano(Plot_Settings="PEA",
 
 We should enable a pre-selection (Which pathways should be plotted) either with a helper function or within the VizVolcano function. 
 
-We should rename AdditionalInput_data
+We should rename AdditionalInput_data?!
 
 If the title of the figure is too long (often when opathway name is long) it is cut-off. This should also be fixed if possible.
 \

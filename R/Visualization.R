@@ -146,6 +146,141 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}  # check and create folder
 
   ############################################################################################################
+  ## ----------- Establish functions for the plots and savings --------------##
+
+  #------- Set the total heights and widths
+  #@param input This is a ggplot object
+  plotGrob <- function(Input){
+    #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
+    plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
+    if(is.null(Plot_SettingsInfo)==TRUE){
+      #-----widths
+      plottable$widths[5] <- unit(8, "cm")#controls x-axis
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(10)] <- unit(0,"cm")#controls margins --> Figure legend
+      plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
+      plot_widths <- 11
+
+      #-----heigths
+      plottable$heights[7] <- unit(8, "cm")#controls x-axis
+      plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+      plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+      plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(OutputPlotName=="" & Subtitle==""){
+        plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+        plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+        plot_heights <- 10.5
+      } else{
+        plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+        plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+        plot_heights <-11
+      }
+    }else if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      #------- Legend heights
+      Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
+      Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
+
+      #-----Plot widths
+      plottable$widths[5] <- unit(8, "cm")#controls x-axis
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+      plot_widths <- 11+Value
+
+      #-----Plot heigths
+      plottable$heights[7] <- unit(8, "cm")#controls x-axis
+      plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+      plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+      plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(OutputPlotName=="" & Subtitle==""){
+        plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+        plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+        if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-10.5)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 10.5
+        }
+      } else{#If we do have Title and or subtitle
+        plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+        plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+        if(Legend_heights>11){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-11)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 11
+        }
+      }
+    }else if("color" %in% names(Plot_SettingsInfo)==TRUE | "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      #------- Legend heights
+      Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
+      Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
+
+      #----- Plot widths
+      plottable$widths[5] <- unit(8, "cm")#controls x-axis
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+      plot_widths <- 11+Value
+
+      #-----Plot heigths
+      plottable$heights[7] <- unit(8, "cm")#controls x-axis
+      plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+      plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+      plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(OutputPlotName=="" & Subtitle==""){
+        plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+        plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+        if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-10.5)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 10.5
+        }
+      }else{#If we do have Title and or subtitle
+        plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+        plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+        if(Legend_heights>11){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-11)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 11
+        }
+      }
+    }
+    #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
+    Output<- list(plot_heights, plot_widths, plottable)
+  }
+
   ## ----------- Make the  plot based on the choosen parameters ------------ ##
   if(is.null(Plot_SettingsFile)==FALSE){
 
@@ -228,7 +363,9 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     PCA <- PCA+theme_classic()
   }
 
-  plot(PCA)
+  #Set the total heights and widths
+  Plot_Sized <- plotGrob(Input=PCA)
+  PCA <-Plot_Sized[[3]]
 
   #Prepare output DF
   loading_data <- prcomp(as.matrix(Input_data_m, scale. = as.logical(Scaling)))
@@ -271,10 +408,12 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
 
   if(OutputPlotName ==""){
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=10, height=8)
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
   }else{
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=10, height=8)
+    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
   }
+  plot(PCA)
+
 }
 
 
@@ -523,7 +662,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       }
     }else if(is.null(keyvals)==FALSE & is.null(keyvalsshape)==FALSE){
       #------- Legend heights
-     Legend <- ggpubr::get_legend(Plot) # Extract legend to adjust separately
+     Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
      Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
 
      #-----Plot widths
@@ -572,7 +711,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       }
    }else if(is.null(keyvals)==FALSE | is.null(keyvalsshape)==FALSE){
      #------- Legend heights
-     Legend <- ggpubr::get_legend(Plot) # Extract legend to adjust separately
+     Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
       Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
 
       #----- Plot widths
@@ -1129,7 +1268,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 colAlpha = 1,
                                                 title= paste(OutputPlotName, ": ", i, sep=""),
                                                 subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
-                                                caption = paste0("Total = ", nrow(InputVolcano), " metabolites of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
+                                                caption = paste0("Total = ", nrow(InputVolcano), " of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
                                                 xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
                                                 cutoffLineType = "dashed",
