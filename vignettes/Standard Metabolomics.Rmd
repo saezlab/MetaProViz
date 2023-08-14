@@ -815,6 +815,12 @@ Here we will first look into the results from DMA (see above 2.2 DMA) for the co
 MetaProViz::VizLolipop(Input_data=`DMA_HK2_vs_786-M1A`,
                        OutputPlotName= "HK2 versus 786M1A",
                        Subtitle= "Results of DMA")
+
+MetaProViz::VizLolipop(Input_data=`DMA_HK2_vs_786-M1A`,
+                       x = "Metabolite",
+                       y = "Log2FC",
+                       OutputPlotName= "HK2 versus 786M1A",
+                       Subtitle= "Results of DMA_Switched Axis")
 ```
 \
 Next we may want to show additional information about the metabolites on the plot. We can change the dot size and/or color again using information from the Plot_SettingsFile by specifying it in the Plot_SettingsInfo vector.

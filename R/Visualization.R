@@ -150,7 +150,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   #------- Set the total heights and widths
   #@param input This is a ggplot object
-  plotGrob <- function(Input){
+  plotGrob_PCA <- function(Input){
     #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
     plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
     if(is.null(Plot_SettingsInfo)==TRUE){
@@ -304,7 +304,6 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
       }
     }
 
-
     #assign column and legend name
     InputPCA  <- InputPCA%>%
       dplyr::rename(!!paste(Plot_SettingsInfo[["color"]]) :="color")
@@ -364,7 +363,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
 
   #Set the total heights and widths
-  Plot_Sized <- plotGrob(Input=PCA)
+  Plot_Sized <- plotGrob_PCA(Input=PCA)
   PCA <-Plot_Sized[[3]]
 
   #Prepare output DF
@@ -415,8 +414,6 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   plot(PCA)
 
 }
-
-
 
 #####################################
 ### ### ### Volcano Plots ### ### ###
@@ -632,18 +629,18 @@ VizVolcano <- function(Plot_Settings="Standard",
 
   #------- Set the total heights and widths
   #@param input This is a ggplot object
-  plotGrob <- function(Input){
+  plotGrob_Volcano <- function(Input){
     #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
     plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
     if(is.null(keyvals)==TRUE & is.null(keyvalsshape)==TRUE){
       #-----widths
       plottable$widths[5] <- unit(6, "cm")#controls x-axis
-      plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
       plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-      plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
       plottable$widths[c(10)] <- unit(5,"cm")#controls margins --> Figure legend
       plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-      plot_widths <- 15.5
+      plot_widths <- 14
 
       #-----heigths
       plottable$heights[7] <- unit(8, "cm")#controls x-axis
@@ -667,13 +664,13 @@ VizVolcano <- function(Plot_Settings="Standard",
 
      #-----Plot widths
      plottable$widths[5] <- unit(6, "cm")#controls x-axis
-     plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+     plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-     plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+     plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
      plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
 
      Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-     plot_widths <- 10.5+Value
+     plot_widths <- 9+Value
 
      #-----Plot heigths
      plottable$heights[7] <- unit(8, "cm")#controls x-axis
@@ -716,13 +713,13 @@ VizVolcano <- function(Plot_Settings="Standard",
 
       #----- Plot widths
       plottable$widths[5] <- unit(6, "cm")#controls x-axis
-      plottable$widths[c(3)] <- unit(1.5,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
       plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-      plottable$widths[c(6)] <- unit(3,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
       plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
 
       Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-      plot_widths <- 10.5+Value
+      plot_widths <- 9+Value
 
       #-----Plot heigths
       plottable$heights[7] <- unit(8, "cm")#controls x-axis
@@ -855,7 +852,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
 
           #Set the total heights and widths
-          Plot_Sized <- plotGrob(Input=Plot)
+          Plot_Sized <-  plotGrob_Volcano(Input=Plot)
           Plot <-Plot_Sized[[3]]
 
           #save plot and get rid of extra signs before saving
@@ -956,7 +953,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
 
           #Set the total heights and widths
-          Plot_Sized <- plotGrob(Input=Plot)
+          Plot_Sized <-  plotGrob_Volcano(Input=Plot)
           Plot <-Plot_Sized[[3]]
 
           #save plot and get rid of extra signs before saving
@@ -1074,7 +1071,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
 
           #Set the total heights and widths
-          Plot_Sized <- plotGrob(Input=Plot)
+          Plot_Sized <-  plotGrob_Volcano(Input=Plot)
           Plot <-Plot_Sized[[3]]
 
           #save plot and get rid of extra signs before saving
@@ -1192,7 +1189,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
 
         #Set the total heights and widths
-        Plot_Sized <- plotGrob(Input=Plot)
+        Plot_Sized <-  plotGrob_Volcano(Input=Plot)
         Plot <-Plot_Sized[[3]]
 
         #save plot and get rid of extra signs before saving i
@@ -1287,7 +1284,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
 
         #Set the total heights and widths
-        Plot_Sized <- plotGrob(Input=Plot)
+        Plot_Sized <- plotGrob_Volcano(Input=Plot)
         Plot <-Plot_Sized[[3]]
 
         #save plot and get rid of extra signs before saving
@@ -1663,7 +1660,7 @@ VizLolipop<- function(Plot_Settings="Standard",
                       Plot_SettingsInfo= NULL,
                       Plot_SettingsFile= NULL, # Input_pathways = NULL,
                       Input_data, # a dataframe of list of dataframes
-                      AdditionalInput_data= NULL, # unsd only for PEA
+                      AdditionalInput_data= NULL, # used only for PEA
                       x = "Log2FC",
                       y = "Metabolite",
                       OutputPlotName= "",
@@ -1873,14 +1870,11 @@ VizLolipop<- function(Plot_Settings="Standard",
                     "PEA_Pathway"=paste(Plot_SettingsInfo[["PEA_Pathway"]]))
   }
 
-
   # 4. Check other plot-specific parameters:
   Save_as_Plot_options <- c("svg","pdf","png")
   if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
     stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
-
-
 
   ## ------------ Create Output folders ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
@@ -1890,6 +1884,150 @@ VizLolipop<- function(Plot_Settings="Standard",
   Results_folder_plots_Lolipop_folder = file.path(Results_folder, "Lolipop")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
   if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}  # check and create folder
 
+  ##########################################################################################################################################
+  ## ----------- Establish functions for the plots and savings --------------##
+
+  #------- Set the total heights and widths
+  #@param input This is a ggplot object
+  plotGrob_Lollipop <- function(Input){
+    #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
+    plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
+    if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
+      #-----widths
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(10)] <- unit(0,"cm")#controls margins --> Figure legend
+      plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(is.numeric(Input_data[,paste(x)])==TRUE){
+        plottable$widths[5] <- unit(8, "cm")#controls x-axis
+        plot_widths <- 11
+      }else{
+        Features <- nrow(Input_data)/4
+        plottable$widths[5] <- unit(Features, "cm")#controls x-axis
+        plot_widths <- 11+Features
+      }
+
+      #-----heigths
+      plottable$heights[7] <- unit(8, "cm")#controls x-axis
+      plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+      plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+      plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(OutputPlotName=="" & Subtitle==""){
+        plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+        plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+        plot_heights <- 10.5
+      } else{
+        plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+        plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+        plot_heights <-11
+      }
+    }else if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      #------- Legend heights
+      Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
+      Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
+
+      #-----Plot widths
+      plottable$widths[5] <- unit(8, "cm")#controls x-axis
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+      plot_widths <- 11+Value
+
+      #-----Plot heigths
+      plottable$heights[7] <- unit(8, "cm")#controls x-axis
+      plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+      plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+      plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(OutputPlotName=="" & Subtitle==""){
+        plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+        plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+        if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-10.5)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 10.5
+        }
+      } else{#If we do have Title and or subtitle
+        plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+        plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+        if(Legend_heights>11){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-11)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 11
+        }
+      }
+    }else if("color" %in% names(Plot_SettingsInfo)==TRUE | "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      #------- Legend heights
+      Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
+      Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
+
+      #----- Plot widths
+      plottable$widths[5] <- unit(8, "cm")#controls x-axis
+      plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+      plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
+      plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+      plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
+      plot_widths <- 11+Value
+
+      #-----Plot heigths
+      plottable$heights[7] <- unit(8, "cm")#controls x-axis
+      plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+      plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+      plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
+
+      if(OutputPlotName=="" & Subtitle==""){
+        plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
+        plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
+
+        if(Legend_heights>10.5){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-10.5)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 10.5
+        }
+      }else{#If we do have Title and or subtitle
+        plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+        plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+        if(Legend_heights>11){#If the legend requires more heights than the Plot
+          Add <- (Legend_heights-11)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+          plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- 11
+        }
+      }
+    }
+    #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
+    Output<- list(plot_heights, plot_widths, plottable)
+  }
+
+  #--------------Plots:
 
   if(Plot_Settings=="Standard"){############################################################################################################
     Input_data <- Input_data[[1]]
