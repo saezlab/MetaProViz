@@ -249,6 +249,8 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
   plot(PCA)
 
+  # Return DF which can be assigned, but which does not print when they are not assigned.
+  invisible(PCA)
 }
 
 
