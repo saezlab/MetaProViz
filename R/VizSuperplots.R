@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: Visualization
+## Script name: Visualization Superplors
 ##
 ## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
@@ -18,7 +18,7 @@
 ##
 ## ---------------------------
 #'
-#' This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+#' This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
 
 ##############################
 ### ### ### Superplots  ### ### ###
@@ -55,7 +55,6 @@ VizSuperplot <- function(Input_data,
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
-
 
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions

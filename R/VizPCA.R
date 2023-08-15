@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: Visualization PCA plot
+## Script name: Visualization  PCA plot
 ##
 ## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
@@ -18,7 +18,7 @@
 ##
 ## ---------------------------
 #'
-#' This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+#' This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis
 
 
 #################################
