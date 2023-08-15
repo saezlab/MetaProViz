@@ -31,7 +31,6 @@
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
 #' @param AdditionalInput_data \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Plot_Settings="Compare") or Pathway enrichment analysis results (Plot_Settings="PEA"). \strong{Default = NULL}
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
-#'
 #' @param Comparison_name \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Plot_Settings= "Compare". \strong{Default = c(Input_data="Cond1", AdditionalInput_data= "Cond2")}
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
@@ -204,7 +203,6 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
     }
 
-  #Legend=="Pie" or Legend="Standard --> If color is not provided and Legend=="Pie" this will be ignored! --> change parameter and give warning!
   #outputplotname
   #theme
 
@@ -230,9 +228,7 @@ VizVolcano <- function(Plot_Settings="Standard",
   if (!dir.exists(Results_folder_plots_Volcano_folder)) {dir.create(Results_folder_plots_Volcano_folder)}  # check and create folder
 
   ############################################################################################################
-  ## ----------- Make the  plot based on the choosen parameters ------------ ##
-  #Check the plot type: Comparison/Standard/PSE
-
+  ## ----------- Make the  plot based on the chosen parameters ------------ ##
   #####--- 1. Standard
   if(Plot_Settings=="Standard"){############################################################################################################
     if("individual" %in% names(Plot_SettingsInfo)==TRUE){
@@ -304,8 +300,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
                                                   caption = paste0("Total = ", nrow(InputVolcano), " Metabolites"),
-                                                  xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
-                                                  ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
+                                                  xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                                                  ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                   cutoffLineType = "dashed",
                                                   cutoffLineCol = "black",
                                                   cutoffLineWidth = 0.5,
@@ -337,10 +333,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           plot(Plot)
         }
       }
-      # Return PlotList into the environment to enable the user to view the plots directly
-      #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
-      # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
-      Return <- PlotList
+      #invisible(PlotList)
       } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
         if(is.null(Plot_SettingsFile)==FALSE){
           InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_data, by="Metabolite", all.x=TRUE)%>%
@@ -405,8 +398,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   title= paste(OutputPlotName),
                                                   subtitle = Subtitle,
                                                   caption = paste0("Total = ", nrow(InputVolcano), " Metabolites"),
-                                                  xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
-                                                  ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
+                                                  xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                                                  ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                   cutoffLineType = "dashed",
                                                   cutoffLineCol = "black",
                                                   cutoffLineWidth = 0.5,
@@ -434,6 +427,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
           #Plot
           plot(Plot)
+          #invisible(Plot)
         }
       }
   #####--- 2. Condition
@@ -523,8 +517,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
                                                   caption = paste0("Total = ", (nrow(InputVolcano)/2), " Metabolites"),
-                                                  xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
-                                                  ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
+                                                  xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                                                  ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                   cutoffLineType = "dashed",
                                                   cutoffLineCol = "black",
                                                   cutoffLineWidth = 0.5,
@@ -556,10 +550,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           plot(Plot)
         }
       }
-      # Return PlotList into the environment to enable the user to view the plots directly
-      #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
-      # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
-      Return <- PlotList
+      #invisible(PlotList)
     } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
       if(is.null(Plot_SettingsFile)==FALSE){
         InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_Comparison, by="Metabolite", all.x=TRUE)%>%
@@ -641,8 +632,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 title= paste(OutputPlotName),
                                                 subtitle = Subtitle,
                                                 caption = paste0("Total = ", (nrow(InputVolcano)/2), " Metabolites"),
-                                                xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
-                                                ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
+                                                xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                                                ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
@@ -670,6 +661,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
         #Plot
         plot(Plot)
+        #invisible(Plot)
       }
     }
   #####--- 3. PEA
@@ -736,8 +728,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 title= paste(OutputPlotName, ": ", i, sep=""),
                                                 subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
                                                 caption = paste0("Total = ", nrow(InputVolcano), " of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
-                                                xlim =  c(min(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])-0.2, max(InputVolcano$Log2FC[is.finite(InputVolcano$Log2FC )])+1.2),
-                                                ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano$p.adj))))),
+                                                xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                                                ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
@@ -769,11 +761,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         plot(Plot)
       }
     }
-    # Return PlotList into the environment to enable the user to view the plots directly
-    #assign("VolcanoPlots", PlotList, envir=.GlobalEnv)
-    # Combine plots into a single plot using facet_grid or patchwork::wrap_plots
-    Return <- PlotList
-
+    #invisible(PlotList)
   }
 }
 
