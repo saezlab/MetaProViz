@@ -33,6 +33,7 @@
 #' @param Show_Loadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
 #' @param Theme \emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}
+#' @param color_scale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #'
@@ -47,6 +48,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                    Show_Loadings = FALSE,
                    Scaling = TRUE,
                    Theme=NULL,#theme_classic()
+                   color_scale=NULL,
                    OutputPlotName= '',
                    Save_as_Plot = "svg"
                   ){
@@ -127,6 +129,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     stop("Check input. The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
   }
   # Theme check
+  # color_scale check
 
   Save_as_Plot_options <- c("svg","pdf", "png")
   if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
@@ -156,13 +159,25 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
 
     # numeric scale or continuous
-    if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
-      if(length(unique(InputPCA$color)) > 4){ # change this to change the number after which color becomes from distinct to continuous
+    if(is.null(color_scale)==TRUE){#Will be set automatically:
+      if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
+        if(length(unique(InputPCA$color)) > 4){ # change this to change the number after which color is not distinct but continuous
+          InputPCA$color <- as.numeric(InputPCA$color)
+          }else{
+            InputPCA$color <- as.factor(InputPCA$color)
+          }
+      }
+    }else if(color_scale=="discrete"){
+      InputPCA$color <- as.factor(InputPCA$color)
+    }else if(color_scale=="continuous"){
+      if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
         InputPCA$color <- as.numeric(InputPCA$color)
       }else{
         InputPCA$color <- as.factor(InputPCA$color)
+        warning("color_scale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
+        }
       }
-    }
+
 
     #assign column and legend name
     InputPCA  <- InputPCA%>%
