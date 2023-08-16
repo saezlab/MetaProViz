@@ -259,6 +259,8 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 ##############################################################
 
 #' @param Input This is the ggplot object generated within the VizPCA function.
+#' @param Plot_SettingsInfo Passed to VizPCA
+#' @param Plot_SettingsInfo Passed to VizPCA
 #'
 #' @keywords PCA helper function
 #' @noRd
