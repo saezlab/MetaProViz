@@ -19,7 +19,7 @@ VizHeatmap(
 \arguments{
 \item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.}
 
-\item{Plot_SettingsInfo}{\emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual= "", color_Metab="ColumnName_Plot_SettingsFile_Metab", color_Sample= list("ColumnName_Plot_SettingsFile_Sample", "ColumnName_Plot_SettingsFile_Sample",...)).\strong{Default = NULL}}
+\item{Plot_SettingsInfo}{\emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_Plot_SettingsFile_Metab",individual_Sample= "ColumnName_Plot_SettingsFile_Sample", color_Metab="ColumnName_Plot_SettingsFile_Metab", color_Sample= list("ColumnName_Plot_SettingsFile_Sample", "ColumnName_Plot_SettingsFile_Sample",...)).\strong{Default = NULL}}
 
 \item{Plot_SettingsFile_Sample}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}}
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/VizSuperplots.R
 \name{VizSuperplot}
 \alias{VizSuperplot}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis}
+\title{This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis}
 \usage{
 VizSuperplot(
   Input_data,
@@ -39,7 +39,7 @@ VizSuperplot(
 \item{Output_Name}{\emph{Optional: } String which is added to the output files of the plot.}
 }
 \description{
-This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
 }
 \keyword{Barplot,}
 \keyword{Boxplot,}

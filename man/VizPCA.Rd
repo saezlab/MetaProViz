@@ -2,7 +2,7 @@
 % Please edit documentation in R/VizPCA.R
 \name{VizPCA}
 \alias{VizPCA}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis}
+\title{This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis}
 \usage{
 VizPCA(
   Plot_SettingsInfo = NULL,
@@ -13,6 +13,7 @@ VizPCA(
   Show_Loadings = FALSE,
   Scaling = TRUE,
   Theme = NULL,
+  color_scale = NULL,
   OutputPlotName = "",
   Save_as_Plot = "svg"
 )
@@ -34,11 +35,13 @@ VizPCA(
 
 \item{Theme}{\emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}}
 
+\item{color_scale}{\emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}}
+
 \item{OutputPlotName}{\emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}}
 
 \item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
 }
 \description{
-This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis
 }
 \keyword{PCA}

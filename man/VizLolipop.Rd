@@ -2,7 +2,7 @@
 % Please edit documentation in R/VizLolipop.R
 \name{VizLolipop}
 \alias{VizLolipop}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis}
+\title{This script allows you to perform Lollipop visualizations using the results of the MetaProViz analysis}
 \usage{
 VizLolipop(
   Plot_Settings = "Standard",
@@ -48,7 +48,7 @@ VizLolipop(
 \item{Legend}{\emph{Optional: } Legend=="Pie" will plot a PieChart as the legend for color or Legend="Standard, plot the standard legend for color. \strong{Default = "Standard"}}
 }
 \description{
-This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+This script allows you to perform Lollipop visualizations using the results of the MetaProViz analysis
 }
 \keyword{Lolipop}
 \keyword{pathways}
