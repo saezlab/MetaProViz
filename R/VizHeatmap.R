@@ -25,7 +25,7 @@
 ###############################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Plot_SettingsInfo  \emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual= "", color_Metab="ColumnName_Plot_SettingsFile_Metab", color_Sample= list("ColumnName_Plot_SettingsFile_Sample", "ColumnName_Plot_SettingsFile_Sample",...)).\strong{Default = NULL}
+#' @param Plot_SettingsInfo  \emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_Plot_SettingsFile_Metab",individual_Sample= "ColumnName_Plot_SettingsFile_Sample", color_Metab="ColumnName_Plot_SettingsFile_Metab", color_Sample= list("ColumnName_Plot_SettingsFile_Sample", "ColumnName_Plot_SettingsFile_Sample",...)).\strong{Default = NULL}
 #' @param Plot_SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}
 #' @param Plot_SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot
@@ -79,24 +79,45 @@ VizHeatmap <- function(Input_data,
 
   #2. Plot_settings
   if(is.null(Plot_SettingsInfo) == FALSE){
-    if("individual" %in% names(Plot_SettingsInfo)==TRUE){
-      if(Plot_SettingsInfo[["individual"]] %in% colnames(Plot_SettingsFile_Metab)== FALSE){
-        stop("You have chosen individual = ",paste(Plot_SettingsInfo$individual), ", ", paste(Plot_SettingsInfo$individual)," does not exist in the Plot_SettingsFile_Metab"   )
+    #--- individual_Metab
+    if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE){
+      if(Plot_SettingsInfo[["individual_Metab"]] %in% colnames(Plot_SettingsFile_Metab)== FALSE){
+        stop("You have chosen individual = ",paste(Plot_SettingsInfo$individual_Metab), ", ", paste(Plot_SettingsInfo$individual_Metab)," does not exist in the Plot_SettingsFile_Metab")
       }
-      # Check pathways with 1 metabolite
-      unique_paths <- unique(Plot_SettingsFile_Metab[[Plot_SettingsInfo[["individual"]]]])
+      #Ensure that groups that are assigned NAs do not cause problems:
+      Plot_SettingsFile_Metab[[Plot_SettingsInfo[["individual_Metab"]]]] <-ifelse(is.na(Plot_SettingsFile_Metab[[Plot_SettingsInfo[["individual_Metab"]]]]), "NA", Plot_SettingsFile_Metab[[Plot_SettingsInfo[["individual_Metab"]]]])
 
-      for (i in unique_paths){
-        selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
+      unique_paths <- unique(Plot_SettingsFile_Metab[[Plot_SettingsInfo[["individual_Metab"]]]])
+
+      for (i in unique_paths){# Check pathways with 1 metabolite
+        selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual_Metab"]]) == i)
         selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
-
         if(length(selected_path_metabs)==1 ){
-          warning("The pathway ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+          warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
           unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
         }
       }
     }
+    #--- individual_Sample
+    if("individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
+        if(Plot_SettingsInfo[["individual_Sample"]] %in% colnames(Plot_SettingsFile_Sample)== FALSE){
+          stop("You have chosen individual = ",paste(Plot_SettingsInfo$individual_Sample), ", ", paste(Plot_SettingsInfo$individual_Sample)," does not exist in the Plot_SettingsFile_Metab"   )
+        }
+        #Ensure that groups that are assigned NAs do not cause problems:
+        Plot_SettingsFile_Sample[[Plot_SettingsInfo[["individual_Sample"]]]] <-ifelse(is.na(Plot_SettingsFile_Sample[[Plot_SettingsInfo[["individual_Sample"]]]]), "NA", Plot_SettingsFile_Sample[[Plot_SettingsInfo[["individual_Sample"]]]])
 
+        unique_paths_Sample <- unique(Plot_SettingsFile_Sample[[Plot_SettingsInfo[["individual_Sample"]]]])
+
+        for (i in unique_paths_Sample){# Check pathways with 1 metabolite
+          selected_path <- Plot_SettingsFile_Sample %>% filter(get(Plot_SettingsInfo[["individual_Sample"]]) == i)
+          selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+          if(length(selected_path_metabs)==1 ){
+            warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+            unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
+          }
+        }
+    }
+    #--- color_Metab
     if(sum(grepl("color_Metab", names(Plot_SettingsInfo)))>0){ # If color metab exists
       if(is.null(Plot_SettingsFile_Metab)==TRUE){ # Check if Plot_SettingsFile_Metab also exists
         stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile_Metab.")
@@ -115,7 +136,7 @@ VizHeatmap <- function(Input_data,
         }
       }
     }
-
+    #--- color_Sample
     if(sum(grepl("color_Sample", names(Plot_SettingsInfo)))>0){
       if(is.null(Plot_SettingsFile_Sample)==TRUE){ # Check if Plot_SettingsFile_Metab also exists
         stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile_Sample.")
@@ -138,8 +159,6 @@ VizHeatmap <- function(Input_data,
     stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
-  data <- Input_data
-
   ## ------------ Create Output folders ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
@@ -150,18 +169,14 @@ VizHeatmap <- function(Input_data,
 
   #####################################################
   ## -------------- Plot --------------- ##
+  data <- Input_data
 
-  if("individual" %in% names(Plot_SettingsInfo)==TRUE){
-    #individual_selection <-  Plot_SettingsInfo[["individual"]]
-    # Create the list of individual plots that should be made:
-    #IndividualPlots <- Plot_SettingsFile_Metab[!duplicated(Plot_SettingsFile_Metab[individual_selection]),]
-    #IndividualPlots <- IndividualPlots[individual_selection]%>% unlist() %>% as.vector
+  if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE & "individual_Sample" %in% names(Plot_SettingsInfo)==FALSE){
     IndividualPlots <-unique_paths
     PlotList <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
-      # Select the data
-      selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual"]]) == i)
+      selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual_Metab"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
       data_path <- data %>% select(all_of(selected_path_metabs))
 
@@ -171,7 +186,6 @@ VizHeatmap <- function(Input_data,
       if(length(col_annot_vars)>0){
         for (x in 1:length(col_annot_vars)){
           annot_sel <- col_annot_vars[[x]]
-
           col_annot[x] <- Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
           names(col_annot)[x] <- annot_sel
         }
@@ -220,100 +234,230 @@ VizHeatmap <- function(Input_data,
       # Make the plot
       set.seed(1234)
       heatmap <- pheatmap::pheatmap(t(data_path),
-                                    show_rownames = as.logical(show_rownames),
-                                    show_colnames = as.logical(show_colnames),
-                                    clustering_method =  "complete",
-                                    scale = SCALE,
-                                    clustering_distance_rows = "correlation",
-                                    annotation_col = col_annot,
-                                    annotation_row = row_annot,
-                                    legend = T,
-                                    cellwidth = cellwidth_Sample,
-                                    cellheight = cellheight_Feature,
-                                    fontsize_row= 10,
-                                    fontsize_col = 10,
-                                    fontsize=9,
-                                    main = paste(OutputPlotName, i, sep=" " ))
+                                     show_rownames = as.logical(show_rownames),
+                                     show_colnames = as.logical(show_colnames),
+                                     clustering_method =  "complete",
+                                     scale = SCALE,
+                                     clustering_distance_rows = "correlation",
+                                     annotation_col = col_annot,
+                                     annotation_row = row_annot,
+                                     legend = T,
+                                     cellwidth = cellwidth_Sample,
+                                     cellheight = cellheight_Feature,
+                                     fontsize_row= 10,
+                                     fontsize_col = 10,
+                                     fontsize=9,
+                                     main = paste(OutputPlotName, " Metabolites: ", i, sep=" " ))
 
       #Width and height according to Sample and metabolite number
-      #Helper function to understand our plots parameters: gtable::gtable_show_layout(heatmap$gtable)
-      #-------- Height
-      heights <- heatmap[["gtable"]][["heights"]]
+      Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
+      heatmap <-Plot_Sized[[3]]
 
-      mylist <- list() #create an empty list
-      for (n in 1:length(heights)) {
-        x <-as.character(heights[[n]])
-        y <-regmatches(x, gregexpr("[0-9.]+",x))
-        y <- paste(y[[1]], collapse = ", ")
-        mylist[[n]] <-c(x,y)
-      }
-
-      height_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
-      height_DF$Original <- height_DF$V1
-      height_DF <- height_DF%>%
-        mutate(V2 = strsplit(as.character(V2), ", ")) %>%
-        unnest(V2) %>%
-        mutate(V1 = strsplit(as.character(V1), ",")) %>%
-        unnest(V1)
-      height_DF$keep <- apply(height_DF, 1, function(row){
-        grepl(row["V2"], row["V1"])
-      })
-      height_DF <- height_DF%>%
-        mutate(Unit= case_when(grepl("bigpts", height_DF$V1)  ~ 'bigpts',
-                               grepl("grobheight", height_DF$V1)  ~ 'grobheight',
-                               TRUE ~ 'NA'))%>%
-        subset(keep==TRUE, select = c(2,5))
-      height_DF$Value <- as.numeric(height_DF$V2)
-      height_DF<- height_DF[,c(3,2)] %>%
-        group_by(Unit) %>%
-        summarize(total_value = sum(Value))
-
-      as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2)))
-
-      plot_height <- (grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2) #grobheight*3 (for annotation_row=TRUE), otherwise 1.2
-
-      #-------- Width
-      widths <- heatmap[["gtable"]][["widths"]]
-
-      mylist <- list() #create an empty list
-      for (m in 1:length(widths)) {
-        x <-as.character(widths[[m]])
-        y <-regmatches(x, gregexpr("[0-9.]+",x))
-        y <- paste(y[[1]], collapse = ", ")
-        mylist[[m]] <-c(x,y)
-      }
-
-      width_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
-      width_DF$Original <- width_DF$V1
-      width_DF <- width_DF%>%
-        mutate(V2 = strsplit(as.character(V2), ", ")) %>%
-        unnest(V2) %>%
-        mutate(V1 = strsplit(as.character(V1), ",")) %>%
-        unnest(V1)
-      width_DF$keep <- apply(width_DF, 1, function(row){
-        grepl(row["V2"], row["V1"])
-      })
-      width_DF <- width_DF%>%
-        mutate(Unit= case_when(grepl("bigpts", width_DF$V1)  ~ 'bigpts',
-                               grepl("grobwidth", width_DF$V1)  ~ 'grobwidth',
-                               TRUE ~ 'NA'))%>%
-        subset(keep==TRUE, select = c(2,5))
-      width_DF$Value <- as.numeric(width_DF$V2)
-      width_DF<- width_DF[,c(3,2)] %>%
-        group_by(Unit) %>%
-        summarize(total_value = sum(Value))
-
-      as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2)))
-
-      plot_width <- (grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2)
-
-      #--------Save
+      #----- Save
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
+      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+      plot(heatmap)
+      }
+    }else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
+      IndividualPlots <-unique_paths_Sample
+      PlotList <- list()#Empty list to store all the plots
 
-    }
+      for (i in IndividualPlots){
+        #Select the data:
+        selected_path <- Plot_SettingsFile_Sample %>% filter(get(Plot_SettingsInfo[["individual_Sample"]]) == i)%>%
+          rownames_to_column("UniqueID")
+        selected_path <- as.data.frame(selected_path[,1])%>%
+          dplyr::rename("UniqueID"=1)
+        data_path <- merge(selected_path, data%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+        data_path <- data_path%>%
+          column_to_rownames("UniqueID")
 
-  }else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
+        # Column annotation
+        selected_Plot_SettingsFile_Sample <- merge(selected_path, Plot_SettingsFile_Sample%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+
+        col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
+        col_annot<- NULL
+        if(length(col_annot_vars)>0){
+          for (x in 1:length(col_annot_vars)){
+            annot_sel <- col_annot_vars[[x]]
+            col_annot[x] <- selected_Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
+            names(col_annot)[x] <- annot_sel
+          }
+          col_annot<- as.data.frame(col_annot)
+          rownames(col_annot) <- rownames(data_path)
+        }
+
+        # Row annotation
+        row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
+        row_annot<- NULL
+        if(length(row_annot_vars)>0){
+          for (y in 1:length(row_annot_vars)){
+            annot_sel <- row_annot_vars[[y]]
+            row_annot[y] <- Plot_SettingsFile_Metab %>% select(all_of(annot_sel))
+            row_annot <- row_annot %>% as.data.frame()
+            names(row_annot)[y] <- annot_sel
+          }
+          rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
+        }
+
+        #Check number of features:
+        Features <- as.data.frame(t(data_path))
+        if(enforce_FeatureNames==TRUE){
+          show_rownames <- TRUE
+          cellheight_Feature <- 9
+        }else if(nrow(Features)>100){
+          show_rownames <- FALSE
+          cellheight_Feature <- 1
+        }else{
+          show_rownames <- TRUE
+          cellheight_Feature <- 9
+        }
+
+        #Check number of samples
+        if(enforce_SampleNames==TRUE){
+          show_colnames <- TRUE
+          cellwidth_Sample <- 9
+        }else if(nrow(data_path)>50){
+          show_colnames <- FALSE
+          cellwidth_Sample <- 1
+        }else{
+          show_colnames <- TRUE
+          cellwidth_Sample <- 9
+        }
+
+        # Make the plot
+        set.seed(1234)
+        heatmap <- pheatmap::pheatmap(t(data_path),
+                                      show_rownames = as.logical(show_rownames),
+                                      show_colnames = as.logical(show_colnames),
+                                      clustering_method =  "complete",
+                                      scale = SCALE,
+                                      clustering_distance_rows = "correlation",
+                                      annotation_col = col_annot,
+                                      annotation_row = row_annot,
+                                      legend = T,
+                                      cellwidth = cellwidth_Sample,
+                                      cellheight = cellheight_Feature,
+                                      fontsize_row= 10,
+                                      fontsize_col = 10,
+                                      fontsize=9,
+                                      main = paste(OutputPlotName," Samples: ", i, sep=" " ))
+
+        #Width and height according to Sample and metabolite number
+        Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
+        heatmap <-Plot_Sized[[3]]
+
+        #----- Save
+        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        plot(heatmap)
+        }
+      }else if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
+        IndividualPlots_Metab <-unique_paths
+        IndividualPlots_Sample <-unique_paths_Sample
+
+        PlotList <- list()#Empty list to store all the plots
+        for (i in IndividualPlots_Metab){
+          selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual_Metab"]]) == i)
+          selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+          data_path_metab <- data %>% select(all_of(selected_path_metabs))
+
+          # Row annotation
+          row_annot_vars <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
+          row_annot<- NULL
+          if(length(row_annot_vars)>0){
+            for (y in 1:length(row_annot_vars)){
+              annot_sel <- row_annot_vars[[y]]
+              row_annot[y] <- Plot_SettingsFile_Metab %>% select(all_of(annot_sel))
+              row_annot <- row_annot %>% as.data.frame()
+              names(row_annot)[y] <- annot_sel
+            }
+            rownames(row_annot) <- Plot_SettingsFile_Metab[["Metabolite"]]
+          }
+
+          #Col annotation:
+          for (s in IndividualPlots_Sample){
+            #Select the data:
+            selected_path <- Plot_SettingsFile_Sample %>% filter(get(Plot_SettingsInfo[["individual_Sample"]]) == s)%>%
+              rownames_to_column("UniqueID")
+            selected_path <- as.data.frame(selected_path[,1])%>%
+              dplyr::rename("UniqueID"=1)
+            data_path <- merge(selected_path, data_path_metab%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+            data_path <- data_path%>%
+              column_to_rownames("UniqueID")
+
+            # Column annotation
+            selected_Plot_SettingsFile_Sample <- merge(selected_path, Plot_SettingsFile_Sample%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+
+            col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
+            col_annot<- NULL
+            if(length(col_annot_vars)>0){
+              for (x in 1:length(col_annot_vars)){
+                annot_sel <- col_annot_vars[[x]]
+                col_annot[x] <- selected_Plot_SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
+                names(col_annot)[x] <- annot_sel
+              }
+              col_annot<- as.data.frame(col_annot)
+              rownames(col_annot) <- rownames(data_path)
+            }
+
+            #Check number of features:
+            Features <- as.data.frame(t(data_path))
+            if(enforce_FeatureNames==TRUE){
+              show_rownames <- TRUE
+              cellheight_Feature <- 9
+            }else if(nrow(Features)>100){
+              show_rownames <- FALSE
+              cellheight_Feature <- 1
+            }else{
+              show_rownames <- TRUE
+              cellheight_Feature <- 9
+            }
+
+            #Check number of samples
+            if(enforce_SampleNames==TRUE){
+              show_colnames <- TRUE
+              cellwidth_Sample <- 9
+            }else if(nrow(data_path)>50){
+              show_colnames <- FALSE
+              cellwidth_Sample <- 1
+            }else{
+              show_colnames <- TRUE
+              cellwidth_Sample <- 9
+            }
+
+            # Make the plot
+            set.seed(1234)
+            heatmap <- pheatmap::pheatmap(t(data_path),
+                                          show_rownames = as.logical(show_rownames),
+                                          show_colnames = as.logical(show_colnames),
+                                          clustering_method =  "complete",
+                                          scale = SCALE,
+                                          clustering_distance_rows = "correlation",
+                                          annotation_col = col_annot,
+                                          annotation_row = row_annot,
+                                          legend = T,
+                                          cellwidth = cellwidth_Sample,
+                                          cellheight = cellheight_Feature,
+                                          fontsize_row= 10,
+                                          fontsize_col = 10,
+                                          fontsize=9,
+                                          main = paste(OutputPlotName," Metabolites: ", i, " Sample:", s, sep="" ))
+
+            #-------- Plot width and heights
+            #Width and height according to Sample and metabolite number
+            Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
+            heatmap <-Plot_Sized[[3]]
+
+            #----- Save
+            cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+            cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
+            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",cleaned_s, "_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
+
+            plot(heatmap)
+            }
+        }
+    } else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==FALSE){
 
     # Column annotation
     col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
@@ -384,79 +528,174 @@ VizHeatmap <- function(Input_data,
                                   fontsize=9,
                                   main = OutputPlotName)
 
+    #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
-    #Helper function to understand our plots parameters: gtable::gtable_show_layout(heatmap$gtable)
-    #-------- Height
-    heights <- heatmap[["gtable"]][["heights"]]
+    Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
+    heatmap <-Plot_Sized[[3]]
 
-    mylist <- list() #create an empty list
-    for (i in 1:length(heights)) {
-      x <-as.character(heights[[i]])
-      y <-regmatches(x, gregexpr("[0-9.]+",x))
-      y <- paste(y[[1]], collapse = ", ")
-      mylist[[i]] <-c(x,y)
-    }
+    #----- Save
+    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
 
-    height_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
-    height_DF$Original <- height_DF$V1
-    height_DF <- height_DF%>%
-      mutate(V2 = strsplit(as.character(V2), ", ")) %>%
-      unnest(V2) %>%
-      mutate(V1 = strsplit(as.character(V1), ",")) %>%
-      unnest(V1)
-    height_DF$keep <- apply(height_DF, 1, function(row){
-      grepl(row["V2"], row["V1"])
-    })
-    height_DF <- height_DF%>%
-      mutate(Unit= case_when(grepl("bigpts", height_DF$V1)  ~ 'bigpts',
-                             grepl("grobheight", height_DF$V1)  ~ 'grobheight',
-                             TRUE ~ 'NA'))%>%
-      subset(keep==TRUE, select = c(2,5))
-    height_DF$Value <- as.numeric(height_DF$V2)
-    height_DF<- height_DF[,c(3,2)] %>%
-      group_by(Unit) %>%
-      summarize(total_value = sum(Value))
-
-    as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2)))
-
-    plot_height <- (grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(height_DF%>%subset(Unit=="grobheight", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2) #grobheight*3 (for annotation_row=TRUE), otherwise 1.2
-
-    #-------- Width
-    widths <- heatmap[["gtable"]][["widths"]]
-
-    mylist <- list() #create an empty list
-    for (i in 1:length(widths)) {
-      x <-as.character(widths[[i]])
-      y <-regmatches(x, gregexpr("[0-9.]+",x))
-      y <- paste(y[[1]], collapse = ", ")
-      mylist[[i]] <-c(x,y)
-    }
-
-    width_DF <- as.data.frame(do.call("rbind",mylist)) #combine all vectors
-    width_DF$Original <- width_DF$V1
-    width_DF <- width_DF%>%
-      mutate(V2 = strsplit(as.character(V2), ", ")) %>%
-      unnest(V2) %>%
-      mutate(V1 = strsplit(as.character(V1), ",")) %>%
-      unnest(V1)
-    width_DF$keep <- apply(width_DF, 1, function(row){
-      grepl(row["V2"], row["V1"])
-    })
-    width_DF <- width_DF%>%
-      mutate(Unit= case_when(grepl("bigpts", width_DF$V1)  ~ 'bigpts',
-                             grepl("grobwidth", width_DF$V1)  ~ 'grobwidth',
-                             TRUE ~ 'NA'))%>%
-      subset(keep==TRUE, select = c(2,5))
-    width_DF$Value <- as.numeric(width_DF$V2)
-    width_DF<- width_DF[,c(3,2)] %>%
-      group_by(Unit) %>%
-      summarize(total_value = sum(Value))
-
-    as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2)))
-
-    plot_width <- (grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="bigpts", select=c(2))), "bigpts"), "cm", valueOnly = TRUE))+((grid::convertX(unit(as.numeric(width_DF%>%subset(Unit=="grobwidth", select=c(2))), "npc"), "cm", valueOnly = TRUE))/9.2)
-
-    #--------Save
-    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=plot_width, height= plot_height, units = "cm")
+    plot(heatmap)
   }
 }
+
+
+
+##############################################################
+### ### ### Heatmap helper function: Internal Function ### ### ###
+##############################################################
+
+#' @param Input This is the ggplot object generated within the VizHeatmap function.
+#' @param Plot_SettingsInfo Passed to VizHeatmap
+#' @param data Generated in VizVolcano from Input_data and used to plot heatmap
+#' @param show_rownames Generated in VizVolcano, is logical TRUE or FALSE
+#' @param show_colnames Generated in VizVolcano, is logical TRUE or FALSE
+#' @param Plot_SettingsFile_Sample Passed to VizHeatmap
+#' @param Plot_SettingsFile_Metab Passed to VizHeatmap
+#'
+#' @keywords Heatmap helper function
+#' @noRd
+
+plotGrob_Heatmap <- function(Input=heatmap, Plot_SettingsInfo, data_path, show_rownames, show_colnames, Plot_SettingsFile_Sample, Plot_SettingsFile_Metab){
+  #------- Set the total heights and widths
+  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
+  plottable<- Input$gtable#get a gtable --> gtable::gtable_show_layout(plottable)
+
+  #----- heights
+  plottable$heights[1] <- unit(1, "cm")#space for headline
+  plottable$heights[2] <- unit((grid::convertX(unit(as.numeric(plottable$heights[2]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#heights x-axis clustering to heatmap, do not change
+  plottable$heights[3] <- unit((grid::convertX(unit(as.numeric(plottable$heights[3]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#distance x-axis clustering to heatmap, do not change
+  plottable$heights[4] <- unit((grid::convertX(unit(as.numeric(plottable$heights[4]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#heatmap itself, do not change
+
+  if(sum(grepl("color_Metab", names(Plot_SettingsInfo)))>0){#We have a legend for the color on the y-axis
+    # Find the longest column name/color name and count its characters:
+    names <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
+    colour_names <- NULL
+    for (x in 1:length(names)){
+      names_sel <- names[[x]]
+      colour_names[x] <- names_sel
+    }
+
+    if(show_colnames==TRUE){#check if we also display sample names
+      column_names <- c(rownames(data_path),colour_names)
+    }else{
+      column_names <- colour_names
+    }
+
+    longest_column_name <- column_names[which.max(nchar(column_names))]
+    character_count <- nchar(longest_column_name)
+
+    plottable$heights[5] <- unit(character_count*0.3, "cm")#sample labels on heatmap
+    plot_heights <- 1+(character_count*0.3) + (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[4])))
+  }else if(sum(grepl("color_Metab", names(Plot_SettingsInfo)))==0){
+    # Find the longest column name and count its characters:
+    if(show_colnames==TRUE){#check if we also display sample names
+      column_names <- rownames(data_path)
+      longest_column_name <- column_names[which.max(nchar(column_names))]
+      character_count <- nchar(longest_column_name)
+    }else{
+      character_count <- 2
+    }
+
+    plottable$heights[5] <- unit(character_count*0.3, "cm")#sample labels on heatmap
+
+    #Summary:
+    plot_heights <- 1+(character_count*0.3) + (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[4])))
+    }
+
+  #--- widths:
+  plottable$widths[1] <- unit((grid::convertX(unit(as.numeric(plottable$widths[1]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#clustering, do not change
+  plottable$widths[2] <- unit((grid::convertX(unit(as.numeric(plottable$widths[2]), "bigpts"), "cm", valueOnly = TRUE)), "cm")##distance clustering to plot, do not change
+  plottable$widths[3] <- unit((grid::convertX(unit(as.numeric(plottable$widths[3]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#heatmap itself, do not change
+  plottable$widths[5] <- unit(2, "cm")#space between heatmap colour legend and legend
+
+  #legend width
+  if((sum(grepl("color_Sample", names(Plot_SettingsInfo)))>0) | (sum(grepl("color_Metab", names(Plot_SettingsInfo)))>0)){
+    if(sum(grepl("color_Sample", names(Plot_SettingsInfo)))>0){
+      names <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
+      colour_names <- NULL
+      legend_names <- NULL
+      for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        legend_names[x] <- names_sel
+        colour_names[x] <- Plot_SettingsFile_Sample[names[[x]]]
+      }
+      }else{
+        colour_names <- NULL
+        legend_names <- NULL
+        }
+
+    if(sum(grepl("color_Metab", names(Plot_SettingsInfo)))>0){
+      names <- Plot_SettingsInfo[grepl("color_Metab", names(Plot_SettingsInfo))]
+      colour_names_M <- NULL
+      legend_names_M <- NULL
+      for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        legend_names_M[x] <- names_sel
+        colour_names_M[x] <- Plot_SettingsFile_Metab[names[[x]]]
+      }
+      }else{
+        colour_names_M <- NULL
+        legend_names_M <- NULL
+        }
+
+    legend_head <- c(legend_names, legend_names_M)
+    longest_name <- legend_head[which.max(nchar(legend_head[[1]]))]
+    character_count_head <- nchar(longest_name)+4#This is the length of the legend title name
+
+    legend_names <- c(unlist(colour_names), unlist(colour_names_M))
+    longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
+    character_count <- nchar(longest_name)#This is the length of the legend colour names
+
+
+    plottable$widths[6] <- unit(((max(character_count_head, character_count))*0.2)+0.7, "cm")#legend space
+  }else{
+    plottable$widths[6] <- unit(0, "cm")#legend space
+  }
+
+  #heatmap labels
+  if(sum(grepl("color_Sample", names(Plot_SettingsInfo)))>0 ){#We have a legend for the color on the x-axis
+    # Find the longest column name/color name and count its characters:
+    names <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
+    colour_names <- NULL
+    for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        colour_names[x] <- names_sel
+    }
+
+    if(show_rownames==TRUE){#check if we also display feature names
+      column_names <- c(colnames(data_path),colour_names)
+      longest_column_name <- column_names[which.max(nchar(column_names))]
+      character_count <- nchar(longest_column_name)
+    }else{
+      character_count <- 2
+    }
+
+    plottable$widths[4] <- unit(character_count*0.2, "cm")#feature labels on heatmap --> unit(sum(grid::convertX(unit(as.numeric(1), "grobwidth", data=plottable), "cm", valueOnly = TRUE), grid::convertX(unit(as.numeric(10), "bigpts", data=plottable), "cm", valueOnly = TRUE)), "cm")
+
+    #Summary:
+    plot_widths <- 2+(as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[4])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[1])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[6])))
+
+  }else if(sum(grepl("color_Sample", names(Plot_SettingsInfo)))==0){
+    # Find the longest column name and count its characters:
+    if(show_rownames==TRUE){#check if we also display feature names
+      column_names <- colnames(data_path)
+      longest_column_name <- column_names[which.max(nchar(column_names))]
+      character_count <- nchar(longest_column_name)
+    }else{
+      character_count <- 2
+    }
+
+    plottable$widths[4] <- unit(character_count*0.2, "cm")#feature labels on heatmap --> unit(sum(grid::convertX(unit(as.numeric(1), "grobwidth", data=plottable), "cm", valueOnly = TRUE), grid::convertX(unit(as.numeric(10), "bigpts", data=plottable), "cm", valueOnly = TRUE)), "cm")
+
+    #Summary:
+    plot_widths <- 2+(as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[4])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[1])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[6])))
+    }
+
+  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
+  Output<- list(plot_heights, plot_widths, plottable)
+}
+
+
+
