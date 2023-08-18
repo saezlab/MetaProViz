@@ -212,13 +212,10 @@ P1
 P2 <- Outlier_Plots[[2]]
 P2
 
-```
-```{r}
 #3.Hotellins Outlier
- Outlier_Plots[[3]]
+P3 <- Outlier_Plots[[3]]
+P3
 
-```
-```{r}
 ################### 
 #If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
 #Here a second round was performed and the plots saved:
@@ -457,12 +454,9 @@ MetaProViz::MC_ORA(Input_data=MCAres,
 \
 
 # 3. Run MetaProViz Visualisation
-One of the big advantages of `MetaProViz` visualisation module is that the user can choose the format (e.g. pdf, svg,...) in which the figures should be saved and that they are saved in a publication ready style. This means that the x- and y-axis size will always be adjusted for the amount of sample or features, or in the case of Volcano plot and PCA plot have a fixed sizes. In this way, there is no need for many adjustments and the figures can just be dropped into the presentation or paper.\
+The big advantages of the `MetaProViz` visualization module is its flexible and easy usage, which we will showcase below and that the figures are saved in a publication ready style and format. For instance, the x- and y-axis size will always be adjusted for the amount of samples or features (=metabolites) plotted, or in the case of Volcano plot and PCA plot the axis size is fixed and not affected by figure legends or title. In this way, there is no need for many adjustments and the figures can just be dropped into the presentation or paper and are all in the same style.\
 \
-In general, each of the different plot types (e.g. Volcano plot, Lollipop graph,...) have up to 3 main `Plot_Settings`.\
-`1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
-`2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
-`3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+All the `VizPlotName()` functions are constructed in the same way. Indeed, with the parameter `Plot_SettingsInfo` the user can pass a named vector with information about the metadata column that should be used to customize the plot by colour, shape or creating individual plots, which will all be showcased for the different plot types. Via the parameter `Plot_SettingsFile` the user can pass the metadata DF, which can be dependent on the plot type for the samples and/or the features (=metabolites). In case of both the parameter is named `Plot_SettingsFile_Sample` and `Plot_SettingsFile_Metab`.\
 \
 In each of those Plot_Settings, the user can label color and/or shape based on additional information (e.g. Pathway information, Cluster information or other other demographics like gender). Moreover, we also enable to plot individual plots where applicable based on those MetaData (e.g. one plot for each metabolic pathway).\
 For this we need a metadata table including information about our samples that could be relevant to e.g. color code:\
@@ -622,6 +616,7 @@ MetaProViz::VizHeatmap(Input_data = Input_Heatmap,
 You can also choose to make individual plots for any Sample Metadata using `individual_Sample` (e.g. in patients you may want to plot male and female separately). Moreover, you can also use both at the same time.
 
 ### Bar/Box/Violin plots
+This is a really simple plot type, where you can generate an individual plot for each of your features (=metabolites).  
 
 ```{r}
 
@@ -630,12 +625,31 @@ You can also choose to make individual plots for any Sample Metadata using `indi
 
 
 ### Volcano plot
-Here we will look at all the different options we have to display our results from the different analysis (DMA, MCA, PEA), which will help us to interpret our results as this can be sometimes difficult from the many data tables.
-
-Note: show the input DF --> Log2Fc and p.adj!
+In general,we have three different `Plot_Settings`, which will also be used for other plot types such as lollipop graphs.\
+`1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
+`2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
+`3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+\
+Here we will look at all the different options we have to display our results from the different analysis (DMA, PEA), which will help us to interpret our results as this can be sometimes difficult to do from the many data tables.\
+Just a quick reminder, how the input data look like:\
+1. Results of Differential Metabolite Analysis (DMA): Log2FC and stats:\
+```{r, echo=FALSE}
+# Check how our data looks like:
+`DMA_786-M1A_vs_HK2`[1:7,]%>%
+  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizVolcano()` are for example differential analysis results from `MetaProViz::DMA()`.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+2. Results from Pathway Enrichment Analysis (PEA): Score (e.g. NES score) and stats\
+```{r, echo=FALSE}
+# Check how our data looks like:
+ORA_786M1A_vs_HK2[1:7,]%>%
+  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizVolcano()` are for example pathway enrichment results from `MetaProViz::DM_ORA()`.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
 
 #### **Standard**
-Here we will first look into the results from the differential analysis (see above 2.2 DMA) for the comparison of `786-M1A_vs_HK2`:
+Here we will first look into the results from the differential analysis (see section `DMA` above) for the comparison of `786-M1A_vs_HK2`:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
 MetaProViz::VizVolcano(Input_data=`DMA_786-M1A_vs_HK2`)
