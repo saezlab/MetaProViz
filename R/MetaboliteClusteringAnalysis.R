@@ -314,7 +314,7 @@ MCA_2Cond <- function(Cond1_File,
                                        Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
                                        Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
                                        Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
-                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1_UP',#State 1
+                                       Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 1
                                        TRUE ~ 'NA'))%>%
     mutate(RG3_SignificantChange = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
                                              Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Core_DOWN',#State 1
@@ -357,7 +357,7 @@ MCA_2Cond <- function(Cond1_File,
                                              Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'None',#State 14
                                              Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Negative" ~ 'None',#State 15
                                              Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
-                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1_UP',#State 1
+                                             Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 1
                                              TRUE ~ 'NA'))
 
   #Safe the DF and return the groupings
@@ -1030,55 +1030,3 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
 
   return(MergeDF_Rearrange)
 }
-
-
-
-
-
-#' MCA_Distance
-#'
-#' This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between two conditions.
-#'
-#' @param Cond1_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param Cond2_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param MetaboliteID Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.
-#' @param Cond1ValueCol Column name of Log2FC in Cond1File
-#' @param Cond1PadjCol Column name of adjusted p-value in Cond1File. Can also be you p-value column if you want to use this instead.
-#' @param Cond2ValueCol  Column name of Log2FC in Cond2File
-#' @param Cond2PadjCol Column name of adjusted p-value in Cond2File. Can also be you p-value column if you want to use this instead.
-#' @param Cond1_padj_cutoff  \emph{Optional: } adjusted p-value cutoff for Cond1File. \strong{Default=0.05}
-#' @param Cond2_padj_cutoff \emph{Optional: } adjusted p-value cutoff for Cond2File. \strong{Default=0.05}
-#' @param backgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
-#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
-#' @return MCA an instance of the MetaProViz package
-#' @export
-#'
-
-##################################################
-### ### ### Metabolite Clustering Analysis ### ### ###
-##################################################
-
-#MCA_Distance <- function(Cond1_File, Cond2_File, MetaboliteID= "Metabolite", Cond1ValueCol="Log2FC",Cond1PadjCol="p.adj", Cond2ValueCol="Log2FC", Cond2PadjCol="p.adj",Cond1_padj_cutoff= 0.05, Cond2_padj_cutoff = 0.05, backgroundMethod="C1&C2", OutputFileName = "MCA_Distance_")
-
-
-
-
-
-#' MCA_KMeans
-#'
-#' This script allows you to perform kmeans clustering to compute clusters of metabolites.
-#'
-#' @param
-#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
-#' @return MCA an instance of the MetaProViz package
-#' @export
-#'
-
-###############################################################
-### ### ### Metabolite Clustering Analysis: K-means ### ### ###
-###############################################################
-
-#MCA_KMeans <- function()
-
-
-
