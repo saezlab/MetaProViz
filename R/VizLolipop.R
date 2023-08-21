@@ -247,6 +247,8 @@ VizLolipop<- function(Plot_Settings="Standard",
     stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
   }
 
+  #Add the theme
+
   ## ------------ Create Output folders ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
   WorkD <- getwd()
@@ -692,9 +694,12 @@ VizLolipop<- function(Plot_Settings="Standard",
         }
       }
 
-
-
-
+      #Add the theme
+      if(is.null(Theme)==FALSE){
+        lolipop_plot <- lolipop_plot+Theme
+      }else{
+        lolipop_plot <- lolipop_plot+theme_classic()
+      }
 
       plot(lolipop_plot)
 

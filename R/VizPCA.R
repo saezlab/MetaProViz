@@ -32,7 +32,7 @@
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param Show_Loadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param Theme \emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}
+#' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = NULL}
 #' @param color_scale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
@@ -128,7 +128,15 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   if(is.logical(Scaling) == FALSE){
     stop("Check input. The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
   }
+
   # Theme check
+  if(is.null(Theme)==FALSE){
+    Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
+    if (Theme %in% Theme_options == FALSE){
+      stop("Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
+    }
+  }
+
   # color_scale check
 
   Save_as_Plot_options <- c("svg","pdf", "png")
