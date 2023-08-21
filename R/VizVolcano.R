@@ -40,7 +40,7 @@
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
-#' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = NULL}
+#' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #'
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
 #'
@@ -68,7 +68,6 @@ VizVolcano <- function(Plot_Settings="Standard",
                        Theme= NULL,
                        Save_as_Plot= "svg"
                        #add assign=TRUE/FALSE if the user wants the plotlist returned
-                       #add parameter for margins that the plot should be saved in
                        ){
 
   ## ------------ Setup and installs ----------- ##
@@ -203,8 +202,14 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
     }
 
-  #outputplotname
+
   #theme
+    if(is.null(Theme)==FALSE){
+      Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
+      if (Theme %in% Theme_options == FALSE){
+      stop("Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
+    }
+    }
 
   # Rename the x and y lab if the information has been passed:
   if(is.null(xlab)==TRUE){#use column name of x provided by user
@@ -318,7 +323,8 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
 
           #Set the total heights and widths
-          Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
+          PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
+          Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
           Plot <-Plot_Sized[[3]]
 
           #save plot and get rid of extra signs before saving
@@ -535,7 +541,8 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
 
           #Set the total heights and widths
-          Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
+          PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
+          Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
           Plot <-Plot_Sized[[3]]
 
           #save plot and get rid of extra signs before saving
@@ -690,6 +697,8 @@ VizVolcano <- function(Plot_Settings="Standard",
             names(col) <- InputVolcano$color[row]
             keyvals <- c(keyvals, col)
           }
+
+          LegendPos<- "right"
         } else{
           keyvals <-NULL
         }
@@ -703,8 +712,14 @@ VizVolcano <- function(Plot_Settings="Standard",
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
           }
+
+          LegendPos<- "right"
         } else{
           keyvalsshape <-NULL
+        }
+
+        if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
+          LegendPos<- "none"
         }
 
         #Prepare the Plot:
@@ -734,7 +749,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
                                                 legendLabels=c(paste(x," < |", FCcutoff, "|"), paste(x," > |", FCcutoff, "|"), paste(y, ' < ', pCutoff) , paste(y, ' < ', pCutoff,' & ',x," < |", FCcutoff, "|")),
-                                                legendPosition = 'right',
+                                                legendPosition = LegendPos,
                                                 legendLabSize = 7,
                                                 legendIconSize =4,
                                                 gridlines.major = FALSE,
@@ -746,7 +761,8 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
 
         #Set the total heights and widths
-        Plot_Sized <- MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
+        PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
+        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
         Plot <-Plot_Sized[[3]]
 
         #save plot and get rid of extra signs before saving
@@ -783,7 +799,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, OutputPlotName, Subtitle){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
+  plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable:  gtable::gtable_show_layout(plottable)
   if(is.null(keyvals)==TRUE & is.null(keyvalsshape)==TRUE){
     #-----widths
     plottable$widths[5] <- unit(6, "cm")#controls x-axis
@@ -794,20 +810,31 @@ plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, OutputPlotName, Subti
     plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
     plot_widths <- 14
 
+    if((OutputPlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
+      Titles <- c(OutputPlotName, Subtitle)
+      longest_title <- Titles[which.max(nchar(Titles))]
+      character_count <- nchar(longest_title)
+      Titles_width <- (character_count*0.25)+0.8
+      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
+        plot_widths <- Titles_width
+      }
+    }
+
     #-----heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
     plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
     plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
 
     if(OutputPlotName=="" & Subtitle==""){
       plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
       plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 10.5
+      plot_heights <- 11
     } else{
       plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
-      plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <-11
+      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+      plot_heights <-11.5
     }
   }else if(is.null(keyvals)==FALSE & is.null(keyvalsshape)==FALSE){
     #------- Legend heights
@@ -824,29 +851,27 @@ plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, OutputPlotName, Subti
     Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
     plot_widths <- 9+Value
 
+    if((OutputPlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
+      Titles <- c(OutputPlotName, Subtitle)
+      longest_title <- Titles[which.max(nchar(Titles))]
+      character_count <- nchar(longest_title)
+      Titles_width <- (character_count*0.25)+0.8
+      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
+        plot_widths <- Titles_width
+      }
+    }
+
     #-----Plot heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
     plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
     plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
 
     if(OutputPlotName=="" & Subtitle==""){
       plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
       plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
 
-      if(Legend_heights>10.5){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-10.5)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 10.5
-      }
-    } else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
       if(Legend_heights>11){#If the legend requires more heights than the Plot
         Add <- (Legend_heights-11)/2
         plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
@@ -856,6 +881,19 @@ plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, OutputPlotName, Subti
         plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
         plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
         plot_heights <- 11
+      }
+    } else{#If we do have Title and or subtitle
+      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
+      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+      if(Legend_heights>11.5){#If the legend requires more heights than the Plot (excluding title space)
+          Add <- (Legend_heights-11.5)/2
+          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+          plot_heights <- Legend_heights
+        }else{
+        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+        plot_heights <- 11.5
       }
     }
   }else if(is.null(keyvals)==FALSE | is.null(keyvalsshape)==FALSE){
@@ -873,30 +911,41 @@ plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, OutputPlotName, Subti
     Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
     plot_widths <- 9+Value
 
+    if((OutputPlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
+      Titles <- c(OutputPlotName, Subtitle)
+      longest_title <- Titles[which.max(nchar(Titles))]
+      character_count <- nchar(longest_title)
+      Titles_width <- (character_count*0.25)+0.8
+      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
+        plot_widths <- Titles_width
+      }
+    }
+
     #-----Plot heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
     plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
     plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
 
     if(OutputPlotName=="" & Subtitle==""){
       plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
       plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
 
-      if(Legend_heights>10.5){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-10.5)/2
+      if(Legend_heights>11){#If the legend requires more heights than the Plot
+        Add <- (Legend_heights-11)/2
         plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
         plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
         plot_heights <- Legend_heights
       }else{
         plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
         plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 10.5
+        plot_heights <- 11
       }
     }else{#If we do have Title and or subtitle
       plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> OutputPlotName and subtitle
       plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
+      if(Legend_heights>11){#If the legend requires more heights than the Plot (excluding title space)
         Add <- (Legend_heights-11)/2
         plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
         plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom

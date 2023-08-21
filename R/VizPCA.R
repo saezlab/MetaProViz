@@ -279,6 +279,15 @@ plotGrob_PCA <- function(Input, Plot_SettingsInfo, OutputPlotName){
     plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
     plot_widths <- 11
 
+    if((OutputPlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
+      character_count <- nchar(OutputPlotName)
+      Titles_width <- (character_count*0.25)+0.8
+      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
+        plot_widths <- Titles_width
+      }
+    }
+
     #-----heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
     plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
@@ -308,6 +317,15 @@ plotGrob_PCA <- function(Input, Plot_SettingsInfo, OutputPlotName){
 
     Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
     plot_widths <- 11+Value
+
+    if((OutputPlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
+      character_count <- nchar(OutputPlotName)
+      Titles_width <- (character_count*0.25)+0.8
+      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
+        plot_widths <- Titles_width
+      }
+    }
 
     #-----Plot heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
@@ -357,6 +375,15 @@ plotGrob_PCA <- function(Input, Plot_SettingsInfo, OutputPlotName){
 
     Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
     plot_widths <- 11+Value
+
+    if((OutputPlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
+      character_count <- nchar(OutputPlotName)
+      Titles_width <- (character_count*0.25)+0.8
+      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
+        plot_widths <- Titles_width
+      }
+    }
 
     #-----Plot heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
