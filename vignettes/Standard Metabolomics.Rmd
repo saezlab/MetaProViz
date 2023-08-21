@@ -643,8 +643,8 @@ Just a quick reminder, how the input data look like:\
 2. Results from Pathway Enrichment Analysis (PEA): Score (e.g. NES score) and stats\
 ```{r, echo=FALSE}
 # Check how our data looks like:
-ORA_786M1A_vs_HK2[1:7,]%>%
-  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizVolcano()` are for example pathway enrichment results from `MetaProViz::DM_ORA()`.") %>%
+ORA_786M1A_vs_HK2[1:7,-c(1)]%>%
+  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizVolcano()` are for example pathway enrichment results from `MetaProViz::DM_ORA()`.", row.names = FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
@@ -664,7 +664,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_786-M1A_vs_HK2`,
                        OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA colour coded for metabolic clusters" )
+                       Subtitle= "Results of DMA. Colour coded for metabolic clusters" )
 
 #If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo
 MetaProViz::VizVolcano(Plot_Settings="Standard",
@@ -672,7 +672,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_786-M1A_vs_HK2`,
                        OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA shape for metabolic clusters" )
+                       Subtitle= "Results of DMA. Shape for metabolic clusters, color for significance." )
 
 #Of course, we can also adapt both, color and shape for the same parameter:
 MetaProViz::VizVolcano(Plot_Settings="Standard",
@@ -680,7 +680,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_786-M1A_vs_HK2`,
                        OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA shape for metabolic clusters" )
+                       Subtitle= "Results of DMA. Shape and color for metabolic clusters." )
 ```
 \
 Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot too. \
@@ -690,8 +690,8 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsInfo= c( color="Pathway"),
                        Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_786-M1A_vs_HK2`,
-                       OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA shape for metabolic clusters" )
+                       OutputPlotName= "786M1A versus HK2 Results of DMA. Colour for metabolic pathways.",
+                       Subtitle= "Results of DMA. Colour for metabolic pathways." )
 ```
 \
 We immediately see that there are many pathways displayed on the plot, which can make it difficult to interpret. Hence, we will change our plot settings in order to get individual plots for each of the pathways:
@@ -702,7 +702,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Plot_SettingsFile= MetaData_Metab,
                        Input_data=`DMA_786-M1A_vs_HK2`,
                        OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA shape for metabolic clusters" )
+                       Subtitle= "Results of DMA. Colour for metabolic pathways." )
 ```
 
 <div class="vscroll-plot">
@@ -726,7 +726,7 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
 MetaProViz::VizVolcano(Plot_Settings="Compare",
                        Input_data=`DMA_786-M1A_vs_HK2`,
                        AdditionalInput_data=`DMA_786-O_vs_HK2`,
-                       OutputPlotName= "786M1A versus HK2 compared to 7860 versus HK2",
+                       OutputPlotName= "786M1A vs HK2 compared to 7860 vs HK2",
                        Subtitle= "Results of DMA" )
 ```
 
@@ -737,7 +737,7 @@ MetaProViz::VizVolcano(Plot_Settings="Compare",
                        Plot_SettingsFile= MetaData_Metab,
                         Input_data=`DMA_786-M1A_vs_HK2`,
                        AdditionalInput_data=`DMA_786-O_vs_HK2`,
-                       OutputPlotName= "786M1A versus HK2 compared to 7860 versus HK2",
+                       OutputPlotName= "786M1A vs HK2 compared to 7860 vs HK2",
                        Subtitle= "Results of DMA" )
 ```
 
