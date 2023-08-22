@@ -365,7 +365,7 @@ Preprocessing <- function(Input_data,
   if (CoRe ==  TRUE){
     CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
     if(dim(CoRe_medias)[1]==1){
-      warning("Only 1 CoRe_media sample was found. Thus, the consistency of the CoRe_media samples cannot be checked. We assume this was done beforehand and the CoRe_media samples are already summed.")
+      warning("Only 1 CoRe_media sample was found. Thus, the consistency of the CoRe_media samples cannot be checked. It is assumed that the CoRe_media samples are already summed.")
       CoRe_media_df <- CoRe_medias %>% t() %>% as.data.frame()
       colnames(CoRe_medias) <- "CoRe_mediaMeans"
 
@@ -374,52 +374,119 @@ Preprocessing <- function(Input_data,
       ## Check metabolite variance
       # Thresholds
       Therhold_cv = 1
-      Threshold_SEMean = 0.1
+      data_cv <- CoRe_medias
 
       ## Coefficient of Variation
-      CV_data <- CoRe_medias
-      result_df <- apply(CV_data, 2,  function(x) { sd(x)/  mean(x) }  ) %>% t()%>% as.data.frame()
+      result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+      result_df[1, is.na(result_df[1,])]<- 0
       rownames(result_df)[1] <- "CV"
 
-      ## Standard Error of Mean
-      SE_data <- log10(CoRe_medias) %>% as.data.frame()
-      # remove zero variance and non mumeric values
-      zero_var_features<- as.vector(sapply(SE_data, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
-      zero_var_features[is.na(zero_var_features)] <- TRUE
-      if( sum(zero_var_features)>0){
-        SE_data <- SE_data[,!zero_var_features]
-      }
-      # make shapiro test
-      shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
-      shaptestres <- as.data.frame(t(shaptestres))
-      Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
-      NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
-      # Do we need to report this again ?
-      message(Norm, " % of the CoRe_media samples metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
+      result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+      rownames(result_df)<- colnames(data_cv)
 
-      # Mean
-      SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
-      result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
-      rownames(result_df)[2] <- "SEMean"
-
-      result_df_final <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-        mutate(CV_high_var = CV > Therhold_cv,
-               SEMean_high_var = SEMean > Threshold_SEMean) %>%
-        mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
-                                           TRUE ~ FALSE)) %>% as.data.frame()
-      rownames(result_df_final)<- colnames(CoRe_medias)
-
-      high_var_metabs <- sum(result_df_final$High_var_Metabs == TRUE)
+      high_var_metabs <- sum(result_df$High_var == TRUE)
       if(high_var_metabs>0){
-        message(paste0(high_var_metabs, " of variables have high variability in the CoRe_media samples. Please  consider checking the pooled samples to decide whether to remove these metabolites or not."))
+        message(paste0(high_var_metabs, " of variables have high variability in the CoRe_media samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
       }
-      CoRe_media_df <- as.data.frame(data.frame("CoRe_mediaMeans"=  colMeans( CoRe_medias)))
+
+      # Do sample outlier testing
+      if(dim(CoRe_medias)[1]>3){
+
+        Outlier_data <- CoRe_medias
+        Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
+
+        while(high_var_metabs>0){
+        #remove the furthest value from the mean
+        max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
+          mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
+          summarise_all(.funs = ~ which.max(abs(.)))
+
+        # Remove rows based on positions
+        for(i in 1:length(max_var_pos)){
+          data_cv[max_var_pos[[i]],names(max_var_pos)[i]] <- NA
+          Outlier_data[max_var_pos[[i]],names(max_var_pos)[i]] <- TRUE
+          }
+
+        # ReCalculate standard deviation for each column in the filtered data
+        result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+        result_df[1, is.na(result_df[1,])]<- 0
+        rownames(result_df)[1] <- "CV"
+
+        result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+          mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+        rownames(result_df)<- colnames(data_cv)
+
+        high_var_metabs <- sum(result_df$High_var == TRUE)
+        }
+
+
+        data_cont <- Outlier_data %>% t() %>% as.data.frame()
+
+        # List to store results
+        fisher_test_results <- list()
+        large_contingency_table <- matrix(0, nrow = 2, ncol = ncol(data_cont))
+
+        for (i in 1:length(colnames(data_cont))) {
+          sample = colnames(data_cont)[i]
+          current_sample <- data_cont[, sample]
+
+          contingency_table <- matrix(0, nrow = 2, ncol = 2)
+          contingency_table[1, 1] <- sum(current_sample)
+          contingency_table[1, 2] <- sum(!current_sample)
+          contingency_table[2, 1] <- sum(rowSums(data_cont) - current_sample)
+          contingency_table[2, 2] <- sum(nrow(data_cont) - rowSums(data_cont) + current_sample)
+
+          # Fisher's exact test
+          fisher_test_result <- fisher.test(contingency_table)
+          fisher_test_results[[sample]] <- fisher_test_result
+
+          # Calculate the sum of "TRUE" and "FALSE" for the current sample
+          large_contingency_table[1, i] <- sum(current_sample)  # Sum of "TRUE"
+          large_contingency_table[2, i] <- sum(!current_sample) # Sum of "FALSE"
+
+        }
+
+        # Convert the matrix into a data_contframe for better readability
+        contingency_data_contframe <- as.data.frame(large_contingency_table)
+        colnames(contingency_data_contframe) <- colnames(data_cont)
+        rownames(contingency_data_contframe) <- c("High_var", "Low_var")
+
+        contingency_data_contframe <- contingency_data_contframe %>% mutate(Total = rowSums(contingency_data_contframe))
+        contingency_data_contframe <- rbind(contingency_data_contframe, Total= colSums(contingency_data_contframe))
+
+        if (ExportQCPlots == TRUE){
+          assign("CoRe_media_contingency_table", contingency_data_contframe, envir=.GlobalEnv)
+        }
+
+
+        different_samples <- c()
+        for (sample in colnames(data_cont)) {
+          p_value <- fisher_test_results[[sample]]$p.value
+          if (p_value < 0.05) {  # Adjust the significance level as needed
+            different_samples <- c(different_samples, sample)
+          }
+        }
+
+        if(is.null(different_samples)==FALSE){
+          warning("The CoRe_media samples ", paste(different_samples, collapse = ", "), " were found to be different from the rest. They will not be included in the sum of the CoRe_media samples.")
+          }
+        # Filter the CoRe_media samples
+        CoRe_medias <- CoRe_medias %>% filter(!rownames(CoRe_medias) %in% different_samples)
+
+
+
+      }
+
+
+
+      CoRe_media_df <- as.data.frame(data.frame("CoRe_mediaMeans"=  colMeans( CoRe_medias, na.rm = TRUE)))
+
+
     }
 
-    # Do sample outlier testing  #### MISSING STILL
-    # if(dim(CoRe_medias)[1]>3){
-    #   # We use anova to see if any wample i
-    # }
+    # Remove CoRe_media samples from the data
+    Data_TIC <- Data_TIC[-grep("CoRe_media", Conditions),]
 
     Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-CoRe_media_df$CoRe_mediaMeans)))  #Subtract from each sample the CoRe_media mean
     message("CoRe data are normalised using CoRe_norm_factor")
@@ -429,10 +496,10 @@ Preprocessing <- function(Input_data,
       warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
     }
     # Remove CoRe_media samples from the data
-    Data_TIC <- Data_TIC[Input_SettingsFile$Conditions!="CoRe_media",]
     Input_SettingsFile <- Input_SettingsFile[Input_SettingsFile$Conditions!="CoRe_media",]
     Conditions <- Conditions[!Conditions=="CoRe_media"]
   }
+
   data_norm <- Data_TIC %>% as.data.frame()
 
 
@@ -837,10 +904,8 @@ ReplicateSum <- function(Input_data){
 #' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
 #' @param Therhold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
-#' @param Threshold_SEMean \emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Mean ration to the Mean. \strong{Default = 0.1}
-#' @param Threshold_CQV \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Quantile variation. \strong{Default = 0.1}
 #'
-#' @keywords Coefficient of Variation, Standard Error of the Mean, high variance metabolites
+#' @keywords Coefficient of Variation, high variance metabolites
 #' @export
 
 
@@ -848,9 +913,7 @@ Pool_Estimation <- function(Input_data,
                             Input_SettingsFile = NULL,
                             Input_SettingsInfo = NULL,
                             Unstable_feature_remove = FALSE,
-                            Therhold_cv = 1,
-                            Threshold_SEMean = 0.1,
-                            Threshold_CQV = 0.1 ){
+                            Therhold_cv = 1){
 
 
   ## ------------ Check Input files ----------- ##
@@ -897,32 +960,6 @@ Pool_Estimation <- function(Input_data,
   if( is.numeric(Therhold_cv)== FALSE | Therhold_cv < 0){
     stop("Check input. The selected Therhold_cv value should be a positive numeric value.")
   }
-  if( is.numeric(Threshold_SEMean)== FALSE | Threshold_SEMean < 0){
-    stop("Check input. The selected Threshold_SEMean value should be a positive numeric value.")
-  }
-  if( is.numeric(Threshold_CQV)== FALSE | Threshold_CQV < 0){
-    stop("Check input. The selected Threshold_CQV value should be a positive numeric value.")
-  }
-
-
-
-  # This is to take only the numeric data but its not needed since the input has to be numeric or it stops at the checks in the beginning.
-  # if(is.null(Input_SettingsFile)==TRUE){
-  #   Input_numeric <- apply(Input_data, 2, as.numeric  )  %>% as.data.frame()
-  #   non_numeric_cols <- which(colSums(Input_numeric, na.rm = T)==0) %>% as.vector()
-  #   if(length(non_numeric_cols) >0 ){
-  #     Input_numeric <- Input_numeric[,-c(non_numeric_cols )]
-  #   }
-  # }else{
-  #   # Get only pool sample data from Input data
-  #   pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
-  #   pool_data_numeric <- apply(pool_data, 2, as.numeric  ) %>% as.data.frame()
-  #   non_numeric_cols <-  which(colSums(pool_data_numeric, na.rm = T)==0) %>% as.vector()
-  #   if(length(non_numeric_cols) >0 ){
-  #     pool_data_numeric <- pool_data_numeric[,-c(non_numeric_cols ) ]
-  #   }
-  #   Input_numeric <- pool_data_numeric
-  # }
 
   if(is.null(Input_SettingsFile)==TRUE){
     Input_numeric <- Input_data
@@ -936,50 +973,13 @@ Pool_Estimation <- function(Input_data,
   result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
   rownames(result_df)[1] <- "CV"
   # Since we expect the pool samples to have very small variation since they "are the same sample" we go for CV=1 as threshold
-  #which(result_df[1,]>Therhold_cv)
 
-  ## Standard Error of Mean
-  SE_data <- log10(Input_numeric) %>% as.data.frame()
-
-  # remove zero variance and non mumerix
-  zero_var_features<- as.vector(sapply(SE_data, function(x) var(x, na.rm = T)) == 0)#  we have to remove features with zero variance if there are any.
-  zero_var_features[is.na(zero_var_features)] <- TRUE
-  if( sum(zero_var_features)>0){
-    SE_data <- SE_data[,!zero_var_features]
-  }
-  # make shapiro test
-  shaptestres <- as.data.frame(sapply(SE_data, function(x) shapiro.test(x))) # do the test for each metabolite
-  shaptestres <- as.data.frame(t(shaptestres))
-
-  Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
-  NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(SE_data)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
-  # Do we need to report this again ?
-  message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
-
-  SEMean <- apply(SE_data, 2,  function(x) { sd(x, na.rm = T)/  sqrt(length(x)) }  ) %>% t()%>% as.data.frame()
-  result_df[2,]<-  SEMean# /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
-  rownames(result_df)[2] <- "SEMean"
-
-  ## Quartile coefficient of dispersion
-  QC_data <- Input_numeric %>% as.data.frame()
-
-  CQV <- apply(SE_data, 2, function(x){
-    q1=quantile(x,0.25)
-    q3=quantile(x,0.75)
-    as.numeric((q3-q1)/(q3+q1))}  ) %>% t()%>% as.data.frame()
-
-  result_df[3,]<-  CQV # /  apply(SE_data, 2,function(x)  {mean(x, na.rm = T)})
-  rownames(result_df)[3] <- "CQV"
 
   result_df_final <- result_df %>%
     t()%>%
     as.data.frame() %>%
     rowwise() %>%
-    mutate(CV_high_var = CV > Therhold_cv,
-           SEMean_high_var = SEMean > Threshold_SEMean,
-           CQV_high_var = CQV > Threshold_CQV) %>%
-    mutate(High_var_Metabs = case_when(sum(CV_high_var,SEMean_high_var, CQV_high_var)>1 ~ TRUE, # if 2 out of 3 are true then results as true otherwise false
-                                       TRUE ~ FALSE)) %>% as.data.frame()
+    mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
 
   rownames(result_df_final)<- colnames(Input_numeric)
 
