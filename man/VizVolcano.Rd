@@ -20,6 +20,7 @@ VizVolcano(
   FCcutoff = 0.5,
   color_palette = NULL,
   shape_palette = NULL,
+  SelectLab = "",
   Connectors = FALSE,
   Subtitle = "",
   Theme = NULL,
@@ -41,6 +42,8 @@ VizVolcano(
 
 \item{AdditionalInput_data}{\emph{Optional: } DF to compare to main Input_data with the same column names x and y (Plot_Settings="Compare") or Pathway enrichment analysis results (Plot_Settings="PEA"). \strong{Default = NULL}}
 
+\item{OutputPlotName}{\emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}}
+
 \item{Comparison_name}{\emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Plot_Settings= "Compare". \strong{Default = c(Input_data="Cond1", AdditionalInput_data= "Cond2")}}
 
 \item{xlab}{\emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}}
@@ -55,15 +58,15 @@ VizVolcano(
 
 \item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 
+\item{SelectLab}{\emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}}
+
 \item{Connectors}{\emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}}
 
 \item{Subtitle}{\emph{Optional: } \strong{Default = ""}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plot. \strong{Default = NULL}}
+\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
 
 \item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}}
-
-\item{Output_Name}{\emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis

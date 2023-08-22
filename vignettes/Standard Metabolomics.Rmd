@@ -655,6 +655,20 @@ Here we will first look into the results from the differential analysis (see sec
 MetaProViz::VizVolcano(Input_data=`DMA_786-M1A_vs_HK2`)
 ```
 \
+If you seek to plot the metabolite names you can change the paramter `SelectLab` from its default (`SelectLab=""`) to NULL and the metabolite names will be plotted randomly. 
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
+# Run with default parameter --> only need to provide Input_data and the title we like
+MetaProViz::VizVolcano(Input_data=`DMA_786-M1A_vs_HK2`,
+                       SelectLab = NULL)
+```
+\
+With the parameter `SelectLab` you can also pass a vector with Metabolite nemaes that should be labeled:
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
+# Run with default parameter --> only need to provide Input_data and the title we like
+MetaProViz::VizVolcano(Input_data=`DMA_786-M1A_vs_HK2`,
+                       SelectLab = c("N-acetylaspartylglutamate", "cystathionine", "orotidine"))
+```
+\
 Next we may be interested to understand which metabolite clusters based on our MCA the metabolites of the plot correspond to. In order to do this we can provide a Plot_SettingsFile with this additional information and use this information to color code and/or to shape the dots on the volcano plot. In order to choose the right column we need to provide a vector Plot_SettingsInfo with this information.\
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results."}
 
@@ -683,12 +697,11 @@ MetaProViz::VizVolcano(Plot_Settings="Standard",
                        Subtitle= "Results of DMA. Shape and color for metabolic clusters." )
 ```
 \
-Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot too. \
+Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot. This is also a good example to showcase the flexibility of the visualisation function: Either you use the parameter `Plot_SettingsFile= MetaData_Metab` as above, but as we have the column "Pathway" also in our Input_data you can also pass `Plot_SettingsFile= DMA_786-M1A_vs_HK2` or simply use the default `Plot_SettingsFile=NULL`, in which case the `Plot_SettingsInfo` information (here `color`) will be used from Input_data. \
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results."}
 #Now we can use color for the pathways and shape for the metabolite clusters:
 MetaProViz::VizVolcano(Plot_Settings="Standard",
-                       Plot_SettingsInfo= c( color="Pathway"),
-                       Plot_SettingsFile= MetaData_Metab,
+                       Plot_SettingsInfo= c(color="Pathway"),
                        Input_data=`DMA_786-M1A_vs_HK2`,
                        OutputPlotName= "786M1A versus HK2 Results of DMA. Colour for metabolic pathways.",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )

@@ -30,7 +30,7 @@
 #' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
 #' @param AdditionalInput_data \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Plot_Settings="Compare") or Pathway enrichment analysis results (Plot_Settings="PEA"). \strong{Default = NULL}
-#' @param Output_Name \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
+#' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
 #' @param Comparison_name \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Plot_Settings= "Compare". \strong{Default = c(Input_data="Cond1", AdditionalInput_data= "Cond2")}
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
@@ -38,6 +38,7 @@
 #' @param FCcutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
+#' @param SelectLab \emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
@@ -63,11 +64,11 @@ VizVolcano <- function(Plot_Settings="Standard",
                        FCcutoff= 0.5,
                        color_palette= NULL,
                        shape_palette=NULL,
+                       SelectLab= "",
                        Connectors=  FALSE,
                        Subtitle= "",
                        Theme= NULL,
                        Save_as_Plot= "svg"
-                       #add assign=TRUE/FALSE if the user wants the plotlist returned
                        ){
 
   ## ------------ Setup and installs ----------- ##
@@ -100,10 +101,33 @@ VizVolcano <- function(Plot_Settings="Standard",
   Plot_options <- c("Standard", "Compare", "PEA")
   if (Plot_Settings %in% Plot_options == FALSE){
     stop("Plot_Settings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+  }
+  if(is.null(Plot_SettingsInfo)==FALSE){
+    if(is.vector(Plot_SettingsInfo)==FALSE){
+      stop("Plot_SettingsInfo must be a named vector or NULL.")
     }
+  }
+  if(is.null(Plot_SettingsFile)==FALSE & "Metabolite" %in% names(Plot_SettingsFile)==FALSE){
+    stop("Check input. Plot_SettingsFile must contain a column named `Metabolite` including the metabolite names.")
+  }
   if(is.vector(Plot_SettingsInfo)==TRUE & is.null(Plot_SettingsFile)==TRUE){
-    stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
+    if("color" %in% names(Plot_SettingsInfo)==TRUE){#If Plot_SettingsFile=NULL, check if Input_data contain required columns
+      if(Plot_SettingsInfo[["color"]] %in% names(Input_data)==FALSE){
+        stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile or the required columns to be present in Input_data.")
       }
+    }
+    if("shape" %in% names(Plot_SettingsInfo)==TRUE){
+      if(Plot_SettingsInfo[["shape"]] %in% names(Input_data)==FALSE){
+        stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile or the required columns to be present in Input_data.")
+      }
+    }
+    if("individual" %in% names(Plot_SettingsInfo)==TRUE){
+      if(Plot_SettingsInfo[["individual" ]] %in% names(Input_data)==FALSE){
+        stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile or the required columns to be present in Input_data.")
+      }
+    }
+    Plot_SettingsFile <- Input_data
+    }
   if(is.vector(Plot_SettingsInfo)==TRUE){
     if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
       if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==TRUE){
@@ -144,8 +168,16 @@ VizVolcano <- function(Plot_Settings="Standard",
   }
   }
 
-   #3. AdditionalInput_data
-   if(Plot_Settings=="Compare" & is.data.frame(AdditionalInput_data)==TRUE){
+  #3. Select Input_data columns and Plot_SettingsFile columns
+  if(is.null(Plot_SettingsFile)==FALSE){
+    common_columns <- intersect(colnames(Input_data), colnames(Plot_SettingsFile))#check for overlapping names
+    common_columns <- setdiff(common_columns, "Metabolite")#remove metabolites
+    Plot_SettingsFile <- Plot_SettingsFile%>%#rename those column since they otherwise will cause issues when we merge the DFs later
+      dplyr::rename_at(vars(common_columns), ~ paste0(., "_PlotSettingsFile"))
+  }
+
+  #4. AdditionalInput_data
+  if(Plot_Settings=="Compare" & is.data.frame(AdditionalInput_data)==TRUE){
     if(paste(x) %in% colnames(AdditionalInput_data)==TRUE & paste(y) %in% colnames(AdditionalInput_data)==TRUE){
       AdditionalInput_data <- AdditionalInput_data %>%
         dplyr::rename("Log2FC"=paste(x),
@@ -178,7 +210,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                       "PEA_Pathway"=paste(Plot_SettingsInfo[["PEA_Pathway"]]))
        }
 
-  # 4. Check other plot-specific parameters:
+  # 5. Check other plot-specific parameters:
     if(is.null(color_palette)){
       safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
       #check that length is enough for what the user wants to colour
@@ -194,6 +226,9 @@ VizVolcano <- function(Plot_Settings="Standard",
       safe_shape_palette <-shape_palette
       #check that length is enough for what the user wants to shape
     }
+  if(is.null(SelectLab)==FALSE & is.vector(SelectLab)==FALSE){
+      stop("Check input. SelectedLab mus be either NULL or a vector.")
+  }
     if(is.logical(Connectors) == FALSE){
       stop("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
     }
@@ -202,8 +237,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
     }
 
-
-  #theme
+  ##theme
     if(is.null(Theme)==FALSE){
       Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
       if (Theme %in% Theme_options == FALSE){
@@ -211,7 +245,7 @@ VizVolcano <- function(Plot_Settings="Standard",
     }
     }
 
-  # Rename the x and y lab if the information has been passed:
+  ## Rename the x and y lab if the information has been passed:
   if(is.null(xlab)==TRUE){#use column name of x provided by user
     xlab <- bquote(.(as.symbol(x)))
     }else if(is.null(xlab)==FALSE){
@@ -287,6 +321,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                   lab = InputVolcano$Metabolite,#Metabolite name
+                                                  selectLab = SelectLab,
                                                   x = paste(x),
                                                   y = paste(y),
                                                   xlab  =xlab,
@@ -386,6 +421,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                   lab = InputVolcano$Metabolite,#Metabolite name
+                                                  selectLab = SelectLab,
                                                   x = paste(x),
                                                   y = paste(y),
                                                   xlab  =xlab,
@@ -505,6 +541,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                   lab = InputVolcano$Metabolite,#Metabolite name
+                                                  selectLab = SelectLab,
                                                   x = paste(x),
                                                   y = paste(y),
                                                   xlab  =xlab,
@@ -621,6 +658,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$Metabolite,#Metabolite name
+                                                selectLab = SelectLab,
                                                 x = paste(x),
                                                 y = paste(y),
                                                 xlab  =xlab,
@@ -725,6 +763,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$Metabolite,#Metabolite name
+                                                selectLab = SelectLab,
                                                 x = paste(x),
                                                 y = paste(y),
                                                 xlab  =xlab,

@@ -33,7 +33,7 @@ VizPCA(
 
 \item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plots from ggplot2. \strong{Default = NULL}}
+\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = NULL}}
 
 \item{color_scale}{\emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}}
 
