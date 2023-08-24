@@ -88,10 +88,15 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 The raw data are available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
 ```{r}
 MetaProViz::toy_data(data="CoRe")
-
-# Check how our data looks like:
-knitr::kable(Media[6:12, 1:8], caption = "Preview of the DF `CoRe` including columns with sample information and metabolite ids with their measured values.")
 ```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Media[6:12, 1:8]%>%
+  kableExtra::kbl(caption = "Preview of the DF `CoRe` including columns with sample information and metabolite ids with their measured values.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+
 \
 We will split the experimental data into the sample information and the metabolites values using the the column "Code" as the unique identifier:
 ```{r}
@@ -106,18 +111,26 @@ SampleInfo <-Media[c(1:39),c(1:6)]%>%
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
 MetaProViz::toy_data(data="MappingInfo")
-
+```
+```{r, echo=FALSE}
 # Check how our data looks like:
-knitr::kable(MappingInfo[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
+MappingInfo[1:5,]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 `3.` KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis. **(KEGG_Pathways)**\
 ```{r}
 #This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::Load_KEGG()
-
-# Check out how this looks:
-knitr::kable(KEGG_Pathways[1:5,], caption = "Preview of the DF `KEGG_Pathways`.")
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+KEGG_Pathways[1:5,]%>%
+  kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 \

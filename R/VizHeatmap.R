@@ -256,7 +256,7 @@ VizHeatmap <- function(Input_data,
       #----- Save
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
       ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-      plot(heatmap)
+      #plot(heatmap)
       }
     }else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
       IndividualPlots <-unique_paths_Sample
@@ -350,7 +350,7 @@ VizHeatmap <- function(Input_data,
         #----- Save
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-        plot(heatmap)
+        #plot(heatmap)
         }
       }else if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
         IndividualPlots_Metab <-unique_paths
@@ -454,7 +454,7 @@ VizHeatmap <- function(Input_data,
             cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
             ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",cleaned_s, "_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
 
-            plot(heatmap)
+            #plot(heatmap)
             }
         }
     } else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==FALSE){
@@ -536,7 +536,7 @@ VizHeatmap <- function(Input_data,
     #----- Save
     ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
 
-    plot(heatmap)
+    #plot(heatmap)
   }
 }
 
