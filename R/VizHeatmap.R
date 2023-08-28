@@ -30,7 +30,7 @@
 #' @param Plot_SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot
 #' @param SCALE \emph{Optional: } String with the information for scale row or column. \strong{Default = row}
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #'
@@ -154,18 +154,22 @@ VizHeatmap <- function(Input_data,
   }
 
   # 4. Check other plot-specific parameters:
-  Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if (!is.null(Save_as_Plot)) {
+    Save_as_Plot_options <- c("svg","pdf","png")
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
 
   ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Heatmaps_folder = file.path(Results_folder, "Heatmap")
-  if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}  # check and create folder
+  if (!is.null(Save_as_Plot)) {
+    name <- paste0("MetaProViz_Results_",Sys.Date())
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+    Results_folder_plots_Heatmaps_folder = file.path(Results_folder, "Heatmap")
+    if (!dir.exists(Results_folder_plots_Heatmaps_folder)) {dir.create(Results_folder_plots_Heatmaps_folder)}  # check and create folder
+  }
 
   #####################################################
   ## -------------- Plot --------------- ##
@@ -255,7 +259,9 @@ VizHeatmap <- function(Input_data,
 
       #----- Save
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+      if (!is.null(Save_as_Plot)) {
+        ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+      }
       #plot(heatmap)
       }
     }else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
@@ -349,7 +355,9 @@ VizHeatmap <- function(Input_data,
 
         #----- Save
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        if (!is.null(Save_as_Plot)) {
+          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        }
         #plot(heatmap)
         }
       }else if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
@@ -452,8 +460,9 @@ VizHeatmap <- function(Input_data,
             #----- Save
             cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
             cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
-            ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",cleaned_s, "_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
-
+            if (!is.null(Save_as_Plot)) {
+              ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",cleaned_s, "_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
+            }
             #plot(heatmap)
             }
         }
@@ -534,8 +543,9 @@ VizHeatmap <- function(Input_data,
     heatmap <-Plot_Sized[[3]]
 
     #----- Save
-    ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
-
+    if (!is.null(Save_as_Plot)) {
+      ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
+    }
     #plot(heatmap)
   }
 }

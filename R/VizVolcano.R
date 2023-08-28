@@ -43,7 +43,7 @@
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #'
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
 #' @keywords Volcano plot, pathways
 #' @export
@@ -232,9 +232,11 @@ VizVolcano <- function(Plot_Settings="Standard",
     if(is.logical(Connectors) == FALSE){
       stop("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
     }
-    Save_as_Plot_options <- c("svg","pdf", "png")
-    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    if (!is.null(Save_as_Plot)) {
+      Save_as_Plot_options <- c("svg","pdf", "png")
+      if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+        stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+      }
     }
 
   ##theme
@@ -259,13 +261,14 @@ VizVolcano <- function(Plot_Settings="Standard",
       }
 
   ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Volcano_folder = file.path(Results_folder, "Volcano")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  if (!dir.exists(Results_folder_plots_Volcano_folder)) {dir.create(Results_folder_plots_Volcano_folder)}  # check and create folder
-
+  if (!is.null(Save_as_Plot)) {
+    name <- paste0("MetaProViz_Results_",Sys.Date())
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+    Results_folder_plots_Volcano_folder = file.path(Results_folder, "Volcano")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+    if (!dir.exists(Results_folder_plots_Volcano_folder)) {dir.create(Results_folder_plots_Volcano_folder)}  # check and create folder
+  }
   ############################################################################################################
   ## ----------- Make the  plot based on the chosen parameters ------------ ##
   #####--- 1. Standard
@@ -364,10 +367,12 @@ VizVolcano <- function(Plot_Settings="Standard",
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-          if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-          }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          if (!is.null(Save_as_Plot)) {
+            if(OutputPlotName ==""){
+              ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+            }else{
+              ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+            }
           }
           ## Store the plot in the 'plots' list
           PlotList[[cleaned_i]] <- Plot
@@ -462,10 +467,12 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <-Plot_Sized[[3]]
 
           #save plot and get rid of extra signs before saving
-          if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-          }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          if (!is.null(Save_as_Plot)) {
+            if(OutputPlotName ==""){
+              ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+            }else{
+              ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+            }
           }
           #Plot
           plot(Plot)
@@ -584,10 +591,12 @@ VizVolcano <- function(Plot_Settings="Standard",
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-          if(OutputPlotName ==""){
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-          }else{
-            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          if (!is.null(Save_as_Plot)) {
+            if(OutputPlotName ==""){
+              ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+            }else{
+              ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+            }
           }
           ## Store the plot in the 'plots' list
           PlotList[[cleaned_i]] <- Plot
@@ -699,10 +708,12 @@ VizVolcano <- function(Plot_Settings="Standard",
         Plot <-Plot_Sized[[3]]
 
         #save plot and get rid of extra signs before saving i
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-        }else{
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        if (!is.null(Save_as_Plot)) {
+          if(OutputPlotName ==""){
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano." ,Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          }else{
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=Plot,  width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          }
         }
         #Plot
         plot(Plot)
@@ -806,10 +817,12 @@ VizVolcano <- function(Plot_Settings="Standard",
 
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-        }else{
-          ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        if (!is.null(Save_as_Plot)) {
+          if(OutputPlotName ==""){
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          }else{
+            ggsave(file=paste(Results_folder_plots_Volcano_folder,"/", "Volcano_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+          }
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- Plot

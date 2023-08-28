@@ -20,9 +20,9 @@
 #'
 #' This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
 
-##############################
+###################################
 ### ### ### Superplots  ### ### ###
-##############################
+###################################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
@@ -33,7 +33,7 @@
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
 #' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = svg}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #' @export
@@ -117,22 +117,25 @@ VizSuperplot <- function(Input_data,
 
 
   # 4. Check other plot-specific parameters:
-  Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if (!is.null(Save_as_Plot)) {
+    Save_as_Plot_options <- c("svg","pdf","png")
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
 
 
   data <- Input_data
 
   ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Barplots_folder = file.path(Results_folder, paste(Graprh_Style, "plots", sep=""))
-  if (!dir.exists(Results_folder_plots_Barplots_folder)) {dir.create(Results_folder_plots_Barplots_folder)}  # check and create folder
-
+  if (!is.null(Save_as_Plot)) {
+    name <- paste0("MetaProViz_Results_",Sys.Date())
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+    Results_folder_plots_Barplots_folder = file.path(Results_folder, paste(Graprh_Style, "plots", sep=""))
+    if (!dir.exists(Results_folder_plots_Barplots_folder)) {dir.create(Results_folder_plots_Barplots_folder)}  # check and create folder
+  }
 
 
   Metabolite_Names <- colnames(data)
@@ -196,16 +199,19 @@ VizSuperplot <- function(Input_data,
 
     Plot
 
+
     if(Output_plots=="Individual"){
 
       i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
       i <- (gsub(":","_",i))
       i <-(gsub("\\*","",i))
 
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",OutputPlotName,"_",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
+      if (!is.null(Save_as_Plot)) {
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Barplots_folder, "/",OutputPlotName,"_",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
+        }
       }
 
 
@@ -219,14 +225,16 @@ VizSuperplot <- function(Input_data,
   }
 
   if(Output_plots=="Together"){
-    if(OutputPlotName ==""){
-      pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graprh_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
-    }else{
-      pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graprh_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
-      for (plot in outlier_plot_list){
-        replayPlot(plot)
+    if (!is.null(Save_as_Plot)) {
+      if(OutputPlotName ==""){
+        pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graprh_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+      }else{
+        pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graprh_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+        for (plot in outlier_plot_list){
+          replayPlot(plot)
+        }
+        dev.off()
       }
-      dev.off()
     }
   }
 }

@@ -37,7 +37,7 @@
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = NULL}
 #'
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
 #' @keywords Lolipop plot, pathways
 #' @export
@@ -242,21 +242,24 @@ VizLolipop<- function(Plot_Settings="Standard",
   }
 
   # 4. Check other plot-specific parameters:
-  Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if (!is.null(Save_as_Plot)) {
+    Save_as_Plot_options <- c("svg","pdf","png")
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
 
   #Add the theme
 
-  ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_Lolipop_folder = file.path(Results_folder, "Lolipop")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}  # check and create folder
-
+  ## ------------ Create Output folders ----------- ##\
+  if (!is.null(Save_as_Plot)) {
+    name <- paste0("MetaProViz_Results_",Sys.Date())
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+    Results_folder_plots_Lolipop_folder = file.path(Results_folder, "Lolipop")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+    if (!dir.exists(Results_folder_plots_Lolipop_folder)) {dir.create(Results_folder_plots_Lolipop_folder)}  # check and create folder
+  }
   ##########################################################################################################################################
   #--------------Plots:
   if(Plot_Settings=="Standard"){############################################################################################################
@@ -477,10 +480,12 @@ VizLolipop<- function(Plot_Settings="Standard",
 
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+        if (!is.null(Save_as_Plot)) {
+          if(OutputPlotName ==""){
+            ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+          }else{
+            ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+          }
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- lolipop_plot
@@ -703,10 +708,12 @@ VizLolipop<- function(Plot_Settings="Standard",
 
       plot(lolipop_plot)
 
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=10, height=10)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=10, height=10)
+      if (!is.null(Save_as_Plot)) {
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=10, height=10)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=10, height=10)
+        }
       }
     }
   }else if(Plot_Settings=="Compare"){
@@ -816,10 +823,12 @@ VizLolipop<- function(Plot_Settings="Standard",
 
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
-        }else{
-          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+        if (!is.null(Save_as_Plot)) {
+          if(OutputPlotName ==""){
+            ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+          }else{
+            ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+          }
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- lolipop_plot
@@ -908,13 +917,12 @@ VizLolipop<- function(Plot_Settings="Standard",
         lolipop_plot <-   lolipop_plot + geom_text(color="black", size=2)
       }
 
-
-
-
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=12, height=14)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=12, height=14)
+      if (!is.null(Save_as_Plot)) {
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop", ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=12, height=14)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=12, height=14)
+        }
       }
       plot(lolipop_plot)
 
@@ -1152,10 +1160,12 @@ VizLolipop<- function(Plot_Settings="Standard",
 
       #save plot and get rid of extra signs before saving
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      if(OutputPlotName ==""){
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
-      }else{
-        ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+      if (!is.null(Save_as_Plot)) {
+        if(OutputPlotName ==""){
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+        }else{
+          ggsave(file=paste(Results_folder_plots_Lolipop_folder,"/", "Lolipop_", OutputPlotName, "_",cleaned_i, ".",Save_as_Plot, sep=""), plot=lolipop_plot, width=8, height=6)
+        }
       }
       ## Store the plot in the 'plots' list
       PlotList[[cleaned_i]] <- lolipop_plot

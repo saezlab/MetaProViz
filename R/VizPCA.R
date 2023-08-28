@@ -35,7 +35,7 @@
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = NULL}
 #' @param color_scale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #'
 #' @keywords PCA
 #' @export
@@ -51,7 +51,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                    color_scale=NULL,
                    OutputPlotName= '',
                    Save_as_Plot = "svg"
-                  ){
+){
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","ggfortify", "ggplot2")
@@ -75,52 +75,52 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   # 2. The Plot_settings: Plot_Settings, Plot_SettingInfo and Plot_SettingFile
   if(is.vector(Plot_SettingsInfo)==TRUE & is.null(Plot_SettingsFile)==TRUE){
-      stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
-    }
+    stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
+  }
   if(is.vector(Plot_SettingsInfo)==TRUE){
-      if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
-        if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==TRUE){
-          Plot_SettingsFile$shape <- Plot_SettingsFile[,paste(Plot_SettingsInfo[["color"]])]
-          Plot_SettingsFile<- Plot_SettingsFile%>%
-            dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
-        }
-        if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==FALSE & "color" %in% names(Plot_SettingsInfo)==TRUE){
-          Plot_SettingsFile <- Plot_SettingsFile%>%
-            dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
-        }
-        if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==FALSE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
-          Plot_SettingsFile <- Plot_SettingsFile%>%
-            dplyr::rename("shape"=paste(Plot_SettingsInfo[["shape"]]))
-        }
-      } else if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
+    if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==TRUE){
+        Plot_SettingsFile$shape <- Plot_SettingsFile[,paste(Plot_SettingsInfo[["color"]])]
+        Plot_SettingsFile<- Plot_SettingsFile%>%
+          dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+      }
+      if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==FALSE & "color" %in% names(Plot_SettingsInfo)==TRUE){
         Plot_SettingsFile <- Plot_SettingsFile%>%
           dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
-      } else if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      }
+      if((Plot_SettingsInfo[["shape"]] == Plot_SettingsInfo[["color"]])==FALSE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
         Plot_SettingsFile <- Plot_SettingsFile%>%
           dplyr::rename("shape"=paste(Plot_SettingsInfo[["shape"]]))
       }
+    } else if("color" %in% names(Plot_SettingsInfo)==TRUE & "shape" %in% names(Plot_SettingsInfo)==FALSE){
+      Plot_SettingsFile <- Plot_SettingsFile%>%
+        dplyr::rename("color"=paste(Plot_SettingsInfo[["color"]]))
+    } else if("color" %in% names(Plot_SettingsInfo)==FALSE & "shape" %in% names(Plot_SettingsInfo)==TRUE){
+      Plot_SettingsFile <- Plot_SettingsFile%>%
+        dplyr::rename("shape"=paste(Plot_SettingsInfo[["shape"]]))
     }
+  }
 
-    if(is.vector(Plot_SettingsInfo)==FALSE & is.null(Plot_SettingsFile)==FALSE){
-      stop("Plot_SettingsInfo must be named vector or NULL.")
-    }
+  if(is.vector(Plot_SettingsInfo)==FALSE & is.null(Plot_SettingsFile)==FALSE){
+    stop("Plot_SettingsInfo must be named vector or NULL.")
+  }
 
   #3. Check other plot-specific parameters:
   if(is.null(color_palette)){
-      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
-      #check that length is enough for what the user wants to colour
-      #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
-      } else{
-        safe_colorblind_palette <-color_palette
-        #check that length is enough for what the user wants to colour
-        }
+    safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+    #check that length is enough for what the user wants to colour
+    #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
+  } else{
+    safe_colorblind_palette <-color_palette
+    #check that length is enough for what the user wants to colour
+  }
   if(is.null(shape_palette)){
-       safe_shape_palette <- c(15,17,16,18,25,7,8,11,12)
-       #check that length is enough for what the user wants to shape
-       } else{
-        safe_shape_palette <-shape_palette
-        #check that length is enough for what the user wants to shape
-      }
+    safe_shape_palette <- c(15,17,16,18,25,7,8,11,12)
+    #check that length is enough for what the user wants to shape
+  } else{
+    safe_shape_palette <-shape_palette
+    #check that length is enough for what the user wants to shape
+  }
 
   if(is.logical(Show_Loadings) == FALSE){
     stop("Check input. The Show_Loadings value should be either =TRUE if loadings are to also be shown in the PCA plot or = FALSE if not.")
@@ -139,27 +139,31 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   # color_scale check
 
-  Save_as_Plot_options <- c("svg","pdf", "png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if (!is.null(Save_as_Plot)) {
+    Save_as_Plot_options <- c("svg","pdf", "png")
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
 
   ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_plots_PCA_folder = file.path(Results_folder, "PCA")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
-  if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}  # check and create folder
+  if (!is.null(Save_as_Plot)) {
+    name <- paste0("MetaProViz_Results_",Sys.Date())
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+    Results_folder_plots_PCA_folder = file.path(Results_folder, "PCA")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+    if (!dir.exists(Results_folder_plots_PCA_folder)) {dir.create(Results_folder_plots_PCA_folder)}  # check and create folder
+  }
 
   ############################################################################################################
   ## ----------- Set the plot parameters: ------------ ##
   if(is.null(Plot_SettingsFile)==FALSE){
     InputPCA  <- merge(x=Plot_SettingsFile%>%rownames_to_column("UniqueID") , y=Input_data%>%rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
       column_to_rownames("UniqueID")
-    }else{
-      InputPCA  <- Input_data
-      }
+  }else{
+    InputPCA  <- Input_data
+  }
 
   #Prepare the color scheme:
   if("color" %in% names(Plot_SettingsInfo)==TRUE){
@@ -171,9 +175,9 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
       if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
         if(length(unique(InputPCA$color)) > 4){ # change this to change the number after which color is not distinct but continuous
           InputPCA$color <- as.numeric(InputPCA$color)
-          }else{
-            InputPCA$color <- as.factor(InputPCA$color)
-          }
+        }else{
+          InputPCA$color <- as.factor(InputPCA$color)
+        }
       }
     }else if(color_scale=="discrete"){
       InputPCA$color <- as.factor(InputPCA$color)
@@ -183,8 +187,8 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
       }else{
         InputPCA$color <- as.factor(InputPCA$color)
         warning("color_scale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
-        }
       }
+    }
 
 
     #assign column and legend name
@@ -217,22 +221,22 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   ## ----------- Make the  plot based on the choosen parameters ------------ ##
   #Make the plot:
-  PCA <- autoplot(prcomp(as.matrix(Input_data_m, scale. = as.logical(Scaling))),
-                   data= InputPCA,
-                   colour = Param_Col,
-                   fill =  Param_Col,
-                   shape = Param_Sha,
-                   size = 3,
-                   alpha = 0.8,
-                   label=T,
-                   label.size=2.5,
-                   label.repel = TRUE,
-                   loadings= as.logical(Show_Loadings), #draws Eigenvectors
-                   loadings.label = as.logical(Show_Loadings),
-                   loadings.label.vjust = 1.2,
-                   loadings.label.size=2.5,
-                   loadings.colour="grey10",
-                   loadings.label.colour="grey10") +
+  PCA <- autoplot(prcomp(as.matrix(Input_data_m), scale. = as.logical(Scaling)),
+                  data= InputPCA,
+                  colour = Param_Col,
+                  fill =  Param_Col,
+                  shape = Param_Sha,
+                  size = 3,
+                  alpha = 0.8,
+                  label=T,
+                  label.size=2.5,
+                  label.repel = TRUE,
+                  loadings= as.logical(Show_Loadings), #draws Eigenvectors
+                  loadings.label = as.logical(Show_Loadings),
+                  loadings.label.vjust = 1.2,
+                  loadings.label.size=2.5,
+                  loadings.colour="grey10",
+                  loadings.label.colour="grey10") +
     scale_shape_manual(values=shape_select)+
     scale_color_manual(values=color_select)+
     ggtitle(paste(OutputPlotName)) +
@@ -241,7 +245,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   #Add the theme
   if(is.null(Theme)==FALSE){
-      PCA <- PCA+Theme
+    PCA <- PCA+Theme
   }else{
     PCA <- PCA+theme_classic()
   }
@@ -250,10 +254,12 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   Plot_Sized <- MetaProViz:::plotGrob_PCA(Input=PCA, Plot_SettingsInfo=Plot_SettingsInfo, OutputPlotName=OutputPlotName)
   PCA <-Plot_Sized[[3]]
 
-  if(OutputPlotName ==""){
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-  }else{
-    ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+  if (!is.null(Save_as_Plot)) {
+    if(OutputPlotName ==""){
+      ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+    }else{
+      ggsave(file=paste(Results_folder_plots_PCA_folder,"/", "PCA_", OutputPlotName, ".",Save_as_Plot, sep=""), plot=PCA, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+    }
   }
   plot(PCA)
 
