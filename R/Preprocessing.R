@@ -130,7 +130,7 @@ Preprocessing <- function(Input_data,
     if ("CoRe_media" %in% names(Input_SettingsInfo)){
       Input_SettingsFile <- Input_SettingsFile %>%
         mutate(Conditions = ifelse(Conditions == paste(Input_SettingsInfo[["CoRe_media"]]), "CoRe_media", Conditions))
-      }
+    }
 
     if(length(grep("CoRe_media", Input_SettingsFile$Conditions)) < 1){     # Check for CoRe_media samples
       stop("No CoRe_media samples were provided in the 'Conditions' in the Experimental design'. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
@@ -397,27 +397,27 @@ Preprocessing <- function(Input_data,
         Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
 
         while(high_var_metabs>0){
-        #remove the furthest value from the mean
-        max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
-          mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
-          summarise_all(.funs = ~ which.max(abs(.)))
+          #remove the furthest value from the mean
+          max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
+            mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
+            summarise_all(.funs = ~ which.max(abs(.)))
 
-        # Remove rows based on positions
-        for(i in 1:length(max_var_pos)){
-          data_cv[max_var_pos[[i]],names(max_var_pos)[i]] <- NA
-          Outlier_data[max_var_pos[[i]],names(max_var_pos)[i]] <- TRUE
+          # Remove rows based on positions
+          for(i in 1:length(max_var_pos)){
+            data_cv[max_var_pos[[i]],names(max_var_pos)[i]] <- NA
+            Outlier_data[max_var_pos[[i]],names(max_var_pos)[i]] <- TRUE
           }
 
-        # ReCalculate coefficient of variation for each column in the filtered data
-        result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
-        result_df[1, is.na(result_df[1,])]<- 0
-        rownames(result_df)[1] <- "CV"
+          # ReCalculate coefficient of variation for each column in the filtered data
+          result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+          result_df[1, is.na(result_df[1,])]<- 0
+          rownames(result_df)[1] <- "CV"
 
-        result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-          mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
-        rownames(result_df)<- colnames(data_cv)
+          result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+            mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+          rownames(result_df)<- colnames(data_cv)
 
-        high_var_metabs <- sum(result_df$High_var == TRUE)
+          high_var_metabs <- sum(result_df$High_var == TRUE)
         }
 
 
@@ -470,7 +470,7 @@ Preprocessing <- function(Input_data,
 
         if(is.null(different_samples)==FALSE){
           warning("The CoRe_media samples ", paste(different_samples, collapse = ", "), " were found to be different from the rest. They will not be included in the sum of the CoRe_media samples.")
-          }
+        }
         # Filter the CoRe_media samples
         CoRe_medias <- CoRe_medias %>% filter(!rownames(CoRe_medias) %in% different_samples)
       }
@@ -532,17 +532,10 @@ Preprocessing <- function(Input_data,
     PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
     outlier_PCA_data <- data_norm
     outlier_PCA_data$Conditions <- Conditions
-    pca.obj <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
-    dtp <- data.frame('Conditions' = outlier_PCA_data$Conditions, pca.obj$x[,c(1,2)])
-    pca_outlier <- ggplot(data = dtp) +
-      geom_point(aes(x = PC1, y = PC2, colour = Conditions), size = 4, alpha = 0.8, show.legend = TRUE) +
-      ggtitle(paste("PCA outlier test filtering round ",loop))+
-      theme_classic()+
-      geom_hline(yintercept =  0,  color = "black", linewidth =  0.1)+
-      geom_vline(xintercept =  0,  color = "black", linewidth = 0.1)+
-      geom_text(aes(x = PC1, y = PC2, label = rownames(outlier_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
-      scale_x_continuous(paste("PC1 ",summary(PCA.res)$importance[2,][[1]]*100,"%")) +
-      scale_y_continuous(paste("PC2 ",summary(PCA.res)$importance[2,][[2]]*100,"%"))
+
+    pca_outlier <-invisible(MetaProViz::VizPCA(Input_data=data_norm, Plot_SettingsInfo= c(color="Conditions"),
+                                               Plot_SettingsFile= outlier_PCA_data, OutputPlotName = paste("PCA outlier test filtering round ",loop),
+                                               Save_as_Plot =  NULL))
 
     plot.new()
     plot(pca_outlier)
@@ -724,33 +717,21 @@ Preprocessing <- function(Input_data,
   ################################################
   ### ### ### Quality Control (QC) PCA ### ### ###
 
-  QC_PCA_data <- Data_TIC %>% as.data.frame()
-  QC_PCA_data$Conditions <- Input_SettingsFile$Conditions
-  if (is.null(Input_SettingsFile$Biological_Replicates) != TRUE){
-    QC_PCA_data$Biological_Replicates <-  as.character(Input_SettingsFile$Biological_Replicates)
-  }
-  pca.obj <- prcomp(Data_TIC, center = TRUE, scale. = TRUE)
 
-  dtp <- merge(data_norm_filtered_full %>% select(Conditions, Outliers), pca.obj$x[,1:2],by = 0)
-  dtp <- dtp%>%  mutate(Outliers = case_when(Outliers == "no" ~ 'no',
-                                             Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
-                                             Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
-                                             Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
-                                             Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
-                                             TRUE ~ 'Outlier_filtering_round = or > 5'))
-
+  dtp <- data_norm_filtered_full %>%
+    select(Conditions,Biological_Replicates, Outliers) %>%
+    mutate(Outliers = case_when(Outliers == "no" ~ 'no',
+                                Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
+                                Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
+                                Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
+                                Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
+                                TRUE ~ 'Outlier_filtering_round = or > 5'))
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
-  ## PCA conditions and Outlier
-  pca_QC <- ggplot(data = dtp) +
-    geom_point(aes(x = PC1, y = PC2, color = Conditions, shape = Outliers), size = 4, alpha = 0.8) +
-    ggtitle("Quality Control PCA Condition clustering and Outlier check")+
-    theme_classic()+
-    geom_hline(yintercept = 0,  color = "black", linewidth = 0.1)+
-    geom_vline(xintercept = 0,  color = "black", linewidth = 0.1)+
-    geom_text(aes(x = PC1, y = PC2, label = rownames(QC_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
-    scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
-    scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
+  pca_QC <-invisible(MetaProViz::VizPCA(Input_data=Data_TIC, Plot_SettingsInfo= c(color="Conditions", shape = "Outliers"),
+                                        Plot_SettingsFile= dtp,OutputPlotName = "Quality Control PCA Condition clustering and Outlier check",
+                                        Save_as_Plot =  NULL))
+
 
   qc_plot_list <- list()
   qc_plot_list[[1]] <- pca_QC
@@ -759,17 +740,12 @@ Preprocessing <- function(Input_data,
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
   }
 
+
   if(is.null(Input_SettingsFile$Biological_Replicates)!= TRUE){
-    ### ### QC PCA color for replicates
-    pca_QC_repl <- ggplot(data = dtp) +
-      geom_point(aes(x = PC1, y = PC2, colour = Input_SettingsFile$Conditions, shape = as.factor(Input_SettingsFile$Biological_Replicates)), size = 4, alpha = 0.8) +
-      ggtitle("Quality Control PCA replicate spread check")+
-      theme_classic()+
-      geom_hline(yintercept = 0,  color = "black", linewidth = 0.1)+
-      geom_vline(xintercept = 0,  color = "black", linewidth = 0.1)+
-      geom_text(aes(x = PC1, y = PC2, label = rownames(QC_PCA_data)),hjust = 0.3, vjust = -0.5,size = 3,alpha = 0.6 )+
-      scale_x_continuous(paste("PC1 ",summary(pca.obj)$importance[2,][[1]]*100,"%")) +
-      scale_y_continuous(paste("PC2 ",summary(pca.obj)$importance[2,][[2]]*100,"%"))
+    pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=Data_TIC, Plot_SettingsInfo= c(color="Conditions", shape = "Biological_Replicates"),
+                                               Plot_SettingsFile= dtp,OutputPlotName =  "Quality Control PCA replicate spread check",
+                                               Save_as_Plot =  NULL))
+
     qc_plot_list[[2]] <- pca_QC_repl
 
     if (ExportQCPlots == TRUE){

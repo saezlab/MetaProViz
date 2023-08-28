@@ -403,40 +403,31 @@ DMA <-function(Input_data,
 
 
   if(Plot == TRUE){ # Make a simple Volcano plot
-    VolcanoPlot<- EnhancedVolcano::EnhancedVolcano(DMA_Output,
-                                   lab = DMA_Output$Metabolite,#Metabolite name
-                                   x = "Log2FC",#Log2FC
-                                   y = "p.adj",#p-value or q-value
-                                   xlab = bquote(~Log[2]~ FC),
-                                   ylab = bquote(~-Log[10]~p.adj),#(~-Log[10]~adjusted~italic(P))
-                                   pCutoff = 0.05,
-                                   FCcutoff = 0.5,#Cut off Log2FC, automatically 2
-                                   pointSize = 3,
-                                   labSize = 2,
-                                   titleLabSize = 16,
-                                   # colCustom = c("black", "grey", "grey", "red"),
-                                   colAlpha = 0.7,
-                                   title= paste0(toString(Condition1)," versus ",toString(Condition2)),
-                                   subtitle = bquote(italic("Differential Metabolite Analysis")),
-                                   caption = paste0("total = ", nrow(DMA_Output), " Metabolites"),
-                                   xlim =  c(min(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])-0.2,max(DMA_Output$Log2FC[is.finite(DMA_Output$Log2FC )])+0.2),
-                                   ylim = c(0,(ceiling(-log10(Reduce(min,DMA_Output$p.adj))))),
-                                   cutoffLineType = "dashed",
-                                   cutoffLineCol = "black",
-                                   cutoffLineWidth = 1,
-                                   legendLabels=c('No changes',paste(0.5,"< |Log2FC|"),paste("p.adj <",0.05) , paste('p.adj<',0.05,' &',0.5,"< |Log2FC|")),
-                                   legendPosition = 'right',
-                                   legendLabSize = 8,
-                                   legendIconSize =4,
-                                   gridlines.major = FALSE,
-                                   gridlines.minor = FALSE,
-                                   drawConnectors = FALSE)
+    VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
+                                                    Input_data=DMA_Output,
+                                                    y= "p.adj",
+                                                    x= "Log2FC",
+                                                    AdditionalInput_data= NULL,
+                                                    OutputPlotName= paste0(toString(Condition1)," versus ",toString(Condition2)),
+                                                    Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
+                                                    xlab= NULL,#"~Log[2]~FC"
+                                                    ylab= NULL,#"~-Log[10]~p.adj"
+                                                    pCutoff= 0.05,
+                                                    FCcutoff= 0.5,
+                                                    color_palette= NULL,
+                                                    shape_palette=NULL,
+                                                    SelectLab= DMA_Output$Metabolite,
+                                                    Connectors=  FALSE,
+                                                    Subtitle=  bquote(italic("Differential Metabolite Analysis")),
+                                                    Theme= NULL,
+                                                    Save_as_Plot= "svg"))
+
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as_Plot))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
 
-    plot(VolcanoPlot)
+  #  plot(VolcanoPlot)
   }
   assign(paste0("DMA_",toString(Condition1),"_vs_",toString(Condition2)), DMA_Output, envir=.GlobalEnv)
 }
