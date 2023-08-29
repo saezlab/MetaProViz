@@ -831,7 +831,7 @@ VizVolcano <- function(Plot_Settings="Standard",
     }
     #invisible(PlotList)
   }
-  return(Plot)
+  return(invisible(Plot))
 }
 
 
