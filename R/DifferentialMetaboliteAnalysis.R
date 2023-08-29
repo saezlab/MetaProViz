@@ -420,14 +420,14 @@ DMA <-function(Input_data,
                                                     Connectors=  FALSE,
                                                     Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     Theme= NULL,
-                                                    Save_as_Plot= "svg"))
+                                                    Save_as_Plot= NULL))
 
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as_Plot))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
 
-  #  plot(VolcanoPlot)
+    plot(VolcanoPlot)
   }
   assign(paste0("DMA_",toString(Condition1),"_vs_",toString(Condition2)), DMA_Output, envir=.GlobalEnv)
 }

@@ -826,11 +826,12 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- Plot
-        plot(Plot)
+       # plot(Plot)
       }
     }
     #invisible(PlotList)
   }
+  return(Plot)
 }
 
 
