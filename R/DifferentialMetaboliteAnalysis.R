@@ -20,10 +20,10 @@
 
 #' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
 #'
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental Experimental_design and outlier column.
-#' @param Experimental_design DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Conditon1 Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".
-#' @param Conditon2 Input needs to contain a column named "Condition" including Condition2 that is compared to Condition1, e.g. "WT".
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental Input_SettingsFile and outlier column.
+#' @param Input_SettingsFile DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
+#' @param Conditon1 Input needs to contain a column named "Condition" including the numerator that will be compared to denominator, e.g. "KO".
+#' @param Conditon2 Input needs to contain a column named "Condition" including denominator that is compared to numerator, e.g. "WT".
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
@@ -42,9 +42,10 @@
 ########################################################
 
 DMA <-function(Input_data,
-               Experimental_design,
-               Condition1,
-               Condition2,
+               Input_SettingsFile,
+               Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
+               #  numerator,
+               #   denominator,
                STAT_pval ="t.test",
                STAT_padj="fdr",
                Input_Pathways = NULL,
@@ -53,14 +54,14 @@ DMA <-function(Input_data,
                Plot = TRUE,
                Save_as_Plot = "svg",
                Save_as_Results = "xlsx" # txt or csv
-                 ){
+){
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0){
     install.packages(new.packages)
-    }
+  }
   suppressMessages(library(tidyverse))
 
   ################################################################################################################################################################################################
@@ -69,38 +70,63 @@ DMA <-function(Input_data,
 
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-    } else if("Conditions" %in% colnames(Experimental_design)==FALSE){
-      stop("There is no column named `Conditions` in Experimental_design to obtain Condition1 and Condition2.")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
     } else{
-      Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
-      if((any(Test_num) ==  FALSE) ==  TRUE){
-        stop("Input_data needs to be of class numeric")
+      Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Input_SettingsFile.")
       } else{
-        Test_match <- merge(Experimental_design, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Experimental_design"?
-        if(nrow(Test_match) ==  0){
-          stop("row.names Input_data need to match row.names Experimental_design.")
-        } else{
-           Input_data <- Input_data
-        }
+        Input_data <- Input_data
       }
     }
+  }
 
-      C1 <- Input_data %>%
-        filter(Experimental_design$Conditions %in% Condition1) %>%
-        select_if(is.numeric)#only keep numeric columns with metabolite values
-      C2 <- Input_data %>%
-        filter(Experimental_design$Conditions %in% Condition2) %>%
-        select_if(is.numeric)
 
-      if(nrow(C1)==1){
-        stop("There is only one sample available for ", Condition1, ", so no statistical test can be performed.")
-      } else if(nrow(C2)==1){
-        stop("There is only one sample available for ", Condition2, ", so no statistical test can be performed.")
-      }else if(nrow(C1)==0){
-        stop("There is no sample available for ", Condition1, ".")
-      }else if(nrow(C2)==0){
-        stop("There is no sample available for ", Condition2, ".")
-      }
+
+  if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
+    stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+  }else{# if true rename to Conditions
+    Input_SettingsFile<- Input_SettingsFile%>%
+      dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+  }
+
+
+  if ("denominator" %in% names(Input_SettingsInfo)){
+    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions  == FALSE){
+      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    }else{
+      denominator <- Input_SettingsInfo[["denominator"]]
+    }
+  }
+
+  if ("numerator" %in% names(Input_SettingsInfo)){
+    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile$Conditions  == FALSE){
+      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    }else{
+      numerator <- Input_SettingsInfo[["numerator"]]
+    }
+  }
+
+
+  C1 <- Input_data %>%
+    filter(Input_SettingsFile$Conditions %in% numerator) %>%
+    select_if(is.numeric)#only keep numeric columns with metabolite values
+  C2 <- Input_data %>%
+    filter(Input_SettingsFile$Conditions %in% denominator) %>%
+    select_if(is.numeric)
+
+  if(nrow(C1)==1){
+    stop("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
+  } else if(nrow(C2)==1){
+    stop("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
+  }else if(nrow(C1)==0){
+    stop("There is no sample available for ", numerator, ".")
+  }else if(nrow(C2)==0){
+    stop("There is no sample available for ", denominator, ".")
+  }
 
   #2. General parameters
   STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
@@ -132,7 +158,7 @@ DMA <-function(Input_data,
     if('Metabolite' %in% colnames(Input_Pathways) == FALSE){
       warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
     }else if('Pathway' %in% colnames(Input_Pathways) == FALSE){
-     warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
+      warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
     }
   }
 
@@ -146,20 +172,20 @@ DMA <-function(Input_data,
   C2_Miss <- C2_Miss[, (colSums(is.na(C2_Miss)) > 0), drop = FALSE]
 
   if((ncol(C1_Miss)>0 & ncol(C2_Miss)==0)){
-    message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(C1_Miss)
-    } else if(ncol(C1_Miss)==0 & ncol(C2_Miss)>0){
-    message("In `Condition2` ",paste0(toString(Condition2)), ", NA/0 values exist in ", ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+  } else if(ncol(C1_Miss)==0 & ncol(C2_Miss)>0){
+    message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(C2_Miss)
-    } else if(ncol(C1_Miss)>0 & ncol(C2_Miss)>0){
-    message("In `Condition1` ",paste0(toString(Condition1)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), " and in `Condition2`",paste0(toString(Condition2)), " ",ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+  } else if(ncol(C1_Miss)>0 & ncol(C2_Miss)>0){
+    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(C1_Miss), " Metabolite(s): ", paste0(colnames(C1_Miss), collapse = ", "), " and in `denominator`",paste0(toString(denominator)), " ",ncol(C2_Miss), " Metabolite(s): ", paste0(colnames(C2_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- c(colnames(C1_Miss), colnames(C2_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
-    } else{
+  } else{
     message("There are no NA/0 values")
     Metabolites_Miss <- c(colnames(C1_Miss), colnames(C2_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
-    }
+  }
 
   ## ------------ Check data normality and statistical test chosen ----------- ##
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test.
@@ -168,7 +194,7 @@ DMA <-function(Input_data,
   Input_data_NA <- replace(Input_data, Input_data==0, NA)#Shapiro test ignores NAs!
 
   shaptest <-   Input_data_NA %>% # Select data
-    filter(Experimental_design$Conditions %in% Condition1 | Experimental_design$Conditions %in% Condition2)%>%
+    filter(Input_SettingsFile$Conditions %in% numerator | Input_SettingsFile$Conditions %in% denominator)%>%
     select_if(is.numeric)
 
   temp<- as.vector(sapply(shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
@@ -183,12 +209,12 @@ DMA <-function(Input_data,
   message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
 
   if (Norm > 50 & STAT_pval =="wilcox.test"){
-      warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
-    }else if(NotNorm > 50 & STAT_pval =="t.test"){
+    warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
+  }else if(NotNorm > 50 & STAT_pval =="t.test"){
     message(NotNorm, " % of the metabolites follow a not-normal distribution but 't.test' for parametric Hypothesis testing was chosen. Please consider selecting a non-parametric test (wilcox.test) instead.")
-    }else if((STAT_pval =="wilcox-test" & nrow(C1)<5)|(STAT_pval =="wilcox-test" & nrow(C2)<5)){# check number of samples for wilcoxons test
-      warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
-    }
+  }else if((STAT_pval =="wilcox-test" & nrow(C1)<5)|(STAT_pval =="wilcox-test" & nrow(C2)<5)){# check number of samples for wilcoxons test
+    warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
+  }
 
   ## ------------ Create Results output folder ----------- ##
   name <- paste0("MetaProViz_Results_",Sys.Date())
@@ -197,7 +223,7 @@ DMA <-function(Input_data,
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
   if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
-  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(Condition1),"_vs_",toString(Condition2))) # Make comparison folder
+  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(numerator),"_vs_",toString(denominator))) # Make comparison folder
   if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
 
   ################################################################################################################################################################################################
@@ -259,45 +285,45 @@ DMA <-function(Input_data,
     Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
     Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
 
-    }else if(CoRe==FALSE){
-      #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
-      Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        rownames_to_column("Metabolite")
-      Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        rownames_to_column("Metabolite")
-      Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        rename("C1"=2,
-               "C2"=3)
-      Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
+  }else if(CoRe==FALSE){
+    #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
+    Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
+      rownames_to_column("Metabolite")
+    Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
+      rownames_to_column("Metabolite")
+    Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
+      rename("C1"=2,
+             "C2"=3)
+    Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
 
-      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
-        mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C1)))%>%
-        mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C2)))%>%
-        mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
-        mutate(C2_Adapted = as.numeric(C2_Adapted))
+    Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
+      mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                    C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                    TRUE ~ paste(C1)))%>%
+      mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                    C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                    C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                    TRUE ~ paste(C2)))%>%
+      mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
+      mutate(C2_Adapted = as.numeric(C2_Adapted))
 
-      if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
-        X <- Mean_Merge%>%
-          subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
-        message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
-      }
+    if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
+      X <- Mean_Merge%>%
+        subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
+      message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
+    }
 
-      #Calculate the Log2FC
-      Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
-      Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
-      Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
+    #Calculate the Log2FC
+    Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
+    Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
+    Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
 
-      }else{
-        stop("Please choose CoRe= TRUE or CoRe=FALSE.")
-        }
+  }else{
+    stop("Please choose CoRe= TRUE or CoRe=FALSE.")
+  }
 
   ## ------------ Perform Hypothesis testing ----------- ##
   # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
@@ -341,10 +367,10 @@ DMA <-function(Input_data,
 
   #Add Metabolites that have p.val=NA back into the DF for completeness.
   if(nrow(PVal_NA)>0){
-  PVal_NA <- merge(Log2FC_C1vC2,PVal_NA, by="Metabolite", all.y=TRUE)
-  PVal_NA$p.adj <- NA
-  PVal_NA$t.val <- NA
-  STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
+    PVal_NA <- merge(Log2FC_C1vC2,PVal_NA, by="Metabolite", all.y=TRUE)
+    PVal_NA$p.adj <- NA
+    PVal_NA$t.val <- NA
+    STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
   }
 
 
@@ -362,9 +388,9 @@ DMA <-function(Input_data,
       }else if (temp1[i]<0 & temp2[i]<0){
         CoRe_info[3,i] <- "Consumed"
       }else if(temp1[i]>0 & temp2[i]<0){
-        CoRe_info[3,i] <- paste("Released in" ,Condition1 , "and Consumed",Condition2 , sep=" ")
+        CoRe_info[3,i] <- paste("Released in" ,numerator , "and Consumed",denominator , sep=" ")
       } else if(temp1[i]<0 & temp2[i]>0){
-        CoRe_info[3,i] <- paste("Consumed in" ,Condition1 , " and Released",Condition2 , sep=" ")
+        CoRe_info[3,i] <- paste("Consumed in" ,numerator , " and Released",denominator , sep=" ")
       }else{
         CoRe_info[3,i] <- "No Change"
       }
@@ -372,8 +398,8 @@ DMA <-function(Input_data,
 
     CoRe_info <- t(CoRe_info) %>% as.data.frame()
     CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
-    names(CoRe_info)[2] <- paste("Mean", "CoRe", Condition1, sep="_")
-    names(CoRe_info)[3] <- paste("Mean", "CoRe", Condition2, sep="_")
+    names(CoRe_info)[2] <- paste("Mean", "CoRe", numerator, sep="_")
+    names(CoRe_info)[3] <- paste("Mean", "CoRe", denominator, sep="_")
     names(CoRe_info)[4] <- "CoRe"
     STAT_C1vC2 <- merge(STAT_C1vC2,CoRe_info,by= "Metabolite")
     STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
@@ -381,22 +407,22 @@ DMA <-function(Input_data,
 
   ## ------------ Add pathway information to DMA results ----------- ##
   if(is.null(Input_Pathways)!=TRUE & 'Metabolite' %in% colnames(Input_Pathways) & 'Pathway' %in% colnames(Input_Pathways)){
-      STAT_C1vC2$Metabolite %in% Input_Pathways$Metabolite
-      STAT_C1vC2<- merge(STAT_C1vC2,Input_Pathways,by="Metabolite", all.x=T)
-      STAT_C1vC2$Pathway[  is.na(STAT_C1vC2$Pathway)] <- "unknown"    # Merge the pathways to DMA result. All non matching metabolites get NA that are changed into "unknown".
-    }else{
-      warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
-    }
+    STAT_C1vC2$Metabolite %in% Input_Pathways$Metabolite
+    STAT_C1vC2<- merge(STAT_C1vC2,Input_Pathways,by="Metabolite", all.x=T)
+    STAT_C1vC2$Pathway[  is.na(STAT_C1vC2$Pathway)] <- "unknown"    # Merge the pathways to DMA result. All non matching metabolites get NA that are changed into "unknown".
+  }else{
+    warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
+  }
   DMA_Output <- STAT_C1vC2
 
   if (Save_as_Results == "xlsx"){
-  xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".xlsx"))   # Save the DMA results table
-  writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
+    xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator),"_", OutputName, ".xlsx"))   # Save the DMA results table
+    writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
   }else if (Save_as_Results == "csv"){
-    csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".csv"))
+    csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator),"_", OutputName, ".csv"))
     write.csv(DMA_Output,csvDMA) # save the DMA result DF
   }else if (Save_as_Results == "txt"){
-    txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(Condition1),"_vs_",toString(Condition2),"_", OutputName, ".txt"))
+    txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator),"_", OutputName, ".txt"))
     write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
@@ -408,7 +434,7 @@ DMA <-function(Input_data,
                                                     y= "p.adj",
                                                     x= "Log2FC",
                                                     AdditionalInput_data= NULL,
-                                                    OutputPlotName= paste0(toString(Condition1)," versus ",toString(Condition2)),
+                                                    OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
                                                     Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
                                                     xlab= NULL,#"~Log[2]~FC"
                                                     ylab= NULL,#"~-Log[10]~p.adj"
@@ -424,12 +450,12 @@ DMA <-function(Input_data,
 
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
-    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(Condition1),"-versus-",toString(Condition2),"_", OutputPlotName,".",Save_as_Plot))
+    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
 
     plot(VolcanoPlot)
   }
-  assign(paste0("DMA_",toString(Condition1),"_vs_",toString(Condition2)), DMA_Output, envir=.GlobalEnv)
+  assign(paste0("DMA_",toString(numerator),"_vs_",toString(denominator)), DMA_Output, envir=.GlobalEnv)
 }
 
 
