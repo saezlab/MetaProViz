@@ -18,12 +18,11 @@
 ##
 ## ---------------------------
 
-#' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
+#' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 #'
-#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental Input_SettingsFile and outlier column.
-#' @param Input_SettingsFile DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Conditon1 Input needs to contain a column named "Condition" including the numerator that will be compared to denominator, e.g. "KO".
-#' @param Conditon2 Input needs to contain a column named "Condition" including denominator that is compared to numerator, e.g. "WT".
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param Input_SettingsInfo \emph{Optional: } Named vector including at least the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile"). \strong{c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
@@ -31,7 +30,7 @@
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
@@ -51,7 +50,7 @@ DMA <-function(Input_data,
                CoRe=FALSE,
                Plot = TRUE,
                Save_as_Plot = "svg",
-               Save_as_Results = "xlsx" # txt or csv
+               Save_as_Results = "csv" # txt or csv
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -65,7 +64,6 @@ DMA <-function(Input_data,
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
-
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
   } else{
@@ -81,8 +79,6 @@ DMA <-function(Input_data,
       }
     }
   }
-
-
 
   if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
     stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
@@ -394,52 +390,7 @@ DMA <-function(Input_data,
 
   ## ------------ Perform Hypothesis testing ----------- ##
   if(ANOVA == FALSE){
-    # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
-    C1[is.na(C1)] <- 0
-    C2[is.na(C2)] <- 0
-
-    #### 1. p.value
-    T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
-
-    VecPVAL_C1vC2 <- c()
-    for(i in 1:length(T_C1vC2)){
-      p_value <- unlist(T_C1vC2[[i]][3])
-      VecPVAL_C1vC2[i] <- p_value
-    }
-    Metabolite <- colnames(C2)
-    PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
-
-    #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
-    PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
-    PVal_C1vC2 <-PVal_C1vC2%>%
-      mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
-                               TRUE ~ paste(VecPVAL_C1vC2)))
-    PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
-
-    #### 2. p. adjusted
-    #Split data for p.value adjustment to exclude NA
-    PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1,4)]
-    PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1,4)]
-
-    #perform adjustment
-    VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
-    Metabolite <- PVal_C1vC2[,1]
-    PADJ_C1vC2 <- data.frame(Metabolite, VecPADJ_C1vC2)
-    STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
-    STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2, by="Metabolite")
-    names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
-
-    #### 3. t.value
-    STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.val / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
-    STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
-
-    #Add Metabolites that have p.val=NA back into the DF for completeness.
-    if(nrow(PVal_NA)>0){
-      PVal_NA <- merge(Log2FC_table,PVal_NA, by="Metabolite", all.y=TRUE)
-      PVal_NA$p.adj <- NA
-      PVal_NA$t.val <- NA
-      STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
-    }
+    STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
 
   }else{ # ANOVA = TRUE
 
@@ -615,4 +566,70 @@ DMA <-function(Input_data,
 
 
 
+##########################################################################################
+### ### ### DMA helper function: Internal Function to perform single comparison ### ### ###
+##########################################################################################
+
+#' @param C1 This is the C1 (Condition 1) DF generated within the DMA function.
+#' @param C2 This is the C2 (Condition 2) DF generated within the DMA function.
+#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
+#' @param Metabolites_Miss these are the metabolites with missing values generated within the DMA function.
+#' @param STAT_pval Passed to DMA
+#' @param STAT_padj Passed to DMA
+#'
+#' @keywords DMA helper function
+#' @noRd
+#'
+
+DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, STAT_padj){
+  ## ------------ Perform Hypothesis testing ----------- ##
+  # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
+  C1[is.na(C1)] <- 0
+  C2[is.na(C2)] <- 0
+
+  #### 1. p.value
+  T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
+
+  VecPVAL_C1vC2 <- c()
+  for(i in 1:length(T_C1vC2)){
+    p_value <- unlist(T_C1vC2[[i]][3])
+    VecPVAL_C1vC2[i] <- p_value
+  }
+  Metabolite <- colnames(C2)
+  PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
+
+  #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
+  PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
+  PVal_C1vC2 <-PVal_C1vC2%>%
+    mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
+                             TRUE ~ paste(VecPVAL_C1vC2)))
+  PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
+
+  #### 2. p. adjusted
+  #Split data for p.value adjustment to exclude NA
+  PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1,4)]
+  PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1,4)]
+
+  #perform adjustment
+  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
+  Metabolite <- PVal_C1vC2[,1]
+  PADJ_C1vC2 <- data.frame(Metabolite, VecPADJ_C1vC2)
+  STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
+  STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2, by="Metabolite")
+  names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
+
+  #### 3. t.value
+  STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.val / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
+  STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
+
+  #Add Metabolites that have p.val=NA back into the DF for completeness.
+  if(nrow(PVal_NA)>0){
+    PVal_NA <- merge(Log2FC_table,PVal_NA, by="Metabolite", all.y=TRUE)
+    PVal_NA$p.adj <- NA
+    PVal_NA$t.val <- NA
+    STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
+  }
+
+  Output <- STAT_C1vC2
+}
 
