@@ -155,11 +155,11 @@ PoolData <- MetaProViz::toy_data(data="Standard") %>%
 
 
 # Check the metabolite variability
-Pool_Estimation(Input_data = PoolData,
-                Input_SettingsFile = NULL,
-                Input_SettingsInfo = NULL,
-                Unstable_feature_remove = FALSE, 
-                Therhold_cv = 1)
+MetaProViz::Pool_Estimation(Input_data = PoolData,
+                            Input_SettingsFile = NULL,
+                            Input_SettingsInfo = NULL,
+                            Unstable_feature_remove = FALSE, 
+                            Therhold_cv = 1)
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -169,7 +169,27 @@ Pool_Estimation_result[1:5,]%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
-The results from the `Pool_Estimation()` is a table that has the Coefficient of variation (CV), Standard Error of the Mean (SEMean) and the Standard Error of the Median (SEMedian). If there is a high variability for those parameters (=TRUE), one should consider to remove those features from the data. For the example data nothing needs to be removed.\
+The results from the `Pool_Estimation()` is a table that has the Coefficient of variation (CV). If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
+
+```{r}
+#Test out QC plots:
+ggplot(Pool_Estimation_result, aes(CV)) +
+  geom_histogram(aes(y=..density..), color="black", fill="white")+
+  geom_vline(aes(xintercept=0.1),
+            color="darkred", linetype="dashed", size=1)+
+  geom_density(alpha=.2, fill="#FF6666") +
+  labs(title="QC Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
+  theme_classic()
+
+ggplot(Pool_Estimation_result, aes(y=CV, x=High_var, label=row.names(Pool_Estimation_result)))+
+  geom_violin(alpha = 0.5 , fill="#FF6666")+  
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
+  #geom_point(position = position_jitter(seed = 1, width = 0.2))+
+  geom_text(aes(label=ifelse(CV>0.3,as.character(row.names(Pool_Estimation_result)),'')), hjust=0, vjust=0)+
+  labs(title="QC Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
+  theme_classic()
+
+```
 \
 Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned to the global environment and can be easily viewed.\
 ```{r}
@@ -259,36 +279,36 @@ As input we will use the  pre-processed data we have generated using the `Prepro
 \
 In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons. The results are automatically saved and returned into the global environment. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
 ```{r}
-MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
-                Input_SettingsFile=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
-                Input_SettingsInfo = c(conditions="Conditions", numerator="786-O", denominator = "HK2"),
-                STAT_pval ="t.test",#ProDA is another test! --> estimates missing information
-                STAT_padj="fdr",
-                Input_Pathways = MappingInfo[,c(1,4)], 
-                OutputName='DMA_786OvHK2', 
-                CoRe=FALSE, 
-                Plot = TRUE)
+`786-O_vs_HK2` <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
+                        Input_SettingsFile=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
+                        Input_SettingsInfo = c(conditions="Conditions", numerator="786-O", denominator = "HK2"),
+                        STAT_pval ="t.test",#ProDA is another test! --> estimates missing information
+                        STAT_padj="fdr",
+                        Input_MetaFile_Metab = MappingInfo, 
+                        OutputName='DMA_786OvHK2', 
+                        CoRe=FALSE, 
+                        Plot = TRUE)
 
 #Perform the other comparisons:
-MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
-                Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
-                Input_SettingsInfo = c(conditions="Conditions", numerator="786-M1A", denominator = "HK2"),
-                STAT_pval ="t.test",
-                STAT_padj="fdr",
-                Input_Pathways = MappingInfo[,c(1,4)], 
-                OutputName='DMA_786M1AvHK2', 
-                CoRe=FALSE,
-                Plot = TRUE)
+`786M1A_vs_HK2` <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
+                                   Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
+                                   Input_SettingsInfo = c(conditions="Conditions", numerator="786-M1A", denominator = "HK2"),
+                                   STAT_pval ="t.test",
+                                   STAT_padj="fdr",
+                                   Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
+                                   OutputName='DMA_786M1AvHK2', 
+                                   CoRe=FALSE,
+                                   Plot = TRUE)
 
-MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
-                Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
-                Input_SettingsInfo = c(conditions="Conditions", numerator="786-M2A", denominator = "HK2"),
-                STAT_pval ="t.test",
-                STAT_padj="fdr",
-                Input_Pathways = MappingInfo[,c(1,4)], 
-                OutputName='DMA_786M2AvHK2', 
-                CoRe=FALSE, 
-                Plot = TRUE)
+`786M2A_vs_HK2` <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:3)], 
+                                   Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
+                                   Input_SettingsInfo = c(conditions="Conditions", numerator="786-M2A", denominator = "HK2"),
+                                   STAT_pval ="t.test",
+                                   STAT_padj="fdr",
+                                   Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
+                                   OutputName='DMA_786M2AvHK2', 
+                                   CoRe=FALSE, 
+                                   Plot = TRUE)
 
 ```
 ```{r, echo=FALSE}

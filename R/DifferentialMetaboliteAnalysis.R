@@ -26,7 +26,7 @@
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
-#' @param Input_Pathways \emph{Optional: } DF which contains the pathway information for each metabolite. \strong{NULL}
+#' @param  Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
@@ -45,7 +45,7 @@ DMA <-function(Input_data,
                Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
                STAT_pval ="kruskal.test",
                STAT_padj="fdr",
-               Input_Pathways = NULL,
+               Input_MetaFile_Metab = NULL,
                OutputName='',
                CoRe=FALSE,
                Plot = TRUE,
@@ -183,16 +183,12 @@ DMA <-function(Input_data,
   }
 
 
-  #3. Input_Pathways
-  if(is.null(Input_Pathways) == FALSE){
-    if('Metabolite' %in% colnames(Input_Pathways) == FALSE){
-      warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
-    }else if('Pathway' %in% colnames(Input_Pathways) == FALSE){
-      warning("The provided file Input_Pathways must have 2 columns named: `Metabolite` and `Pathway`.")
+  #3.  Input_MetaFile_Metab
+  if(is.null(Input_MetaFile_Metab) == FALSE){
+    if('Metabolite' %in% colnames(Input_MetaFile_Metab) == FALSE){
+      warning("The provided file Input_MetaFile_Metab must have a columns named: `Metabolite`.")
     }
   }
-
-
 
 
   ## ------------ Check Missingness ------------- ##
@@ -506,12 +502,8 @@ DMA <-function(Input_data,
   }
 
   ## ------------ Add pathway information to DMA results ----------- ##
-  if(is.null(Input_Pathways)!=TRUE & 'Metabolite' %in% colnames(Input_Pathways) & 'Pathway' %in% colnames(Input_Pathways)){
-    STAT_C1vC2$Metabolite %in% Input_Pathways$Metabolite
-    STAT_C1vC2<- merge(STAT_C1vC2,Input_Pathways,by="Metabolite", all.x=T)
-    STAT_C1vC2$Pathway[  is.na(STAT_C1vC2$Pathway)] <- "unknown"    # Merge the pathways to DMA result. All non matching metabolites get NA that are changed into "unknown".
-  }else{
-    warning("No column Pathway was added to the output. The pathway data must have 2 columns named: Metabolite and Pathway")
+  if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
+    STAT_C1vC2<- merge(STAT_C1vC2, Input_MetaFile_Metab,by="Metabolite", all.x=T)
   }
   DMA_Output <- STAT_C1vC2
 
@@ -561,7 +553,8 @@ DMA <-function(Input_data,
 
     plot(VolcanoPlot)
   }
-  assign(paste0("DMA_",toString(numerator),"_vs_",toString(denominator)), DMA_Output, envir=.GlobalEnv)
+  invisible(DMA_Output)
+  #assign(paste0("DMA_",toString(numerator),"_vs_",toString(denominator)), DMA_Output, envir=.GlobalEnv)
 }
 
 
