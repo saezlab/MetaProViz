@@ -416,7 +416,8 @@ Preprocessing <- function(Input_data,
       # Export/Save CV table ?
 
       # Do sample outlier testing
-      while(dim(CoRe_medias)[1]>3){
+      if(dim(CoRe_medias)[1]>3){
+
 
         Outlier_data <- CoRe_medias
         Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
