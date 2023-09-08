@@ -362,6 +362,11 @@ Preprocessing <- function(Input_data,
     message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
   }
 
+
+  # Start QC plot list
+  qc_plot_list <- list()
+  qc_plot_list_counter = 1
+
   if (CoRe ==  TRUE){
     CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
     if(dim(CoRe_medias)[1]==1){
@@ -370,6 +375,24 @@ Preprocessing <- function(Input_data,
       colnames(CoRe_medias) <- "CoRe_mediaMeans"
 
     }else{
+
+      ## Media_control PCA
+      media_pca_data <- merge(Input_SettingsFile %>% select(Conditions), Data_TIC, by=0) %>%
+        column_to_rownames("Row.names") %>%
+        mutate(Sample_type = case_when(Conditions == "CoRe_media" ~ "CoRe_media",
+                                       TRUE ~ "Sample"))
+
+      pca_QC_media <-invisible(MetaProViz::VizPCA(Input_data=media_pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
+                                                 Plot_SettingsFile= media_pca_data, OutputPlotName = "QC Media_samples",
+                                                 Save_as_Plot =  NULL))
+
+      qc_plot_list[[qc_plot_list_counter]] <- pca_QC_media
+      qc_plot_list_counter = qc_plot_list_counter+1
+
+      if (ExportQCPlots == TRUE){
+        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Media_samples.",Save_as_Plot), plot = pca_QC_media, width = 10,  height = 8)
+      }
+
 
       ## Check metabolite variance
       # Thresholds
@@ -390,17 +413,30 @@ Preprocessing <- function(Input_data,
         message(paste0(high_var_metabs, " of variables have high variability in the CoRe_media samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
       }
 
+      # Export/Save CV table ?
+
       # Do sample outlier testing
-      if(dim(CoRe_medias)[1]>3){
+      while(dim(CoRe_medias)[1]>3){
 
         Outlier_data <- CoRe_medias
         Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
 
         while(high_var_metabs>0){
+
           #remove the furthest value from the mean
-          max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
-            mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
-            summarise_all(.funs = ~ which.max(abs(.)))
+          if(high_var_metabs>1){
+            max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
+              as.data.frame() %>%
+              mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
+              summarise_all(.funs = ~ which.max(abs(.)))
+          }else{
+            max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
+              as.data.frame() %>%
+              mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
+              summarise_all(.funs = ~ which.max(abs(.)))
+            colnames(max_var_pos)<- colnames( data_cv)[result_df$High_var == TRUE]
+
+          }
 
           # Remove rows based on positions
           for(i in 1:length(max_var_pos)){
@@ -433,9 +469,10 @@ Preprocessing <- function(Input_data,
 
           contingency_table <- matrix(0, nrow = 2, ncol = 2)
           contingency_table[1, 1] <- sum(current_sample)
-          contingency_table[1, 2] <- sum(!current_sample)
-          contingency_table[2, 1] <- sum(rowSums(data_cont) - current_sample)
-          contingency_table[2, 2] <- sum(nrow(data_cont) - rowSums(data_cont) + current_sample)
+          contingency_table[2, 1] <- sum(!current_sample)
+          contingency_table[1, 2] <- sum(rowSums(data_cont) - current_sample)
+          #contingency_table[2, 2] <- sum(nrow(data_cont) - rowSums(data_cont) + current_sample)
+          contingency_table[2, 2] <- dim(data_cont %>% select(!all_of(sample)))[1]*dim(data_cont %>% select(!all_of(sample)))[2] -sum( rowSums(data_cont) - current_sample)
 
           # Fisher's exact test
           fisher_test_result <- fisher.test(contingency_table)
@@ -733,8 +770,8 @@ Preprocessing <- function(Input_data,
                                         Save_as_Plot =  NULL))
 
 
-  qc_plot_list <- list()
-  qc_plot_list[[1]] <- pca_QC
+  qc_plot_list[[qc_plot_list_counter]] <- pca_QC
+  qc_plot_list_counter = qc_plot_list_counter+1
 
   if (ExportQCPlots == TRUE){
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
@@ -746,7 +783,7 @@ Preprocessing <- function(Input_data,
                                                Plot_SettingsFile= dtp,OutputPlotName =  "Quality Control PCA replicate spread check",
                                                Save_as_Plot =  NULL))
 
-    qc_plot_list[[2]] <- pca_QC_repl
+    qc_plot_list[[qc_plot_list_counter]] <- pca_QC_repl
 
     if (ExportQCPlots == TRUE){
       ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)

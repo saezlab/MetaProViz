@@ -549,7 +549,7 @@ DMA <-function(Input_data,
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
-    ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the voplcano plot
+    ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
 
     plot(VolcanoPlot)
   }
