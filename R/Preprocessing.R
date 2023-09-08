@@ -766,7 +766,7 @@ Preprocessing <- function(Input_data,
                                 TRUE ~ 'Outlier_filtering_round = or > 5'))
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
-  pca_QC <-invisible(MetaProViz::VizPCA(Input_data=Data_TIC, Plot_SettingsInfo= c(color="Conditions", shape = "Outliers"),
+  pca_QC <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(Data_TIC), Plot_SettingsInfo= c(color="Conditions", shape = "Outliers"),
                                         Plot_SettingsFile= dtp,OutputPlotName = "Quality Control PCA Condition clustering and Outlier check",
                                         Save_as_Plot =  NULL))
 
@@ -780,7 +780,7 @@ Preprocessing <- function(Input_data,
 
 
   if(is.null(Input_SettingsFile$Biological_Replicates)!= TRUE){
-    pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=Data_TIC, Plot_SettingsInfo= c(color="Conditions", shape = "Biological_Replicates"),
+    pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(Data_TIC), Plot_SettingsInfo= c(color="Conditions", shape = "Biological_Replicates"),
                                                Plot_SettingsFile= dtp,OutputPlotName =  "Quality Control PCA replicate spread check",
                                                Save_as_Plot =  NULL))
 
