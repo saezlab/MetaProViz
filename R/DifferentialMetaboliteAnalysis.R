@@ -64,6 +64,9 @@ DMA <-function(Input_data,
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   #1. Input_data and Conditions
+  if(class(Input_data) != "data.frame"){
+    stop("Input_data should be a data.frame. It's currently a ", paste(class(Input_data), ".",sep = ""))
+  }
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
   } else{
