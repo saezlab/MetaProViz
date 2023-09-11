@@ -1,0 +1,915 @@
+---
+title: "Standard Metabolomics"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg Universiy
+  - name: Dimitrios Prymidis
+    affiliation:
+    - Heidelberg Universiy
+output: 
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 1000px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+\
+Benchmark.\
+\
+<span style="text-decoration:underline">In this tutorial we showcase why some desisions were made in **MetaProViz**</span>:\
+
+* Regarding Media_sample preprocessing for CoRe experiment.\
+
+
+# CoRe metabolomics
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+A Consumption-Release (CoRe) metabolomics experiment usually refers to a cell culture experiment where metabolomics is performed on the cell culture media.\
+\
+<span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
+`-` To process raw peak data and identify outliers.\
+`-` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+`-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
+`-` To use specific visualizations to aid biological interpretation of the results.\
+\
+\
+First if you have not done yet, install the required dependencies and load the libraries:
+```{r, message=FALSE, warning=FALSE}
+#MetaProViz
+
+#library(MetaProViz)
+#devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
+devtools::load_all("C:/Users/Dimitrios/Documents/GitHub/MetaProViz")
+
+#dependencies
+library(tidyverse)
+
+```
+\
+```{r}
+MetaProViz::toy_data(data="CoRe")
+
+# Check how our data looks like:
+knitr::kable(Media[6:12, 1:8], caption = "Preview of the DF `CoRe` including columns with sample information and metabolite ids with their measured values.")
+```
+\
+We will split the experimental data into the sample information and the metabolites values using the the column "Code" as the unique identifier:
+```{r}
+Media_M <- Media[1:39,-c(2:6)]%>%
+  column_to_rownames("Code")
+
+SampleInfo <-Media[c(1:39),c(1:6)]%>%
+  column_to_rownames("Code")
+
+```
+\
+`2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
+```{r}
+MetaProViz::toy_data(data="MappingInfo")
+
+# Check how our data looks like:
+knitr::kable(MappingInfo[1:5,], caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.")
+```
+
+
+# Preprocessing
+
+## Load parameters
+```{r}
+Input_data=Media_M
+Input_SettingsFile=SampleInfo
+Input_SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biolgical_Replicates",  CoRe_norm_factor ="AverageCellNumber", CoRe_media = "blank")
+Feature_Filtering = "Modified"
+Feature_Filt_Value = 0.8
+TIC_Normalization = TRUE# As we have raw data we will perform total ion count normalisation
+MVI=TRUE #We assume the values are not missing at random and perform half minimum missing value imputation
+MVI_Percentage=50
+HotellinsConfidence = 0.99# We perform outlier testing using 0.99 confidence intervall
+ExportQCPlots = TRUE
+CoRe = TRUE
+Save_as_Plot = "svg"
+
+
+```
+
+
+Run functions untill the CoRe Media sample processing
+
+```{r}
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+
+  ## ------------------ Run ------------------- ##
+
+  #######################################################################################
+  ### ### ### Check Input Information and add Input_SettingsFile information ### ### ###
+
+  #1.  Input data
+  if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Input_SettingsFile.")
+      } else(
+        Input_data <- Input_data
+      )
+    }
+  }
+
+  #2. The Input_settings: Input_SettingInfo and Input_SettingFile
+  if(is.vector(Input_SettingsInfo)==TRUE & is.null(Input_SettingsFile)==TRUE){
+    stop("You have chosen Plot_SettingsInfo option that requires you to provide a DF Plot_SettingsFile.")
+  }
+  if(is.null(Input_SettingsInfo)==TRUE & is.null(Input_SettingsFile)==FALSE){
+    warning("You have added a Plot_SettingsFile DF but the Plot_SettingsInfo option is empty. If you want to preprocess based some experimental condition please specify it in the Input_SettingsInfo.")
+  }
+  if(is.null(Input_SettingsInfo)==TRUE & is.null(Input_SettingsFile)==TRUE){
+    message("No Input_Settings have been added.")
+  }
+
+  if(is.vector(Input_SettingsInfo)==TRUE){
+    if ( "Conditions" %in% names(Input_SettingsInfo)){
+      if(Input_SettingsInfo[["Conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
+        stop("The ",Input_SettingsInfo[["Conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      }else{# if true rename to Conditions
+        Input_SettingsFile<- Input_SettingsFile%>%
+          dplyr::rename("Conditions"= paste(Input_SettingsInfo[["Conditions"]]) )
+      }
+    }
+
+    if ( "Biological_Replicates" %in% names(Input_SettingsInfo)){
+      if(Input_SettingsInfo[["Biological_Replicates"]] %in% colnames(Input_SettingsFile)== FALSE){
+        stop("The ",Input_SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      }else{# if true rename to Conditions
+        Input_SettingsFile<- Input_SettingsFile%>%
+          dplyr::rename("Biological_Replicates"= paste(Input_SettingsInfo[["Biological_Replicates"]]) )
+      }
+    }
+  }
+
+  #3. Core parameters
+  if (CoRe ==  TRUE){   # parse CoRe normalisation factor
+    message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
+    if ("CoRe_media" %in% names(Input_SettingsInfo)){
+      Input_SettingsFile <- Input_SettingsFile %>%
+        mutate(Conditions = ifelse(Conditions == paste(Input_SettingsInfo[["CoRe_media"]]), "CoRe_media", Conditions))
+    }
+
+    if(length(grep("CoRe_media", Input_SettingsFile$Conditions)) < 1){     # Check for CoRe_media samples
+      stop("No CoRe_media samples were provided in the 'Conditions' in the Experimental design'. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
+           column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRE = FALSE for your analysis")
+    }
+    if ("CoRe_norm_factor" %in% names(Input_SettingsInfo)){
+      Input_SettingsFile<- Input_SettingsFile%>%
+        dplyr::rename("CoRe_norm_factor"= paste(Input_SettingsInfo[["CoRe_norm_factor"]]) )
+      CoRe_norm_factor <-   Input_SettingsFile %>% filter(Conditions!="CoRe_media") %>% select(CoRe_norm_factor) %>%pull()
+
+    }else{
+      warning("No growth rate or growth factor provided for normalising the CoRe result, hence CoRe_norm_factor set to 1 for each sample")
+      CoRe_norm_factor <- as.numeric(rep(1,dim(Input_SettingsFile %>% filter(Conditions!="CoRe_media"))[1]))
+    }
+  }
+
+  #4. Parse Conditions
+  if ( "Conditions" %in% colnames(Input_SettingsFile)){   # Parse Condition and Replicate information
+    Conditions <- Input_SettingsFile$Conditions
+  }else{
+    Conditions <- NULL
+  }
+
+  #5. General parameters
+  Feature_Filtering_options <- c("Standard","Modified", "none")
+  if(Feature_Filtering %in% Feature_Filtering_options == FALSE ){
+    stop("Check input. The selected Feature_Filtering option is not valid. Please select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
+  }
+  if( is.numeric(Feature_Filt_Value) == FALSE |Feature_Filt_Value > 1 | Feature_Filt_Value < 0){
+    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
+  }
+  if(is.logical(TIC_Normalization) == FALSE){
+    stop("Check input. The TIC_Normalization value should be either =TRUE if TIC normalization is to be performed or =FALSE if no data normalization is to be applied.")
+  }
+  if(is.logical(MVI) == FALSE){
+    stop("Check input. MVI value should be either =TRUE if mising value imputation should be performed or =FALSE if not.")
+  }
+  if( is.numeric(MVI_Percentage)== FALSE |HotellinsConfidence > 100 | HotellinsConfidence < 0){
+    stop("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
+  }
+  if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
+    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
+  }
+  if(is.logical(ExportQCPlots) == FALSE){
+    stop("Check input. The ExportQCPlots value should be either =TRUE if QC plots are to be exported or =FALSE if not.")
+  }
+  if(is.logical(CoRe) == FALSE){
+    stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
+  }
+  Save_as_Plot_options <- c("svg","pdf", "png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  }
+
+  Input_data <- as.matrix(mutate_all(as.data.frame(Input_data), function(x) as.numeric(as.character(x))))
+
+
+  #############################################
+  ### ### ### Create output folders ### ### ###
+
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name)
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+  Results_folder_Preprocessing_folder = file.path(Results_folder, "Preprocessing")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+  if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
+  Results_folder_Preprocessing_Outlier_detection_folder = file.path(Results_folder_Preprocessing_folder, "Outlier_detection")   # Create Outlier_Detection directory
+  if (!dir.exists(Results_folder_Preprocessing_Outlier_detection_folder)) {dir.create(Results_folder_Preprocessing_Outlier_detection_folder)}
+  if (ExportQCPlots ==  TRUE){   # Create Quality_Control_PCA directory
+    Results_folder_Preprocessing_folder_Quality_Control_PCA_folder = file.path(Results_folder_Preprocessing_folder, "Quality_Control_PCA")
+    if (!dir.exists(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)) {dir.create(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder)}
+  }
+
+
+  #########################################
+  ### ### ### Feature filtering ### ### ###
+  #message("Feature filtering is performed to reduce missing values that can bias the analysis and cause methods to underperform, which leads to low precision in the statistical analysis. REF: Steuer et. al. (2007), Methods Mol Biol. 358:105-26., doi:10.1007/978-1-59745-244-1_7.")
+  #Prepare data:
+  Input_data <- replace(Input_data, Input_data==0, NA)
+  Original_Input_SettingsFile<-Input_SettingsFile
+
+  #Perfrom filtering as selected
+  if (Feature_Filtering ==  "Modified"){
+    message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
+    message(paste("filtering value selected:", Feature_Filt_Value))
+
+    feat_filt_data <- as.data.frame(Input_data)
+    feat_filt_Conditions <- Conditions[!Input_SettingsFile$Conditions=="CoRe_media"]
+
+    if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Input_SettingsFile$Conditions=="CoRe_media")
+    }
+
+    if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
+      stop("Condition information is missing from the Experimental design.")
+    }
+    if(length(unique(feat_filt_Conditions)) ==  1){
+      stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
+    }
+
+    miss <- c()
+    # for (i in unique_conditions){
+    split_Input <- split(feat_filt_data, feat_filt_Conditions) # splits data frame into a list of dataframes by condition
+
+    for (m in split_Input){ # Select metabolites to be filtered for different conditions
+      for(i in 1:ncol(m)) {
+        if(length(which(is.na(m[,i]))) > (1-Feature_Filt_Value)*nrow(m))
+          miss <- append(miss,i)
+      }
+    }
+    #   }
+
+    if(length(miss) ==  0){ #remove metabolites if any are found
+      message("There where no metabolites exluded")
+      filtered_matrix <- Input_data
+      feat_file_res <- "There where no metabolites exluded"
+      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+    } else {
+      names<-unique(colnames(Input_data)[miss])
+      message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
+      filtered_matrix <- Input_data[,-miss]
+      write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+    }
+  }
+  if (Feature_Filtering ==  "Standard"){
+    message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
+    message(paste("filtering value selected:", Feature_Filt_Value))
+
+    feat_filt_data <- as.data.frame(Input_data)
+
+    if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
+      feat_filt_data <- feat_filt_data %>% filter(!Input_SettingsFile$Conditions=="CoRe_media")
+    }
+
+    split_Input <- feat_filt_data
+
+    miss <- c()
+    message("***Performing standard feature filtering***")
+    for(i in 1:ncol(split_Input)) { # Select metabolites to be filtered for one condition
+      if(length(which(is.na(split_Input[,i]))) > (1-Feature_Filt_Value)*nrow(split_Input))
+        miss <- append(miss,i)
+    }
+
+    if(length(miss) ==  0){ #remove metabolites if any are found
+      message("There where no metabolites exluded")
+      filtered_matrix <- Input_data
+      feat_file_res <- "There where no metabolites exluded"
+      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+    } else {
+      names<-unique(colnames(Input_data)[miss])
+      message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
+      filtered_matrix <- Input_data[,-miss]
+      write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+    }
+  }
+  if (Feature_Filtering ==  "None"){
+    warning("No feature filtering is selected.")
+    filtered_matrix <- as.data.frame(Input_data)
+  }
+
+  filtered_matrix <- as.data.frame(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
+
+```
+\
+
+
+# Here we will investigate the relationship of the Missing values/MVI with the resulting CV
+
+For the first 10 metabolites we remove 0,20,40,60 and 80 % of metabolites and for all combinations and percentages do MVI, TIC normalisation and calculate the resulting CVs. Finally we plot them all together and find the optimal fitting line to the data.
+
+
+```{r}
+#a <- filtered_matrix
+
+final_df <- data.frame()
+#for (metab in 1:ncol(filtered_matrix)){
+for (metab in 1:10){
+  print(metab)
+  
+  filtered_matrix <- a %>% as.data.frame()
+  name <- names(filtered_matrix)[metab]
+  names(filtered_matrix)[metab]<- "test"
+  
+
+###################
+### For 0 NAs
+CV_0NA <- vector()
+  ######## DO MVI and TIC  ##############
+  ### ### ### Missing value Imputation ### ### ###
+
+  # Do MVI for control media samples
+  if(CoRe==TRUE){
+    replaceNAdf <- filtered_matrix%>% filter( Input_SettingsFile$Conditions=="CoRe_media")
+
+    # find metabolites with NA
+    na_percentage <- colMeans(is.na(replaceNAdf)) * 100
+    highNA_metabs <- na_percentage[na_percentage>20]
+
+    # report metabolites with NA
+    if(sum(na_percentage)>0){
+      message("NA values were found in Control_media samples for metabolites.")
+      if(sum(na_percentage>20)>0){
+        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+    }
+    # if all values are NA set to 0
+    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    # If there is at least 1 value use the half minimum per feature
+    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    return(x)
+    }) %>% as.data.frame()
+
+    # replace the samples in the original dataframe
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+  }
+
+  # Do MVI for the samples
+  if (MVI ==  TRUE){
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      feature_data <- merge(NA_removed_matrix[feature] , Input_SettingsFile %>% select(Conditions), by= 0)
+      feature_data <-column_to_rownames(feature_data, "Row.names")
+
+      imputed_feature_data <- feature_data %>%
+        group_by(Conditions) %>%
+        mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+    }
+
+  } else if(MVI == FALSE){
+    message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
+  }
+
+
+
+  if (TIC_Normalization ==  TRUE){
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    RowSums <- rowSums(NA_removed_matrix)
+    Median_RowSums <- median(RowSums) #This will built the median
+    Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
+    Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+    Data_TIC <- as.data.frame(Data_TIC)
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
+
+
+  ######## Calculate CV   ###########
+  CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+
+Therhold_cv = 1
+data_cv <- CoRe_medias
+    
+## Coefficient of Variation
+result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+result_df[1, is.na(result_df[1,])]<- 0
+rownames(result_df)[1] <- "CV"
+    
+      result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+      rownames(result_df)<- colnames(data_cv)
+
+CV_0NA <- append(CV_0NA, result_df["test","CV"])
+
+
+
+########################
+#### For 1 NA
+CV_1NA <- vector()
+for (value in 1:5){
+  
+  filtered_matrix <- a %>% as.data.frame()
+  names(filtered_matrix)[metab]<- "test"
+  filtered_matrix[value,metab] <- NA
+
+  ######## DO MVI and TIC  ##############
+  ### ### ### Missing value Imputation ### ### ###
+
+  # Do MVI for control media samples
+  if(CoRe==TRUE){
+    replaceNAdf <- filtered_matrix%>% filter( Input_SettingsFile$Conditions=="CoRe_media")
+
+    # find metabolites with NA
+    na_percentage <- colMeans(is.na(replaceNAdf)) * 100
+    highNA_metabs <- na_percentage[na_percentage>20]
+
+    # report metabolites with NA
+    if(sum(na_percentage)>0){
+      message("NA values were found in Control_media samples for metabolites.")
+      if(sum(na_percentage>20)>0){
+        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+    }
+    # if all values are NA set to 0
+    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    # If there is at least 1 value use the half minimum per feature
+    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    return(x)
+    }) %>% as.data.frame()
+
+    # replace the samples in the original dataframe
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+  }
+
+  # Do MVI for the samples
+  if (MVI ==  TRUE){
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      feature_data <- merge(NA_removed_matrix[feature] , Input_SettingsFile %>% select(Conditions), by= 0)
+      feature_data <-column_to_rownames(feature_data, "Row.names")
+
+      imputed_feature_data <- feature_data %>%
+        group_by(Conditions) %>%
+        mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+    }
+
+  } else if(MVI == FALSE){
+    message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
+  }
+
+
+
+  if (TIC_Normalization ==  TRUE){
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    RowSums <- rowSums(NA_removed_matrix)
+    Median_RowSums <- median(RowSums) #This will built the median
+    Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
+    Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+    Data_TIC <- as.data.frame(Data_TIC)
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
+
+
+  ######## Calculate CV   ###########
+  CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+
+Therhold_cv = 1
+data_cv <- CoRe_medias
+    
+## Coefficient of Variation
+result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+result_df[1, is.na(result_df[1,])]<- 0
+rownames(result_df)[1] <- "CV"
+    
+      result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+      rownames(result_df)<- colnames(data_cv)
+
+CV_1NA <- append(CV_1NA, result_df["test","CV"])
+}
+
+
+########################
+#### For 2 NA
+combinations <- combn(c(1, 2, 3, 4, 5), 2)
+
+CV_2NA <- vector()
+# Iterate through each combination using a loop
+for (i in 1:ncol(combinations)) {
+  filtered_matrix <- a %>% as.data.frame()
+  names(filtered_matrix)[metab]<- "test"
+  value <- combinations[,i]
+  filtered_matrix[value,metab] <- NA
+  
+    ######## DO MVI and TIC  ##############
+  ### ### ### Missing value Imputation ### ### ###
+
+  # Do MVI for control media samples
+  if(CoRe==TRUE){
+    replaceNAdf <- filtered_matrix%>% filter( Input_SettingsFile$Conditions=="CoRe_media")
+
+    # find metabolites with NA
+    na_percentage <- colMeans(is.na(replaceNAdf)) * 100
+    highNA_metabs <- na_percentage[na_percentage>20]
+
+    # report metabolites with NA
+    if(sum(na_percentage)>0){
+      message("NA values were found in Control_media samples for metabolites.")
+      if(sum(na_percentage>20)>0){
+        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+    }
+    # if all values are NA set to 0
+    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    # If there is at least 1 value use the half minimum per feature
+    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    return(x)
+    }) %>% as.data.frame()
+
+    # replace the samples in the original dataframe
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+  }
+
+  # Do MVI for the samples
+  if (MVI ==  TRUE){
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      feature_data <- merge(NA_removed_matrix[feature] , Input_SettingsFile %>% select(Conditions), by= 0)
+      feature_data <-column_to_rownames(feature_data, "Row.names")
+
+      imputed_feature_data <- feature_data %>%
+        group_by(Conditions) %>%
+        mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+    }
+
+  } else if(MVI == FALSE){
+    message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
+  }
+
+
+
+  if (TIC_Normalization ==  TRUE){
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    RowSums <- rowSums(NA_removed_matrix)
+    Median_RowSums <- median(RowSums) #This will built the median
+    Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
+    Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+    Data_TIC <- as.data.frame(Data_TIC)
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
+
+
+  ######## Calculate CV   ###########
+  CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+
+  Therhold_cv = 1
+  data_cv <- CoRe_medias
+    
+  ## Coefficient of Variation
+  result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+  result_df[1, is.na(result_df[1,])]<- 0
+  rownames(result_df)[1] <- "CV"
+    
+      result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+      rownames(result_df)<- colnames(data_cv)
+
+CV_2NA <- append(CV_2NA, result_df["test","CV"])
+}
+  
+########################
+#### For 3 NA
+combinations <- combn(c(1, 2, 3, 4, 5), 3)
+
+CV_3NA <- vector()
+# Iterate through each combination using a loop
+for (i in 1:ncol(combinations)) {
+  filtered_matrix <- a %>% as.data.frame()
+  names(filtered_matrix)[metab]<- "test"
+  value <- combinations[,i]
+  filtered_matrix[value,metab] <- NA
+  
+    ######## DO MVI and TIC  ##############
+  ### ### ### Missing value Imputation ### ### ###
+
+  # Do MVI for control media samples
+  if(CoRe==TRUE){
+    replaceNAdf <- filtered_matrix%>% filter( Input_SettingsFile$Conditions=="CoRe_media")
+
+    # find metabolites with NA
+    na_percentage <- colMeans(is.na(replaceNAdf)) * 100
+    highNA_metabs <- na_percentage[na_percentage>20]
+
+    # report metabolites with NA
+    if(sum(na_percentage)>0){
+      message("NA values were found in Control_media samples for metabolites.")
+      if(sum(na_percentage>20)>0){
+        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+    }
+    # if all values are NA set to 0
+    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    # If there is at least 1 value use the half minimum per feature
+    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    return(x)
+    }) %>% as.data.frame()
+
+    # replace the samples in the original dataframe
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+  }
+
+  # Do MVI for the samples
+  if (MVI ==  TRUE){
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      feature_data <- merge(NA_removed_matrix[feature] , Input_SettingsFile %>% select(Conditions), by= 0)
+      feature_data <-column_to_rownames(feature_data, "Row.names")
+
+      imputed_feature_data <- feature_data %>%
+        group_by(Conditions) %>%
+        mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+    }
+
+  } else if(MVI == FALSE){
+    message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
+  }
+
+
+
+  if (TIC_Normalization ==  TRUE){
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    RowSums <- rowSums(NA_removed_matrix)
+    Median_RowSums <- median(RowSums) #This will built the median
+    Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
+    Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+    Data_TIC <- as.data.frame(Data_TIC)
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
+
+
+  ######## Calculate CV   ###########
+  CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+
+  Therhold_cv = 1
+  data_cv <- CoRe_medias
+    
+  ## Coefficient of Variation
+  result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+  result_df[1, is.na(result_df[1,])]<- 0
+  rownames(result_df)[1] <- "CV"
+    
+      result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+      rownames(result_df)<- colnames(data_cv)
+
+CV_3NA <- append(CV_3NA, result_df["test","CV"])
+}
+
+########################
+#### For 4 NA
+combinations <- combn(c(1, 2, 3, 4, 5), 4)
+
+CV_4NA <- vector()
+# Iterate through each combination using a loop
+for (i in 1:ncol(combinations)) {
+  filtered_matrix <- a %>% as.data.frame()
+  names(filtered_matrix)[metab]<- "test"
+  value <- combinations[,i]
+  filtered_matrix[value,metab] <- NA
+  
+    ######## DO MVI and TIC  ##############
+  ### ### ### Missing value Imputation ### ### ###
+
+  # Do MVI for control media samples
+  if(CoRe==TRUE){
+    replaceNAdf <- filtered_matrix%>% filter( Input_SettingsFile$Conditions=="CoRe_media")
+
+    # find metabolites with NA
+    na_percentage <- colMeans(is.na(replaceNAdf)) * 100
+    highNA_metabs <- na_percentage[na_percentage>20]
+
+    # report metabolites with NA
+    if(sum(na_percentage)>0){
+      message("NA values were found in Control_media samples for metabolites.")
+      if(sum(na_percentage>20)>0){
+        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+    }
+    # if all values are NA set to 0
+    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    # If there is at least 1 value use the half minimum per feature
+    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    return(x)
+    }) %>% as.data.frame()
+
+    # replace the samples in the original dataframe
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+  }
+
+  # Do MVI for the samples
+  if (MVI ==  TRUE){
+    message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+    for (feature  in colnames(NA_removed_matrix)){
+      feature_data <- merge(NA_removed_matrix[feature] , Input_SettingsFile %>% select(Conditions), by= 0)
+      feature_data <-column_to_rownames(feature_data, "Row.names")
+
+      imputed_feature_data <- feature_data %>%
+        group_by(Conditions) %>%
+        mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+
+      NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+    }
+
+  } else if(MVI == FALSE){
+    message("Missing value imputation is not performed.")
+    stored_NA_positions <- which(is.na(filtered_matrix), arr.ind = TRUE)
+    NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
+  }
+
+
+
+  if (TIC_Normalization ==  TRUE){
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    RowSums <- rowSums(NA_removed_matrix)
+    Median_RowSums <- median(RowSums) #This will built the median
+    Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
+    Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+    Data_TIC <- as.data.frame(Data_TIC)
+  } else {  # TIC_Normalization == FALSE
+    Data_TIC <- as.data.frame(NA_removed_matrix)
+    warning("***Total Ion Count normalization is not performed***")
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
+
+
+  ######## Calculate CV   ###########
+  CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+
+  Therhold_cv = 1
+  data_cv <- CoRe_medias
+    
+  ## Coefficient of Variation
+  result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+  result_df[1, is.na(result_df[1,])]<- 0
+  rownames(result_df)[1] <- "CV"
+    
+      result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+      rownames(result_df)<- colnames(data_cv)
+
+CV_4NA <- append(CV_4NA, result_df["test","CV"])
+}
+
+# Make the final CV plot
+resdf <- data.frame(NA0 = CV_0NA,  NA1 = CV_1NA, NA2 = CV_2NA, NA3 = CV_3NA, NA4 = CV_4NA)
+df_long <- gather(resdf, key = "Vector", value = "Value")
+df_long$Metab <- name
+
+final_df <- rbind(final_df,df_long )
+
+}
+  
+```
+
+```{r}
+final_df2 <- final_df
+final_df2$Vector <- factor(final_df2$Vector, levels = c("NA0", "NA1", "NA2", "NA3", "NA4"), 
+                           labels = c("0%", "20%", "40%", "60%", "80%"))
+final_df2$Total = 1
+# Plot with 'Vector' as a factor
+ggplot(final_df2, aes(x = Vector, y = Value, color = Metab)) +
+  geom_point(stat = "identity") +
+  labs(x = "Percentage of NAs", y = "Coefficient of Variation (CV)") +
+  theme_minimal() +
+  geom_smooth(method = "lm", formula= y~x, se = FALSE)
+
+# Create the ggplot
+gg <- ggplot(final_df2, aes(x = Vector, y = Value, color = Metab)) +
+  geom_point(stat = "identity") +
+  labs(x = "Percentage of NAs", y = "Coefficient of Variation (CV)", title = "Relationship of CV and Metab NAs", subtitle = "with grouped polynomial fit") +
+  theme_minimal()
+
+# # Add the linear regression lines
+# gg + geom_smooth(method = "lm", formula = y ~ x, data = final_df2, 
+#                        aes(group = Metab), se = FALSE, linetype = "dashed")
+# 
+# # Add polynomial regression lines 
+# gg + geom_smooth(method = "lm", formula = y ~ poly(x, 2), data = final_df2, 
+#                        aes(group = Metab), se = FALSE, linetype = "dashed")
+# 
+# # Add polynomial regression lines 
+# gg + geom_smooth(method = "lm", formula = y ~ poly(x, 3), data = final_df2, 
+#                        aes(group = Metab), se = FALSE, linetype = "dashed")
+
+# Only 1 general line
+gg + geom_smooth(method = "lm", formula = y ~ poly(x, 3), data = final_df2, 
+                       aes(group = Total), se = FALSE, linetype = "dashed")
+
+
+```
+
+# All CVs are below 1. We can see that for all the samples CV changes the same as more NAs are introduced. The Max is ~ 50-60% NAs. the CV goes up the more NAs we introduce. Also the highest the original CV, the highest the CV when NAs are introduced.
+
+
+
+
+
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
+```
+
+# Bibliography

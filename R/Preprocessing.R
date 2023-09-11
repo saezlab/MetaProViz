@@ -455,6 +455,7 @@ Preprocessing <- function(Input_data,
       }
 
       # Export/Save CV table ?
+      # Export some QC plots?
 
       # Do sample outlier testing
       if(dim(CoRe_medias)[1]>3){
@@ -513,7 +514,6 @@ Preprocessing <- function(Input_data,
           contingency_table[1, 1] <- sum(current_sample)
           contingency_table[2, 1] <- sum(!current_sample)
           contingency_table[1, 2] <- sum(rowSums(data_cont) - current_sample)
-          #contingency_table[2, 2] <- sum(nrow(data_cont) - rowSums(data_cont) + current_sample)
           contingency_table[2, 2] <- dim(data_cont %>% select(!all_of(sample)))[1]*dim(data_cont %>% select(!all_of(sample)))[2] -sum( rowSums(data_cont) - current_sample)
 
           # Fisher's exact test
