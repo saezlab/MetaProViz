@@ -65,7 +65,9 @@ Preprocessing <- function(Input_data,
                         "ggplot2", # For visualization PCA
                         "hash", # Dictionary in R for making column of outliers
                         "reshape", # for melting df for anova
-                        "inflection")# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
+                        "patchwork", # for combining ggplots
+                        "inflection"
+                        )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
@@ -360,6 +362,45 @@ Preprocessing <- function(Input_data,
     Data_TIC <- as.data.frame(NA_removed_matrix)
     warning("***Total Ion Count normalization is not performed***")
     message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+  }
+
+  # Normalization QC plots
+  # pre normalization
+  log_NA_removed_matrix <- log(NA_removed_matrix) %>% t() %>% as.data.frame() # log tranforms the data
+  medians <- apply(log_NA_removed_matrix, 2, median) # get median
+  RLA_data_raw <- log_NA_removed_matrix - medians   # Subtract the medians from each column
+  RLA_data_long <- pivot_longer(RLA_data_raw, cols = everything(), names_to = "Group")
+  names(RLA_data_long)<- c("Samples", "Intensity")
+
+  # Create the ggplot boxplot
+  RLA_data_raw <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0, color = "red", linetype = "solid") +
+    labs(title = "Before Normalization")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+  # after normalization
+  log_Data_TIC <- log(Data_TIC) %>% t() %>% as.data.frame()
+  medians <- apply(log_Data_TIC, 2, median)
+  RLA_data_norm <- log_Data_TIC - medians   # Subtract the medians from each column
+  RLA_data_long <- pivot_longer(RLA_data_norm, cols = everything(), names_to = "Group")
+  names(RLA_data_long)<- c("Samples", "Intensity")
+
+  # Create the ggplot boxplot
+  RLA_data_norm <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0, color = "red", linetype = "solid") +
+    labs(title = "Aftre Normalization")+
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+  norm_plots <- RLA_data_raw + RLA_data_norm
+
+  if (ExportQCPlots == TRUE){
+    ggsave(filename = paste0(Results_folder_Preprocessing_folder, "/Normalization.",Save_as_Plot), plot = norm_plots, width = 10,  height = 8)
   }
 
 
@@ -974,6 +1015,24 @@ Pool_Estimation <- function(Input_data,
     pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
     Input_numeric <- pool_data
   }
+
+
+  # Pool sample PCA
+  if(is.null(Input_SettingsFile)==TRUE){
+    pca_data <- Input_numeric
+    pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data, OutputPlotName = "QC Pool samples",Save_as_Plot =  NULL))
+  }else{
+    pca_data <- merge(Input_SettingsFile %>% select(Conditions), Input_data, by=0) %>%
+      column_to_rownames("Row.names") %>%
+      mutate(Sample_type = case_when(Conditions == Input_SettingsInfo[["Conditions"]] ~ "Pool",
+                                     TRUE ~ "Sample"))
+
+    pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
+                                                Plot_SettingsFile= pca_data, OutputPlotName = "QC Pool samples",
+                                                Save_as_Plot =  NULL))
+  }
+
+  plot(pca_QC_pool)
 
   ## Coefficient of Variation
   CV_data <- Input_numeric
