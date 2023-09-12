@@ -65,7 +65,7 @@ Preprocessing <- function(Input_data,
                         "ggplot2", # For visualization PCA
                         "hash", # Dictionary in R for making column of outliers
                         "reshape", # for melting df for anova
-                        "patchwork", # for combining ggplots
+                        "gridExtra",
                         "inflection"
                         )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
@@ -396,8 +396,9 @@ Preprocessing <- function(Input_data,
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
+  norm_plots <- grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2)
 
-  norm_plots <- RLA_data_raw + RLA_data_norm
+
 
   if (ExportQCPlots == TRUE){
     ggsave(filename = paste0(Results_folder_Preprocessing_folder, "/Normalization.",Save_as_Plot), plot = norm_plots, width = 10,  height = 8)
