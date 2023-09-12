@@ -68,8 +68,8 @@ First if you have not done yet, install the required dependencies and load the l
 #MetaProViz
 
 #library(MetaProViz)
-#devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
-devtools::load_all("C:/Users/Dimitrios/Documents/GitHub/MetaProViz")
+devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
+#devtools::load_all("C:/Users/Dimitrios/Documents/GitHub/MetaProViz")
 
 #dependencies
 library(tidyverse)
@@ -126,8 +126,8 @@ Save_as_Plot = "svg"
 Run functions untill the CoRe Media sample processing
 
 ```{r}
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
+  #new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  #if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
   ## ------------------ Run ------------------- ##
@@ -361,7 +361,7 @@ Run functions untill the CoRe Media sample processing
 For the first 10 metabolites we remove 0,20,40,60 and 80 % of metabolites and for all combinations and percentages do MVI, TIC normalisation and calculate the resulting CVs. Finally we plot them all together and find the optimal fitting line to the data.
 
 
-```{r}
+```{r, eval=FALSE}
 #a <- filtered_matrix
 
 final_df <- data.frame()
@@ -860,7 +860,7 @@ final_df <- rbind(final_df,df_long )
   
 ```
 
-```{r}
+```{r, eval=FALSE}
 final_df2 <- final_df
 final_df2$Vector <- factor(final_df2$Vector, levels = c("NA0", "NA1", "NA2", "NA3", "NA4"), 
                            labels = c("0%", "20%", "40%", "60%", "80%"))
