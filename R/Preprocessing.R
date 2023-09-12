@@ -951,7 +951,9 @@ ReplicateSum <- function(Input_data){
 #' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}
 #' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
-#' @param Therhold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
+#' @param threshold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #'
 #' @keywords Coefficient of Variation, high variance metabolites
 #' @export
@@ -961,7 +963,10 @@ Pool_Estimation <- function(Input_data,
                             Input_SettingsFile = NULL,
                             Input_SettingsInfo = NULL,
                             Unstable_feature_remove = FALSE,
-                            Therhold_cv = 1){
+                            Therhold_cv = 1,
+                            Save_as_Plot = "svg",
+                            Save_as_Results = "csv" # txt or csv
+){
 
 
   ## ------------ Check Input files ----------- ##
@@ -1005,15 +1010,46 @@ Pool_Estimation <- function(Input_data,
   if(is_bare_logical(Unstable_feature_remove)==FALSE){
     stop("Check input. The Unstable_feature_remove value should be either =TRUE if metabolites with high variance are to be removed or =FALSE if not.")
   }
-  if( is.numeric(Therhold_cv)== FALSE | Therhold_cv < 0){
-    stop("Check input. The selected Therhold_cv value should be a positive numeric value.")
+  if( is.numeric(threshold_cv)== FALSE | threshold_cv < 0){
+    stop("Check input. The selected threshold_cv value should be a positive numeric value.")
   }
+  if(is.null(Save_as_Plot)==FALSE){
+    Save_as_Plot_options <- c("svg","pdf","png")
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
+  }
+  if(is.null(Save_as_Results)==FALSE){
+    Save_as_Results_options <- c("txt","csv", "xlsx" )
+    if(Save_as_Results %in% Save_as_Results_options == FALSE){
+      stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+    }
+  }
+
+  # Start QC plot list
+  pool_plot_list <- list()
+  pool_plot_list_counter = 1
+
 
   if(is.null(Input_SettingsFile)==TRUE){
     Input_numeric <- Input_data
   }else{
     pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
     Input_numeric <- pool_data
+  }
+
+
+  if(is.null(Save_as_Plot)==FALSE |is.null(Save_as_Results)==FALSE ){
+    ## ------------ Create Results output folder ----------- ##
+    name <- paste0("MetaProViz_Results_",Sys.Date())
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
+    Results_folder_Preprocessing_folder = file.path(Results_folder, "Preprocessing")  # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
+    if (!dir.exists(Results_folder_Preprocessing_folder)) {dir.create(Results_folder_Preprocessing_folder)}  # check and create folder
+    Results_folder_Preprocessing_folder_Pool_Estimation = file.path(Results_folder_Preprocessing_folder, "Pool_Estimation")   # Create Outlier_Detection directory
+    if (!dir.exists(Results_folder_Preprocessing_folder_Pool_Estimation)) {dir.create(Results_folder_Preprocessing_folder_Pool_Estimation)}
+
   }
 
 
@@ -1028,11 +1064,16 @@ Pool_Estimation <- function(Input_data,
                                      TRUE ~ "Sample"))
 
     pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
-                                                Plot_SettingsFile= pca_data, OutputPlotName = "QC Pool samples",
-                                                Save_as_Plot =  NULL))
+                                               Plot_SettingsFile= pca_data, OutputPlotName = "QC Pool samples",
+                                               Save_as_Plot =  NULL))
   }
 
-  plot(pca_QC_pool)
+  pool_plot_list[[pool_plot_list_counter]] <- pca_QC_pool
+  pool_plot_list_counter = pool_plot_list_counter+1
+
+  if (is.null(Save_as_Plot) == FALSE){
+    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/PCA_Pool_samples.",Save_as_Plot), plot = pca_QC_pool, width = 10,  height = 8)
+  }
 
   ## Coefficient of Variation
   CV_data <- Input_numeric
@@ -1045,31 +1086,73 @@ Pool_Estimation <- function(Input_data,
     t()%>%
     as.data.frame() %>%
     rowwise() %>%
-    mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+    mutate(High_var = CV > threshold_cv) %>% as.data.frame()
 
   rownames(result_df_final)<- colnames(Input_numeric)
+  result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
 
+  # Save results
+  if(is.null(Save_as_Results)==FALSE){
+    if (Save_as_Results == "xlsx"){
+      xlsDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".xlsx"))   # Save the DMA results table
+      writexl::write_xlsx(result_df_final_out,xlsDMA, col_names = TRUE) # save the DMA result DF
+    }else if (Save_as_Results == "csv"){
+      csvDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".csv"))
+      write.csv(result_df_final_out,csvDMA,row.names = FALSE) # save the DMA result DF
+    }else if (Save_as_Results == "txt"){
+      txtDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".txt"))
+      write.table(result_df_final_out,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+    }
+  }
+
+  #Make histogram of CVs
+  HistCV <- invisible(ggplot(Pool_Estimation_result, aes(CV)) +
+                        geom_histogram(aes(y=..density..), color="black", fill="white")+
+                        geom_vline(aes(xintercept=Therhold_cv),
+                                   color="darkred", linetype="dashed", size=1)+
+                        geom_density(alpha=.2, fill="#FF6666") +
+                        labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                        theme_classic())
+
+  pool_plot_list[[pool_plot_list_counter]] <- HistCV
+  pool_plot_list_counter = pool_plot_list_counter+1
+
+  if (is.null(Save_as_Plot) == FALSE){
+    suppressMessages(ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/Pool_CV_Histogram",".",Save_as_Plot), plot = invisible(HistCV), width = 8,  height = 8))
+  }
+
+  ViolinCV <- invisible(ggplot(Pool_Estimation_result, aes(y=CV, x=High_var, label=row.names(Pool_Estimation_result)))+
+                          geom_violin(alpha = 0.5 , fill="#FF6666")+
+                          geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
+                          #geom_point(position = position_jitter(seed = 1, width = 0.2))+
+                          geom_text(aes(label=ifelse(CV>Therhold_cv,as.character(row.names(Pool_Estimation_result)),'')), hjust=0, vjust=0)+
+                          labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                          theme_classic())
+
+  pool_plot_list[[pool_plot_list_counter]] <- ViolinCV
+  pool_plot_list_counter = pool_plot_list_counter+1
+
+  if (is.null(Save_as_Plot) == FALSE){
+    suppressMessages(suppressWarnings(ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/Pool_CV_Violin",".",Save_as_Plot), plot = ViolinCV, width = 8,  height = 8)))
+  }
+  # Remove unstable metabolites
+  filtered_Input_data <- Input_data # in case only pool samples in Input_data
   if(is.null(Input_SettingsFile)==FALSE){
     if(Unstable_feature_remove ==TRUE){
-
       unstable_metabs <- rownames(result_df_final)[result_df_final[["High_var_Metabs"]]]
       if(length(unstable_metabs)>0){
         filtered_Input_data <- Input_data %>% select(!unstable_metabs)
       }else{
         filtered_Input_data <- Input_data
       }
-
     }
   }
 
-  # List <- list("Pool_Estimation_result"= result_df_final, "filtered_Input_data"= filtered_Input_data)
-  # list2env(List, envir = .GlobalEnv)
-  assign("Pool_Estimation_result", result_df_final, envir=.GlobalEnv)
 
-  if(is.null(Input_SettingsFile)==FALSE){
-    if(Unstable_feature_remove ==TRUE){
-      assign("filtered_Input_data", filtered_Input_data, envir=.GlobalEnv)
-    }
-  }
+  DF_list <- list("Filtered_Input_data" = filtered_Input_data, "CV_result" = result_df_final_out )
+  Pool_Estimation_res_list <- list("DFs"= DF_list,"Plots"=pool_plot_list )
+  # Return the result
+  assign("PoolEstimation_res",  Pool_Estimation_res_list, envir=.GlobalEnv)
 
 }
+
