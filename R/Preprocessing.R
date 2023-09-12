@@ -371,14 +371,18 @@ Preprocessing <- function(Input_data,
   RLA_data_raw <- log_NA_removed_matrix - medians   # Subtract the medians from each column
   RLA_data_long <- pivot_longer(RLA_data_raw, cols = everything(), names_to = "Group")
   names(RLA_data_long)<- c("Samples", "Intensity")
+  RLA_data_long <- as.data.frame(RLA_data_long)
+  for (row in 1:nrow(RLA_data_long)){ # add conditions
+    RLA_data_long[row,"Conditions"] <- Input_SettingsFile[rownames(Input_SettingsFile) %in%RLA_data_long[row,1],"Conditions"]
+  }
 
   # Create the ggplot boxplot
-  RLA_data_raw <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity)) +
+  RLA_data_raw <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity, color = Conditions)) +
     geom_boxplot() +
     geom_hline(yintercept = 0, color = "red", linetype = "solid") +
     labs(title = "Before Normalization")+
     theme_minimal()+
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
 
   # after normalization
@@ -387,14 +391,17 @@ Preprocessing <- function(Input_data,
   RLA_data_norm <- log_Data_TIC - medians   # Subtract the medians from each column
   RLA_data_long <- pivot_longer(RLA_data_norm, cols = everything(), names_to = "Group")
   names(RLA_data_long)<- c("Samples", "Intensity")
+  for (row in 1:nrow(RLA_data_long)){ # add conditions
+    RLA_data_long[row,"Conditions"] <- Input_SettingsFile[rownames(Input_SettingsFile) %in%RLA_data_long[row,1],"Conditions"]
+  }
 
   # Create the ggplot boxplot
-  RLA_data_norm <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity)) +
+  RLA_data_norm <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity, color = Conditions)) +
     geom_boxplot() +
     geom_hline(yintercept = 0, color = "red", linetype = "solid") +
     labs(title = "Aftre Normalization")+
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
   norm_plots <- grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2)
 
