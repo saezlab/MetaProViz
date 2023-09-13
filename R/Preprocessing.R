@@ -403,7 +403,7 @@ Preprocessing <- function(Input_data,
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
-  norm_plots <- gridExtra::grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2)
+  norm_plots <-suppressWarnings(gridExtra::grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2))
 
 
 
@@ -445,7 +445,7 @@ Preprocessing <- function(Input_data,
 
       ## Check metabolite variance
       # Thresholds
-      Therhold_cv = 1
+     # Threshold_cv = 1
       data_cv <- CoRe_medias
 
       ## Coefficient of Variation
@@ -454,7 +454,7 @@ Preprocessing <- function(Input_data,
       rownames(result_df)[1] <- "CV"
 
       result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-        mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+        mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
       rownames(result_df)<- colnames(data_cv)
 
       high_var_metabs <- sum(result_df$High_var == TRUE)
@@ -501,7 +501,7 @@ Preprocessing <- function(Input_data,
           rownames(result_df)[1] <- "CV"
 
           result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-            mutate(High_var = CV > Therhold_cv) %>% as.data.frame()
+            mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
           rownames(result_df)<- colnames(data_cv)
 
           high_var_metabs <- sum(result_df$High_var == TRUE)
@@ -959,7 +959,7 @@ ReplicateSum <- function(Input_data){
 #' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}
 #' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
-#' @param threshold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
+#' @param Threshold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #'
@@ -971,7 +971,7 @@ Pool_Estimation <- function(Input_data,
                             Input_SettingsFile = NULL,
                             Input_SettingsInfo = NULL,
                             Unstable_feature_remove = FALSE,
-                            Therhold_cv = 1,
+                            Threshold_cv = 1,
                             Save_as_Plot = "svg",
                             Save_as_Results = "csv" # txt or csv
 ){
@@ -1018,8 +1018,8 @@ Pool_Estimation <- function(Input_data,
   if(is_bare_logical(Unstable_feature_remove)==FALSE){
     stop("Check input. The Unstable_feature_remove value should be either =TRUE if metabolites with high variance are to be removed or =FALSE if not.")
   }
-  if( is.numeric(threshold_cv)== FALSE | threshold_cv < 0){
-    stop("Check input. The selected threshold_cv value should be a positive numeric value.")
+  if( is.numeric(Threshold_cv)== FALSE | Threshold_cv < 0){
+    stop("Check input. The selected Threshold_cv value should be a positive numeric value.")
   }
   if(is.null(Save_as_Plot)==FALSE){
     Save_as_Plot_options <- c("svg","pdf","png")
@@ -1094,7 +1094,7 @@ Pool_Estimation <- function(Input_data,
     t()%>%
     as.data.frame() %>%
     rowwise() %>%
-    mutate(High_var = CV > threshold_cv) %>% as.data.frame()
+    mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
 
   rownames(result_df_final)<- colnames(Input_numeric)
   result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
@@ -1114,9 +1114,9 @@ Pool_Estimation <- function(Input_data,
   }
 
   #Make histogram of CVs
-  HistCV <- invisible(ggplot(Pool_Estimation_result, aes(CV)) +
+  HistCV <- invisible(ggplot(result_df_final_out, aes(CV)) +
                         geom_histogram(aes(y=..density..), color="black", fill="white")+
-                        geom_vline(aes(xintercept=Therhold_cv),
+                        geom_vline(aes(xintercept=Threshold_cv),
                                    color="darkred", linetype="dashed", size=1)+
                         geom_density(alpha=.2, fill="#FF6666") +
                         labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
@@ -1129,11 +1129,11 @@ Pool_Estimation <- function(Input_data,
     suppressMessages(ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/Pool_CV_Histogram",".",Save_as_Plot), plot = invisible(HistCV), width = 8,  height = 8))
   }
 
-  ViolinCV <- invisible(ggplot(Pool_Estimation_result, aes(y=CV, x=High_var, label=row.names(Pool_Estimation_result)))+
+  ViolinCV <- invisible(ggplot(result_df_final_out, aes(y=CV, x=High_var, label=row.names(result_df_final_out)))+
                           geom_violin(alpha = 0.5 , fill="#FF6666")+
                           geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                           #geom_point(position = position_jitter(seed = 1, width = 0.2))+
-                          geom_text(aes(label=ifelse(CV>Therhold_cv,as.character(row.names(Pool_Estimation_result)),'')), hjust=0, vjust=0)+
+                          geom_text(aes(label=ifelse(CV>Threshold_cv,as.character(row.names(result_df_final_out)),'')), hjust=0, vjust=0)+
                           labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
                           theme_classic())
 
@@ -1160,7 +1160,7 @@ Pool_Estimation <- function(Input_data,
   DF_list <- list("Filtered_Input_data" = filtered_Input_data, "CV_result" = result_df_final_out )
   Pool_Estimation_res_list <- list("DFs"= DF_list,"Plots"=pool_plot_list )
   # Return the result
-  assign("PoolEstimation_res",  Pool_Estimation_res_list, envir=.GlobalEnv)
+  #assign("PoolEstimation_res",  Pool_Estimation_res_list, envir=.GlobalEnv)
 
   return(Pool_Estimation_res_list)
 
