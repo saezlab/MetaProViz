@@ -972,7 +972,8 @@ Pool_Estimation <- function(Input_data,
                             Input_SettingsInfo = NULL,
                             Unstable_feature_remove = FALSE,
                             Save_as_Plot = "svg",
-                            Save_as_Results = "csv" # txt or csv
+                            Save_as_Results = "csv", # txt or csv
+                            Threshold_cv = 1
 ){
 
 
