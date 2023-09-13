@@ -403,7 +403,7 @@ Preprocessing <- function(Input_data,
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
-  norm_plots <- grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2)
+  norm_plots <- gridExtra::grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2)
 
 
 
@@ -1161,6 +1161,8 @@ Pool_Estimation <- function(Input_data,
   Pool_Estimation_res_list <- list("DFs"= DF_list,"Plots"=pool_plot_list )
   # Return the result
   assign("PoolEstimation_res",  Pool_Estimation_res_list, envir=.GlobalEnv)
+
+  return(Pool_Estimation_res_list)
 
 }
 
