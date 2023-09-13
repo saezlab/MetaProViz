@@ -1115,7 +1115,7 @@ Pool_Estimation <- function(Input_data,
 
   #Make histogram of CVs
   HistCV <- invisible(ggplot(result_df_final_out, aes(CV)) +
-                        geom_histogram(aes(y=..density..), color="black", fill="white")+
+                        geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
                         geom_vline(aes(xintercept=Threshold_cv),
                                    color="darkred", linetype="dashed", size=1)+
                         geom_density(alpha=.2, fill="#FF6666") +
