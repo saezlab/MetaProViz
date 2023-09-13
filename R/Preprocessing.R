@@ -445,7 +445,7 @@ Preprocessing <- function(Input_data,
 
       ## Check metabolite variance
       # Thresholds
-     # Threshold_cv = 1
+      Threshold_cv = 1
       data_cv <- CoRe_medias
 
       ## Coefficient of Variation
