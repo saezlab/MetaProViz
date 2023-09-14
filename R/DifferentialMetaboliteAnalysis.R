@@ -23,10 +23,10 @@
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param Input_SettingsInfo \emph{Optional: } Named vector including at least the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile"). \strong{c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{"t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
-#' @param  Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{NULL}
+#' @param Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
@@ -83,46 +83,206 @@ DMA <-function(Input_data,
     }
   }
 
-  if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
-    stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-  }else{# if true rename to Conditions
-    Input_SettingsFile<- Input_SettingsFile%>%
-      dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+  #2.  Input_MetaFile_Metab
+  if(is.null(Input_MetaFile_Metab) == FALSE){
+    if('Metabolite' %in% colnames(Input_MetaFile_Metab) == FALSE){
+      warning("The provided file Input_MetaFile_Metab must have a columns named: `Metabolite`.")
+    }
   }
 
-  if ("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE ){
-    # Anova all-vs-all
-    message("No conditions were specified as numerator or denumerator. Performing Anova all against all.")
-    conditions =Input_SettingsFile$Conditions
-    denominator <-unique( Input_SettingsFile$Conditions)
-    numerator <-unique( Input_SettingsFile$Conditions)
-    ANOVA = TRUE
-    All = TRUE
-    # Generate all pairwise combinations
-    comparisons <- combn( unique(conditions), 2) %>% as.matrix()
-  }else if ("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==TRUE ){
-    stop("Check input. The selected denominator option is empty while ",paste(Input_SettingsInfo[["numerator"]])," has been selected as a numerator. Please add a denminator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
-  }else if ("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE ){
-    # Anova all-vs-one
-    ANOVA = TRUE
-  }else if ("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo) ==TRUE ){
-    # one-vs-one
-    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions  == FALSE){
-      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+  ## ------------ Check Input SettingsInfo ----------- ##
+  #3. Input_SettingsInfo
+  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
+    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
+      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      }else{# if true rename to Conditions
+        Input_SettingsFile<- Input_SettingsFile%>%
+          dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+        }
     }else{
-      denominator <- Input_SettingsInfo[["denominator"]]
+      stop("You have to provide a Input_SettingsInfo for conditions.")
+  }
+  if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsInfo==TRUE){
+    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
+      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      }else{
+        denominator <- Input_SettingsInfo[["denominator"]]
+      }
     }
+  if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsInfo==TRUE){
     if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile$Conditions  == FALSE){
       stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-    }else{
-      numerator <- Input_SettingsInfo[["numerator"]]
-    }
-    comparisons <- matrix(c(denominator, numerator))
-    ANOVA = FALSE
+      }else{
+        numerator <- Input_SettingsInfo[["numerator"]]
+      }
+  }
+  if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==TRUE){
+    stop("Check input. The selected denominator option is empty while ",paste(Input_SettingsInfo[["numerator"]])," has been selected as a numerator. Please add a denminator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
   }
 
+  ## ------------ Check Denominator/numerator ----------- ##
+  #4.  Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
+  if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE){
+    # all-vs-all: Generate all pairwise combinations
+    conditions = Input_SettingsFile$Conditions
+    denominator <-unique(Input_SettingsFile$Conditions)
+    numerator <-unique(Input_SettingsFile$Conditions)
+    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = TRUE
+  }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
+    #all-vs-one: Generate the pairwise combinations
+
+
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = FALSE
+  }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==TRUE){
+    # one-vs-one: Generate the comparisons
+    comparisons <- matrix(c(denominator, numerator))
+    #Settings:
+    MultipleComparison = FALSE
+    all_vs_all = FALSE
+  }
+
+  #5. Check if chosen test statistics fits with choice of comparison
+  if(MultipleComparison==FALSE){
+    STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
+    if(STAT_pval %in% STAT_pval_options == FALSE){
+      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
+    }
+  }else{
+    STAT_pval_options <- c("aov", "kruskal.test", "lmFit")
+    if(STAT_pval %in% STAT_pval_options == FALSE){
+      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
+    }
+  }
+  #if((STAT_pval =="wilcox-test" & nrow(Num)<5)|(STAT_pval =="wilcox-test" & nrow(Denom)<5)){# check number of samples for wilcoxons test
+  #  warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
+  #}
+
+  ## ------------ Check General parameters ----------- ##
+  #6. General parameters
+  STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
+  if(STAT_padj %in% STAT_padj_options == FALSE){
+    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
+  }
+  if(is.logical(CoRe) == FALSE){
+    stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
+  }
+  if(is.logical(Plot) == FALSE){
+    stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
+  }
+  Save_as_Plot_options <- c("svg","pdf","png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  }
+  Save_as_Results_options <- c("txt","csv", "xlsx" )
+  if(Save_as_Results %in% Save_as_Results_options == FALSE){
+    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+  }
+
+  ## ------------ Check Missingness ------------- ##
+  #7.
+  # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
+  # Here we will check how many metabolites this affects in Num and Denom, and weather all replicates of a metabolite are affected.
+  Num_Miss <- replace(Num, Num==0, NA)
+  Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
+
+  Denom_Miss <- replace(Denom, Denom==0, NA)
+  Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
+
+  if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
+    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- colnames(Num_Miss)
+  } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
+    message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- colnames(Denom_Miss)
+  } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
+    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+  } else{
+    message("There are no NA/0 values")
+    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+  }
+
+  ## ------------ Create Results output folder ----------- ##
+  #8. Folders:
+  name <- paste0("MetaProViz_Results_",Sys.Date())
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name) # Make Results folder
+  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
+  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
+  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(numerator),"_vs_",toString(denominator))) # Make comparison folder
+  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
+
+  ###############################################################################################################################################################################################################
+  ## ------------ Check data normality and statistical test chosen and generate Output DF----------- ##
+  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. We can test the data normality using the Shapiro test.
+  ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
+  #Prepare the input:
+  Input_shaptest <- replace(Input_data, Input_data==0, NA) %>% #Shapiro test ignores NAs!
+    filter(Input_SettingsFile$Conditions %in% numerator | Input_SettingsFile$Conditions %in% denominator)%>%
+    select_if(is.numeric)
+  temp<- as.vector(sapply(Input_shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
+  Input_shaptest <- Input_shaptest[,!temp]
+  Input_shaptest_Cond <-merge(data.frame(Conditions = Input_SettingsFile[, "Conditions", drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
+
+  UniqueConditions <- Input_SettingsFile%>%
+    subset(Input_SettingsFile$Conditions %in% numerator | Input_SettingsFile$Conditions %in% denominator, select = c(1))
+  UniqueConditions <- unique(UniqueConditions$Conditions)
+
+  #Generate the results
+  shapiro_results <- list()
+  for (i in UniqueConditions) {
+    # Subset the data for the current condition
+    subset_data <- Input_shaptest_Cond%>%
+      column_to_rownames("Row.names")%>%
+      subset(Conditions == i, select = -c(1))
+
+    # Apply Shapiro-Wilk test to each feature in the subset
+    shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+  }
+
+  #Make the output DF
+  DF_shapiro_results <- as.data.frame(matrix(NA, nrow = length(UniqueConditions), ncol = ncol(Input_shaptest)))
+  rownames(DF_shapiro_results) <- UniqueConditions
+  colnames(DF_shapiro_results) <- colnames(Input_shaptest)
+  for(k in 1:length(UniqueConditions)){
+    for(l in 1:ncol(Input_shaptest)){
+      DF_shapiro_results[k, l] <- shapiro_results[[UniqueConditions[k]]][[l]]$p.value
+    }
+  }
+  colnames(DF_shapiro_results) <- paste("Shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
+
+  ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
+  for(x in 1:nrow(DF_shapiro_results)){
+    transpose <- as.data.frame(t(DF_shapiro_results[x,]))
+    Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+    NotNorm <- format((round(sum(transpose[[1]] < 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+    if(STAT_pval =="kruskal.test" | STAT_pval =="wilcox.test"){
+      message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(STAT_pval), ", which is for non parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+    }else{
+      message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(STAT_pval), ", which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+    }
+
+    # Assign the calculated values to the corresponding rows in result_df
+    DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
+    DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
+    }
+
+  #reorder the DF:
+  DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
+
+  ###############################################################################################################################################################################################################
+  #### Prepare the data ######
+  #1. Metabolite names:
   # If anova is used change the column names
-  if(ANOVA == TRUE){
+  if(MultipleComparison == TRUE){
     for (i in 1:length(colnames(Input_data))){
       metabolite_name <- colnames(Input_data)[i]
       metabolite_name <- gsub("-", "", metabolite_name)
@@ -154,119 +314,7 @@ DMA <-function(Input_data,
     stop("There is no sample available for ", denominator, ".")
   }
 
-  #2. General parameters
-  if(ANOVA==FALSE){
-    STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
-    if(STAT_pval %in% STAT_pval_options == FALSE){
-      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid. Please select one of the folowwing: ",paste(STAT_pval_options,collapse = ", "),"." )
-    }
-  }else{
-    STAT_pval_options <- c("anova", "kruskal.test")
-    if(STAT_pval %in% STAT_pval_options == FALSE){
-      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid. Multiple comparison is selected. Please select one of the folowwing: ",paste(STAT_pval_options,collapse = ", "),"." )
-    }
-  }
-  STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
-  if(STAT_padj %in% STAT_padj_options == FALSE){
-    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
-  }
-  if(is.logical(CoRe) == FALSE){
-    stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
-  }
-  if(is.logical(Plot) == FALSE){
-    stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
-  }
-  Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
-  }
-  Save_as_Results_options <- c("txt","csv", "xlsx" )
-  if(Save_as_Results %in% Save_as_Results_options == FALSE){
-    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
-  }
 
-
-  #3.  Input_MetaFile_Metab
-  if(is.null(Input_MetaFile_Metab) == FALSE){
-    if('Metabolite' %in% colnames(Input_MetaFile_Metab) == FALSE){
-      warning("The provided file Input_MetaFile_Metab must have a columns named: `Metabolite`.")
-    }
-  }
-
-
-  ## ------------ Check Missingness ------------- ##
-  # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
-  # Here we will check how many metabolites this affects in Num and Denom, and weather all replicates of a metabolite are affected.
-  Num_Miss <- replace(Num, Num==0, NA)
-  Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
-
-  Denom_Miss <- replace(Denom, Denom==0, NA)
-  Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
-
-  if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
-    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
-    Metabolites_Miss <- colnames(Num_Miss)
-  } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
-    message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
-    Metabolites_Miss <- colnames(Denom_Miss)
-  } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
-    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
-  } else{
-    message("There are no NA/0 values")
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
-  }
-
-  ## ------------ Check data normality and statistical test chosen ----------- ##
-  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. we can test the data normality using the Shapiro test.
-
-  # 1. Load the data and perform the shapiro.test on each metabolite:
-  Input_data_NA <- replace(Input_data, Input_data==0, NA)#Shapiro test ignores NAs!
-
-  shaptest <-   Input_data_NA %>% # Select data
-    filter(Input_SettingsFile$Conditions %in% numerator | Input_SettingsFile$Conditions %in% denominator)%>%
-    select_if(is.numeric)
-
-  temp<- as.vector(sapply(shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
-  shaptest <- shaptest[,!temp]
-
-  shaptestres <- as.data.frame(sapply(shaptest, function(x) shapiro.test(x))) # do the test for each metabolite
-  shaptestres <- as.data.frame(t(shaptestres))
-
-  # 2. Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
-  Norm <- format((round(sum(shaptestres$p.value > 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
-  NotNorm <- format((round(sum(shaptestres$p.value < 0.05)/dim(shaptest)[2],4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
-  message(Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. `shapiro.test` ignores missing values in the calculation.")
-
-  if(ANOVA==TRUE){
-    if (Norm > 50 & STAT_pval =="kruskal.test"){
-      warning(Norm, " % of the metabolites follow a normal distribution but 'kruskal.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (anova) instead.")
-    }else if(NotNorm > 50 & STAT_pval =="anova"){
-      message(NotNorm, " % of the metabolites follow a not-normal distribution but 'anova' for parametric Hypothesis testing was chosen. Please consider selecting a non-parametric test (kruskal.test) instead.")
-    }
-  }else{
-    if (Norm > 50 & STAT_pval =="wilcox.test"){
-      warning(Norm, " % of the metabolites follow a normal distribution but 'wilcox.test' for non parametric Hypothesis testing was chosen. Please consider selecting a parametric test (t.test) instead.")
-    }else if(NotNorm > 50 & STAT_pval =="t.test"){
-      message(NotNorm, " % of the metabolites follow a not-normal distribution but 't.test' for parametric Hypothesis testing was chosen. Please consider selecting a non-parametric test (wilcox.test) instead.")
-    }else if((STAT_pval =="wilcox-test" & nrow(Num)<5)|(STAT_pval =="wilcox-test" & nrow(Denom)<5)){# check number of samples for wilcoxons test
-      warning("Number of samples measured per condition is <5 in at least one of the two conditions, which is small for using wilcox.test. Consider using another test.")
-    }
-  }
-
-  ## ------------ Create Results output folder ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) # Make Results folder
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
-  if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
-  Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(numerator),"_vs_",toString(denominator))) # Make comparison folder
-  if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
-
-  ##################
 
   Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
   for (column in 1:dim(comparisons)[2]){
@@ -556,7 +604,10 @@ DMA <-function(Input_data,
 
     plot(VolcanoPlot)
   }
-  invisible(DMA_Output)
+
+  output_list <- list()  #Here we make a list in which we will save the output
+  DMA_output_list <- list(DMA_Results = DMA_Output, Shapiro_Results = DF_shapiro_results)
+  invisible( DMA_output_list)
   #assign(paste0("DMA_",toString(numerator),"_vs_",toString(denominator)), DMA_Output, envir=.GlobalEnv)
 }
 
@@ -629,4 +680,17 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 
   Output <- STAT_C1vC2
 }
+
+
+
+# all-vs-all:
+message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using", paste(STAT_pval), ".")
+
+#all-vs-one:
+message("No conditions were specified as numerator. Performing multiple testing `one-vs-all` using", paste(STAT_pval), ".")
+
+# one-vs-one:
+message("conditions were specified as numerator and denumerator. Performing testing `one-vs-one` using", paste(STAT_pval), ".")
+
+
 
