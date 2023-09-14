@@ -583,16 +583,19 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
   C1[is.na(C1)] <- 0
   C2[is.na(C2)] <- 0
 
-  #### 1. p.value
+  #### 1. p.value and test statistics (=t.val)
   T_C1vC2 <-mapply(STAT_pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
 
   VecPVAL_C1vC2 <- c()
+  VecTVAL_C1vC2 <- c()
   for(i in 1:length(T_C1vC2)){
     p_value <- unlist(T_C1vC2[[i]][3])
+    t_value <- unlist(T_C1vC2[[i]])[1]   # Extract the t-value
     VecPVAL_C1vC2[i] <- p_value
+    VecTVAL_C1vC2[i] <- t_value
   }
   Metabolite <- colnames(C2)
-  PVal_C1vC2 <- data.frame(Metabolite, VecPVAL_C1vC2)
+  PVal_C1vC2 <- data.frame(Metabolite, p.val = VecPVAL_C1vC2, t.val = VecTVAL_C1vC2)
 
   #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
   PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
@@ -601,30 +604,28 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
                              TRUE ~ paste(VecPVAL_C1vC2)))
   PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
 
-  #### 2. p. adjusted
+  #### 2. p.adjusted
   #Split data for p.value adjustment to exclude NA
-  PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1,4)]
-  PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1,4)]
+  PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1:3)]
+  PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
   #perform adjustment
   VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   Metabolite <- PVal_C1vC2[,1]
-  PADJ_C1vC2 <- data.frame(Metabolite, VecPADJ_C1vC2)
+  PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
-  STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2, by="Metabolite")
-  names(STAT_C1vC2)[names(STAT_C1vC2) == "VecPADJ_C1vC2"] <- "p.adj"
-
-  #### 3. t.value
-  STAT_C1vC2$t.val <- qnorm((1 - STAT_C1vC2$p.val / 2)) * sign(STAT_C1vC2$Log2FC) # calculate and add t-value
-  STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
 
   #Add Metabolites that have p.val=NA back into the DF for completeness.
   if(nrow(PVal_NA)>0){
-    PVal_NA <- merge(Log2FC_table,PVal_NA, by="Metabolite", all.y=TRUE)
     PVal_NA$p.adj <- NA
-    PVal_NA$t.val <- NA
     STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
   }
+
+  #Add Log2FC
+  STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2[,c(1:2,4,3)], by="Metabolite")
+
+  #order for t.value
+  STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
 
   Output <- STAT_C1vC2
 }
