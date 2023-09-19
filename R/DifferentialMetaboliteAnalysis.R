@@ -50,7 +50,7 @@ DMA <-function(Input_data,
                CoRe=FALSE,
                Plot = TRUE,
                Save_as_Plot = "svg",
-               Save_as_Results = "csv" # txt or csv
+               Save_as_Results = "csv"
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -183,6 +183,24 @@ DMA <-function(Input_data,
     stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
   }
 
+  #7. Are sample numbers enough?
+  Num <- Input_data %>%
+    filter(Input_SettingsFile$Conditions %in% numerator) %>%
+    select_if(is.numeric)#only keep numeric columns with metabolite values
+  Denom <- Input_data %>%
+    filter(Input_SettingsFile$Conditions %in% denominator) %>%
+    select_if(is.numeric)
+
+  if(nrow(Num)==1){
+    stop("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
+  } else if(nrow(Denom)==1){
+    stop("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
+  }else if(nrow(Num)==0){
+    stop("There is no sample available for ", numerator, ".")
+  }else if(nrow(Denom)==0){
+    stop("There is no sample available for ", denominator, ".")
+  }
+
   ## ------------ Check Missingness ------------- ##
   #7.
   # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
@@ -297,23 +315,6 @@ DMA <-function(Input_data,
     }
   }
 
-  Num <- Input_data %>%
-    filter(Input_SettingsFile$Conditions %in% numerator) %>%
-    select_if(is.numeric)#only keep numeric columns with metabolite values
-  Denom <- Input_data %>%
-    filter(Input_SettingsFile$Conditions %in% denominator) %>%
-    select_if(is.numeric)
-
-  if(nrow(Num)==1){
-    stop("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
-  } else if(nrow(Denom)==1){
-    stop("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
-  }else if(nrow(Num)==0){
-    stop("There is no sample available for ", numerator, ".")
-  }else if(nrow(Denom)==0){
-    stop("There is no sample available for ", denominator, ".")
-  }
-
 
 
   Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
@@ -422,7 +423,7 @@ DMA <-function(Input_data,
       Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
       Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
 
-      if(ANOVA == TRUE){
+      if(MultipleComparison == TRUE){
         logname <- paste("Log2FC", paste( comparisons[2,column], comparisons[1,column],sep="-"), sep="_")
         names(Log2FC_C1vC2)[2] <- logname
       }
@@ -436,7 +437,7 @@ DMA <-function(Input_data,
 
 
   ## ------------ Perform Hypothesis testing ----------- ##
-  if(ANOVA == FALSE){
+  if(MultipleComparison == FALSE){
     STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
 
   }else{ # ANOVA = TRUE
@@ -558,7 +559,7 @@ DMA <-function(Input_data,
   }
   DMA_Output <- STAT_C1vC2
 
-  if(ANOVA==TRUE){
+  if(MultipleComparison==TRUE){
     if(All==TRUE){
       numerator <- "Anova_All"
       denominator<- "All"
@@ -684,13 +685,13 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 
 
 # all-vs-all:
-message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using", paste(STAT_pval), ".")
+#message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using", paste(STAT_pval), ".")
 
 #all-vs-one:
-message("No conditions were specified as numerator. Performing multiple testing `one-vs-all` using", paste(STAT_pval), ".")
+#message("No conditions were specified as numerator. Performing multiple testing `one-vs-all` using", paste(STAT_pval), ".")
 
 # one-vs-one:
-message("conditions were specified as numerator and denumerator. Performing testing `one-vs-one` using", paste(STAT_pval), ".")
+#message("conditions were specified as numerator and denumerator. Performing testing `one-vs-one` using", paste(STAT_pval), ".")
 
 
 
