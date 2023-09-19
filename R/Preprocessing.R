@@ -854,7 +854,9 @@ Preprocessing <- function(Input_data,
   writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
 
   # Return the result
-  assign("PreProcessing_res",  preprocessing_output_list, envir=.GlobalEnv)
+  invisible(preprocessing_output_list)
+  #assign("PreProcessing_res",  preprocessing_output_list, envir=.GlobalEnv)
+
 }
 
 
