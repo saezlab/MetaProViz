@@ -1067,7 +1067,7 @@ Pool_Estimation <- function(Input_data,
   if(is.null(Input_SettingsFile)==TRUE){
     pca_data <- Input_numeric
     pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data, OutputPlotName = "QC Pool samples",Save_as_Plot =  NULL))
-  }else{
+    }else{
     pca_data <- merge(Input_SettingsFile %>% select(Conditions), Input_data, by=0) %>%
       column_to_rownames("Row.names") %>%
       mutate(Sample_type = case_when(Conditions == Input_SettingsInfo[["Conditions"]] ~ "Pool",

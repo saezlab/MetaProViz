@@ -364,6 +364,8 @@ VizVolcano <- function(Plot_Settings="Standard",
           PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
           Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
           Plot <-Plot_Sized[[3]]
+          Plot <- ggplot2::ggplot() +
+            annotation_custom(Plot)
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -465,6 +467,8 @@ VizVolcano <- function(Plot_Settings="Standard",
           #Set the total heights and widths
           Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
           Plot <-Plot_Sized[[3]]
+          Plot <- ggplot2::ggplot() +
+            annotation_custom(Plot)
 
           #save plot and get rid of extra signs before saving
           if (!is.null(Save_as_Plot)) {
@@ -588,6 +592,8 @@ VizVolcano <- function(Plot_Settings="Standard",
           PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
           Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
           Plot <-Plot_Sized[[3]]
+          Plot <- ggplot2::ggplot() +
+            annotation_custom(Plot)
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -706,6 +712,8 @@ VizVolcano <- function(Plot_Settings="Standard",
         #Set the total heights and widths
         Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
         Plot <-Plot_Sized[[3]]
+        Plot <- ggplot2::ggplot() +
+          annotation_custom(Plot)
 
         #save plot and get rid of extra signs before saving i
         if (!is.null(Save_as_Plot)) {
@@ -814,6 +822,10 @@ VizVolcano <- function(Plot_Settings="Standard",
         PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
         Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
         Plot <-Plot_Sized[[3]]
+
+        # First we want to convert the plot back into a ggplot object:
+        Plot <- ggplot2::ggplot() +
+          annotation_custom(Plot)
 
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -

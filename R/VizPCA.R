@@ -263,8 +263,12 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
   plot(PCA)
 
-  # Return DF which can be assigned, but which does not print when they are not assigned.
-  invisible(PCA)
+
+  # Return DF/Plots which can be assigned, but which does not print when they are not assigned.
+  # First we want to convert the plot back into a ggplot object:
+  PCA_ggplot <- ggplot2::ggplot() +
+    annotation_custom(PCA)
+  invisible(PCA_ggplot)
 }
 
 

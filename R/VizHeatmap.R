@@ -256,6 +256,9 @@ VizHeatmap <- function(Input_data,
       #Width and height according to Sample and metabolite number
       Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
       heatmap <-Plot_Sized[[3]]
+      heatmap <- ggplot2::ggplot() +
+        annotation_custom(heatmap)
+
 
       #----- Save
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -352,6 +355,8 @@ VizHeatmap <- function(Input_data,
         #Width and height according to Sample and metabolite number
         Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
         heatmap <-Plot_Sized[[3]]
+        heatmap <- ggplot2::ggplot() +
+          annotation_custom(heatmap)
 
         #----- Save
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -456,6 +461,8 @@ VizHeatmap <- function(Input_data,
             #Width and height according to Sample and metabolite number
             Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
             heatmap <-Plot_Sized[[3]]
+            heatmap <- ggplot2::ggplot() +
+              annotation_custom(heatmap)
 
             #----- Save
             cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -541,6 +548,8 @@ VizHeatmap <- function(Input_data,
     #Width and height according to Sample and metabolite number
     Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
     heatmap <-Plot_Sized[[3]]
+    heatmap <- ggplot2::ggplot() +
+      annotation_custom(heatmap)
 
     #----- Save
     if (!is.null(Save_as_Plot)) {
