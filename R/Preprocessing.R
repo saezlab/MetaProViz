@@ -959,7 +959,7 @@ ReplicateSum <- function(Input_data){
 #'
 #' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with just the pooled samples.
 #' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}
-#' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}
+#' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column in names 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
 #' @param Threshold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
@@ -975,7 +975,7 @@ Pool_Estimation <- function(Input_data,
                             Unstable_feature_remove = FALSE,
                             Save_as_Plot = "svg",
                             Save_as_Results = "csv", # txt or csv
-                            Threshold_cv = 1
+                            Threshold_cv = 100
 ){
 
 
@@ -1008,13 +1008,26 @@ Pool_Estimation <- function(Input_data,
 
     # 2. Input_Settings
     if("Conditions" %in% names(Input_SettingsInfo)==TRUE){
-      if(Input_SettingsInfo[["Conditions"]] %in% Input_SettingsFile[["Conditions"]]== FALSE ){
-        stop("You have chosen Conditions = ",paste(Input_SettingsInfo[["Conditions"]]), ", ", paste(Input_SettingsInfo[["Conditions"]])," was not found in Plot_SettingsFile as sample Condition. Please insert the name of the pooled samples as stated in the Conditions column of the Input_SettingsFile."   )
+      if(Input_SettingsInfo[["Conditions"]] %in% colnames(Input_SettingsFile)== FALSE ){
+        stop("You have chosen Conditions = ",paste(Input_SettingsInfo[["Conditions"]]), ", ", paste(Input_SettingsInfo[["Conditions"]])," was not found in Input_SettingsFile as column. Please insert the name of the experimental conditions as stated in the Input_SettingsFile."   )
+      }else{
+        Input_SettingsFile<- Input_SettingsFile%>%
+          dplyr::rename("Conditions"= paste(Input_SettingsInfo[["Conditions"]]))
       }
     }else{
-      stop("The Conditions column was not found in the Input_SettingsFile. Either input a correct Input_SettingsFile or use a DF containing only yhe pooled samples as Input_data.")
+      if("Conditions" %in% colnames(Input_SettingsFile)== FALSE ){
+        warning("Input_SettingsFile has been added while no Conditions are specified in the Input_SettingsInfo. We assume that the Conditions column exists in the Input_SettingsFile. However, no 'Conditions' column was identified in the Input_SettingsFile ")
+      }
+    }
+
+    if("PoolSamples" %in% names(Input_SettingsInfo)==TRUE){
+      if(Input_SettingsInfo[["PoolSamples"]] %in% Input_SettingsFile[["Conditions"]] == FALSE ){
+        stop("You have chosen PoolSamples = ",paste(Input_SettingsInfo[["PoolSamples"]] ), ", ", paste(Input_SettingsInfo[["PoolSamples"]] )," was not found in Input_SettingsFile as sample condition. Please insert the name of the pool samples as stated in the Conditions column of the Input_SettingsFile."   )
+      }
     }
   }
+
+
 
   # 3. General parameters
   if(is_bare_logical(Unstable_feature_remove)==FALSE){
@@ -1036,15 +1049,11 @@ Pool_Estimation <- function(Input_data,
     }
   }
 
-  # Start QC plot list
-  pool_plot_list <- list()
-  pool_plot_list_counter = 1
-
 
   if(is.null(Input_SettingsFile)==TRUE){
     Input_numeric <- Input_data
   }else{
-    pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["Conditions"]],]
+    pool_data <- Input_data[Input_SettingsFile[["Conditions"]]== Input_SettingsInfo[["PoolSamples"]],]
     Input_numeric <- pool_data
   }
 
@@ -1062,15 +1071,38 @@ Pool_Estimation <- function(Input_data,
 
   }
 
+  ## Coefficient of Variation
+  CV_data <- Input_numeric
+  result_df <- apply(CV_data, 2,  function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 }  ) %>% t()%>% as.data.frame()
+  rownames(result_df)[1] <- "CV"
+  # Since we expect the pool samples to have very small variation since they "are the same sample" we go for CV=1 as threshold
+
+  # calculate the NAs
+  NAvector <- apply(CV_data, 2,  function(x) { (sum(is.na(x))/length(x))*100 }  )#%>% t()%>% as.data.frame()
+
+  # Make a final df
+  result_df_final <- result_df %>%
+    t()%>% as.data.frame() %>% rowwise() %>%
+    mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
+
+  result_df_final$MissingValuesPercentage <- NAvector
+
+  rownames(result_df_final)<- colnames(Input_numeric)
+  result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
+
+
+  # Start QC plot list
+  pool_plot_list <- list()
+  pool_plot_list_counter = 1
 
   # Pool sample PCA
   if(is.null(Input_SettingsFile)==TRUE){
     pca_data <- Input_numeric
     pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data, OutputPlotName = "QC Pool samples",Save_as_Plot =  NULL))
-    }else{
+  }else{
     pca_data <- merge(Input_SettingsFile %>% select(Conditions), Input_data, by=0) %>%
       column_to_rownames("Row.names") %>%
-      mutate(Sample_type = case_when(Conditions == Input_SettingsInfo[["Conditions"]] ~ "Pool",
+      mutate(Sample_type = case_when(Conditions == Input_SettingsInfo[["PoolSamples"]] ~ "Pool",
                                      TRUE ~ "Sample"))
 
     pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
@@ -1084,37 +1116,6 @@ Pool_Estimation <- function(Input_data,
   if (is.null(Save_as_Plot) == FALSE){
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/PCA_Pool_samples.",Save_as_Plot), plot = pca_QC_pool, width = 10,  height = 8)
   }
-
-  ## Coefficient of Variation
-  CV_data <- Input_numeric
-  result_df <- apply(CV_data, 2,  function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) }  ) %>% t()%>% as.data.frame()
-  rownames(result_df)[1] <- "CV"
-  # Since we expect the pool samples to have very small variation since they "are the same sample" we go for CV=1 as threshold
-
-
-  result_df_final <- result_df %>%
-    t()%>%
-    as.data.frame() %>%
-    rowwise() %>%
-    mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
-
-  rownames(result_df_final)<- colnames(Input_numeric)
-  result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
-
-  # Save results
-  if(is.null(Save_as_Results)==FALSE){
-    if (Save_as_Results == "xlsx"){
-      xlsDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".xlsx"))   # Save the DMA results table
-      writexl::write_xlsx(result_df_final_out,xlsDMA, col_names = TRUE) # save the DMA result DF
-    }else if (Save_as_Results == "csv"){
-      csvDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".csv"))
-      write.csv(result_df_final_out,csvDMA,row.names = FALSE) # save the DMA result DF
-    }else if (Save_as_Results == "txt"){
-      txtDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".txt"))
-      write.table(result_df_final_out,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
-    }
-  }
-
   #Make histogram of CVs
   HistCV <- invisible(ggplot(result_df_final_out, aes(CV)) +
                         geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
@@ -1158,6 +1159,19 @@ Pool_Estimation <- function(Input_data,
     }
   }
 
+  # Save results
+  if(is.null(Save_as_Results)==FALSE){
+    if (Save_as_Results == "xlsx"){
+      xlsDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".xlsx"))   # Save the DMA results table
+      writexl::write_xlsx(result_df_final_out,xlsDMA, col_names = TRUE) # save the DMA result DF
+    }else if (Save_as_Results == "csv"){
+      csvDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".csv"))
+      write.csv(result_df_final_out,csvDMA,row.names = FALSE) # save the DMA result DF
+    }else if (Save_as_Results == "txt"){
+      txtDMA <- file.path(Results_folder_Preprocessing_folder_Pool_Estimation,paste0("Pool_Estimation_CV", ".txt"))
+      write.table(result_df_final_out,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+    }
+  }
 
   DF_list <- list("Filtered_Input_data" = filtered_Input_data, "CV_result" = result_df_final_out )
   Pool_Estimation_res_list <- list("DFs"= DF_list,"Plots"=pool_plot_list )

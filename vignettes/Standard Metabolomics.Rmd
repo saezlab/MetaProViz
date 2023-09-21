@@ -160,7 +160,13 @@ Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = PoolData,
                             Input_SettingsFile = NULL,
                             Input_SettingsInfo = NULL,
                             Unstable_feature_remove = FALSE, 
-                            Threshold_cv = 1)
+                            Threshold_cv = 100)
+# Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_SettingsInfo  
+Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Intra[,-c(2:4)] %>% column_to_rownames("Code"),
+                            Input_SettingsFile = Intra[,1:4] %>% column_to_rownames("Code"),
+                            Input_SettingsInfo = c( PoolSamples = "Pool"),
+                            Unstable_feature_remove = FALSE, 
+                            Threshold_cv = 100)
 ```
 ```{r, echo=FALSE}
 Pool_Estimation_result_DF <- Pool_Estimation_result[["DFs"]]
