@@ -67,7 +67,7 @@ Preprocessing <- function(Input_data,
                         "reshape", # for melting df for anova
                         "gridExtra",
                         "inflection"
-                        )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
+  )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
@@ -292,6 +292,7 @@ Preprocessing <- function(Input_data,
     warning("No feature filtering is selected.")
     filtered_matrix <- as.data.frame(Input_data)
   }
+  features_filtered <- unique(colnames(Input_data)[miss]) %>% as.vector()
 
   filtered_matrix <- as.data.frame(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
 
@@ -348,6 +349,7 @@ Preprocessing <- function(Input_data,
     NA_removed_matrix <- replace(filtered_matrix, is.na(filtered_matrix), 0)
   }
 
+
   #######################################################
   ### ### ### Total Ion Current Normalization ### ### ###
 
@@ -399,11 +401,14 @@ Preprocessing <- function(Input_data,
   RLA_data_norm <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity, color = Conditions)) +
     geom_boxplot() +
     geom_hline(yintercept = 0, color = "red", linetype = "solid") +
-    labs(title = "Aftre Normalization")+
+    labs(title = "After Normalization")+
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
+  dev.new()
   norm_plots <-suppressWarnings(gridExtra::grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2))
+  dev.off()
+  norm_plots <- ggplot2::ggplot() + annotation_custom(norm_plots)
 
 
 
@@ -414,7 +419,6 @@ Preprocessing <- function(Input_data,
 
   # Start QC plot list
   qc_plot_list <- list()
-  qc_plot_list_counter = 1
 
   if (CoRe ==  TRUE){
     CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
@@ -431,12 +435,13 @@ Preprocessing <- function(Input_data,
         mutate(Sample_type = case_when(Conditions == "CoRe_media" ~ "CoRe_media",
                                        TRUE ~ "Sample"))
 
+      dev.new()
       pca_QC_media <-invisible(MetaProViz::VizPCA(Input_data=media_pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
-                                                 Plot_SettingsFile= media_pca_data, OutputPlotName = "QC Media_samples",
-                                                 Save_as_Plot =  NULL))
+                                                  Plot_SettingsFile= media_pca_data, OutputPlotName = "QC Media_samples",
+                                                  Save_as_Plot =  NULL))
+      dev.off()
 
-      qc_plot_list[[qc_plot_list_counter]] <- pca_QC_media
-      qc_plot_list_counter = qc_plot_list_counter+1
+      qc_plot_list[["CoRe PCA MediaSamples"]] <- pca_QC_media
 
       if (ExportQCPlots == TRUE){
         ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Media_samples.",Save_as_Plot), plot = pca_QC_media, width = 10,  height = 8)
@@ -445,11 +450,11 @@ Preprocessing <- function(Input_data,
 
       ## Check metabolite variance
       # Thresholds
-      Threshold_cv = 1
+      Threshold_cv = 100
       data_cv <- CoRe_medias
 
       ## Coefficient of Variation
-      result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+      result_df <- apply(data_cv, 2,   function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 } ) %>% t()%>% as.data.frame()
       result_df[1, is.na(result_df[1,])]<- 0
       rownames(result_df)[1] <- "CV"
 
@@ -457,17 +462,43 @@ Preprocessing <- function(Input_data,
         mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
       rownames(result_df)<- colnames(data_cv)
 
+      # calculate the NAs
+      NAvector <- apply(data_cv, 2,  function(x) { (sum(is.na(x))/length(x))*100 }  )#%>% t()%>% as.data.frame()
+      result_df$MissingValuesPercentage <- NAvector
+
+      cv_result_df <- result_df
+
       high_var_metabs <- sum(result_df$High_var == TRUE)
       if(high_var_metabs>0){
         message(paste0(high_var_metabs, " of variables have high variability in the CoRe_media samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
       }
 
-      # Export/Save CV table ?
-      # Export some QC plots?
+      ###########################
+      #Make histogram of CVs
+      HistCV <- invisible(ggplot(cv_result_df, aes(CV)) +
+                            geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
+                            geom_vline(aes(xintercept=Threshold_cv),
+                                       color="darkred", linetype="dashed", size=1)+
+                            geom_density(alpha=.2, fill="#FF6666") +
+                            labs(title="Coefficient of Variation for metabolites of Media samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                            theme_classic())
+
+      qc_plot_list[["CoRe_Media_CV_Hist"]] <- HistCV
+
+      ViolinCV <- invisible(ggplot(cv_result_df, aes(y=CV, x=High_var, label=row.names(cv_result_df)))+
+                              geom_violin(alpha = 0.5 , fill="#FF6666")+
+                              geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
+                              #geom_point(position = position_jitter(seed = 1, width = 0.2))+
+                              geom_text(aes(label=ifelse(CV>Threshold_cv,as.character(row.names(cv_result_df)),'')), hjust=0, vjust=0)+
+                              labs(title="Coefficient of Variation for metabolites of Media samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                              theme_classic())
+
+      qc_plot_list[["CoRe_Media_CV_Violin"]] <- ViolinCV
+
+      #######################################################
 
       # Do sample outlier testing
       if(dim(CoRe_medias)[1]>3){
-
 
         Outlier_data <- CoRe_medias
         Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
@@ -542,10 +573,6 @@ Preprocessing <- function(Input_data,
         contingency_data_contframe <- contingency_data_contframe %>% mutate(Total = rowSums(contingency_data_contframe))
         contingency_data_contframe <- rbind(contingency_data_contframe, Total= colSums(contingency_data_contframe))
 
-        if (ExportQCPlots == TRUE){
-          assign("CoRe_media_contingency_table", contingency_data_contframe, envir=.GlobalEnv)
-        }
-
 
         different_samples <- c()
         for (sample in colnames(data_cont)) {
@@ -595,7 +622,7 @@ Preprocessing <- function(Input_data,
   outlier_plot_list <- list()
   metabolite_zero_var_total_list <- list()
   zero_var_metab_warning = FALSE
-  k =  1
+  #  k =  1
   a =  1
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
 
@@ -626,9 +653,9 @@ Preprocessing <- function(Input_data,
 
     plot.new()
     plot(pca_outlier)
-    outlier_plot_list[[k]] <- recordPlot()
+    outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- recordPlot()
     dev.off()
-    k = k+1
+    #  k = k+1
 
     ### ### Scree plot ### ###
     inflect_df <- as.data.frame(c(1:length(PCA.res$sdev))) # get Scree plot values for inflection point calculation
@@ -651,9 +678,9 @@ Preprocessing <- function(Input_data,
 
     plot.new()
     plot(screeplot)
-    outlier_plot_list[[k]] <- recordPlot() # save plot
+    outlier_plot_list[[paste("ScreePlot_round",loop,sep="")]] <- recordPlot() # save plot
     dev.off()
-    k = k+1
+    # k = k+1
 
     ### ### HotellingT2 test for outliers ### ###
     data_hot <- as.matrix(PCA.res$x[,1:npcs])
@@ -689,9 +716,9 @@ Preprocessing <- function(Input_data,
 
     plot.new()
     plot(HotellingT2plot)
-    outlier_plot_list[[k]] <- recordPlot()
+    outlier_plot_list[[paste("HotellingsPlot_round",loop,sep="")]] <- recordPlot()
     dev.off()
-    k = k+1
+    # k = k+1
 
     ### Save the outlier detection plots in the outlier detection folder
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
@@ -701,10 +728,6 @@ Preprocessing <- function(Input_data,
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
            plot = HotellingT2plot, width = 10,height = 8)
     a = a+1
-
-    #Return the plots to environment:
-    #The `outlier_plot_list` contains all the different plots that are saved as part of the Hotellins T2 test rounds. For each round three plots are recorded.
-    assign("Outlier_Plots",  outlier_plot_list, envir=.GlobalEnv)
 
     # Here for the outliers we use confidence of 0.999 and p.val < 0.01.
     if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0){ # loop for outliers until no outlier is detected
@@ -815,13 +838,13 @@ Preprocessing <- function(Input_data,
                                 TRUE ~ 'Outlier_filtering_round = or > 5'))
   dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
 
+  dev.new()
   pca_QC <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(Data_TIC), Plot_SettingsInfo= c(color="Conditions", shape = "Outliers"),
-                                        Plot_SettingsFile= dtp,OutputPlotName = "Quality Control PCA Condition clustering and Outlier check",
+                                        Plot_SettingsFile= dtp,OutputPlotName = "Quality Control PCA Condition clustering and outlier check",
                                         Save_as_Plot =  NULL))
+  dev.off()
+  qc_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC
 
-
-  qc_plot_list[[qc_plot_list_counter]] <- pca_QC
-  qc_plot_list_counter = qc_plot_list_counter+1
 
   if (ExportQCPlots == TRUE){
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
@@ -829,19 +852,19 @@ Preprocessing <- function(Input_data,
 
 
   if(is.null(Input_SettingsFile$Biological_Replicates)!= TRUE){
+    dev.new()
     pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(Data_TIC), Plot_SettingsInfo= c(color="Conditions", shape = "Biological_Replicates"),
                                                Plot_SettingsFile= dtp,OutputPlotName =  "Quality Control PCA replicate spread check",
                                                Save_as_Plot =  NULL))
+    dev.off()
 
-    qc_plot_list[[qc_plot_list_counter]] <- pca_QC_repl
+    qc_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl
 
     if (ExportQCPlots == TRUE){
       ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
     }
   }
 
-  #Return the QC plots to environment:
-  assign("QC_Plots",  qc_plot_list, envir=.GlobalEnv)
 
   #########################################################
   ### ### ###  Make list with output dataframes ### ### ###
@@ -854,8 +877,15 @@ Preprocessing <- function(Input_data,
   writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
 
   # Return the result
-  invisible(preprocessing_output_list)
-  #assign("PreProcessing_res",  preprocessing_output_list, envir=.GlobalEnv)
+  if(CoRe ==TRUE){
+    DFs = list("Filtered_metabolites"= features_filtered,"CV_result_table"= cv_result_df,"MediaSample_variation_Contigency_table"=contingency_data_contframe, "Preprocessing_output" = preprocessing_output_list_out)
+  }else{
+    DFs = list("Filtered_metabolites"= features_filtered, "Preprocessing_output" = preprocessing_output_list_out)
+
+    }
+
+  Plots = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
+  invisible(return(list("DFs"=DFs,"Plots" =Plots)))
 
 }
 
@@ -1093,8 +1123,8 @@ Pool_Estimation <- function(Input_data,
 
   # Start QC plot list
   pool_plot_list <- list()
-  pool_plot_list_counter = 1
 
+  dev.new()
   # Pool sample PCA
   if(is.null(Input_SettingsFile)==TRUE){
     pca_data <- Input_numeric
@@ -1109,9 +1139,8 @@ Pool_Estimation <- function(Input_data,
                                                Plot_SettingsFile= pca_data, OutputPlotName = "QC Pool samples",
                                                Save_as_Plot =  NULL))
   }
-
-  pool_plot_list[[pool_plot_list_counter]] <- pca_QC_pool
-  pool_plot_list_counter = pool_plot_list_counter+1
+  dev.off()
+  pool_plot_list[["QC_PCA_PoolSamples"]] <- pca_QC_pool
 
   if (is.null(Save_as_Plot) == FALSE){
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/PCA_Pool_samples.",Save_as_Plot), plot = pca_QC_pool, width = 10,  height = 8)
@@ -1125,8 +1154,8 @@ Pool_Estimation <- function(Input_data,
                         labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
                         theme_classic())
 
-  pool_plot_list[[pool_plot_list_counter]] <- HistCV
-  pool_plot_list_counter = pool_plot_list_counter+1
+  pool_plot_list[["Pool_CV_Hist"]] <- HistCV
+
 
   if (is.null(Save_as_Plot) == FALSE){
     suppressMessages(ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/Pool_CV_Histogram",".",Save_as_Plot), plot = invisible(HistCV), width = 8,  height = 8))
@@ -1140,8 +1169,8 @@ Pool_Estimation <- function(Input_data,
                           labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
                           theme_classic())
 
-  pool_plot_list[[pool_plot_list_counter]] <- ViolinCV
-  pool_plot_list_counter = pool_plot_list_counter+1
+  pool_plot_list[["Pool_CV_Violin"]] <- ViolinCV
+
 
   if (is.null(Save_as_Plot) == FALSE){
     suppressMessages(suppressWarnings(ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/Pool_CV_Violin",".",Save_as_Plot), plot = ViolinCV, width = 8,  height = 8)))

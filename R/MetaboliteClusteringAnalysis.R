@@ -380,9 +380,6 @@ MCA_2Cond <- function(Cond1_File,
     dplyr::rename("Metabolite"="MetaboliteID")
 
 
-  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""))
-
-
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
     count(RG1_All, name="Number of Genes")%>%
@@ -402,24 +399,31 @@ MCA_2Cond <- function(Cond1_File,
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
 
-  writexl::write_xlsx(ClusterSummary, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = ""))
-
 
   if (Save_as_Results == "xlsx"){
     xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = "") # Save the DMA results table
     writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
+
+    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = "") # Save the DMA results table
+    writexl::write_xlsx(MergeDF_Rearrange,xlsMCA, col_names = TRUE) # save the DMA result DF
   }else if (Save_as_Results == "csv"){
     csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.csv", sep = "")
     write.csv(ClusterSummary,csvMCA) # save the DMA result DF
+
+    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".csv", sep = "")
+    write.csv(MergeDF_Rearrange,csvMCA) # save the DMA result DF
   }else if (Save_as_Results == "txt"){
     txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.txt", sep = "")
     write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+
+    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".txt", sep = "")
+    write.table(MergeDF_Rearrange,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
   #Return:
-  assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
-  assign(paste("MCA2Cond_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
-  return(MergeDF_Rearrange)
+ # assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
+#  assign(paste("MCA2Cond_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
+  invisible(return(list("DFs"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
 }
 
 
@@ -990,8 +994,6 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
   MergeDF_Rearrange <-MergeDF_Rearrange%>%
     dplyr::rename("Metabolite"="MetaboliteID")
 
-  writexl::write_xlsx(MergeDF_Rearrange, paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = ""))
-
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
@@ -1016,17 +1018,26 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
   if (Save_as_Results == "xlsx"){
     xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = "") # Save the DMA results table
     writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
+
+    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = "") # Save the DMA results table
+    writexl::write_xlsx(MergeDF_Rearrange,xlsMCA, col_names = TRUE) # save the DMA result DF
   }else if (Save_as_Results == "csv"){
     csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.csv", sep = "")
     write.csv(ClusterSummary,csvMCA) # save the DMA result DF
+
+    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".csv", sep = "")
+    write.csv(MergeDF_Rearrange,csvMCA) # save the DMA result DF
   }else if (Save_as_Results == "txt"){
     txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.txt", sep = "")
     write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+
+    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".txt", sep = "")
+    write.table(MergeDF_Rearrange,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
-  #Return:
-  assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
-  assign(paste("MCACoRe_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
 
-  return(MergeDF_Rearrange)
+  invisible(return(list("DFs"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
 }
+
+
+

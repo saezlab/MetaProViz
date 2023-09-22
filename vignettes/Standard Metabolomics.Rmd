@@ -195,7 +195,7 @@ PreprocessingResults <- MetaProViz::Preprocessing(Input_data=Intra_M,
                                                   CoRe = FALSE) 
 
 # This is the results table:
-Intra_Preprocessed <- PreprocessingResults[["Processed_data"]]
+Intra_Preprocessed <- PreprocessingResults[["DFs"]][["Preprocessing_output"]][["Processed_data"]]
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -211,25 +211,25 @@ As part of the `Preprocessing()` function several plots are generated, returned 
 ```{r}
 #For each Round of HotellinsT2 test three plots will be saved:
 #1.PCA plot
-P1 <- Outlier_Plots[[1]]
+P1 <- PreprocessingResults[["Plots"]][["Outlier_plots"]][["PCA_round1"]]
 #P1
 
 #2.Screeplot
-P2 <- Outlier_Plots[[2]]
+P2 <- PreprocessingResults[["Plots"]][["Outlier_plots"]][["ScreePlot_round1"]]
 #P2
 
 #3.Hotellins Outlier
-P3 <- Outlier_Plots[[3]]
+P3 <-  PreprocessingResults[["Plots"]][["Outlier_plots"]][["HotellingsPlot_round1"]]
 P3
 
 ################### 
 #If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
 #Here a second round was performed and the plots saved:
-P4<- Outlier_Plots[[4]]
+P4<- PreprocessingResults[["Plots"]][["Outlier_plots"]][["PCA_round2"]]
 P4
-P5<- Outlier_Plots[[5]]
+P5<- PreprocessingResults[["Plots"]][["Outlier_plots"]][["ScreePlot_round2"]]
 P5
-P6<- Outlier_Plots[[6]]
+P6<- PreprocessingResults[["Plots"]][["Outlier_plots"]][["HotellingsPlot_round2"]]
 P6
 ```
 \
@@ -237,11 +237,11 @@ The QC plots `QC_Plots` include an PCA plot using the processed data and highlig
 ```{r}
 # PCA plot
 # 1. Marked Outliers:
-Q1 <- QC_Plots[[1]]
+Q1 <- PreprocessingResults[["Plots"]][["QC_plots"]][["QC_PCA_and_Outliers"]]
 Q1
 
 #2. Marked Biological replicates:
-Q2 <- QC_Plots[[2]]
+Q2 <- PreprocessingResults[["Plots"]][["QC_plots"]][["QC_PCA_Replicates"]]
 Q2
 ```
 \
@@ -279,7 +279,7 @@ DMA_786O_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we 
                         CoRe=FALSE, 
                         Plot = TRUE)
 
-`DMA_786-O_vs_HK2`<- DMA_786O_vs_HK2[["DMA_Results"]]#Get the DMA table
+`DMA_786-O_vs_HK2`<- DMA_786O_vs_HK2[["DFs"]][["DMA_result"]]#Get the DMA table
 
 #Perform the other comparisons:
 DMA_786M1A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
@@ -292,7 +292,7 @@ DMA_786M1A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)],
                                    CoRe=FALSE,
                                    Plot = TRUE)
 
-`DMA_786-M1A_vs_HK2` <- DMA_786M1A_vs_HK2[["DMA_Results"]]#Get the DMA table
+`DMA_786-M1A_vs_HK2` <- DMA_786M1A_vs_HK2[["DFs"]][["DMA_result"]]#Get the DMA table
 
 DMA_786M2A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
                                    Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
@@ -305,7 +305,7 @@ DMA_786M2A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)],
                                    Plot = TRUE)
 
 
-`DMA_786-M2A_vs_HK2` <- DMA_786M2A_vs_HK2[["DMA_Results"]]#Get the DMA table
+`DMA_786-M2A_vs_HK2` <- DMA_786M2A_vs_HK2[["DFs"]][["DMA_result"]]#Get the DMA table
 
 ```
 ```{r, echo=FALSE}
@@ -428,11 +428,12 @@ MCAres <- MetaProViz::MCA_2Cond(Cond1_File=`DMA_786-O_vs_HK2`,
                       Cond1_FC_cutoff= 1,
                       Cond2_FC_cutoff = 1,
                       backgroundMethod="C1&C2",
-                      OutputFileName = "MCA_2Cond")
+                      OutputFileName = "MCA_2Cond",
+                      Save_as_Results = "xlsx")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
-Summary_MCA_2Cond%>%
+MCAres[["DFs"]][["ClusterSummary"]]%>%
   kableExtra::kbl(caption ="Summary of MCA: 2 Conditions.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) 
 ```
@@ -447,7 +448,7 @@ PathwayInput$Description <- PathwayInput$term
 ```
 
 ```{r, include=FALSE, warning=FALSE}
-MetaProViz::MC_ORA(Input_data=MCAres,
+MC_ORA_result<- MetaProViz::MC_ORA(Input_data=MCAres[["DFs"]][["MCA_result"]],
                    MetabCluster_lab="RG2_Significant",
                    RemoveBackground=TRUE,
                    PathwayFile=PathwayInput,
