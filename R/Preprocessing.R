@@ -33,6 +33,7 @@
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Plot  \emph{Optional: } IF TRUE prints an overview of resulting plots. \strong{Default = TRUE}
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
 #' @export
@@ -54,7 +55,8 @@ Preprocessing <- function(Input_data,
                           HotellinsConfidence = 0.99,
                           ExportQCPlots = TRUE,
                           CoRe = FALSE,
-                          Save_as_Plot = "svg"
+                          Save_as_Plot = "svg",
+                          Plot = TRUE
 ){
 
 
@@ -66,7 +68,8 @@ Preprocessing <- function(Input_data,
                         "hash", # Dictionary in R for making column of outliers
                         "reshape", # for melting df for anova
                         "gridExtra",
-                        "inflection"
+                        "inflection",
+                        "patchwork" # for output plot grid
   )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -406,10 +409,10 @@ Preprocessing <- function(Input_data,
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
   dev.new()
-  norm_plots <-suppressWarnings(gridExtra::grid.arrange(RLA_data_raw, RLA_data_norm, ncol = 2))
+  norm_plots <-suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+                                                        RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"), ncol = 2))
   dev.off()
-  norm_plots <- ggplot2::ggplot() + annotation_custom(norm_plots)
-
+  norm_plots <- ggplot2::ggplot() +theme_minimal()+ annotation_custom(norm_plots)
 
 
   if (ExportQCPlots == TRUE){
@@ -459,18 +462,18 @@ Preprocessing <- function(Input_data,
       rownames(result_df)[1] <- "CV"
 
       result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-        mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
+        mutate(HighVar = CV > Threshold_cv) %>% as.data.frame()
       rownames(result_df)<- colnames(data_cv)
 
       # calculate the NAs
       NAvector <- apply(data_cv, 2,  function(x) { (sum(is.na(x))/length(x))*100 }  )#%>% t()%>% as.data.frame()
-      result_df$MissingValuesPercentage <- NAvector
+      result_df$MissingValuePercentage <- NAvector
 
       cv_result_df <- result_df
 
-      high_var_metabs <- sum(result_df$High_var == TRUE)
-      if(high_var_metabs>0){
-        message(paste0(high_var_metabs, " of variables have high variability in the CoRe_media samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
+      HighVar_metabs <- sum(result_df$HighVar == TRUE)
+      if(HighVar_metabs>0){
+        message(paste0(HighVar_metabs, " of variables have high variability in the CoRe_media samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
       }
 
       ###########################
@@ -485,7 +488,7 @@ Preprocessing <- function(Input_data,
 
       qc_plot_list[["CoRe_Media_CV_Hist"]] <- HistCV
 
-      ViolinCV <- invisible(ggplot(cv_result_df, aes(y=CV, x=High_var, label=row.names(cv_result_df)))+
+      ViolinCV <- invisible(ggplot(cv_result_df, aes(y=CV, x=HighVar, label=row.names(cv_result_df)))+
                               geom_violin(alpha = 0.5 , fill="#FF6666")+
                               geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                               #geom_point(position = position_jitter(seed = 1, width = 0.2))+
@@ -503,20 +506,20 @@ Preprocessing <- function(Input_data,
         Outlier_data <- CoRe_medias
         Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
 
-        while(high_var_metabs>0){
+        while(HighVar_metabs>0){
 
           #remove the furthest value from the mean
-          if(high_var_metabs>1){
-            max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
+          if(HighVar_metabs>1){
+            max_var_pos <-  data_cv[,result_df$HighVar == TRUE]  %>%
               as.data.frame() %>%
               mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
               summarise_all(.funs = ~ which.max(abs(.)))
           }else{
-            max_var_pos <-  data_cv[,result_df$High_var == TRUE]  %>%
+            max_var_pos <-  data_cv[,result_df$HighVar == TRUE]  %>%
               as.data.frame() %>%
               mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
               summarise_all(.funs = ~ which.max(abs(.)))
-            colnames(max_var_pos)<- colnames( data_cv)[result_df$High_var == TRUE]
+            colnames(max_var_pos)<- colnames( data_cv)[result_df$HighVar == TRUE]
 
           }
 
@@ -532,10 +535,10 @@ Preprocessing <- function(Input_data,
           rownames(result_df)[1] <- "CV"
 
           result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-            mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
+            mutate(HighVar = CV > Threshold_cv) %>% as.data.frame()
           rownames(result_df)<- colnames(data_cv)
 
-          high_var_metabs <- sum(result_df$High_var == TRUE)
+          HighVar_metabs <- sum(result_df$HighVar == TRUE)
         }
 
 
@@ -568,7 +571,7 @@ Preprocessing <- function(Input_data,
         # Convert the matrix into a data_contframe for better readability
         contingency_data_contframe <- as.data.frame(large_contingency_table)
         colnames(contingency_data_contframe) <- colnames(data_cont)
-        rownames(contingency_data_contframe) <- c("High_var", "Low_var")
+        rownames(contingency_data_contframe) <- c("HighVar", "Low_var")
 
         contingency_data_contframe <- contingency_data_contframe %>% mutate(Total = rowSums(contingency_data_contframe))
         contingency_data_contframe <- rbind(contingency_data_contframe, Total= colSums(contingency_data_contframe))
@@ -651,6 +654,9 @@ Preprocessing <- function(Input_data,
                                                Plot_SettingsFile= outlier_PCA_data, OutputPlotName = paste("PCA outlier test filtering round ",loop),
                                                Save_as_Plot =  NULL))
 
+    if(loop==1){
+      pca_outlierloop1 <- pca_outlier
+    }
     plot.new()
     plot(pca_outlier)
     outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- recordPlot()
@@ -676,6 +682,9 @@ Preprocessing <- function(Input_data,
                                             linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
       annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 3)
 
+    if(loop==1){
+      scree_outlierloop1 <-screeplot
+    }
     plot.new()
     plot(screeplot)
     outlier_plot_list[[paste("ScreePlot_round",loop,sep="")]] <- recordPlot() # save plot
@@ -708,12 +717,15 @@ Preprocessing <- function(Input_data,
 
     HotellingT2plot <- HotellingT2plot + theme_classic()
     HotellingT2plot <- HotellingT2plot + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
-    HotellingT2plot <- HotellingT2plot + ggtitle(paste("Outlier filtering via Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"))
+    HotellingT2plot <- HotellingT2plot + ggtitle(paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"))
     #plot1 <- plot1 + scale_linetype_manual(name = LegendTitle,values = "dashed") # this line instead of the next for bashed red line
     HotellingT2plot <- HotellingT2plot + scale_linetype_discrete(name = LegendTitle,)
-    HotellingT2plot <- HotellingT2plot + theme(plot.title = element_text(size = 10, face = "bold")) +
+    HotellingT2plot <- HotellingT2plot + theme(plot.title = element_text(size = 13))+#, face = "bold")) +
       theme(axis.text = element_text(size = 12))
 
+    if(loop==1){
+      hotel_outlierloop1 <- HotellingT2plot
+    }
     plot.new()
     plot(HotellingT2plot)
     outlier_plot_list[[paste("HotellingsPlot_round",loop,sep="")]] <- recordPlot()
@@ -884,12 +896,17 @@ Preprocessing <- function(Input_data,
 
     }
 
-  Plots = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
-  invisible(return(list("DFs"=DFs,"Plots" =Plots)))
+  PlotList = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
 
+  if(Plot==TRUE){ # print plots
+  print(patchwork::wrap_plots(norm_plots,  PlotList$QC_plots[[1]],  PlotList$QC_plots[[2]],
+             pca_outlierloop1,scree_outlierloop1,hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")),
+             widths = c(2,2.1,1),
+             heights = c(1.4,1)))
+             }
+
+    invisible(return(list("DF"=DFs,"Plot" =PlotList)))
 }
-
-
 
 
 
@@ -1005,7 +1022,8 @@ Pool_Estimation <- function(Input_data,
                             Unstable_feature_remove = FALSE,
                             Save_as_Plot = "svg",
                             Save_as_Results = "csv", # txt or csv
-                            Threshold_cv = 100
+                            Threshold_cv = 100,
+                            Plot=TRUE
 ){
 
 
@@ -1113,9 +1131,9 @@ Pool_Estimation <- function(Input_data,
   # Make a final df
   result_df_final <- result_df %>%
     t()%>% as.data.frame() %>% rowwise() %>%
-    mutate(High_var = CV > Threshold_cv) %>% as.data.frame()
+    mutate(HighVar = CV > Threshold_cv) %>% as.data.frame()
 
-  result_df_final$MissingValuesPercentage <- NAvector
+  result_df_final$MissingValuePercentage <- NAvector
 
   rownames(result_df_final)<- colnames(Input_numeric)
   result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
@@ -1161,7 +1179,7 @@ Pool_Estimation <- function(Input_data,
     suppressMessages(ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/Pool_CV_Histogram",".",Save_as_Plot), plot = invisible(HistCV), width = 8,  height = 8))
   }
 
-  ViolinCV <- invisible(ggplot(result_df_final_out, aes(y=CV, x=High_var, label=row.names(result_df_final_out)))+
+  ViolinCV <- invisible(ggplot(result_df_final_out, aes(y=CV, x=HighVar, label=row.names(result_df_final_out)))+
                           geom_violin(alpha = 0.5 , fill="#FF6666")+
                           geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                           #geom_point(position = position_jitter(seed = 1, width = 0.2))+
@@ -1179,7 +1197,7 @@ Pool_Estimation <- function(Input_data,
   filtered_Input_data <- Input_data # in case only pool samples in Input_data
   if(is.null(Input_SettingsFile)==FALSE){
     if(Unstable_feature_remove ==TRUE){
-      unstable_metabs <- rownames(result_df_final)[result_df_final[["High_var_Metabs"]]]
+      unstable_metabs <- rownames(result_df_final)[result_df_final[["HighVar_Metabs"]]]
       if(length(unstable_metabs)>0){
         filtered_Input_data <- Input_data %>% select(!unstable_metabs)
       }else{
@@ -1203,11 +1221,18 @@ Pool_Estimation <- function(Input_data,
   }
 
   DF_list <- list("Filtered_Input_data" = filtered_Input_data, "CV_result" = result_df_final_out )
-  Pool_Estimation_res_list <- list("DFs"= DF_list,"Plots"=pool_plot_list )
-  # Return the result
-  #assign("PoolEstimation_res",  Pool_Estimation_res_list, envir=.GlobalEnv)
+  Pool_Estimation_res_list <- list("DF"= DF_list,"Plot"=pool_plot_list )
 
-  return(Pool_Estimation_res_list)
+  if(Plot==TRUE){ # print plots
+    print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
+                                pool_plot_list$Pool_CV_Hist,
+                                pool_plot_list$Pool_CV_Violin,
+                                widths = c(1,1.2,1.2),
+                                heights = c(1.3,1)))
+  }
+
+
+  invisible(return(Pool_Estimation_res_list))
 
 }
 

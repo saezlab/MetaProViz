@@ -421,9 +421,7 @@ MCA_2Cond <- function(Cond1_File,
   }
 
   #Return:
- # assign(paste("Summary_",OutputFileName, sep=""), ClusterSummary, envir=.GlobalEnv)
-#  assign(paste("MCA2Cond_",OutputFileName, sep=""), MergeDF_Rearrange, envir=.GlobalEnv)
-  invisible(return(list("DFs"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
+  invisible(return(list("DF"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
 }
 
 
@@ -1036,7 +1034,7 @@ MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraVal
   }
 
 
-  invisible(return(list("DFs"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
+  invisible(return(list("DF"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
 }
 
 

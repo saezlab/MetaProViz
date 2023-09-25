@@ -214,9 +214,6 @@ MC_ORA <- function(Input_data,
       names(inner_list) <- g
       df_list <- c(df_list, inner_list)
 
-
-
-
       #Make Selection of terms that should be displayed on the plots
       clusterGoSummary_Select <- clusterGoSummary %>%
         subset(p.adjust <= pCutoff & Percentage_of_Pathway_detected >= PercentageCutoff)
@@ -269,8 +266,12 @@ MC_ORA <- function(Input_data,
       }
     }
   }
+  if(Plot==TRUE){ # print plots
+    print(plot_list[[grps_labels[[1]]]])
+  }
+
   #return <- clusterGoSummary
-  invisible(return(list("DFs"=df_list, "Plots" = plot_list)))
+  invisible(return(list("DF"=df_list, "Plot" = plot_list)))
 }
 
 
@@ -305,7 +306,8 @@ DM_ORA <- function(Input_data,
                    Save_as_Plot="svg",
                    pCutoff=0.2,
                    PercentageCutoff=10,
-                   Save_as_Results="csv"
+                   Save_as_Results="csv",
+                   Plot=TRUE
 ){
   ## ------------ Setup and installs ----------- ##
   packages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
@@ -486,13 +488,14 @@ DM_ORA <- function(Input_data,
         }
       }
   }
-  # plot(Dotplot)
-  # plot(Emapplot)
-  # plot(UpsetPlot)
-  #
-  # return <- clusterGoSummary
 
-  invisible(return(list("DFs"=list(clusterGoSummary), "Plots" = list("Dotplot"=suppressWarnings(Dotplot),"Emapplot"=suppressWarnings(Emapplot) ,"UpsetPlot"=suppressWarnings(UpsetPlot) ))))
+  if(Plot==TRUE){ # print plots
+    print(Dotplot)
+    print(UpsetPlot)
+    print(Emapplot)
+  }
+
+  invisible(return(list("DF"=list(clusterGoSummary), "Plot" = list("Dotplot"=suppressWarnings(Dotplot),"Emapplot"=suppressWarnings(Emapplot) ,"UpsetPlot"=suppressWarnings(UpsetPlot) ))))
 }
 
 

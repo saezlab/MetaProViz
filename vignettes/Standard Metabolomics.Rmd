@@ -164,12 +164,12 @@ Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = PoolData,
 # Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_SettingsInfo  
 Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Intra[,-c(2:4)] %>% column_to_rownames("Code"),
                             Input_SettingsFile = Intra[,1:4] %>% column_to_rownames("Code"),
-                            Input_SettingsInfo = c( PoolSamples = "Pool"),
+                            Input_SettingsInfo = c( PoolSamples = "Pool", Conditions="Conditions"),
                             Unstable_feature_remove = FALSE, 
                             Threshold_cv = 100)
 ```
 ```{r, echo=FALSE}
-Pool_Estimation_result_DF <- Pool_Estimation_result[["DFs"]]
+Pool_Estimation_result_DF <- Pool_Estimation_result[["DF"]]
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result_DF[["CV_result"]]
 
 # Check how our data looks like:
@@ -177,6 +177,10 @@ Pool_Estimation_result_DF_CV [1:5,]%>%
   kableExtra::kbl(caption = "Preview of the Pool_Estimation result.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
+
+# Check the plots
+Pool_Estimation_result_Plots <- Pool_Estimation_result[["Plot"]]
+Pool_Estimation_result_Plots
 ```
 \
 The results from the `Pool_Estimation()` is a table that has the CV. If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
@@ -185,17 +189,19 @@ Now we will apply the `Preprocessing()` function to example data and have a look
 ```{r}
 PreprocessingResults <- MetaProViz::Preprocessing(Input_data=Intra_M, 
                                                   Input_SettingsFile=SampleInfo,
-                                                  Input_SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"),
+                                                  Input_SettingsInfo = c(Conditions = "Conditions",
+                                                                         Biological_Replicates = "Biological_Replicates"),
                                                   Feature_Filtering = "Modified",
                                                   Feature_Filt_Value = 0.8,
                                                   TIC_Normalization = TRUE,
                                                   MVI=TRUE, 
                                                   HotellinsConfidence = 0.99,# We perform outlier testing using 0.99 confidence intervall
                                                   ExportQCPlots = TRUE,
-                                                  CoRe = FALSE) 
+                                                  CoRe = FALSE,
+                                                  Plot = TRUE) 
 
 # This is the results table:
-Intra_Preprocessed <- PreprocessingResults[["DFs"]][["Preprocessing_output"]][["Processed_data"]]
+Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]][["Processed_data"]]
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -211,25 +217,25 @@ As part of the `Preprocessing()` function several plots are generated, returned 
 ```{r}
 #For each Round of HotellinsT2 test three plots will be saved:
 #1.PCA plot
-P1 <- PreprocessingResults[["Plots"]][["Outlier_plots"]][["PCA_round1"]]
+P1 <- PreprocessingResults[["Plot"]][["Outlier_plots"]][["PCA_round1"]]
 #P1
 
 #2.Screeplot
-P2 <- PreprocessingResults[["Plots"]][["Outlier_plots"]][["ScreePlot_round1"]]
+P2 <- PreprocessingResults[["Plot"]][["Outlier_plots"]][["ScreePlot_round1"]]
 #P2
 
 #3.Hotellins Outlier
-P3 <-  PreprocessingResults[["Plots"]][["Outlier_plots"]][["HotellingsPlot_round1"]]
+P3 <-  PreprocessingResults[["Plot"]][["Outlier_plots"]][["HotellingsPlot_round1"]]
 P3
 
 ################### 
 #If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
 #Here a second round was performed and the plots saved:
-P4<- PreprocessingResults[["Plots"]][["Outlier_plots"]][["PCA_round2"]]
+P4<- PreprocessingResults[["Plot"]][["Outlier_plots"]][["PCA_round2"]]
 P4
-P5<- PreprocessingResults[["Plots"]][["Outlier_plots"]][["ScreePlot_round2"]]
+P5<- PreprocessingResults[["Plot"]][["Outlier_plots"]][["ScreePlot_round2"]]
 P5
-P6<- PreprocessingResults[["Plots"]][["Outlier_plots"]][["HotellingsPlot_round2"]]
+P6<- PreprocessingResults[["Plot"]][["Outlier_plots"]][["HotellingsPlot_round2"]]
 P6
 ```
 \
@@ -237,11 +243,11 @@ The QC plots `QC_Plots` include an PCA plot using the processed data and highlig
 ```{r}
 # PCA plot
 # 1. Marked Outliers:
-Q1 <- PreprocessingResults[["Plots"]][["QC_plots"]][["QC_PCA_and_Outliers"]]
+Q1 <- PreprocessingResults[["Plot"]][["QC_plots"]][["QC_PCA_and_Outliers"]]
 Q1
 
 #2. Marked Biological replicates:
-Q2 <- PreprocessingResults[["Plots"]][["QC_plots"]][["QC_PCA_Replicates"]]
+Q2 <- PreprocessingResults[["Plot"]][["QC_plots"]][["QC_PCA_Replicates"]]
 Q2
 ```
 \
@@ -277,9 +283,9 @@ DMA_786O_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we 
                         Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
                         OutputName='DMA_786OvHK2', 
                         CoRe=FALSE, 
-                        Plot = TRUE)
+                        Plot = FALSE)
 
-`DMA_786-O_vs_HK2`<- DMA_786O_vs_HK2[["DFs"]][["DMA_result"]]#Get the DMA table
+`DMA_786-O_vs_HK2`<- DMA_786O_vs_HK2[["DF"]][["DMA_result"]]#Get the DMA table
 
 #Perform the other comparisons:
 DMA_786M1A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
@@ -292,7 +298,7 @@ DMA_786M1A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)],
                                    CoRe=FALSE,
                                    Plot = TRUE)
 
-`DMA_786-M1A_vs_HK2` <- DMA_786M1A_vs_HK2[["DFs"]][["DMA_result"]]#Get the DMA table
+`DMA_786-M1A_vs_HK2` <- DMA_786M1A_vs_HK2[["DF"]][["DMA_result"]]#Get the DMA table
 
 DMA_786M2A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
                                    Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
@@ -305,7 +311,7 @@ DMA_786M2A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)],
                                    Plot = TRUE)
 
 
-`DMA_786-M2A_vs_HK2` <- DMA_786M2A_vs_HK2[["DFs"]][["DMA_result"]]#Get the DMA table
+`DMA_786-M2A_vs_HK2` <- DMA_786M2A_vs_HK2[["DF"]][["DMA_result"]]#Get the DMA table
 
 ```
 ```{r, echo=FALSE}
@@ -433,7 +439,7 @@ MCAres <- MetaProViz::MCA_2Cond(Cond1_File=`DMA_786-O_vs_HK2`,
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
-MCAres[["DFs"]][["ClusterSummary"]]%>%
+MCAres[["DF"]][["ClusterSummary"]]%>%
   kableExtra::kbl(caption ="Summary of MCA: 2 Conditions.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) 
 ```
@@ -448,7 +454,7 @@ PathwayInput$Description <- PathwayInput$term
 ```
 
 ```{r, include=FALSE, warning=FALSE}
-MC_ORA_result<- MetaProViz::MC_ORA(Input_data=MCAres[["DFs"]][["MCA_result"]],
+MC_ORA_result<- MetaProViz::MC_ORA(Input_data=MCAres[["DF"]][["MCA_result"]],
                    MetabCluster_lab="RG2_Significant",
                    RemoveBackground=TRUE,
                    PathwayFile=PathwayInput,
