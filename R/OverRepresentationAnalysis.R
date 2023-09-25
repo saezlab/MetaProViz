@@ -153,10 +153,13 @@ MC_ORA <- function(Input_data,
   names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
   Pathway <- merge(x= Pathway[,-4], y=Pathway_Mean,by="term", all.x=TRUE)
 
+  df_list = list()
+  plot_list = list()
   #Run ORA
   for(g in grps_labels) {
     grpMetabolites <- subset(df, df[[MetabCluster_lab]] == g)
     print(g)
+
     print(dim(grpMetabolites))
 
     clusterGo <- clusterProfiler::enricher(gene=as.character(grpMetabolites$Metabolite),
@@ -204,12 +207,12 @@ MC_ORA <- function(Input_data,
         txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.txt', sep="")#Export the ORA results as .csv
         write.table(clusterGoSummary,txtORA , col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
       }
-
-
       }
 
-
-
+      dfs = list(clusterGoSummary)
+      inner_list <- list(dfs)
+      names(inner_list) <- g
+      df_list <- c(df_list, inner_list)
 
       #Make Selection of terms that should be displayed on the plots
       clusterGoSummary_Select <- clusterGoSummary %>%
@@ -223,40 +226,52 @@ MC_ORA <- function(Input_data,
         if (!(dim(clusterGoSummary_Select)[1] == 0)) {#exclude df's that have no observations
         clusterGo@result <- clusterGoSummary_Select[,1:9]
         #1. Dotplot:
-        Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
-          ggtitle(paste("Dotplot:", g, PathwayName, sep=" "))
+        suppressWarnings( Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
+          ggtitle(paste("Dotplot:", g, PathwayName, sep=" ")))
         if(PathwayName ==""){
           ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
         } else{
           ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
         }
-        plot(Dotplot)
+
 
         #2. Emapplot
         x2 <- enrichplot::pairwise_termsim(clusterGo)
-        Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
-          ggtitle(paste("Emapplot:", g, PathwayName, sep=" "))
+        suppressWarnings(Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
+          ggtitle(paste("Emapplot:", g, PathwayName, sep=" ")))
         if(PathwayName ==""){
           ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
         } else{
           ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
         }
-        plot(Emapplot)
+
 
         #3. Upsetplot:
-        UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
-          ggtitle(paste("UpsetPlot", g, PathwayName, sep=" "))
+        suppressWarnings(UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
+          ggtitle(paste("UpsetPlot", g, PathwayName, sep=" ")))
         if(PathwayName ==""){
           ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
         } else{
           ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
         }
-        plot(UpsetPlot)
+
         }
+
+        plots = list("Dotplot"=suppressWarnings(Dotplot),"Emapplot"=suppressWarnings(Emapplot) ,"UpsetPlot"=suppressWarnings(UpsetPlot) )
+        inner_list <- list(plots)
+        names(inner_list) <- g
+        plot_list <- c(plot_list, inner_list)
+
+
       }
     }
   }
-  return <- clusterGoSummary
+  if(Plot==TRUE){ # print plots
+    print(plot_list[[grps_labels[[1]]]])
+  }
+
+  #return <- clusterGoSummary
+  invisible(return(list("DF"=df_list, "Plot" = plot_list)))
 }
 
 
@@ -291,7 +306,8 @@ DM_ORA <- function(Input_data,
                    Save_as_Plot="svg",
                    pCutoff=0.2,
                    PercentageCutoff=10,
-                   Save_as_Results="csv"
+                   Save_as_Results="csv",
+                   Plot=TRUE
 ){
   ## ------------ Setup and installs ----------- ##
   packages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
@@ -389,7 +405,7 @@ DM_ORA <- function(Input_data,
                                            TERM2NAME = term2name)
   clusterGoSummary <- data.frame(clusterGo)
 
-  #Safe file and plots
+  #Save file and plots
   if (!(dim(clusterGoSummary)[1] == 0)){
       #Add pathway information (% of genes in pathway detected)
       clusterGoSummary <- merge(x= clusterGoSummary[,-2], y=Pathway[,-2],by.x="ID",by.y="term", all=TRUE)
@@ -400,7 +416,7 @@ DM_ORA <- function(Input_data,
       clusterGoSummary <- clusterGoSummary[,c(1,9,2:8, 10:11)]%>%
         dplyr::rename("MetaboliteIDs_in_pathway"="geneID")
 
-      #Safe file
+      #Save file
       if (Save_as_Results == "xlsx"){
         if(PathwayName ==""){
           xlsORA <-  paste(Results_folder_DM_ORA,"/", 'ClusterGoSummary','.xlsx', sep="")
@@ -440,38 +456,46 @@ DM_ORA <- function(Input_data,
         if (!(dim(clusterGoSummary_Select)[1] == 0)) {#exclude df's that have no observations
           clusterGo@result <- clusterGoSummary_Select[,1:9]
           #1. Dotplot:
-          Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
-            ggtitle(paste("Dotplot: ", PathwayName, sep=" "))
+          suppressWarnings(Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
+            ggtitle(paste("Dotplot: ", PathwayName, sep=" ")))
           if(PathwayName ==""){
             ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot.", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
           } else{
             ggsave(file=paste(Results_folder_DM_ORA,"/", "Dotplot_",PathwayName, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
           }
-          plot(Dotplot)
+
 
           #2. Emapplot
           x2 <- enrichplot::pairwise_termsim(clusterGo)
-          Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
-            ggtitle(paste("Emapplot:", PathwayName, sep=" "))
+          suppressWarnings(Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
+            ggtitle(paste("Emapplot:", PathwayName, sep=" ")) )
           if(PathwayName ==""){
             ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot.", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
           } else{
             ggsave(file=paste(Results_folder_DM_ORA,"/", "Emapplot_",PathwayName, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
           }
-          plot(Emapplot)
+
 
           #3. Upsetplot:
-          UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
-            ggtitle(paste("UpsetPlot: ",  PathwayName, sep=" "))
+          suppressWarnings( UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
+            ggtitle(paste("UpsetPlot: ",  PathwayName, sep=" ")))
           if(PathwayName ==""){
             ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot.",  Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
           } else{
             ggsave(file=paste(Results_folder_DM_ORA,"/", "UpsetPlot_", PathwayName, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
           }
-          plot(UpsetPlot)
+
         }
       }
   }
-  return <- clusterGoSummary
+
+  if(Plot==TRUE){ # print plots
+    print(Dotplot)
+    print(UpsetPlot)
+    print(Emapplot)
+  }
+
+  invisible(return(list("DF"=list(clusterGoSummary), "Plot" = list("Dotplot"=suppressWarnings(Dotplot),"Emapplot"=suppressWarnings(Emapplot) ,"UpsetPlot"=suppressWarnings(UpsetPlot) ))))
 }
+
 

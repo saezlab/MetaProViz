@@ -576,9 +576,8 @@ DMA <-function(Input_data,
     write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
-
-
-  if(Plot == TRUE){ # Make a simple Volcano plot
+# Make a simple Volcano plot
+    dev.new()
     VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
                                                     Input_data=DMA_Output,
                                                     y= "p.adj",
@@ -597,19 +596,19 @@ DMA <-function(Input_data,
                                                     Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     Theme= NULL,
                                                     Save_as_Plot= NULL))
-
+    dev.off()
     OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
     volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
 
-    plot(VolcanoPlot)
-  }
-
   output_list <- list()  #Here we make a list in which we will save the output
-  DMA_output_list <- list(DMA_Results = DMA_Output, Shapiro_Results = DF_shapiro_results)
-  invisible( DMA_output_list)
-  #assign(paste0("DMA_",toString(numerator),"_vs_",toString(denominator)), DMA_Output, envir=.GlobalEnv)
+  DMA_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results,"DMA_result"=DMA_Output),"Plot"=list("Volcano"=VolcanoPlot))
+
+  if(Plot == TRUE){
+    VolcanoPlot
+  }
+    invisible(return(DMA_output_list))
 }
 
 
