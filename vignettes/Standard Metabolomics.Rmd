@@ -159,21 +159,32 @@ PoolData <- MetaProViz::toy_data(data="Standard") %>%
 Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = PoolData,
                             Input_SettingsFile = NULL,
                             Input_SettingsInfo = NULL,
-                            Unstable_feature_remove = FALSE, 
+                            Unstable_feature_remove = FALSE,
                             Threshold_cv = 100)
+
 # Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_SettingsInfo  
 Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Intra[,-c(2:4)] %>% column_to_rownames("Code"),
                             Input_SettingsFile = Intra[,1:4] %>% column_to_rownames("Code"),
                             Input_SettingsInfo = c( PoolSamples = "Pool", Conditions="Conditions"),
                             Unstable_feature_remove = FALSE, 
                             Threshold_cv = 100)
-```
-```{r, echo=FALSE}
+
+
 Pool_Estimation_result_DF <- Pool_Estimation_result[["DF"]]
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result_DF[["CV_result"]]
 
+# The Pool_Estimation_result is a List of 2 containing DFs and Plots with the results. 
+#We can check the plots:
+Pool_Estimation_result[["Plots"]][[1]]
+Pool_Estimation_result[["Plots"]][[2]]
+Pool_Estimation_result[["Plots"]][[3]]
+
+#We can check the main results DF:
+CV_results <- Pool_Estimation_result[["DFs"]][["CV_result"]]
+```
+```{r, echo=FALSE}
 # Check how our data looks like:
-Pool_Estimation_result_DF_CV [1:5,]%>%
+CV_results[1:5,]%>%
   kableExtra::kbl(caption = "Preview of the Pool_Estimation result.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
@@ -287,6 +298,8 @@ DMA_786O_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we 
 
 `DMA_786-O_vs_HK2`<- DMA_786O_vs_HK2[["DF"]][["DMA_result"]]#Get the DMA table
 
+Shapiro <- DMA_786O_vs_HK2[["Shapiro_Results"]]
+
 #Perform the other comparisons:
 DMA_786M1A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
                                    Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
@@ -316,8 +329,8 @@ DMA_786M2A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)],
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
-`DMA_786-O_vs_HK2`[1:6,]%>%
-  kableExtra::kbl(caption = "Preview of the DMA results for the comparison of HK2 versus 786-O cells.", row.names=FALSE) %>%
+Shapiro[,1:8]%>%
+  kableExtra::kbl(caption = "Preview of the Shaprio results for the comparison of HK2 versus 786-O cells.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
@@ -627,10 +640,6 @@ MetaProViz::VizHeatmap(Input_data = Input_Heatmap,
 \
 You can also choose to make individual plots for any Sample Metadata using `individual_Sample` (e.g. in patients you may want to plot male and female separately). Moreover, you can also use both at the same time.
 
-### Bar/Box/Violin plots
-This is a really simple plot type, where you can generate an individual plot for each of your features (=metabolites).  
-
-
 ### Volcano plot
 In general,we have three different `Plot_Settings`, which will also be used for other plot types such as lollipop graphs.\
 `1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
@@ -669,7 +678,7 @@ MetaProViz::VizVolcano(Input_data=`DMA_786-M1A_vs_HK2`,
                        SelectLab = NULL)
 ```
 \
-With the parameter `SelectLab` you can also pass a vector with Metabolite nemaes that should be labeled:
+With the parameter `SelectLab` you can also pass a vector with Metabolite names that should be labeled:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
 MetaProViz::VizVolcano(Input_data=`DMA_786-M1A_vs_HK2`,
@@ -805,135 +814,6 @@ MetaProViz::VizVolcano(Plot_Settings="PEA",
 </div>
 \
 \
-
-### Lollipop graphs
-Lollipop graphs are another option to visualize the results from the different **MetaProViz** analysis.
-
-#### **Standard**
-Here we will first look into the results from DMA (see above 2.2 DMA) for the comparison of `HK2 versus 786M1A` using a plain graph:
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
-# Run with default parameter --> only need to provide Input_data
-MetaProViz::VizLolipop(Input_data=`DMA_786-M1A_vs_HK2`,
-                       OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA")
-
-MetaProViz::VizLolipop(Input_data=`DMA_786-M1A_vs_HK2`,
-                       x = "Metabolite",
-                       y = "Log2FC",
-                       OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA_Switched Axis")
-```
-\
-Next we may want to show additional information about the metabolites on the plot. We can change the dot size and/or color again using information from the Plot_SettingsFile by specifying it in the Plot_SettingsInfo vector.
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying color and size option."}
-MetaProViz::VizLolipop(Input_data=`DMA_786-M1A_vs_HK2`, 
-                       Plot_SettingsInfo= c(color="t.val", size="p.adj"), 
-                       Plot_SettingsFile= `DMA_786-M1A_vs_HK2`,
-                       OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA")
-```
-\
-We can also use the metabolite cluster information of our MCA to colorcode the metabolites while showing another information using the dot size. First we need to put the displaying information together in the Settings file.
-```{r, fig.cap="Figure: Lolipop displaying metabolite clusters together."}
-MetaData_Metab <- merge(MetaData_Metab,`DMA_786-M1A_vs_HK2`[,-6], by="Metabolite" )
-```
-
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying metabolite clusters together."}
-MetaProViz::VizLolipop(Input_data = `DMA_786-M1A_vs_HK2`, 
-           Plot_SettingsInfo= c(color="RG2_Significant", size = "p.adj"), 
-           Plot_SettingsFile= MetaData_Metab,
-           OutputPlotName= "786M1A versus HK2",
-           Subtitle= "Results of DMA with MCA")
-```
-\
-Alternatively we can make individual plot of each metabolite cluster
-```{r, eval=FALSE}
-MetaProViz::VizLolipop(Input_data =  `DMA_786-M1A_vs_HK2`, 
-                       Plot_SettingsInfo= c(color = "t.val", size = "p.val", individual= "RG2_Significant"),
-                       Plot_SettingsFile=  MetaData_Metab,
-                       OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA with MCA")
-```
-
-<div class="vscroll-plot">
-```{r,eval=FALSE, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Lolipop displaying metabolite clusters individually"}
-MetaProViz::VizLolipop(Input_data =  `DMA_786-M1A_vs_HK2`, 
-                       Plot_SettingsInfo= c(color = "t.val", size = "p.val", individual= "RG2_Significant"),
-                       Plot_SettingsFile=  MetaData_Metab,
-                       OutputPlotName= "786M1A versus HK2",
-                       Subtitle= "Results of DMA with MCA")
-```
-
-</div>
-\
-\
-We can also use lolipop plots to compare 2 or more DMA results by setting the value in Plot_Settings to "Compare". Here, we have to add a list of dataframes in the Input_data as well as a list of the names of the datasets to be used for displaying the data. Colorcoding is used for the datasets. \
-```{r}
-## Compare
-MetaProViz::VizLolipop(Input_data = list(`DMA_786-O_vs_HK2`,`DMA_786-M1A_vs_HK2`), 
-           Plot_Settings="Compare", 
-           Comparison_name= list("Cond1", "Cond2"),
-           OutputPlotName= "DMA 786OvHK2 versus DMA 786M1AvHK2",
-           Subtitle= "Results of DMA")
-
-```
-\
-Again we can add a Plot_SettingsFile to use for the dot size. In compare mode the Plot_SettingsFile input has to be a list. 
-```{r, eval=FALSE}
-#  When  Plot_Settings="Compare" colorcoding of the different datasets is usel. Thus we can change only the size of the dots using the Plot_SettingsFile
-MetaProViz::VizLolipop(Input_data = list(`DMA_786-O_vs_HK2`,`DMA_786-M1A_vs_HK2`),
-           Plot_SettingsInfo= c(size = "t.val"),  
-           Plot_Settings="Compare", 
-           Comparison_name= list("Cond1", "Cond2"), 
-           Plot_SettingsFile = list(`DMA_786-O_vs_HK2`,`DMA_786-M1A_vs_HK2`),
-           OutputPlotName= "DMA 786OvHK2 versus DMA 786M1AvHK2",
-           Subtitle= "Results of DMA")
-
-```
-\
-Finally we can compare the DMA results and make individual plots each cluster of the MCA.
-```{r, eval=FALSE}
-SettingsM1A <- merge(Settings,`DMA_786-M1A_vs_HK2`, by="Metabolite" )
-```
-
-```{r, eval=FALSE}
-VizLolipop(Input_data = list(`DMA_786-O_vs_HK2`,`DMA_786-M1A_vs_HK2`), 
-           Plot_SettingsInfo= c(individual= "RG3_SignificantChange", size = "t.val"), 
-           Plot_Settings="Compare", 
-           Comparison_name= list("786-O versus HK2", "786-M1A versus HK2"), 
-           Plot_SettingsFile = list(SettingsO,SettingsM1A),
-           OutputPlotName= "DMA 786OvHK2 versus DMA 786M1AvHK2",
-           Subtitle= "Results of DMA for each Metabolite Cluster")
-```
-
-#### **PathwayEnrichmentAnalysis**
-If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results or add the information into the Figure legends.
-```{r, eval=FALSE}
-MetaProViz::VizLolipop(Plot_Settings="PEA",
-                       Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
-                       Plot_SettingsFile= KEGG_Pathways[,-3],#Must be the pathways used for pathway analysis
-                       Input_data= `DMA_786-M1A_vs_HK2`,# Must be the data you have used as an input for the pathway analysis
-                       AdditionalInput_data=ORA_786M1A_vs_HK2,#Must be the results of the pathway analysis
-                       OutputPlotName= "test",
-                       Subtitle= "PEA" )
-```
-
-<div class="vscroll-plot">
-```{r, echo=FALSE,  fig.align="left", fig.width=7, fig.height=5}
-MetaProViz::VizLolipop(Plot_Settings="PEA",
-                       Plot_SettingsInfo= c(individual="term", PEA_Pathway="ID", PEA_stat="p.adjust", PEA_score="GeneRatio"),
-                       Plot_SettingsFile= KEGG_Pathways[,-3],#Must be the pathways used for pathway analysis
-                       Input_data= `DMA_786-M1A_vs_HK2`,# Must be the data you have used as an input for the pathway analysis
-                       AdditionalInput_data=ORA_786M1A_vs_HK2,#Must be the results of the pathway analysis
-                       OutputPlotName= "test",
-                       Subtitle= "PEA" )
-```
-</div>
-\
-\
-
-### Alluvial plots
-This is a rather specific plot that can be particularly useful to visualize the output of the `MCA` module. 
 
 
 <div class="progress progress-striped active">
