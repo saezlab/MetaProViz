@@ -172,26 +172,13 @@ Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Intra[,-c(2:4)
 
 Pool_Estimation_result_DF <- Pool_Estimation_result[["DF"]]
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result_DF[["CV_result"]]
-
-# The Pool_Estimation_result is a List of 2 containing DFs and Plots with the results. 
-#We can check the plots:
-Pool_Estimation_result[["Plots"]][[1]]
-Pool_Estimation_result[["Plots"]][[2]]
-Pool_Estimation_result[["Plots"]][[3]]
-
-#We can check the main results DF:
-CV_results <- Pool_Estimation_result[["DFs"]][["CV_result"]]
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
-CV_results[1:5,]%>%
+Pool_Estimation_result_DF_CV[1:5,]%>%
   kableExtra::kbl(caption = "Preview of the Pool_Estimation result.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
-
-# Check the plots
-Pool_Estimation_result_Plots <- Pool_Estimation_result[["Plot"]]
-Pool_Estimation_result_Plots
 ```
 \
 The results from the `Pool_Estimation()` is a table that has the CV. If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
