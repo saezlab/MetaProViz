@@ -28,9 +28,9 @@
 #' @param OutputName String which is added to the output files of the DMA.
 #' @param Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
@@ -48,9 +48,9 @@ DMA <-function(Input_data,
                Input_MetaFile_Metab = NULL,
                OutputName='',
                CoRe=FALSE,
-               Plot = TRUE,
                Save_as_Plot = "svg",
-               Save_as_Results = "csv"
+               Save_as_Results = "csv",
+               Plot = TRUE
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -58,6 +58,13 @@ DMA <-function(Input_data,
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0){
     install.packages(new.packages)
+  }
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    if (!require("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+
+    BiocManager::install(new.packages)
   }
   suppressMessages(library(tidyverse))
 

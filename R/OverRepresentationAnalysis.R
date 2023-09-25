@@ -56,10 +56,16 @@ MC_ORA <- function(Input_data,
                    PercentageCutoff=10
                    ){
   ## ------------ Setup and installs ----------- ##
-  packages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
-  install.packages(setdiff(packages, rownames(installed.packages())))
+  RequiredPackages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
-
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    if (!require("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+    BiocManager::install(new.packages)
+  }
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
   if("Metabolite" %in% names(Input_data)==FALSE){
@@ -310,9 +316,16 @@ DM_ORA <- function(Input_data,
                    Plot=TRUE
 ){
   ## ------------ Setup and installs ----------- ##
-  packages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
-  install.packages(setdiff(packages, rownames(installed.packages())))
+  RequiredPackages <- c("tidyverse","clusterProfiler", "enrichplot", "ggupset")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    if (!require("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+    BiocManager::install(new.packages)
+  }
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:

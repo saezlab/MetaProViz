@@ -452,7 +452,21 @@ MCA_2Cond <- function(Cond1_File,
 ### ### ### Metabolite Clustering Analysis ### ### ###
 ##################################################
 
-MCA_CoRe <- function(Intra_File, CoRe_File, MetaboliteID= "Metabolite", IntraValueCol="Log2FC",IntraPadjCol="p.adj", CoReValueCol="Log2FC", CoReDirectionCol="CoRe_info", CoRePadjCol="p.adj",Intra_padj_cutoff= 0.05, CoRe_padj_cutoff = 0.05,Intra_FC_cutoff= 1,Save_as_Results = "xlsx", CoRe_FC_cutoff = 1, backgroundMethod="Intra&CoRe", OutputFileName = "MCA_CoRe_"){
+MCA_CoRe <- function(Intra_File,
+                     CoRe_File,
+                     MetaboliteID= "Metabolite",
+                     IntraValueCol="Log2FC",
+                     IntraPadjCol="p.adj",
+                     CoReValueCol="Log2FC",
+                     CoReDirectionCol="CoRe_info",
+                     CoRePadjCol="p.adj",
+                     Intra_padj_cutoff= 0.05,
+                     CoRe_padj_cutoff = 0.05,
+                     Intra_FC_cutoff= 1,
+                     Save_as_Results = "xlsx",
+                     CoRe_FC_cutoff = 1,
+                     backgroundMethod="Intra&CoRe",
+                     OutputFileName = "MCA_CoRe_"){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]

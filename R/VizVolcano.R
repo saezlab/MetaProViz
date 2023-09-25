@@ -74,7 +74,16 @@ VizVolcano <- function(Plot_Settings="Standard",
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "EnhancedVolcano")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
+  if(length(new.packages)>0){
+    install.packages(new.packages)
+  }
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    if (!require("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+
+    BiocManager::install(new.packages)
+  }
   suppressMessages(library(tidyverse))
 
   ## ------------ Check Input files ----------- ##

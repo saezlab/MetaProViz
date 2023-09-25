@@ -30,10 +30,10 @@
 #' @param MVI \emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
 #' @param MVI_Percentage \emph(Optional: ) Percentage (0 to 100)of imputed value based on the minimum value. \strong{Default = 50}
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
-#' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}
+#' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param Plot  \emph{Optional: } IF TRUE prints an overview of resulting plots. \strong{Default = TRUE}
+#' @param Plot  \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
 #' @export
@@ -53,8 +53,8 @@ Preprocessing <- function(Input_data,
                           MVI= TRUE,
                           MVI_Percentage=50,
                           HotellinsConfidence = 0.99,
-                          ExportQCPlots = TRUE,
                           CoRe = FALSE,
+                          ExportQCPlots = TRUE,
                           Save_as_Plot = "svg",
                           Plot = TRUE
 ){
@@ -73,7 +73,9 @@ Preprocessing <- function(Input_data,
   )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
 
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
+  if(length(new.packages)>0){
+    install.packages(new.packages)
+  }
   suppressMessages(library(tidyverse))
 
   ## ------------------ Run ------------------- ##
@@ -899,10 +901,10 @@ Preprocessing <- function(Input_data,
   PlotList = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
 
   if(Plot==TRUE){ # print plots
-  print(patchwork::wrap_plots(norm_plots,  PlotList$QC_plots[[1]],  PlotList$QC_plots[[2]],
+    suppressMessages(suppressWarnings(print(patchwork::wrap_plots(norm_plots,  PlotList$QC_plots[[1]],  PlotList$QC_plots[[2]],
              pca_outlierloop1,scree_outlierloop1,hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")),
              widths = c(2,2.1,1),
-             heights = c(1.4,1)))
+             heights = c(1.4,1)))))
              }
 
     invisible(return(list("DF"=DFs,"Plot" =PlotList)))
@@ -1004,13 +1006,14 @@ ReplicateSum <- function(Input_data){
 
 #' Description
 #'
-#' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with just the pooled samples.
+#' @param Input_data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.
 #' @param Input_SettingsFile  \emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}
-#' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column in names 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}
+#' @param Input_SettingsInfo  \emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}
 #' @param Unstable_feature_remove  \emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}
 #' @param Threshold_cv \emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
+#' @param Plot \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
 #'
 #' @keywords Coefficient of Variation, high variance metabolites
 #' @export
@@ -1020,12 +1023,20 @@ Pool_Estimation <- function(Input_data,
                             Input_SettingsFile = NULL,
                             Input_SettingsInfo = NULL,
                             Unstable_feature_remove = FALSE,
+                            Threshold_cv = 100,
                             Save_as_Plot = "svg",
                             Save_as_Results = "csv", # txt or csv
-                            Threshold_cv = 100,
                             Plot=TRUE
 ){
 
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", # general scripting
+                        "patchwork" # for output plot grid
+  )# For finding inflection point/ Elbow knee /PCA component selection # https://cran.r-project.org/web/packages/inflection/inflection.pdf # https://deliverypdf.ssrn.com/delivery.php?ID = 454026098004123081018105104090015093000085002012023032095093077109069092095000114006057018122039107109012089110120018031068078025094036037013095100070100076109026029024044005068010070117123085122016083112098002109001027028000024115096122101001083084026&EXT = pdf&INDEX = TRUE # https://arxiv.org/abs/1206.5478
+
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
@@ -1224,14 +1235,20 @@ Pool_Estimation <- function(Input_data,
   Pool_Estimation_res_list <- list("DF"= DF_list,"Plot"=pool_plot_list )
 
   if(Plot==TRUE){ # print plots
-    print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
-                                pool_plot_list$Pool_CV_Hist,
-                                pool_plot_list$Pool_CV_Violin,
-                                widths = c(1,1.2,1.2),
-                                heights = c(1.3,1)))
+    if(is.null(Input_SettingsInfo)==FALSE){
+      suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
+                                  pool_plot_list$Pool_CV_Hist,
+                                  pool_plot_list$Pool_CV_Violin,
+                                  widths = c(1.09,1.03,1),
+                                  heights = c(1.1,1)))))
+    }else{
+      suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
+                                  pool_plot_list$Pool_CV_Hist,
+                                  pool_plot_list$Pool_CV_Violin,
+                                  widths = c(0.9,1,1),
+                                  heights = c(1.3,1)))))
+    }
   }
-
-
   invisible(return(Pool_Estimation_res_list))
 
 }

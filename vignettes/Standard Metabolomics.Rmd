@@ -154,7 +154,6 @@ PoolData <- MetaProViz::toy_data(data="Standard") %>%
   remove_rownames() %>% 
   column_to_rownames("Code")
 
-
 # Check the metabolite variability
 Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = PoolData,
                             Input_SettingsFile = NULL,

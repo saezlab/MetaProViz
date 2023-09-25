@@ -59,7 +59,6 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
   suppressMessages(library("ggfortify"))
-  suppressMessages(library("ggplot2"))
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
