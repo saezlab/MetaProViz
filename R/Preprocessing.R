@@ -1180,7 +1180,7 @@ Pool_Estimation <- function(Input_data,
                         geom_vline(aes(xintercept=Threshold_cv),
                                    color="darkred", linetype="dashed", size=1)+
                         geom_density(alpha=.2, fill="#FF6666") +
-                        labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                        labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
                         theme_classic())
 
   pool_plot_list[["Pool_CV_Hist"]] <- HistCV
@@ -1195,7 +1195,7 @@ Pool_Estimation <- function(Input_data,
                           geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                           #geom_point(position = position_jitter(seed = 1, width = 0.2))+
                           geom_text(aes(label=ifelse(CV>Threshold_cv,as.character(row.names(result_df_final_out)),'')), hjust=0, vjust=0)+
-                          labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                          labs(title="Coefficient of Variation for metabolites of Pool samples",x="Metabolites", y = "Coefficient of variation (CV%)")+
                           theme_classic())
 
   pool_plot_list[["Pool_CV_Violin"]] <- ViolinCV
@@ -1235,19 +1235,12 @@ Pool_Estimation <- function(Input_data,
   Pool_Estimation_res_list <- list("DF"= DF_list,"Plot"=pool_plot_list )
 
   if(Plot==TRUE){ # print plots
-    if(is.null(Input_SettingsInfo)==FALSE){
-      suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
-                                  pool_plot_list$Pool_CV_Hist,
-                                  pool_plot_list$Pool_CV_Violin,
-                                  widths = c(1.09,1.03,1),
-                                  heights = c(1.1,1)))))
-    }else{
-      suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
-                                  pool_plot_list$Pool_CV_Hist,
-                                  pool_plot_list$Pool_CV_Violin,
-                                  widths = c(0.9,1,1),
-                                  heights = c(1.3,1)))))
-    }
+    suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
+                                pool_plot_list$Pool_CV_Hist,
+                                pool_plot_list$Pool_CV_Violin,
+                                widths = c(1,1,1),
+                                heights = c(1.1,1)))))
+
   }
   invisible(return(Pool_Estimation_res_list))
 

@@ -22,7 +22,7 @@
 #'
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param Input_SettingsInfo \emph{Optional: } Named vector including at least the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile"). \strong{c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param Input_SettingsInfo \emph{Optional: } Named vector including at least the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying comparisons. Log2Fold changes are obtained by dividing the numerator by the denominator, thus positive log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot. Using =NULL selects all the condition and performs multiple comparison. \strong{c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{"t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
@@ -102,26 +102,28 @@ DMA <-function(Input_data,
   if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
     if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
       stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-      }else{# if true rename to Conditions
-        Input_SettingsFile<- Input_SettingsFile%>%
-          dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
-        }
-    }else{
-      stop("You have to provide a Input_SettingsInfo for conditions.")
+    }else{# if true rename to Conditions
+      Input_SettingsFile<- Input_SettingsFile%>%
+        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+    }
+  }else{
+    stop("You have to provide a Input_SettingsInfo for conditions.")
   }
-  if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsInfo==TRUE){
+
+  ##########################
+  if("denominator" %in% names(Input_SettingsInfo)==TRUE){
     if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
       stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-      }else{
-        denominator <- Input_SettingsInfo[["denominator"]]
-      }
+    }else{
+      denominator <- Input_SettingsInfo[["denominator"]]
     }
-  if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsInfo==TRUE){
+  }
+  if("numerator" %in% names(Input_SettingsInfo)==TRUE){
     if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile$Conditions  == FALSE){
       stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-      }else{
-        numerator <- Input_SettingsInfo[["numerator"]]
-      }
+    }else{
+      numerator <- Input_SettingsInfo[["numerator"]]
+    }
   }
   if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==TRUE){
     stop("Check input. The selected denominator option is empty while ",paste(Input_SettingsInfo[["numerator"]])," has been selected as a numerator. Please add a denminator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
@@ -242,8 +244,16 @@ DMA <-function(Input_data,
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
   if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
+  Results_folder_DMA_folder_Shapiro_folder <- file.path(Results_folder_DMA_folder,"Shapiro") # Make DMA results folder
+  if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder)) {dir.create(Results_folder_DMA_folder_Shapiro_folder)}
   Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(numerator),"_vs_",toString(denominator))) # Make comparison folder
   if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
+
+  conds <- unique(c(numerator, denominator))
+  for(x in conds){
+    Results_folder_DMA_folder_Shapiro_folder_Condition <- file.path(Results_folder_DMA_folder_Shapiro_folder, paste(x)) # Make DMA results folder
+    if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder_Condition)) {dir.create(Results_folder_DMA_folder_Shapiro_folder_Condition)}
+  }
 
   ###############################################################################################################################################################################################################
   ## ------------ Check data normality and statistical test chosen and generate Output DF----------- ##
@@ -285,6 +295,8 @@ DMA <-function(Input_data,
   colnames(DF_shapiro_results) <- paste("Shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
 
   ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
+  Density_plots <- list()
+  QQ_plots <- list()
   for(x in 1:nrow(DF_shapiro_results)){
     transpose <- as.data.frame(t(DF_shapiro_results[x,]))
     Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
@@ -298,7 +310,78 @@ DMA <-function(Input_data,
     # Assign the calculated values to the corresponding rows in result_df
     DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
     DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
+
+    ## Make Group wise data distribution plot and QQ plots
+    subset_data <- Input_shaptest_Cond%>%
+      column_to_rownames("Row.names")%>%
+      subset(Conditions ==  colnames(transpose), select = -c(1))
+    all_data <- unlist(subset_data)
+
+    plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
+      geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white")  +
+      geom_density(alpha = 0.2, fill = "grey45")
+
+    density_values <- ggplot_build(plot)$data[[2]]
+
+    plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
+      geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
+      geom_density(alpha=.2, fill="grey45") +
+      scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
+
+    density_values2 <- ggplot_build(plot)$data[[2]]
+
+    sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
+      geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
+      geom_density(alpha=.2, fill="grey45") +
+      scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
+      theme_minimal()+
+      geom_vline(xintercept =median(all_data) , linetype = "dashed", color = "red")+
+      labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites are not normally distributed based on Shapiro test"),x="Abundance", y = "Density")+
+      theme_classic()+
+      geom_text(aes(x = density_values2$x[which.max(density_values2$y)], y = 0, label = "Median"),  vjust = 0, hjust = -0.5, color = "red", size = 3.5)  # Add label for
+
+    plot.new()
+    plot(sampleDist)
+    Density_plots[[paste(colnames(transpose))]] <- recordPlot()
+    dev.off()
+
+    ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"_Density_plot.",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+
+    # Make qqplot for each groups for each metabolite
+    qq_plot_list <- list()
+    for (col_name in colnames(subset_data)){
+      qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
+        geom_qq() +
+        geom_qq_line(color = "red") +
+        labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+
+      plot.new()
+      plot(qq_plot)
+      qq_plot_list[[col_name]] <-  recordPlot()
+
+      col_name2 <- (gsub("/","_",col_name))#remove "/" cause this can not be safed in a PDF name
+      col_name2 <- gsub("-", "", col_name2)
+      col_name2 <- gsub("/", "", col_name2)
+      col_name2 <- gsub(" ", "", col_name2)
+      col_name2 <- gsub("\\*", "", col_name2)
+      col_name2 <- gsub("\\+", "", col_name2)
+      col_name2 <- gsub(",", "", col_name2)
+      col_name2 <- gsub("\\(", "", col_name2)
+      col_name2 <- gsub("\\)", "", col_name2)
+
+      ggsave(paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"/",paste(col_name2),".",Save_as_Plot), plot = qq_plot, device = Save_as_Plot, width = 10,  height = 8)
+
+      dev.off()
+
     }
+
+    QQ_plots[[paste(colnames(transpose))]] <- qq_plot_list
+  }
+
+  Results_folder_DMA_folder_Shapiro_folder
+  Density_plots
+  QQ_plots
+
 
   #reorder the DF:
   DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
@@ -583,39 +666,39 @@ DMA <-function(Input_data,
     write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
-# Make a simple Volcano plot
-    dev.new()
-    VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
-                                                    Input_data=DMA_Output,
-                                                    y= "p.adj",
-                                                    x= "Log2FC",
-                                                    AdditionalInput_data= NULL,
-                                                    OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
-                                                    Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                                                    xlab= NULL,#"~Log[2]~FC"
-                                                    ylab= NULL,#"~-Log[10]~p.adj"
-                                                    pCutoff= 0.05,
-                                                    FCcutoff= 0.5,
-                                                    color_palette= NULL,
-                                                    shape_palette=NULL,
-                                                    SelectLab= DMA_Output$Metabolite,
-                                                    Connectors=  FALSE,
-                                                    Subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                    Theme= NULL,
-                                                    Save_as_Plot= NULL))
-    dev.off()
-    OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
+  # Make a simple Volcano plot
+  dev.new()
+  VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
+                                                  Input_data=DMA_Output,
+                                                  y= "p.adj",
+                                                  x= "Log2FC",
+                                                  AdditionalInput_data= NULL,
+                                                  OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
+                                                  Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
+                                                  xlab= NULL,#"~Log[2]~FC"
+                                                  ylab= NULL,#"~-Log[10]~p.adj"
+                                                  pCutoff= 0.05,
+                                                  FCcutoff= 0.5,
+                                                  color_palette= NULL,
+                                                  shape_palette=NULL,
+                                                  SelectLab= DMA_Output$Metabolite,
+                                                  Connectors=  FALSE,
+                                                  Subtitle=  bquote(italic("Differential Metabolite Analysis")),
+                                                  Theme= NULL,
+                                                  Save_as_Plot= NULL))
+  dev.off()
+  OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
 
-    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
-    ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
+  volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
+  ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
 
   output_list <- list()  #Here we make a list in which we will save the output
-  DMA_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results,"DMA_result"=DMA_Output),"Plot"=list("Volcano"=VolcanoPlot))
+  DMA_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots, "Volcano"=VolcanoPlot))
 
   if(Plot == TRUE){
     VolcanoPlot
   }
-    invisible(return(DMA_output_list))
+  invisible(return(DMA_output_list))
 }
 
 
