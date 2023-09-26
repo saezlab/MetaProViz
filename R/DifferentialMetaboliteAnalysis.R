@@ -22,15 +22,15 @@
 #'
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param Input_SettingsInfo \emph{Optional: } Named vector including at least the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying comparisons. Log2Fold changes are obtained by dividing the numerator by the denominator, thus positive log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot. Using =NULL selects all the condition and performs multiple comparison. \strong{c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{"t-test"}
-#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}
+#' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying comparisons. Log2Fold changes are obtained by dividing the numerator by the denominator, thus positive log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot. Using =NULL selects all the condition and performs multiple comparison. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
+#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
-#' @param Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{NULL}
-#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}
+#' @param Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
+#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
@@ -249,12 +249,6 @@ DMA <-function(Input_data,
   Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(numerator),"_vs_",toString(denominator))) # Make comparison folder
   if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
 
-  conds <- unique(c(numerator, denominator))
-  for(x in conds){
-    Results_folder_DMA_folder_Shapiro_folder_Condition <- file.path(Results_folder_DMA_folder_Shapiro_folder, paste(x)) # Make DMA results folder
-    if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder_Condition)) {dir.create(Results_folder_DMA_folder_Shapiro_folder_Condition)}
-  }
-
   ###############################################################################################################################################################################################################
   ## ------------ Check data normality and statistical test chosen and generate Output DF----------- ##
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. We can test the data normality using the Shapiro test.
@@ -311,6 +305,24 @@ DMA <-function(Input_data,
     DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
     DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
 
+    #reorder the DF:
+    DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
+
+    DF_shapiro_results_out<- t(DF_shapiro_results)%>% as.data.frame()%>% rownames_to_column("Shapiro_p.val")
+    DF_shapiro_results_out$Shapiro_p.val <-  str_replace_all(a$Shapiro_p.val, "Shapiro p.val", " ")
+    DF_shapiro_results_out$Shapiro_p.val <-gsub("[[:punct:]]", " ", DF_shapiro_results_out$Shapiro_p.val)
+
+    write.table(DF_shapiro_results_out,row.names =  FALSE, file = paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""))
+
+
+    if (Save_as_Results == "xlsx"){
+      writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  "")) # save the DMA result DF
+    }else if (Save_as_Results == "csv"){
+      write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
+    }else if (Save_as_Results == "txt"){
+      write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+    }
+
     ## Make Group wise data distribution plot and QQ plots
     subset_data <- Input_shaptest_Cond%>%
       column_to_rownames("Row.names")%>%
@@ -330,63 +342,61 @@ DMA <-function(Input_data,
 
     density_values2 <- ggplot_build(plot)$data[[2]]
 
-    sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
+   suppressWarnings( sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
       geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
       geom_density(alpha=.2, fill="grey45") +
       scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
       theme_minimal()+
       geom_vline(xintercept =median(all_data) , linetype = "dashed", color = "red")+
-      labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites are not normally distributed based on Shapiro test"),x="Abundance", y = "Density")+
-      theme_classic()+
+      labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")+
       geom_text(aes(x = density_values2$x[which.max(density_values2$y)], y = 0, label = "Median"),  vjust = 0, hjust = -0.5, color = "red", size = 3.5)  # Add label for
-
-    plot.new()
+   )
+    #plot.new()
     plot(sampleDist)
     Density_plots[[paste(colnames(transpose))]] <- recordPlot()
-    dev.off()
+    #dev.off()
 
     ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"_Density_plot.",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
 
-    # Make qqplot for each groups for each metabolite
-    qq_plot_list <- list()
-    for (col_name in colnames(subset_data)){
-      qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
-        geom_qq() +
-        geom_qq_line(color = "red") +
-        labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+    # # QQ plots
+    # # Make folders !has to be moved on top!
+    # conds <- unique(c(numerator, denominator))
+    # for(x in conds){
+    #   Results_folder_DMA_folder_Shapiro_folder_Condition <- file.path(Results_folder_DMA_folder_Shapiro_folder, paste(x)) # Make DMA results folder
+    #   if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder_Condition)) {dir.create(Results_folder_DMA_folder_Shapiro_folder_Condition)}
+    # }
+    # QQ plots for each groups for each metabolite for normality visual check
+    # qq_plot_list <- list()
+    # for (col_name in colnames(subset_data)){
+    #   qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
+    #     geom_qq() +
+    #     geom_qq_line(color = "red") +
+    #     labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+    #
+    #   plot.new()
+    #   plot(qq_plot)
+    #   qq_plot_list[[col_name]] <-  recordPlot()
+    #
+    #   col_name2 <- (gsub("/","_",col_name))#remove "/" cause this can not be safed in a PDF name
+    #   col_name2 <- gsub("-", "", col_name2)
+    #   col_name2 <- gsub("/", "", col_name2)
+    #   col_name2 <- gsub(" ", "", col_name2)
+    #   col_name2 <- gsub("\\*", "", col_name2)
+    #   col_name2 <- gsub("\\+", "", col_name2)
+    #   col_name2 <- gsub(",", "", col_name2)
+    #   col_name2 <- gsub("\\(", "", col_name2)
+    #   col_name2 <- gsub("\\)", "", col_name2)
+    #
+    #   ggsave(paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"/",paste(col_name2),".",Save_as_Plot), plot = qq_plot, device = Save_as_Plot, width = 10,  height = 8)
+    #
+    #   dev.off()
+    #}
 
-      plot.new()
-      plot(qq_plot)
-      qq_plot_list[[col_name]] <-  recordPlot()
-
-      col_name2 <- (gsub("/","_",col_name))#remove "/" cause this can not be safed in a PDF name
-      col_name2 <- gsub("-", "", col_name2)
-      col_name2 <- gsub("/", "", col_name2)
-      col_name2 <- gsub(" ", "", col_name2)
-      col_name2 <- gsub("\\*", "", col_name2)
-      col_name2 <- gsub("\\+", "", col_name2)
-      col_name2 <- gsub(",", "", col_name2)
-      col_name2 <- gsub("\\(", "", col_name2)
-      col_name2 <- gsub("\\)", "", col_name2)
-
-      ggsave(paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"/",paste(col_name2),".",Save_as_Plot), plot = qq_plot, device = Save_as_Plot, width = 10,  height = 8)
-
-      dev.off()
-
-    }
-
-    QQ_plots[[paste(colnames(transpose))]] <- qq_plot_list
+    #QQ_plots[[paste(colnames(transpose))]] <- qq_plot_list
   }
 
-  Results_folder_DMA_folder_Shapiro_folder
-  Density_plots
-  QQ_plots
 
-
-  #reorder the DF:
-  DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
-
-  ###############################################################################################################################################################################################################
+   ###############################################################################################################################################################################################################
   #### Prepare the data ######
   #1. Metabolite names:
   # If anova is used change the column names
@@ -688,6 +698,8 @@ DMA <-function(Input_data,
                                                   Save_as_Plot= NULL))
   dev.off()
   OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
+
+  plot(VolcanoPlot)
 
   volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
   ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
