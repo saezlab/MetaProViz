@@ -426,6 +426,7 @@ DMA <-function(Input_data,
     C2 <- Input_data %>% # Deniminator
       filter(Input_SettingsFile$Conditions %in%  comparisons[1,column]) %>%
       select_if(is.numeric)
+  }
 
 
     ################################################################################################################################################################################################
@@ -443,8 +444,8 @@ DMA <-function(Input_data,
     Mean_C2 <- C2_Zero %>%
       summarise_all("mean")
 
-    if(CoRe==TRUE){#Calculate Log2FC by taking into account the distance between the means:
-      #CoRe values can be negative and positive, which can lead to problems when calculating the Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A or B being negative, with x being a constant that is adapted to the size range of the respective metabolite.
+    if(CoRe==TRUE){#Calculate absolute distance between the means. log2 transform and add sign (-/+):
+      #CoRe values can be negative and positive, which can does not allow us to calculate a Log2FC.
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
         rownames_to_column("Metabolite")
       Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
@@ -452,41 +453,41 @@ DMA <-function(Input_data,
       Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
         rename("C1"=2,
                "C2"=3)
+
+      #Deal with NA/0s
       Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
 
-      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
-        mutate(C1_Adapted = case_when(C1 < 0 & C2 > 0 ~ paste(C1*-1),#Here we have a negative value and transform it into a positive value
-                                      C1 > 0 & C2 < 0 ~ paste(C1+(C2*-2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
-                                      C1 > 0 & C2 > 0 ~ paste(C1),#Both values are positive, so no action needed
-                                      C1 < 0 & C2 < 0 ~ paste(C1),#Both values are negative, so no action needed
-                                      C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ 'NA'))%>%
-        mutate(C2_Adapted = case_when(C2 < 0 & C1 > 0 ~ paste(C2*-1),#Here we have a negative value and transform it into a positive value
-                                      C2 > 0 & C1 < 0 ~ paste(C2+(C1*-2)),#Here we have a positive value, but the other condition has a negative value that is transformed to a positive value, hence we add the distance
-                                      C2 > 0 & C1 > 0 ~ paste(C2),#Both values are positive, so no action needed
-                                      C2 < 0 & C1 < 0 ~ paste(C2),#Both values are negative, so no action needed
-                                      C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ 'NA'))%>%
-        mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
-        mutate(C2_Adapted = as.numeric(C2_Adapted))
-
       if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
+        Mean_Merge <- Mean_Merge%>%
+          mutate(C1 = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                        C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                        C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                        C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                        TRUE ~ paste(C1)))%>%
+          mutate(C2 = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                        C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+                                        C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                        C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
+                                        TRUE ~ paste(C2)))%>%
+          mutate(C1 = as.numeric(C1))%>%
+          mutate(C2 = as.numeric(C2))
+
         X <- Mean_Merge%>%
           subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
         message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
       }
 
-      #Calculate the Log2FC
-      Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
-      Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
-      Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
+      #Add the distance column:
+      Mean_Merge$`Log2(Distance)` <-log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
 
+      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
+        mutate(`Log2(Distance)` = case_when(C1 > C2 ~ paste(`Log2(Distance)`*+1),#If C1>C2 the distance stays positive to reflect that C1 > C2
+                                            C1 < C2 ~ paste(`Log2(Distance)`*-1),#If C1<C2 the distance gets a negative sign to reflect that C1 < C2
+                                            TRUE ~ 'NA'))%>%
+        mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+
+
+     Log2FC_table <-Mean_Merge[,c(1,5)]
     }else if(CoRe==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
@@ -498,7 +499,7 @@ DMA <-function(Input_data,
                "C2"=3)
       Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
 
-      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
+      Mean_Merge <- Mean_Merge%>%
         mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
@@ -533,7 +534,6 @@ DMA <-function(Input_data,
     }else{
       stop("Please choose CoRe= TRUE or CoRe=FALSE.")
     }
-  }
 
 
   ## ------------ Perform Hypothesis testing ----------- ##
@@ -678,10 +678,15 @@ DMA <-function(Input_data,
 
   # Make a simple Volcano plot
   dev.new()
-  VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
+  if(CoRe==TRUE){
+    x <- "Log2(Distance)"
+  }else{
+    x <- "Log2FC"
+  }
+    VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
                                                   Input_data=DMA_Output,
                                                   y= "p.adj",
-                                                  x= "Log2FC",
+                                                  x= x,
                                                   AdditionalInput_data= NULL,
                                                   OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
                                                   Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
@@ -706,6 +711,8 @@ DMA <-function(Input_data,
 
   output_list <- list()  #Here we make a list in which we will save the output
   DMA_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots, "Volcano"=VolcanoPlot))
+
+
 
   if(Plot == TRUE){
     VolcanoPlot
