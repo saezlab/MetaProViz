@@ -192,6 +192,10 @@ DMA <-function(Input_data,
     stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
   }
 
+  if(CoRe==TRUE){
+    OutputName <- paste(OutputName, "_CoRe",sep="")
+  }
+
   #7. Are sample numbers enough?
   Num <- Input_data %>%
     filter(Input_SettingsFile$Conditions %in% numerator) %>%
@@ -312,15 +316,13 @@ DMA <-function(Input_data,
     DF_shapiro_results_out$Shapiro_p.val <-  str_replace_all(DF_shapiro_results_out$Shapiro_p.val, "Shapiro p.val", " ")
     DF_shapiro_results_out$Shapiro_p.val <-gsub("[[:punct:]]", " ", DF_shapiro_results_out$Shapiro_p.val)
 
-    write.table(DF_shapiro_results_out,row.names =  FALSE, file = paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""))
-
-
+    # Save the DF Shapiro
     if (Save_as_Results == "xlsx"){
-      writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  "")) # save the DMA result DF
+      writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
     }else if (Save_as_Results == "csv"){
-      write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
+      write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
     }else if (Save_as_Results == "txt"){
-      write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+      write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
     }
 
     ## Make Group wise data distribution plot and QQ plots
@@ -347,17 +349,20 @@ DMA <-function(Input_data,
       geom_density(alpha=.2, fill="grey45") +
       scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
       theme_minimal()+
-      geom_vline(xintercept =median(all_data) , linetype = "dashed", color = "red")+
-      labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")+
-      geom_text(aes(x = density_values2$x[which.max(density_values2$y)], y = 0, label = "Median"),  vjust = 0, hjust = -0.5, color = "red", size = 3.5)  # Add label for
+     # geom_vline(xintercept =median(all_data) , linetype = "dashed", color = "red")+
+      labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")#+
+     # geom_text(aes(x = density_values2$x[which.max(density_values2$y)], y = 0, label = "Median"),  vjust = 0, hjust = -0.5, color = "red", size = 3.5)  # Add label for
    )
-    #plot.new()
+
     plot(sampleDist)
     Density_plots[[paste(colnames(transpose))]] <- recordPlot()
-    #dev.off()
 
-    ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"_Density_plot.",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+    if(CoRe==TRUE){
+      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),"_CoRe.",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+    }else{
+      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
 
+    }
     # # QQ plots
     # # Make folders !has to be moved on top!
     # conds <- unique(c(numerator, denominator))
@@ -680,11 +685,18 @@ DMA <-function(Input_data,
   dev.new()
   if(CoRe==TRUE){
     x <- "Log2(Distance)"
+    VolPlot_SettingsInfo= c(color="CoRe")
+    VOlPlot_SettingsFile = DMA_Output
+
   }else{
     x <- "Log2FC"
+    VolPlot_SettingsInfo= NULL
+    VOlPlot_SettingsFile = NULL
   }
     VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
                                                   Input_data=DMA_Output,
+                                                  Plot_SettingsInfo=VolPlot_SettingsInfo,
+                                                  Plot_SettingsFile=VOlPlot_SettingsFile,
                                                   y= "p.adj",
                                                   x= x,
                                                   AdditionalInput_data= NULL,
@@ -701,23 +713,21 @@ DMA <-function(Input_data,
                                                   Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                   Theme= NULL,
                                                   Save_as_Plot= NULL))
-  dev.off()
-  OutputPlotName = paste0(OutputName,"_padj_",0.05,"Log2FC_",0.5)
+    dev.off()
+    plot(VolcanoPlot)
 
-  plot(VolcanoPlot)
+    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_",OutputName,".",Save_as_Plot))
+    ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
 
-  volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_", OutputPlotName,".",Save_as_Plot))
-  ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
-
-  output_list <- list()  #Here we make a list in which we will save the output
-  DMA_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots, "Volcano"=VolcanoPlot))
+    output_list <- list()  #Here we make a list in which we will save the output
+    DMA_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots, "Volcano"=VolcanoPlot))
 
 
 
-  if(Plot == TRUE){
-    VolcanoPlot
-  }
-  invisible(return(DMA_output_list))
+    if(Plot == TRUE){
+      VolcanoPlot
+    }
+    return(invisible(DMA_output_list))
 }
 
 
