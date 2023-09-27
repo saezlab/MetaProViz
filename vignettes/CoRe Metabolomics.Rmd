@@ -163,7 +163,15 @@ Since our example data contains pool samples, we will do `Pool_Estimation()` bef
 ```{r}
 #Get the Pool data:
 PoolData <- MetaProViz::toy_data(data="CoRe")%>%
-  subset(Conditions=="Pool", select = -c(2:6))# we remove the columns "Conditions", "Biological_Replicates", cell parameters
+  subset(Conditions=="Pool", select = -c(2:6))%>% 
+    remove_rownames() %>% 
+  column_to_rownames("Code")# we remove the columns "Conditions", "Biological_Replicates", cell parameters
+
+Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = PoolData,
+                            Input_SettingsFile = NULL,
+                            Input_SettingsInfo = NULL,
+                            Unstable_feature_remove = FALSE, 
+                            Threshold_cv = 100)
 
 #--> remove features if needed.
 ```
@@ -175,7 +183,7 @@ Now we will apply the `Preprocessing()` function to example data and have a look
 
 \
 ```{r, eval=FALSE}
-MetaProViz::Preprocessing(Input_data=Media_M,
+PreProcessing_res <-  MetaProViz::Preprocessing(Input_data=Media_M,
               Input_SettingsFile=SampleInfo,
               Input_SettingsInfo = c(Conditions = "Conditions",
                                      Biological_Replicates = "Biolgical_Replicates",
@@ -188,8 +196,8 @@ MetaProViz::Preprocessing(Input_data=Media_M,
                           ExportQCPlots = TRUE,
                           CoRe = TRUE) 
 
-# Now we can have a look at the results table:
-Media_Preprocessed <- PreProcessing_res[["Processed_data"]]
+ # Now we can have a look at the results table:
+Media_Preprocessed <-  PreProcessing_res[["DF"]][["Preprocessing_output"]][["Processed_data"]]
 
 knitr::kable(Media_Preprocessed[6:12, 1:7]%>%rownames_to_column("Code"), caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.", row.names=FALSE)
 
@@ -203,14 +211,14 @@ As part of the `Preprocessing()` function several plots are generated, returned 
 ```{r, eval=FALSE}
 #For each Round of HotellinsT2 test three plots will be saved:
 #1.PCA plot
-P1 <- Outlier_Plots[[1]]
+P1 <- PreProcessing_res[["Plot"]][["Outlier_plots"]][["PCA_round1"]]
 P1
 
 #2.Screeplot
-P2 <- Outlier_Plots[[2]]
+P2 <- PreProcessing_res[["Plot"]][["Outlier_plots"]][["ScreePlot_round1"]]
 P2
 #3.Hotellins Outlier
-P3 <- Outlier_Plots[[3]]
+P3 <- PreProcessing_res[["Plot"]][["Outlier_plots"]][["HotellingsPlot_round1"]]
 P3
 
 ################### 
@@ -221,11 +229,11 @@ The QC plots `QC_Plots` include an PCA plot using the processed data and highlig
 ```{r, eval=FALSE}
 # PCA plot
 # 1. Marked Outliers:
-Q1 <- QC_Plots[[1]]
+Q1 <- PreProcessing_res[["Plot"]][["QC_plots"]][["QC_PCA_and_Outliers"]]
 Q1
 
 #2. Marked Biological replicates:
-#Q2 <- QC_Plots[[2]]
+#Q2 <- PreProcessing_res[["Plot"]][["QC_plots"]][["QC_PCA_Replicates"]]
 #Q2
 ```
 \
@@ -233,7 +241,7 @@ As part of the **MetaProViz** visualization module one can easily customize the 
 \
 Before we proceed, we will remove the outlier:\
 ```{r, eval=FALSE}
-Media_Preprocessed <- Media_Preprocessed[-29,]#remove MS55_29
+Media_Preprocessed <- Media_Preprocessed[-c(1,4),]#remove MS55_29
 ```
 \
 In metabolomics, sometimes samples are injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will summarise those save the results.
@@ -248,6 +256,33 @@ Important: For CoRe, we have negative and positive values! --> explain how we de
 
 
 In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons. The results are automatically saved and returned into the global environment. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
+
+```{r}
+
+MetaProViz::DMA(Input_data=Media_Preprocessed[,-c(2:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"), #we need to remove columns that do not include metabolite measurements
+                        Input_SettingsFile=Media_Preprocessed[,c(1:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"),#only maintain the information about condition and replicates
+                        Input_SettingsInfo = c(conditions="Conditions", numerator="786-O CCM", denominator = "HK2 CCM"),
+                        STAT_pval ="t.test",#ProDA is another test! --> estimates missing information
+                        STAT_padj="fdr",
+                        Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
+                        OutputName='', 
+                        CoRe=TRUE, 
+                        Plot = TRUE)
+```
+
+
+```{r}
+VizSuperplot(Input_data = Media_Preprocessed[,-c(2:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"),
+Input_SettingsFile =Media_Preprocessed[,c(1:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"),
+Graprh_Style = "Box", # Bar, Box, Violin
+Superplot = NULL,
+OutputPlotName = "Box",
+Output_plots = "Together",
+Selected_Conditions = NULL, # not added yet
+Selected_Comparisons = NULL, # not added yet
+Theme = theme_classic(),
+Save_as_Plot = "svg") # for together it always pdf
+```
 
 
 # Session information
