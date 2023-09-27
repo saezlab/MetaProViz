@@ -309,7 +309,7 @@ DMA <-function(Input_data,
     DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
 
     DF_shapiro_results_out<- t(DF_shapiro_results)%>% as.data.frame()%>% rownames_to_column("Shapiro_p.val")
-    DF_shapiro_results_out$Shapiro_p.val <-  str_replace_all(a$Shapiro_p.val, "Shapiro p.val", " ")
+    DF_shapiro_results_out$Shapiro_p.val <-  str_replace_all(DF_shapiro_results_out$Shapiro_p.val, "Shapiro p.val", " ")
     DF_shapiro_results_out$Shapiro_p.val <-gsub("[[:punct:]]", " ", DF_shapiro_results_out$Shapiro_p.val)
 
     write.table(DF_shapiro_results_out,row.names =  FALSE, file = paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table.",Save_as_Results,sep =  ""))
