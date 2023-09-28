@@ -23,5 +23,19 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 version: 1.0.0
 Imports: 
+    clusterProfiler,
+    EnhancedVolcano,
+    factoextra,
+    ggfortify,
     ggplot2,
-    tidyr
+    ggupset,
+    gridExtra,
+    gtools,
+    hash,
+    inflection,
+    patchwork,
+    pheatmap,
+    qcc,
+    reshape,
+    tidyverse,
+    writexl
