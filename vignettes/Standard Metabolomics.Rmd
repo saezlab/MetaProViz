@@ -403,7 +403,7 @@ Lastly, we will get clusters of metabolites that are defined by the metabolite c
 \
 ```{r}
 #Example of all possible flows:
-MetaProViz::MCA_rules(data="2Cond")
+MCA_2Cond <- MetaProViz::MCA_rules(data="2Cond")
 ```
 
 ```{r, echo=FALSE}
@@ -456,11 +456,7 @@ MC_ORA_result<- MetaProViz::MC_ORA(Input_data=MCAres[["DF"]][["MCA_result"]],
                    PathwayFile=PathwayInput,
                    PathwayName="Selfmade",
                    minGSSize=3,
-                   maxGSSize=1000 ,
-                   Save_as_Plot="svg",
-                   pCutoff=0.2,
-                   PercentageCutoff=10
-                   )
+                   maxGSSize=1000)
 ```
 
 # 3. Run MetaProViz Visualisation

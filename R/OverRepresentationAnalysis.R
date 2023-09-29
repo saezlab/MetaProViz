@@ -37,8 +37,6 @@
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param Save_as_Plot \emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}
-#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}
 #'
 #' @return Saves results as individual .csv files.
 #' @export
@@ -50,10 +48,7 @@ MC_ORA <- function(Input_data,
                    PathwayName="",
                    minGSSize=10,
                    maxGSSize=1000 ,
-                   Save_as_Plot="svg",
-                   Save_as_Results= "csv",
-                   pCutoff=0.2,
-                   PercentageCutoff=10
+                   Save_as_Results= "csv"
                    ){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","clusterProfiler", "ggupset")
@@ -110,19 +105,9 @@ MC_ORA <- function(Input_data,
   if(is.numeric(maxGSSize)== FALSE){
     stop("Check input. The selected maxGSSize value should be numeric.")
   }
-  Save_as_Plot_options <- c("svg","png", "pdf")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE & is.null(Save_as_Plot)==FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please set Save_as_Plot=NULL or select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
-  }
   Save_as_Results_options <- c("txt","csv", "xlsx" )
   if(Save_as_Results %in% Save_as_Results_options == FALSE){
     stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
-  }
-  if( is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
-    stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
-  }
-  if( is.numeric(PercentageCutoff)== FALSE  | PercentageCutoff > 100 | PercentageCutoff < 0){
-    stop("Check input. The selected PercentageCutoff value should be numeric and between 0 and 100.")
   }
 
   ## ------------ Create Output folders ----------- ##
@@ -159,10 +144,9 @@ MC_ORA <- function(Input_data,
   names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
   Pathway <- merge(x= Pathway[,-4], y=Pathway_Mean,by="term", all.x=TRUE)
 
-  df_list = list()
-  plot_list = list()
+  df_list = list()# Make an empty list to store the created DFs
   #Run ORA
-  for(g in grps_labels) {
+  for(g in grps_labels){
     grpMetabolites <- subset(df, df[[MetabCluster_lab]] == g)
     print(g)
 
@@ -178,7 +162,7 @@ MC_ORA <- function(Input_data,
                                            TERM2GENE=Term2gene ,
                                            TERM2NAME = term2name)
     clusterGoSummary <- data.frame(clusterGo)
-    if (!(dim(clusterGoSummary)[1] == 0)){
+    if(!(dim(clusterGoSummary)[1] == 0)){
       #Add pathway information (% of genes in pathway detected)
       clusterGoSummary <- merge(x= clusterGoSummary[,-2], y=Pathway[,-2],by.x="ID",by.y="term", all=TRUE)
       clusterGoSummary$Count[is.na(clusterGoSummary$Count)] <- 0
@@ -187,17 +171,12 @@ MC_ORA <- function(Input_data,
       clusterGoSummary <- clusterGoSummary[order(clusterGoSummary$p.adjust),]
       clusterGoSummary <- clusterGoSummary[,c(1,9,2:8, 10:11)]%>%
         dplyr::rename("MetaboliteIDs_in_pathway"="geneID")
+    }else{
+      message("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
+    }
 
       #Save file
-      if (Save_as_Results == "xlsx"){
-        if(PathwayName ==""){
-          xlsORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.xlsx', sep="")
-          writexl::write_xlsx(clusterGoSummary,xlsORA , col_names = TRUE) #Export the ORA results as .csv
-        } else{
-          xlsORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.xlsx', sep="")#Export the ORA results as .csv
-          writexl::write_xlsx(clusterGoSummary,xlsORA , col_names = TRUE) #Export the ORA results as .csv
-        }
-      }else if (Save_as_Results == "csv"){
+      if (Save_as_Results == "csv"){
         if(PathwayName ==""){
           csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.csv', sep="")
           write_csv(clusterGoSummary,csvORA )#Export the ORA results as .csv
@@ -205,7 +184,7 @@ MC_ORA <- function(Input_data,
           csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.csv', sep="")#Export the ORA results as .csv
           write_csv(clusterGoSummary,csvORA )
         }
-      }else if (Save_as_Results == "txt"){
+      }else if(Save_as_Results == "txt"){
       if(PathwayName ==""){
         txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.txt', sep="")
         write.table(clusterGoSummary,txtORA, col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
@@ -215,69 +194,24 @@ MC_ORA <- function(Input_data,
       }
       }
 
-      dfs = list(clusterGoSummary)
-      inner_list <- list(dfs)
-      names(inner_list) <- g
-      df_list <- c(df_list, inner_list)
-
-      #Make Selection of terms that should be displayed on the plots
-      clusterGoSummary_Select <- clusterGoSummary %>%
-        subset(p.adjust <= pCutoff & Percentage_of_Pathway_detected >= PercentageCutoff)
-      rownames(clusterGoSummary_Select)<-clusterGoSummary_Select$ID
-      clusterGoSummary_Select<-  clusterGoSummary_Select%>%
-        dplyr::rename("geneID"="MetaboliteIDs_in_pathway")
-
-      ## ------------ Plots ----------- ##
-      if(is.null(Save_as_Plot)==FALSE){
-        if (!(dim(clusterGoSummary_Select)[1] == 0)) {#exclude df's that have no observations
-        clusterGo@result <- clusterGoSummary_Select[,1:9]
-        #1. Dotplot:
-        suppressWarnings( Dotplot <-  enrichplot::dotplot(clusterGo, showCategory=nrow(clusterGoSummary_Select)) +
-          ggtitle(paste("Dotplot:", g, PathwayName, sep=" ")))
-        if(PathwayName ==""){
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
-        } else{
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Dotplot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=Dotplot, width=10, height=8)
-        }
-
-
-        #2. Emapplot
-        x2 <- enrichplot::pairwise_termsim(clusterGo)
-        suppressWarnings(Emapplot <-  enrichplot::emapplot(x2, pie_scale=1.5, layout = "nicely", showCategory=nrow(clusterGoSummary_Select))+
-          ggtitle(paste("Emapplot:", g, PathwayName, sep=" ")))
-        if(PathwayName ==""){
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
-        } else{
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "Emapplot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=Emapplot, width=10, height=8)
-        }
-
-
-        #3. Upsetplot:
-        suppressWarnings(UpsetPlot <-  enrichplot::upsetplot(clusterGo, showCategory=nrow(clusterGoSummary_Select))+
-          ggtitle(paste("UpsetPlot", g, PathwayName, sep=" ")))
-        if(PathwayName ==""){
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
-        } else{
-          ggsave(file=paste(Results_folder_MC_ORA,"/", "UpsetPlot_", g,"_" ,PathwayName, ".", Save_as_Plot, sep=""), plot=UpsetPlot, width=10, height=8)
-        }
-
-        }
-
-        plots = list("Dotplot"=suppressWarnings(Dotplot),"Emapplot"=suppressWarnings(Emapplot) ,"UpsetPlot"=suppressWarnings(UpsetPlot) )
-        inner_list <- list(plots)
-        names(inner_list) <- g
-        plot_list <- c(plot_list, inner_list)
-
-
-      }
+    # Make list of DFs
+    if(!(dim(clusterGoSummary)[1] == 0)){ #Check if the data frame is not empty
+      # Add it to the list
+      df_list[[g]] <- clusterGoSummary
     }
   }
-  if(Plot==TRUE){ # print plots
-    print(plot_list[[grps_labels[[1]]]])
+
+  #Save excel file with output sheets:
+  if(Save_as_Results == "xlsx"){
+    if(PathwayName ==""){
+      writexl::write_xlsx(df_list, paste(Results_folder_MC_ORA, "/ORASummary.xlsx", sep = ""), col_names = TRUE)#Export the ORA results as .xlxs
+      } else{
+        writexl::write_xlsx(df_list, paste(Results_folder_MC_ORA, "/ORASummary_", PathwayName, '.xlsx', sep = ""), col_names = TRUE)#Export the ORA results as .xlxs
+      }
   }
 
   #return <- clusterGoSummary
-  invisible(return(list("DF"=df_list, "Plot" = plot_list)))
+  invisible(return(df_list))
 }
 
 
