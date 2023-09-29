@@ -351,28 +351,25 @@ ORA_786M1A_vs_HK2 <- MetaProViz::DM_ORA(Input_data=`786M1A_vs_HK2`,
                    PathwayFile=KEGG_Pathways[,-3],
                    PathwayName="KEGG",
                    minGSSize=3,
-                   maxGSSize=1000 ,
-                   Save_as_Plot="svg",
-                   pCutoff=1,
-                   PercentageCutoff=1)
+                   maxGSSize=1000,
+                   pCutoff=0.01,
+                   PercentageCutoff=10)
 
 ORA_786M2A_vs_HK2 <- MetaProViz::DM_ORA(Input_data=`786M2A_vs_HK2`,
                    PathwayFile=KEGG_Pathways[,-3],
                    PathwayName="KEGG",
                    minGSSize=3,
-                   maxGSSize=1000 ,
-                   Save_as_Plot="svg",
-                   pCutoff=1,
-                   PercentageCutoff=1)
+                   maxGSSize=1000,
+                   pCutoff=0.01,
+                   PercentageCutoff=10)
 
 `ORA_786-O_vs_HK2` <- MetaProViz::DM_ORA(Input_data=`786-O_vs_HK2`,
                    PathwayFile=KEGG_Pathways[,-3],
                    PathwayName="KEGG",
                    minGSSize=3,
                    maxGSSize=1000 ,
-                   Save_as_Plot="svg",
-                   pCutoff=1,
-                   PercentageCutoff=1)
+                   pCutoff=0.05,
+                   PercentageCutoff=10)
 
 ```
 
