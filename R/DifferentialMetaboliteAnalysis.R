@@ -31,6 +31,7 @@
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
@@ -50,7 +51,8 @@ DMA <-function(Input_data,
                CoRe=FALSE,
                Save_as_Plot = "svg",
                Save_as_Results = "csv",
-               Plot = TRUE
+               Plot = TRUE,
+               Folder_Name = NULL
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -192,10 +194,6 @@ DMA <-function(Input_data,
     stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
   }
 
-  if(CoRe==TRUE){
-    OutputName <- paste(OutputName, "_CoRe",sep="")
-  }
-
   #7. Are sample numbers enough?
   Num <- Input_data %>%
     filter(Input_SettingsFile$Conditions %in% numerator) %>%
@@ -242,9 +240,13 @@ DMA <-function(Input_data,
 
   ## ------------ Create Results output folder ----------- ##
   #8. Folders:
-  name <- paste0("MetaProViz_Results_",Sys.Date())
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
   WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) # Make Results folder
+  Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
   if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
@@ -252,6 +254,17 @@ DMA <-function(Input_data,
   if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder)) {dir.create(Results_folder_DMA_folder_Shapiro_folder)}
   Results_folder_Conditions <- file.path(Results_folder_DMA_folder,paste0(toString(numerator),"_vs_",toString(denominator))) # Make comparison folder
   if (!dir.exists(Results_folder_Conditions)) {dir.create(Results_folder_Conditions)}
+
+  # Prepare output names
+  if(OutputName==""){
+    OutputName <- OutputName
+  }else{
+    OutputName <- paste("_",OutputName, sep="")
+  }
+  if(CoRe==TRUE){
+    OutputName <- paste(OutputName,"_CoRe", sep="")
+  }
+
 
   ###############################################################################################################################################################################################################
   ## ------------ Check data normality and statistical test chosen and generate Output DF----------- ##
@@ -358,9 +371,9 @@ DMA <-function(Input_data,
     Density_plots[[paste(colnames(transpose))]] <- recordPlot()
 
     if(CoRe==TRUE){
-      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),"_CoRe.",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
     }else{
-      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
 
     }
     # # QQ plots
@@ -670,14 +683,16 @@ DMA <-function(Input_data,
       denominator<- "All"
     }
   }
+
+
   if (Save_as_Results == "xlsx"){
-    xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator),"_", OutputName, ".xlsx"))   # Save the DMA results table
+    xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
     writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
   }else if (Save_as_Results == "csv"){
-    csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator),"_", OutputName, ".csv"))
+    csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".csv"))
     write.csv(DMA_Output,csvDMA) # save the DMA result DF
   }else if (Save_as_Results == "txt"){
-    txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator),"_", OutputName, ".txt"))
+    txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
     write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
@@ -716,7 +731,7 @@ DMA <-function(Input_data,
     dev.off()
     plot(VolcanoPlot)
 
-    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"-versus-",toString(denominator),"_",OutputName,".",Save_as_Plot))
+    volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"_versus_",toString(denominator),OutputName,".",Save_as_Plot))
     ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
 
     output_list <- list()  #Here we make a list in which we will save the output

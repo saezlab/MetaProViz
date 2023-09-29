@@ -37,6 +37,7 @@
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param Save_as_Plot \emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @return Saves results as individual .csv files.
 #' @export
@@ -48,7 +49,8 @@ MC_ORA <- function(Input_data,
                    PathwayName="",
                    minGSSize=10,
                    maxGSSize=1000 ,
-                   Save_as_Results= "csv"
+                   Save_as_Results= "csv",
+                   Folder_Name = NULL
                    ){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","clusterProfiler", "ggupset")
@@ -111,7 +113,11 @@ MC_ORA <- function(Input_data,
   }
 
   ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
   WorkD <- getwd()
   Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
@@ -233,6 +239,7 @@ MC_ORA <- function(Input_data,
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results. \strong{default: 0.05}
 #' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that should be considered for ORA. \strong{default: 10}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @return Saves results as individual .csv files.
 #' @export
@@ -244,7 +251,8 @@ DM_ORA <- function(Input_data,
                    maxGSSize=1000 ,
                    pCutoff=0.05,
                    PercentageCutoff=10,
-                   Save_as_Results="csv"
+                   Save_as_Results="csv",
+                   Folder_Name = NULL
 ){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","clusterProfiler", "ggupset")
@@ -305,7 +313,11 @@ DM_ORA <- function(Input_data,
   }
 
   ## ------------ Create Output folders ----------- ##
-  name <- paste0("MetaProViz_Results_",Sys.Date())
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
   WorkD <- getwd()
   Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder

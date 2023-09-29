@@ -42,6 +42,7 @@
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
@@ -68,7 +69,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                        Connectors=  FALSE,
                        Subtitle= "",
                        Theme= NULL,
-                       Save_as_Plot= "svg"
+                       Save_as_Plot= "svg",
+                       Folder_Name = NULL
                        ){
 
   ## ------------ Setup and installs ----------- ##
@@ -271,7 +273,11 @@ VizVolcano <- function(Plot_Settings="Standard",
 
   ## ------------ Create Output folders ----------- ##
   if (!is.null(Save_as_Plot)) {
-    name <- paste0("MetaProViz_Results_",Sys.Date())
+    if(is.null(Folder_Name)){
+      name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+    }else{
+      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+    }
     WorkD <- getwd()
     Results_folder <- file.path(WorkD, name)
     if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder

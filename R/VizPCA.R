@@ -36,6 +36,7 @@
 #' @param color_scale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords PCA
 #' @export
@@ -50,7 +51,9 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                    Theme=NULL,#theme_classic()
                    color_scale=NULL,
                    OutputPlotName= '',
-                   Save_as_Plot = "svg"
+                   Save_as_Plot = "svg",
+                   Folder_Name = NULL
+
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -147,7 +150,11 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   ## ------------ Create Output folders ----------- ##
   if (!is.null(Save_as_Plot)) {
-    name <- paste0("MetaProViz_Results_",Sys.Date())
+    if(is.null(Folder_Name)){
+      name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+    }else{
+      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+    }
     WorkD <- getwd()
     Results_folder <- file.path(WorkD, name)
     if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder

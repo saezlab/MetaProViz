@@ -37,6 +37,7 @@
 #' @param backgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
 #' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #' @return MCA an instance of the MetaProViz package
 #' @export
 #'
@@ -58,7 +59,9 @@ MCA_2Cond <- function(Cond1_File,
                       Cond2_FC_cutoff = 1,
                       Save_as_Results = "xlsx", # txt or csv
                       backgroundMethod="C1&C2",
-                      OutputFileName = "MCA_2Cond_"){
+                      OutputFileName = "MCA_2Cond_",
+                      Folder_Name = NULL
+                      ){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -100,10 +103,13 @@ MCA_2Cond <- function(Cond1_File,
   }
 
   ## -------- Create Results output folder ---------- ##
-
-  name <- paste0("MetaProViz_Results_",Sys.Date())
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
   WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) # Make Results folder
+  Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_MCA_folder = file.path(Results_folder, "MCA") # select name of result directory
   if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
@@ -444,6 +450,7 @@ MCA_2Cond <- function(Cond1_File,
 #' @param CoRe_FC_cutoff \emph{Optional: } Log2FC cutoff for CoReFile. \strong{Default=0.5}
 #' @param backgroundMethod \emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="C1&C2"}
 #' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #' @return MCA an instance of the MetaProViz package
 #' @export
 #'
@@ -466,7 +473,8 @@ MCA_CoRe <- function(Intra_File,
                      Save_as_Results = "xlsx",
                      CoRe_FC_cutoff = 1,
                      backgroundMethod="Intra&CoRe",
-                     OutputFileName = "MCA_CoRe_"){
+                     OutputFileName = "MCA_CoRe_",
+                     Folder_Name = NULL){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -512,10 +520,13 @@ MCA_CoRe <- function(Intra_File,
 
 
   ## -------- Create Results output folder ---------- ##
-
-  name <- paste0("MetaProViz_Results_",Sys.Date())
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
   WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name) # Make Results folder
+  Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   Results_folder_MCA_folder = file.path(Results_folder, "MCA") # select name of result directory
   if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder

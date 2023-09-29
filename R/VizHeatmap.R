@@ -33,6 +33,7 @@
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Volcano plot, pathways
 #' @export
@@ -48,7 +49,8 @@ VizHeatmap <- function(Input_data,
                        SCALE = "row",
                        Save_as_Plot = "svg",
                        enforce_FeatureNames= FALSE,
-                       enforce_SampleNames=FALSE
+                       enforce_SampleNames=FALSE,
+                       Folder_Name = NULL
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -163,7 +165,11 @@ VizHeatmap <- function(Input_data,
 
   ## ------------ Create Output folders ----------- ##
   if (!is.null(Save_as_Plot)) {
-    name <- paste0("MetaProViz_Results_",Sys.Date())
+    if(is.null(Folder_Name)){
+      name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+    }else{
+      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+    }
     WorkD <- getwd()
     Results_folder <- file.path(WorkD, name)
     if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder

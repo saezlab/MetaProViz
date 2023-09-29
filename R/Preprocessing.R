@@ -34,6 +34,7 @@
 #' @param ExportQCPlots \emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param Plot  \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
 #' @export
@@ -56,7 +57,8 @@ Preprocessing <- function(Input_data,
                           CoRe = FALSE,
                           ExportQCPlots = TRUE,
                           Save_as_Plot = "svg",
-                          Plot = TRUE
+                          Plot = TRUE,
+                          Folder_Name = NULL
 ){
 
 
@@ -198,7 +200,11 @@ Preprocessing <- function(Input_data,
   #############################################
   ### ### ### Create output folders ### ### ###
 
-  name <- paste0("MetaProViz_Results_",Sys.Date())
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
   WorkD <- getwd()
   Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
@@ -920,12 +926,13 @@ Preprocessing <- function(Input_data,
 #' Merges the analytical replicates of an experiment
 #'
 #' @param Input Dataframe which contains unique sample identifiers as row names the Experimental design and the metabolite numerical values in columns with metabolite identifiers as column names. Needs to have Conditions, Biological_Replicates and Analytical_Replicate columns
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Analyrical Replicate Merge
 #' @export
 
 
-ReplicateSum <- function(Input_data){
+ReplicateSum <- function(Input_data,Folder_Name = NULL){
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse")
@@ -960,8 +967,14 @@ ReplicateSum <- function(Input_data){
   ############################################
   ### ### ### Create Output folder ### ### ###
 
-  # This searches for a folder called "Results" within the current working directory and if its not found it creates one
-  Results_folder = paste(getwd(), "/MetaProViz_Results_",Sys.Date(),  sep =  "")
+  if(is.null(Folder_Name)){
+    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+  }else{
+    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+  }
+
+  WorkD <- getwd()
+  Results_folder <- file.path(WorkD, name)
   if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
   # This searches for a folder called "Preprocessing" within the "Results" folder in the current working directory and if its not found it creates one
   Results_folder_Preprocessing_folder = paste(Results_folder, "/Preprocessing", sep = "")
@@ -1014,6 +1027,7 @@ ReplicateSum <- function(Input_data){
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #' @param Plot \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Coefficient of Variation, high variance metabolites
 #' @export
@@ -1026,7 +1040,8 @@ Pool_Estimation <- function(Input_data,
                             Threshold_cv = 100,
                             Save_as_Plot = "svg",
                             Save_as_Results = "csv", # txt or csv
-                            Plot=TRUE
+                            Plot=TRUE,
+                            Folder_Name = NULL
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -1119,7 +1134,11 @@ Pool_Estimation <- function(Input_data,
 
   if(is.null(Save_as_Plot)==FALSE |is.null(Save_as_Results)==FALSE ){
     ## ------------ Create Results output folder ----------- ##
-    name <- paste0("MetaProViz_Results_",Sys.Date())
+    if(is.null(Folder_Name)){
+      name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
+    }else{
+      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+    }
     WorkD <- getwd()
     Results_folder <- file.path(WorkD, name)
     if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
