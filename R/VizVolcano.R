@@ -276,7 +276,11 @@ VizVolcano <- function(Plot_Settings="Standard",
     if(is.null(Folder_Name)){
       name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
     }else{
-      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+      if(grepl('[^[:alnum:]]', Folder_Name)){
+        stop("The 'Folder_Name' must not contain any special character.")
+      }else{
+        name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+      }
     }
     WorkD <- getwd()
     Results_folder <- file.path(WorkD, name)

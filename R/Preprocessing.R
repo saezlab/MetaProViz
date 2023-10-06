@@ -199,11 +199,14 @@ Preprocessing <- function(Input_data,
 
   #############################################
   ### ### ### Create output folders ### ### ###
-
   if(is.null(Folder_Name)){
     name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
   }else{
-    name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+    if(grepl('[^[:alnum:]]', Folder_Name)){
+      stop("The 'Folder_Name' must not contain any special character.")
+    }else{
+      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+    }
   }
   WorkD <- getwd()
   Results_folder <- file.path(WorkD, name)
@@ -633,7 +636,6 @@ Preprocessing <- function(Input_data,
   outlier_plot_list <- list()
   metabolite_zero_var_total_list <- list()
   zero_var_metab_warning = FALSE
-  #  k =  1
   a =  1
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
 
@@ -658,6 +660,7 @@ Preprocessing <- function(Input_data,
     outlier_PCA_data <- data_norm
     outlier_PCA_data$Conditions <- Conditions
 
+    dev.new()
     pca_outlier <-invisible(MetaProViz::VizPCA(Input_data=data_norm, Plot_SettingsInfo= c(color="Conditions"),
                                                Plot_SettingsFile= outlier_PCA_data, OutputPlotName = paste("PCA outlier test filtering round ",loop),
                                                Save_as_Plot =  NULL))
@@ -665,11 +668,9 @@ Preprocessing <- function(Input_data,
     if(loop==1){
       pca_outlierloop1 <- pca_outlier
     }
-    plot.new()
     plot(pca_outlier)
     outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- recordPlot()
     dev.off()
-    #  k = k+1
 
     ### ### Scree plot ### ###
     inflect_df <- as.data.frame(c(1:length(PCA.res$sdev))) # get Scree plot values for inflection point calculation
@@ -693,11 +694,10 @@ Preprocessing <- function(Input_data,
     if(loop==1){
       scree_outlierloop1 <-screeplot
     }
-    plot.new()
+    dev.new()
     plot(screeplot)
     outlier_plot_list[[paste("ScreePlot_round",loop,sep="")]] <- recordPlot() # save plot
     dev.off()
-    # k = k+1
 
     ### ### HotellingT2 test for outliers ### ###
     data_hot <- as.matrix(PCA.res$x[,1:npcs])
@@ -726,7 +726,6 @@ Preprocessing <- function(Input_data,
     HotellingT2plot <- HotellingT2plot + theme_classic()
     HotellingT2plot <- HotellingT2plot + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
     HotellingT2plot <- HotellingT2plot + ggtitle(paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"))
-    #plot1 <- plot1 + scale_linetype_manual(name = LegendTitle,values = "dashed") # this line instead of the next for bashed red line
     HotellingT2plot <- HotellingT2plot + scale_linetype_discrete(name = LegendTitle,)
     HotellingT2plot <- HotellingT2plot + theme(plot.title = element_text(size = 13))+#, face = "bold")) +
       theme(axis.text = element_text(size = 12))
@@ -734,11 +733,10 @@ Preprocessing <- function(Input_data,
     if(loop==1){
       hotel_outlierloop1 <- HotellingT2plot
     }
-    plot.new()
+    dev.new()
     plot(HotellingT2plot)
     outlier_plot_list[[paste("HotellingsPlot_round",loop,sep="")]] <- recordPlot()
     dev.off()
-    # k = k+1
 
     ### Save the outlier detection plots in the outlier detection folder
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
@@ -1123,7 +1121,6 @@ Pool_Estimation <- function(Input_data,
     }
   }
 
-
   if(is.null(Input_SettingsFile)==TRUE){
     Input_numeric <- Input_data
   }else{
@@ -1137,7 +1134,11 @@ Pool_Estimation <- function(Input_data,
     if(is.null(Folder_Name)){
       name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
     }else{
-      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+      if(grepl('[^[:alnum:]]', Folder_Name)){
+        stop("The 'Folder_Name' must not contain any special character.")
+      }else{
+        name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+      }
     }
     WorkD <- getwd()
     Results_folder <- file.path(WorkD, name)
@@ -1194,13 +1195,13 @@ Pool_Estimation <- function(Input_data,
     ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/PCA_Pool_samples.",Save_as_Plot), plot = pca_QC_pool, width = 10,  height = 8)
   }
   #Make histogram of CVs
-  HistCV <- invisible(ggplot(result_df_final_out, aes(CV)) +
+  HistCV <-suppressWarnings(invisible(ggplot(result_df_final_out, aes(CV)) +
                         geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
                         geom_vline(aes(xintercept=Threshold_cv),
                                    color="darkred", linetype="dashed", size=1)+
                         geom_density(alpha=.2, fill="#FF6666") +
                         labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
-                        theme_classic())
+                        theme_classic()))
 
   pool_plot_list[["Pool_CV_Hist"]] <- HistCV
 
