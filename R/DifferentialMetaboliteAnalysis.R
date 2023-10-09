@@ -144,7 +144,14 @@ DMA <-function(Input_data,
     all_vs_all = TRUE
   }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
     #all-vs-one: Generate the pairwise combinations
+    conditions = Input_SettingsFile$Conditions
+    denominator <- Input_SettingsInfo[["denominator"]]
+    numerator <-unique(Input_SettingsFile$Conditions)
+    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
 
+    # Remove any
+    columns_to_remove <- sapply(comparisons, function(x) length(unique(x))) == 1
+    comparisons <- comparisons[, !columns_to_remove]
 
     #Settings:
     MultipleComparison = TRUE
@@ -310,10 +317,10 @@ DMA <-function(Input_data,
   for (column in 1:dim(comparisons)[2]){
 
     C1 <- Input_data %>% # Numerator
-      filter(Input_SettingsFile$Conditions %in% comparisons[2,column]) %>%
+      filter(Input_SettingsFile$Conditions %in% comparisons[1,column]) %>%
       select_if(is.numeric)#only keep numeric columns with metabolite values
     C2 <- Input_data %>% # Deniminator
-      filter(Input_SettingsFile$Conditions %in%  comparisons[1,column]) %>%
+      filter(Input_SettingsFile$Conditions %in%  comparisons[2,column]) %>%
       select_if(is.numeric)
 
 
@@ -413,7 +420,7 @@ DMA <-function(Input_data,
       Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
 
       if(MultipleComparison == TRUE){
-        logname <- paste("Log2FC", paste( comparisons[2,column], comparisons[1,column],sep="-"), sep="_")
+        logname <- paste("Log2FC", paste( comparisons[1,column], comparisons[2,column],sep="-"), sep="_")
         names(Log2FC_C1vC2)[2] <- logname
       }
       Log2FC_table <- merge(Log2FC_table, Log2FC_C1vC2, by= "Metabolite")
@@ -427,25 +434,35 @@ DMA <-function(Input_data,
   if(MultipleComparison == FALSE){
     STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
 
-  }else{ # ANOVA = TRUE
+  }else{ # MultipleComparison = TRUE
 
-    # for 1 vs all
     conditions =as.factor(conditions)
-    #conditions=relevel(conditions, ref = "HK2")
+
+    if (all_vs_all ==TRUE){
+      message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
+    }else{# for 1 vs all
+      message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
+      conditions=relevel(conditions, ref = denominator)
+    }
+
 
     if(STAT_pval=="aov"){
       STAT_C1vC2 <-AOV(Input_data=Input_data,
                        conditions=conditions,
                        STAT_padj=STAT_padj,
-                       Log2FC_table=Log2FC_table)
+                       Log2FC_table=Log2FC_table,
+                       all_vs_all=all_vs_all)
     }else if(STAT_pval=="kruskal.test"){# STAT_pval = kruskal.test
       STAT_C1vC2 <-Kruskal(Input_data=Input_data,
                            conditions=conditions,
                            STAT_padj=STAT_padj,
-                           Log2FC_table=Log2FC_table)
-    }else{# lmFit
-
+                           Log2FC_table=Log2FC_table,
+                           all_vs_all=all_vs_all,
+                           comparisons=comparisons)
+    }else{
+      # lmFit
     }
+
   }
 
 
@@ -488,7 +505,9 @@ DMA <-function(Input_data,
 
   if(MultipleComparison==TRUE){
     numerator <- "Anova_All"
-    denominator<- "All"
+    if(all_vs_all==TRUE){
+      denominator<- "All"
+    }
   }
 
 
@@ -526,8 +545,8 @@ DMA <-function(Input_data,
     for (i in seq(2, num_columns, by = 3)) {
       Volplotdata<-DMA_Output[c(1,i, i+1)]
 
-      title <- gsub("p.adj_", "", colnames(Volplotdata)[2])
-      colnames(Volplotdata)<- c("Metabolite", "p.adj", "Log2FC")
+      title <- gsub("p.adj_", "", colnames(Volplotdata)[3])
+      colnames(Volplotdata)<- c("Metabolite", "Log2FC", "p.adj")
 
       dev.new()
       VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
@@ -562,7 +581,7 @@ DMA <-function(Input_data,
   # Make a simple Volcano plot
   dev.new()
   VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
-                                                  Input_data=a,
+                                                  Input_data=DMA_Output,
                                                   Plot_SettingsInfo=VolPlot_SettingsInfo,
                                                   Plot_SettingsFile=VOlPlot_SettingsFile,
                                                   y= "p.adj",
@@ -682,6 +701,7 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 #' @param Conditions Factor with sample group information.
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param Log2FC_table Table with Metabolites are rows and a Log2FC column \strong(Default = Log2FC_table)
+#' @param all_vs_all  True for multiple comparison of all against all or FALSE for multiple comparison of all against one selected base.
 #'
 #' @keywords Kruskal test,Hypothesis testing, p.value
 #' @export
@@ -690,10 +710,10 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 AOV <-function(Input_data,
                conditions,
                STAT_padj,
-               Log2FC_table
+               Log2FC_table,
+               all_vs_all
 ){
 
-  message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using", paste(STAT_pval), ".")
 
   ## 1. Anova
   aov.res= apply(Input_data,2,function(x) aov(x~conditions))
@@ -706,6 +726,9 @@ AOV <-function(Input_data,
   Pval_table <- Tukey_res
   Pval_table <- rownames_to_column(Pval_table,"Metabolite")
 
+  if(all_vs_all==FALSE){
+    Pval_table <- Pval_table[,gsub("p.adj_","",colnames(Pval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  }
 
   ### put Log2FC and pval dataframes
   merged_table <- merge(Log2FC_table, Pval_table, by = "Metabolite", all = TRUE)
@@ -714,6 +737,11 @@ AOV <-function(Input_data,
   Tukey_res_diff <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'diff'])) %>% as.data.frame()
   colnames(Tukey_res_diff) <- paste("q.val", colnames(Tukey_res_diff), sep = "_")
   Tukey_res_diff <- rownames_to_column(Tukey_res_diff,"Metabolite")
+
+  if(all_vs_all==FALSE){
+    Tukey_res_diff <- Tukey_res_diff[,gsub("q.val_","",colnames(Tukey_res_diff)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  }
+
   merged_table <- merge(merged_table, Tukey_res_diff, by = "Metabolite", all = TRUE)
 
   step <- dim(Pval_table)[2]-1
@@ -738,6 +766,8 @@ AOV <-function(Input_data,
 #' @param Conditions Factor with sample group information.
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param Log2FC_table Table with Metabolites are rows and a Log2FC column \strong(Default = Log2FC_table)
+#' @param all_vs_all  True for multiple comparison of all against all or FALSE for multiple comparison of all against one selected base.
+#' @param comparisons Dataframe containing the comparison information for multiple comparison. The first row is the numerator, the second row is the denominator and each column is a different comparison.
 #'
 #' @keywords Kruskal test,Hypothesis testing, p.value
 #' @export
@@ -746,11 +776,11 @@ AOV <-function(Input_data,
 Kruskal <-function(Input_data,
                    conditions,
                    STAT_padj,
-                   Log2FC_table
+                   Log2FC_table,
+                   all_vs_all,
+                   comparisons
 ){
   # Kruskal test
-
-  message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using", paste(STAT_pval), ".")
 
   aov.res= apply(Input_data,2,function(x) kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
@@ -761,7 +791,7 @@ Kruskal <-function(Input_data,
     mutate(conditions = conditions) %>%
     select(conditions, everything())%>% as.data.frame()
   # apply doesnt for so going for a loop
-  Dunn_res<- data.frame( comparisons = paste(comparisons[2,],    comparisons[1,], sep = "_" ))
+  Dunn_res<- data.frame( comparisons = paste(comparisons[1,],    comparisons[2,], sep = "-" ))
   Dunn_Pres<- Dunn_res
   Dunn_Tres<- Dunn_res
   for(col in 2:dim(Dunndata)[2]){
@@ -772,13 +802,15 @@ Kruskal <-function(Input_data,
     formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
     posthoc.res= rstatix::dunn_test(data, formula, p.adjust.method = STAT_padj)
 
-    res <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "_" ))
+    res <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "-" ))
     res[[colnames(Dunndata)[col] ]] <-  posthoc.res$p.adj
+    res <- res[res$comparisons %in% Dunn_Pres$comparisons ,]
     Dunn_Pres <- merge(Dunn_Pres,res,by="comparisons")
 
-    tvalres <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "_" ))
-    tvalres[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
-    Dunn_Tres <- merge(Dunn_Tres,tvalres,by="comparisons")
+    tvalues <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "-" ))
+    tvalues[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
+    tvalues <- tvalues[tvalues$comparisons %in% Dunn_Pres$comparisons ,]
+    Dunn_Tres <- merge(Dunn_Tres,tvalues,by="comparisons")
   }
   Dunn_Pres <- column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
   colnames(Dunn_Pres) <- paste("p.adj", colnames(Dunn_Pres), sep = "_")
@@ -793,7 +825,14 @@ Kruskal <-function(Input_data,
   Tval_table <- Dunn_Tres %>% as.data.frame()
   Tval_table <- rownames_to_column(Tval_table, "Metabolite")
 
+  if(all_vs_all==FALSE){
+    Pval_table <- Pval_table[,gsub("p.adj_","",colnames(Pval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  }
   merged_table <- merge(Log2FC_table, Pval_table, by = "Metabolite", all = TRUE)
+
+  if(all_vs_all==FALSE){
+    Tval_table <- Tval_table[,gsub("t.val_","",colnames(Tval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  }
   merged_table <- merge(merged_table, Tval_table, by = "Metabolite", all = TRUE)
 
   step <- dim(Pval_table)[2]-1
@@ -916,6 +955,11 @@ Shapiro <-function(Input_data,
   if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE){
     conditions = Input_SettingsFile$Conditions
     denominator <-unique(Input_SettingsFile$Conditions)
+    numerator <-unique(Input_SettingsFile$Conditions)
+  }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
+    #all-vs-one: Generate the pairwise combinations
+    conditions = Input_SettingsFile$Conditions
+    denominator <- Input_SettingsInfo[["denominator"]]
     numerator <-unique(Input_SettingsFile$Conditions)
   }
 
