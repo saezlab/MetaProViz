@@ -238,6 +238,7 @@ Preprocessing <- function(Input_data,
 
     if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
       feat_filt_data <- feat_filt_data %>% filter(!Input_SettingsFile$Conditions=="CoRe_media")
+      Feature_Filtering <- paste0(Feature_Filtering, "_CoRe")
     }
 
     if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
@@ -248,8 +249,7 @@ Preprocessing <- function(Input_data,
     }
 
     miss <- c()
-    # for (i in unique_conditions){
-    split_Input <- split(feat_filt_data, feat_filt_Conditions) # splits data frame into a list of dataframes by condition
+    split_Input <- split(feat_filt_data, feat_filt_Conditions) # split data frame into a list of dataframes by condition
 
     for (m in split_Input){ # Select metabolites to be filtered for different conditions
       for(i in 1:ncol(m)) {
@@ -257,18 +257,17 @@ Preprocessing <- function(Input_data,
           miss <- append(miss,i)
       }
     }
-    #   }
 
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
       filtered_matrix <- Input_data
       feat_file_res <- "There where no metabolites exluded"
-      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value*100,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
       names<-unique(colnames(Input_data)[miss])
       message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- Input_data[,-miss]
-      write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(unique(colnames(Input_data)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value*100,"%_",Feature_Filtering,".csv",sep =  ""))
     }
   }
   if (Feature_Filtering ==  "Standard"){
@@ -279,6 +278,7 @@ Preprocessing <- function(Input_data,
 
     if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
       feat_filt_data <- feat_filt_data %>% filter(!Input_SettingsFile$Conditions=="CoRe_media")
+      Feature_Filtering <- paste0(Feature_Filtering, "_CoRe")
     }
 
     split_Input <- feat_filt_data
@@ -294,12 +294,12 @@ Preprocessing <- function(Input_data,
       message("There where no metabolites exluded")
       filtered_matrix <- Input_data
       feat_file_res <- "There where no metabolites exluded"
-      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value*100,"%_",Feature_Filtering,".csv",sep =  ""))
     } else {
       names<-unique(colnames(Input_data)[miss])
       message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- Input_data[,-miss]
-      write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value,"%_",Feature_Filtering,".csv",sep =  ""))
+      write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value*100,"%_",Feature_Filtering,".csv",sep =  ""))
     }
   }
   if (Feature_Filtering ==  "None"){
@@ -427,7 +427,11 @@ Preprocessing <- function(Input_data,
 
 
   if (ExportQCPlots == TRUE){
-    ggsave(filename = paste0(Results_folder_Preprocessing_folder, "/Normalization.",Save_as_Plot), plot = norm_plots, width = 10,  height = 8)
+    if(CoRe==TRUE){
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder, "/Normalization_CoRe.",Save_as_Plot), plot = norm_plots, width = 10,  height = 8)
+    }else{
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder, "/Normalization.",Save_as_Plot), plot = norm_plots, width = 10,  height = 8)
+    }
   }
 
 
@@ -458,7 +462,7 @@ Preprocessing <- function(Input_data,
       qc_plot_list[["CoRe PCA MediaSamples"]] <- pca_QC_media
 
       if (ExportQCPlots == TRUE){
-        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Media_samples.",Save_as_Plot), plot = pca_QC_media, width = 10,  height = 8)
+        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Media_samples_CoRe.",Save_as_Plot), plot = pca_QC_media, width = 10,  height = 8)
       }
 
 
@@ -606,6 +610,10 @@ Preprocessing <- function(Input_data,
 
     }
 
+    cv_result_df <- rownames_to_column(cv_result_df, "Metabolite")
+    write.table(cv_result_df,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/CV_table_CoRe",".csv",sep =  ""))
+    write.table(contingency_data_contframe,row.names =  TRUE, file = paste(Results_folder_Preprocessing_folder,"/Contigency_table_CoRe",".csv",sep =  ""))
+
     # Remove CoRe_media samples from the data
     Data_TIC <- Data_TIC[-grep("CoRe_media", Conditions),]
 
@@ -636,7 +644,7 @@ Preprocessing <- function(Input_data,
   outlier_plot_list <- list()
   metabolite_zero_var_total_list <- list()
   zero_var_metab_warning = FALSE
-  a =  1
+  #a =  1
   for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
 
     #################################################
@@ -738,6 +746,10 @@ Preprocessing <- function(Input_data,
     outlier_plot_list[[paste("HotellingsPlot_round",loop,sep="")]] <- recordPlot()
     dev.off()
 
+    a<- loop
+    if(CoRe==TRUE){
+      a<- paste0(a,"_CoRe")
+    }
     ### Save the outlier detection plots in the outlier detection folder
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
            plot = pca_outlier, width = 10,height = 8)
@@ -745,7 +757,7 @@ Preprocessing <- function(Input_data,
            plot = screeplot, width = 10,height = 8)
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
            plot = HotellingT2plot, width = 10,height = 8)
-    a = a+1
+
 
     # Here for the outliers we use confidence of 0.999 and p.val < 0.01.
     if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0){ # loop for outliers until no outlier is detected
@@ -772,7 +784,12 @@ Preprocessing <- function(Input_data,
     }
   }
 
-  pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or Outlier detection related plots
+  if(CoRe==TRUE){
+    pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing_CoRe.pdf", sep = ""), onefile = TRUE ) # or Outlier detection related plots
+  }else{
+    pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or Outlier detection related plots
+  }
+
   for (plot in outlier_plot_list) {
     replayPlot(plot)
   }
@@ -807,7 +824,11 @@ Preprocessing <- function(Input_data,
     }
   }
   if (zero_var_metab_warning==TRUE){
-    write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
+    if(CoRe==TRUE){
+      write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites_CoRe",".csv",sep =  "")) # save zero var metabolite list
+    }else{
+      write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
+    }
   }
 
   #############################################
@@ -865,7 +886,11 @@ Preprocessing <- function(Input_data,
 
 
   if (ExportQCPlots == TRUE){
-    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
+    if(CoRe==TRUE){
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering_CoRe.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
+    }else{
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
+    }
   }
 
 
@@ -879,7 +904,11 @@ Preprocessing <- function(Input_data,
     qc_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl
 
     if (ExportQCPlots == TRUE){
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
+      if(CoRe==TRUE){
+        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution_CoRe.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
+      }else{
+        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
+      }
     }
   }
 
@@ -892,7 +921,12 @@ Preprocessing <- function(Input_data,
 
   ##Write to file
   preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe
-  writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
+  if(CoRe ==TRUE){
+    writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output_CoRe.xlsx", sep = ""))#,showNA = TRUE)
+  }else{
+    writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
+  }
+
 
   # Return the result
   if(CoRe ==TRUE){

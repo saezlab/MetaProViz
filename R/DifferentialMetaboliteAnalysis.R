@@ -508,9 +508,9 @@ DMA <-function(Input_data,
     }
   }
 
-  a <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
-  a$Metabolite <- NULL
-  colnames(a)[1] <- "Metabolite"
+  DMA_Output <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
+  DMA_Output$Metabolite <- NULL
+  colnames(DMA_Output)[1] <- "Metabolite"
 
 
   if (Save_as_Results == "xlsx"){

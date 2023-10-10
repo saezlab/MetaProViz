@@ -477,7 +477,7 @@ MCA_CoRe <- function(Intra_File,
                      Save_as_Results = "xlsx",
                      CoRe_FC_cutoff = 1,
                      backgroundMethod="Intra&CoRe",
-                     OutputFileName = "MCA_CoRe_",
+                     OutputFileName = "MCA_",
                      Folder_Name = NULL){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "alluvial")
@@ -1047,22 +1047,22 @@ MCA_CoRe <- function(Intra_File,
 
 
   if (Save_as_Results == "xlsx"){
-    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = "") # Save the DMA results table
+    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary_CoRe.xlsx", sep = "") # Save the DMA results table
     writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
 
-    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = "") # Save the DMA results table
+    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_CoRe.xlsx", sep = "") # Save the DMA results table
     writexl::write_xlsx(MergeDF_Rearrange,xlsMCA, col_names = TRUE) # save the DMA result DF
   }else if (Save_as_Results == "csv"){
-    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.csv", sep = "")
+    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary_CoRe.csv", sep = "")
     write.csv(ClusterSummary,csvMCA) # save the DMA result DF
 
-    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".csv", sep = "")
+    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_CoRe.csv", sep = "")
     write.csv(MergeDF_Rearrange,csvMCA) # save the DMA result DF
   }else if (Save_as_Results == "txt"){
-    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.txt", sep = "")
+    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary_CoRe.txt", sep = "")
     write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
 
-    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".txt", sep = "")
+    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_CoRe.txt", sep = "")
     write.table(MergeDF_Rearrange,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
 
