@@ -147,11 +147,10 @@ DMA <-function(Input_data,
     conditions = Input_SettingsFile$Conditions
     denominator <- Input_SettingsInfo[["denominator"]]
     numerator <-unique(Input_SettingsFile$Conditions)
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
 
-    # Remove any
-    columns_to_remove <- sapply(comparisons, function(x) length(unique(x))) == 1
-    comparisons <- comparisons[, !columns_to_remove]
+    # Remove denom from num
+    numerator <- numerator[!numerator %in% denominator]
+    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
 
     #Settings:
     MultipleComparison = TRUE
@@ -310,8 +309,7 @@ DMA <-function(Input_data,
       colnames(Input_data)[i] <- metabolite_name
     }
   }
-
-
+  savedMetaboliteNames <- data.frame("MetabNames"=savedMetaboliteNames,"Metabolite"= colnames(Input_data))
 
   Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
   for (column in 1:dim(comparisons)[2]){
@@ -436,13 +434,13 @@ DMA <-function(Input_data,
 
   }else{ # MultipleComparison = TRUE
 
-    conditions =as.factor(conditions)
+   # conditions =as.factor(conditions)
 
     if (all_vs_all ==TRUE){
       message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
     }else{# for 1 vs all
       message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
-      conditions=relevel(conditions, ref = denominator)
+     # conditions=relevel(conditions, ref = denominator)
     }
 
 
@@ -509,6 +507,10 @@ DMA <-function(Input_data,
       denominator<- "All"
     }
   }
+
+  a <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
+  a$Metabolite <- NULL
+  colnames(a)[1] <- "Metabolite"
 
 
   if (Save_as_Results == "xlsx"){
@@ -722,6 +724,16 @@ AOV <-function(Input_data,
   posthoc.res = lapply(aov.res, TukeyHSD, conf.level=0.95)
   Tukey_res <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'p adj']))
   Tukey_res <- as.data.frame(Tukey_res)
+
+  comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
+  opp_comps <-  paste(comparisons[2, ], comparisons[1, ], sep="-")
+
+  if (sum(opposite_comparisons %in%  colnames(Tukey_res))>0){# if oposite comparisons is true
+    for (comp in 1: length(opposite_comparisons)){
+      colnames(Tukey_res)[colnames(Tukey_res) %in% opposite_comparisons[comp]] <-  comps[comp]
+    }
+  }
+
   names(Tukey_res) <- paste("p.adj", names(Tukey_res), sep = "_")
   Pval_table <- Tukey_res
   Pval_table <- rownames_to_column(Pval_table,"Metabolite")
@@ -735,6 +747,13 @@ AOV <-function(Input_data,
 
   #### 3. t.value/ Diff
   Tukey_res_diff <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'diff'])) %>% as.data.frame()
+
+  if (sum(opposite_comparisons %in%  colnames(Tukey_res_diff))>0){# if oposite comparisons is true
+    for (comp in 1: length(opposite_comparisons)){
+      colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opposite_comparisons[comp]] <-  comps[comp]
+    }
+  }
+
   colnames(Tukey_res_diff) <- paste("q.val", colnames(Tukey_res_diff), sep = "_")
   Tukey_res_diff <- rownames_to_column(Tukey_res_diff,"Metabolite")
 
@@ -791,9 +810,8 @@ Kruskal <-function(Input_data,
     mutate(conditions = conditions) %>%
     select(conditions, everything())%>% as.data.frame()
   # apply doesnt for so going for a loop
-  Dunn_res<- data.frame( comparisons = paste(comparisons[1,],    comparisons[2,], sep = "-" ))
-  Dunn_Pres<- Dunn_res
-  Dunn_Tres<- Dunn_res
+  Dunn_Pres<- data.frame( comparisons = paste(comparisons[1,],    comparisons[2,], sep = "-" ))
+  Dunn_Tres<- Dunn_Pres
   for(col in 2:dim(Dunndata)[2]){
     data = Dunndata[,c(1,col)]
     colnames(data)[2] <- gsub("^\\d+", "", colnames(data)[2])
@@ -802,12 +820,12 @@ Kruskal <-function(Input_data,
     formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
     posthoc.res= rstatix::dunn_test(data, formula, p.adjust.method = STAT_padj)
 
-    res <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "-" ))
+    res <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "-" ))
     res[[colnames(Dunndata)[col] ]] <-  posthoc.res$p.adj
-    res <- res[res$comparisons %in% Dunn_Pres$comparisons ,]
+    res <- res[res$comparisons %in% Dunn_Pres$comparisons ,] # take only the comparisons selected
     Dunn_Pres <- merge(Dunn_Pres,res,by="comparisons")
 
-    tvalues <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "-" ))
+    tvalues <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "-" ))
     tvalues[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
     tvalues <- tvalues[tvalues$comparisons %in% Dunn_Pres$comparisons ,]
     Dunn_Tres <- merge(Dunn_Tres,tvalues,by="comparisons")
@@ -825,14 +843,14 @@ Kruskal <-function(Input_data,
   Tval_table <- Dunn_Tres %>% as.data.frame()
   Tval_table <- rownames_to_column(Tval_table, "Metabolite")
 
-  if(all_vs_all==FALSE){
-    Pval_table <- Pval_table[,gsub("p.adj_","",colnames(Pval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
-  }
+  # if(all_vs_all==FALSE){
+  #   Pval_table <- Pval_table[,gsub("p.adj_","",colnames(Pval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  # }
   merged_table <- merge(Log2FC_table, Pval_table, by = "Metabolite", all = TRUE)
 
-  if(all_vs_all==FALSE){
-    Tval_table <- Tval_table[,gsub("t.val_","",colnames(Tval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
-  }
+  # if(all_vs_all==FALSE){
+  #   Tval_table <- Tval_table[,gsub("t.val_","",colnames(Tval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  # }
   merged_table <- merge(merged_table, Tval_table, by = "Metabolite", all = TRUE)
 
   step <- dim(Pval_table)[2]-1
