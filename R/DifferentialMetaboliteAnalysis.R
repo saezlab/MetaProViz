@@ -293,23 +293,10 @@ DMA <-function(Input_data,
   ###############################################################################################################################################################################################################
   #### Prepare the data ######
   #1. Metabolite names:
-  savedMetaboliteNames <- colnames(Input_data)
-  # If anova is used change the column names
-  if(MultipleComparison == TRUE){
-    for (i in 1:length(colnames(Input_data))){
-      metabolite_name <- colnames(Input_data)[i]
-      metabolite_name <- gsub("-", "", metabolite_name)
-      metabolite_name <- gsub("/", "", metabolite_name)
-      metabolite_name <- gsub(" ", "", metabolite_name)
-      metabolite_name <- gsub("\\*", "", metabolite_name)
-      metabolite_name <- gsub("\\+", "", metabolite_name)
-      metabolite_name <- gsub(",", "", metabolite_name)
-      metabolite_name <- gsub("\\(", "", metabolite_name)
-      metabolite_name <- gsub("\\)", "", metabolite_name)
-      colnames(Input_data)[i] <- metabolite_name
-    }
-  }
-  savedMetaboliteNames <- data.frame("MetabNames"=savedMetaboliteNames,"Metabolite"= colnames(Input_data))
+  savedMetaboliteNames <-  data.frame("InnputName"=colnames(Input_data))
+  savedMetaboliteNames$Metabolite <- paste0("M", seq(1,length(colnames(Input_data))))
+  colnames(Input_data) <- savedMetaboliteNames$Metabolite
+
 
   Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
   for (column in 1:dim(comparisons)[2]){
@@ -728,9 +715,9 @@ AOV <-function(Input_data,
   comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
   opp_comps <-  paste(comparisons[2, ], comparisons[1, ], sep="-")
 
-  if (sum(opposite_comparisons %in%  colnames(Tukey_res))>0){# if oposite comparisons is true
-    for (comp in 1: length(opposite_comparisons)){
-      colnames(Tukey_res)[colnames(Tukey_res) %in% opposite_comparisons[comp]] <-  comps[comp]
+  if (sum(opp_comps %in%  colnames(Tukey_res))>0){# if oposite comparisons is true
+    for (comp in 1: length(opp_comps)){
+      colnames(Tukey_res)[colnames(Tukey_res) %in% opp_comps[comp]] <-  comps[comp]
     }
   }
 
@@ -748,9 +735,9 @@ AOV <-function(Input_data,
   #### 3. t.value/ Diff
   Tukey_res_diff <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'diff'])) %>% as.data.frame()
 
-  if (sum(opposite_comparisons %in%  colnames(Tukey_res_diff))>0){# if oposite comparisons is true
-    for (comp in 1: length(opposite_comparisons)){
-      colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opposite_comparisons[comp]] <-  comps[comp]
+  if (sum(opp_comps %in%  colnames(Tukey_res_diff))>0){# if oposite comparisons is true
+    for (comp in 1: length(opp_comps)){
+      colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opp_comps[comp]] <-  comps[comp]
     }
   }
 
