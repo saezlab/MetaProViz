@@ -147,11 +147,9 @@ DMA <-function(Input_data,
     conditions = Input_SettingsFile$Conditions
     denominator <- Input_SettingsInfo[["denominator"]]
     numerator <-unique(Input_SettingsFile$Conditions)
-
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
     comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-
     #Settings:
     MultipleComparison = TRUE
     all_vs_all = FALSE
@@ -297,6 +295,8 @@ DMA <-function(Input_data,
   savedMetaboliteNames$Metabolite <- paste0("M", seq(1,length(colnames(Input_data))))
   colnames(Input_data) <- savedMetaboliteNames$Metabolite
 
+  ################################################################################################################################################################################################
+  ############### Calculate Log2FC, pval, padj, tval ###############
 
   Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
   for (column in 1:dim(comparisons)[2]){
@@ -307,10 +307,6 @@ DMA <-function(Input_data,
     C2 <- Input_data %>% # Deniminator
       filter(Input_SettingsFile$Conditions %in%  comparisons[2,column]) %>%
       select_if(is.numeric)
-
-
-    ################################################################################################################################################################################################
-    ############### Calculate Log2FC, pval, padj, tval ###############
 
     ## ------------  Calculate Log2FC ----------- ##
     # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if mean = 0 (If one value is NA, the mean will be NA even though all other values are available.)
@@ -415,45 +411,39 @@ DMA <-function(Input_data,
     }
   }
 
-  ## ------------ Perform Hypothesis testing ----------- ##
+  ################################################################################################################################################################################################
+  ############### Perform Hypothesis testing ###############
   if(MultipleComparison == FALSE){
     STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
+    }else{ # MultipleComparison = TRUE
+      # conditions =as.factor(conditions)
+      if (all_vs_all ==TRUE){
+        message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
+        }else{# for 1 vs all
+          message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
+          # conditions=relevel(conditions, ref = denominator)
+        }
 
-  }else{ # MultipleComparison = TRUE
-
-   # conditions =as.factor(conditions)
-
-    if (all_vs_all ==TRUE){
-      message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
-    }else{# for 1 vs all
-      message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
-     # conditions=relevel(conditions, ref = denominator)
-    }
-
-
-    if(STAT_pval=="aov"){
-      STAT_C1vC2 <-AOV(Input_data=Input_data,
-                       conditions=conditions,
-                       STAT_padj=STAT_padj,
-                       Log2FC_table=Log2FC_table,
-                       all_vs_all=all_vs_all)
-    }else if(STAT_pval=="kruskal.test"){# STAT_pval = kruskal.test
-      STAT_C1vC2 <-Kruskal(Input_data=Input_data,
-                           conditions=conditions,
-                           STAT_padj=STAT_padj,
-                           Log2FC_table=Log2FC_table,
-                           all_vs_all=all_vs_all,
-                           comparisons=comparisons)
-    }else{
-      # lmFit
-    }
-
-  }
-
+      if(STAT_pval=="aov"){
+        STAT_C1vC2 <-AOV(Input_data=Input_data,
+                        conditions=conditions,
+                        STAT_padj=STAT_padj,
+                        Log2FC_table=Log2FC_table,
+                        all_vs_all=all_vs_all)
+        }else if(STAT_pval=="kruskal.test"){# STAT_pval = kruskal.test
+          STAT_C1vC2 <-Kruskal(Input_data=Input_data,
+                              conditions=conditions,
+                              STAT_padj=STAT_padj,
+                              Log2FC_table=Log2FC_table,
+                              all_vs_all=all_vs_all,
+                              comparisons=comparisons)
+          }else{#
+            # lmFit
+          }
+      }
 
   ################################################################################################################################################################################################
-
-  ## ------------ Add information on groups to DMA results----------- ##
+  ############### Add information on groups to DMA results ###############
   if(CoRe==TRUE){#add consumption release info to the result
     temp1 <- Mean_C1
     temp2 <- Mean_C2
@@ -482,7 +472,7 @@ DMA <-function(Input_data,
     STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   }
 
-  ## ------------ Add pathway information to DMA results ----------- ##
+  ###############  Add pathway information to DMA results ###############
   if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
     STAT_C1vC2<- merge(STAT_C1vC2, Input_MetaFile_Metab,by="Metabolite", all.x=T)
   }
@@ -495,11 +485,11 @@ DMA <-function(Input_data,
     }
   }
 
-  DMA_Output <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
+    DMA_Output <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
   DMA_Output$Metabolite <- NULL
   colnames(DMA_Output)[1] <- "Metabolite"
 
-
+ ###############  Save ###############
   if (Save_as_Results == "xlsx"){
     xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
     writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
@@ -510,7 +500,6 @@ DMA <-function(Input_data,
     txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
     write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
   }
-
 
   if(CoRe==TRUE){
     x <- "Log2(Distance)"
@@ -523,6 +512,7 @@ DMA <-function(Input_data,
     VOlPlot_SettingsFile = NULL
   }
 
+  ###############  Plots ###############
   volplotList = list()
   if(MultipleComparison==TRUE){
     if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
@@ -853,12 +843,117 @@ Kruskal <-function(Input_data,
 
   return(STAT_C1vC2)
 }
-#all-vs-one:
-#message("No conditions were specified as numerator. Performing multiple testing `one-vs-all` using", paste(STAT_pval), ".")
 
-# one-vs-one:
-#message("conditions were specified as numerator and denumerator. Performing testing `one-vs-one` using", paste(STAT_pval), ".")
+##########################################################################################
+### ### ### DMA helper function: Internal Function to perform limma ### ### ###
+##########################################################################################
 
+#' @param Input_data Passed to DMA
+#' @param Input_SettingsFile Passed to DMA
+#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
+#' @param STAT_padj Passed to DMA
+#'
+#' @keywords DMA helper function
+#' @noRd
+#'
+
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, Log2FC_table, STAT_padj, all_vs_all){
+  ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile:
+  targets <- Input_SettingsFile%>%
+    rownames_to_column("sample")
+  targets<- targets[,c("sample", Input_SettingsInfo[["conditions"]])]%>%
+    dplyr::rename("condition"=2)%>%
+    arrange(sample)#Order the column "sample" alphabetically
+  targets$condition_limma_compatible <-make.names(targets$condition)#make appropriate condition names accepted by limma
+
+  targets_limma <-targets[,-2]%>%
+    dplyr::rename("condition"="condition_limma_compatible")
+
+  Limma_input <- Input_data%>%rownames_to_column("sample")%>%
+    arrange(sample)#Order the column "sample" alphabetically
+
+  #Check if the order of the "sample" column is the same in both data frames
+  if(identical(targets$sample, Limma_input$sample)==FALSE){
+    stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile and Input_data contain the same rownames and sample numbers.")
+  }
+
+  #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other.
+
+  Limma_input <- as.data.frame(t(Limma_input%>%column_to_rownames("sample")))
+  Limma_input_log2 <- log2(Limma_input) # communicate the log2 transformation --> how does limma deals with NA when calculaing the change?
+
+  #### ------Run limma:
+  ####  Make design matrix:
+  cond <- as.factor(targets_limma$condition)#all versus all
+
+  design <- model.matrix(~0 + fcond)# Create the design matrix
+  colnames(design) <- levels(fcond) # Give meaningful column names to the design matrix
+
+  #### Fit the linear model
+  fit <- limma::lmFit(Limma_input_log2, design)
+
+  ####  Make contrast matrix:
+  if(all_vs_all ==TRUE){
+    unique_conditions <- unique(targets_limma$condition)# Get unique conditions
+
+    # Create an empty contrast matrix
+    num_conditions <- length(unique_conditions)
+    num_comparisons <- num_conditions * (num_conditions - 1) / 2
+    cont.matrix <- matrix(0, nrow = num_comparisons, ncol = num_conditions)
+
+    # Initialize an index for the column in the contrast matrix
+    i <- 1
+
+    # Initialize column and row names
+    colnames(cont.matrix) <- unique_conditions
+    rownames(cont.matrix) <- character(num_comparisons)
+
+    # Loop through all pairwise combinations of unique conditions
+    for (condition1 in 1:(num_conditions - 1)) {
+      for (condition2 in (condition1 + 1):num_conditions) {
+        # Create the pairwise comparison vector
+        comparison <- rep(0, num_conditions)
+        comparison[condition1] <- 1
+        comparison[condition2] <- -1
+
+        # Add the comparison vector to the contrast matrix
+        cont.matrix[i, ] <- comparison
+
+        # Set row name
+        rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2])
+
+        i <- i + 1
+      }
+    }
+  }else if(all_vs_all ==FALSE){
+
+  }#Can we use limma for one_versus_one comparison?
+
+  cont.matrix<- t(cont.matrix)
+
+  # Fit the linear model with contrasts
+  #fit2 <- limma::contrasts.fit(fit, cont.matrix)
+  fit2 <- limma::contrasts.fit(fit, cont.matrix)
+  fit2 <- limma::eBayes(fit2)# Perform empirical Bayes moderation
+
+  #### ------Extract results:
+  contrast_names <- colnames(fit2$coefficients)  # Get all contrast names
+
+  results_list <- list()# Create an empty list to store results data frames
+  for (contrast_name in contrast_names) {
+    # Extract results for the current contrast
+    res.t <- limma::topTable(fit2, coef=contrast_name, n=Inf, sort.by="n", adjust.method = STAT_padj)%>% # coef= the comparison the test is done for!
+      rownames_to_column("Metabolite")
+
+    # Store the data frame in the results list, named after the contrast
+    results_list[[contrast_name]] <- res.t
+  }
+
+
+  #Combine with Log2FC_table
+  #return results to main function!
+
+}
 
 
 #############################################################################################
