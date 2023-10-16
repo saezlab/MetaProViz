@@ -296,9 +296,8 @@ DMA <-function(Input_data,
   colnames(Input_data) <- savedMetaboliteNames$Metabolite
 
   ################################################################################################################################################################################################
-  ############### Calculate Log2FC, pval, padj, tval ###############
-
-  Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
+  ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
+  Log2FC_table <- list()# Create an empty list to store results data frames
   for(column in 1:dim(comparisons)[2]){
     C1 <- Input_data %>% # Numerator
       filter(Input_SettingsFile$Conditions %in% comparisons[1,column]) %>%
@@ -361,14 +360,61 @@ DMA <-function(Input_data,
                                             TRUE ~ 'NA'))%>%
         mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
-      Log2FC_C1vC2 <-Mean_Merge[,c(1,5)]
-
-      if(MultipleComparison == TRUE){
-        logname <- paste("Log2 [Distance (", paste(comparisons[1,column], comparisons[2,column],sep="_vs_"),")]" ,sep="")
-        names(Log2FC_C1vC2)[2] <- logname
+      #Add additional information:
+      temp1 <- Mean_C1
+      temp2 <- Mean_C2
+      #Add Info of CoRe:
+      CoRe_info <- rbind(temp1, temp2,rep(0,length(temp1)))
+      for (i in 1:length(temp1)){
+        if (temp1[i]>0 & temp2[i]>0){
+          CoRe_info[3,i] <- "Released"
+        }else if (temp1[i]<0 & temp2[i]<0){
+          CoRe_info[3,i] <- "Consumed"
+        }else if(temp1[i]>0 & temp2[i]<0){
+          CoRe_info[3,i] <- paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")
+        } else if(temp1[i]<0 & temp2[i]>0){
+          CoRe_info[3,i] <- paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")
+        }else{
+          CoRe_info[3,i] <- "No Change"
+        }
       }
 
-      Log2FC_table <-merge(Log2FC_table, Log2FC_C1vC2, by= "Metabolite")
+      CoRe_info <- t(CoRe_info) %>% as.data.frame()
+      CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
+      names(CoRe_info)[2] <- paste("Mean",  comparisons[1,column], sep="_")
+      names(CoRe_info)[3] <- paste("Mean",  comparisons[2,column], sep="_")
+      names(CoRe_info)[4] <- "CoRe"
+
+      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], CoRe_info[,c(1,4,2:3)], by="Metabolite", all.x=TRUE)
+
+      #Add info on Input:
+      temp3 <- as.data.frame(t(C1))%>%rownames_to_column("Metabolite")
+      temp4 <- as.data.frame(t(C2))%>%rownames_to_column("Metabolite")
+      temp_3a4 <-merge(temp3, temp4, by="Metabolite", all=TRUE)
+      Log2FC_C1vC2 <-merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
+
+      #Add info on Pathways:
+      if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
+        Pathways <- merge(savedMetaboliteNames , Input_MetaFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
+        Log2FC_C1vC2<- merge(Log2FC_C1vC2, Pathways[,-c(1)],by="Metabolite", all.x=T)
+      }
+
+      #Return DFs
+      ##Make reverse DF
+      Log2FC_C2vC1 <-Log2FC_C1vC2
+      Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` *-1
+
+      ##Save them
+      if(MultipleComparison == TRUE){
+        logname <- paste(comparisons[1,column], comparisons[2,column],sep="_vs_")
+        logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
+
+        # Store the data frame in the results list, named after the contrast
+        Log2FC_table[[logname]] <- Log2FC_C1vC2
+        Log2FC_table[[logname_reverse]] <- Log2FC_C2vC1
+      }else{
+         Log2FC_table <- Log2FC_C1vC2
+      }
     }else if(CoRe==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
@@ -403,14 +449,35 @@ DMA <-function(Input_data,
       #Calculate the Log2FC
       Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
       Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
-      Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
+
+      #Add info on Input:
+      temp3 <- as.data.frame(t(C1))%>%rownames_to_column("Metabolite")
+      temp4 <- as.data.frame(t(C2))%>%rownames_to_column("Metabolite")
+      temp_3a4 <-merge(temp3, temp4, by="Metabolite", all=TRUE)
+      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,8)], temp_3a4, by="Metabolite", all.x=TRUE)
+
+      #Add info on Pathways:
+      if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
+        Pathways <- merge(savedMetaboliteNames , Input_MetaFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
+        Log2FC_C1vC2<- merge(Log2FC_C1vC2, Pathways[,-c(1)],by="Metabolite", all.x=T)
+      }
+
+      #Return DFs
+      ##Make reverse DF
+      Log2FC_C2vC1 <-Log2FC_C1vC2
+      Log2FC_C2vC1$Log2FC <- Log2FC_C2vC1$Log2FC*-1
 
       if(MultipleComparison == TRUE){
-        logname <- paste("Log2FC (", paste(comparisons[1,column], comparisons[2,column],sep="_vs_"),")" ,sep="")
-        names(Log2FC_C1vC2)[2] <- logname
-      }
-      Log2FC_table <- merge(Log2FC_table, Log2FC_C1vC2, by= "Metabolite")
+        logname <- paste(comparisons[1,column], comparisons[2,column],sep="_vs_")
+        logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
 
+
+        # Store the data frame in the results list, named after the contrast
+        Log2FC_table[[logname]] <- Log2FC_C1vC2
+        Log2FC_table[[logname_reverse]] <- Log2FC_C2vC1
+      }else{
+        Log2FC_table <- Log2FC_C1vC2
+      }
     }else{
       stop("Please choose CoRe= TRUE or CoRe=FALSE.")
     }
@@ -447,58 +514,24 @@ DMA <-function(Input_data,
                                          Input_SettingsFile=Input_SettingsFile,
                                          Input_SettingsInfo=Input_SettingsInfo,
                                          STAT_padj=STAT_padj,
+                                         Log2FC_table=Log2FC_table,
+                                         CoRe=CoRe,
                                          all_vs_all=all_vs_all)
           }
       }
 
   ################################################################################################################################################################################################
-  ############### Add information on groups to DMA results ###############
-  if(CoRe==TRUE){#add consumption release info to the result
-    temp1 <- Mean_C1
-    temp2 <- Mean_C2
-    #Add Info:
-    CoRe_info <- rbind(temp1, temp2,rep(0,length(temp1)))
-    for (i in 1:length(temp1)){
-      if (temp1[i]>0 & temp2[i]>0){
-        CoRe_info[3,i] <- "Released"
-      }else if (temp1[i]<0 & temp2[i]<0){
-        CoRe_info[3,i] <- "Consumed"
-      }else if(temp1[i]>0 & temp2[i]<0){
-        CoRe_info[3,i] <- paste("Released in" ,numerator , "and Consumed",denominator , sep=" ")
-      } else if(temp1[i]<0 & temp2[i]>0){
-        CoRe_info[3,i] <- paste("Consumed in" ,numerator , " and Released",denominator , sep=" ")
-      }else{
-        CoRe_info[3,i] <- "No Change"
-      }
-    }
+  ###############  Add the previous metabolite names back ###############
+  if(MultipleComparison==FALSE){
+    DMA_Output <- merge(savedMetaboliteNames, STAT_C1vC2, by="Metabolite")
+    DMA_Output$Metabolite <- NULL
+    colnames(DMA_Output)[1] <- "Metabolite"
+  }else{
 
-    CoRe_info <- t(CoRe_info) %>% as.data.frame()
-    CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
-    names(CoRe_info)[2] <- paste("Mean", "CoRe", numerator, sep="_")
-    names(CoRe_info)[3] <- paste("Mean", "CoRe", denominator, sep="_")
-    names(CoRe_info)[4] <- "CoRe"
-    STAT_C1vC2 <- merge(STAT_C1vC2,CoRe_info,by= "Metabolite")
-    STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
   }
 
-  ###############  Add pathway information to DMA results ###############
-  if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
-    STAT_C1vC2<- merge(STAT_C1vC2, Input_MetaFile_Metab,by="Metabolite", all.x=T)
-  }
-  DMA_Output <- STAT_C1vC2
 
-  if(MultipleComparison==TRUE){
-    numerator <- "Anova_All"
-    if(all_vs_all==TRUE){
-      denominator<- "All"
-    }
-  }
-
-  DMA_Output <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
-  DMA_Output$Metabolite <- NULL
-  colnames(DMA_Output)[1] <- "Metabolite"
-
- ###############  Save ###############
+ ###############  Folder ###############
   if (Save_as_Results == "xlsx"){
     xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
     writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
@@ -866,7 +899,7 @@ Kruskal <-function(Input_data,
 #' @noRd
 #'
 
-DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, STAT_padj, all_vs_all){
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all){
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile:
   targets <- Input_SettingsFile%>%
     rownames_to_column("sample")
@@ -987,9 +1020,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, S
                     "p.val"=4,
                     "p.adj"=5)
 
-    colnames(res.t) <- paste(colnames(res.t), " (",contrast_name ,")", sep = "")
-
-    res.t <- res.t%>%
+   res.t <- res.t%>%
       rownames_to_column("Metabolite")
 
     # Store the data frame in the results list, named after the contrast
@@ -1002,23 +1033,44 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, S
     STAT_C1vC2 <- merge(STAT_C1vC2 , results_list[[i]], by = "Metabolite", all = TRUE)
   }
 
-  #If CoRe=TRUE, we need to exchange the Log2FC with the Distance
-  test <- as.data.frame(colnames(STAT_C1vC2))%>%
-    separate("colnames(STAT_C1vC2)", into=c("a", "b"), sep=" ", remove=FALSE)%>%
-    separate("b", into=c("c", "d"), sep="_vs_", remove=FALSE)%>%
-    separate("c", into=c("e", "f"), sep="\\s*\\(\\s*", remove=FALSE)%>%
-    separate("d", into=c("g"), sep="\\s*\\)\\s*", remove=FALSE)
+  #If CoRe=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
+  #Make the name_match_df
+  name_match_df <- as.data.frame(names(results_list))%>%
+    separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
 
-  test <- merge(test, targets , by.x="f", by.y="condition_limma_compatible", all.x=TRUE)%>%
-    dplyr::rename("Condition1"=10)
-  test <- merge(test, targets , by.x="g", by.y="condition_limma_compatible", all.x=TRUE)%>%
-    dplyr::rename("Condition2"=12)%>%
-    unite("h", "a", "Condition1", sep=" (", remove=FALSE)%>%
-    unite("i", "h", "Condition2", sep="_vs_", remove=FALSE)
-  test$New <- paste(test$i, ")", sep="")
-  test<- test[,c(3,15)]%>%
+  name_match_df <-merge(name_match_df, targets , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
+    dplyr::rename("Condition1"=5)
+  name_match_df <- merge(name_match_df, targets , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
+    dplyr::rename("Condition2"=7)%>%
+    unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
+
+  name_match_df<- name_match_df[,c(3,5)]%>%
     distinct(New, .keep_all = TRUE)
 
+  #Match the lists using name_match_df
+  for(i in 1:nrow(name_match_df)){
+    old_name <- name_match_df$`names(results_list)`[i]
+    new_name <- name_match_df$New[i]
+    results_list[[new_name]] <- results_list[[old_name]]
+    results_list[[old_name]] <- NULL
+  }
+
+  if(CoRe==TRUE){#Problem: the direction of the comparison is not the same for each, hence the mapping doesn't work
+   # Merge the data frames in list1 and list2 based on the "Metabolite" column
+    merged_list <- list()
+    for(i in 1:nrow(name_match_df)){
+      list_dfs <- name_match_df$New[i]
+
+      # Check if the data frames exist in both lists
+      if(list_dfs %in% names(results_list) && list_dfs %in% names(Log2FC_table)){
+        merged_df <- merge(results_list[[list_dfs]], Log2FC_table[[list_dfs]], by = "Metabolite", all = TRUE)
+        merged_list[[list_dfs]] <- merged_df
+      }
+    }
+    STAT_C1vC2 <- merged_list
+  }else{
+    STAT_C1vC2 <- results_list
+  }
 
   return(STAT_C1vC2)
 }
