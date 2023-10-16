@@ -299,8 +299,7 @@ DMA <-function(Input_data,
   ############### Calculate Log2FC, pval, padj, tval ###############
 
   Log2FC_table <- data.frame(Metabolite = colnames(Input_data))
-  for (column in 1:dim(comparisons)[2]){
-
+  for(column in 1:dim(comparisons)[2]){
     C1 <- Input_data %>% # Numerator
       filter(Input_SettingsFile$Conditions %in% comparisons[1,column]) %>%
       select_if(is.numeric)#only keep numeric columns with metabolite values
@@ -362,8 +361,14 @@ DMA <-function(Input_data,
                                             TRUE ~ 'NA'))%>%
         mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
+      Log2FC_C1vC2 <-Mean_Merge[,c(1,5)]
 
-      Log2FC_table <-Mean_Merge[,c(1,5)]
+      if(MultipleComparison == TRUE){
+        logname <- paste("Log2 [Distance (", paste(comparisons[1,column], comparisons[2,column],sep="_vs_"),")]" ,sep="")
+        names(Log2FC_C1vC2)[2] <- logname
+      }
+
+      Log2FC_table <-merge(Log2FC_table, Log2FC_C1vC2, by= "Metabolite")
     }else if(CoRe==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
@@ -401,7 +406,7 @@ DMA <-function(Input_data,
       Log2FC_C1vC2 <-Mean_Merge[,c(1,8)]
 
       if(MultipleComparison == TRUE){
-        logname <- paste("Log2FC", paste( comparisons[1,column], comparisons[2,column],sep="-"), sep="_")
+        logname <- paste("Log2FC (", paste(comparisons[1,column], comparisons[2,column],sep="_vs_"),")" ,sep="")
         names(Log2FC_C1vC2)[2] <- logname
       }
       Log2FC_table <- merge(Log2FC_table, Log2FC_C1vC2, by= "Metabolite")
@@ -430,15 +435,19 @@ DMA <-function(Input_data,
                         STAT_padj=STAT_padj,
                         Log2FC_table=Log2FC_table,
                         all_vs_all=all_vs_all)
-        }else if(STAT_pval=="kruskal.test"){# STAT_pval = kruskal.test
+        }else if(STAT_pval=="kruskal.test"){
           STAT_C1vC2 <-Kruskal(Input_data=Input_data,
                               conditions=conditions,
                               STAT_padj=STAT_padj,
                               Log2FC_table=Log2FC_table,
                               all_vs_all=all_vs_all,
                               comparisons=comparisons)
-          }else{#
-            # lmFit
+          }else if(STAT_pval=="lmFit"){
+            STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
+                                         Input_SettingsFile=Input_SettingsFile,
+                                         Input_SettingsInfo=Input_SettingsInfo,
+                                         STAT_padj=STAT_padj,
+                                         all_vs_all=all_vs_all)
           }
       }
 
@@ -485,7 +494,7 @@ DMA <-function(Input_data,
     }
   }
 
-    DMA_Output <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
+  DMA_Output <- merge(savedMetaboliteNames, DMA_Output, by="Metabolite")
   DMA_Output$Metabolite <- NULL
   colnames(DMA_Output)[1] <- "Metabolite"
 
@@ -857,7 +866,7 @@ Kruskal <-function(Input_data,
 #' @noRd
 #'
 
-DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, Log2FC_table, STAT_padj, all_vs_all){
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, STAT_padj, all_vs_all){
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile:
   targets <- Input_SettingsFile%>%
     rownames_to_column("sample")
@@ -877,14 +886,13 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
     stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile and Input_data contain the same rownames and sample numbers.")
   }
 
-  #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other.
-
+  #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other
   Limma_input <- as.data.frame(t(Limma_input%>%column_to_rownames("sample")))
-  Limma_input_log2 <- log2(Limma_input) # communicate the log2 transformation --> how does limma deals with NA when calculaing the change?
+  Limma_input_log2 <- log2(Limma_input) # communicate the log2 transformation --> how does limma deals with NA when calculating the change?
 
   #### ------Run limma:
   ####  Make design matrix:
-  cond <- as.factor(targets_limma$condition)#all versus all
+  fcond <- as.factor(targets_limma$condition)#all versus all
 
   design <- model.matrix(~0 + fcond)# Create the design matrix
   colnames(design) <- levels(fcond) # Give meaningful column names to the design matrix
@@ -894,7 +902,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
 
   ####  Make contrast matrix:
   if(all_vs_all ==TRUE){
-    unique_conditions <- unique(targets_limma$condition)# Get unique conditions
+    unique_conditions <- levels(fcond)# Get unique conditions
 
     # Create an empty contrast matrix
     num_conditions <- length(unique_conditions)
@@ -920,12 +928,43 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
         cont.matrix[i, ] <- comparison
 
         # Set row name
-        rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2])
+        rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2], sep="")
 
         i <- i + 1
       }
     }
   }else if(all_vs_all ==FALSE){
+    unique_conditions <- levels(fcond)# Get unique conditions
+    numerator <- Input_SettingsInfo[["numerator"]]
+
+    # Create an empty contrast matrix
+    num_conditions <- length(unique_conditions)
+    num_comparisons <- num_conditions - 1
+    cont.matrix <- matrix(0, nrow = num_comparisons, ncol = num_conditions)
+
+
+    # Initialize an index for the column in the contrast matrix
+    i <- 1
+
+    # Initialize column and row names
+    colnames(cont.matrix) <- unique_conditions
+    rownames(cont.matrix) <- character(num_comparisons)
+
+    # Loop through all pairwise combinations of unique conditions
+    for (numerator in 2:num_conditions) {
+      # Create the pairwise comparison vector
+      comparison <- rep(0, num_conditions)
+      comparison[1] <- -1  # The first condition (HE) as the reference
+      comparison[numerator] <- 1
+
+      # Add the comparison vector to the contrast matrix
+      cont.matrix[i, ] <- comparison
+
+      # Set row name
+      rownames(cont.matrix)[i] <- paste(unique_conditions[numerator], "_vs_", unique_conditions[1], sep = "")
+
+      i <- i + 1
+    }
 
   }#Can we use limma for one_versus_one comparison?
 
@@ -943,16 +982,45 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
   for (contrast_name in contrast_names) {
     # Extract results for the current contrast
     res.t <- limma::topTable(fit2, coef=contrast_name, n=Inf, sort.by="n", adjust.method = STAT_padj)%>% # coef= the comparison the test is done for!
+      dplyr::rename("Log2FC"=1,
+                    "t.val"=3,
+                    "p.val"=4,
+                    "p.adj"=5)
+
+    colnames(res.t) <- paste(colnames(res.t), " (",contrast_name ,")", sep = "")
+
+    res.t <- res.t%>%
       rownames_to_column("Metabolite")
 
     # Store the data frame in the results list, named after the contrast
     results_list[[contrast_name]] <- res.t
   }
 
+  #combine the list of dfs
+  STAT_C1vC2 <- results_list[[1]]
+  for (i in 2:length(results_list)) {
+    STAT_C1vC2 <- merge(STAT_C1vC2 , results_list[[i]], by = "Metabolite", all = TRUE)
+  }
 
-  #Combine with Log2FC_table
-  #return results to main function!
+  #If CoRe=TRUE, we need to exchange the Log2FC with the Distance
+  test <- as.data.frame(colnames(STAT_C1vC2))%>%
+    separate("colnames(STAT_C1vC2)", into=c("a", "b"), sep=" ", remove=FALSE)%>%
+    separate("b", into=c("c", "d"), sep="_vs_", remove=FALSE)%>%
+    separate("c", into=c("e", "f"), sep="\\s*\\(\\s*", remove=FALSE)%>%
+    separate("d", into=c("g"), sep="\\s*\\)\\s*", remove=FALSE)
 
+  test <- merge(test, targets , by.x="f", by.y="condition_limma_compatible", all.x=TRUE)%>%
+    dplyr::rename("Condition1"=10)
+  test <- merge(test, targets , by.x="g", by.y="condition_limma_compatible", all.x=TRUE)%>%
+    dplyr::rename("Condition2"=12)%>%
+    unite("h", "a", "Condition1", sep=" (", remove=FALSE)%>%
+    unite("i", "h", "Condition2", sep="_vs_", remove=FALSE)
+  test$New <- paste(test$i, ")", sep="")
+  test<- test[,c(3,15)]%>%
+    distinct(New, .keep_all = TRUE)
+
+
+  return(STAT_C1vC2)
 }
 
 
