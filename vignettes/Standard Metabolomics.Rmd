@@ -271,6 +271,11 @@ As input we will use the  pre-processed data we have generated using the `Prepro
 Discuss the potential usage of data transformation prior to DMA (e.g. log transformation)--> Is this even possible to use in the DMA as we do Log2FC of log transformed data?
 \
 In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons. The results are automatically saved and returned into the global environment. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
+
+FYI: you can use 
+1. numerator=NULL, denominator ="Condition" one-vs_all
+2. numerator=NULL, denominator =NULL all_vs_all
+3. numerator="Condition1", denominator ="Condition2" one_vs_one
 ```{r}
 DMA_786O_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we need to remove columns that do not include metabolite measurements
                         Input_SettingsFile=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates

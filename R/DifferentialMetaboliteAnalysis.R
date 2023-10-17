@@ -22,7 +22,7 @@
 #'
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denominator  = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
@@ -43,7 +43,7 @@
 
 DMA <-function(Input_data,
                Input_SettingsFile,
-               Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
+               Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denominator  = NULL),
                STAT_pval ="kruskal.test",
                STAT_padj="fdr",
                Input_MetaFile_Metab = NULL,
@@ -796,7 +796,20 @@ AOV <-function(Input_data,
       merged_list[[name]] <- merged_df
     }
   }
-  STAT_C1vC2 <- merged_list
+
+  # Make sure the right comparisons are returned:
+  if(all_vs_all==TRUE){
+    STAT_C1vC2 <- merged_list
+  }else if(all_vs_all==FALSE){
+    #remove the comparisons that are not needed:
+    modified_df_list <- list()
+    for(df_name in names(merged_list)){
+      if(endsWith(df_name, "HK2")){
+        modified_df_list[[df_name]] <- merged_list[[df_name]]
+      }
+    }
+    STAT_C1vC2 <- modified_df_list
+  }
 
   return(STAT_C1vC2)
 }
@@ -889,6 +902,7 @@ Kruskal <-function(Input_data,
       merged_list[[name]] <- merged_df
     }
   }
+
   STAT_C1vC2 <- merged_list
 
   return(STAT_C1vC2)
@@ -976,7 +990,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
     }
   }else if(all_vs_all ==FALSE){
     unique_conditions <- levels(fcond)# Get unique conditions
-    numerator <- Input_SettingsInfo[["numerator"]]
+    denominator  <- Input_SettingsInfo[["denominator "]]
 
     # Create an empty contrast matrix
     num_conditions <- length(unique_conditions)
@@ -996,13 +1010,13 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
       # Create the pairwise comparison vector
       comparison <- rep(0, num_conditions)
       comparison[1] <- -1  # The first condition (HE) as the reference
-      comparison[numerator] <- 1
+      comparison[denominator ] <- 1
 
       # Add the comparison vector to the contrast matrix
       cont.matrix[i, ] <- comparison
 
       # Set row name
-      rownames(cont.matrix)[i] <- paste(unique_conditions[numerator], "_vs_", unique_conditions[1], sep = "")
+      rownames(cont.matrix)[i] <- paste(unique_conditions[denominator], "_vs_", unique_conditions[1], sep = "")
 
       i <- i + 1
     }
