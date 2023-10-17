@@ -263,20 +263,41 @@ Intra_Preprocessed <- MetaProViz::ReplicateSum(Input_data=Intra_Preprocessed)
 Using the pre-processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `VizHeatmap()` or PCA plots `VizPCA()`. You can see some examples below. 
 
 ## DMA
-Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) calculates the Log2FC, p-value, adjusted p-value and t-value. With the different parameters of the `DMA()` function one can choose the statistical tests to calculate the p-value and adjusted p-value (parameters `STAT_pval` and `STAT_padj`).\
-As input we will use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values and information about the conditions that should be compared (even though we recommend to normalize the data and remove outliers prior to DMA). Noteworthy, if you have not performed missing value imputation and hence you data includes NAs or 0 values for some features, this will be taken into account in the `DMA()` function:\
+Differential Metabolite Analysis (`DMA`) is used to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value. With the different parameters `STAT_pval` and `STAT_padj` one can choose the statistical tests such as t.test, wilcoxon test, limma, annova, kruskal walles, etc. (see function reference for more information).\
+As input one can use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values, even though we recommend to normalize the data and remove outliers prior to DMA. Moreover, we require the `Input_SettingsFile_Sample` including the sample metadata with information which condition a sample corresponds to.\
+\
+By defining the numerator and denominator as part of the `Input_SettingsInfo` parameter, it is defined which comparisons are performed:\
+1. one_vs_one (single comparison): numerator="Condition1", denominator ="Condition2"\
+2. all_vs_one (multiple comparison): numerator=NULL, denominator ="Condition"\
+3. all_vs_all (multiple comparison): numerator=NULL, denominator =NULL (=default)\
+\
+Dealing with missing values:
+- automatically taken care of in limma --> we do log transformation, so we need untransformed data.
+
+`Plot_SettingsFile_Sample` and `Plot_SettingsFile_Metab`
+
+Noteworthy, if you have not performed missing value imputation and hence your data includes NAs or 0 values for some features, this will be taken into account in the `DMA()` function:\
 `1.` If all values of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= Inf/-Inf and the statistics will be NA\
 `2.` If some values  of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= positive or negative value, but the statistics will be NA\
 \
-Discuss the potential usage of data transformation prior to DMA (e.g. log transformation)--> Is this even possible to use in the DMA as we do Log2FC of log transformed data?
-\
-In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons. The results are automatically saved and returned into the global environment. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
-
-FYI: you can use 
-1. numerator=NULL, denominator ="Condition" one-vs_all
-2. numerator=NULL, denominator =NULL all_vs_all
-3. numerator="Condition1", denominator ="Condition2" one_vs_one
+In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O), hence we can perform multiple different comparisons. The results can be automatically saved and all the results are returned in a list with the different data frames. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
 ```{r}
+
+DMA_Annova <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we need to remove columns that do not include metabolite measurements
+                              Input_SettingsFile_Sample=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
+                              Input_SettingsInfo = c(conditions="Conditions", numerator=NULL, denominator = "HK2"),# we compar all_vs_HK2
+                              STAT_pval ="aov",
+                              STAT_padj="fdr",
+                              Input_SettingsFile_Metab = MappingInfo,# Adds metadata for the metabolites such as KEGG_ID, Pathway, retention time,...
+                              OutputName='Annova')
+
+#rename to Input_SettingsFile_Sample and Input_SettingsFile_Metab
+
+#DMA_Annova[["DF"]][["DMA_result"]][["786-M1A_vs_HK2"]]
+
+
+
+
 DMA_786O_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we need to remove columns that do not include metabolite measurements
                         Input_SettingsFile=Intra_Preprocessed[,c(1:2)],#only maintain the information about condition and replicates
                         Input_SettingsInfo = c(conditions="Conditions", numerator="786-O", denominator = "HK2"),
@@ -291,31 +312,6 @@ DMA_786O_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], #we 
 
 Shapiro <- DMA_786O_vs_HK2[["Shapiro_Results"]]
 
-#Perform the other comparisons:
-DMA_786M1A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
-                                   Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
-                                   Input_SettingsInfo = c(conditions="Conditions", numerator="786-M1A", denominator = "HK2"),
-                                   STAT_pval ="t.test",
-                                   STAT_padj="fdr",
-                                   Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
-                                   OutputName='DMA_786M1AvHK2', 
-                                   CoRe=FALSE,
-                                   Plot = TRUE)
-
-`DMA_786-M1A_vs_HK2` <- DMA_786M1A_vs_HK2[["DF"]][["DMA_result"]]#Get the DMA table
-
-DMA_786M2A_vs_HK2 <- MetaProViz::DMA(Input_data=Intra_Preprocessed[,-c(1:4)], 
-                                   Input_SettingsFile=Intra_Preprocessed[,c(1:2)],
-                                   Input_SettingsInfo = c(conditions="Conditions", numerator="786-M2A", denominator = "HK2"),
-                                   STAT_pval ="t.test",
-                                   STAT_padj="fdr",
-                                   Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
-                                   OutputName='DMA_786M2AvHK2', 
-                                   CoRe=FALSE, 
-                                   Plot = TRUE)
-
-
-`DMA_786-M2A_vs_HK2` <- DMA_786M2A_vs_HK2[["DF"]][["DMA_result"]]#Get the DMA table
 
 ```
 ```{r, echo=FALSE}
@@ -326,7 +322,7 @@ Shapiro[,1:8]%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
-Using the DMA results, we can now use the **MetaProViz** visualization module and generate customized Volcano plots `VizVolcano()` or Lollipop graphs `VizLollipop()`. You can see some examples below. 
+Using the DMA results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `VizVolcano()`. You can see some examples below. 
 
 ### ORA using the DMA results
 Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\

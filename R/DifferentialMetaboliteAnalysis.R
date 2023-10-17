@@ -21,12 +21,12 @@
 #' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 #'
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param Input_SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denominator  = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
-#' @param Input_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
+#' @param Input_SettingsFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
@@ -42,11 +42,11 @@
 ########################################################
 
 DMA <-function(Input_data,
-               Input_SettingsFile,
+               Input_SettingsFile_Sample,
                Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denominator  = NULL),
                STAT_pval ="kruskal.test",
                STAT_padj="fdr",
-               Input_MetaFile_Metab = NULL,
+               Input_SettingsFile_Metab = NULL,
                OutputName='',
                CoRe=FALSE,
                Save_as_Plot = "svg",
@@ -83,29 +83,29 @@ DMA <-function(Input_data,
     if((any(Test_num) ==  FALSE) ==  TRUE){
       stop("Input_data needs to be of class numeric")
     } else{
-      Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+      Test_match <- merge(Input_SettingsFile_Sample, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE)
       if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Input_SettingsFile.")
+        stop("row.names Input_data need to match row.names Input_SettingsFile_Sample.")
       } else{
         Input_data <- Input_data
       }
     }
   }
 
-  #2.  Input_MetaFile_Metab
-  if(is.null(Input_MetaFile_Metab) == FALSE){
-    if('Metabolite' %in% colnames(Input_MetaFile_Metab) == FALSE){
-      warning("The provided file Input_MetaFile_Metab must have a columns named: `Metabolite`.")
+  #2.  Input_SettingsFile_Metab
+  if(is.null(Input_SettingsFile_Metab) == FALSE){
+    if('Metabolite' %in% colnames(Input_SettingsFile_Metab) == FALSE){
+      warning("The provided file Input_SettingsFile_Metab must have a columns named: `Metabolite`.")
     }
   }
 
   ## ------------ Check Input SettingsInfo ----------- ##
   #3. Input_SettingsInfo
   if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
+      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
     }else{# if true rename to Conditions
-      Input_SettingsFile<- Input_SettingsFile%>%
+      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
         dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
     }
   }else{
@@ -114,15 +114,15 @@ DMA <-function(Input_data,
 
   ##########################
   if("denominator" %in% names(Input_SettingsInfo)==TRUE){
-    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
-      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile_Sample$Conditions==FALSE){
+      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
     }else{
       denominator <- Input_SettingsInfo[["denominator"]]
     }
   }
   if("numerator" %in% names(Input_SettingsInfo)==TRUE){
-    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile$Conditions  == FALSE){
-      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile_Sample$Conditions  == FALSE){
+      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
     }else{
       numerator <- Input_SettingsInfo[["numerator"]]
     }
@@ -135,18 +135,18 @@ DMA <-function(Input_data,
   #4.  Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
   if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE){
     # all-vs-all: Generate all pairwise combinations
-    conditions = Input_SettingsFile$Conditions
-    denominator <-unique(Input_SettingsFile$Conditions)
-    numerator <-unique(Input_SettingsFile$Conditions)
+    conditions = Input_SettingsFile_Sample$Conditions
+    denominator <-unique(Input_SettingsFile_Sample$Conditions)
+    numerator <-unique(Input_SettingsFile_Sample$Conditions)
     comparisons <- combn(unique(conditions), 2) %>% as.matrix()
     #Settings:
     MultipleComparison = TRUE
     all_vs_all = TRUE
   }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
     #all-vs-one: Generate the pairwise combinations
-    conditions = Input_SettingsFile$Conditions
+    conditions = Input_SettingsFile_Sample$Conditions
     denominator <- Input_SettingsInfo[["denominator"]]
-    numerator <-unique(Input_SettingsFile$Conditions)
+    numerator <-unique(Input_SettingsFile_Sample$Conditions)
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
     comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
@@ -200,10 +200,10 @@ DMA <-function(Input_data,
 
   #7. Are sample numbers enough?
   Num <- Input_data %>%
-    filter(Input_SettingsFile$Conditions %in% numerator) %>%
+    filter(Input_SettingsFile_Sample$Conditions %in% numerator) %>%
     select_if(is.numeric)#only keep numeric columns with metabolite values
   Denom <- Input_data %>%
-    filter(Input_SettingsFile$Conditions %in% denominator) %>%
+    filter(Input_SettingsFile_Sample$Conditions %in% denominator) %>%
     select_if(is.numeric)
 
   if(nrow(Num)==1){
@@ -277,7 +277,7 @@ DMA <-function(Input_data,
 
   # Here is the Shapiro
   Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(Input_data=Input_data,
-                                                         Input_SettingsFile=Input_SettingsFile,
+                                                         Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                                          Input_SettingsInfo=Input_SettingsInfo,
                                                          STAT_pval=STAT_pval,
                                                          CoRe=CoRe,
@@ -300,10 +300,10 @@ DMA <-function(Input_data,
   Log2FC_table <- list()# Create an empty list to store results data frames
   for(column in 1:dim(comparisons)[2]){
     C1 <- Input_data %>% # Numerator
-      filter(Input_SettingsFile$Conditions %in% comparisons[1,column]) %>%
+      filter(Input_SettingsFile_Sample$Conditions %in% comparisons[1,column]) %>%
       select_if(is.numeric)#only keep numeric columns with metabolite values
     C2 <- Input_data %>% # Deniminator
-      filter(Input_SettingsFile$Conditions %in%  comparisons[2,column]) %>%
+      filter(Input_SettingsFile_Sample$Conditions %in%  comparisons[2,column]) %>%
       select_if(is.numeric)
 
     ## ------------  Calculate Log2FC ----------- ##
@@ -394,8 +394,8 @@ DMA <-function(Input_data,
       Log2FC_C1vC2 <-merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
 
       #Add info on Pathways:
-      if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
-        Pathways <- merge(savedMetaboliteNames , Input_MetaFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
+      if(is.null(Input_SettingsFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_SettingsFile_Metab)){
+        Pathways <- merge(savedMetaboliteNames , Input_SettingsFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
         Log2FC_C1vC2<- merge(Log2FC_C1vC2, Pathways[,-c(1)],by="Metabolite", all.x=T)
       }
 
@@ -457,8 +457,8 @@ DMA <-function(Input_data,
       Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,8)], temp_3a4, by="Metabolite", all.x=TRUE)
 
       #Add info on Pathways:
-      if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
-        Pathways <- merge(savedMetaboliteNames , Input_MetaFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
+      if(is.null(Input_SettingsFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_SettingsFile_Metab)){
+        Pathways <- merge(savedMetaboliteNames , Input_SettingsFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
         Log2FC_C1vC2<- merge(Log2FC_C1vC2, Pathways[,-c(1)],by="Metabolite", all.x=T)
       }
 
@@ -511,7 +511,7 @@ DMA <-function(Input_data,
                               comparisons=comparisons)
           }else if(STAT_pval=="lmFit"){
             STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
-                                         Input_SettingsFile=Input_SettingsFile,
+                                         Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                          Input_SettingsInfo=Input_SettingsInfo,
                                          STAT_padj=STAT_padj,
                                          Log2FC_table=Log2FC_table,
@@ -927,7 +927,7 @@ Kruskal <-function(Input_data,
 ##########################################################################################
 
 #' @param Input_data Passed to DMA
-#' @param Input_SettingsFile Passed to DMA
+#' @param Input_SettingsFile_Sample Passed to DMA
 #' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
 #' @param STAT_padj Passed to DMA
 #'
@@ -935,9 +935,9 @@ Kruskal <-function(Input_data,
 #' @noRd
 #'
 
-DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all){
-  ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile:
-  targets <- Input_SettingsFile%>%
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all){
+  ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
+  targets <- Input_SettingsFile_Sample%>%
     rownames_to_column("sample")
   targets<- targets[,c("sample", Input_SettingsInfo[["conditions"]])]%>%
     dplyr::rename("condition"=2)%>%
@@ -952,7 +952,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
 
   #Check if the order of the "sample" column is the same in both data frames
   if(identical(targets$sample, Limma_input$sample)==FALSE){
-    stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile and Input_data contain the same rownames and sample numbers.")
+    stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile_Sample and Input_data contain the same rownames and sample numbers.")
   }
 
   #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other
@@ -1117,7 +1117,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
 #############################################################################################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param Input_SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
 #' @param OutputName String which is added to the output files of the DMA.
@@ -1133,7 +1133,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
 #'
 
 Shapiro <-function(Input_data,
-                   Input_SettingsFile,
+                   Input_SettingsFile_Sample,
                    Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
                    STAT_pval ="kruskal.test",
                    OutputName="",
@@ -1165,9 +1165,9 @@ Shapiro <-function(Input_data,
     if((any(Test_num) ==  FALSE) ==  TRUE){
       stop("Input_data needs to be of class numeric")
     } else{
-      Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+      Test_match <- merge(Input_SettingsFile_Sample, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile_Sample"?
       if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Input_SettingsFile.")
+        stop("row.names Input_data need to match row.names Input_SettingsFile_Sample.")
       } else{
         Input_data <- Input_data
       }
@@ -1177,10 +1177,10 @@ Shapiro <-function(Input_data,
   ## ------------ Check Input SettingsInfo ----------- ##
   #3. Input_SettingsInfo
   if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
+      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
     }else{# if true rename to Conditions
-      Input_SettingsFile<- Input_SettingsFile%>%
+      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
         dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
     }
   }else{
@@ -1189,15 +1189,15 @@ Shapiro <-function(Input_data,
 
   ##########################
   if("denominator" %in% names(Input_SettingsInfo)==TRUE){
-    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
-      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile_Sample$Conditions==FALSE){
+      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
     }else{
       denominator <- Input_SettingsInfo[["denominator"]]
     }
   }
   if("numerator" %in% names(Input_SettingsInfo)==TRUE){
-    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile$Conditions  == FALSE){
-      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile_Sample$Conditions  == FALSE){
+      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
     }else{
       numerator <- Input_SettingsInfo[["numerator"]]
     }
@@ -1209,14 +1209,14 @@ Shapiro <-function(Input_data,
   ## ------------ Check Denominator/numerator ----------- ##
   #4.  Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
   if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE){
-    conditions = Input_SettingsFile$Conditions
-    denominator <-unique(Input_SettingsFile$Conditions)
-    numerator <-unique(Input_SettingsFile$Conditions)
+    conditions = Input_SettingsFile_Sample$Conditions
+    denominator <-unique(Input_SettingsFile_Sample$Conditions)
+    numerator <-unique(Input_SettingsFile_Sample$Conditions)
   }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
     #all-vs-one: Generate the pairwise combinations
-    conditions = Input_SettingsFile$Conditions
+    conditions = Input_SettingsFile_Sample$Conditions
     denominator <- Input_SettingsInfo[["denominator"]]
-    numerator <-unique(Input_SettingsFile$Conditions)
+    numerator <-unique(Input_SettingsFile_Sample$Conditions)
   }
 
   ## ------------ Check General parameters ----------- ##
@@ -1235,10 +1235,10 @@ Shapiro <-function(Input_data,
 
   #7. Are sample numbers enough?
   Num <- Input_data %>%
-    filter(Input_SettingsFile$Conditions %in% numerator) %>%
+    filter(Input_SettingsFile_Sample$Conditions %in% numerator) %>%
     select_if(is.numeric)#only keep numeric columns with metabolite values
   Denom <- Input_data %>%
-    filter(Input_SettingsFile$Conditions %in% denominator) %>%
+    filter(Input_SettingsFile_Sample$Conditions %in% denominator) %>%
     select_if(is.numeric)
 
   if(nrow(Num)==1){
@@ -1272,14 +1272,14 @@ Shapiro <-function(Input_data,
   ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
   #Prepare the input:
   Input_shaptest <- replace(Input_data, Input_data==0, NA) %>% #Shapiro test ignores NAs!
-    filter(Input_SettingsFile$Conditions %in% numerator | Input_SettingsFile$Conditions %in% denominator)%>%
+    filter(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator)%>%
     select_if(is.numeric)
   temp<- as.vector(sapply(Input_shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
   Input_shaptest <- Input_shaptest[,!temp]
-  Input_shaptest_Cond <-merge(data.frame(Conditions = Input_SettingsFile[, "Conditions", drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
+  Input_shaptest_Cond <-merge(data.frame(Conditions = Input_SettingsFile_Sample[, "Conditions", drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
 
-  UniqueConditions <- Input_SettingsFile%>%
-    subset(Input_SettingsFile$Conditions %in% numerator | Input_SettingsFile$Conditions %in% denominator, select = c(1))
+  UniqueConditions <- Input_SettingsFile_Sample%>%
+    subset(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator, select = c(1))
   UniqueConditions <- unique(UniqueConditions$Conditions)
 
   #Generate the results
