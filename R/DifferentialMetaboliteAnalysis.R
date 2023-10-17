@@ -527,47 +527,61 @@ DMA <-function(Input_data,
     DMA_Output$Metabolite <- NULL
     colnames(DMA_Output)[1] <- "Metabolite"
   }else{
-
+    DMA_Output <- lapply(STAT_C1vC2, function(df){
+      merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
+      merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
+        dplyr::rename("Metabolite"=1)
+      return(merged_df)
+    })
   }
 
+  ################################################################################################################################################################################################
+  ###############  Folder ###############
+  if(MultipleComparison==FALSE){
+    if (Save_as_Results == "xlsx"){
+      xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
+      writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
+      }else if (Save_as_Results == "csv"){
+        csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".csv"))
+        write.csv(DMA_Output,csvDMA) # save the DMA result DF
+      }else if (Save_as_Results == "txt"){
+        txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
+        write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+      }
+  }else{
+    for(DF in names(DMA_Output)){
+      DMA_Output_Save <- DMA_Output[[DF]]
+      DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
 
- ###############  Folder ###############
-  if (Save_as_Results == "xlsx"){
-    xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
-    writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
-  }else if (Save_as_Results == "csv"){
-    csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".csv"))
-    write.csv(DMA_Output,csvDMA) # save the DMA result DF
-  }else if (Save_as_Results == "txt"){
-    txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
-    write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+      if (Save_as_Results == "xlsx"){
+        xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".xlsx"))   # Save the DMA results table
+        writexl::write_xlsx(DMA_Output_Save,xlsDMA, col_names = TRUE) # save the DMA result DF
+      }else if (Save_as_Results == "csv"){
+        csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".csv"))
+        write.csv(DMA_Output_Save,csvDMA) # save the DMA result DF
+      }else if (Save_as_Results == "txt"){
+        txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".txt"))
+        write.table(DMA_Output_Save,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+      }
+    }
   }
 
   if(CoRe==TRUE){
     x <- "Log2(Distance)"
     VolPlot_SettingsInfo= c(color="CoRe")
     VOlPlot_SettingsFile = DMA_Output
-
   }else{
     x <- "Log2FC"
     VolPlot_SettingsInfo= NULL
     VOlPlot_SettingsFile = NULL
   }
 
+  ################################################################################################################################################################################################
   ###############  Plots ###############
   volplotList = list()
   if(MultipleComparison==TRUE){
-    if(is.null(Input_MetaFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_MetaFile_Metab)){
-      num_columns <- ncol(DMA_Output)-2
-    }else{
-      num_columns <- ncol(DMA_Output)-1
-    }
-
-    for (i in seq(2, num_columns, by = 3)) {
-      Volplotdata<-DMA_Output[c(1,i, i+1)]
-
-      title <- gsub("p.adj_", "", colnames(Volplotdata)[3])
-      colnames(Volplotdata)<- c("Metabolite", "Log2FC", "p.adj")
+    for(DF in names(DMA_Output)){
+      Volplotdata<- DMA_Output[[DF]]
 
       dev.new()
       VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
@@ -577,7 +591,7 @@ DMA <-function(Input_data,
                                                       y= "p.adj",
                                                       x= x,
                                                       AdditionalInput_data= NULL,
-                                                      OutputPlotName= title,
+                                                      OutputPlotName= DF,
                                                       Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
                                                       xlab= NULL,#"~Log[2]~FC"
                                                       ylab= NULL,#"~-Log[10]~p.adj"
@@ -585,19 +599,19 @@ DMA <-function(Input_data,
                                                       FCcutoff= 0.5,
                                                       color_palette= NULL,
                                                       shape_palette=NULL,
-                                                      SelectLab= DMA_Output$Metabolite,
+                                                      SelectLab= "",
                                                       Connectors=  FALSE,
                                                       Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                       Theme= NULL,
                                                       Save_as_Plot= NULL))
 
-      volplotList[[title]]<- VolcanoPlot
-      volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"_versus_",toString(denominator),title, OutputName,".",Save_as_Plot))
+      volplotList[[DF]]<- VolcanoPlot
+
+      DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
+      volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_", DF_save, OutputName,".",Save_as_Plot))
       ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
       dev.off()
     }
-
-
   }else{
   # Make a simple Volcano plot
   dev.new()
@@ -616,7 +630,7 @@ DMA <-function(Input_data,
                                                   FCcutoff= 0.5,
                                                   color_palette= NULL,
                                                   shape_palette=NULL,
-                                                  SelectLab= DMA_Output$Metabolite,
+                                                  SelectLab= "",
                                                   Connectors=  FALSE,
                                                   Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                   Theme= NULL,
