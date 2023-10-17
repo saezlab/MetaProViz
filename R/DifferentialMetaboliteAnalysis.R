@@ -1018,15 +1018,29 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
       for (condition2 in (condition1 + 1):num_conditions) {
         # Create the pairwise comparison vector
         comparison <- rep(0, num_conditions)
-        comparison[condition1] <- 1
-        comparison[condition2] <- -1
-
-        # Add the comparison vector to the contrast matrix
-        cont.matrix[i, ] <- comparison
-
-        # Set row name
-        rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2], sep="")
-
+        if(MultipleComparison==FALSE){
+          if(unique_conditions[condition1]==Input_SettingsInfo[["denominator"]]){
+            comparison[condition1] <- -1
+            comparison[condition2] <- 1
+            # Add the comparison vector to the contrast matrix
+            cont.matrix[i, ] <- comparison
+            # Set row name
+            rownames(cont.matrix)[i] <- paste(unique_conditions[condition2], "_vs_", unique_conditions[condition1], sep="")
+          }else{
+            comparison[condition1] <- 1
+            comparison[condition2] <- -1
+            # Add the comparison vector to the contrast matrix
+            cont.matrix[i, ] <- comparison
+            # Set row name
+            rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2], sep="")
+          }
+        }else{
+          comparison[condition2] <- -1
+          # Add the comparison vector to the contrast matrix
+          cont.matrix[i, ] <- comparison
+          # Set row name
+          rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2], sep="")
+        }
         i <- i + 1
       }
     }
@@ -1051,14 +1065,14 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     for (numerator in 2:num_conditions) {
       # Create the pairwise comparison vector
       comparison <- rep(0, num_conditions)
-      comparison[1] <- -1  # The first condition (HE) as the reference
-      comparison[denominator ] <- 1
+      comparison[1] <- 1  # The first condition (HE) as the reference
+      comparison[denominator] <- -1
 
       # Add the comparison vector to the contrast matrix
       cont.matrix[i, ] <- comparison
 
       # Set row name
-      rownames(cont.matrix)[i] <- paste(unique_conditions[denominator], "_vs_", unique_conditions[1], sep = "")
+      rownames(cont.matrix)[i] <- paste(unique_conditions[1], "_vs_", unique_conditions[denominator], sep = "")
 
       i <- i + 1
     }
