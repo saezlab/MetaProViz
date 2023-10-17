@@ -512,7 +512,8 @@ DMA <-function(Input_data,
                         conditions=conditions,
                         STAT_padj=STAT_padj,
                         Log2FC_table=Log2FC_table,
-                        all_vs_all=all_vs_all)
+                        all_vs_all=all_vs_all,
+                        comparisons=comparisons)
         }else if(STAT_pval=="kruskal.test"){
           STAT_C1vC2 <-Kruskal(Input_data=Input_data,
                               conditions=conditions,
@@ -745,10 +746,11 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 ################################################################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param Conditions Factor with sample group information.
+#' @param conditions Factor with sample group information.
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param Log2FC_table Table with Metabolites are rows and a Log2FC column \strong(Default = Log2FC_table)
 #' @param all_vs_all  True for multiple comparison of all against all or FALSE for multiple comparison of all against one selected base.
+#' @param comparisons Dataframe containing the comparison information for multiple comparison. The first row is the numerator, the second row is the denominator and each column is a different comparison.
 #'
 #' @keywords Kruskal test,Hypothesis testing, p.value
 #' @export
@@ -758,7 +760,8 @@ AOV <-function(Input_data,
                conditions,
                STAT_padj,
                Log2FC_table,
-               all_vs_all
+               all_vs_all,
+               comparisons
 ){
   ## 1. Anova p.val
   aov.res= apply(Input_data,2,function(x) aov(x~conditions))
@@ -845,7 +848,7 @@ AOV <-function(Input_data,
 ###########################################################################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param Conditions Factor with sample group information.
+#' @param conditions Factor with sample group information.
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param Log2FC_table Table with Metabolites are rows and a Log2FC column \strong(Default = Log2FC_table)
 #' @param all_vs_all  True for multiple comparison of all against all or FALSE for multiple comparison of all against one selected base.
