@@ -489,7 +489,7 @@ DMA <-function(Input_data,
     STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
     }else{ # MultipleComparison = TRUE
       # conditions =as.factor(conditions)
-      if (all_vs_all ==TRUE){
+      if(all_vs_all ==TRUE){
         message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
         }else{# for 1 vs all
           message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
@@ -734,12 +734,10 @@ AOV <-function(Input_data,
                Log2FC_table,
                all_vs_all
 ){
-
-
-  ## 1. Anova
+  ## 1. Anova p.val
   aov.res= apply(Input_data,2,function(x) aov(x~conditions))
 
-  ## 2. Tukey test
+  ## 2. Tukey test p.adj
   posthoc.res = lapply(aov.res, TukeyHSD, conf.level=0.95)
   Tukey_res <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'p adj']))
   Tukey_res <- as.data.frame(Tukey_res)
@@ -747,24 +745,13 @@ AOV <-function(Input_data,
   comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
   opp_comps <-  paste(comparisons[2, ], comparisons[1, ], sep="-")
 
-  if (sum(opp_comps %in%  colnames(Tukey_res))>0){# if oposite comparisons is true
+  if(sum(opp_comps %in%  colnames(Tukey_res))>0){# if opposite comparisons is true
     for (comp in 1: length(opp_comps)){
       colnames(Tukey_res)[colnames(Tukey_res) %in% opp_comps[comp]] <-  comps[comp]
     }
   }
 
-  names(Tukey_res) <- paste("p.adj", names(Tukey_res), sep = "_")
-  Pval_table <- Tukey_res
-  Pval_table <- rownames_to_column(Pval_table,"Metabolite")
-
-  if(all_vs_all==FALSE){
-    Pval_table <- Pval_table[,gsub("p.adj_","",colnames(Pval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
-  }
-
-  ### put Log2FC and pval dataframes
-  merged_table <- merge(Log2FC_table, Pval_table, by = "Metabolite", all = TRUE)
-
-  #### 3. t.value/ Diff
+  ## 3. t.val
   Tukey_res_diff <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'diff'])) %>% as.data.frame()
 
   if (sum(opp_comps %in%  colnames(Tukey_res_diff))>0){# if oposite comparisons is true
@@ -773,25 +760,43 @@ AOV <-function(Input_data,
     }
   }
 
-  colnames(Tukey_res_diff) <- paste("q.val", colnames(Tukey_res_diff), sep = "_")
-  Tukey_res_diff <- rownames_to_column(Tukey_res_diff,"Metabolite")
+  #Make output DFs:
+  Pval_table <- Tukey_res
+  Pval_table <- rownames_to_column(Pval_table,"Metabolite")
 
-  if(all_vs_all==FALSE){
-    Tukey_res_diff <- Tukey_res_diff[,gsub("q.val_","",colnames(Tukey_res_diff)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
+  Tval_table <- rownames_to_column(Tukey_res_diff,"Metabolite")
+
+  common_col_names <- setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
+
+  results_list <- list()
+  for(col_name in common_col_names){
+    # Create a new data frame by merging the two data frames
+    merged_df <- merge(Pval_table[,c("Metabolite",col_name)], Tval_table[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
+      dplyr::rename("p.adj"=2,
+                    "t.val"=3)
+
+    #We need to add _vs_ into the comparison col_name
+    pattern <- paste(conditions, collapse = "|")
+    conditions_present <- unique(unlist(regmatches(col_name, gregexpr(pattern, col_name))))
+    modified_col_name <- paste(conditions_present[1], "vs", conditions_present[2], sep = "_")
+
+    # Add the new data frame to the list with the column name as the list element name
+    results_list[[modified_col_name]] <- merged_df
   }
 
-  merged_table <- merge(merged_table, Tukey_res_diff, by = "Metabolite", all = TRUE)
+  # Merge the data frames in list1 and list2 based on the "Metabolite" column
+  list_names <-  names(results_list)
 
-  step <- dim(Pval_table)[2]-1
-  # re-order columns
-  order<- c(1)
-  for(i in 1:(dim(Pval_table)[2]-1)){
-    order <- append(order, 1+i)
-    order <- append(order, 1+step+i)
-    order <- append(order,1+(2*step)+i)
+  merged_list <- list()
+  for(name in list_names){
+    # Check if the data frames exist in both lists
+    if(name %in% names(results_list) && name %in% names(Log2FC_table)){
+      merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+      merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+      merged_list[[name]] <- merged_df
+    }
   }
-  merged_table <- merged_table[, order]
-  STAT_C1vC2 <- merged_table
+  STAT_C1vC2 <- merged_list
 
   return(STAT_C1vC2)
 }
@@ -818,18 +823,19 @@ Kruskal <-function(Input_data,
                    all_vs_all,
                    comparisons
 ){
-  # Kruskal test
-
+  # Kruskal test (p.val)
   aov.res= apply(Input_data,2,function(x) kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
   anova_res <- as.matrix(mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
   colnames(anova_res) = c("Kruskal_p.val")
-  # Dunn test
+
+  # Dunn test (p.adj)
   Dunndata <- Input_data %>%
     mutate(conditions = conditions) %>%
     select(conditions, everything())%>% as.data.frame()
-  # apply doesnt for so going for a loop
-  Dunn_Pres<- data.frame( comparisons = paste(comparisons[1,],    comparisons[2,], sep = "-" ))
+
+  # Applying a loop to obtain p.adj and t.val:
+  Dunn_Pres<- data.frame(comparisons = paste(comparisons[1,],    comparisons[2,], sep = "_vs_" ))
   Dunn_Tres<- Dunn_Pres
   for(col in 2:dim(Dunndata)[2]){
     data = Dunndata[,c(1,col)]
@@ -839,49 +845,51 @@ Kruskal <-function(Input_data,
     formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
     posthoc.res= rstatix::dunn_test(data, formula, p.adjust.method = STAT_padj)
 
-    res <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "-" ))
+    res <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
     res[[colnames(Dunndata)[col] ]] <-  posthoc.res$p.adj
     res <- res[res$comparisons %in% Dunn_Pres$comparisons ,] # take only the comparisons selected
     Dunn_Pres <- merge(Dunn_Pres,res,by="comparisons")
 
-    tvalues <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "-" ))
+    tvalues <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
     tvalues[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
     tvalues <- tvalues[tvalues$comparisons %in% Dunn_Pres$comparisons ,]
     Dunn_Tres <- merge(Dunn_Tres,tvalues,by="comparisons")
   }
+
+  #Make output DFs:
   Dunn_Pres <- column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
-  colnames(Dunn_Pres) <- paste("p.adj", colnames(Dunn_Pres), sep = "_")
-  Dunn_Pres <- as.matrix(mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x))))
-  Pval_table <- Dunn_Pres %>% as.data.frame()
+  Pval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x))))
+  Pval_table <- Pval_table %>% as.data.frame()
   Pval_table <- rownames_to_column(Pval_table, "Metabolite")
 
-  #### 3. t.value
   Dunn_Tres <- column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
-  colnames(Dunn_Tres) <- paste("t.val", colnames(Dunn_Tres), sep = "_")
-  Dunn_Pres <- as.matrix(mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))
-  Tval_table <- Dunn_Tres %>% as.data.frame()
+  Tval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))
+  Tval_table <- Tval_table %>% as.data.frame()
   Tval_table <- rownames_to_column(Tval_table, "Metabolite")
 
-  # if(all_vs_all==FALSE){
-  #   Pval_table <- Pval_table[,gsub("p.adj_","",colnames(Pval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
-  # }
-  merged_table <- merge(Log2FC_table, Pval_table, by = "Metabolite", all = TRUE)
+  common_col_names <- setdiff(names(Dunn_Pres), "row.names")
 
-  # if(all_vs_all==FALSE){
-  #   Tval_table <- Tval_table[,gsub("t.val_","",colnames(Tval_table)) %in%   gsub("Log2FC_","",colnames(Log2FC_table))]
-  # }
-  merged_table <- merge(merged_table, Tval_table, by = "Metabolite", all = TRUE)
-
-  step <- dim(Pval_table)[2]-1
-  # re-order columns
-  order<- c(1)
-  for(i in 1:(dim(Pval_table)[2]-1)){
-    order <- append(order, 1+i)
-    order <- append(order, 1+step+i)
-    order <- append(order,1+(2*step)+i)
+  results_list <- list()
+  for(col_name in common_col_names){
+    # Create a new data frame by merging the two data frames
+    merged_df <- merge(Pval_table[,c("Metabolite",col_name)], Tval_table[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
+      dplyr::rename("p.adj"=2,
+                    "t.val"=3)
+    # Add the new data frame to the list with the column name as the list element name
+    results_list[[col_name]] <- merged_df
   }
-  merged_table <- merged_table[, order]
-  STAT_C1vC2 <- merged_table
+
+  # Merge the data frames in list1 and list2 based on the "Metabolite" column
+  merged_list <- list()
+  for(name in common_col_names){
+    # Check if the data frames exist in both lists
+    if(name %in% names(results_list) && name %in% names(Log2FC_table)){
+      merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+      merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+      merged_list[[name]] <- merged_df
+    }
+  }
+  STAT_C1vC2 <- merged_list
 
   return(STAT_C1vC2)
 }
@@ -1055,7 +1063,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile, Input_SettingsInfo, L
     results_list[[old_name]] <- NULL
   }
 
-  if(CoRe==TRUE){#Problem: the direction of the comparison is not the same for each, hence the mapping doesn't work
+  if(CoRe==TRUE){
    # Merge the data frames in list1 and list2 based on the "Metabolite" column
     merged_list <- list()
     for(i in 1:nrow(name_match_df)){
