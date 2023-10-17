@@ -23,7 +23,7 @@
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denominator  = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
 #' @param Input_SettingsFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
@@ -44,7 +44,7 @@
 DMA <-function(Input_data,
                Input_SettingsFile_Sample,
                Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denominator  = NULL),
-               STAT_pval ="kruskal.test",
+               STAT_pval ="lmFit",
                STAT_padj="fdr",
                Input_SettingsFile_Metab = NULL,
                OutputName='',
@@ -163,7 +163,7 @@ DMA <-function(Input_data,
 
   #5. Check if chosen test statistics fits with choice of comparison
   if(MultipleComparison==FALSE){
-    STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test")
+    STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test", "lmFit")
     if(STAT_pval %in% STAT_pval_options == FALSE){
       stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
     }
@@ -181,7 +181,7 @@ DMA <-function(Input_data,
   #6. General parameters
   STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
   if(STAT_padj %in% STAT_padj_options == FALSE){
-    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowwing: ",paste(STAT_padj_options,collapse = ", "),"." )
+    stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
   }
   if(is.logical(CoRe) == FALSE){
     stop("Check input. The CoRe value should be either =TRUE for analysis of Consuption/Release experiment or =FALSE if not.")
@@ -486,7 +486,18 @@ DMA <-function(Input_data,
   ################################################################################################################################################################################################
   ############### Perform Hypothesis testing ###############
   if(MultipleComparison == FALSE){
-    STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
+    if(STAT_pval=="lmFit"){
+      STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
+                                   Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                   Input_SettingsInfo=Input_SettingsInfo,
+                                   STAT_padj=STAT_padj,
+                                   Log2FC_table=Log2FC_table,
+                                   CoRe=CoRe,
+                                   all_vs_all=all_vs_all,
+                                   MultipleComparison=MultipleComparison)
+    }else{
+      STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
+    }
     }else{ # MultipleComparison = TRUE
       # conditions =as.factor(conditions)
       if(all_vs_all ==TRUE){
@@ -516,7 +527,8 @@ DMA <-function(Input_data,
                                          STAT_padj=STAT_padj,
                                          Log2FC_table=Log2FC_table,
                                          CoRe=CoRe,
-                                         all_vs_all=all_vs_all)
+                                         all_vs_all=all_vs_all,
+                                         MultipleComparison=MultipleComparison)
           }
       }
 
@@ -928,14 +940,18 @@ Kruskal <-function(Input_data,
 
 #' @param Input_data Passed to DMA
 #' @param Input_SettingsFile_Sample Passed to DMA
+#' @param Input_SettingsInfo Passed to DMA
 #' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
 #' @param STAT_padj Passed to DMA
+#' @param CoRe Passed to DMA
+#' @param all_vs_all generated within the DMA function
+#' @param MultipleComparison generated within the DMA function
 #'
 #' @keywords DMA helper function
 #' @noRd
 #'
 
-DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all){
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all, MultipleComparison){
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
   targets <- Input_SettingsFile_Sample%>%
     rownames_to_column("sample")
@@ -944,16 +960,28 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     arrange(sample)#Order the column "sample" alphabetically
   targets$condition_limma_compatible <-make.names(targets$condition)#make appropriate condition names accepted by limma
 
-  targets_limma <-targets[,-2]%>%
-    dplyr::rename("condition"="condition_limma_compatible")
+  if(MultipleComparison==FALSE){
+    #subset the data:
+    targets<-targets%>%
+      subset(condition==Input_SettingsInfo[["numerator"]] | condition==Input_SettingsInfo[["denominator"]])%>%
+      arrange(sample)#Order the column "sample" alphabetically
 
-  Limma_input <- Input_data%>%rownames_to_column("sample")%>%
+    Limma_input <- Input_data%>%rownames_to_column("sample")
+    Limma_input <-merge(targets[,1:2],  Limma_input, by="sample", all.x=TRUE)
+    Limma_input <- Limma_input[,-2]%>%
+      arrange(sample)#Order the column "sample" alphabetically
+  }else if(MultipleComparison==TRUE){
+    Limma_input <- Input_data%>%rownames_to_column("sample")%>%
     arrange(sample)#Order the column "sample" alphabetically
+  }
 
   #Check if the order of the "sample" column is the same in both data frames
   if(identical(targets$sample, Limma_input$sample)==FALSE){
     stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile_Sample and Input_data contain the same rownames and sample numbers.")
   }
+
+  targets_limma <-targets[,-2]%>%
+    dplyr::rename("condition"="condition_limma_compatible")
 
   #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other
   Limma_input <- as.data.frame(t(Limma_input%>%column_to_rownames("sample")))
@@ -970,7 +998,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
   fit <- limma::lmFit(Limma_input_log2, design)
 
   ####  Make contrast matrix:
-  if(all_vs_all ==TRUE){
+  if(all_vs_all ==TRUE | MultipleComparison==FALSE){
     unique_conditions <- levels(fcond)# Get unique conditions
 
     # Create an empty contrast matrix
@@ -1004,7 +1032,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     }
   }else if(all_vs_all ==FALSE){
     unique_conditions <- levels(fcond)# Get unique conditions
-    denominator  <- Input_SettingsInfo[["denominator "]]
+    denominator  <- Input_SettingsInfo[["denominator"]]
 
     # Create an empty contrast matrix
     num_conditions <- length(unique_conditions)
@@ -1063,12 +1091,6 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     results_list[[contrast_name]] <- res.t
   }
 
-  #combine the list of dfs
-  STAT_C1vC2 <- results_list[[1]]
-  for (i in 2:length(results_list)) {
-    STAT_C1vC2 <- merge(STAT_C1vC2 , results_list[[i]], by = "Metabolite", all = TRUE)
-  }
-
   #If CoRe=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
   #Make the name_match_df
   name_match_df <- as.data.frame(names(results_list))%>%
@@ -1106,6 +1128,11 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     STAT_C1vC2 <- merged_list
   }else{
     STAT_C1vC2 <- results_list
+  }
+
+  if(MultipleComparison==FALSE){
+    nameComp <- names(STAT_C1vC2)
+    STAT_C1vC2 <-STAT_C1vC2[[nameComp]]
   }
 
   return(STAT_C1vC2)
