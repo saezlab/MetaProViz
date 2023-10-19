@@ -124,7 +124,7 @@ Load_KEGG<- function(){
 
     # 3. Iterate over each pathway and extract the needed information
     for (k in 1:nrow(Pathways_H)) {
-      path <- rownames(Pathways_H)[k]
+      path <- rownames(Pathways_H)[100]
 
       tryCatch({#try-catch block is used to catch any errors that occur during the query process
         # Query the pathway information

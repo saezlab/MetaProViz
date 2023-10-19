@@ -52,7 +52,7 @@ A Consumption-Release (CoRe) metabolomics experiment usually refers to a cell cu
 \
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
 `-` To process raw peak data and identify outliers.\
-`-` To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+`-` To perform differential metabolite analysis (DMA) to generate Log2Distance and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
 `-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
 `-` To use specific visualizations to aid biological interpretation of the results.\
 \
@@ -66,7 +66,6 @@ devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded unt
 
 #dependencies
 library(tidyverse)
-
 ```
 \
 \
@@ -148,37 +147,35 @@ Currently, **MetaProViz** contains four different modules, which include differe
 
 ## Pre-processing
 **MetaProViz** includes a pre-processing module with the function `Preprocessing()` that has multiple parameters to perform customize data processing.\
-`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") (Bijlsma S. et al., 2006) or per condition (="Modified") (Yang, J et al., 2015). This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. In case of the CoRe experiment, the blank samples are ignored during feature filtering, since often metabolites are released from a cell and not naturally present in the culture media leading to no detection in the blank. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool (mixture of all experimental samples measured several times during the LC-MS run) measurements and hence the quality of the detection is pool and hence the metabolite should be removed from the data.\
-The parameter `TIC_Normalization` refers to Total Ion Count (TIC) normalization, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalization should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects (Wulff et. al., (2018)).\
-The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) (Wei et. al., 2018 ,https://www.nature.com/articles/s41598-017-19120-0).\
-Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test (Hotelling, H., 1931, doi:https://doi.org/10.1214/aoms/1177732979.).\
-
-Notes on MVI: 
-- Wei quantile regression imputation of left-censored data (QRILC) as performing best even though HM performs better in some of their tests and quantile normalization would not work well for normal distribution!
-- Show MVI results with different percentages (not just 50% as per half minimum!) --> implement parameter for user to change?!
-- Show that per feature imputation is advantageous over the "standard" imputation --> change standard to per feature!
-- Check out QRILC and see if its the same as in  proDA (https://www.bioconductor.org/packages/release/bioc/html/proDA.html) 
+`Feature_Filtering` applies the 80%-filtering rule on the metabolite features either on the whole dataset (="Standard") [@Bijlsma2006] or per condition (="Modified") [@Wei2018].  This means that metabolites are removed were more than 20% of the samples (all or per condition) have no detection. In case of the CoRe experiment, the blank samples are ignored during feature filtering, since often metabolites are released from a cell and not naturally present in the culture media leading to no detection in the blank. With the parameter `Feature_Filt_Value` we enable the adaptation of the stringency of the filtering based on the experimental context. For instance, patient tumour samples can contain many unknown subgroups due to gender, age, stage etc., which leads to a metabolite being detected in only 50% (or even less) of the tumour samples, hence in this context it could be considered to change the `Feature_Filt_Value` from the default (=0.8). If `Feature_Filtering = "None"`, no feature filtering is performed. In the context of `Feature_Filtering` it is also noteworthy that the function `Pool_Estimation()` can be used to estimate the quality of the metabolite detection and will return a list of metabolites that are variable across the different pool measurements (pool = mixture of all experimental samples measured several times during the LC-MS run) . Variable metabolite in the pool sample should be removed from the data.\
+The parameter `TIC_Normalization` refers to Total Ion Count (TIC) normalisation, which is often used with LC-MS derived metabolomics data. If `TIC_Normalization = TRUE`, each feature (=metabolite) in a sample is divided by the sum of all intensity value (= total number of ions)  for the sample and finally multiplied by a constant ( = the mean of all samples total number of ions). Noteworthy, TIC normalisation should not be used with small number of features (= metabolites), since TIC assumes that on “average” the ion count of each sample is equal if there were no instrument batch effects [@Wulff2018].\
+The parameter `MVI` refers to Missing Value Imputation (MVI) and if `MVI = TRUE` half minimum (HM) missing value imputation is performed per feature (= per metabolite). Here it is important to mention that HM has been shown to perform well for missing vales that are missing not at random (MNAR) [@Wei2018].\
+Lastly, the function `Preprocessing()` performs outlier detection and adds a column "Outliers" into the DF, which can be used to remove outliers. The parameter `HotellinsConfidence` can be used to choose the confidence interval that should be used for the Hotellins T2 outlier test [@Hotelling1931].\
 \
 Since our example data contains pool samples, we will do `Pool_Estimation()` before applying the `Preprocessing()` function. This is important, since one should remove the features (=metabolites) that are too variable prior to performing any data transformations such as TIC as part of the `Preprocessing()` function.\
+It is worth mentioning that the Coefficient of variation (CV) is calculated by dividing the standard deviation (SD) by the mean. Hence CV depends on the SD, which in turn works for normally distributed data.\
 ```{r}
-#Get the Pool data:
-PoolData <- MetaProViz::toy_data(data="CoRe")%>%
-  subset(Conditions=="Pool", select = -c(2:6))%>% 
-    remove_rownames() %>% 
-  column_to_rownames("Code")# we remove the columns "Conditions", "Biological_Replicates", cell parameters
-
-Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = PoolData,
-                            Input_SettingsFile = NULL,
-                            Input_SettingsInfo = NULL,
+Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Media[,-c(2:6)] %>% column_to_rownames("Code"),
+                            Input_SettingsFile = Media[,1:6] %>% column_to_rownames("Code"),
+                            Input_SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
                             Unstable_feature_remove = FALSE, 
                             Threshold_cv = 100)
 
-#--> remove features if needed.
+Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV_result"]]
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Pool_Estimation_result_DF_CV[1:5,]%>%
+  kableExtra::kbl(caption = "Preview of the Pool_Estimation result.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned to the global environment and can be easily viewed. Importantly, here we are able to specify that we have a CoRe experiment setting the parameter `CoRe=TRUE`, in which case a few additional data processing steps are applied:\
+The results from the `Pool_Estimation()` is a table that has the CVs. If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
+\
+Now we will apply the `Preprocessing()` function to the example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned and can be easily viewed. Importantly, here we are able to specify that we have a CoRe experiment setting the parameter `CoRe=TRUE`, in which case a few additional data processing steps are applied:\
 `1.` **Blank sample**: This refers to media samples where no cells have been cultured in, which will be used as blank. In detail, the mean of the blank sample of a feature (= metabolite) will be subtracted from the values measured in each sample for the same feature. In the column "Condition" of the Experimental_design DF, you will need to label your blank samples with "blank".\
 `2.` **Growth factor** or **growth rate**: This refers to 
+
 --> "CoRe_norm_factor" in your "Experimental_design" DF
 
 \

@@ -207,7 +207,7 @@ VizVolcano <- function(Plot_Settings="Standard",
      #Combine DFs and add appropriate column names
      Input_data[,"comparison"]  <- as.character(paste(Comparison_name[["Input_data"]]))
      AdditionalInput_data[,"comparison"]  <- as.character(paste(Comparison_name[["AdditionalInput_data"]]))
-     Input_Comparison <- rbind(Input_data,AdditionalInput_data)
+     Input_Comparison <- rbind(Input_data[,c("Metabolite", "Log2FC", "p.adj", "comparison")],AdditionalInput_data[,c("Metabolite", "Log2FC", "p.adj", "comparison")])
    } else if(Plot_Settings=="Comparison" & is.data.frame(AdditionalInput_data)==FALSE){
     stop("If Plot_Settings=`Comparison` you have to provide a DF for AdditionalInput_data.")
    }
