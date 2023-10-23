@@ -508,12 +508,13 @@ DMA <-function(Input_data,
         }
 
       if(STAT_pval=="aov"){
-        STAT_C1vC2 <-AOV(Input_data=Input_data,
-                        conditions=conditions,
-                        STAT_padj=STAT_padj,
-                        Log2FC_table=Log2FC_table,
-                        all_vs_all=all_vs_all,
-                        comparisons=comparisons)
+        STAT_C1vC2 <- AOV(Input_data=Input_data,
+                          Input_SettingsInfo=Input_SettingsInfo,
+                          conditions=conditions,
+                          STAT_padj=STAT_padj,
+                          Log2FC_table=Log2FC_table,
+                          all_vs_all=all_vs_all,
+                          comparisons=comparisons)
         }else if(STAT_pval=="kruskal.test"){
           STAT_C1vC2 <-Kruskal(Input_data=Input_data,
                               conditions=conditions,
@@ -746,6 +747,7 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 ################################################################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param Input_SettingsInfo Passed to DMA
 #' @param conditions Factor with sample group information.
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param Log2FC_table Table with Metabolites are rows and a Log2FC column \strong(Default = Log2FC_table)
@@ -757,6 +759,7 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 
 
 AOV <-function(Input_data,
+               Input_SettingsInfo,
                conditions,
                STAT_padj,
                Log2FC_table,
@@ -833,7 +836,7 @@ AOV <-function(Input_data,
     #remove the comparisons that are not needed:
     modified_df_list <- list()
     for(df_name in names(merged_list)){
-      if(endsWith(df_name, "HK2")){
+      if(endsWith(df_name, Input_SettingsInfo[["denominator"]])){
         modified_df_list[[df_name]] <- merged_list[[df_name]]
       }
     }
