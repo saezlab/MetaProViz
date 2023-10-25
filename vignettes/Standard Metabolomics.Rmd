@@ -236,7 +236,7 @@ By defining the numerator and denominator as part of the `Input_SettingsInfo` pa
 \
 Noteworthy, if you have not performed missing value imputation and hence your data includes NAs or 0 values for some features, this is how we deal with this in the `DMA()` function:\
 1. If you use the parameter `STAT_pval="lmFit"`, limma is performed. Limma does a baesian fit of the data and substracts Mean(Condition1 fit) - Mean(Condition2 fit). As such, unless all values of a feature are NA, Limma can deal with NAs.
-2. Standard Log2FC: log2(Mean(Condition1)) - log2(Mean(Condtio2))
+2. Standard Log2FC: log2(Mean(Condition1)) - log2(Mean(Condition2))
     a. If all values of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= Inf/-Inf and the statistics will be NA\
     b. If some values  of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= positive or negative value, but the statistics will be NA\
 
@@ -277,7 +277,6 @@ Of course, there are many other PEA methods such as the well known GSEA. Here we
 \
 Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
 ```{r, warning=FALSE, include=FALSE}
-
 #Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
@@ -309,7 +308,7 @@ DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
 ```
 
 ## MCA
-Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules or based on kmeans clustering. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
+Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
 ### MCA-2Cond
 This metabolite clustering method is based on the Regulatory Clustering Method (RCM) that was developed as part of the Signature Regulatory Clustering (SiRCle) model (@Mora_Schmidt2022). As part of the [SiRCleR package](https://github.com/ArianeMora/SiRCleR/tree/main), also variation of the initial RCM method are proposed as  clustering based on two comparisons (e.g. KO versus WT in hypoxia and in normoxia).\
