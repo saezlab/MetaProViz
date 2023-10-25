@@ -95,17 +95,6 @@ Media[6:12, 1:8]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
-
-\
-We will split the experimental data into the sample information and the metabolites values using the the column "Code" as the unique identifier:
-```{r}
-Media_M <- Media[1:39,-c(2:6)]%>%
-  column_to_rownames("Code")
-
-SampleInfo <-Media[c(1:39),c(1:6)]%>%
-  column_to_rownames("Code")
-
-```
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
@@ -173,113 +162,180 @@ Pool_Estimation_result_DF_CV[1:5,]%>%
 The results from the `Pool_Estimation()` is a table that has the CVs. If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
 \
 Now we will apply the `Preprocessing()` function to the example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned and can be easily viewed. Importantly, here we are able to specify that we have a CoRe experiment setting the parameter `CoRe=TRUE`, in which case a few additional data processing steps are applied:\
-`1.` **Blank sample**: This refers to media samples where no cells have been cultured in, which will be used as blank. In detail, the mean of the blank sample of a feature (= metabolite) will be subtracted from the values measured in each sample for the same feature. In the column "Condition" of the Experimental_design DF, you will need to label your blank samples with "blank".\
-`2.` **Growth factor** or **growth rate**: This refers to 
-
---> "CoRe_norm_factor" in your "Experimental_design" DF
-
+`1.` **Blank sample**: This refers to media samples where no cells have been cultured in, which will be used as blank. In detail, the mean of the blank sample of a feature (= metabolite) will be substracted from the values measured in each sample for the same feature. In the column "Condition" of the Experimental_design DF, you will need to label your blank samples with "blank".\
+`2.` **Growth factor** or **growth rate**: This refers to the different conditions and is either based on cell count or protein quantification at the start of the experiment (t0) and at the end of the experiment (t1) resulting in the growth factor (t1/t0). Otherwise, one can experimentally estimate the growth rate of each condition. Ultimately, this measure is used to normalize the data, since the amount of growth will impact the consumption and release of metabolites from the media and hence we need to account for this. If you do not have this information, this will be set to 1, yet be aware that this may affect the results.\
 \
-```{r, eval=FALSE}
-PreProcessing_res <-  MetaProViz::Preprocessing(Input_data=Media_M,
-              Input_SettingsFile=SampleInfo,
-              Input_SettingsInfo = c(Conditions = "Conditions",
-                                     Biological_Replicates = "Biolgical_Replicates",
-                                     CoRe_media = "blank"),
-                          Feature_Filtering = "Modified",
-                          Feature_Filt_Value = 0.8,
-                          TIC_Normalization = TRUE,# As we have raw data we will perform total ion count normalisation
-                          MVI=TRUE, #We assume the values are not missing at random and perform half minimum missing value imputation
-                          HotellinsConfidence = 0.99,# We perform outlier testing using 0.99 confidence intervall
-                          ExportQCPlots = TRUE,
-                          CoRe = TRUE) 
+You can pass these additional information via the parameter `Input_SettingsInfo`, by passing the column name for the `CoRe_norm_factor` in the `Input_SettingsFile` and the condition name for the `CoRe_media` in the `Input_data` file.\
+```{r}
+#Prepare the input:
+Media_input <- Media%>%
+  subset(!Conditions=="Pool", select = -c(2:6))%>%#remove pool samples and remove the information columns
+  column_to_rownames("Code")
 
- # Now we can have a look at the results table:
+Media_Metadata <- Media%>%
+  subset(!Conditions=="Pool", select = c(1:6))%>%#remove pool samples and keep the information columns only
+  column_to_rownames("Code")
+
+
+PreProcessing_res <-  MetaProViz::Preprocessing(Input_data=Media_input,
+                                                Input_SettingsFile=Media_Metadata,
+                                                Input_SettingsInfo = c(Conditions = "Conditions",
+                                                                       Biological_Replicates = "Biolgical_Replicates",
+                                                                       CoRe_norm_factor = "AverageCellNumber",
+                                                                       CoRe_media = "blank"),
+                                                Feature_Filtering = "Modified",
+                                                Feature_Filt_Value = 0.8,
+                                                TIC_Normalization = TRUE,# As we have raw data we will perform total ion count normalisation
+                                                MVI=TRUE, #We assume the values are not missing at random and perform half minimum missing value imputation
+                                                HotellinsConfidence = 0.99,# We perform outlier testing using 0.99 confidence interval
+                                                CoRe = TRUE) 
+
+# Now we can have a look at the results table:
 Media_Preprocessed <-  PreProcessing_res[["DF"]][["Preprocessing_output"]][["Processed_data"]]
 
-knitr::kable(Media_Preprocessed[6:12, 1:7]%>%rownames_to_column("Code"), caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.", row.names=FALSE)
-
-#Give the option to pass a name for the results, otherwise if run multiple analysis on the same day its overwritten!
-#Remove blank from DF after substraction has been done!
-#ignore blank samples for feature filtering per condition!
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Media_Preprocessed[1:5,1:9]%>%
+  kableExtra::kbl(caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an outlier in the first round of filtering.\
-As part of the `Preprocessing()` function several plots are generated, returned to the environment and saved. Those include the `Outlier_Plots`, which we can further check for the outlier:\
-```{r, eval=FALSE}
-#For each Round of HotellinsT2 test three plots will be saved:
-#1.PCA plot
-P1 <- PreProcessing_res[["Plot"]][["Outlier_plots"]][["PCA_round1"]]
-P1
-
-#2.Screeplot
-P2 <- PreProcessing_res[["Plot"]][["Outlier_plots"]][["ScreePlot_round1"]]
-P2
-#3.Hotellins Outlier
-P3 <- PreProcessing_res[["Plot"]][["Outlier_plots"]][["HotellingsPlot_round1"]]
-P3
-
-################### 
-#If there has been an outlier detected, it will be removed and the HotellinsT2 test is repeated. 
-```
+In the output table you can now see the column "Outliers" and for the Condition HK2 CCM, we can see that based on Hotellin's T2 test, samples were detected as outliers in the first and second round of filtering.\
+As part of the `Preprocessing()` function several plots are generated  and saved. Additionally, the ggplots are returned into the list to enable further modifiaction using the ggplot syntax. These plots include plots showing the outliers for each filtering round and other QC plots.\
 \
-The QC plots `QC_Plots` include an PCA plot using the processed data and highlighting the outliers. Moreover, if one has provided information about biological replicates a second plot is generated highlighting the biological replicates, which would highlight if there is a batch effect.\
-```{r, eval=FALSE}
-# PCA plot
-# 1. Marked Outliers:
-Q1 <- PreProcessing_res[["Plot"]][["QC_plots"]][["QC_PCA_and_Outliers"]]
-Q1
-
-#2. Marked Biological replicates:
-#Q2 <- PreProcessing_res[["Plot"]][["QC_plots"]][["QC_PCA_Replicates"]]
-#Q2
-```
-\
-As part of the **MetaProViz** visualization module one can easily customize the PCA plot and adapt color and shape for the information of interest. You can see more below for the `VizPCA()` function and generate some overview Heatmaps `VizHeatmap().
-\
+As part of the **MetaProViz** visualization module one can easily further customize the PCA plot and adapt color and shape for the information of interest. You can see more below for the `VizPCA()` function.\
 Before we proceed, we will remove the outlier:\
-```{r, eval=FALSE}
-Media_Preprocessed <- Media_Preprocessed[-c(1,4),]#remove MS55_29
+```{r}
+Media_Preprocessed <-Media_Preprocessed%>%
+  subset(!Outliers=="Outlier_filtering_round_1")
 ```
 \
-In metabolomics, sometimes samples are injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will summarise those save the results.
+In metabolomics, sometimes samples are injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will summarize those and save the results.
 
 ## DMA
-Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) calculates the Log2FC, p-value, adjusted p-value and t-value. With the different parameters of the `DMA()` function one can choose the statistical tests to calculate the p-value and adjusted p-value (parameters `STAT_pval` and `STAT_padj`).\
-As input we will use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values and information about the conditions that should be compared (even though we recommend to normalize the data and remove outliers prior to DMA). Noteworthy, if you have not performed missing value imputation and hence your data includes NAs or 0 values for some features, this will be taken into account in the `DMA()` function:\
-`1.` If all values of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= Inf/-Inf and the statistics will be NA\
-`2.` If some values  of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= positive or negative value, but the statistics will be NA\
+Differential Metabolite Analysis (`DMA`) between two conditions (e.g. Tumour versus Healthy) usually calculates the Log2FC, p-value, adjusted p-value and t-value. Yet, in a CoRe experiment the normalized metabolite values can be either a negative value, if the metabolite has been consumed from the media, or a positive value, if the metabolite has been released from the cell into the culture media. Since we can not calculate a Log2FC using negative values, we calculate the absolute difference between the mean of Condition 1 versus the mean of Condition 2. The absolute difference is log2 transformed in order to make the values comparable between the different metabolites, resulting in the Log2Dist. The result doesn't consider whether one product is larger than the other; it only looks at the magnitude of their difference. To reflect the direction of change between the two conditions we multiply with -1 if C1 < C2. By setting the paramteter `CoRe` = TRUE, instead of calclulating the Log2FC, the Log2 Distance is calculated.\
+With the different parameters `STAT_pval` and `STAT_padj` one can choose the statistical tests such as t.test, wilcoxon test, limma, annova, kruskal walles, etc. (see function reference for more information).\
+As input one can use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values, even though we recommend to normalize the data and remove outliers prior to DMA. Moreover, we require the `Input_SettingsFile_Sample` including the sample metadata with information which condition a sample corresponds to. Additionally, we enable the user to provide a `Plot_SettingsFile_Metab` containing the metadata for the features (metabolites), such as KEGG ID, pathway, retention time, etc.\
 \
-Important: For CoRe, we have negative and positive values! --> explain how we deal with them!
-
-
-In the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O) and hence we can perform multiple different comparisons. The results are automatically saved and returned into the global environment. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
-
+By defining the numerator and denominator as part of the `Input_SettingsInfo` parameter, it is defined which comparisons are performed:\
+1. **one_vs_one** (single comparison): numerator="Condition1", denominator ="Condition2"\
+2. **all_vs_one** (multiple comparison): numerator=NULL, denominator ="Condition"\
+3. **all_vs_all** (multiple comparison): numerator=NULL, denominator =NULL (=default)\
+\
+As input we will use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values and information about the conditions that should be compared (even though we recommend to normalize the data and remove outliers prior to DMA).\
+\
+In the example data we have seven different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A, 786-O, OSRC2, OSLM1B and RFX631) and hence we can perform multiple different comparisons.  The results can be automatically saved and all the results are returned in a list with the different data frames. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
 ```{r}
+#Prepare the input:
+Media_preprocessed_input <- Media_Preprocessed[,-c(2:7)]%>% 
+  remove_rownames()%>%
+  column_to_rownames("Sample_ID")
 
-MetaProViz::DMA(Input_data=Media_Preprocessed[,-c(2:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"), #we need to remove columns that do not include metabolite measurements
-                        Input_SettingsFile=Media_Preprocessed[,c(1:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"),#only maintain the information about condition and replicates
-                        Input_SettingsInfo = c(conditions="Conditions", numerator="786-O CCM", denominator = "HK2 CCM"),
-                        STAT_pval ="t.test",#ProDA is another test! --> estimates missing information
-                        STAT_padj="fdr",
-                        Input_MetaFile_Metab = MappingInfo[,c(1,4)], 
-                        OutputName='', 
-                        CoRe=TRUE, 
-                        Plot = TRUE)
+Media_Metadata <- Media_Preprocessed[,c(1:7)]%>%
+  remove_rownames()%>%
+  column_to_rownames("Sample_ID")
+
+# Perform multiple comparison All_vs_One using annova:
+DMA_Annova <-  MetaProViz::DMA(Input_data=Media_preprocessed_input,
+                               Input_SettingsFile_Sample=Media_Metadata,
+                               Input_SettingsInfo = c(conditions="Conditions", numerator=NULL, denominator = "HK2 CCM"),
+                               STAT_pval ="aov",
+                               STAT_padj="fdr",
+                               Input_SettingsFile_Metab = MappingInfo, 
+                               CoRe=TRUE)
+
+#Inspect the DMA results tables:
+DMA_786M1A_vs_HK2 <- DMA_Annova[["DF"]][["DMA_result"]][["786-M1A CCM_vs_HK2 CCM"]]
+Shapiro <- DMA_Annova[["DF"]][["Shapiro_result"]]
+
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Shapiro[,c(13:14, 1:4)]%>%
+  kableExtra::kbl(caption = "1. Preview of the Shaprio results for the different conditions.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+
+DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
+  kableExtra::kbl(caption = "2. Preview of the DMA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+
+#Question: Does limma works with negative values?
+```
+\
+Using the DMA results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `VizVolcano()`. You can see some examples below. 
+
+### ORA using the DMA results
+Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values. Given that for CoRe data it is important to consider weather a metabolite was consumed or released, it is sensible to perform ORA on each metabolite cluster.\
+Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites. If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
+\
+Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+```{r}
+#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+DM_ORA_res<- list()
+
+comparisons <- names(DMA_Annova[["DF"]][["DMA_result"]])
+for(comparison in comparisons){
+  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
+  DMA <- DMA_Annova[["DF"]][["DMA_result"]][[comparison]]
+  DMA <- DMA[complete.cases(DMA),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
+  dplyr::rename("Metabolite"="KEGGCompound")#We use the KEGG trivial names to match with the KEGG pathways
+  
+  #Perform ORA: Here we use 
+  DM_ORA_res[[comparison]] <- MetaProViz::MC_ORA(Input_data=DMA,
+                   MetabCluster_lab="CoRe",#column including information on the 
+                   RemoveBackground=FALSE,#we do not have any background
+                   PathwayFile=KEGG_Pathways[,-3],
+                   PathwayName="KEGG",
+                   minGSSize=3,
+                   maxGSSize=1000)
+}
+
+#Lets check how the results look like:
+MC_ORA_786M1A_vs_HK2_Consumed <- DM_ORA_res[["786-M1A CCM_vs_HK2 CCM"]][["Consumed"]]
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+MC_ORA_786M1A_vs_HK2_Consumed[c(1:5),-1]%>%
+  kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells focusing on pathways enriched in `consumed` metabolites.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
+## MCA
+Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups based on logical regulatory rules. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
+### MCA_CoRe
+This metabolite clustering method is based on logical regulatory rules to sort metabolites into metabolite clusters. Here you additionally need intracellular samples corresponding to the CoRe samples. Regulatory rules:\
+\
 ```{r}
-VizSuperplot(Input_data = Media_Preprocessed[,-c(2:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"),
-Input_SettingsFile =Media_Preprocessed[,c(1:7)]%>% remove_rownames() %>%column_to_rownames("Sample_ID"),
-Graprh_Style = "Box", # Bar, Box, Violin
-Superplot = NULL,
-OutputPlotName = "Box",
-Output_plots = "Together",
-Selected_Conditions = NULL, # not added yet
-Selected_Comparisons = NULL, # not added yet
-Theme = theme_classic(),
-Save_as_Plot = "svg") # for together it always pdf
+#Example of all possible flows:
+MCA_CORE <- MetaProViz::MCA_rules(data="CoRe")
 ```
+```{r, echo=FALSE}
+# Check how our data looks like:
+MCA_CORE[,1:6]%>%
+  kableExtra::kbl(caption ="Metabolite Clustering Analysis: CoRe.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) 
+```
+\
+Now we can load the corresponding pre-processed intracellular example data (For the detailed pre-processing please see the vignette "Standard Metabolomics").
+```{r}
+#Load the Pre-processed intracellular data:
+MetaProViz::toy_data(data="Standard_processed")
+
+```
+
+### ORA on each metabolite cluster
+
+
+
+
+
+
+# 3. Run MetaProViz Visualisation
+
+
+
 
 
 # Session information
