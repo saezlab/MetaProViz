@@ -21,7 +21,7 @@
 
 #' Imports toy data into environment
 #'
-#' @param data Either "Standard", "CoRe" or "MappingInfo" depending which data you would like to load
+#' @param data Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load
 #' @title Toy Data Import
 #' @description Import and process .csv file to create toy data.
 #' @importFrom utils read.csv
@@ -33,6 +33,9 @@ toy_data <- function(data) {
   Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
   Intra<- read.csv(Intra, check.names=FALSE)
 
+  Intra_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
+  Intra_DMA<- read.csv(Intra_DMA, check.names=FALSE)
+
   Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
   Media<- read.csv(Media, check.names=FALSE)
 
@@ -42,7 +45,9 @@ toy_data <- function(data) {
   # Return the toy data into environment
   if(data=="Standard"){
     assign("Intra", Intra, envir=.GlobalEnv)
-  } else if(data=="CoRe"){
+  } else if(data=="Standard_DMA"){
+    assign("Intra_DMA_786M1A_vs_HK2",  Intra_DMA, envir=.GlobalEnv)
+  }else if(data=="CoRe"){
     assign("Media", Media, envir=.GlobalEnv)
   } else if(data=="MappingInfo"){
     assign("MappingInfo", Pathways, envir=.GlobalEnv)

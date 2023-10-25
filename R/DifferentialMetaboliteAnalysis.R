@@ -383,9 +383,14 @@ DMA <-function(Input_data,
       CoRe_info <- rownames_to_column(CoRe_info, "Metabolite")
       names(CoRe_info)[2] <- paste("Mean",  comparisons[1,column], sep="_")
       names(CoRe_info)[3] <- paste("Mean",  comparisons[2,column], sep="_")
-      names(CoRe_info)[4] <- "CoRe"
+      names(CoRe_info)[4] <- "CoRe_specific"
 
-      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], CoRe_info[,c(1,4,2:3)], by="Metabolite", all.x=TRUE)
+      CoRe_info <-CoRe_info%>%
+        mutate(CoRe = case_when(CoRe_specific == "Released" ~ 'Released',
+                                CoRe_specific == "Consumed" ~ 'Consumed',
+                                TRUE ~ 'Released/Consumed'))
+
+      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], CoRe_info[,c(1,4:5,2:3)], by="Metabolite", all.x=TRUE)
 
       #Add info on Input:
       temp3 <- as.data.frame(t(C1))%>%rownames_to_column("Metabolite")
