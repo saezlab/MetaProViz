@@ -186,20 +186,22 @@ MC_ORA <- function(Input_data,
     }
 
       #Save file
+      g_save <- gsub("/", "-", g)
+
       if (Save_as_Results == "csv"){
         if(PathwayName ==""){
-          csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.csv', sep="")
+          csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g_save, '.csv', sep="")
           write_csv(clusterGoSummary,csvORA )#Export the ORA results as .csv
         } else{
-          csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.csv', sep="")#Export the ORA results as .csv
+          csvORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g_save, '.csv', sep="")#Export the ORA results as .csv
           write_csv(clusterGoSummary,csvORA )
         }
       }else if(Save_as_Results == "txt"){
       if(PathwayName ==""){
-        txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g, '.txt', sep="")
+        txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', g_save, '.txt', sep="")
         write.table(clusterGoSummary,txtORA, col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
       } else{
-        txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g, '.txt', sep="")#Export the ORA results as .csv
+        txtORA <-  paste(Results_folder_MC_ORA,"/", 'ClusterGoSummary_', PathwayName, '-', g_save, '.txt', sep="")#Export the ORA results as .csv
         write.table(clusterGoSummary,txtORA , col.names = TRUE, row.names = FALSE) #Export the ORA results as txt
       }
       }

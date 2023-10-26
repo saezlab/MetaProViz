@@ -28,12 +28,12 @@
 #' @param Plot_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param Plot_SettingsFile \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
-#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
+#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param Show_Loadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = NULL}
-#' @param color_scale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}
+#' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}
+#' @param color_scale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
@@ -45,11 +45,11 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                    Plot_SettingsFile= NULL,#Design
                    Input_data,
                    color_palette= NULL,
+                   color_scale="discrete",
                    shape_palette=NULL,
                    Show_Loadings = FALSE,
                    Scaling = TRUE,
                    Theme=NULL,#theme_classic()
-                   color_scale=NULL,
                    OutputPlotName= '',
                    Save_as_Plot = "svg",
                    Folder_Name = NULL
@@ -109,15 +109,17 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   #3. Check other plot-specific parameters:
   if(is.null(color_palette)){
-    safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
-    #check that length is enough for what the user wants to colour
-    #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
-  } else{
+    if((color_scale=="discrete")==TRUE){
+      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+    }else if(color_scale=="continuous"){
+      safe_colorblind_palette <- NULL
+    }
+    } else{
     safe_colorblind_palette <-color_palette
     #check that length is enough for what the user wants to colour
   }
   if(is.null(shape_palette)){
-    safe_shape_palette <- c(15,17,16,18,25,7,8,11,12)
+    safe_shape_palette <- c(15,17,16,18,6,7,8,11,12)
     #check that length is enough for what the user wants to shape
   } else{
     safe_shape_palette <-shape_palette
@@ -140,7 +142,10 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
   }
 
   # color_scale check
+  #check that length is enough for what the user wants to colour
+  #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
 
+  #save
   if (!is.null(Save_as_Plot)) {
     Save_as_Plot_options <- c("svg","pdf", "png")
     if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
@@ -177,29 +182,26 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
 
   #Prepare the color scheme:
   if("color" %in% names(Plot_SettingsInfo)==TRUE){
-    #color that will be used
-    color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
-
-    # numeric scale or continuous
-    if(is.null(color_scale)==TRUE){#Will be set automatically:
-      if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
-        if(length(unique(InputPCA$color)) > 4){ # change this to change the number after which color is not distinct but continuous
-          InputPCA$color <- as.numeric(InputPCA$color)
-        }else{
-          InputPCA$color <- as.factor(InputPCA$color)
-        }
-      }
-    }else if(color_scale=="discrete"){
+    if(color_scale=="discrete"){
       InputPCA$color <- as.factor(InputPCA$color)
+      #color that will be used for distinct
+      color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
     }else if(color_scale=="continuous"){
       if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
         InputPCA$color <- as.numeric(InputPCA$color)
+        #color that will be used for continuous
+        color_select <- safe_colorblind_palette
       }else{
         InputPCA$color <- as.factor(InputPCA$color)
+        #Overwrite color pallette
+        safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+        #color that will be used for distinct
+        color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
+        #Overwrite color_scale
+        color_scale<- "discrete"
         warning("color_scale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
       }
     }
-
 
     #assign column and legend name
     InputPCA  <- InputPCA%>%
@@ -246,12 +248,17 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
                   loadings.label.vjust = 1.2,
                   loadings.label.size=2.5,
                   loadings.colour="grey10",
-                  loadings.label.colour="grey10") +
+                  loadings.label.colour="grey10" ) +
     scale_shape_manual(values=shape_select)+
-    scale_color_manual(values=color_select)+
     ggtitle(paste(OutputPlotName)) +
     geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
     geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+
+    if(color_scale=="discrete"){
+      PCA <-PCA + scale_color_manual(values=color_select)
+    }else if(color_scale=="continuous" & is.null(color_palette)){
+      PCA <-PCA + color_select
+    }
 
   #Add the theme
   if(is.null(Theme)==FALSE){

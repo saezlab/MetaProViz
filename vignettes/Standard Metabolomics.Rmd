@@ -377,9 +377,16 @@ MCAres[["DF"]][["ClusterSummary"]]%>%
 ### ORA on each metabolite cluster
 As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method. As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites). In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
 ```{r}
+#We need a pathway file with the columns Metabolite, term and description
 PathwayInput <- MappingInfo[,c(1,4)]%>%
   rename("term"="Pathway")
 PathwayInput$Description <- PathwayInput$term
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+PathwayInput[1:6,]%>%
+  kableExtra::kbl(caption ="Pathway Input for MetaProViz::MC_ORA.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) 
 ```
 
 ```{r, include=FALSE, warning=FALSE}
@@ -387,7 +394,7 @@ MC_ORA_result<- MetaProViz::MC_ORA(Input_data=MCAres[["DF"]][["MCA_result"]],
                    MetabCluster_lab="RG2_Significant",
                    RemoveBackground=TRUE,
                    PathwayFile=PathwayInput,
-                   PathwayName="Selfmade",
+                   PathwayName="KEGG",
                    minGSSize=3,
                    maxGSSize=1000)
 ```

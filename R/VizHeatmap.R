@@ -247,8 +247,9 @@ VizHeatmap <- function(Input_data,
       }
 
       # Make the plot
-      set.seed(1234)
-      heatmap <- pheatmap::pheatmap(t(data_path),
+      if(nrow(t(data_path))>= 2){
+        set.seed(1234)
+        heatmap <- pheatmap::pheatmap(t(data_path),
                                      show_rownames = as.logical(show_rownames),
                                      show_colnames = as.logical(show_colnames),
                                      clustering_method =  "complete",
@@ -264,18 +265,20 @@ VizHeatmap <- function(Input_data,
                                      fontsize=9,
                                      main = paste(OutputPlotName, " Metabolites: ", i, sep=" " ))
 
-      #Width and height according to Sample and metabolite number
-      Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
-      heatmap <-Plot_Sized[[3]]
-      heatmap <- ggplot2::ggplot() +
-        annotation_custom(heatmap)
+        #Width and height according to Sample and metabolite number
+        Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
+        heatmap <-Plot_Sized[[3]]
+        heatmap <- ggplot2::ggplot() +
+          annotation_custom(heatmap)
 
-
-      #----- Save
-      cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      if (!is.null(Save_as_Plot)) {
-        ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-      }
+        #----- Save
+        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        if (!is.null(Save_as_Plot)) {
+          ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        }
+      }else{
+          message(i , " includes >= 2 objects and is hence not plotted.")
+        }
       #plot(heatmap)
       }
     }else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
@@ -346,6 +349,7 @@ VizHeatmap <- function(Input_data,
         }
 
         # Make the plot
+        if(nrow(t(data_path))>= 2){
         set.seed(1234)
         heatmap <- pheatmap::pheatmap(t(data_path),
                                       show_rownames = as.logical(show_rownames),
@@ -373,6 +377,9 @@ VizHeatmap <- function(Input_data,
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if (!is.null(Save_as_Plot)) {
           ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
+        }
+        }else{
+          message(i , " includes >= 2 objects and is hence not plotted.")
         }
         #plot(heatmap)
         }
@@ -451,6 +458,7 @@ VizHeatmap <- function(Input_data,
             }
 
             # Make the plot
+            if(nrow(t(data_path))>= 2){
             set.seed(1234)
             heatmap <- pheatmap::pheatmap(t(data_path),
                                           show_rownames = as.logical(show_rownames),
@@ -480,6 +488,9 @@ VizHeatmap <- function(Input_data,
             cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
             if (!is.null(Save_as_Plot)) {
               ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",cleaned_s, "_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
+            }
+            }else{
+              message(i , " includes >= 2 objects and is hence not plotted.")
             }
             #plot(heatmap)
             }
@@ -538,6 +549,7 @@ VizHeatmap <- function(Input_data,
     }
 
     #Make the plot:
+    if(nrow(t(data))>= 2){
     set.seed(1234)
     heatmap <- pheatmap::pheatmap(t(data),
                                   show_rownames = as.logical(show_rownames),
@@ -565,6 +577,9 @@ VizHeatmap <- function(Input_data,
     #----- Save
     if (!is.null(Save_as_Plot)) {
       ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
+    }
+    }else{
+      message(i , " includes >= 2 objects and is hence not plotted.")
     }
     #plot(heatmap)
   }
