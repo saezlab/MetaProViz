@@ -895,15 +895,33 @@ Kruskal <-function(Input_data,
     formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
     posthoc.res= rstatix::dunn_test(data, formula, p.adjust.method = STAT_padj)
 
-    res <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
-    res[[colnames(Dunndata)[col] ]] <-  posthoc.res$p.adj
-    res <- res[res$comparisons %in% Dunn_Pres$comparisons ,] # take only the comparisons selected
-    Dunn_Pres <- merge(Dunn_Pres,res,by="comparisons")
+    pres <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
+    revpres <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" ))
+    # Check if our comparisons have correct direction or reverse
+    if(sum(revpres$comparisons %in% Dunn_Pres$comparisons) > sum(pres$comparisons %in% Dunn_Pres$comparisons)){
+     pres <- revpres
+    }else{
+     pres <- pres
+    }
 
-    tvalues <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
-    tvalues[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
-    tvalues <- tvalues[tvalues$comparisons %in% Dunn_Pres$comparisons ,]
-    Dunn_Tres <- merge(Dunn_Tres,tvalues,by="comparisons")
+    pres[[colnames(Dunndata)[col] ]] <-  posthoc.res$p.adj
+    pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons ,] # take only the comparisons selected
+    Dunn_Pres <- merge(Dunn_Pres,pres,by="comparisons")
+
+    tres <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
+    revtres <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" ))
+    # Check if our comparisons have correct direction or reverse
+    if(sum(revtres$comparisons %in% Dunn_Pres$comparisons) > sum(tres$comparisons %in% Dunn_Pres$comparisons)){
+      tres <- revtres
+          tres[[colnames(Dunndata)[col] ]] <- - posthoc.res$statistic
+    }else{
+      tres <- tres
+      tres[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
+    }
+
+
+    tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons ,]
+    Dunn_Tres <- merge(Dunn_Tres,tres,by="comparisons")
   }
 
   #Make output DFs:
