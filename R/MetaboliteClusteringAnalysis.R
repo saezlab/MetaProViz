@@ -704,48 +704,48 @@ MCA_CoRe <- function(Intra_File,
                                Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe Significant Positive_Consumed',
                                Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed"~ 'Intra Not Significant + CoRe UP_Consumed',
 
-                               #Consumed/Released (Consumed in one, released in the other)
-                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra DOWN + CoRe DOWN_Consumed/Released',
+                               #Released/Consumed (Consumed in one, released in the other)
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra DOWN + CoRe DOWN_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_CoRe_Direction=="Not Detected"~ 'Intra DOWN + CoRe Not Detected',
-                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra DOWN + CoRe Not Significant_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra DOWN + CoRe Significant Negative_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra DOWN + CoRe Significant Positive_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra DOWN + CoRe UP_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra DOWN + CoRe Not Significant_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra DOWN + CoRe Significant Negative_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra DOWN + CoRe Significant Positive_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra DOWN + CoRe UP_Released/Consumed',
 
-                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra UP + CoRe DOWN_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_CoRe_Direction=="Not Detected" ~ 'Intra UP + CoRe Not Detected',
-                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe Not Significant_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe Significant Negative_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe Significant Positive_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra UP + CoRe UP_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra UP + CoRe Not Significant_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra UP + CoRe Significant Negative_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra UP + CoRe Significant Positive_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="UP" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra UP + CoRe UP_Released/Consumed',
 
-                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Detected + CoRe DOWN_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_CoRe_Direction=="Not Detected" ~ 'Intra Not Detected + CoRe Not Detected',
-                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe Not Significant_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe Significant Negative_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe Significant Positive_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed/Released" ~ 'Intra Not Detected + CoRe UP_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Detected + CoRe Not Significant_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Detected + CoRe Significant Negative_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Detected + CoRe Significant Positive_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Detected + CoRe UP_Released/Consumed',
 
-                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Negative + CoRe DOWN_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_CoRe_Direction=="Not Detected"~ 'Intra Significant Negative + CoRe Not Detected',
-                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe Not Significant_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe Significant Negative_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe Significant Positive_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Negative + CoRe UP_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Negative + CoRe Not Significant_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Negative + CoRe Significant Negative_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Negative + CoRe Significant Positive_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Negative + CoRe UP_Released/Consumed',
 
-                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Positive + CoRe DOWN_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_CoRe_Direction=="Not Detected"~ 'Intra Significant Positive + CoRe Not Detected',
-                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe Not Significant_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe Significant Negative_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe Significant Positive_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Significant Positive + CoRe UP_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Positive + CoRe Not Significant_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Positive + CoRe Significant Negative_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Positive + CoRe Significant Positive_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Significant Positive + CoRe UP_Released/Consumed',
 
-                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe DOWN_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Significant + CoRe DOWN_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Detected" & CoRe_DF_CoRe_Direction=="Not Detected"~ 'Intra Not Significant + CoRe Not Detected',
-                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe Not Significant_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe Significant Negative_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe Significant Positive_Consumed/Released',
-                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Consumed/Released"~ 'Intra Not Significant + CoRe UP_Consumed/Released',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Significant + CoRe Not Significant_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Negative" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Significant + CoRe Significant Negative_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="Significant Positive" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Significant + CoRe Significant Positive_Released/Consumed',
+                               Intra_DF_Cutoff_Specific=="Not Significant" & CoRe_DF_Cutoff_Specific=="UP" & CoRe_DF_CoRe_Direction=="Released/Consumed"~ 'Intra Not Significant + CoRe UP_Released/Consumed',
                                TRUE ~ 'NA'))%>%
     mutate(RG2_Significant = case_when(BG_Method =="FALSE"~ 'Background = FALSE',
                                        Intra_DF_Cutoff_Specific=="DOWN" & CoRe_DF_Cutoff_Specific=="DOWN" & CoRe_DF_CoRe_Direction=="Released" ~ 'Both_DOWN (Released)',
@@ -1008,14 +1008,14 @@ MCA_CoRe <- function(Intra_File,
 
   #Safe the DF and return the groupings
   ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
-  MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Intra_DF_Detected","Intra_DF_ValueCol","Intra_DF_PadjCol","Intra_DF_Cutoff", "Intra_DF_Cutoff_Specific", "CoRe_DF_Detected", "CoRe_DF_ValueCol","CoRe_DF_PadjCol","CoRe_DF_Cutoff", "CoRe_DF_Cutoff_Specific", "BG_Method", "RG1_All", "RG2_Significant", "RG3_SignificantChange")]
+  MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Intra_DF_Detected","Intra_DF_ValueCol","Intra_DF_PadjCol","Intra_DF_Cutoff", "Intra_DF_Cutoff_Specific", "CoRe_DF_Detected", "CoRe_DF_ValueCol","CoRe_DF_PadjCol","CoRe_DF_Cutoff", "CoRe_DF_Cutoff_Specific", "BG_Method", "RG1_All", "RG2_Significant", "RG3_Change")]
 
   CoReValueCol_Unique<-paste("CoRe_DF_",CoReValueCol)
   CoRePadjCol_Unique <-paste("CoRe_DF_",CoRePadjCol)
   IntraValueCol_Unique<-paste("Intra_DF_",IntraValueCol)
   IntraPadjCol_Unique <-paste("Intra_DF_",IntraPadjCol)
 
-  MergeDF_Select2<- subset(MergeDF, select=-c(Intra_DF_Detected,Intra_DF_Cutoff, CoRe_DF_Detected,CoRe_DF_Cutoff, CoRe_DF_Cutoff_Specific, BG_Method, RG1_All, RG2_Significant, RG3_SignificantChange))%>%
+  MergeDF_Select2<- subset(MergeDF, select=-c(Intra_DF_Detected,Intra_DF_Cutoff, CoRe_DF_Detected,CoRe_DF_Cutoff, CoRe_DF_Cutoff_Specific, BG_Method, RG1_All, RG2_Significant, RG3_Change))%>%
     dplyr::rename(!!CoReValueCol_Unique :="CoRe_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
                   !!CoRePadjCol_Unique :="CoRe_DF_PadjCol",
                   !!IntraValueCol_Unique :="Intra_DF_ValueCol",
@@ -1037,10 +1037,10 @@ MCA_CoRe <- function(Intra_File,
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
-  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
-    count(RG3_SignificantChange, name="Number of Genes")%>%
-    dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
-  ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
+  ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_Change")]%>%
+    count(RG3_Change, name="Number of Genes")%>%
+    dplyr::rename("SiRCle cluster Name"= "RG3_Change")
+  ClusterSummary_RG3$`Regulation Grouping` <- "RG3_Change"
 
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
