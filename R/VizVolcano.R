@@ -190,9 +190,7 @@ VizVolcano <- function(Plot_Settings="Standard",
   #4. AdditionalInput_data
   if(Plot_Settings=="Compare" & is.data.frame(AdditionalInput_data)==TRUE){
     if(paste(x) %in% colnames(AdditionalInput_data)==TRUE & paste(y) %in% colnames(AdditionalInput_data)==TRUE){
-      AdditionalInput_data <- AdditionalInput_data %>%
-        dplyr::rename("Log2FC"=paste(x),
-                      "p.adj"=paste(y))
+      AdditionalInput_data <- AdditionalInput_data
       } else{
         stop("Check your AdditionalInput_data. The column name of x and/or y does not exist in AdditionalInput_data.")
       }
@@ -207,7 +205,7 @@ VizVolcano <- function(Plot_Settings="Standard",
      #Combine DFs and add appropriate column names
      Input_data[,"comparison"]  <- as.character(paste(Comparison_name[["Input_data"]]))
      AdditionalInput_data[,"comparison"]  <- as.character(paste(Comparison_name[["AdditionalInput_data"]]))
-     Input_Comparison <- rbind(Input_data[,c("Metabolite", "Log2FC", "p.adj", "comparison")],AdditionalInput_data[,c("Metabolite", "Log2FC", "p.adj", "comparison")])
+     Input_Comparison <- rbind(Input_data[,c("Metabolite", x, y, "comparison")],AdditionalInput_data[,c("Metabolite", x, y, "comparison")])
    } else if(Plot_Settings=="Comparison" & is.data.frame(AdditionalInput_data)==FALSE){
     stop("If Plot_Settings=`Comparison` you have to provide a DF for AdditionalInput_data.")
    }
@@ -558,7 +556,7 @@ VizVolcano <- function(Plot_Settings="Standard",
               names(sha) <- InputVolcano$comparison[row]
               keyvalsshape <- c(keyvalsshape, sha)
             }
-          } else if("shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==FALSE){
+          } else if("shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==FALSE | "shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==TRUE){
             shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
 
             keyvalsshape <- c()
@@ -679,7 +677,7 @@ VizVolcano <- function(Plot_Settings="Standard",
             names(sha) <- InputVolcano$comparison[row]
             keyvalsshape <- c(keyvalsshape, sha)
           }
-        } else if("shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==FALSE){
+        } else if("shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==FALSE | "shape" %in% names(Plot_SettingsInfo)==FALSE & "color" %in% names(Plot_SettingsInfo)==TRUE){
           shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
 
           keyvalsshape <- c()
@@ -857,7 +855,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
         ## Store the plot in the 'plots' list
         PlotList[[cleaned_i]] <- Plot
-       # plot(Plot)
+        plot(Plot)
       }
     }
     #invisible(PlotList)
