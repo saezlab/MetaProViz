@@ -275,7 +275,8 @@ DMA <-function(Input_data,
   }
 
 
-  # Here is the Shapiro
+  # Check hypothesis test assumptions
+  # Normality
   Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(Input_data=Input_data,
                                                          Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                                          Input_SettingsInfo=Input_SettingsInfo,
@@ -287,6 +288,21 @@ DMA <-function(Input_data,
                                                          Save_as_Results=Save_as_Results,
                                                          Plot=FALSE,
                                                          Folder_Name=Results_folder_DMA_folder_Shapiro_folder))
+
+  #Variance homogeneity
+  if(MultipleComparison==TRUE){
+    Bartlett_output<-suppressWarnings(MetaProViz:::Bartlett(Input_data=Input_data,
+                                                           Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                                           Input_SettingsInfo=Input_SettingsInfo,
+                                                           OutputName=OutputName,
+                                                           Save_as_Plot=Save_as_Plot,
+                                                           Save_as_Results=Save_as_Results,
+                                                           Plot=FALSE,
+                                                           Folder_Name=Results_folder_DMA_folder))
+
+  }
+
+
 
   ###############################################################################################################################################################################################################
   #### Prepare the data ######
@@ -895,32 +911,14 @@ Kruskal <-function(Input_data,
     formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
     posthoc.res= rstatix::dunn_test(data, formula, p.adjust.method = STAT_padj)
 
-    pres <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
-    revpres <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" ))
-    # Check if our comparisons have correct direction or reverse
-    if(sum(revpres$comparisons %in% Dunn_Pres$comparisons) > sum(pres$comparisons %in% Dunn_Pres$comparisons)){
-     pres <- revpres
-    }else{
-     pres <- pres
-    }
-
-    pres[[colnames(Dunndata)[col] ]] <-  posthoc.res$p.adj
+    pres <- data.frame(comparisons = c(paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ), paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" )))
+    pres[[colnames(Dunndata)[col] ]] <-  c(posthoc.res$p.adj, posthoc.res$p.adj )
     pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons ,] # take only the comparisons selected
     Dunn_Pres <- merge(Dunn_Pres,pres,by="comparisons")
 
-    tres <- data.frame(comparisons =  paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ))
-    revtres <- data.frame(comparisons =  paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" ))
-    # Check if our comparisons have correct direction or reverse
-    if(sum(revtres$comparisons %in% Dunn_Pres$comparisons) > sum(tres$comparisons %in% Dunn_Pres$comparisons)){
-      tres <- revtres
-          tres[[colnames(Dunndata)[col] ]] <- - posthoc.res$statistic
-    }else{
-      tres <- tres
-      tres[[colnames(Dunndata)[col] ]] <-  posthoc.res$statistic
-    }
-
-
-    tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons ,]
+    tres <- data.frame(comparisons = c(paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ), paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" )))
+    tres[[colnames(Dunndata)[col] ]] <-  c(posthoc.res$statistic, -posthoc.res$statistic )
+    tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons ,]# take only the comparisons selected
     Dunn_Tres <- merge(Dunn_Tres,tres,by="comparisons")
   }
 
@@ -1525,4 +1523,173 @@ Shapiro <-function(Input_data,
   if(Plot == TRUE){
     Shapiro_output$Plot$Distributions
   }
+}
+
+
+
+###########################################################################################
+### ### ### Bartlett function: Internal Function to perform Bartlett test and plots ### ###
+###########################################################################################
+
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param Input_SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param OutputName String which is added to the output files of the DMA.
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
+#' @param Plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#'
+#' @keywords Bartlett test,Normality testing, Density plot, QQplot
+#' @export
+#'
+
+
+
+Bartlett <-function(Input_data,
+                    Input_SettingsFile_Sample,
+                    Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
+                    OutputName="",
+                    Save_as_Plot="svg",
+                    Save_as_Results="csv",
+                    Plot=TRUE,
+                    Folder_Name=NULL
+){
+
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    install.packages(new.packages)
+  }
+
+  ################################################################################################################################################################################################
+  ## ------------ Check Input files ----------- ##
+  #1. Input_data and Conditions
+  if(class(Input_data) != "data.frame"){
+    stop("Input_data should be a data.frame. It's currently a ", paste(class(Input_data), ".",sep = ""))
+  }
+  if(any(duplicated(row.names(Input_data)))==TRUE){
+    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
+  } else{
+    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
+    if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("Input_data needs to be of class numeric")
+    } else{
+      Test_match <- merge(Input_SettingsFile_Sample, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile_Sample"?
+      if(nrow(Test_match) ==  0){
+        stop("row.names Input_data need to match row.names Input_SettingsFile_Sample.")
+      } else{
+        Input_data <- Input_data
+      }
+    }
+  }
+
+  ## ------------ Check Input SettingsInfo ----------- ##
+  #3. Input_SettingsInfo
+  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
+    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
+      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
+    }else{# if true rename to Conditions
+      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
+        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+    }
+  }else{
+    stop("You have to provide a Input_SettingsInfo for conditions.")
+  }
+
+  ##########################
+  if("denominator" %in% names(Input_SettingsInfo)==TRUE){
+    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile_Sample$Conditions==FALSE){
+      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
+    }else{
+      denominator <- Input_SettingsInfo[["denominator"]]
+    }
+  }
+  if("numerator" %in% names(Input_SettingsInfo)==TRUE){
+    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile_Sample$Conditions  == FALSE){
+      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
+    }else{
+      numerator <- Input_SettingsInfo[["numerator"]]
+    }
+  }
+  if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==TRUE){
+    stop("Check input. The selected denominator option is empty while ",paste(Input_SettingsInfo[["numerator"]])," has been selected as a numerator. Please add a denminator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
+  }
+
+  ## ------------ Check Denominator/numerator ----------- ##
+  #4.  Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
+  if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE){
+    conditions = Input_SettingsFile_Sample$Conditions
+    denominator <-unique(Input_SettingsFile_Sample$Conditions)
+    numerator <-unique(Input_SettingsFile_Sample$Conditions)
+  }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
+    #all-vs-one: Generate the pairwise combinations
+    conditions = Input_SettingsFile_Sample$Conditions
+    denominator <- Input_SettingsInfo[["denominator"]]
+    numerator <-unique(Input_SettingsFile_Sample$Conditions)
+  }
+
+  ## ------------ Check General parameters ----------- ##
+  #6. General parameters
+  if(is.logical(Plot) == FALSE){
+    stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
+  }
+  Save_as_Plot_options <- c("svg","pdf","png")
+  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  }
+  Save_as_Results_options <- c("txt","csv", "xlsx" )
+  if(Save_as_Results %in% Save_as_Results_options == FALSE){
+    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+  }
+
+
+  # Use Bartletts test
+  bartlett_res =  apply(Input_data,2,function(x) bartlett.test(x~conditions))
+
+  #Make the output DF
+  DF_bartlett_results <- as.data.frame(matrix(NA, nrow = ncol(Input_data)), ncol = 1)
+  rownames(DF_bartlett_results) <- colnames(Input_data)
+  colnames(DF_bartlett_results) <- "Bartlett p.val"
+
+  for(l in 1:length(bartlett_res)){
+    DF_bartlett_results[l, 1] <-bartlett_res[[l]]$p.value
+  }
+  DF_bartlett_results <- DF_bartlett_results %>% mutate(`Var homogeneity`= case_when(`Bartlett p.val`< 0.05~ FALSE,
+                                                                                     `Bartlett p.val`>=0.05 ~ TRUE))
+  # if p<0.05 then unequal variances
+  paste("For",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
+
+  DF_Bartlett_results_out <- DF_bartlett_results
+
+  # Save the DF Bartlett
+  if (Save_as_Results == "xlsx"){
+    writexl::write_xlsx(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
+  }else if (Save_as_Results == "csv"){
+    write.csv(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
+  }else if (Save_as_Results == "txt"){
+    write.table(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  }
+
+  # Make density plots
+  Bartlettplot <- ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`Bartlett p.val`)) +
+    geom_histogram(aes(y=..density..), colour="black", fill="white")  +
+    geom_density(alpha = 0.2, fill = "grey45")+ ggtitle("Bartlett's test p.value distribution") +
+    xlab("p.value")+ geom_vline(aes(xintercept = 0.05, color="darkred"))
+
+
+  # Do we save the pvalue density plot?
+  # ggsave(filename = paste0(Folder_Name, "/Bartlett_Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = Bartlettplot, width = 10,  height = 8)
+
+  if(Plot == TRUE){
+    plot(Bartlettplot)
+  }
+
+  message("For ",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
+
+  Bartlett_output_list<- list("DF"=DF_Bartlett_results_out , "Plot"= Bartlettplot)
+
+  suppressWarnings(invisible(return(Bartlett_output_list)))
+
 }
