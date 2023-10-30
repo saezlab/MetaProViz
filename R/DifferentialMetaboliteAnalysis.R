@@ -27,11 +27,12 @@
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
 #' @param Input_SettingsFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
-#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
+#' @param VST TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name. \strong(Default = NULL)
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @export
@@ -49,6 +50,7 @@ DMA <-function(Input_data,
                Input_SettingsFile_Metab = NULL,
                OutputName='',
                CoRe=FALSE,
+               VST = FALSE,
                Save_as_Plot = "svg",
                Save_as_Results = "csv",
                Plot = TRUE,
@@ -520,7 +522,13 @@ DMA <-function(Input_data,
       STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
     }
     }else{ # MultipleComparison = TRUE
-      # conditions =as.factor(conditions)
+
+      #Correct data heteroscedasticity
+      if(STAT_pval!="lmFit" & VST == TRUE){
+        temp <- vst(Input_data,Plot=FALSE)
+        Input_data <- temp$DFs$Corrected_data
+      }
+
       if(all_vs_all ==TRUE){
         message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
         }else{# for 1 vs all
@@ -1756,6 +1764,7 @@ Bartlett <-function(Input_data,
   # if p<0.05 then unequal variances
   paste("For",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
 
+  DF_bartlett_results <- DF_bartlett_results %>% rownames_to_column("Metabolite") %>% relocate("Metabolite")
   DF_Bartlett_results_out <- DF_bartlett_results
 
   # Save the DF Bartlett
@@ -1788,3 +1797,83 @@ Bartlett <-function(Input_data,
   suppressWarnings(invisible(return(Bartlett_output_list)))
 
 }
+
+
+################################################################
+### ### ### Variance stabilizing transformation function ### ###
+################################################################
+
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param OutputName String which is added to the output files of the DMA.
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#'
+#' @keywords Heteroscedasticity, variance stabilizing transformation
+#' @export
+
+vst <- function(Input_data,
+                OutputName="",
+                Save_as_Plot="svg",
+                Plot=TRUE,
+                Folder_Name=NULL
+){
+
+  ## ------------ Create Results output folder ----------- ##
+  if(is.null(Folder_Name)==TRUE){
+    WorkD <- getwd()
+    Results_folder <- file.path(WorkD, name)
+    if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
+    Results_folder_DMA_folder <- file.path(Results_folder,"DMA") # Make DMA results folder
+    if (!dir.exists(Results_folder_DMA_folder)) {dir.create(Results_folder_DMA_folder)}
+  }else{
+    Results_folder_DMA_folder_Shapiro_folder <- Folder_Name
+  }
+
+  # model the mean and variance relationship on the data
+  suppressMessages(melted <- reshape2::melt(Input_data))
+  het.data <- melted %>% group_by(variable) %>% # make a dataframe to save the values
+    summarise(mean=mean(value), sd=sd(value))
+  het.data$lm <- 1 # add a common group for the lm function to account for the whole data together
+
+  invisible( het_plot <-  ggplot(het.data, aes(x = mean, y = sd)) +
+               geom_point() + theme_bw() +
+               scale_x_continuous(trans='log2') +
+               scale_y_continuous(trans='log2') + xlab("log(mean)") + ylab("log(sd)") + geom_abline(intercept = 0, slope = 1)  +
+               ggtitle(" Data heteroscedasticity")  + geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
+
+  # select data
+  prevst.data <- het.data
+  prevst.data$mean <- log(prevst.data$mean)
+  prevst.data$sd <- log(prevst.data$sd)
+
+  # calculate the slope of the log data
+  data.fit <- lm(sd~mean, prevst.data)
+  coef(data.fit)
+
+  # Make the vst transformation
+  data.vst <- as.data.frame(Input_data^(1-coef(data.fit)['mean'][1]))
+
+  # Heteroscedasticity visual check again
+  suppressMessages(melted.vst <- reshape::melt(data.vst))
+  het.vst.data <- melted.vst %>% group_by(variable) %>% # make a dataframe to save the values
+    summarise(mean=mean(value), sd=sd(value))
+  het.vst.data$lm <- 1 # add a common group for the lm function to account for the whole data together
+
+  # plot variable stadard deviation as a function of the mean
+  invisible(hom_plot <- ggplot(het.vst.data, aes(x = mean, y = sd)) +
+              geom_point() + theme_bw() +
+              scale_x_continuous(trans='log2') +
+              scale_y_continuous(trans='log2') + xlab("log(mean)") + ylab("log(sd)") + geom_abline(intercept = 0)  +
+              ggtitle("Vst transformed data")  + geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
+
+  invisible(scedasticity_plot <- patchwork::wrap_plots(het_plot,hom_plot))
+  if(Plot==TRUE){
+    scedasticity_plot
+  }
+
+  ggsave(filename = paste0(Results_folder_DMA_folder, "/Scedasticity_plot",OutputName,".",Save_as_Plot), plot = scedasticity_plot, width = 12,  height = 6)
+
+  return(list("DFs" = list("Corrected_data" = data.vst), "Plots" = list("scedasticity_plot" = scedasticity_plot)))
+}
+
