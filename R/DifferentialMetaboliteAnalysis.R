@@ -23,7 +23,7 @@
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denominator  = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
 #' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param OutputName String which is added to the output files of the DMA.
 #' @param Input_SettingsFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
@@ -168,7 +168,7 @@ DMA <-function(Input_data,
       stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
     }
   }else{
-    STAT_pval_options <- c("aov", "kruskal.test", "lmFit")
+    STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
     if(STAT_pval %in% STAT_pval_options == FALSE){
       stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
     }
@@ -543,7 +543,13 @@ DMA <-function(Input_data,
                               Log2FC_table=Log2FC_table,
                               all_vs_all=all_vs_all,
                               comparisons=comparisons)
-          }else if(STAT_pval=="lmFit"){
+        }else if(STAT_pval=="welch"){
+          STAT_C1vC2 <-Welch(Input_data=Input_data,
+                               conditions=conditions,
+                               Log2FC_table=Log2FC_table,
+                               all_vs_all=all_vs_all,
+                               comparisons=comparisons)
+        }else if(STAT_pval=="lmFit"){
             STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
                                          Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                          Input_SettingsInfo=Input_SettingsInfo,
@@ -615,7 +621,7 @@ DMA <-function(Input_data,
   ###############  Plots ###############
   volplotList = list()
   if(MultipleComparison==TRUE){
-    for(DF in names(DMA_Output)){
+    for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
       Volplotdata<- DMA_Output[[DF]]
 
       dev.new()
@@ -960,6 +966,95 @@ Kruskal <-function(Input_data,
 
   return(STAT_C1vC2)
 }
+
+
+
+#############################################################################################
+### ### ### Welch: Internal Function to perform anova for unequal variance groups ### ### ###
+#############################################################################################
+
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param Input_SettingsInfo Passed to DMA
+#' @param conditions Factor with sample group information.
+#' @param Log2FC_table Table with Metabolites are rows and a Log2FC column \strong(Default = Log2FC_table)
+#' @param all_vs_all  True for multiple comparison of all against all or FALSE for multiple comparison of all against one selected base.
+#' @param comparisons Dataframe containing the comparison information for multiple comparison. The first row is the numerator, the second row is the denominator and each column is a different comparison.
+#'
+#' @keywords Welch anova,Hypothesis testing, p.value, Games-Howell-test
+#' @export
+
+Welch <-function(Input_data,
+                 Input_SettingsInfo,
+                 conditions,
+                 Log2FC_table,
+                 all_vs_all,
+                 comparisons
+){
+
+  ## 1. Welch's ANOVA using oneway.test is not used by the Games post.hoc function
+  #aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
+  games_data <- Input_data
+  games_data$conditions <- conditions
+  posthoc.res.list <- list()
+
+  ## 2. Games post hoc test
+  for (col in names(Input_data)){ # col = names(Input_data)[1]
+    posthoc.res <- rstatix::games_howell_test(data = games_data,detailed =TRUE, formula = as.formula(paste0(col, " ~ ", "conditions"))) %>% as.data.frame()
+
+    result.df <- rbind(data.frame(p.adj = posthoc.res[,"p.adj"],
+                                  t.val = posthoc.res[,"statistic"],
+                                  row.names = paste(posthoc.res[["group1"]], posthoc.res[["group2"]], sep = "-")),
+                       data.frame(p.adj = posthoc.res[,"p.adj"],
+                                  t.val = -posthoc.res[,"statistic"],
+                                  row.names = paste(posthoc.res[["group2"]], posthoc.res[["group1"]], sep = "-")))
+    posthoc.res.list[[col]] <- result.df
+  }
+  Games_Pres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'p.adj'])) %>% as.data.frame()
+  colnames(Games_Pres) <- rownames(posthoc.res.list[[1]])
+  comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
+  Games_Pres <- Games_Pres[,colnames(Games_Pres) %in% comps] %>% rownames_to_column("Metabolite")
+  # In case of p.adj =0 we change it to 10^-6
+  Games_Pres[Games_Pres ==0] <- 0.000001
+
+  ## 3. t.val
+  Games_Tres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'t.val'])) %>% as.data.frame()
+  colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
+  Games_Tres <- Games_Tres[,colnames(Games_Tres) %in% comps] %>% rownames_to_column("Metabolite")
+
+  results_list <- list()
+  for(col_name in colnames(Games_Pres)){
+    # Create a new data frame by merging the two data frames
+    merged_df <- merge(Games_Pres[,c("Metabolite",col_name)], Games_Tres[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
+      dplyr::rename("p.adj"=2,
+                    "t.val"=3)
+
+    #We need to add _vs_ into the comparison col_name
+    pattern <- paste(conditions, collapse = "|")
+    conditions_present <- unique(unlist(regmatches(col_name, gregexpr(pattern, col_name))))
+    modified_col_name <- paste(conditions_present[1], "vs", conditions_present[2], sep = "_")
+
+    # Add the new data frame to the list with the column name as the list element name
+    results_list[[modified_col_name]] <- merged_df
+  }
+
+  # Merge the data frames in list1 and list2 based on the "Metabolite" column
+  list_names <-  names(results_list)
+
+  merged_list <- list()
+  for(name in list_names){
+    # Check if the data frames exist in both lists
+    if(name %in% names(results_list) && name %in% names(Log2FC_table)){
+      merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+      merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+      merged_list[[name]] <- merged_df
+    }
+  }
+
+  STAT_C1vC2 <- merged_list
+
+  return(STAT_C1vC2)
+}
+
 
 ##########################################################################################
 ### ### ### DMA helper function: Internal Function to perform limma ### ### ###
