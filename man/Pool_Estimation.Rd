@@ -9,36 +9,38 @@ Pool_Estimation(
   Input_SettingsFile = NULL,
   Input_SettingsInfo = NULL,
   Unstable_feature_remove = FALSE,
-  Therhold_cv = 1,
-  Threshold_SEMean = 0.1,
-  Threshold_CQV = 0.1
+  Threshold_cv = 100,
+  Save_as_Plot = "svg",
+  Save_as_Results = "csv",
+  Plot = TRUE,
+  Folder_Name = NULL
 )
 }
 \arguments{
-\item{Input_data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with just the pooled samples.}
+\item{Input_data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.}
 
 \item{Input_SettingsFile}{\emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}}
 
-\item{Input_SettingsInfo}{\emph{Optional: } NULL or Named vector including the Pooled_Sample information (Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="Pooled_Samples). \strong{Default = NULL}}
+\item{Input_SettingsInfo}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
 
 \item{Unstable_feature_remove}{\emph{Optional: }  Parameter to automatically remove unstable(high variance) metabolites from the dataset. Used only when a full dataset is used as Input_data. \strong{Default = FALSE}}
 
-\item{Therhold_cv}{\emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}}
+\item{Threshold_cv}{\emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}}
 
-\item{Threshold_SEMean}{\emph{Optional: } Filtering threshold for high variance metabolites using the Standard Error of the Mean ration to the Mean. \strong{Default = 0.1}}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
 
-\item{Threshold_CQV}{\emph{Optional: } Filtering threshold for high variance metabolites using the Coefficient of Quantile variation. \strong{Default = 0.1}}
+\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
+
+\item{Plot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
+
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 }
 \description{
 Description
 }
 \keyword{Coefficient}
-\keyword{Error}
-\keyword{Mean,}
-\keyword{Standard}
 \keyword{Variation,}
 \keyword{high}
 \keyword{metabolites}
 \keyword{of}
-\keyword{the}
 \keyword{variance}

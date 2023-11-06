@@ -13,7 +13,8 @@ VizHeatmap(
   SCALE = "row",
   Save_as_Plot = "svg",
   enforce_FeatureNames = FALSE,
-  enforce_SampleNames = FALSE
+  enforce_SampleNames = FALSE,
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -29,11 +30,13 @@ VizHeatmap(
 
 \item{SCALE}{\emph{Optional: } String with the information for scale row or column. \strong{Default = row}}
 
-\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
 \item{enforce_FeatureNames}{\emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}}
 
 \item{enforce_SampleNames}{\emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can enforce this by setting this parameter to TRUE. \strong{Default = FALSE}}
+
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis

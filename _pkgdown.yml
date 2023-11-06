@@ -41,15 +41,15 @@ navbar:
     #Customize twitter:
     github:
       icon: "fa-brands fa-github"
-      href: https://github.com/saezlab/OmnipathR
+      href: https://github.com/saezlab
     #Customize twitter:
     twitter:
       icon: "fab fa-twitter fa-lg"
-      href: https://twitter.com/rstudio
+      href: https://twitter.com/saezlab
     #Customize homepage:
     homepage:
       icon: "fas fa-university"
-      href: https://github.com/rstudio4edu
+      href: https://saezlab.org/
 
 home:
   sidebar:

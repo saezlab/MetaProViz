@@ -13,10 +13,8 @@ MC_ORA(
   PathwayName = "",
   minGSSize = 10,
   maxGSSize = 1000,
-  Save_as_Plot = "svg",
   Save_as_Results = "csv",
-  pCutoff = 0.2,
-  PercentageCutoff = 10
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -32,15 +30,13 @@ MC_ORA(
 
 \item{maxGSSize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{Save_as_Plot}{\emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}}
-
 \item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 
-\item{pCutoff}{\emph{Optional: } p-adjusted value cutoff from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 0.2}}
-
-\item{PercentageCutoff}{\emph{Optional: } Percentage cutoff of metabolites that are detected of a pathway from ORA results that should be plotted. If Save_as_Plot=NULL, this is ignored. \strong{default: 10}}
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 
 \item{RemoveBackground\emph{Optional:}{} If TRUE, column "BG_Method" needs to be in Input_data, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}}
+
+\item{Save_as_Plot}{\emph{Optional: } If Save_as_Plot=NULL no plots will be saved. Otherwise, file types for the figures are: "svg", "pdf", "png" \strong{default: "pdf"}}
 }
 \value{
 Saves results as individual .csv files.

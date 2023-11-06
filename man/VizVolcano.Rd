@@ -24,7 +24,8 @@ VizVolcano(
   Connectors = FALSE,
   Subtitle = "",
   Theme = NULL,
-  Save_as_Plot = "svg"
+  Save_as_Plot = "svg",
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -66,7 +67,9 @@ VizVolcano(
 
 \item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
 
-\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf or png. \strong{Default = "svg"}}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
+
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis

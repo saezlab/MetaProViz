@@ -4,9 +4,11 @@
 \alias{ReplicateSum}
 \title{Merges the analytical replicates of an experiment}
 \usage{
-ReplicateSum(Input_data)
+ReplicateSum(Input_data, Folder_Name = NULL)
 }
 \arguments{
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
+
 \item{Input}{Dataframe which contains unique sample identifiers as row names the Experimental design and the metabolite numerical values in columns with metabolite identifiers as column names. Needs to have Conditions, Biological_Replicates and Analytical_Replicate columns}
 }
 \description{

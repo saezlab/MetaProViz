@@ -21,7 +21,8 @@ MCA_2Cond(
   Cond2_FC_cutoff = 1,
   Save_as_Results = "xlsx",
   backgroundMethod = "C1&C2",
-  OutputFileName = "MCA_2Cond_"
+  OutputFileName = "MCA_2Cond_",
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -50,6 +51,8 @@ MCA_2Cond(
 \item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}}
 
 \item{backgroundMethod}{\emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}}
+
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 
 \item{outputFileName}{\emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}}
 }

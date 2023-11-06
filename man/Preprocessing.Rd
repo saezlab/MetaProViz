@@ -14,9 +14,11 @@ Preprocessing(
   MVI = TRUE,
   MVI_Percentage = 50,
   HotellinsConfidence = 0.99,
-  ExportQCPlots = TRUE,
   CoRe = FALSE,
-  Save_as_Plot = "svg"
+  ExportQCPlots = TRUE,
+  Save_as_Plot = "svg",
+  Plot = TRUE,
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -38,11 +40,15 @@ Preprocessing(
 
 \item{HotellinsConfidence}{\emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}}
 
+\item{CoRe}{\emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}}
+
 \item{ExportQCPlots}{\emph{Optional: } Select whether the quality control (QC) plots will be exported. \strong{Default = TRUE}}
 
-\item{CoRe}{\emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. Th normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}}
-
 \item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
+
+\item{Plot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
+
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 }
 \description{
 Applies 80\%-filtering rule, total-ion count normalisation, missing value imputation and HotellingT2 outlier detection

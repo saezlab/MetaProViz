@@ -2,50 +2,53 @@
 % Please edit documentation in R/DifferentialMetaboliteAnalysis.R
 \name{DMA}
 \alias{DMA}
-\title{This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.}
+\title{This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.}
 \usage{
 DMA(
   Input_data,
-  Experimental_design,
-  Condition1,
-  Condition2,
-  STAT_pval = "t.test",
+  Input_SettingsFile_Sample,
+  Input_SettingsInfo = c(conditions = "Conditions", numerator = NULL, denominator = NULL),
+  STAT_pval = "lmFit",
   STAT_padj = "fdr",
-  Input_Pathways = NULL,
+  Input_SettingsFile_Metab = NULL,
   OutputName = "",
   CoRe = FALSE,
-  Plot = TRUE,
+  VST = FALSE,
   Save_as_Plot = "svg",
-  Save_as_Results = "xlsx"
+  Save_as_Results = "csv",
+  Plot = TRUE,
+  Folder_Name = NULL
 )
 }
 \arguments{
-\item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental Experimental_design and outlier column.}
+\item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
 
-\item{Experimental_design}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
+\item{Input_SettingsFile_Sample}{DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.}
 
-\item{STAT_pval}{\emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value (t.test or wilcox.test) \strong{"t-test"}}
+\item{Input_SettingsInfo}{\emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denominator  = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}}
 
-\item{STAT_padj}{\emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{"fdr"}}
+\item{STAT_pval}{\emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}}
 
-\item{Input_Pathways}{\emph{Optional: } DF which contains the pathway information for each metabolite. \strong{NULL}}
+\item{STAT_padj}{\emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}}
+
+\item{Input_SettingsFile_Metab}{\emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}}
 
 \item{OutputName}{String which is added to the output files of the DMA.}
 
-\item{CoRe}{\emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{FALSE}}
+\item{CoRe}{\emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}}
+
+\item{VST}{TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = TRUE}}
 
 \item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
 
-\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}}
+\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{Conditon1}{Input needs to contain a column named "Condition" including the Condition1 that will be compared to Condition2, e.g. "KO".}
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name. \strong(Default = NULL)}
 
-\item{Conditon2}{Input needs to contain a column named "Condition" including Condition2 that is compared to Condition1, e.g. "WT".}
-
-\item{plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{TRUE}}
+\item{plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 }
 \description{
-This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two conditions.
+This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 }
 \keyword{Analysis,}
 \keyword{Differential}

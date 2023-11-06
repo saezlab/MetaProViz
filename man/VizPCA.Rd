@@ -9,13 +9,14 @@ VizPCA(
   Plot_SettingsFile = NULL,
   Input_data,
   color_palette = NULL,
+  color_scale = "discrete",
   shape_palette = NULL,
   Show_Loadings = FALSE,
   Scaling = TRUE,
   Theme = NULL,
-  color_scale = NULL,
   OutputPlotName = "",
-  Save_as_Plot = "svg"
+  Save_as_Plot = "svg",
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -25,7 +26,9 @@ VizPCA(
 
 \item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
 
-\item{color_palette}{\emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}}
+\item{color_palette}{\emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}}
+
+\item{color_scale}{\emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}}
 
 \item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 
@@ -33,13 +36,13 @@ VizPCA(
 
 \item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = NULL}}
-
-\item{color_scale}{\emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. If set to NULL this is done automatically. \strong{Default = NULL}}
+\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}}
 
 \item{OutputPlotName}{\emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}}
 
-\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
+\item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
+
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 }
 \description{
 This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis

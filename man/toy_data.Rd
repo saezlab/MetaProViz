@@ -7,7 +7,7 @@
 toy_data(data)
 }
 \arguments{
-\item{data}{Either "Standard", "CoRe" or "MappingInfo" depending which data you would like to load}
+\item{data}{Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load}
 }
 \value{
 A data frame containing the toy data.

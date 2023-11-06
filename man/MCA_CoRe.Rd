@@ -10,16 +10,17 @@ MCA_CoRe(
   MetaboliteID = "Metabolite",
   IntraValueCol = "Log2FC",
   IntraPadjCol = "p.adj",
-  CoReValueCol = "Log2FC",
-  CoReDirectionCol = "CoRe_info",
+  CoReValueCol = "Log2(Distance)",
+  CoReDirectionCol = "CoRe",
   CoRePadjCol = "p.adj",
   Intra_padj_cutoff = 0.05,
   CoRe_padj_cutoff = 0.05,
   Intra_FC_cutoff = 1,
   Save_as_Results = "xlsx",
-  CoRe_FC_cutoff = 1,
+  CoRe_FC_cutoff = 20,
   backgroundMethod = "Intra&CoRe",
-  OutputFileName = "MCA_CoRe_"
+  OutputFileName = "MCA_",
+  Folder_Name = NULL
 )
 }
 \arguments{
@@ -33,7 +34,7 @@ MCA_CoRe(
 
 \item{IntraPadjCol}{Column name of adjusted p-value in IntraFile. Can also be you p-value column if you want to use this instead.}
 
-\item{CoReValueCol}{Column name of Log2FC in CoReFile}
+\item{CoReValueCol}{Column name of Log2(Distance) in CoReFile}
 
 \item{CoRePadjCol}{Column name of adjusted p-value in CoReFile. Can also be you p-value column if you want to use this instead.}
 
@@ -43,11 +44,13 @@ MCA_CoRe(
 
 \item{Intra_FC_cutoff}{\emph{Optional: } Log2FC cutoff for IntraFile. \strong{Default=0.5}}
 
-\item{CoRe_FC_cutoff}{\emph{Optional: } Log2FC cutoff for CoReFile. \strong{Default=0.5}}
+\item{CoRe_FC_cutoff}{\emph{Optional: } Log2FC cutoff for CoReFile. \strong{Default=20}}
 
-\item{backgroundMethod}{\emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="C1&C2"}}
+\item{backgroundMethod}{\emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}}
 
-\item{outputFileName}{\emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}}
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
+
+\item{outputFileName}{\emph{Optional: } Output filename \strong{Default="MCA_"}}
 }
 \value{
 MCA an instance of the MetaProViz package
