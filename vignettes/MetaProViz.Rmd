@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 
 \
 <center>
-![**Fig. 1:** Overview of MetaProViz functions.](Fig.1.png){width=60%}
+![**Fig. 1:** Overview of MetaProViz functions.](Fig.1.png){width=90%}
 </center>
 \
 \
@@ -89,14 +89,17 @@ library(tidyverse)
 </div>
 
 ## Citation
-Text
-
-
+```
+@Manual{,
+  title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
+  author = {Christina Schmidt and Dimitrios Prymidis and Julio Saez-Rodriguez and Christian Frezza},
+  year = {2023},
+  note = {R package version 0.0.0.9000},
+}
+```
 
 ## Session information
 ```{r session_info, echo=FALSE}
 options(width = 120)
 sessioninfo::session_info()
 ```
-
-## Bibliography
