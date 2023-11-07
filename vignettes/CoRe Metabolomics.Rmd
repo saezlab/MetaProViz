@@ -1,20 +1,24 @@
 ---
-#title: "**MetaProViz**"
-#author: "Authors: Christina Schmidt, Dimitrios"
-#date: "24 November 2022"
-output:
-   html_document:
-    #yml: _site.yml
-    css: style.css
-    theme: flatly
-    highlight: tango #`default`, `tango`, `pygments`, `kate`, `monochrome`, `espresso`, `zenburn`, `haddock`, `breezedark`, `textmate`, `arrow`, or `rstudio`
+title: "CoRe Metabolomics"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg Universiy
+  - name: Dimitrios Prymidis
+    affiliation:
+    - Heidelberg Universiy
+output: 
+  html_document:
     self_contained: true
     toc: true
     toc_float: true
-    toc_depth: 4
+    toc_depth: 5
     code_folding: show
-#vignette: >
-#  %\VignetteEngine{knitr::rmarkdown}
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
 editor_options: 
   chunk_output_type: console
 ---
