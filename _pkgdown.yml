@@ -17,7 +17,7 @@ navbar:
   bg: primary #If you want a different style you can check on bootstrap, e.g. for bootswatch: flatly = https://bootswatch.com/flatly/
   structure:
     left: [home, intro, articles, reference, tutorials, news] #intro: “Get Started”, which links to a vignette with the same name as the package.#reference, if there are any .Rd files. #articles, if there are any vignettes or articles.#tutorials, if there any tutorials. #news, if NEWS.md exists.
-    right: [search, github, twitter, homepage]
+    right: [search, github, twitter,twitter2, homepage, homepage2]
   components:
     #Customize articles:
     articles:
@@ -46,10 +46,18 @@ navbar:
     twitter:
       icon: "fab fa-twitter fa-lg"
       href: https://twitter.com/saezlab
+    #Customize twitter:
+    twitter2:
+      icon: "fab fa-twitter fa-lg"
+      href: https://twitter.com/FrezzaLab/
     #Customize homepage:
     homepage:
       icon: "fas fa-university"
       href: https://saezlab.org/
+    homepage2:
+      icon: "fas fa-university" # Add the icon you want
+      href: https://frezza.cecad-labs.uni-koeln.de/home
+
 
 home:
   sidebar:
