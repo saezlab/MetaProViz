@@ -66,7 +66,7 @@ Here you will find a brief overview and information about the installation of th
 
 **MetaProViz** is an R package and to install the package, start R and enter:
 ```{r github_install, eval=FALSE}
-BiocManager::install("https://github.com/saezlab/MetaProViz")
+devtools::install_github("https://github.com/saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:

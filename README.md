@@ -41,7 +41,7 @@ installation of the package and its dependencies.
 enter:
 
 ``` r
-BiocManager::install("https://github.com/saezlab/MetaProViz")
+devtools::install_github("https://github.com/saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:
