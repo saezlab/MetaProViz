@@ -158,9 +158,7 @@ MC_ORA <- function(Input_data,
   #Run ORA
   for(g in grps_labels){
     grpMetabolites <- subset(df, df[[MetabCluster_lab]] == g)
-    print(g)
-
-    print(dim(grpMetabolites))
+    message("Number of metabolite in cluster `",g, "`: ", nrow(grpMetabolites), sep="")
 
     clusterGo <- clusterProfiler::enricher(gene=as.character(grpMetabolites$Metabolite),
                                            pvalueCutoff = 1,
