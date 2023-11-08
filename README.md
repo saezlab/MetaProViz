@@ -28,9 +28,9 @@ those tutorial on the top under the “Tutorial” button, where you can
 follow specific user case examples for different analysis. Otherwise,
 you can also follow the links below:  
 - [Standard metabolomics
-data](https://github.com/saezlab/MetaProViz/docs/articles/Standard%20Metabolomics.html)  
+data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)  
 - [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://github.com/saezlab/MetaProViz/docs/articles/CoRe%20Metabolomics.html)  
+media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)  
   
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
