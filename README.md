@@ -52,7 +52,7 @@ library(MetaProViz)
 
 ### Dependencies
 
-If you are using **MetaProViz** the following packages are require:  
+If you are using **MetaProViz** the following packages are required:  
 
     "tidyverse"
     "ggplot2"
