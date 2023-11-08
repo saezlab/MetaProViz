@@ -61,13 +61,11 @@ navbar:
 
 home:
   sidebar:
-    structure: [funding, citation, authors, toc, license] #other options: dev, links, community
+    structure: [links, citation, authors, license, funding, toc] #other options: dev, links, community
     components:
-      #links:
-      #- text: Browse source code
-      #  href: https://github.com/rstudio4edu
-      #- text: View on Bioconductor
-      #  href: https://github.com/rstudio4edu
+      links:
+        title: Links
+        text: Browse [source code](https://github.com/saezlab/MetaProViz)
       funding:
         title: Funding
         text: We are grateful for [***SmartCare***](https://smart-care.mscoresys.de/research/computational-data-analysis)
