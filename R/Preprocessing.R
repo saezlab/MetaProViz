@@ -939,11 +939,17 @@ Preprocessing <- function(Input_data,
   PlotList = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
 
   if(Plot==TRUE){ # print plots
-    suppressMessages(suppressWarnings(print(patchwork::wrap_plots(norm_plots,  PlotList$QC_plots[[1]],  PlotList$QC_plots[[2]],
-             pca_outlierloop1,scree_outlierloop1,hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")),
-             widths = c(2,2.1,1),
-             heights = c(1.4,1)))))
-             }
+    #Summary
+    #suppressMessages(suppressWarnings(print(patchwork::wrap_plots(norm_plots,  PlotList$QC_plots[[1]],  PlotList$QC_plots[[2]], pca_outlierloop1,scree_outlierloop1,hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")), widths = c(2,2.1,1), heights = c(1.4,1)))))
+
+    #individual plots:
+    suppressMessages(suppressWarnings(plot(norm_plots)))
+    suppressMessages(suppressWarnings(plot(PlotList$QC_plots[[1]])))
+    suppressMessages(suppressWarnings(plot(PlotList$QC_plots[[2]])))
+    suppressMessages(suppressWarnings(plot(pca_outlierloop1)))
+    suppressMessages(suppressWarnings(plot(scree_outlierloop1)))
+    suppressMessages(suppressWarnings(plot(hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")))))
+    }
 
     invisible(return(list("DF"=DFs,"Plot" =PlotList)))
 }
@@ -1289,12 +1295,13 @@ Pool_Estimation <- function(Input_data,
   Pool_Estimation_res_list <- list("DF"= DF_list,"Plot"=pool_plot_list )
 
   if(Plot==TRUE){ # print plots
-    suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples,
-                                pool_plot_list$Pool_CV_Hist,
-                                pool_plot_list$Pool_CV_Violin,
-                                widths = c(1,1,1),
-                                heights = c(1.1,1)))))
+    #Summary
+    #suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples, pool_plot_list$Pool_CV_Hist, pool_plot_list$Pool_CV_Violin, widths = c(1,1,1), heights = c(1.1,1)))))
 
+    #individual plots:
+    suppressMessages(suppressWarnings(plot(pool_plot_list$QC_PCA_PoolSamples)))
+    suppressMessages(suppressWarnings(plot(pool_plot_list$Pool_CV_Hist)))
+    suppressMessages(suppressWarnings(plot(pool_plot_list$Pool_CV_Violin)))
   }
   invisible(return(Pool_Estimation_res_list))
 

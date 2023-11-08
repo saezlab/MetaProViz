@@ -39,26 +39,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-# MetaProViz <img src="Hexagon_MetaProViz.png" align="right" width="200" />
-
-
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
-
-# CoRe metabolomics
-
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
-
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+\
 A Consumption-Release (CoRe) metabolomics experiment usually refers to a cell culture experiment where metabolomics is performed on the cell culture media.\
 \
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
-`-` To process raw peak data and identify outliers.\
-`-` To perform differential metabolite analysis (DMA) to generate Log2Distance and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
-`-` To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
-`-` To use specific visualizations to aid biological interpretation of the results.\
+
+* To process raw peak data and identify outliers.\
+* To perform differential metabolite analysis (DMA) to generate Log2Distance and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+* To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
+* To use specific visualizations to aid biological interpretation of the results.\
 \
 \
 First if you have not done yet, install the required dependencies and load the libraries:
@@ -150,15 +140,30 @@ Lastly, the function `Preprocessing()` performs outlier detection and adds a col
 \
 Since our example data contains pool samples, we will do `Pool_Estimation()` before applying the `Preprocessing()` function. This is important, since one should remove the features (=metabolites) that are too variable prior to performing any data transformations such as TIC as part of the `Preprocessing()` function.\
 It is worth mentioning that the Coefficient of variation (CV) is calculated by dividing the standard deviation (SD) by the mean. Hence CV depends on the SD, which in turn works for normally distributed data.\
-```{r}
-Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Media[,-c(1:5)],
-                            Input_SettingsFile = Media[,1:5],
+```{r, eval=FALSE}
+Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Media[,-c(1:3)],
+                            Input_SettingsFile = Media[,1:3],
                             Input_SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
                             Unstable_feature_remove = FALSE, 
                             Threshold_cv = 100)
 
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV_result"]]
 ```
+
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
+Pool_Estimation_result<- MetaProViz::Pool_Estimation(Input_data = Media[,-c(1:3)],
+                            Input_SettingsFile = Media[,1:3],
+                            Input_SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
+                            Unstable_feature_remove = FALSE, 
+                            Threshold_cv = 100)
+
+Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV_result"]]
+```
+</div>
+\
+\
+\
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Pool_Estimation_result_DF_CV[1:5,]%>%
@@ -173,19 +178,19 @@ Now we will apply the `Preprocessing()` function to the example data and have a 
 `2.` **Growth factor** or **growth rate**: This refers to the different conditions and is either based on cell count or protein quantification at the start of the experiment (t0) and at the end of the experiment (t1) resulting in the growth factor (t1/t0). Otherwise, one can experimentally estimate the growth rate of each condition. Ultimately, this measure is used to normalize the data, since the amount of growth will impact the consumption and release of metabolites from the media and hence we need to account for this. If you do not have this information, this will be set to 1, yet be aware that this may affect the results.\
 \
 You can pass these additional information via the parameter `Input_SettingsInfo`, by passing the column name for the `CoRe_norm_factor` in the `Input_SettingsFile` and the condition name for the `CoRe_media` in the `Input_data` file.\
-```{r}
+```{r, eval=FALSE}
 #Prepare the input:
 Media_input <- Media%>%
-  subset(!Conditions=="Pool", select = -c(1:5))#remove pool samples and remove the information columns
+  subset(!Conditions=="Pool", select = -c(1:3))#remove pool samples and remove the information columns
 
 Media_Metadata <- Media%>%
-  subset(!Conditions=="Pool", select = c(1:5))#remove pool samples and keep the information columns only
+  subset(!Conditions=="Pool", select = c(1:3))#remove pool samples and keep the information columns only
 
 PreProcessing_res <-  MetaProViz::Preprocessing(Input_data=Media_input,
                                                 Input_SettingsFile=Media_Metadata,
                                                 Input_SettingsInfo = c(Conditions = "Conditions",
                                                                        Biological_Replicates = "Biolgical_Replicates",
-                                                                       CoRe_norm_factor = "AverageCellNumber",
+                                                                       CoRe_norm_factor = "GrowthFactor",
                                                                        CoRe_media = "blank"),
                                                 Feature_Filtering = "Modified",
                                                 Feature_Filt_Value = 0.8,
@@ -196,8 +201,37 @@ PreProcessing_res <-  MetaProViz::Preprocessing(Input_data=Media_input,
 
 # Now we can have a look at the results table:
 Media_Preprocessed <-  PreProcessing_res[["DF"]][["Preprocessing_output"]][["Processed_data"]]
-
 ```
+
+<div class="vscroll-plot">
+```{r, echo=FALSE,   fig.width=6, fig.height=4.5, fig.align="left"}
+#Prepare the input:
+Media_input <- Media%>%
+  subset(!Conditions=="Pool", select = -c(1:3))#remove pool samples and remove the information columns
+
+Media_Metadata <- Media%>%
+  subset(!Conditions=="Pool", select = c(1:3))#remove pool samples and keep the information columns only
+
+PreProcessing_res <-  MetaProViz::Preprocessing(Input_data=Media_input,
+                                                Input_SettingsFile=Media_Metadata,
+                                                Input_SettingsInfo = c(Conditions = "Conditions",
+                                                                       Biological_Replicates = "Biolgical_Replicates",
+                                                                       CoRe_norm_factor = "GrowthFactor",
+                                                                       CoRe_media = "blank"),
+                                                Feature_Filtering = "Modified",
+                                                Feature_Filt_Value = 0.8,
+                                                TIC_Normalization = TRUE,# As we have raw data we will perform total ion count norm
+                                                MVI=TRUE, #We assume the values are not missing at random and perform half minimum MVI
+                                                HotellinsConfidence = 0.99,# We perform outlier testing using 0.99 confidence interval
+                                                CoRe = TRUE) 
+
+# Now we can have a look at the results table:
+Media_Preprocessed <-  PreProcessing_res[["DF"]][["Preprocessing_output"]][["Processed_data"]]
+```
+</div>
+\
+\
+\
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Media_Preprocessed[1:5,1:9]%>%
@@ -231,10 +265,10 @@ By defining the numerator and denominator as part of the `Input_SettingsInfo` pa
 As input we will use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values and information about the conditions that should be compared (even though we recommend to normalize the data and remove outliers prior to DMA).\
 \
 In the example data we have seven different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A, 786-O, OSRC2, OSLM1B and RFX631) and hence we can perform multiple different comparisons.  The results can be automatically saved and all the results are returned in a list with the different data frames. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
-```{r}
+```{r, eval=FALSE}
 # Perform multiple comparison All_vs_One using annova:
-DMA_Annova <-  MetaProViz::DMA(Input_data=Media_Preprocessed[,-c(1:6)],
-                               Input_SettingsFile_Sample=Media_Preprocessed[,c(1:6)],
+DMA_Annova <-  MetaProViz::DMA(Input_data=Media_Preprocessed[,-c(1:4)],
+                               Input_SettingsFile_Sample=Media_Preprocessed[,c(1:4)],
                                Input_SettingsInfo = c(conditions="Conditions", numerator=NULL, denominator = "HK2"),
                                STAT_pval ="aov",
                                STAT_padj="fdr",
@@ -244,8 +278,27 @@ DMA_Annova <-  MetaProViz::DMA(Input_data=Media_Preprocessed[,-c(1:6)],
 #Inspect the DMA results tables:
 DMA_786M1A_vs_HK2 <- DMA_Annova[["DF"]][["DMA_result"]][["786-M1A_vs_HK2"]]
 Shapiro <- DMA_Annova[["DF"]][["Shapiro_result"]]
-
 ```
+
+<div class="vscroll-plot">
+```{r, warning=FALSE, echo=FALSE, fig.width=7, fig.height=5, fig.align="left"}
+# Perform multiple comparison All_vs_One using annova:
+DMA_Annova <-  MetaProViz::DMA(Input_data=Media_Preprocessed[,-c(1:4)],
+                               Input_SettingsFile_Sample=Media_Preprocessed[,c(1:4)],
+                               Input_SettingsInfo = c(conditions="Conditions", numerator=NULL, denominator = "HK2"),
+                               STAT_pval ="aov",
+                               STAT_padj="fdr",
+                               Input_SettingsFile_Metab = MappingInfo, 
+                               CoRe=TRUE)
+
+#Inspect the DMA results tables:
+DMA_786M1A_vs_HK2 <- DMA_Annova[["DF"]][["DMA_result"]][["786-M1A_vs_HK2"]]
+Shapiro <- DMA_Annova[["DF"]][["Shapiro_result"]]
+```
+</div>
+\
+\
+\
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Shapiro[,c(13:14, 1:4)]%>%
@@ -400,7 +453,7 @@ PathwayInput[1:4,]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) 
 ```
 
-```{r, include=FALSE, warning=FALSE}
+```{r}
 MC_ORA_result<- MetaProViz::MC_ORA(Input_data=MCA_CoRe_res[["DF"]][["MCA_result"]],
                    MetabCluster_lab="RG2_Significant",#The cluster we want to use to perform the pathway analysis on
                    RemoveBackground=TRUE,
@@ -459,7 +512,7 @@ As mentioned above, PCA plots can be quite useful for quality control, but of co
 \
 As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
 ```{r}
-Input_PCA <- Media_Preprocessed[,-c(1:6)] #remove columns that include Metadata such as cell type,...
+Input_PCA <- Media_Preprocessed[,-c(1:4)] #remove columns that include Metadata such as cell type,...
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -522,7 +575,7 @@ MetaProViz::VizPCA(Plot_SettingsInfo= c(color="Conditions", shape="Status"),
 Clustered heatmaps can be useful to understand the patterns in the data, which will be showcased on different examples.\
 As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
 ```{r}
-Input_Heatmap <-   Media_Preprocessed[,-c(1:6)] #remove columns that include Metadata such as cell type,...
+Input_Heatmap <-   Media_Preprocessed[,-c(1:4)] #remove columns that include Metadata such as cell type,...
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
