@@ -53,7 +53,6 @@ A standard metabolomics experiment refers to intracellular extracts (e.g. cell o
 First if you have not done yet, install the required dependencies and load the libraries:
 ```{r message=FALSE, warning=FALSE}
 #MetaProViz
-devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")#only loaded until package is online
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
