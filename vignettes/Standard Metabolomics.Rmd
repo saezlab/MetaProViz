@@ -6,7 +6,7 @@ author:
     - Heidelberg Universiy
   - name: Dimitrios Prymidis
     affiliation:
-    - Heidelberg Universiy
+    - Cologne Universiy
 output: 
   html_document:
     self_contained: true
