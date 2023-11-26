@@ -192,12 +192,16 @@ DMA <-function(Input_data,
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
   Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if(is.null(Save_as_Plot)==FALSE){
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
   Save_as_Results_options <- c("txt","csv", "xlsx" )
-  if(Save_as_Results %in% Save_as_Results_options == FALSE){
-    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+  if(is.null(Save_as_Results)==FALSE){
+    if(Save_as_Results %in% Save_as_Results_options == FALSE){
+      stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+    }
   }
 
   #7. Are sample numbers enough?
@@ -279,28 +283,28 @@ DMA <-function(Input_data,
 
   # Check hypothesis test assumptions
   # Normality
-  Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(Input_data=Input_data,
-                                                         Input_SettingsFile_Sample=Input_SettingsFile_Sample,
-                                                         Input_SettingsInfo=Input_SettingsInfo,
-                                                         STAT_pval=STAT_pval,
-                                                         CoRe=CoRe,
-                                                         OutputName=OutputName,
-                                                         Save_as_Plot=Save_as_Plot,
-                                                         QQplots=FALSE,
-                                                         Save_as_Results=Save_as_Results,
-                                                         Plot=FALSE,
-                                                         Folder_Name=Results_folder_DMA_folder_Shapiro_folder))
+  Shapiro_output <-suppressWarnings(Shapiro(Input_data=Input_data,
+                                            Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                            Input_SettingsInfo=Input_SettingsInfo,
+                                            STAT_pval=STAT_pval,
+                                            CoRe=CoRe,
+                                            OutputName=OutputName,
+                                            Save_as_Plot=Save_as_Plot,
+                                            QQplots=FALSE,
+                                            Save_as_Results=Save_as_Results,
+                                            Plot=FALSE,
+                                            Folder_Name=Results_folder_DMA_folder_Shapiro_folder))
 
   #Variance homogeneity
   if(MultipleComparison==TRUE){
-    Bartlett_output<-suppressWarnings(MetaProViz:::Bartlett(Input_data=Input_data,
-                                                           Input_SettingsFile_Sample=Input_SettingsFile_Sample,
-                                                           Input_SettingsInfo=Input_SettingsInfo,
-                                                           OutputName=OutputName,
-                                                           Save_as_Plot=Save_as_Plot,
-                                                           Save_as_Results=Save_as_Results,
-                                                           Plot=FALSE,
-                                                           Folder_Name=Results_folder_DMA_folder))
+    Bartlett_output<-suppressWarnings(Bartlett(Input_data=Input_data,
+                                               Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                               Input_SettingsInfo=Input_SettingsInfo,
+                                               OutputName=OutputName,
+                                               Save_as_Plot=Save_as_Plot,
+                                               Save_as_Results=Save_as_Results,
+                                               Plot=FALSE,
+                                               Folder_Name=Results_folder_DMA_folder))
 
   }
 
@@ -315,13 +319,410 @@ DMA <-function(Input_data,
 
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
+  Log2FCRes <- Log2FC(Input_data=Input_data,
+                      Input_SettingsFile=Input_SettingsFile_Sample,
+                      Input_SettingsInfo=Input_SettingsInfo,
+                      OutputName='',
+                      CoRe=FALSE,
+                      Save_as_Plot = "svg",
+                      Save_as_Results = "csv",
+                      Plot = FALSE,
+                      FolderName = NULL)
+
+  ################################################################################################################################################################################################
+  ############### Perform Hypothesis testing ###############
+  if(MultipleComparison == FALSE){
+    if(STAT_pval=="lmFit"){
+      STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
+                                   Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                   Input_SettingsInfo=Input_SettingsInfo,
+                                   STAT_padj=STAT_padj,
+                                   Log2FC_table=Log2FCRes,
+                                   CoRe=CoRe,
+                                   all_vs_all=all_vs_all,
+                                   MultipleComparison=MultipleComparison)
+    }else{
+      STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
+    }
+  }else{ # MultipleComparison = TRUE
+
+    #Correct data heteroscedasticity
+    if(STAT_pval!="lmFit" & VST == TRUE){
+      temp <- vst(Input_data,Plot=FALSE)
+      Input_data <- temp$DFs$Corrected_data
+    }
+
+    if(all_vs_all ==TRUE){
+      message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
+    }else{# for 1 vs all
+      message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
+      # conditions=relevel(conditions, ref = denominator)
+    }
+
+    if(STAT_pval=="aov"){
+      STAT_C1vC2 <- AOV(Input_data=Input_data,
+                        Input_SettingsInfo=Input_SettingsInfo,
+                        conditions=conditions,
+                        STAT_padj=STAT_padj,
+                        Log2FC_table=Log2FC_table,
+                        all_vs_all=all_vs_all,
+                        comparisons=comparisons)
+    }else if(STAT_pval=="kruskal.test"){
+      STAT_C1vC2 <-Kruskal(Input_data=Input_data,
+                           conditions=conditions,
+                           STAT_padj=STAT_padj,
+                           Log2FC_table=Log2FC_table,
+                           all_vs_all=all_vs_all,
+                           comparisons=comparisons)
+    }else if(STAT_pval=="welch"){
+      STAT_C1vC2 <-Welch(Input_data=Input_data,
+                         conditions=conditions,
+                         Log2FC_table=Log2FC_table,
+                         all_vs_all=all_vs_all,
+                         comparisons=comparisons)
+    }else if(STAT_pval=="lmFit"){
+      STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
+                                   Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                   Input_SettingsInfo=Input_SettingsInfo,
+                                   STAT_padj=STAT_padj,
+                                   Log2FC_table=Log2FC_table,
+                                   CoRe=CoRe,
+                                   all_vs_all=all_vs_all,
+                                   MultipleComparison=MultipleComparison)
+    }
+  }
+
+  ################################################################################################################################################################################################
+  ###############  Add the previous metabolite names back ###############
+  if(MultipleComparison==FALSE){
+    DMA_Output <- merge(savedMetaboliteNames, STAT_C1vC2, by="Metabolite")
+    DMA_Output$Metabolite <- NULL
+    colnames(DMA_Output)[1] <- "Metabolite"
+  }else{
+    DMA_Output <- lapply(STAT_C1vC2, function(df){
+      merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
+      merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
+        dplyr::rename("Metabolite"=1)
+      return(merged_df)
+    })
+  }
+
+  ################################################################################################################################################################################################
+  ###############  Folder ###############
+  if(is.null(Save_as_Results)==FALSE){
+    if(MultipleComparison==FALSE){
+      if (Save_as_Results == "xlsx"){
+        xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
+        writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
+      }else if (Save_as_Results == "csv"){
+        csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".csv"))
+        write.csv(DMA_Output,csvDMA) # save the DMA result DF
+      }else if (Save_as_Results == "txt"){
+        txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
+        write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+      }
+    }else{
+      for(DF in names(DMA_Output)){
+        DMA_Output_Save <- DMA_Output[[DF]]
+        DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
+
+        if (Save_as_Results == "xlsx"){
+          xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".xlsx"))   # Save the DMA results table
+          writexl::write_xlsx(DMA_Output_Save,xlsDMA, col_names = TRUE) # save the DMA result DF
+        }else if (Save_as_Results == "csv"){
+          csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".csv"))
+          write.csv(DMA_Output_Save,csvDMA) # save the DMA result DF
+        }else if (Save_as_Results == "txt"){
+          txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".txt"))
+          write.table(DMA_Output_Save,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+        }
+      }
+    }
+  }
+
+  if(CoRe==TRUE){
+    x <- "Log2(Distance)"
+    VolPlot_SettingsInfo= c(color="CoRe")
+    VOlPlot_SettingsFile = DMA_Output
+  }else{
+    x <- "Log2FC"
+    VolPlot_SettingsInfo= NULL
+    VOlPlot_SettingsFile = NULL
+  }
+
+  ################################################################################################################################################################################################
+  ###############  Plots ###############
+  volplotList = list()
+  if(MultipleComparison==TRUE){
+    for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
+      Volplotdata<- DMA_Output[[DF]]
+
+      dev.new()
+      VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
+                                                      Input_data=Volplotdata,
+                                                      Plot_SettingsInfo=VolPlot_SettingsInfo,
+                                                      Plot_SettingsFile=VOlPlot_SettingsFile[[DF]],
+                                                      y= "p.adj",
+                                                      x= x,
+                                                      AdditionalInput_data= NULL,
+                                                      OutputPlotName= DF,
+                                                      Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
+                                                      xlab= NULL,#"~Log[2]~FC"
+                                                      ylab= NULL,#"~-Log[10]~p.adj"
+                                                      pCutoff= 0.05,
+                                                      FCcutoff= 0.5,
+                                                      color_palette= NULL,
+                                                      shape_palette=NULL,
+                                                      SelectLab= "",
+                                                      Connectors=  FALSE,
+                                                      Subtitle=  bquote(italic("Differential Metabolite Analysis")),
+                                                      Theme= NULL,
+                                                      Save_as_Plot= NULL))
+
+      volplotList[[DF]]<- VolcanoPlot
+
+      DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
+      if(is.null(Save_as_Plot)==FALSE){
+        volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_", DF_save, OutputName,".",Save_as_Plot))
+        ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
+      }
+      dev.off()
+    }
+  }else{
+    # Make a simple Volcano plot
+    dev.new()
+    VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
+                                                    Input_data=DMA_Output,
+                                                    Plot_SettingsInfo=VolPlot_SettingsInfo,
+                                                    Plot_SettingsFile=VOlPlot_SettingsFile,
+                                                    y= "p.adj",
+                                                    x= x,
+                                                    AdditionalInput_data= NULL,
+                                                    OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
+                                                    Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
+                                                    xlab= NULL,#"~Log[2]~FC"
+                                                    ylab= NULL,#"~-Log[10]~p.adj"
+                                                    pCutoff= 0.05,
+                                                    FCcutoff= 0.5,
+                                                    color_palette= NULL,
+                                                    shape_palette=NULL,
+                                                    SelectLab= "",
+                                                    Connectors=  FALSE,
+                                                    Subtitle=  bquote(italic("Differential Metabolite Analysis")),
+                                                    Theme= NULL,
+                                                    Save_as_Plot= NULL))
+    volplotList[[paste0(toString(numerator)," versus ",toString(denominator))]]<- VolcanoPlot
+    dev.off()
+    #plot(VolcanoPlot)
+
+    if(is.null(Save_as_Plot)==FALSE){
+      volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"_versus_",toString(denominator),OutputName,".",Save_as_Plot))
+      ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
+    }
+  }
+
+
+  #Here we make a list in which we will save the output
+  suppressWarnings(DMA_output_list <- list("DF" = list("Shapiro_result"=Shapiro_output$DF$Shapiro_result,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Shapiro_output$Plot$Distributions, "Volcano"=volplotList)))
+
+
+  if(Plot == TRUE){
+    for (plot in volplotList){
+      print(plot)
+    }
+  }
+  return(invisible(DMA_output_list))
+}
+
+
+#' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+#'
+#' @param DMA_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param DMA_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param DMA_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
+#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param OutputName String which is added to the output files of the DMA.
+#' @param DMA_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
+#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param FolderName {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#'
+#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
+#' @export
+
+
+###############################
+### ### ### Log2FC  ### ### ###
+###############################
+
+#' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+#'
+#' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
+#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param OutputName String which is added to the output files of the DMA.
+#' @param DMA_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
+#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
+#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param FolderName {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#'
+#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
+#' @export
+
+
+
+Log2FC <-function(Input_data,
+                  Input_SettingsFile,
+                  Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
+
+                  CoRe=FALSE,
+                  Plot = TRUE,
+                  Save_as_Results = "csv",
+                  Save_as_Plot = "svg",
+
+                  FolderName = NULL,
+                  OutputName = NULL
+){
+
+  ## 1. ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){install.packages(new.packages)}
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)>0){
+    if (!require("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+    BiocManager::install(new.packages)}
+
+  suppressWarnings(suppressMessages(library(tidyverse)))
+
+
+  ## ------------ Check Input SettingsInfo ----------- ##
+  #3. Input_SettingsInfo
+  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
+    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
+      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    }else{# if true rename to Conditions
+      Input_SettingsFile<- Input_SettingsFile%>%
+        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+    }
+  }else{
+    stop("You have to provide a Input_SettingsInfo for conditions.")
+  }
+
+  ##########################
+  if("denominator" %in% names(Input_SettingsInfo)==TRUE){
+    if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
+      stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    }else{
+      denominator <- Input_SettingsInfo[["denominator"]]
+    }
+  }
+  if("numerator" %in% names(Input_SettingsInfo)==TRUE){
+    if(Input_SettingsInfo[["numerator"]] %in% Input_SettingsFile$Conditions  == FALSE){
+      stop("The ",Input_SettingsInfo[["numerator"]], " column selected as numerator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+    }else{
+      numerator <- Input_SettingsInfo[["numerator"]]
+    }
+  }
+  if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==TRUE){
+    stop("Check input. The selected denominator option is empty while ",paste(Input_SettingsInfo[["numerator"]])," has been selected as a numerator. Please add a denminator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
+  }
+
+  ## ------------ Check Denominator/numerator ----------- ##
+  #4.  Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
+  if("denominator" %in% names(Input_SettingsInfo)==FALSE  & "numerator" %in% names(Input_SettingsInfo) ==FALSE){
+    # all-vs-all: Generate all pairwise combinations
+    conditions = Input_SettingsFile$Conditions
+    denominator <-unique(Input_SettingsFile$Conditions)
+    numerator <-unique(Input_SettingsFile$Conditions)
+    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = TRUE
+  }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==FALSE){
+    #all-vs-one: Generate the pairwise combinations
+    conditions = Input_SettingsFile$Conditions
+    denominator <- Input_SettingsInfo[["denominator"]]
+    numerator <-unique(Input_SettingsFile$Conditions)
+
+    # Remove denom from num
+    numerator <- numerator[!numerator %in% denominator]
+    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
+
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = FALSE
+  }else if("denominator" %in% names(Input_SettingsInfo)==TRUE  & "numerator" %in% names(Input_SettingsInfo)==TRUE){
+    # one-vs-one: Generate the comparisons
+    comparisons <- matrix(c(denominator, numerator))
+    #Settings:
+    MultipleComparison = FALSE
+    all_vs_all = FALSE
+  }
+
+
+  #7. Are sample numbers enough?
+  Num <- Input_data %>%
+    filter(Input_SettingsFile$Conditions %in% numerator) %>%
+    select_if(is.numeric)#only keep numeric columns with metabolite values
+  Denom <- Input_data %>%
+    filter(Input_SettingsFile$Conditions %in% denominator) %>%
+    select_if(is.numeric)
+
+  if(nrow(Num)==1){
+    stop("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
+  } else if(nrow(Denom)==1){
+    stop("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
+  }else if(nrow(Num)==0){
+    stop("There is no sample available for ", numerator, ".")
+  }else if(nrow(Denom)==0){
+    stop("There is no sample available for ", denominator, ".")
+  }
+
+
+
+  ## ------------ Check Missingness ------------- ##
+  #7.
+  # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
+  # Here we will check how many metabolites this affects in Num and Denom, and weather all replicates of a metabolite are affected.
+  Num_Miss <- replace(Num, Num==0, NA)
+  Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
+
+  Denom_Miss <- replace(Denom, Denom==0, NA)
+  Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
+
+  if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
+    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- colnames(Num_Miss)
+  } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
+    message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- colnames(Denom_Miss)
+  } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
+    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+  } else{
+    message("There are no NA/0 values")
+    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+  }
+
+
   Log2FC_table <- list()# Create an empty list to store results data frames
   for(column in 1:dim(comparisons)[2]){
     C1 <- Input_data %>% # Numerator
-      filter(Input_SettingsFile_Sample$Conditions %in% comparisons[1,column]) %>%
+      filter(Input_SettingsFile$Conditions %in% comparisons[1,column]) %>%
       select_if(is.numeric)#only keep numeric columns with metabolite values
     C2 <- Input_data %>% # Deniminator
-      filter(Input_SettingsFile_Sample$Conditions %in%  comparisons[2,column]) %>%
+      filter(Input_SettingsFile$Conditions %in%  comparisons[2,column]) %>%
       select_if(is.numeric)
 
     ## ------------  Calculate Log2FC ----------- ##
@@ -417,8 +818,8 @@ DMA <-function(Input_data,
       Log2FC_C1vC2 <-merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
 
       #Add info on Pathways:
-      if(is.null(Input_SettingsFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_SettingsFile_Metab)){
-        Pathways <- merge(savedMetaboliteNames , Input_SettingsFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
+      if(is.null(Input_SettingsFile)!=TRUE & 'Metabolite' %in% colnames(Input_SettingsFile)){
+        Pathways <- merge(savedMetaboliteNames , Input_SettingsFile, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
         Log2FC_C1vC2<- merge(Log2FC_C1vC2, Pathways[,-c(1)],by="Metabolite", all.x=T)
       }
 
@@ -436,7 +837,7 @@ DMA <-function(Input_data,
         Log2FC_table[[logname]] <- Log2FC_C1vC2
         Log2FC_table[[logname_reverse]] <- Log2FC_C2vC1
       }else{
-         Log2FC_table <- Log2FC_C1vC2
+        Log2FC_table <- Log2FC_C1vC2
       }
     }else if(CoRe==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
@@ -480,8 +881,8 @@ DMA <-function(Input_data,
       Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,8)], temp_3a4, by="Metabolite", all.x=TRUE)
 
       #Add info on Pathways:
-      if(is.null(Input_SettingsFile_Metab)!=TRUE & 'Metabolite' %in% colnames(Input_SettingsFile_Metab)){
-        Pathways <- merge(savedMetaboliteNames , Input_SettingsFile_Metab, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
+      if(is.null(Input_SettingsFile)!=TRUE & 'Metabolite' %in% colnames(Input_SettingsFile)){
+        Pathways <- merge(savedMetaboliteNames , Input_SettingsFile, by.x="InnputName", by.y="Metabolite", all.y=TRUE)
         Log2FC_C1vC2<- merge(Log2FC_C1vC2, Pathways[,-c(1)],by="Metabolite", all.x=T)
       }
 
@@ -505,205 +906,10 @@ DMA <-function(Input_data,
       stop("Please choose CoRe= TRUE or CoRe=FALSE.")
     }
   }
-
-  ################################################################################################################################################################################################
-  ############### Perform Hypothesis testing ###############
-  if(MultipleComparison == FALSE){
-    if(STAT_pval=="lmFit"){
-      STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
-                                   Input_SettingsFile_Sample=Input_SettingsFile_Sample,
-                                   Input_SettingsInfo=Input_SettingsInfo,
-                                   STAT_padj=STAT_padj,
-                                   Log2FC_table=Log2FC_table,
-                                   CoRe=CoRe,
-                                   all_vs_all=all_vs_all,
-                                   MultipleComparison=MultipleComparison)
-    }else{
-      STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
-    }
-    }else{ # MultipleComparison = TRUE
-
-      #Correct data heteroscedasticity
-      if(STAT_pval!="lmFit" & VST == TRUE){
-        temp <- vst(Input_data,Plot=FALSE)
-        Input_data <- temp$DFs$Corrected_data
-      }
-
-      if(all_vs_all ==TRUE){
-        message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(STAT_pval), ".")
-        }else{# for 1 vs all
-          message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(STAT_pval), ".")
-          # conditions=relevel(conditions, ref = denominator)
-        }
-
-      if(STAT_pval=="aov"){
-        STAT_C1vC2 <- AOV(Input_data=Input_data,
-                          Input_SettingsInfo=Input_SettingsInfo,
-                          conditions=conditions,
-                          STAT_padj=STAT_padj,
-                          Log2FC_table=Log2FC_table,
-                          all_vs_all=all_vs_all,
-                          comparisons=comparisons)
-        }else if(STAT_pval=="kruskal.test"){
-          STAT_C1vC2 <-Kruskal(Input_data=Input_data,
-                              conditions=conditions,
-                              STAT_padj=STAT_padj,
-                              Log2FC_table=Log2FC_table,
-                              all_vs_all=all_vs_all,
-                              comparisons=comparisons)
-        }else if(STAT_pval=="welch"){
-          STAT_C1vC2 <-Welch(Input_data=Input_data,
-                               conditions=conditions,
-                               Log2FC_table=Log2FC_table,
-                               all_vs_all=all_vs_all,
-                               comparisons=comparisons)
-        }else if(STAT_pval=="lmFit"){
-            STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
-                                         Input_SettingsFile_Sample=Input_SettingsFile_Sample,
-                                         Input_SettingsInfo=Input_SettingsInfo,
-                                         STAT_padj=STAT_padj,
-                                         Log2FC_table=Log2FC_table,
-                                         CoRe=CoRe,
-                                         all_vs_all=all_vs_all,
-                                         MultipleComparison=MultipleComparison)
-          }
-      }
-
-  ################################################################################################################################################################################################
-  ###############  Add the previous metabolite names back ###############
-  if(MultipleComparison==FALSE){
-    DMA_Output <- merge(savedMetaboliteNames, STAT_C1vC2, by="Metabolite")
-    DMA_Output$Metabolite <- NULL
-    colnames(DMA_Output)[1] <- "Metabolite"
-  }else{
-    DMA_Output <- lapply(STAT_C1vC2, function(df){
-      merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
-      merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
-        dplyr::rename("Metabolite"=1)
-      return(merged_df)
-    })
-  }
-
-  ################################################################################################################################################################################################
-  ###############  Folder ###############
-  if(MultipleComparison==FALSE){
-    if (Save_as_Results == "xlsx"){
-      xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".xlsx"))   # Save the DMA results table
-      writexl::write_xlsx(DMA_Output,xlsDMA, col_names = TRUE) # save the DMA result DF
-      }else if (Save_as_Results == "csv"){
-        csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".csv"))
-        write.csv(DMA_Output,csvDMA) # save the DMA result DF
-      }else if (Save_as_Results == "txt"){
-        txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
-        write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
-      }
-  }else{
-    for(DF in names(DMA_Output)){
-      DMA_Output_Save <- DMA_Output[[DF]]
-      DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
-
-      if (Save_as_Results == "xlsx"){
-        xlsDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".xlsx"))   # Save the DMA results table
-        writexl::write_xlsx(DMA_Output_Save,xlsDMA, col_names = TRUE) # save the DMA result DF
-      }else if (Save_as_Results == "csv"){
-        csvDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".csv"))
-        write.csv(DMA_Output_Save,csvDMA) # save the DMA result DF
-      }else if (Save_as_Results == "txt"){
-        txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",DF_save, OutputName, ".txt"))
-        write.table(DMA_Output_Save,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
-      }
-    }
-  }
-
-  if(CoRe==TRUE){
-    x <- "Log2(Distance)"
-    VolPlot_SettingsInfo= c(color="CoRe")
-    VOlPlot_SettingsFile = DMA_Output
-  }else{
-    x <- "Log2FC"
-    VolPlot_SettingsInfo= NULL
-    VOlPlot_SettingsFile = NULL
-  }
-
-  ################################################################################################################################################################################################
-  ###############  Plots ###############
-  volplotList = list()
-  if(MultipleComparison==TRUE){
-    for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
-      Volplotdata<- DMA_Output[[DF]]
-
-      dev.new()
-      VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
-                                                      Input_data=Volplotdata,
-                                                      Plot_SettingsInfo=VolPlot_SettingsInfo,
-                                                      Plot_SettingsFile=VOlPlot_SettingsFile[[DF]],
-                                                      y= "p.adj",
-                                                      x= x,
-                                                      AdditionalInput_data= NULL,
-                                                      OutputPlotName= DF,
-                                                      Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                                                      xlab= NULL,#"~Log[2]~FC"
-                                                      ylab= NULL,#"~-Log[10]~p.adj"
-                                                      pCutoff= 0.05,
-                                                      FCcutoff= 0.5,
-                                                      color_palette= NULL,
-                                                      shape_palette=NULL,
-                                                      SelectLab= "",
-                                                      Connectors=  FALSE,
-                                                      Subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                      Theme= NULL,
-                                                      Save_as_Plot= NULL))
-
-      volplotList[[DF]]<- VolcanoPlot
-
-      DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
-      volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_", DF_save, OutputName,".",Save_as_Plot))
-      ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
-      dev.off()
-    }
-  }else{
-  # Make a simple Volcano plot
-  dev.new()
-  VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
-                                                  Input_data=DMA_Output,
-                                                  Plot_SettingsInfo=VolPlot_SettingsInfo,
-                                                  Plot_SettingsFile=VOlPlot_SettingsFile,
-                                                  y= "p.adj",
-                                                  x= x,
-                                                  AdditionalInput_data= NULL,
-                                                  OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
-                                                  Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                                                  xlab= NULL,#"~Log[2]~FC"
-                                                  ylab= NULL,#"~-Log[10]~p.adj"
-                                                  pCutoff= 0.05,
-                                                  FCcutoff= 0.5,
-                                                  color_palette= NULL,
-                                                  shape_palette=NULL,
-                                                  SelectLab= "",
-                                                  Connectors=  FALSE,
-                                                  Subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                  Theme= NULL,
-                                                  Save_as_Plot= NULL))
-  volplotList[[paste0(toString(numerator)," versus ",toString(denominator))]]<- VolcanoPlot
-  dev.off()
-  #plot(VolcanoPlot)
-
-  volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"_versus_",toString(denominator),OutputName,".",Save_as_Plot))
-  ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
-  }
-
-
-  #Here we make a list in which we will save the output
-  suppressWarnings(DMA_output_list <- list("DF" = list("Shapiro_result"=Shapiro_output$DF$Shapiro_result,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Shapiro_output$Plot$Distributions, "Volcano"=volplotList)))
-
-
-  if(Plot == TRUE){
-    for (plot in volplotList){
-      print(plot)
-    }
-  }
-  return(invisible(DMA_output_list))
+  return(Log2FC_table)
 }
+
+
 
 
 
@@ -1102,7 +1308,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
       arrange(sample)#Order the column "sample" alphabetically
   }else if(MultipleComparison==TRUE){
     Limma_input <- Input_data%>%rownames_to_column("sample")%>%
-    arrange(sample)#Order the column "sample" alphabetically
+      arrange(sample)#Order the column "sample" alphabetically
   }
 
   #Check if the order of the "sample" column is the same in both data frames
@@ -1193,8 +1399,8 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
         # Set row name
         rownames(cont.matrix)[i] <- paste(unique_conditions[1], "_vs_", unique_conditions[condition], sep = "")
 
-        }
-   i <- i + 1
+      }
+      i <- i + 1
     }
   }else if(all_vs_all ==FALSE & MultipleComparison==FALSE){
     unique_conditions <- levels(fcond)# Get unique conditions
@@ -1255,7 +1461,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
                     "p.val"=4,
                     "p.adj"=5)
 
-   res.t <- res.t%>%
+    res.t <- res.t%>%
       rownames_to_column("Metabolite")
 
     # Store the data frame in the results list, named after the contrast
@@ -1285,7 +1491,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
   }
 
   if(CoRe==TRUE){
-   # Merge the data frames in list1 and list2 based on the "Metabolite" column
+    # Merge the data frames in list1 and list2 based on the "Metabolite" column
     merged_list <- list()
     for(i in 1:nrow(name_match_df)){
       list_dfs <- name_match_df$New[i]
@@ -1423,12 +1629,16 @@ Shapiro <-function(Input_data,
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
   Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if(is.null(Save_as_Plot)==FALSE){
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
-  Save_as_Results_options <- c("txt","csv", "xlsx" )
-  if(Save_as_Results %in% Save_as_Results_options == FALSE){
-    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+  if(is.null(Save_as_Results)==FALSE){
+    Save_as_Results_options <- c("txt","csv", "xlsx" )
+    if(Save_as_Results %in% Save_as_Results_options == FALSE){
+      stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+    }
   }
 
   #7. Are sample numbers enough?
@@ -1473,7 +1683,12 @@ Shapiro <-function(Input_data,
     filter(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator)%>%
     select_if(is.numeric)
   temp<- as.vector(sapply(Input_shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
-  Input_shaptest <- Input_shaptest[,!temp]
+  if(length(Input_shaptest)==1){
+    Input_shaptest <-Input_data
+  }else{
+    Input_shaptest <- Input_shaptest[,!temp]
+  }
+
   Input_shaptest_Cond <-merge(data.frame(Conditions = Input_SettingsFile_Sample[, "Conditions", drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
 
   UniqueConditions <- Input_SettingsFile_Sample%>%
@@ -1530,12 +1745,14 @@ Shapiro <-function(Input_data,
     DF_shapiro_results_out$Shapiro_p.val <-gsub("[[:punct:]]", " ", DF_shapiro_results_out$Shapiro_p.val)
 
     # Save the DF Shapiro
-    if (Save_as_Results == "xlsx"){
-      writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
-    }else if (Save_as_Results == "csv"){
-      write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
-    }else if (Save_as_Results == "txt"){
-      write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+    if(is.null(Save_as_Results)==FALSE){
+      if (Save_as_Results == "xlsx"){
+        writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
+      }else if (Save_as_Results == "csv"){
+        write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
+      }else if (Save_as_Results == "txt"){
+        write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+      }
     }
 
     ## Make Group wise data distribution plot and QQ plots
@@ -1570,12 +1787,15 @@ Shapiro <-function(Input_data,
     plot(sampleDist)
     Density_plots[[paste(colnames(transpose))]] <- recordPlot()
 
-    if(CoRe==TRUE){
-      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
-    }else{
-      ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+    if(is.null(Save_as_Plot)==FALSE){
+      if(CoRe==TRUE){
+        ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+      }else{
+        ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
 
+      }
     }
+
     # QQ plots
     if(QQplots==TRUE){
       # Make folders !has to be moved on top!
@@ -1739,13 +1959,18 @@ Bartlett <-function(Input_data,
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
   Save_as_Plot_options <- c("svg","pdf","png")
-  if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+  if(is.null(Save_as_Plot)==FALSE){
+    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
+      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", "),"." )
+    }
   }
   Save_as_Results_options <- c("txt","csv", "xlsx" )
-  if(Save_as_Results %in% Save_as_Results_options == FALSE){
-    stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+  if(is.null(Save_as_Results)==FALSE){
+    if(Save_as_Results %in% Save_as_Results_options == FALSE){
+      stop("Check input. The selected Save_as_Results option is not valid. Please select one of the folowwing: ",paste(Save_as_Results_options,collapse = ", "),"." )
+    }
   }
+
 
 
   # Use Bartletts test
@@ -1768,12 +1993,14 @@ Bartlett <-function(Input_data,
   DF_Bartlett_results_out <- DF_bartlett_results
 
   # Save the DF Bartlett
-  if (Save_as_Results == "xlsx"){
-    writexl::write_xlsx(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
-  }else if (Save_as_Results == "csv"){
-    write.csv(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
-  }else if (Save_as_Results == "txt"){
-    write.table(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  if(is.null(Save_as_Results)==FALSE){
+    if (Save_as_Results == "xlsx"){
+      writexl::write_xlsx(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
+    }else if (Save_as_Results == "csv"){
+      write.csv(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
+    }else if (Save_as_Results == "txt"){
+      write.table(DF_Bartlett_results_out,paste(Folder_Name,"/DF_Bartlett_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+    }
   }
 
   # Make density plots
