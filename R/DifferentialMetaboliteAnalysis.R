@@ -319,7 +319,7 @@ DMA <-function(Input_data,
 
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  Log2FCRes <- Log2FC(Input_data=Input_data,
+  Log2FC_table <- Log2FC(Input_data=Input_data,
                       Input_SettingsFile=Input_SettingsFile_Sample,
                       Input_SettingsInfo=Input_SettingsInfo,
                       OutputName='',
@@ -337,7 +337,7 @@ DMA <-function(Input_data,
                                    Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                    Input_SettingsInfo=Input_SettingsInfo,
                                    STAT_padj=STAT_padj,
-                                   Log2FC_table=Log2FCRes,
+                                   Log2FC_table=Log2FC_table,
                                    CoRe=CoRe,
                                    all_vs_all=all_vs_all,
                                    MultipleComparison=MultipleComparison)
