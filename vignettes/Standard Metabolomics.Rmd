@@ -637,6 +637,30 @@ MetaProViz::VizHeatmap(Input_data = Input_Heatmap,
                        Plot_SettingsFile_Metab =  MetaData_Metab,
                        OutputPlotName = "Pathway")
 ```
+
+### Superplots
+Intensity plots for each feature (=metabolite) can be useful to visually examine differences among groups.\
+
+As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
+```{r}
+Input_Superplot <-  Intra_Preprocessed[,-c(1:4)]#remove columns that include Metadata such as cell type,...
+```
+
+We can select the conditions that are plotted using the `Selected_Conditions` parameter. Additionally, after selecting some conditions, we can add statistics for comparisons specified in the `Selected conditions` parameter. If only one pair is added in the Selected_Comparisons students t-test  is performed which anova is used for more than one comparison. Finally, plots are exposted in one pdf file. However, individual plots can be exported by setting the parameter `Individual_plot` = TRUE
+```{r}
+Vizsuperplot(Input_data = Input_Superplot,
+             Input_SettingsFile = MetaData_Sample,
+             Input_SettingsInfo = c(conditions="Conditions", superplot = "Biological_Replicates"),
+             Graph_Style = "Box", # Bar, Box, Violin
+             OutputPlotName = "",
+             palette = c("red", "blue", "green"),
+             Individual_plots = FALSE,
+             Selected_Conditions = c("786-M1A", "786-O", "HK2"),
+             Selected_Comparisons = list(c(1,2), c(1,3), c(2,3)),
+             Theme = theme_classic(),
+             Save_as_Plot = "svg")
+```
+
 </div>
 \
 \
