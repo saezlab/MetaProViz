@@ -48,7 +48,7 @@ VizSuperplot <- function(Input_data,
                      Selected_Comparisons = NULL,
                      Individual_plots = FALSE,
                      Theme = theme_classic(),
-                     # palette =
+                     palette = NULL,
                      Save_as_Plot = "svg"
 ){
 
@@ -137,6 +137,12 @@ VizSuperplot <- function(Input_data,
     }
   }
 
+  #6. Check palette:
+  if(is.null(palette)){
+    palette <- "skyblue"
+  }else{
+
+    }
   data <- Input_data
 
 
@@ -187,11 +193,11 @@ VizSuperplot <- function(Input_data,
 
     # Add graph style
     if (Graph_Style == "Bar"){
-      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = "skyblue")
+      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = palette)
     } else if (Graph_Style == "Violin"){
-      Plot <- Plot+ geom_violin(fill = "skyblue")
+      Plot <- Plot+ geom_violin(fill = palette)
     } else if (Graph_Style == "Box"){
-      Plot <- Plot +  geom_boxplot(fill="skyblue")
+      Plot <- Plot +  geom_boxplot(fill= palette)
     }
 
     # Add superplot
@@ -211,12 +217,12 @@ VizSuperplot <- function(Input_data,
       }else{
 
 
-        Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+      suppressMessages(Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                             Input_SettingsFile=plotdata[,c(2:3)],
                             Input_SettingsInfo=c(conditions="Conditions"),
                             Save_as_Results = NULL,
                             Save_as_Plot=NULL,
-                            Plot = FALSE)
+                            Plot = FALSE))
 
         #Log2FC_table <- Log2FCRes$Log2FC_table
         #colnames(Log2FC_table) <- str_replace(colnames( Log2FCRes$Log2FC_table), "Log2FC_", "")
