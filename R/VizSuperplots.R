@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: Visualization Superplors
+## Script name: Visualization Superplots
 ##
 ## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
@@ -20,14 +20,11 @@
 #'
 #' This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
 
-###################################
-### ### ### Superplots  ### ### ###
-###################################
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param Input_SettingsFile DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
 #' @param Graph_Style String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
-#' @param Superplot \emph{Optional: } String with a Column name of the Input_SettingsFile as string which is used to make the plots Superplots.
+#' @param superplot \emph{Optional: } String with a Column name of the Input_SettingsFile as string which is used to make the plots superplots.
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
 #' @param Individual_plots \emph{Optional: }  Logical, TRUE to save each plot individually. \strong{Default = FALSE}
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
@@ -35,20 +32,19 @@
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic} ??
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #'
-#' @keywords Barplot, Boxplot, Violinplot, Superplot
+#' @keywords Barplot, Boxplot, Violinplot, superplot
 #' @export
 
-VizSuperplot <- function(Input_data,
+Vizsuperplot <- function(Input_data,
                      Input_SettingsFile,
                      Input_SettingsInfo = c(conditions="Conditions", superplot = NULL),
                      Graph_Style = "Box", # Bar, Box, Violin
-                     Superplot = NULL,
                      OutputPlotName = "",
                      Selected_Conditions = NULL,
                      Selected_Comparisons = NULL,
                      Individual_plots = FALSE,
                      Theme = theme_classic(),
-                     # palette =
+                     palette = NULL,
                      Save_as_Plot = "svg"
 ){
 
@@ -95,7 +91,7 @@ VizSuperplot <- function(Input_data,
   if(Input_SettingsInfo[["superplot"]] %in% colnames(Input_SettingsFile)== TRUE){
     if(Input_SettingsInfo[["superplot"]] %in% Input_SettingsInfo==TRUE){
       Input_SettingsFile<- Input_SettingsFile%>%
-        dplyr::rename("Superplot"= paste(Input_SettingsInfo[["superplot"]]) )
+        dplyr::rename("superplot"= paste(Input_SettingsInfo[["superplot"]]) )
     }else{
       stop("The ",Input_SettingsInfo[["superplot"]], " column selected for superplot in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
     }
@@ -137,6 +133,22 @@ VizSuperplot <- function(Input_data,
     }
   }
 
+  #6. Check palette:
+  if(is.null(palette)){
+    palette <- "skyblue"
+  }else{
+    if(is.null(Selected_Conditions)==TRUE){
+      if(length(palette) !=length(unique(Input_SettingsFile$Conditions)) ){
+        stop(paste0("The palette colors used are not 1-to-1 with the groups in the ",Input_SettingsInfo[["conditions"]] ," column. Please check your Input."))
+      }
+    }else{
+      if(length(palette) !=length(Selected_Conditions) ){
+        stop("The Selected_Conditions and the palette used are not 1-to-1. Please check your Input.")
+      }
+    }
+
+
+    }
   data <- Input_data
 
 
@@ -158,7 +170,7 @@ VizSuperplot <- function(Input_data,
 
 
   Metabolite_Names <- colnames(data)
-  data <- merge( Input_SettingsFile[c("Conditions","Superplot")] ,data, by=0)
+  data <- merge( Input_SettingsFile[c("Conditions","superplot")] ,data, by=0)
   data <- column_to_rownames(data, "Row.names")
 
   # make a list for plotting all plots together
@@ -170,7 +182,7 @@ VizSuperplot <- function(Input_data,
 
     suppressWarnings(dataMeans <- data %>%  select(i, Conditions) %>% group_by(Conditions) %>% summarise_at(vars(i), list(mean = mean, sd = sd)) %>% as.data.frame())
     names(dataMeans)[2] <- "Intensity"
-    suppressWarnings(plotdata <- data %>%  select(i,Conditions, Superplot) %>%  group_by(Conditions)  %>% as.data.frame() )
+    suppressWarnings(plotdata <- data %>%  select(i,Conditions, superplot) %>%  group_by(Conditions)  %>% as.data.frame() )
     names(plotdata)[1] <- c("Intensity")
     # Make conditions a factor
     plotdata$Conditions <- factor(plotdata$Conditions)
@@ -187,16 +199,16 @@ VizSuperplot <- function(Input_data,
 
     # Add graph style
     if (Graph_Style == "Bar"){
-      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = "skyblue")
+      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = palette)
     } else if (Graph_Style == "Violin"){
-      Plot <- Plot+ geom_violin(fill = "skyblue")
+      Plot <- Plot+ geom_violin(fill = palette)
     } else if (Graph_Style == "Box"){
-      Plot <- Plot +  geom_boxplot(fill="skyblue")
+      Plot <- Plot +  geom_boxplot(fill= palette)
     }
 
     # Add superplot
-    if ("Superplot" %in% colnames(Input_SettingsInfo)){
-      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)
+    if ("superplot" %in% names(Input_SettingsInfo)){
+      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)
       Plot + labs(color=paste(Input_SettingsInfo[["superplot"]]))
     }
 
@@ -211,12 +223,12 @@ VizSuperplot <- function(Input_data,
       }else{
 
 
-        Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+      suppressMessages(Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                             Input_SettingsFile=plotdata[,c(2:3)],
                             Input_SettingsInfo=c(conditions="Conditions"),
                             Save_as_Results = NULL,
                             Save_as_Plot=NULL,
-                            Plot = FALSE)
+                            Plot = FALSE))
 
         #Log2FC_table <- Log2FCRes$Log2FC_table
         #colnames(Log2FC_table) <- str_replace(colnames( Log2FCRes$Log2FC_table), "Log2FC_", "")
