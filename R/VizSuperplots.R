@@ -106,7 +106,7 @@ Vizsuperplot <- function(Input_data,
 
 
   #4. Comparison options
-  if(is.null(Selected_Conditions)==FALSE){
+  if(is.null(Selected_Conditions) == FALSE){
     for (Condition in Selected_Conditions){
       if(Condition %in% Input_SettingsFile$Conditions==FALSE){
         stop(paste0("Check Input. The Selected_Conditions ",Condition," were not found in the Conditions Column."))
@@ -116,13 +116,15 @@ Vizsuperplot <- function(Input_data,
 
   if(is.null(Selected_Comparisons)==FALSE){
     for (Comp in Selected_Comparisons){
-      if(Selected_Conditions[Comp[1]] %in% Input_SettingsFile$Conditions ==FALSE){
+      if(is.null(Selected_Conditions)==FALSE){
+        if(Selected_Conditions[Comp[1]] %in% Input_SettingsFile$Conditions ==FALSE){
         stop("Check Input. The Selected_Comparisons condition ",paste(Comp[1]), " is not found in the Conditions Column of the Input_SettingsFile.")
-      }
-      if(Selected_Conditions[Comp[2]] %in% Input_SettingsFile$Conditions ==FALSE){
+          }
+        if(Selected_Conditions[Comp[2]] %in% Input_SettingsFile$Conditions ==FALSE){
         stop("Check Input. The Selected_Comparisons condition ",paste(Comp[2]), " is not found in the Conditions Column of the Input_SettingsFile.")
+        }
       }
-    }
+      }
   }
 
 
@@ -187,7 +189,7 @@ Vizsuperplot <- function(Input_data,
     plotdata$Conditions <- factor(plotdata$Conditions)
 
     # Take only selected conditions
-    if (is.null(Selected_Conditions) == "FALSE"){
+    if (is.null(Selected_Conditions) == FALSE){
       dataMeans <- dataMeans %>% filter(Conditions %in% Selected_Conditions)
       plotdata <- plotdata %>% filter(Conditions %in% Selected_Conditions)
       plotdata$Conditions <- factor(plotdata$Conditions, levels = Selected_Conditions)
@@ -236,16 +238,11 @@ Vizsuperplot <- function(Input_data,
                             Save_as_Plot=NULL,
                             Plot = FALSE))
 
-        #Log2FC_table <- Log2FCRes$Log2FC_table
-        #colnames(Log2FC_table) <- str_replace(colnames( Log2FCRes$Log2FC_table), "Log2FC_", "")
-
         comparison_table <- data.frame(matrix(ncol = length(Selected_Comparisons), nrow = 2))
         for (k in seq_along(Selected_Comparisons)) {
           comparison_table[, k] <- sapply(Selected_Comparisons[[k]], function(x) Selected_Conditions[x])
           colnames(comparison_table)[k] <- paste0(Selected_Conditions[Selected_Comparisons[[k]][[1]]],"_vs_",  Selected_Conditions[Selected_Comparisons[[k]][[2]]])
         }
-        #Log2FC_table
-        #comparison_table
 
         STAT_C1vC2 <- AOV(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           conditions= plotdata[,c(2)],
