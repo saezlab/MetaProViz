@@ -216,8 +216,8 @@ Vizsuperplot <- function(Input_data,
 
     # Add superplot
     if ("superplot" %in% names(Input_SettingsInfo)){
-      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)
-      Plot + labs(color=paste(Input_SettingsInfo[["superplot"]]), fill = Input_SettingsInfo[["superplot"]])
+      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)+
+        labs(color=Input_SettingsInfo[["superplot"]], fill = Input_SettingsInfo[["superplot"]])
     }
 
     if(is.null(Selected_Comparisons)== TRUE){
@@ -227,7 +227,7 @@ Vizsuperplot <- function(Input_data,
         Plot <- Plot+ ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
                                                  label = "p.format", method = "t.test", hide.ns = TRUE,
                                                position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
-        Plot <- Plot +labs(caption = "p.value using pairwise t-test")
+        Plot <- Plot +labs(caption = "p.val using pairwise t-test")
       }else{
       suppressMessages(Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                             Input_SettingsFile=plotdata[,c(2:3)],
@@ -272,15 +272,15 @@ Vizsuperplot <- function(Input_data,
         }else{
           Plot <- Plot +ggpubr::stat_pvalue_manual(df, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
         }
-        Plot <- Plot +labs(caption = "p.adjusted using Anova and FDR")
+        Plot <- Plot +labs(caption = "p.adj using Anova and FDR")
      }
     }
 
-    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=18))+xlab("Conditions")+ ylab("Normalized Intensity")
     Plot <- Plot + Theme+ ggtitle(paste(i))
+    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab("Conditions")+ ylab("Normalized Intensity")
 
     # Make plot into nice format:
-    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(Input=Plot, Input_SettingsInfo=Input_SettingsInfo, MetaboliteName=i, Graph_Style=Graph_Style)
+    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(Input=Plot, Input_SettingsInfo=Input_SettingsInfo, Input_SettingsFile=Input_SettingsFile, MetaboliteName=i, Graph_Style=Graph_Style)
     Plot <- Plot_Sized[[3]]
     # First we want to convert the plot back into a ggplot object:
     Plot <- ggplot2::ggplot() +
@@ -331,13 +331,14 @@ Vizsuperplot <- function(Input_data,
 
 #' @param Input This is the ggplot object generated within the VizSuperplots function.
 #' @param Input_SettingsInfo Passed to VizSuperplots
+#' @param Input_SettingsFile Passed to VizSuperplots
 #' @param MetaboliteName Passed to VizSuperplots
 #' @param Graph_Style Passed to VizSuperplots
 #'
 #' @keywords PCA helper function
 #' @noRd
 
-plotGrob_Superplot <- function(Input, Input_SettingsInfo, MetaboliteName, Graph_Style){
+plotGrob_Superplot <- function(Input, Input_SettingsInfo, Input_SettingsFile, MetaboliteName, Graph_Style){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable <- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
