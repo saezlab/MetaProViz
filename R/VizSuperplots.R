@@ -22,30 +22,30 @@
 
 
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param Input_SettingsFile DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
-#' @param Input_SettingsInfo Named vector including at least information on the conditions column: c(conditions="ColumnName_Plot_SettingsFile"). Additionally superplots can be made by adding superplot ="olumnName_Plot_SettingsFile", which are ususally biological replicates or patient IDs. \strong{Default = c(conditions="Conditions", superplot = NULL)}
+#' @param Plot_SettingsFile DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
+#' @param Plot_SettingsInfo Named vector including at least information on the conditions column: c(conditions="ColumnName_Plot_SettingsFile"). Additionally superplots can be made by adding superplot ="olumnName_Plot_SettingsFile", which are ususally biological replicates or patient IDs. \strong{Default = c(conditions="Conditions", superplot = NULL)}
 #' @param Graph_Style String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
 #' @param Individual_plots \emph{Optional: }  Logical, TRUE to save each plot individually. \strong{Default = FALSE}
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
 #' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic}
-#' @param palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
+#' @param color_palette \emph{Optional: } Provide customiced color-color_palette in vector format. \strong{Default = NULL}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, superplot
 #' @export
 
 Vizsuperplot <- function(Input_data,
-                     Input_SettingsFile,
-                     Input_SettingsInfo = c(conditions="Conditions", superplot = NULL),
+                     Plot_SettingsFile,
+                     Plot_SettingsInfo = c(conditions="Conditions", superplot = NULL),
                      Graph_Style = "Box", # Bar, Box, Violin
                      OutputPlotName = "",
                      Selected_Conditions = NULL,
                      Selected_Comparisons = NULL,
                      Individual_plots = FALSE,
                      Theme = theme_classic(),
-                     palette = NULL,
+                     color_palette = NULL,
                      Save_as_Plot = "svg"
 ){
 
@@ -59,42 +59,42 @@ Vizsuperplot <- function(Input_data,
   #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Input_SettingsFile)==FALSE){
-    stop("There is no column named `Conditions` in Input_SettingsFile to obtain Condition1 and Condition2.")
+  } else if("Conditions" %in% colnames(Plot_SettingsFile)==FALSE){
+    stop("There is no column named `Conditions` in Plot_SettingsFile to obtain Condition1 and Condition2.")
   } else{
     Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
     if((any(Test_num) ==  FALSE) ==  TRUE){
       stop("Input_data needs to be of class numeric")
     } else{
-      Test_match <- merge(Input_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Input_SettingsFile"?
+      Test_match <- merge(Plot_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Plot_SettingsFile"?
       if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Input_SettingsFile.")
+        stop("row.names Input_data need to match row.names Plot_SettingsFile.")
       } else(
         data <- Input_data
       )
     }
-    Input_SettingsFile <- Input_SettingsFile
+    Plot_SettingsFile <- Plot_SettingsFile
   }
 
   ## ------------ Check Input SettingsInfo ----------- ##
-  #2. Input_SettingsInfo
-  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== TRUE){
-      Input_SettingsFile<- Input_SettingsFile%>%
-        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
+  #2. Plot_SettingsInfo
+  if(Plot_SettingsInfo[["conditions"]] %in% Plot_SettingsInfo==TRUE){
+    if(Plot_SettingsInfo[["conditions"]] %in% colnames(Plot_SettingsFile)== TRUE){
+      Plot_SettingsFile<- Plot_SettingsFile%>%
+        dplyr::rename("Conditions"= paste(Plot_SettingsInfo[["conditions"]]) )
     }else{# if true rename to Conditions
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      stop("The ",Plot_SettingsInfo[["conditions"]], " column selected as conditions in Plot_SettingsInfo was not found in Plot_SettingsFile. Please check your input.")
     }
   }else{
-    stop("You have to provide a Input_SettingsInfo for conditions.")
+    stop("You have to provide a Plot_SettingsInfo for conditions.")
   }
 
-  if(Input_SettingsInfo[["superplot"]] %in% colnames(Input_SettingsFile)== TRUE){
-    if(Input_SettingsInfo[["superplot"]] %in% Input_SettingsInfo==TRUE){
-      Input_SettingsFile<- Input_SettingsFile%>%
-        dplyr::rename("superplot"= paste(Input_SettingsInfo[["superplot"]]) )
+  if(Plot_SettingsInfo[["superplot"]] %in% colnames(Plot_SettingsFile)== TRUE){
+    if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){
+      Plot_SettingsFile<- Plot_SettingsFile%>%
+        dplyr::rename("superplot"= paste(Plot_SettingsInfo[["superplot"]]) )
     }else{
-      stop("The ",Input_SettingsInfo[["superplot"]], " column selected for superplot in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
+      stop("The ",Plot_SettingsInfo[["superplot"]], " column selected for superplot in Plot_SettingsInfo was not found in Plot_SettingsFile. Please check your input.")
     }
   }
 
@@ -108,7 +108,7 @@ Vizsuperplot <- function(Input_data,
   #4. Comparison options
   if(is.null(Selected_Conditions) == FALSE){
     for (Condition in Selected_Conditions){
-      if(Condition %in% Input_SettingsFile$Conditions==FALSE){
+      if(Condition %in% Plot_SettingsFile$Conditions==FALSE){
         stop(paste0("Check Input. The Selected_Conditions ",Condition," were not found in the Conditions Column."))
       }
     }
@@ -117,11 +117,11 @@ Vizsuperplot <- function(Input_data,
   if(is.null(Selected_Comparisons)==FALSE){
     for (Comp in Selected_Comparisons){
       if(is.null(Selected_Conditions)==FALSE){
-        if(Selected_Conditions[Comp[1]] %in% Input_SettingsFile$Conditions ==FALSE){
-        stop("Check Input. The Selected_Comparisons condition ",paste(Comp[1]), " is not found in the Conditions Column of the Input_SettingsFile.")
+        if(Selected_Conditions[Comp[1]] %in% Plot_SettingsFile$Conditions ==FALSE){
+        stop("Check Input. The Selected_Comparisons condition ",paste(Comp[1]), " is not found in the Conditions Column of the Plot_SettingsFile.")
           }
-        if(Selected_Conditions[Comp[2]] %in% Input_SettingsFile$Conditions ==FALSE){
-        stop("Check Input. The Selected_Comparisons condition ",paste(Comp[2]), " is not found in the Conditions Column of the Input_SettingsFile.")
+        if(Selected_Conditions[Comp[2]] %in% Plot_SettingsFile$Conditions ==FALSE){
+        stop("Check Input. The Selected_Comparisons condition ",paste(Comp[2]), " is not found in the Conditions Column of the Plot_SettingsFile.")
         }
       }
       }
@@ -136,17 +136,17 @@ Vizsuperplot <- function(Input_data,
     }
   }
 
-  #6. Check palette:
-  if(is.null(palette)){
-    palette <- "grey"
+  #6. Check color_palette:
+  if(is.null(color_palette)){
+    color_palette <- "grey"
   }else{
     if(is.null(Selected_Conditions)==TRUE){
-      if(length(palette) !=length(unique(Input_SettingsFile$Conditions)) ){
-        stop(paste0("The palette colors used are not 1-to-1 with the groups in the ",Input_SettingsInfo[["conditions"]] ," column. Please check your Input."))
+      if(length(color_palette) !=length(unique(Plot_SettingsFile$Conditions)) ){
+        stop(paste0("The color_palette colors used are not 1-to-1 with the groups in the ",Plot_SettingsInfo[["conditions"]] ," column. Please check your Input."))
       }
     }else{
-      if(length(palette) !=length(Selected_Conditions) ){
-        stop("The Selected_Conditions and the palette used are not 1-to-1. Please check your Input.")
+      if(length(color_palette) !=length(Selected_Conditions) ){
+        stop("The Selected_Conditions and the color_palette used are not 1-to-1. Please check your Input.")
       }
     }
 
@@ -173,7 +173,7 @@ Vizsuperplot <- function(Input_data,
 
 
   Metabolite_Names <- colnames(data)
-  data <- merge( Input_SettingsFile[c("Conditions","superplot")] ,data, by=0)
+  data <- merge( Plot_SettingsFile[c("Conditions","superplot")] ,data, by=0)
   data <- column_to_rownames(data, "Row.names")
 
   # make a list for plotting all plots together
@@ -207,19 +207,19 @@ Vizsuperplot <- function(Input_data,
     }
 
     if (Graph_Style == "Bar"){
-      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = palette)+ stat_summary(fun.data=data_summary,
+      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = color_palette)+ stat_summary(fun.data=data_summary,
                                                                                             geom="errorbar", color="black", width=0.2)
     } else if (Graph_Style == "Violin"){
-      Plot <- Plot+ geom_violin(fill = palette)+ stat_summary(fun.data=data_summary,
+      Plot <- Plot+ geom_violin(fill = color_palette)+ stat_summary(fun.data=data_summary,
                                                               geom="errorbar", color="black", width=0.2)
     } else if (Graph_Style == "Box"){
-      Plot <- Plot +  geom_boxplot(fill=palette,  width=0.5, position=position_dodge(width = 0.5))
+      Plot <- Plot +  geom_boxplot(fill=color_palette,  width=0.5, position=position_dodge(width = 0.5))
     }
 
     # Add superplot
-    if ("superplot" %in% names(Input_SettingsInfo)){
+    if ("superplot" %in% names(Plot_SettingsInfo)){
       Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)+
-        labs(color=Input_SettingsInfo[["superplot"]], fill = Input_SettingsInfo[["superplot"]])
+        labs(color=Plot_SettingsInfo[["superplot"]], fill = Plot_SettingsInfo[["superplot"]])
     }
 
     if(is.null(Selected_Comparisons)== TRUE){
@@ -232,8 +232,8 @@ Vizsuperplot <- function(Input_data,
         Plot <- Plot +labs(caption = "p.val using pairwise t-test")
       }else{
       suppressMessages(Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
-                            Input_SettingsFile=plotdata[,c(2:3)],
-                            Input_SettingsInfo=c(conditions="Conditions"),
+                            Plot_SettingsFile=plotdata[,c(2:3)],
+                            Plot_SettingsInfo=c(conditions="Conditions"),
                             Save_as_Results = NULL,
                             Save_as_Plot=NULL,
                             Plot = FALSE))
@@ -246,7 +246,7 @@ Vizsuperplot <- function(Input_data,
 
         STAT_C1vC2 <- AOV(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           conditions= plotdata[,c(2)],
-                          Input_SettingsInfo=c(conditions="Conditions"),
+                          Plot_SettingsInfo=c(conditions="Conditions"),
                           STAT_padj="fdr",
                           Log2FC_table=Log2FCRes,
                           all_vs_all=TRUE,
@@ -277,7 +277,8 @@ Vizsuperplot <- function(Input_data,
     Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab("Conditions")+ ylab("Normalized Intensity")
 
     # Make plot into nice format:
-    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(Input=Plot, Input_SettingsInfo=Input_SettingsInfo, Input_SettingsFile=Input_SettingsFile, MetaboliteName=i, Graph_Style=Graph_Style)
+    # MetaProViz:::
+    Plot_Sized <-  plotGrob_Superplot(Input=Plot, Plot_SettingsInfo=Plot_SettingsInfo, Plot_SettingsFile=Plot_SettingsFile, MetaboliteName=i, Graph_Style=Graph_Style)
     Plot <- Plot_Sized[[3]]
     # First we want to convert the plot back into a ggplot object:
     Plot <- ggplot2::ggplot() +
@@ -306,16 +307,16 @@ Vizsuperplot <- function(Input_data,
   }
 
   if(Individual_plots==FALSE){
-    if (!is.null(Save_as_Plot)) {
+    if (!is.null(Save_as_Plot)){
       if(OutputPlotName ==""){
         pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graph_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
       }else{
-        pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graph_Style, "plots", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+        pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graph_Style, "plots","_", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
+      }
         for (plot in plot_list){
           replayPlot(plot)
         }
-        dev.off()
-      }
+      dev.off()
     }
   }
 }
@@ -327,21 +328,21 @@ Vizsuperplot <- function(Input_data,
 #####################################################################
 
 #' @param Input This is the ggplot object generated within the VizSuperplots function.
-#' @param Input_SettingsInfo Passed to VizSuperplots
-#' @param Input_SettingsFile Passed to VizSuperplots
+#' @param Plot_SettingsInfo Passed to VizSuperplots
+#' @param Plot_SettingsFile Passed to VizSuperplots
 #' @param MetaboliteName Passed to VizSuperplots
 #' @param Graph_Style Passed to VizSuperplots
 #'
 #' @keywords PCA helper function
 #' @noRd
 
-plotGrob_Superplot <- function(Input, Input_SettingsInfo, Input_SettingsFile, MetaboliteName, Graph_Style){
+plotGrob_Superplot <- function(Input, Plot_SettingsInfo, Plot_SettingsFile, MetaboliteName, Graph_Style){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable <- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
 
   #-----widths (adapt for number of conditions)
-  Number_Conditions <- Input_SettingsFile%>%
+  Number_Conditions <- Plot_SettingsFile%>%
     dplyr::distinct(Conditions) %>%
     nrow()
 
@@ -360,7 +361,7 @@ plotGrob_Superplot <- function(Input, Input_SettingsInfo, Input_SettingsFile, Me
 
   plot(plottable)
 
-  if(Input_SettingsInfo[["superplot"]] %in% Input_SettingsInfo==TRUE){#legend will be present!
+  if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){#legend will be present!
     Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
     plot_widths <- plot_widths+Value
   }else{
@@ -383,7 +384,7 @@ plotGrob_Superplot <- function(Input, Input_SettingsInfo, Input_SettingsFile, Me
   plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> Some space above the plot
   plottable$heights[c(1,2,4,5)] <- unit(0,"cm")#controls margins --> not needed
 
-  if(Input_SettingsInfo[["superplot"]] %in% Input_SettingsInfo==TRUE){#legend will be present!
+  if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){#legend will be present!
     #------- Legend heights
     Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
