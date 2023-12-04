@@ -28,9 +28,9 @@
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
 #' @param Individual_plots \emph{Optional: }  Logical, TRUE to save each plot individually. \strong{Default = FALSE}
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
-#' @param Selected_Comparisons Logical, TRUE to use t.test between the Selected_Conditions or FALSE. \strong{Default = NULL}
+#' @param Selected_Comparisons List of numeric vectors containing Condition pairs to compare based on the order of the Selected_Conditions vector. \strong{Default = NULL}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic}
-#' @param color_palette \emph{Optional: } Provide customiced color-color_palette in vector format. \strong{Default = NULL}
+#' @param color_palette \emph{Optional: } Provide customized color-color_palette in vector format. \strong{Default = NULL}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, superplot
@@ -114,6 +114,10 @@ Vizsuperplot <- function(Input_data,
     }
   }
 
+  if(is.null(Selected_Conditions) == TRUE & is.null(Selected_Comparisons)==FALSE){
+    stop(paste0("The comparisons of the Selected_Comparisons parameter are selected from the Selected_Conditions vector. Comparisons were added while the Selected_Conditions vector is NULL. Please check your input."))
+  }
+
   if(is.null(Selected_Comparisons)==FALSE){
     for (Comp in Selected_Comparisons){
       if(is.null(Selected_Conditions)==FALSE){
@@ -178,7 +182,7 @@ Vizsuperplot <- function(Input_data,
 
   # make a list for plotting all plots together
   plot_list <- list()
-  k=1
+  p=1
 
   for (i in Metabolite_Names){
     suppressWarnings(dataMeans <- data %>%  select(i, Conditions) %>% group_by(Conditions) %>% summarise_at(vars(i), list(mean = mean, sd = sd)) %>% as.data.frame())
@@ -232,8 +236,8 @@ Vizsuperplot <- function(Input_data,
         Plot <- Plot +labs(caption = "p.val using pairwise t-test")
       }else{
       suppressMessages(Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
-                            Plot_SettingsFile=plotdata[,c(2:3)],
-                            Plot_SettingsInfo=c(conditions="Conditions"),
+                            Input_SettingsFile=plotdata[,c(2:3)],
+                            Input_SettingsInfo=c(conditions="Conditions"),
                             Save_as_Results = NULL,
                             Save_as_Plot=NULL,
                             Plot = FALSE))
@@ -246,7 +250,7 @@ Vizsuperplot <- function(Input_data,
 
         STAT_C1vC2 <- AOV(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           conditions= plotdata[,c(2)],
-                          Plot_SettingsInfo=c(conditions="Conditions"),
+                          Input_SettingsInfo=c(conditions="Conditions"),
                           STAT_padj="fdr",
                           Log2FC_table=Log2FCRes,
                           all_vs_all=TRUE,
@@ -274,12 +278,13 @@ Vizsuperplot <- function(Input_data,
     }
 
     Plot <- Plot + Theme+ ggtitle(paste(i))
-    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab("Conditions")+ ylab("Normalized Intensity")
+    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab("")+ ylab("Normalized Intensity")
 
     # Make plot into nice format:
     # MetaProViz:::
-    Plot_Sized <-  plotGrob_Superplot(Input=Plot, Plot_SettingsInfo=Plot_SettingsInfo, Plot_SettingsFile=Plot_SettingsFile, MetaboliteName=i, Graph_Style=Graph_Style)
+    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(Input=Plot, Plot_SettingsInfo=Plot_SettingsInfo, Plot_SettingsFile=Plot_SettingsFile, MetaboliteName=i, Graph_Style=Graph_Style)
     Plot <- Plot_Sized[[3]]
+
     # First we want to convert the plot back into a ggplot object:
     Plot <- ggplot2::ggplot() +
       annotation_custom(Plot)
@@ -297,12 +302,12 @@ Vizsuperplot <- function(Input_data,
           ggsave(file=paste(Results_folder_plots_Barplots_folder_Individual, "/",OutputPlotName,"_",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
         }
       }
-    }
-    else{
-      plot(Plot)
-      plot_list[[k]] <- recordPlot()
-      dev.off()
-      k=k+1
+    }else{
+
+      Plot
+      plot_list[[p]] <- recordPlot()
+      p=p+1
+     # dev.off()
     }
   }
 
@@ -313,9 +318,9 @@ Vizsuperplot <- function(Input_data,
       }else{
         pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graph_Style, "plots","_", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
       }
-        for (plot in plot_list){
-          replayPlot(plot)
-        }
+      for (plot in plot_list){
+        replayPlot(plot)
+      }
       dev.off()
     }
   }
