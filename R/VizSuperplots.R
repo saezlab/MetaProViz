@@ -235,7 +235,7 @@ Vizsuperplot <- function(Input_data,
                                                position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
         Plot <- Plot +labs(caption = "p.val using pairwise t-test")
       }else{
-      suppressMessages(Log2FCRes <- Log2FC(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+      suppressMessages(Log2FCRes <- MetaProViz:::Log2FC_fun(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                             Input_SettingsFile=plotdata[,c(2:3)],
                             Input_SettingsInfo=c(conditions="Conditions"),
                             Save_as_Results = NULL,
@@ -360,7 +360,7 @@ plotGrob_Superplot <- function(Input, Plot_SettingsInfo, Plot_SettingsFile, Meta
   plottable$widths[c(1)] <- unit(0.5,"cm")#controls margins --> y-axis label is there
   plottable$widths[c(4)] <- unit(2,"cm")#controls margins --> y-axis label is there
   plottable$widths[c(2,3)] <- unit(0,"cm")#controls margins --> not needed
-  plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
+  plottable$widths[c(6)] <- unit((Number_Conditions * 0.5)-1,"cm")#controls margins --> start Figure legend
   plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
   plot_widths <- as.numeric(plottable$widths[5])+4
 

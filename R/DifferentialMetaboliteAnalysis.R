@@ -283,7 +283,7 @@ DMA <-function(Input_data,
 
   # Check hypothesis test assumptions
   # Normality
-  Shapiro_output <-suppressWarnings(Shapiro(Input_data=Input_data,
+  Shapiro_output <-suppressWarnings(MetaproViz:::Shapiro(Input_data=Input_data,
                                             Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                             Input_SettingsInfo=Input_SettingsInfo,
                                             STAT_pval=STAT_pval,
@@ -297,7 +297,7 @@ DMA <-function(Input_data,
 
   #Variance homogeneity
   if(MultipleComparison==TRUE){
-    Bartlett_output<-suppressWarnings(Bartlett(Input_data=Input_data,
+    Bartlett_output<-suppressWarnings(MetaproViz:::Bartlett(Input_data=Input_data,
                                                Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                                Input_SettingsInfo=Input_SettingsInfo,
                                                OutputName=OutputName,
@@ -319,7 +319,7 @@ DMA <-function(Input_data,
 
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  Log2FC_table <- Log2FC(Input_data=Input_data,
+  Log2FC_table <- MetaProViz:::Log2FC_fun(Input_data=Input_data,
                       Input_SettingsFile=Input_SettingsFile_Sample,
                       Input_SettingsInfo=Input_SettingsInfo,
                       OutputName='',
@@ -333,7 +333,7 @@ DMA <-function(Input_data,
   ############### Perform Hypothesis testing ###############
   if(MultipleComparison == FALSE){
     if(STAT_pval=="lmFit"){
-      STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
+      STAT_C1vC2 <- MetaproViz:::DMA_Stat_limma(Input_data=Input_data,
                                    Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                    Input_SettingsInfo=Input_SettingsInfo,
                                    STAT_padj=STAT_padj,
@@ -360,7 +360,7 @@ DMA <-function(Input_data,
     }
 
     if(STAT_pval=="aov"){
-      STAT_C1vC2 <- AOV(Input_data=Input_data,
+      STAT_C1vC2 <- MetaproViz:::AOV(Input_data=Input_data,
                         Input_SettingsInfo=Input_SettingsInfo,
                         conditions=conditions,
                         STAT_padj=STAT_padj,
@@ -368,20 +368,20 @@ DMA <-function(Input_data,
                         all_vs_all=all_vs_all,
                         comparisons=comparisons)
     }else if(STAT_pval=="kruskal.test"){
-      STAT_C1vC2 <-Kruskal(Input_data=Input_data,
+      STAT_C1vC2 <-MetaproViz:::Kruskal(Input_data=Input_data,
                            conditions=conditions,
                            STAT_padj=STAT_padj,
                            Log2FC_table=Log2FC_table,
                            all_vs_all=all_vs_all,
                            comparisons=comparisons)
     }else if(STAT_pval=="welch"){
-      STAT_C1vC2 <-Welch(Input_data=Input_data,
+      STAT_C1vC2 <-MetaproViz:::Welch(Input_data=Input_data,
                          conditions=conditions,
                          Log2FC_table=Log2FC_table,
                          all_vs_all=all_vs_all,
                          comparisons=comparisons)
     }else if(STAT_pval=="lmFit"){
-      STAT_C1vC2 <- DMA_Stat_limma(Input_data=Input_data,
+      STAT_C1vC2 <- MetaproViz:::DMA_Stat_limma(Input_data=Input_data,
                                    Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                    Input_SettingsInfo=Input_SettingsInfo,
                                    STAT_padj=STAT_padj,
@@ -534,26 +534,6 @@ DMA <-function(Input_data,
   return(invisible(DMA_output_list))
 }
 
-
-#' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
-#'
-#' @param DMA_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param DMA_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param DMA_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
-#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
-#' @param OutputName String which is added to the output files of the DMA.
-#' @param DMA_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
-#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderName {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
-#'
-#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
-#' @export
-
-
 ###############################
 ### ### ### Log2FC  ### ### ###
 ###############################
@@ -574,19 +554,17 @@ DMA <-function(Input_data,
 #' @param FolderName {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
-#' @export
+#' @noRd
 
 
 
-Log2FC <-function(Input_data,
+Log2FC_fun <-function(Input_data,
                   Input_SettingsFile,
                   Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
-
                   CoRe=FALSE,
                   Plot = TRUE,
                   Save_as_Results = "csv",
                   Save_as_Plot = "svg",
-
                   FolderName = NULL,
                   OutputName = NULL
 ){
@@ -996,7 +974,7 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
 #' @param comparisons Dataframe containing the comparison information for multiple comparison. The first row is the numerator, the second row is the denominator and each column is a different comparison.
 #'
 #' @keywords Kruskal test,Hypothesis testing, p.value
-#' @export
+#' @noRd
 
 
 AOV <-function(Input_data,
@@ -1099,7 +1077,7 @@ AOV <-function(Input_data,
 #' @param comparisons Dataframe containing the comparison information for multiple comparison. The first row is the numerator, the second row is the denominator and each column is a different comparison.
 #'
 #' @keywords Kruskal test,Hypothesis testing, p.value
-#' @export
+#' @noRd
 
 
 Kruskal <-function(Input_data,
@@ -1195,7 +1173,7 @@ Kruskal <-function(Input_data,
 #' @param comparisons Dataframe containing the comparison information for multiple comparison. The first row is the numerator, the second row is the denominator and each column is a different comparison.
 #'
 #' @keywords Welch anova,Hypothesis testing, p.value, Games-Howell-test
-#' @export
+#' @noRd
 
 Welch <-function(Input_data,
                  Input_SettingsInfo,
@@ -1533,7 +1511,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Shapiro test,Normality testing, Density plot, QQplot
-#' @export
+#' @noRd
 #'
 
 Shapiro <-function(Input_data,
@@ -1864,7 +1842,7 @@ Shapiro <-function(Input_data,
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Bartlett test,Normality testing, Density plot, QQplot
-#' @export
+#' @noRd
 #'
 
 
@@ -2037,7 +2015,7 @@ Bartlett <-function(Input_data,
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @keywords Heteroscedasticity, variance stabilizing transformation
-#' @export
+#' @noRd
 
 vst <- function(Input_data,
                 OutputName="",
