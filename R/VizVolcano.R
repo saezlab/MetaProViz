@@ -25,10 +25,11 @@
 #####################################
 #' @param Plot_Settings \emph{Optional: } Choose between "Standard" (Input_data), "Compare" (plot two comparisons together Input_data and Input_data2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
 #' @param Plot_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Plot_Settings="Standard" or "Compare": c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile", individual="ColumnName_Plot_SettingsFile"). For Plot_Settings="PEA" a named vector with c(PEA_Pathway="ColumnNameAdditionalInput_data", PEA_score="ColumnNameAdditionalInput_data", PEA_stat= "ColumnNameAdditionalInput_data", individual="Plot_SettingsFile), optionally you can additionally include c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile").\strong{Default = NULL}
-#' @param Plot_SettingsFile \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
-#' @param Input_data DF with column "Metabolite" including the Metabolite names, Log2FC, pvalue/padjusted values. Can also include additional columns with metadata usable for Plot_Setting_Info.
+#' @param Plot_SettingsFile \emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Mteabolite column name of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
+#' @param Input_data DF with column including the Metabolite names, Log2FC, pvalue/padjusted values. Can also include additional columns with metadata usable for Plot_Setting_Info.
 #' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
+#' @param FeatureID {Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}
 #' @param AdditionalInput_data \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Plot_Settings="Compare") or Pathway enrichment analysis results (Plot_Settings="PEA"). \strong{Default = NULL}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
 #' @param Comparison_name \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Plot_Settings= "Compare". \strong{Default = c(Input_data="Cond1", AdditionalInput_data= "Cond2")}
@@ -43,6 +44,7 @@
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
 #'
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
@@ -56,6 +58,7 @@ VizVolcano <- function(Plot_Settings="Standard",
                        Input_data,
                        y= "p.adj",
                        x= "Log2FC",
+                       FeatureID = "Metabolite",
                        AdditionalInput_data= NULL,
                        OutputPlotName= "",
                        Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
@@ -70,7 +73,8 @@ VizVolcano <- function(Plot_Settings="Standard",
                        Subtitle= "",
                        Theme= NULL,
                        Save_as_Plot= "svg",
-                       Folder_Name = NULL
+                       Folder_Name = NULL,
+                       Features="Metabolites"
                        ){
 
   ## ------------ Setup and installs ----------- ##
@@ -90,13 +94,16 @@ VizVolcano <- function(Plot_Settings="Standard",
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
-  if("Metabolite" %in% names(Input_data)==FALSE){
-    stop("Check input. Input_data must contain a column named `Metabolite` including the metabolite names.")
+  if(FeatureID %in% names(Input_data)==FALSE){
+    stop("Check input. Input_data must contain a column named ", FeatureID, " including the feature names. Check parameter FeatureID.")
+  }else{
+    Input_data<- Input_data%>%
+      dplyr::rename("FeatureNames" = FeatureID)
   }
-  if(length(Input_data[duplicated(Input_data$Metabolite), "Metabolite"]) > 0){
-    doublons <- as.character(Input_data[duplicated(Input_data$Metabolite), "Metabolite"])#number of duplications
-    Input_data <-Input_data[!duplicated(Input_data$Metabolite),]#remove duplications
-    warning("Input_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running VizVolcano.")
+  if(length(Input_data[duplicated(Input_data$FeatureNames), "FeatureNames"]) > 0){
+    doublons <- as.character(Input_data[duplicated(Input_data$FeatureNames), "FeatureNames"])#number of duplications
+    Input_data <-Input_data[!duplicated(Input_data$FeatureNames),]#remove duplications
+    warning("Input_data contained duplicates based on ", FeatureID ,". Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running VizVolcano.")
   }
   if( is.numeric(pCutoff)== FALSE |pCutoff > 1 | pCutoff < 0){
       stop("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
@@ -118,8 +125,11 @@ VizVolcano <- function(Plot_Settings="Standard",
       stop("Plot_SettingsInfo must be a named vector or NULL.")
     }
   }
-  if(is.null(Plot_SettingsFile)==FALSE & "Metabolite" %in% names(Plot_SettingsFile)==FALSE){
-    stop("Check input. Plot_SettingsFile must contain a column named `Metabolite` including the metabolite names.")
+  if(is.null(Plot_SettingsFile)==FALSE & FeatureID %in% names(Plot_SettingsFile)==FALSE){
+    stop("Check input. Plot_SettingsFile must contain a column named after `FeatureID` including the feature names. Please pass the correct column name using parameter FeatureID.")
+  }else if(is.null(Plot_SettingsFile)==FALSE & FeatureID %in% names(Plot_SettingsFile)==FALSE){
+    Plot_SettingsFile<- Plot_SettingsFile%>%
+      dplyr::rename("FeatureNames" = FeatureID)
   }
   if(is.vector(Plot_SettingsInfo)==TRUE & is.null(Plot_SettingsFile)==TRUE){
     if("color" %in% names(Plot_SettingsInfo)==TRUE){#If Plot_SettingsFile=NULL, check if Input_data contain required columns
@@ -182,7 +192,7 @@ VizVolcano <- function(Plot_Settings="Standard",
   #3. Select Input_data columns and Plot_SettingsFile columns
   if(is.null(Plot_SettingsFile)==FALSE){
     common_columns <- intersect(colnames(Input_data), colnames(Plot_SettingsFile))#check for overlapping names
-    common_columns <- setdiff(common_columns, "Metabolite")#remove metabolites
+    common_columns <- setdiff(common_columns, "FeatureNames")#remove metabolites
     Plot_SettingsFile <- Plot_SettingsFile%>%#rename those column since they otherwise will cause issues when we merge the DFs later
       dplyr::rename_at(vars(common_columns), ~ paste0(., "_PlotSettingsFile"))
   }
@@ -194,14 +204,17 @@ VizVolcano <- function(Plot_Settings="Standard",
       } else{
         stop("Check your AdditionalInput_data. The column name of x and/or y does not exist in AdditionalInput_data.")
       }
-     if("Metabolite" %in% names(AdditionalInput_data)==FALSE){
-       stop("Check input. AdditionalInput_data must contain a column named `Metabolite` including the metabolite names.")
-     }
-     if(length(AdditionalInput_data[duplicated(AdditionalInput_data$Metabolite), "Metabolite"]) > 0){
-       doublons <- as.character(AdditionalInput_data[duplicated(AdditionalInput_data$Metabolite), "Metabolite"])#number of duplications
-       AdditionalInput_data <-AdditionalInput_data[!duplicated(AdditionalInput_data$Metabolite),]#remove duplications
-       warning("AdditionalInput_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running VizVolcano.")
-     }
+    if(FeatureID %in% names(AdditionalInput_data)==FALSE){
+      stop("Check input. AdditionalInput_data must contain a column with `FeatureID` including the feature names.")
+    }else{
+      AdditionalInput_data<- AdditionalInput_data%>%
+        dplyr::rename("FeatureNames" = FeatureID)
+    }
+    if(length(AdditionalInput_data[duplicated(AdditionalInput_data$FeatureNames), "FeatureNames"]) > 0){
+      doublons <- as.character(AdditionalInput_data[duplicated(AdditionalInput_data$FeatureNames), "FeatureNames"])#number of duplications
+      AdditionalInput_data <-AdditionalInput_data[!duplicated(AdditionalInput_data$FeatureNames),]#remove duplications
+      warning("AdditionalInput_data contained duplicates based on", FeatureID , " .Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running VizVolcano.")
+    }
      #Combine DFs and add appropriate column names
      Input_data[,"comparison"]  <- as.character(paste(Comparison_name[["Input_data"]]))
      AdditionalInput_data[,"comparison"]  <- as.character(paste(Comparison_name[["AdditionalInput_data"]]))
@@ -222,10 +235,12 @@ VizVolcano <- function(Plot_Settings="Standard",
   # 5. Check other plot-specific parameters:
     if(is.null(color_palette)){
       safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+      safe_colorblind_palette_four <- c("black", "#DDCC77", "#DDCC77","#661100")
       #check that length is enough for what the user wants to colour
       #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
     } else{
       safe_colorblind_palette <-color_palette
+      safe_colorblind_palette_four<-color_palette
       #check that length is enough for what the user wants to colour
     }
     if(is.null(shape_palette)){
@@ -299,11 +314,10 @@ VizVolcano <- function(Plot_Settings="Standard",
 
       for (i in IndividualPlots){
         Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
-        InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+        InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="FeatureNames", all.x=TRUE)%>%
         na.omit()
 
         if(nrow(InputVolcano)>=1){
-
           if("color" %in% names(Plot_SettingsInfo)==TRUE ){
             color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
 
@@ -340,7 +354,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                                                  lab = InputVolcano$Metabolite,#Metabolite name
+                                                  lab = InputVolcano$FeatureNames,#Metabolite name
                                                   selectLab = SelectLab,
                                                   x = paste(x),
                                                   y = paste(y),
@@ -354,12 +368,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   titleLabSize = 12,
                                                   subtitleLabSize = 11,
                                                   captionLabSize = 10,
+                                                  col=safe_colorblind_palette_four,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
-                                                  caption = paste0("Total = ", nrow(InputVolcano), " Metabolites"),
+                                                  caption = paste0("Total = ", nrow(InputVolcano), " ", Features),
                                                   xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                   cutoffLineType = "dashed",
@@ -383,6 +398,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <-Plot_Sized[[3]]
           Plot <- ggplot2::ggplot() +
             annotation_custom(Plot)
+          Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -401,7 +417,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       #invisible(PlotList)
       } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
         if(is.null(Plot_SettingsFile)==FALSE){
-          InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+          InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_data, by="FeatureNames", all.x=TRUE)%>%
             na.omit()
           }else{
             InputVolcano  <- Input_data
@@ -444,7 +460,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                                                  lab = InputVolcano$Metabolite,#Metabolite name
+                                                  lab = InputVolcano$FeatureNames,#Metabolite name
                                                   selectLab = SelectLab,
                                                   x = paste(x),
                                                   y = paste(y),
@@ -458,12 +474,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   titleLabSize = 12,
                                                   subtitleLabSize = 11,
                                                   captionLabSize = 10,
+                                                  col=safe_colorblind_palette_four,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
                                                   title= paste(OutputPlotName),
                                                   subtitle = Subtitle,
-                                                  caption = paste0("Total = ", nrow(InputVolcano), " Metabolites"),
+                                                  caption = paste0("Total = ", nrow(InputVolcano), " ", Features),
                                                   xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                   cutoffLineType = "dashed",
@@ -486,6 +503,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <-Plot_Sized[[3]]
           Plot <- ggplot2::ggplot() +
             annotation_custom(Plot)
+          Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
 
           #save plot and get rid of extra signs before saving
           if (!is.null(Save_as_Plot)) {
@@ -511,7 +529,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
       for (i in IndividualPlots){
         Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
-        InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_Comparison, by="Metabolite", all.x=TRUE)%>%
+        InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_Comparison, by="FeatureNames", all.x=TRUE)%>%
           na.omit()
 
         if(nrow(InputVolcano)>=1){
@@ -568,7 +586,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
           #Prepare the Plot:
           Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                                                  lab = InputVolcano$Metabolite,#Metabolite name
+                                                  lab = InputVolcano$FeatureNames,#Metabolite name
                                                   selectLab = SelectLab,
                                                   x = paste(x),
                                                   y = paste(y),
@@ -582,12 +600,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                   titleLabSize = 12,
                                                   subtitleLabSize = 11,
                                                   captionLabSize = 10,
+                                                  col=safe_colorblind_palette_four,
                                                   colCustom = keyvals,
                                                   shapeCustom = keyvalsshape,
                                                   colAlpha = 1,
                                                   title= paste(OutputPlotName, ": ", i, sep=""),
                                                   subtitle = Subtitle,
-                                                  caption = paste0("Total = ", (nrow(InputVolcano)/2), " Metabolites"),
+                                                  caption = paste0("Total = ", (nrow(InputVolcano)/2), " ", Features),
                                                   xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                   ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                   cutoffLineType = "dashed",
@@ -611,6 +630,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <-Plot_Sized[[3]]
           Plot <- ggplot2::ggplot() +
             annotation_custom(Plot)
+          Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -629,7 +649,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       #invisible(PlotList)
     } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
       if(is.null(Plot_SettingsFile)==FALSE){
-        InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_Comparison, by="Metabolite", all.x=TRUE)%>%
+        InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_Comparison, by="FeatureNames", all.x=TRUE)%>%
           na.omit()
       }else{
         InputVolcano  <- Input_Comparison
@@ -689,7 +709,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         }
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                                                lab = InputVolcano$Metabolite,#Metabolite name
+                                                lab = InputVolcano$FeatureNames,#Metabolite name
                                                 selectLab = SelectLab,
                                                 x = paste(x),
                                                 y = paste(y),
@@ -703,12 +723,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 titleLabSize = 12,
                                                 subtitleLabSize = 11,
                                                 captionLabSize = 10,
+                                                col=safe_colorblind_palette_four,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
                                                 title= paste(OutputPlotName),
                                                 subtitle = Subtitle,
-                                                caption = paste0("Total = ", (nrow(InputVolcano)/2), " Metabolites"),
+                                                caption = paste0("Total = ", (nrow(InputVolcano)/2)," ", Features),
                                                 xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                 cutoffLineType = "dashed",
@@ -731,6 +752,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         Plot <-Plot_Sized[[3]]
         Plot <- ggplot2::ggplot() +
           annotation_custom(Plot)
+        Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
 
         #save plot and get rid of extra signs before saving i
         if (!is.null(Save_as_Plot)) {
@@ -755,7 +777,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
     for (i in IndividualPlots){
       Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
-      InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
+      InputVolcano  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="FeatureNames", all.x=TRUE)%>%
         na.omit()
 
       AdditionalInput_data_Select<- subset(AdditionalInput_data, PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
@@ -798,7 +820,7 @@ VizVolcano <- function(Plot_Settings="Standard",
 
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                                                lab = InputVolcano$Metabolite,#Metabolite name
+                                                lab = InputVolcano$FeatureNames,#Metabolite name
                                                 selectLab = SelectLab,
                                                 x = paste(x),
                                                 y = paste(y),
@@ -812,12 +834,13 @@ VizVolcano <- function(Plot_Settings="Standard",
                                                 titleLabSize = 12,
                                                 subtitleLabSize = 11,
                                                 captionLabSize = 10,
+                                                col=safe_colorblind_palette_four,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
                                                 title= paste(OutputPlotName, ": ", i, sep=""),
                                                 subtitle = paste(Plot_SettingsInfo[["PEA_score"]],"= ", AdditionalInput_data_Select$PEA_score, ", ",Plot_SettingsInfo[["PEA_stat"]] , "= ", AdditionalInput_data_Select$PEA_stat, sep=""),
-                                                caption = paste0("Total = ", nrow(InputVolcano), " of ", nrow(Plot_SettingsFile_Select), " metabolites in pathway"),
+                                                caption = paste0("Total = ", nrow(InputVolcano), " of ", nrow(Plot_SettingsFile_Select), " ", Features, " in pathway"),
                                                 xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                 cutoffLineType = "dashed",
@@ -843,6 +866,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         # First we want to convert the plot back into a ggplot object:
         Plot <- ggplot2::ggplot() +
           annotation_custom(Plot)
+        Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
 
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
