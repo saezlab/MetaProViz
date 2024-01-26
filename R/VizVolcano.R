@@ -235,7 +235,7 @@ VizVolcano <- function(Plot_Settings="Standard",
   # 5. Check other plot-specific parameters:
     if(is.null(color_palette)){
       safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
-      safe_colorblind_palette_four <- c("black", "#DDCC77", "#DDCC77","#661100")
+      safe_colorblind_palette_four <- c("#888888", "#44AA99", "#44AA99","#CC6677")
       #check that length is enough for what the user wants to colour
       #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
     } else{
