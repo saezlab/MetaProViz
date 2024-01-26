@@ -951,7 +951,9 @@ DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, S
   }
 
   #Add Log2FC
-  STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2[,c(1:2,4,3)], by="Metabolite")
+  if(is.null(Log2FC_table)==FALSE){
+    STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2[,c(1:2,4,3)], by="Metabolite")
+  }
 
   #order for t.value
   STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
@@ -1036,16 +1038,20 @@ AOV <-function(Input_data,
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  list_names <-  names(results_list)
+  if(is.null(Log2FC_table)==FALSE){
+    list_names <-  names(results_list)
 
-  merged_list <- list()
-  for(name in list_names){
-    # Check if the data frames exist in both lists
-    if(name %in% names(results_list) && name %in% names(Log2FC_table)){
-      merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
-      merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
-      merged_list[[name]] <- merged_df
+    merged_list <- list()
+    for(name in list_names){
+      # Check if the data frames exist in both lists
+      if(name %in% names(results_list) && name %in% names(Log2FC_table)){
+        merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+        merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+        merged_list[[name]] <- merged_df
+      }
     }
+  }else{
+    merged_list <- results_list
   }
 
   # Make sure the right comparisons are returned:
@@ -1144,17 +1150,20 @@ Kruskal <-function(Input_data,
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  merged_list <- list()
-  for(name in common_col_names){
-    # Check if the data frames exist in both lists
-    if(name %in% names(results_list) && name %in% names(Log2FC_table)){
-      merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
-      merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
-      merged_list[[name]] <- merged_df
+  if(is.null(Log2FC_table)==FALSE){
+    merged_list <- list()
+    for(name in common_col_names){
+      # Check if the data frames exist in both lists
+      if(name %in% names(results_list) && name %in% names(Log2FC_table)){
+        merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+        merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+        merged_list[[name]] <- merged_df
+      }
     }
-  }
-
-  STAT_C1vC2 <- merged_list
+    STAT_C1vC2 <- merged_list
+  }else{
+    STAT_C1vC2 <- results_list
+    }
 
   return(STAT_C1vC2)
 }
@@ -1230,19 +1239,22 @@ Welch <-function(Input_data,
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  list_names <-  names(results_list)
+  if(is.null(Log2FC_table)==FALSE){
+    list_names <-  names(results_list)
 
-  merged_list <- list()
-  for(name in list_names){
-    # Check if the data frames exist in both lists
-    if(name %in% names(results_list) && name %in% names(Log2FC_table)){
-      merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
-      merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
-      merged_list[[name]] <- merged_df
-    }
-  }
-
-  STAT_C1vC2 <- merged_list
+    merged_list <- list()
+    for(name in list_names){
+      # Check if the data frames exist in both lists
+      if(name %in% names(results_list) && name %in% names(Log2FC_table)){
+        merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+        merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+        merged_list[[name]] <- merged_df
+      }
+      }
+    STAT_C1vC2 <- merged_list
+    }else{
+      STAT_C1vC2 <-STAT_C1vC2 <- results_list
+      }
 
   return(STAT_C1vC2)
 }
