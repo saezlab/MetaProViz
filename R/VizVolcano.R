@@ -127,7 +127,7 @@ VizVolcano <- function(Plot_Settings="Standard",
   }
   if(is.null(Plot_SettingsFile)==FALSE & FeatureID %in% names(Plot_SettingsFile)==FALSE){
     stop("Check input. Plot_SettingsFile must contain a column named after `FeatureID` including the feature names. Please pass the correct column name using parameter FeatureID.")
-  }else if(is.null(Plot_SettingsFile)==FALSE & FeatureID %in% names(Plot_SettingsFile)==FALSE){
+  }else if(is.null(Plot_SettingsFile)==FALSE & FeatureID %in% names(Plot_SettingsFile)==TRUE){
     Plot_SettingsFile<- Plot_SettingsFile%>%
       dplyr::rename("FeatureNames" = FeatureID)
   }
