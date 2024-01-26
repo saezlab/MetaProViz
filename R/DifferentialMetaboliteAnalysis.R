@@ -283,7 +283,7 @@ DMA <-function(Input_data,
 
   # Check hypothesis test assumptions
   # Normality
-  Shapiro_output <-suppressWarnings(MetaproViz:::Shapiro(Input_data=Input_data,
+  Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(Input_data=Input_data,
                                             Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                             Input_SettingsInfo=Input_SettingsInfo,
                                             STAT_pval=STAT_pval,
@@ -297,7 +297,7 @@ DMA <-function(Input_data,
 
   #Variance homogeneity
   if(MultipleComparison==TRUE){
-    Bartlett_output<-suppressWarnings(MetaproViz:::Bartlett(Input_data=Input_data,
+    Bartlett_output<-suppressWarnings(MetaProViz:::Bartlett(Input_data=Input_data,
                                                Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                                Input_SettingsInfo=Input_SettingsInfo,
                                                OutputName=OutputName,
@@ -333,7 +333,7 @@ DMA <-function(Input_data,
   ############### Perform Hypothesis testing ###############
   if(MultipleComparison == FALSE){
     if(STAT_pval=="lmFit"){
-      STAT_C1vC2 <- MetaproViz:::DMA_Stat_limma(Input_data=Input_data,
+      STAT_C1vC2 <- MetaProViz:::DMA_Stat_limma(Input_data=Input_data,
                                    Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                    Input_SettingsInfo=Input_SettingsInfo,
                                    STAT_padj=STAT_padj,
@@ -360,7 +360,7 @@ DMA <-function(Input_data,
     }
 
     if(STAT_pval=="aov"){
-      STAT_C1vC2 <- MetaproViz:::AOV(Input_data=Input_data,
+      STAT_C1vC2 <- MetaProViz:::AOV(Input_data=Input_data,
                         Input_SettingsInfo=Input_SettingsInfo,
                         conditions=conditions,
                         STAT_padj=STAT_padj,
@@ -368,20 +368,20 @@ DMA <-function(Input_data,
                         all_vs_all=all_vs_all,
                         comparisons=comparisons)
     }else if(STAT_pval=="kruskal.test"){
-      STAT_C1vC2 <-MetaproViz:::Kruskal(Input_data=Input_data,
+      STAT_C1vC2 <-MetaProViz:::Kruskal(Input_data=Input_data,
                            conditions=conditions,
                            STAT_padj=STAT_padj,
                            Log2FC_table=Log2FC_table,
                            all_vs_all=all_vs_all,
                            comparisons=comparisons)
     }else if(STAT_pval=="welch"){
-      STAT_C1vC2 <-MetaproViz:::Welch(Input_data=Input_data,
+      STAT_C1vC2 <-MetaProViz:::Welch(Input_data=Input_data,
                          conditions=conditions,
                          Log2FC_table=Log2FC_table,
                          all_vs_all=all_vs_all,
                          comparisons=comparisons)
     }else if(STAT_pval=="lmFit"){
-      STAT_C1vC2 <- MetaproViz:::DMA_Stat_limma(Input_data=Input_data,
+      STAT_C1vC2 <- MetaProViz:::DMA_Stat_limma(Input_data=Input_data,
                                    Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                    Input_SettingsInfo=Input_SettingsInfo,
                                    STAT_padj=STAT_padj,
