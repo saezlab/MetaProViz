@@ -25,12 +25,15 @@
 #' @param Plot_SettingsFile DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
 #' @param Plot_SettingsInfo Named vector including at least information on the conditions column: c(conditions="ColumnName_Plot_SettingsFile"). Additionally superplots can be made by adding superplot ="olumnName_Plot_SettingsFile", which are ususally biological replicates or patient IDs. \strong{Default = c(conditions="Conditions", superplot = NULL)}
 #' @param Graph_Style String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
+#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test or wilcox.test , for one-vs-all or all-vs-all comparison choose aov (=anova) or kruskal.test \strong{Default = NULL}
+#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = NULL}
 #' @param Output_Name \emph{Optional: } String which is added to the output files of the plot.
 #' @param Individual_plots \emph{Optional: }  Logical, TRUE to save each plot individually. \strong{Default = FALSE}
 #' @param Selected_Conditions Vector with names of selected Conditions for the plot. \strong{Default = NULL}
 #' @param Selected_Comparisons List of numeric vectors containing Condition pairs to compare based on the order of the Selected_Conditions vector. \strong{Default = NULL}
 #' @param Theme \emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic}
-#' @param color_palette \emph{Optional: } Provide customized color-color_palette in vector format. \strong{Default = NULL}
+#' @param color_palette \emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}
+#' @param color_palette_dot \emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, superplot
@@ -40,12 +43,15 @@ Vizsuperplot <- function(Input_data,
                      Plot_SettingsFile,
                      Plot_SettingsInfo = c(conditions="Conditions", superplot = NULL),
                      Graph_Style = "Box", # Bar, Box, Violin
+                     STAT_pval =NULL,
+                     STAT_padj=NULL,
                      OutputPlotName = "",
                      Selected_Conditions = NULL,
                      Selected_Comparisons = NULL,
                      Individual_plots = FALSE,
                      Theme = theme_classic(),
                      color_palette = NULL,
+                     color_palette_dot=NULL,
                      Save_as_Plot = "svg"
 ){
 
@@ -99,11 +105,11 @@ Vizsuperplot <- function(Input_data,
   }
 
 
+  ## ------------ Check other plot parameters ----------- ##
   #3. Plot options
   if(Graph_Style %in% c("Box", "Bar", "Violin") == FALSE){
     stop("Graph_Style must be either Box, Bar ot Violin.")
   }
-
 
   #4. Comparison options
   if(is.null(Selected_Conditions) == FALSE){
@@ -131,7 +137,6 @@ Vizsuperplot <- function(Input_data,
       }
   }
 
-
   #5. Check other plot-specific parameters:
   if (!is.null(Save_as_Plot)) {
     Save_as_Plot_options <- c("svg","pdf","png")
@@ -153,10 +158,31 @@ Vizsuperplot <- function(Input_data,
         stop("The Selected_Conditions and the color_palette used are not 1-to-1. Please check your Input.")
       }
     }
+  }
 
-
+  #7. Check Stat values:
+  if(length(Selected_Comparisons)==1 & length(Selected_Conditions)<= 2){#one-vs-one
+    STAT_pval_options <- c("t.test", "wilcox.test")
+    if(is.null(STAT_pval)==FALSE){
+      if(STAT_pval %in% STAT_pval_options == FALSE & is.null(STAT_pval)==FALSE){
+      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select NULL or one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
     }
-  data <- Input_data
+    }
+  }else{
+    STAT_pval_options <- c("aov", "kruskal.test")
+    if(is.null(STAT_pval)==FALSE){
+      if(STAT_pval %in% STAT_pval_options == FALSE){
+        stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select NULL or one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
+      }
+       }
+  }
+
+  STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
+  if(is.null(STAT_padj)==FALSE){
+    if(STAT_padj %in% STAT_padj_options == FALSE){
+      stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
+  }
+  }
 
 
   ## ------------ Create Output folders ----------- ##
@@ -175,7 +201,8 @@ Vizsuperplot <- function(Input_data,
     }
   }
 
-
+  ## ------------ Create plots ----------- ##
+  data <- Input_data
   Metabolite_Names <- colnames(data)
   data <- merge( Plot_SettingsFile[c("Conditions","superplot")] ,data, by=0)
   data <- column_to_rownames(data, "Row.names")
@@ -185,22 +212,31 @@ Vizsuperplot <- function(Input_data,
   p=1
 
   for (i in Metabolite_Names){
-    suppressWarnings(dataMeans <- data %>%  select(i, Conditions) %>% group_by(Conditions) %>% summarise_at(vars(i), list(mean = mean, sd = sd)) %>% as.data.frame())
+    #Prepare the dfs:
+    suppressWarnings(dataMeans <- data %>%
+                       select(i, Conditions)
+                     %>% group_by(Conditions)
+                     %>% summarise_at(vars(i), list(mean = mean, sd = sd))
+                     %>% as.data.frame())
     names(dataMeans)[2] <- "Intensity"
-    suppressWarnings(plotdata <- data %>%  select(i,Conditions, superplot) %>%  group_by(Conditions)  %>% as.data.frame() )
+
+    suppressWarnings(plotdata <- data %>%
+                       select(i,Conditions, superplot)
+                     %>%  group_by(Conditions)
+                     %>% as.data.frame() )
     names(plotdata)[1] <- c("Intensity")
-    # Make conditions a factor
-    plotdata$Conditions <- factor(plotdata$Conditions)
+    plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
 
     # Take only selected conditions
-    if (is.null(Selected_Conditions) == FALSE){
+    if(is.null(Selected_Conditions) == FALSE){
       dataMeans <- dataMeans %>% filter(Conditions %in% Selected_Conditions)
       plotdata <- plotdata %>% filter(Conditions %in% Selected_Conditions)
       plotdata$Conditions <- factor(plotdata$Conditions, levels = Selected_Conditions)
     }
 
     # Make the Plot
-    Plot <- ggplot(plotdata, aes(x = Conditions, y = Intensity))
+
+ Plot <- ggplot(plotdata, aes(x = Conditions, y = Intensity))
 
     # Add graph style and error bar
     data_summary <- function(x){#calculate error bar!
@@ -222,60 +258,96 @@ Vizsuperplot <- function(Input_data,
 
     # Add superplot
     if ("superplot" %in% names(Plot_SettingsInfo)){
-      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)+
-        labs(color=Plot_SettingsInfo[["superplot"]], fill = Plot_SettingsInfo[["superplot"]])
+      if(is.null(color_palette_dot)==FALSE){
+        Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)+
+          labs(color=Plot_SettingsInfo[["superplot"]], fill = Plot_SettingsInfo[["superplot"]])+
+          scale_color_manual(values = color_palette_dot)
+      }else{
+        Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)+
+          labs(color=Plot_SettingsInfo[["superplot"]], fill = Plot_SettingsInfo[["superplot"]])
+      }
     }
 
-    if(is.null(Selected_Comparisons)== TRUE){
-      #Plot <- Plot + geom_errorbar(data = dataMeans, aes(x=Conditions, ymin=Intensity-sd, ymax=Intensity+sd), width=0.4, colour="black", alpha=0.9, size=0.5)
-    }else{
-      if(length(Selected_Comparisons)==1){# t-test
-        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
-                                                 label = "p.format", method = "t.test", hide.ns = TRUE,
+    ####---- Add stats:
+    if(length(Selected_Comparisons)==1 & length(Selected_Conditions)<= 2){
+      if(is.null(STAT_pval)==TRUE){
+        STAT_pval<- "t.test"
+      }
+      # One vs. One comparison: t-test
+      Plot <- Plot+ ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
+                                                 label = "p.format", method = STAT_pval, hide.ns = TRUE,
                                                position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
-        Plot <- Plot +labs(caption = "p.val using pairwise t-test")
+      Plot <- Plot +labs(caption = paste("p.val using pairwise ", STAT_pval))
       }else{
-      suppressMessages(Log2FCRes <- MetaProViz:::Log2FC_fun(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
-                            Input_SettingsFile=plotdata[,c(2:3)],
-                            Input_SettingsInfo=c(conditions="Conditions"),
-                            Save_as_Results = NULL,
-                            Save_as_Plot=NULL,
-                            Plot = FALSE))
-
-        comparison_table <- data.frame(matrix(ncol = length(Selected_Comparisons), nrow = 2))
-        for (k in seq_along(Selected_Comparisons)) {
-          comparison_table[, k] <- sapply(Selected_Comparisons[[k]], function(x) Selected_Conditions[x])
-          colnames(comparison_table)[k] <- paste0(Selected_Conditions[Selected_Comparisons[[k]][[1]]],"_vs_",  Selected_Conditions[Selected_Comparisons[[k]][[2]]])
+        if(is.null(STAT_pval)==TRUE){
+          STAT_pval<- "aov"
         }
+        if(is.null(STAT_padj)==TRUE){
+          STAT_padj<- "fdr"
+        }
+        #All-vs-All comparisons table:
+        conditions <- Plot_SettingsFile$Conditions
+        denominator <-unique(Plot_SettingsFile$Conditions)
+        numerator <-unique(Plot_SettingsFile$Conditions)
+        comparisons <- combn(unique(conditions), 2) %>% as.matrix()
 
-        STAT_C1vC2 <- AOV(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+        #Prepare Stat results using MetaProViz::DMA STAT helper functions
+        if(STAT_pval=="aov"){
+        STAT_C1vC2 <- MetaProViz:::AOV(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           conditions= plotdata[,c(2)],
                           Input_SettingsInfo=c(conditions="Conditions"),
-                          STAT_padj="fdr",
-                          Log2FC_table=Log2FCRes,
+                          STAT_padj=STAT_padj,
+                          Log2FC_table=NULL,
                           all_vs_all=TRUE,
-                          comparisons=comparison_table)
+                          comparisons=comparisons)
+        }else if(STAT_pval=="kruskal.test"){
+          STAT_C1vC2 <-MetaProViz:::Kruskal(Input_data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+                                            conditions=plotdata[,c(2)],
+                                            STAT_padj=STAT_padj,
+                                            Log2FC_table=NULL,
+                                            all_vs_all=all_vs_all,
+                                            comparisons=comparisons)
+        }
 
-        # make data for plot
-        df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE)
-        split_names <- strsplit(df$comparisons, "_vs_")
-        df$group1 <- sapply(split_names, function(x) x[1])
-        df$group2 <- sapply(split_names, function(x) x[2])
-        df$Log2FC <- sapply(STAT_C1vC2, function(x) x$Log2FC)
+        #Prepare df to add stats to plot
+        df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE)%>%
+          separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
+          unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
         df$p.adj <- round(sapply(STAT_C1vC2, function(x) x$p.adj),5)
-        df$comparisons <- NULL
         df$y.position <-c(max(dataMeans$Intensity + 2*dataMeans$sd),
                           max(dataMeans$Intensity + 2*dataMeans$sd)+0.04* max(dataMeans$Intensity + 2*dataMeans$sd) ,
                           max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
+
+        # select stats based on comparison_table
+        if(is.null(Selected_Comparisons)== FALSE){
+          # Generate the comparisons
+          df_select <- data.frame()
+          for(comp in Selected_Comparisons){
+            entry <- paste0(Selected_Conditions[comp[1]], "_vs_", Selected_Conditions[comp[2]])
+            df_select <- rbind(df_select, data.frame(entry))
+          }
+
+          df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons", all.x=TRUE)%>%
+            column_to_rownames("entry")
+
+          if(all(is.na(df_merge))==TRUE){#in case the reverse comparisons are needed
+            df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons_rev", all.x=TRUE)%>%
+              column_to_rownames("entry")
+          }
+        }else{
+          df_merge <- df[,-2]%>%
+            column_to_rownames("comparisons")
+          }
+
+
         # add stats to plot
         if(Graph_Style == "Bar"){
-          Plot <- Plot +ggpubr::stat_pvalue_manual(df, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.05)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+          Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.05)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
         }else{
-          Plot <- Plot +ggpubr::stat_pvalue_manual(df, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+          Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
         }
-        Plot <- Plot +labs(caption = "p.adj using Anova and FDR")
+        Plot <- Plot +labs(caption = paste("p.adj using ", STAT_pval, "and", STAT_padj))
      }
-    }
 
     Plot <- Plot + Theme+ ggtitle(paste(i))
     Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab("")+ ylab("Normalized Intensity")
