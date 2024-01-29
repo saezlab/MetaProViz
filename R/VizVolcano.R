@@ -311,6 +311,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       IndividualPlots <- IndividualPlots$individual
 
       PlotList <- list()#Empty list to store all the plots
+      PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
       for (i in IndividualPlots){
         Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
@@ -392,6 +393,9 @@ VizVolcano <- function(Plot_Settings="Standard",
             Plot <- Plot+Theme
           }
 
+          ## Store the plot in the 'plots' list
+          PlotList[[i]] <- Plot
+
           #Set the total heights and widths
           PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
           Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
@@ -399,6 +403,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <- ggplot2::ggplot() +
             annotation_custom(Plot)
           Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+          PlotList_adaptedGrid[[i]] <- Plot
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -410,11 +415,11 @@ VizVolcano <- function(Plot_Settings="Standard",
             }
           }
           ## Store the plot in the 'plots' list
-          PlotList[[cleaned_i]] <- Plot
           plot(Plot)
         }
       }
-      #invisible(PlotList)
+      return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+
       } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
         if(is.null(Plot_SettingsFile)==FALSE){
           InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_data, by="FeatureNames", all.x=TRUE)%>%
@@ -422,6 +427,9 @@ VizVolcano <- function(Plot_Settings="Standard",
           }else{
             InputVolcano  <- Input_data
             }
+
+        PlotList <- list()#Empty list to store all the plots
+        PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
         if(nrow(InputVolcano)>=1){
           if("color" %in% names(Plot_SettingsInfo)==TRUE ){
@@ -498,12 +506,16 @@ VizVolcano <- function(Plot_Settings="Standard",
             Plot <- Plot+Theme
           }
 
+          ## Store the plot in the 'plots' list
+          PlotList[[OutputPlotName]] <- Plot
+
           #Set the total heights and widths
           Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
           Plot <-Plot_Sized[[3]]
           Plot <- ggplot2::ggplot() +
             annotation_custom(Plot)
           Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+          PlotList_adaptedGrid[[OutputPlotName]] <- Plot
 
           #save plot and get rid of extra signs before saving
           if (!is.null(Save_as_Plot)) {
@@ -518,6 +530,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           #invisible(Plot)
         }
       }
+    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
   #####--- 2. Condition
   } else if(Plot_Settings=="Compare"){############################################################################################################
     if("individual" %in% names(Plot_SettingsInfo)==TRUE){
@@ -526,6 +539,7 @@ VizVolcano <- function(Plot_Settings="Standard",
       IndividualPlots <- IndividualPlots$individual
 
       PlotList <- list()#Empty list to store all the plots
+      PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
       for (i in IndividualPlots){
         Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
@@ -624,6 +638,9 @@ VizVolcano <- function(Plot_Settings="Standard",
             Plot <- Plot+Theme
           }
 
+          ## Store the plot in the 'plots' list
+          PlotList[[i]] <- Plot
+
           #Set the total heights and widths
           PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
           Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
@@ -631,6 +648,7 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <- ggplot2::ggplot() +
             annotation_custom(Plot)
           Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+          PlotList_adaptedGrid[[i]] <- Plot
 
           #save plot and get rid of extra signs before saving
           cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -646,7 +664,8 @@ VizVolcano <- function(Plot_Settings="Standard",
           plot(Plot)
         }
       }
-      #invisible(PlotList)
+      return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+
     } else if("individual" %in% names(Plot_SettingsInfo)==FALSE){
       if(is.null(Plot_SettingsFile)==FALSE){
         InputVolcano  <- merge(x=Plot_SettingsFile,y=Input_Comparison, by="FeatureNames", all.x=TRUE)%>%
@@ -654,6 +673,9 @@ VizVolcano <- function(Plot_Settings="Standard",
       }else{
         InputVolcano  <- Input_Comparison
       }
+
+      PlotList <- list()#Empty list to store all the plots
+      PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
       if(nrow(InputVolcano)>=1){
         #Prepare the colour scheme:
@@ -747,12 +769,16 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <- Plot+Theme
         }
 
+        ## Store the plot in the 'plots' list
+        PlotList[[OutputPlotName]] <- Plot
+
         #Set the total heights and widths
         Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = OutputPlotName, Subtitle = Subtitle)
         Plot <-Plot_Sized[[3]]
         Plot <- ggplot2::ggplot() +
           annotation_custom(Plot)
         Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+        PlotList_adaptedGrid[[OutputPlotName]] <- Plot
 
         #save plot and get rid of extra signs before saving i
         if (!is.null(Save_as_Plot)) {
@@ -767,6 +793,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         #invisible(Plot)
       }
     }
+    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
   #####--- 3. PEA
   } else if(Plot_Settings=="PEA"){############################################################################################################
     # Create the list of individual plots that should be made:
@@ -774,6 +801,7 @@ VizVolcano <- function(Plot_Settings="Standard",
     IndividualPlots <- IndividualPlots$individual
 
     PlotList <- list()#Empty list to store all the plots
+    PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
       Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
@@ -858,6 +886,9 @@ VizVolcano <- function(Plot_Settings="Standard",
           Plot <- Plot+Theme
         }
 
+        ## Store the plot in the 'plots' list
+        PlotList[[i]] <- Plot
+
         #Set the total heights and widths
         PlotTitle <- paste(OutputPlotName, ": ", i, sep="")
         Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, OutputPlotName = PlotTitle, Subtitle = Subtitle)
@@ -867,6 +898,7 @@ VizVolcano <- function(Plot_Settings="Standard",
         Plot <- ggplot2::ggplot() +
           annotation_custom(Plot)
         Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+        PlotList_adaptedGrid[[i]] <- Plot
 
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -878,13 +910,11 @@ VizVolcano <- function(Plot_Settings="Standard",
           }
         }
         ## Store the plot in the 'plots' list
-        PlotList[[cleaned_i]] <- Plot
         plot(Plot)
       }
     }
-    #invisible(PlotList)
+    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
   }
-  return(invisible(Plot))
 }
 
 

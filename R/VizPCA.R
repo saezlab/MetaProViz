@@ -180,6 +180,9 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     InputPCA  <- Input_data
   }
 
+  PlotList <- list()#Empty list to store all the plots
+  PlotList_adaptedGrid <- list()#Empty list to store all the plots
+
   #Prepare the color scheme:
   if("color" %in% names(Plot_SettingsInfo)==TRUE){
     if(color_scale=="discrete"){
@@ -267,9 +270,16 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     PCA <- PCA+theme_classic()
   }
 
+  ## Store the plot in the 'plots' list
+  PlotList[[OutputPlotName]] <- PCA
+
   #Set the total heights and widths
   Plot_Sized <- MetaProViz:::plotGrob_PCA(Input=PCA, Plot_SettingsInfo=Plot_SettingsInfo, OutputPlotName=OutputPlotName)
-  PCA <-Plot_Sized[[3]]
+  PCA <- Plot_Sized[[3]]
+  PCA <- ggplot2::ggplot() +
+    annotation_custom(PCA)
+  PCA  <-PCA  + theme(panel.background = element_rect(fill = "transparent"))
+  PlotList_adaptedGrid[[OutputPlotName]] <- PCA
 
   if (!is.null(Save_as_Plot)) {
     if(OutputPlotName ==""){
@@ -279,13 +289,7 @@ VizPCA <- function(Plot_SettingsInfo= NULL,
     }
   }
   plot(PCA)
-
-
-  # Return DF/Plots which can be assigned, but which does not print when they are not assigned.
-  # First we want to convert the plot back into a ggplot object:
-  PCA_ggplot <- ggplot2::ggplot() +
-    annotation_custom(PCA)
-  invisible(PCA_ggplot)
+  return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
 
 

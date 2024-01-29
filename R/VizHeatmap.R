@@ -189,6 +189,7 @@ VizHeatmap <- function(Input_data,
   if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE & "individual_Sample" %in% names(Plot_SettingsInfo)==FALSE){
     IndividualPlots <-unique_paths
     PlotList <- list()#Empty list to store all the plots
+    PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
       selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual_Metab"]]) == i)
@@ -265,25 +266,34 @@ VizHeatmap <- function(Input_data,
                                      fontsize=9,
                                      main = paste(OutputPlotName, " Metabolites: ", i, sep=" " ))
 
+        ## Store the plot in the 'plots' list
+        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        PlotList[[cleaned_i]] <- heatmap
+
         #Width and height according to Sample and metabolite number
         Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
         heatmap <-Plot_Sized[[3]]
         heatmap <- ggplot2::ggplot() +
           annotation_custom(heatmap)
+        heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+
+        PlotList_adaptedGrid[[cleaned_i]] <- heatmap
 
         #----- Save
-        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         if (!is.null(Save_as_Plot)) {
           ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-        }
-      }else{
+        }else{
           message(i , " includes >= 2 objects and is hence not plotted.")
         }
-      #plot(heatmap)
       }
+    }
+    #Return if assigned:
+    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+
     }else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
       IndividualPlots <-unique_paths_Sample
       PlotList <- list()#Empty list to store all the plots
+      PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
       for (i in IndividualPlots){
         #Select the data:
@@ -367,27 +377,37 @@ VizHeatmap <- function(Input_data,
                                       fontsize=9,
                                       main = paste(OutputPlotName," Samples: ", i, sep=" " ))
 
-        #Width and height according to Sample and metabolite number
-        Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
-        heatmap <-Plot_Sized[[3]]
-        heatmap <- ggplot2::ggplot() +
-          annotation_custom(heatmap)
-
         #----- Save
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+        PlotList[[cleaned_i]] <- heatmap
+
+        #Width and height according to Sample and metabolite number
+        Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
+        heatmap <- Plot_Sized[[3]]
+        heatmap <- ggplot2::ggplot() +
+          annotation_custom(heatmap)
+        heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+
+        PlotList_adaptedGrid[[cleaned_i]] <- heatmap
+
+        #----- Save
         if (!is.null(Save_as_Plot)) {
           ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], unit="cm")
-        }
         }else{
           message(i , " includes >= 2 objects and is hence not plotted.")
         }
-        #plot(heatmap)
         }
+        }
+      #Return if assigned:
+      return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+
       }else if("individual_Metab" %in% names(Plot_SettingsInfo)==TRUE & "individual_Sample" %in% names(Plot_SettingsInfo)==TRUE){
         IndividualPlots_Metab <-unique_paths
         IndividualPlots_Sample <-unique_paths_Sample
 
         PlotList <- list()#Empty list to store all the plots
+        PlotList_adaptedGrid <- list()#Empty list to store all the plots
+
         for (i in IndividualPlots_Metab){
           selected_path <- Plot_SettingsFile_Metab %>% filter(get(Plot_SettingsInfo[["individual_Metab"]]) == i)
           selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
@@ -476,26 +496,35 @@ VizHeatmap <- function(Input_data,
                                           fontsize=9,
                                           main = paste(OutputPlotName," Metabolites: ", i, " Sample:", s, sep="" ))
 
+            ## Store the plot in the 'plots' list
+            cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+            cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
+            PlotList[[paste(cleaned_i,cleaned_s, sep="_")]] <- heatmap
+
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
             Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
             heatmap <-Plot_Sized[[3]]
             heatmap <- ggplot2::ggplot() +
               annotation_custom(heatmap)
+            heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+
+            PlotList[[paste(cleaned_i,cleaned_s, sep="_")]] <- heatmap
 
             #----- Save
-            cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-            cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
             if (!is.null(Save_as_Plot)) {
               ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap_",cleaned_i,"_",cleaned_s, "_",OutputPlotName, ".",Save_as_Plot, sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
-            }
             }else{
               message(i , " includes >= 2 objects and is hence not plotted.")
             }
-            #plot(heatmap)
             }
+          }
         }
+        return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
     } else if("individual_Metab" %in% names(Plot_SettingsInfo)==FALSE & "individual_Sample" %in% names(Plot_SettingsInfo)==FALSE){
+
+    PlotList <- list()#Empty list to store all the plots
+    PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
     # Column annotation
     col_annot_vars <- Plot_SettingsInfo[grepl("color_Sample", names(Plot_SettingsInfo))]
@@ -567,22 +596,28 @@ VizHeatmap <- function(Input_data,
                                   fontsize=9,
                                   main = OutputPlotName)
 
+    ## Store the plot in the 'plots' list
+    PlotList[[OutputPlotName]] <- heatmap
+
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
     Plot_Sized <- plotGrob_Heatmap(Input=heatmap, Plot_SettingsInfo=Plot_SettingsInfo, data_path=data, show_rownames=show_rownames, show_colnames=show_colnames,  Plot_SettingsFile_Sample= Plot_SettingsFile_Sample,  Plot_SettingsFile_Metab= Plot_SettingsFile_Metab)
     heatmap <-Plot_Sized[[3]]
     heatmap <- ggplot2::ggplot() +
       annotation_custom(heatmap)
+    heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+
+    PlotList_adaptedGrid[[OutputPlotName]] <- heatmap
 
     #----- Save
     if (!is.null(Save_as_Plot)) {
       ggsave(file=paste(Results_folder_plots_Heatmaps_folder,"/", "Heatmap",OutputPlotName, ".", Save_as_Plot ,sep=""), plot=heatmap, width=Plot_Sized[[2]], height=Plot_Sized[[1]], units = "cm")
-    }
     }else{
       message(i , " includes >= 2 objects and is hence not plotted.")
     }
-    #plot(heatmap)
-  }
+    }
+    }
+   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
 
 

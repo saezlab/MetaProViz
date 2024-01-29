@@ -208,8 +208,8 @@ Vizsuperplot <- function(Input_data,
   data <- column_to_rownames(data, "Row.names")
 
   # make a list for plotting all plots together
-  plot_list <- list()
-  p=1
+  PlotList <- list()#Empty list to store all the plots
+  PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
   for (i in Metabolite_Names){
     #Prepare the dfs:
@@ -235,8 +235,7 @@ Vizsuperplot <- function(Input_data,
     }
 
     # Make the Plot
-
- Plot <- ggplot(plotdata, aes(x = Conditions, y = Intensity))
+    Plot <- ggplot(plotdata, aes(x = Conditions, y = Intensity))
 
     # Add graph style and error bar
     data_summary <- function(x){#calculate error bar!
@@ -352,6 +351,10 @@ Vizsuperplot <- function(Input_data,
     Plot <- Plot + Theme+ ggtitle(paste(i))
     Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab("")+ ylab("Normalized Intensity")
 
+    ## Store the plot in the 'plots' list
+    PlotList[[i]] <- Plot
+
+
     # Make plot into nice format:
     # MetaProViz:::
     Plot_Sized <-  MetaProViz:::plotGrob_Superplot(Input=Plot, Plot_SettingsInfo=Plot_SettingsInfo, Plot_SettingsFile=Plot_SettingsFile, MetaboliteName=i, Graph_Style=Graph_Style)
@@ -360,26 +363,22 @@ Vizsuperplot <- function(Input_data,
     # First we want to convert the plot back into a ggplot object:
     Plot <- ggplot2::ggplot() +
       annotation_custom(Plot)
+    Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+
+    PlotList_adaptedGrid[[i]] <- Plot
 
     if(Individual_plots==TRUE){
-
-      i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
-      i <- (gsub(":","_",i))
-      i <-(gsub("\\*","",i))
+      cleaned_i <- (gsub("/","_",i))#remove "/" cause this can not be safed in a PDF name
+      cleaned_i <- (gsub(":","_",cleaned_i))
+      cleaned_i <-(gsub("\\*","",cleaned_i))
 
       if (!is.null(Save_as_Plot)) {
         if(OutputPlotName ==""){
-          ggsave(file=paste(Results_folder_plots_Barplots_folder_Individual, "/",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
+          ggsave(file=paste(Results_folder_plots_Barplots_folder_Individual, "/",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
         }else{
-          ggsave(file=paste(Results_folder_plots_Barplots_folder_Individual, "/",OutputPlotName,"_",i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
+          ggsave(file=paste(Results_folder_plots_Barplots_folder_Individual, "/",OutputPlotName,"_",cleaned_i, ".",Save_as_Plot, sep=""), plot=Plot, width=10, height=8)
         }
       }
-    }else{
-
-      Plot
-      plot_list[[p]] <- recordPlot()
-      p=p+1
-     # dev.off()
     }
   }
 
@@ -390,12 +389,10 @@ Vizsuperplot <- function(Input_data,
       }else{
         pdf(file= paste(Results_folder_plots_Barplots_folder,"/",Graph_Style, "plots","_", OutputPlotName,".pdf", sep = ""), onefile = TRUE )
       }
-      for (plot in plot_list){
-        replayPlot(plot)
-      }
       dev.off()
     }
   }
+  return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
 
 
