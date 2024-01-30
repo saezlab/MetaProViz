@@ -1372,20 +1372,6 @@ Shapiro <-function(Input_data,
     }
   }
 
-  ## ------------ Check Input SettingsInfo ----------- ##
-  #3. Input_SettingsInfo
-  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
-    }else{# if true rename to Conditions
-      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
-        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
-    }
-  }else{
-    stop("You have to provide a Input_SettingsInfo for conditions.")
-  }
-
-  ##########################
   if("denominator" %in% names(Input_SettingsInfo)==TRUE){
     if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile_Sample$Conditions==FALSE){
       stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
@@ -1686,19 +1672,6 @@ Bartlett <-function(Input_data,
         Input_data <- Input_data
       }
     }
-  }
-
-  ## ------------ Check Input SettingsInfo ----------- ##
-  #3. Input_SettingsInfo
-  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
-    }else{# if true rename to Conditions
-      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
-        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
-    }
-  }else{
-    stop("You have to provide a Input_SettingsInfo for conditions.")
   }
 
   ##########################
