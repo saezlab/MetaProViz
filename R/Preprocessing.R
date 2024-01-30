@@ -674,9 +674,9 @@ Preprocessing <- function(Input_data,
                                                Save_as_Plot =  NULL))
 
     if(loop==1){
-      pca_outlierloop1 <- pca_outlier
+      pca_outlierloop1 <- pca_outlier[["Plot_Sized"]][[1]]
     }
-    plot(pca_outlier)
+    suppressMessages(plot(pca_outlier[["Plot_Sized"]][[1]]))
     outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- recordPlot()
     dev.off()
 
@@ -752,7 +752,7 @@ Preprocessing <- function(Input_data,
     }
     ### Save the outlier detection plots in the outlier detection folder
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
-           plot = pca_outlier, width = 10,height = 8)
+           plot = pca_outlier[["Plot_Sized"]][[1]], width = 10,height = 8)
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "//Scree_plot_OD_round_" ,a ,".",Save_as_Plot, sep = ""),
            plot = screeplot, width = 10,height = 8)
     ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
@@ -882,14 +882,14 @@ Preprocessing <- function(Input_data,
                                         Plot_SettingsFile= dtp,OutputPlotName = "Quality Control PCA Condition clustering and outlier check",
                                         Save_as_Plot =  NULL))
   dev.off()
-  qc_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC
+  qc_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC[["Plot_Sized"]][[1]]
 
 
   if (ExportQCPlots == TRUE){
     if(CoRe==TRUE){
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering_CoRe.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering_CoRe.",Save_as_Plot), plot = pca_QC[["Plot_Sized"]][[1]], width = 10,  height = 8)
     }else{
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC, width = 10,  height = 8)
+      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC[["Plot_Sized"]][[1]], width = 10,  height = 8)
     }
   }
 
@@ -901,13 +901,13 @@ Preprocessing <- function(Input_data,
                                                Save_as_Plot =  NULL))
     dev.off()
 
-    qc_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl
+    qc_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
 
     if (ExportQCPlots == TRUE){
       if(CoRe==TRUE){
-        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution_CoRe.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
+        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution_CoRe.",Save_as_Plot), plot = pca_QC_repl[["Plot_Sized"]][[1]], width = 10,  height = 8)
       }else{
-        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl, width = 10,  height = 8)
+        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl[["Plot_Sized"]][[1]], width = 10,  height = 8)
       }
     }
   }
@@ -939,13 +939,10 @@ Preprocessing <- function(Input_data,
   PlotList = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
 
   if(Plot==TRUE){ # print plots
-    #Summary
-    #suppressMessages(suppressWarnings(print(patchwork::wrap_plots(norm_plots,  PlotList$QC_plots[[1]],  PlotList$QC_plots[[2]], pca_outlierloop1,scree_outlierloop1,hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")), widths = c(2,2.1,1), heights = c(1.4,1)))))
-
     #individual plots:
     suppressMessages(suppressWarnings(plot(norm_plots)))
-    suppressMessages(suppressWarnings(plot(PlotList$QC_plots[[1]])))
-    suppressMessages(suppressWarnings(plot(PlotList$QC_plots[[2]])))
+    suppressMessages(suppressWarnings(plot(PlotList[["QC_plots"]][[1]])))
+    suppressMessages(suppressWarnings(plot(PlotList[["QC_plots"]][[2]])))
     suppressMessages(suppressWarnings(plot(pca_outlierloop1)))
     suppressMessages(suppressWarnings(plot(scree_outlierloop1)))
     suppressMessages(suppressWarnings(plot(hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")))))
@@ -1229,10 +1226,10 @@ Pool_Estimation <- function(Input_data,
                                                Save_as_Plot =  NULL))
   }
   dev.off()
-  pool_plot_list[["QC_PCA_PoolSamples"]] <- pca_QC_pool
+  pool_plot_list[["QC_PCA_PoolSamples"]] <- pca_QC_pool[["Plot_Sized"]][["QC Pool samples"]]
 
-  if (is.null(Save_as_Plot) == FALSE){
-    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/PCA_Pool_samples.",Save_as_Plot), plot = pca_QC_pool, width = 10,  height = 8)
+  if(is.null(Save_as_Plot) == FALSE){
+    ggsave(filename = paste0(Results_folder_Preprocessing_folder_Pool_Estimation, "/PCA_Pool_samples.",Save_as_Plot), plot = pca_QC_pool[["Plot_Sized"]][["QC Pool samples"]], width = 10,  height = 8)
   }
   #Make histogram of CVs
   HistCV <-suppressWarnings(invisible(ggplot(result_df_final_out, aes(CV)) +
@@ -1294,11 +1291,7 @@ Pool_Estimation <- function(Input_data,
   DF_list <- list("Filtered_Input_data" = filtered_Input_data, "CV_result" = result_df_final_out )
   Pool_Estimation_res_list <- list("DF"= DF_list,"Plot"=pool_plot_list )
 
-  if(Plot==TRUE){ # print plots
-    #Summary
-    #suppressMessages(suppressWarnings(print(patchwork::wrap_plots(pool_plot_list$QC_PCA_PoolSamples, pool_plot_list$Pool_CV_Hist, pool_plot_list$Pool_CV_Violin, widths = c(1,1,1), heights = c(1.1,1)))))
-
-    #individual plots:
+  if(Plot==TRUE){#individual plots:
     suppressMessages(suppressWarnings(plot(pool_plot_list$QC_PCA_PoolSamples)))
     suppressMessages(suppressWarnings(plot(pool_plot_list$Pool_CV_Hist)))
     suppressMessages(suppressWarnings(plot(pool_plot_list$Pool_CV_Violin)))
