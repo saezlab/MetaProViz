@@ -408,6 +408,19 @@ DMA <-function(Input_data,
   }
 
   ################################################################################################################################################################################################
+  ###############  Add the metabolite Metadata if available ###############
+  if(is.null(Input_SettingsFile_Metab) == FALSE & 'Metabolite' %in% colnames(Input_SettingsFile_Metab) == TRUE){
+    if(MultipleComparison==FALSE){
+      DMA_Output <- merge(DMA_Output,Input_SettingsFile_Metab, by="Metabolite", all.y = TRUE)
+    }else{
+      DMA_Output <- lapply(DMA_Output, function(df){
+        merged_df <- merge(df,Input_SettingsFile_Metab, by = "Metabolite", all.y = TRUE)
+        return(merged_df)
+      })
+    }
+  }
+
+  ################################################################################################################################################################################################
   ###############  Folder ###############
   if(is.null(Save_as_Results)==FALSE){
     if(MultipleComparison==FALSE){
@@ -479,12 +492,12 @@ DMA <-function(Input_data,
                                                       Theme= NULL,
                                                       Save_as_Plot= NULL))
 
-      volplotList[[DF]]<- VolcanoPlot
+      volplotList[[DF]]<- VolcanoPlot[["Plot_Sized"]][[1]]
 
       DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
       if(is.null(Save_as_Plot)==FALSE){
         volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_", DF_save, OutputName,".",Save_as_Plot))
-        ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
+        ggsave(volcanoDMA,plot=VolcanoPlot[["Plot_Sized"]][[1]], width=10, height=8) # save the volcano plot
       }
       dev.off()
     }
@@ -511,13 +524,13 @@ DMA <-function(Input_data,
                                                     Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     Theme= NULL,
                                                     Save_as_Plot= NULL))
-    volplotList[[paste0(toString(numerator)," versus ",toString(denominator))]]<- VolcanoPlot
+    volplotList[[paste0(toString(numerator)," versus ",toString(denominator))]]<- VolcanoPlot[["Plot_Sized"]][[1]]
     dev.off()
     #plot(VolcanoPlot)
 
     if(is.null(Save_as_Plot)==FALSE){
       volcanoDMA <- file.path(Results_folder_Conditions,paste0( "Volcano_Plot_",toString(numerator),"_versus_",toString(denominator),OutputName,".",Save_as_Plot))
-      ggsave(volcanoDMA,plot=VolcanoPlot, width=10, height=8) # save the volcano plot
+      ggsave(volcanoDMA,plot=VolcanoPlot[["Plot_Sized"]][[1]], width=10, height=8) # save the volcano plot
     }
   }
 
