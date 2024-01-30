@@ -1568,20 +1568,7 @@ Shapiro <-function(Input_data,
     }
   }
 
-  ## ------------ Check Input SettingsInfo ----------- ##
-  #3. Input_SettingsInfo
-  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
-    }else{# if true rename to Conditions
-      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
-        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
-    }
-  }else{
-    stop("You have to provide a Input_SettingsInfo for conditions.")
-  }
-
-  ##########################
+ ##########################
   if("denominator" %in% names(Input_SettingsInfo)==TRUE){
     if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile_Sample$Conditions==FALSE){
       stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
@@ -1693,78 +1680,87 @@ Shapiro <-function(Input_data,
       column_to_rownames("Row.names")%>%
       subset(Conditions == i, select = -c(1))
 
-    # Apply Shapiro-Wilk test to each feature in the subset
-    shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
-  }
-
-  #Make the output DF
-  DF_shapiro_results <- as.data.frame(matrix(NA, nrow = length(UniqueConditions), ncol = ncol(Input_shaptest)))
-  rownames(DF_shapiro_results) <- UniqueConditions
-  colnames(DF_shapiro_results) <- colnames(Input_shaptest)
-  for(k in 1:length(UniqueConditions)){
-    for(l in 1:ncol(Input_shaptest)){
-      DF_shapiro_results[k, l] <- shapiro_results[[UniqueConditions[k]]][[l]]$p.value
-    }
-  }
-  colnames(DF_shapiro_results) <- paste("Shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
-
-  ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
-  Density_plots <- list()
-  if(QQplots==TRUE){
-    QQ_plots <- list()
-  }
-  for(x in 1:nrow(DF_shapiro_results)){
-    transpose <- as.data.frame(t(DF_shapiro_results[x,]))
-    Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
-    NotNorm <- format((round(sum(transpose[[1]] < 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
-    if(STAT_pval =="kruskal.test" | STAT_pval =="wilcox.test"){
-      message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(STAT_pval), ", which is for non parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+    #Check the sample size (shapiro.test(x) : sample size must be between 3 and 5000):
+    if(nrow(subset_data)<3){
+      warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided <3 Samples for condition ", i, ". Hence Shaprio test can not be performed for this condition.", sep="")
+    }else if(nrow(subset_data)>5000){
+      warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
+      #shapiro_results[[i]] <- as.data.frame(sapply(subset_data[1:5000,], function(x) shapiro.test(x)))
     }else{
-      message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(STAT_pval), ", which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+      # Apply Shapiro-Wilk test to each feature in the subset
+      shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
     }
+  }
 
-    # Assign the calculated values to the corresponding rows in result_df
-    DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
-    DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
-
-    #reorder the DF:
-    DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
-
-    DF_shapiro_results_out<- t(DF_shapiro_results)%>% as.data.frame()%>% rownames_to_column("Shapiro_p.val")
-    DF_shapiro_results_out$Shapiro_p.val <-  str_replace_all(DF_shapiro_results_out$Shapiro_p.val, "Shapiro p.val", " ")
-    DF_shapiro_results_out$Shapiro_p.val <-gsub("[[:punct:]]", " ", DF_shapiro_results_out$Shapiro_p.val)
-
-    # Save the DF Shapiro
-    if(is.null(Save_as_Results)==FALSE){
-      if (Save_as_Results == "xlsx"){
-        writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
-      }else if (Save_as_Results == "csv"){
-        write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
-      }else if (Save_as_Results == "txt"){
-        write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  if(nrow(subset_data)>=3 & nrow(subset_data)<=5000){
+    #Make the output DF
+    DF_shapiro_results <- as.data.frame(matrix(NA, nrow = length(UniqueConditions), ncol = ncol(Input_shaptest)))
+    rownames(DF_shapiro_results) <- UniqueConditions
+    colnames(DF_shapiro_results) <- colnames(Input_shaptest)
+    for(k in 1:length(UniqueConditions)){
+      for(l in 1:ncol(Input_shaptest)){
+        DF_shapiro_results[k, l] <- shapiro_results[[UniqueConditions[k]]][[l]]$p.value
       }
     }
+    colnames(DF_shapiro_results) <- paste("Shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
 
-    ## Make Group wise data distribution plot and QQ plots
-    subset_data <- Input_shaptest_Cond%>%
-      column_to_rownames("Row.names")%>%
-      subset(Conditions ==  colnames(transpose), select = -c(1))
-    all_data <- unlist(subset_data)
+    ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
+    Density_plots <- list()
+    if(QQplots==TRUE){
+      QQ_plots <- list()
+    }
+    for(x in 1:nrow(DF_shapiro_results)){
+      transpose <- as.data.frame(t(DF_shapiro_results[x,]))
+      Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
+      NotNorm <- format((round(sum(transpose[[1]] < 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+      if(STAT_pval =="kruskal.test" | STAT_pval =="wilcox.test"){
+        message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(STAT_pval), ", which is for non parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+      }else{
+        message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(STAT_pval), ", which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+      }
 
-    plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-      geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white")  +
-      geom_density(alpha = 0.2, fill = "grey45")
+      # Assign the calculated values to the corresponding rows in result_df
+      DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
+      DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
 
-    density_values <- ggplot_build(plot)$data[[2]]
+      #reorder the DF:
+      DF_shapiro_results<-DF_shapiro_results[,c(ncol(DF_shapiro_results)-1, ncol(DF_shapiro_results), 1:(ncol(DF_shapiro_results)-2))]
 
-    plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-      geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
-      geom_density(alpha=.2, fill="grey45") +
-      scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
+      DF_shapiro_results_out<- t(DF_shapiro_results)%>% as.data.frame()%>% rownames_to_column("Shapiro_p.val")
+      DF_shapiro_results_out$Shapiro_p.val <-  str_replace_all(DF_shapiro_results_out$Shapiro_p.val, "Shapiro p.val", " ")
+      DF_shapiro_results_out$Shapiro_p.val <-gsub("[[:punct:]]", " ", DF_shapiro_results_out$Shapiro_p.val)
 
-    density_values2 <- ggplot_build(plot)$data[[2]]
+      # Save the DF Shapiro
+      if(is.null(Save_as_Results)==FALSE){
+        if (Save_as_Results == "xlsx"){
+          writexl::write_xlsx(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  "")) # save the DMA result DF
+        }else if (Save_as_Results == "csv"){
+          write.csv(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""),row.names =FALSE) # save the DMA result DF
+        }else if (Save_as_Results == "txt"){
+          write.table(DF_shapiro_results_out,paste(Results_folder_DMA_folder_Shapiro_folder,"/DF_shapiro_results_table",OutputName,".",Save_as_Results,sep =  ""), col.names = TRUE, row.names = FALSE) # save the DMA result DF
+        }
+      }
 
-    suppressWarnings( sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
+      ## Make Group wise data distribution plot and QQ plots
+      subset_data <- Input_shaptest_Cond%>%
+        column_to_rownames("Row.names")%>%
+        subset(Conditions ==  colnames(transpose), select = -c(1))
+      all_data <- unlist(subset_data)
+
+      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
+        geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white")  +
+        geom_density(alpha = 0.2, fill = "grey45")
+
+      density_values <- ggplot_build(plot)$data[[2]]
+
+      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
+        geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
+        geom_density(alpha=.2, fill="grey45") +
+        scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
+
+      density_values2 <- ggplot_build(plot)$data[[2]]
+
+      suppressWarnings( sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
                         geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
                         geom_density(alpha=.2, fill="grey45") +
                         scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
@@ -1772,70 +1768,70 @@ Shapiro <-function(Input_data,
                         # geom_vline(xintercept =median(all_data) , linetype = "dashed", color = "red")+
                         labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")#+
                       # geom_text(aes(x = density_values2$x[which.max(density_values2$y)], y = 0, label = "Median"),  vjust = 0, hjust = -0.5, color = "red", size = 3.5)  # Add label for
-    )
+      )
 
-    plot(sampleDist)
-    Density_plots[[paste(colnames(transpose))]] <- recordPlot()
+      plot(sampleDist)
+      Density_plots[[paste(colnames(transpose))]] <- recordPlot()
 
-    if(is.null(Save_as_Plot)==FALSE){
-      if(CoRe==TRUE){
-        ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
-      }else{
-        ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+      if(is.null(Save_as_Plot)==FALSE){
+       if(CoRe==TRUE){
+          ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+        }else{
+         ggsave(filename = paste0(Results_folder_DMA_folder_Shapiro_folder, "/Density_plot", paste(colnames(transpose)),OutputName,".",Save_as_Plot), plot = sampleDist, width = 10,  height = 8)
+        }
+        }
 
+      # QQ plots
+      if(QQplots==TRUE){
+        # Make folders !has to be moved on top!
+        conds <- unique(c(numerator, denominator))
+        for(x in conds){
+          Results_folder_DMA_folder_Shapiro_folder_Condition <- file.path(Results_folder_DMA_folder_Shapiro_folder, paste(x)) # Make DMA results folder
+          if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder_Condition)) {dir.create(Results_folder_DMA_folder_Shapiro_folder_Condition)}
+        }
+        #QQ plots for each groups for each metabolite for normality visual check
+        qq_plot_list <- list()
+        for (col_name in colnames(subset_data)){
+          qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
+            geom_qq() +
+            geom_qq_line(color = "red") +
+            labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+
+          plot.new()
+          plot(qq_plot)
+          qq_plot_list[[col_name]] <-  recordPlot()
+
+          col_name2 <- (gsub("/","_",col_name))#remove "/" cause this can not be safed in a PDF name
+          col_name2 <- gsub("-", "", col_name2)
+          col_name2 <- gsub("/", "", col_name2)
+          col_name2 <- gsub(" ", "", col_name2)
+          col_name2 <- gsub("\\*", "", col_name2)
+          col_name2 <- gsub("\\+", "", col_name2)
+          col_name2 <- gsub(",", "", col_name2)
+          col_name2 <- gsub("\\(", "", col_name2)
+          col_name2 <- gsub("\\)", "", col_name2)
+
+          ggsave(paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"/",paste(col_name2),".",Save_as_Plot), plot = qq_plot, device = Save_as_Plot, width = 10,  height = 8)
+
+          dev.off()
+        }
+
+        QQ_plots[[paste(colnames(transpose))]] <- qq_plot_list
       }
     }
 
-    # QQ plots
+    #Here we make a list in which we will save the output
     if(QQplots==TRUE){
-      # Make folders !has to be moved on top!
-      conds <- unique(c(numerator, denominator))
-      for(x in conds){
-        Results_folder_DMA_folder_Shapiro_folder_Condition <- file.path(Results_folder_DMA_folder_Shapiro_folder, paste(x)) # Make DMA results folder
-        if (!dir.exists(Results_folder_DMA_folder_Shapiro_folder_Condition)) {dir.create(Results_folder_DMA_folder_Shapiro_folder_Condition)}
-      }
-      #QQ plots for each groups for each metabolite for normality visual check
-      qq_plot_list <- list()
-      for (col_name in colnames(subset_data)){
-        qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
-          geom_qq() +
-          geom_qq_line(color = "red") +
-          labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
-
-        plot.new()
-        plot(qq_plot)
-        qq_plot_list[[col_name]] <-  recordPlot()
-
-        col_name2 <- (gsub("/","_",col_name))#remove "/" cause this can not be safed in a PDF name
-        col_name2 <- gsub("-", "", col_name2)
-        col_name2 <- gsub("/", "", col_name2)
-        col_name2 <- gsub(" ", "", col_name2)
-        col_name2 <- gsub("\\*", "", col_name2)
-        col_name2 <- gsub("\\+", "", col_name2)
-        col_name2 <- gsub(",", "", col_name2)
-        col_name2 <- gsub("\\(", "", col_name2)
-        col_name2 <- gsub("\\)", "", col_name2)
-
-        ggsave(paste0(Results_folder_DMA_folder_Shapiro_folder, "/", paste(colnames(transpose)),"/",paste(col_name2),".",Save_as_Plot), plot = qq_plot, device = Save_as_Plot, width = 10,  height = 8)
-
-        dev.off()
-      }
-
-      QQ_plots[[paste(colnames(transpose))]] <- qq_plot_list
+      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
+    }else{
+      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results),"Plot"=list( "Distributions"=Density_plots))
     }
-  }
+    suppressWarnings(invisible(return(Shapiro_output_list)))
 
-  #Here we make a list in which we will save the output
-  if(QQplots==TRUE){
-    Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
-  }else{
-    Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results),"Plot"=list( "Distributions"=Density_plots))
-  }
-  suppressWarnings(invisible(return(Shapiro_output_list)))
-
-  if(Plot == TRUE){
-    Shapiro_output$Plot$Distributions
-  }
+    if(Plot == TRUE){
+      Shapiro_output$Plot$Distributions
+    }
+    }
 }
 
 
@@ -1896,19 +1892,6 @@ Bartlett <-function(Input_data,
         Input_data <- Input_data
       }
     }
-  }
-
-  ## ------------ Check Input SettingsInfo ----------- ##
-  #3. Input_SettingsInfo
-  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile_Sample)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile_Sample. Please check your input.")
-    }else{# if true rename to Conditions
-      Input_SettingsFile_Sample<- Input_SettingsFile_Sample%>%
-        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
-    }
-  }else{
-    stop("You have to provide a Input_SettingsInfo for conditions.")
   }
 
   ##########################
