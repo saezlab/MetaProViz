@@ -65,7 +65,7 @@ Vizsuperplot <- function(Input_data,
   #1. Input_data and Conditions
   if(any(duplicated(row.names(Input_data)))==TRUE){
     stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if("Conditions" %in% colnames(Plot_SettingsFile)==FALSE){
+  } else if(Plot_SettingsInfo[["conditions"]] %in% colnames(Plot_SettingsFile)==FALSE){
     stop("There is no column named `Conditions` in Plot_SettingsFile to obtain Condition1 and Condition2.")
   } else{
     Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
@@ -83,7 +83,7 @@ Vizsuperplot <- function(Input_data,
   }
 
   ## ------------ Check Input SettingsInfo ----------- ##
-  #2. Plot_SettingsInfo
+    #2. Plot_SettingsInfo
   if(Plot_SettingsInfo[["conditions"]] %in% Plot_SettingsInfo==TRUE){
     if(Plot_SettingsInfo[["conditions"]] %in% colnames(Plot_SettingsFile)== TRUE){
       Plot_SettingsFile<- Plot_SettingsFile%>%
@@ -95,14 +95,17 @@ Vizsuperplot <- function(Input_data,
     stop("You have to provide a Plot_SettingsInfo for conditions.")
   }
 
-  if(Plot_SettingsInfo[["superplot"]] %in% colnames(Plot_SettingsFile)== TRUE){
-    if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){
-      Plot_SettingsFile<- Plot_SettingsFile%>%
-        dplyr::rename("superplot"= paste(Plot_SettingsInfo[["superplot"]]) )
-    }else{
-      stop("The ",Plot_SettingsInfo[["superplot"]], " column selected for superplot in Plot_SettingsInfo was not found in Plot_SettingsFile. Please check your input.")
+  if("superplot" %in% names(Plot_SettingsInfo)){
+     if(Plot_SettingsInfo[["superplot"]] %in% colnames(Plot_SettingsFile)== TRUE){
+       if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){
+         Plot_SettingsFile<- Plot_SettingsFile%>%
+           dplyr::rename("superplot"= paste(Plot_SettingsInfo[["superplot"]]) )
+         }else{
+           stop("The ",Plot_SettingsInfo[["superplot"]], " column selected for superplot in Plot_SettingsInfo was not found in Plot_SettingsFile. Please check your input.")
+         }
+     }
     }
-  }
+
 
 
   ## ------------ Check other plot parameters ----------- ##
@@ -160,21 +163,52 @@ Vizsuperplot <- function(Input_data,
     }
   }
 
-  #7. Check Stat values:
-  if(length(Selected_Comparisons)==1 & length(Selected_Conditions)<= 2){#one-vs-one
-    STAT_pval_options <- c("t.test", "wilcox.test")
-    if(is.null(STAT_pval)==FALSE){
-      if(STAT_pval %in% STAT_pval_options == FALSE & is.null(STAT_pval)==FALSE){
-      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select NULL or one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
+  #7. Check Selected_Comparisons & Selected_Conditions
+  if(is.null(Selected_Conditions)){
+    Number_Cond <- length(unique(tolower(Plot_SettingsFile[["Conditions"]])))
+    if(Number_Cond<=2){
+      MultipleComparison = FALSE
+    }else{
+      MultipleComparison = TRUE
+    }
+  }else if(length(Selected_Conditions)>2){
+    MultipleComparison = TRUE
+  }else if(length(Selected_Conditions)<=2){
+    Number_Cond <- length(unique(tolower(Plot_SettingsFile[["Conditions"]])))
+    if(Number_Cond<=2){
+      MultipleComparison = FALSE
+    }else{
+      MultipleComparison = TRUE
+    }
+  }
+
+  #8. Check Stat values:
+  STAT_pval_options <- c("t.test", "wilcox.test", "aov", "kruskal.test")
+  if(is.null(STAT_pval)==FALSE){
+    if(STAT_pval %in% STAT_pval_options == FALSE & is.null(STAT_pval)==FALSE){
+      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid. Please select NULL or one of the following: ",paste(STAT_pval_options,collapse = ", "),"." )
     }
     }
-  }else{
-    STAT_pval_options <- c("aov", "kruskal.test")
-    if(is.null(STAT_pval)==FALSE){
-      if(STAT_pval %in% STAT_pval_options == FALSE){
-        stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select NULL or one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
+
+  if(is.null(STAT_pval)==FALSE){
+    if(MultipleComparison == TRUE & (STAT_pval=="t.test" | STAT_pval=="wilcox.test")){
+      warning("The selected STAT_pval option for Hypothesis testing,", STAT_pval, " is for one-versus-one comparison, but you have more than 2 conditions. Hence aov is performed.")
+      STAT_pval <- "aov"
+    }else if(MultipleComparison == FALSE & (STAT_pval=="aov" | STAT_pval=="kruskal.test")){
+      warning("The selected STAT_pval option for Hypothesis testing,", STAT_pval, " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
+      STAT_pval <- "t.test"
       }
-       }
+    }
+
+
+
+
+  if(is.null(STAT_pval)==TRUE & MultipleComparison == FALSE){
+    STAT_pval <- "t.test"
+  }
+
+  if(is.null(STAT_pval)==TRUE & MultipleComparison == TRUE){
+    STAT_pval <- "aov"
   }
 
   STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
@@ -183,6 +217,13 @@ Vizsuperplot <- function(Input_data,
       stop("Check input. The selected STAT_padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
   }
   }
+
+  if(is.null(STAT_padj)==TRUE){
+    STAT_padj <- "fdr"
+  }
+
+
+
 
 
   ## ------------ Create Output folders ----------- ##
@@ -204,8 +245,14 @@ Vizsuperplot <- function(Input_data,
   ## ------------ Create plots ----------- ##
   data <- Input_data
   Metabolite_Names <- colnames(data)
-  data <- merge( Plot_SettingsFile[c("Conditions","superplot")] ,data, by=0)
-  data <- column_to_rownames(data, "Row.names")
+  if("superplot" %in% names(Plot_SettingsInfo)){
+    data <- merge(Plot_SettingsFile[c("Conditions","superplot")] ,data, by=0)
+    data <- column_to_rownames(data, "Row.names")
+  }else{
+    data <- merge(Plot_SettingsFile[c("Conditions")] ,data, by=0)
+    data <- column_to_rownames(data, "Row.names")
+  }
+
 
   # make a list for plotting all plots together
   PlotList <- list()#Empty list to store all the plots
@@ -220,10 +267,17 @@ Vizsuperplot <- function(Input_data,
                      %>% as.data.frame())
     names(dataMeans)[2] <- "Intensity"
 
-    suppressWarnings(plotdata <- data %>%
+    if("superplot" %in% names(Plot_SettingsInfo)){
+      suppressWarnings(plotdata <- data %>%
                        select(i,Conditions, superplot)
                      %>%  group_by(Conditions)
                      %>% as.data.frame() )
+    }else{
+      suppressWarnings(plotdata <- data %>%
+                         select(i,Conditions)
+                       %>%  group_by(Conditions)
+                       %>% as.data.frame() )
+    }
     names(plotdata)[1] <- c("Intensity")
     plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
 
@@ -265,25 +319,26 @@ Vizsuperplot <- function(Input_data,
         Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(superplot)),size=3)+
           labs(color=Plot_SettingsInfo[["superplot"]], fill = Plot_SettingsInfo[["superplot"]])
       }
+    }else{
+      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity),size=2)
     }
 
     ####---- Add stats:
-    if(length(Selected_Comparisons)==1 & length(Selected_Conditions)<= 2){
-      if(is.null(STAT_pval)==TRUE){
-        STAT_pval<- "t.test"
-      }
+    if(STAT_pval=="t.test" | STAT_pval=="wilcox.test"){
       # One vs. One comparison: t-test
-      Plot <- Plot+ ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
+      if(is.null(Selected_Comparisons)==FALSE){
+        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = Selected_Comparisons,
                                                  label = "p.format", method = STAT_pval, hide.ns = TRUE,
                                                position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+      }else{
+        comparison <- unique(plotdata$Conditions)
+        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = comparison ,
+                                                 label = "p.format", method = STAT_pval, hide.ns = TRUE,
+                                                 position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+
+      }
       Plot <- Plot +labs(caption = paste("p.val using pairwise ", STAT_pval))
       }else{
-        if(is.null(STAT_pval)==TRUE){
-          STAT_pval<- "aov"
-        }
-        if(is.null(STAT_padj)==TRUE){
-          STAT_padj<- "fdr"
-        }
         #All-vs-All comparisons table:
         conditions <- Plot_SettingsFile$Conditions
         denominator <-unique(Plot_SettingsFile$Conditions)
@@ -435,7 +490,7 @@ plotGrob_Superplot <- function(Input, Plot_SettingsInfo, Plot_SettingsFile, Meta
 
   plot(plottable)
 
-  if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){#legend will be present!
+  if("superplot" %in% Plot_SettingsInfo==TRUE){#legend will be present!
     Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
     plot_widths <- plot_widths+Value
   }else{
@@ -458,7 +513,7 @@ plotGrob_Superplot <- function(Input, Plot_SettingsInfo, Plot_SettingsFile, Meta
   plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> Some space above the plot
   plottable$heights[c(1,2,4,5)] <- unit(0,"cm")#controls margins --> not needed
 
-  if(Plot_SettingsInfo[["superplot"]] %in% Plot_SettingsInfo==TRUE){#legend will be present!
+  if("superplot" %in% Plot_SettingsInfo==TRUE){#legend will be present!
     #------- Legend heights
     Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
