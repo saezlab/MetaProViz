@@ -28,7 +28,9 @@
 #' @param OutputName String which is added to the output files of the DMA.
 #' @param Input_SettingsFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
-#' @param VST TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = TRUE}
+#' @param VST TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = FALSE}
+#' @param Perform_Shapiro TRUE or FALSE for whether to perform the shapiro.test and get informed about data distribution (normal versus not-normal distribution. \strong{Default = TRUE}
+#' @param Perform_Bartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
@@ -51,6 +53,8 @@ DMA <-function(Input_data,
                OutputName='',
                CoRe=FALSE,
                VST = FALSE,
+               Perform_Shapiro =TRUE,
+               Perform_Bartlett =TRUE,
                Save_as_Plot = "svg",
                Save_as_Results = "csv",
                Plot = TRUE,
@@ -191,6 +195,12 @@ DMA <-function(Input_data,
   if(is.logical(Plot) == FALSE){
     stop("Check input. The plot value should be either =TRUE if a Volcano plot presenting the DMA results is to be exported or =FALSE if not.")
   }
+  if(is.logical(Perform_Shapiro) == FALSE){
+    stop("Check input. The Shapiro value should be either =TRUE or =FALSE.")
+  }
+  if(is.logical(Perform_Bartlett) == FALSE){
+    stop("Check input. The Bartlett value should be either =TRUE or =FALSE.")
+  }
   Save_as_Plot_options <- c("svg","pdf","png")
   if(is.null(Save_as_Plot)==FALSE){
     if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
@@ -233,15 +243,23 @@ DMA <-function(Input_data,
   Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
 
   if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
-    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(Num_Miss)
-  } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
-    message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
-    Metabolites_Miss <- colnames(Denom_Miss)
-  } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
-    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
+    if(ncol(Num_Miss)<=10){
+      message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    }else{
+      message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " Those metabolite(s) mightl return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      }
+    } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
+       Metabolites_Miss <- colnames(Denom_Miss)
+      if(ncol(Num_Miss)<=10){
+        message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      }else{
+        message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s).", " Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")#
+        }
+       } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
+          Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+          Metabolites_Miss <- unique(Metabolites_Miss)
+          message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s).",". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
   } else{
     message("There are no NA/0 values")
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
@@ -283,7 +301,13 @@ DMA <-function(Input_data,
 
   # Check hypothesis test assumptions
   # Normality
-  Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(Input_data=Input_data,
+  if(Perform_Shapiro==TRUE){
+    if(length(Metabolites_Miss>=1)){
+    message("There are NA's/0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs/0s.")#
+      }
+    tryCatch(
+    {
+     Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(Input_data=Input_data,
                                             Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                             Input_SettingsInfo=Input_SettingsInfo,
                                             STAT_pval=STAT_pval,
@@ -294,10 +318,26 @@ DMA <-function(Input_data,
                                             Save_as_Results=Save_as_Results,
                                             Plot=FALSE,
                                             Folder_Name=Results_folder_DMA_folder_Shapiro_folder))
+    },
+    error = function(e) {
+      message("Error occurred during MetaProViz:::Shapiro that performs the Shapiro-Wilk test. Message: ", conditionMessage(e))
+    }
+  )
+  }
+
+
 
   #Variance homogeneity
-  if(MultipleComparison==TRUE){
-    Bartlett_output<-suppressWarnings(MetaProViz:::Bartlett(Input_data=Input_data,
+  if(Perform_Bartlett==TRUE){
+    if(MultipleComparison==TRUE){#if we only have two conditions, which can happen even tough multiple comparison (C1 versus C2 and C2 versus C1 is done)
+      UniqueConditions <- Input_SettingsFile_Sample%>%
+        subset(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator, select = c("Conditions"))
+      UniqueConditions <- unique(UniqueConditions$Conditions)
+
+    if(length(UniqueConditions)>2){
+      tryCatch(
+        {
+          Bartlett_output<-suppressWarnings(MetaProViz:::Bartlett(Input_data=Input_data,
                                                Input_SettingsFile_Sample=Input_SettingsFile_Sample,
                                                Input_SettingsInfo=Input_SettingsInfo,
                                                OutputName=OutputName,
@@ -305,7 +345,13 @@ DMA <-function(Input_data,
                                                Save_as_Results=Save_as_Results,
                                                Plot=FALSE,
                                                Folder_Name=Results_folder_DMA_folder))
-
+        },
+        error = function(e) {
+          message("Error occurred during MetaProViz:::Bartlett that performs the Bartlett test. Message: ", conditionMessage(e))
+        }
+      )
+    }
+    }
   }
 
 
@@ -342,7 +388,12 @@ DMA <-function(Input_data,
                                    all_vs_all=all_vs_all,
                                    MultipleComparison=MultipleComparison)
     }else{
-      STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(C1=C1, C2=C2, Log2FC_table=Log2FC_table, Metabolites_Miss=Metabolites_Miss, STAT_pval=STAT_pval, STAT_padj=STAT_padj)
+      STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(Input_data=Input_data,
+                                                Input_SettingsFile_Sample=Input_SettingsFile_Sample,
+                                                Log2FC_table=Log2FC_table,
+                                                Metabolites_Miss=Metabolites_Miss,
+                                                STAT_pval=STAT_pval,
+                                                STAT_padj=STAT_padj)
     }
   }else{ # MultipleComparison = TRUE
 
@@ -536,7 +587,13 @@ DMA <-function(Input_data,
 
 
   #Here we make a list in which we will save the output
-  suppressWarnings(DMA_output_list <- list("DF" = list("Shapiro_result"=Shapiro_output$DF$Shapiro_result,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Shapiro_output$Plot$Distributions, "Volcano"=volplotList)))
+  if(Perform_Shapiro==TRUE & exists("Shapiro_output")==TRUE){
+    suppressWarnings(DMA_output_list <- list("DF" = list("Shapiro_result"=Shapiro_output$DF$Shapiro_result,"DMA_result"=DMA_Output),"Plot"=list( "Distributions"=Shapiro_output$Plot$Distributions, "Volcano"=volplotList)))
+  }else if(Perform_Shapiro==TRUE & exists("Shapiro_output")==FALSE){
+    suppressWarnings(DMA_output_list <- list("DF" = list("DMA_result"=DMA_Output),"Plot"=list( "Volcano"=volplotList)))
+    }else{
+      suppressWarnings(DMA_output_list <- list("DF" = list("DMA_result"=DMA_Output),"Plot"=list( "Volcano"=volplotList)))
+  }
 
 
   if(Plot == TRUE){
@@ -573,7 +630,7 @@ DMA <-function(Input_data,
 
 Log2FC_fun <-function(Input_data,
                   Input_SettingsFile,
-                  Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
+                  Input_SettingsInfo,
                   CoRe=FALSE,
                   Plot = TRUE,
                   Save_as_Results = "csv",
@@ -596,19 +653,7 @@ Log2FC_fun <-function(Input_data,
 
 
   ## ------------ Check Input SettingsInfo ----------- ##
-  #3. Input_SettingsInfo
-  if(Input_SettingsInfo[["conditions"]] %in% Input_SettingsInfo==TRUE){
-    if(Input_SettingsInfo[["conditions"]] %in% colnames(Input_SettingsFile)== FALSE){
-      stop("The ",Input_SettingsInfo[["conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-    }else{# if true rename to Conditions
-      Input_SettingsFile<- Input_SettingsFile%>%
-        dplyr::rename("Conditions"= paste(Input_SettingsInfo[["conditions"]]) )
-    }
-  }else{
-    stop("You have to provide a Input_SettingsInfo for conditions.")
-  }
 
-  ##########################
   if("denominator" %in% names(Input_SettingsInfo)==TRUE){
     if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
       stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
@@ -659,7 +704,6 @@ Log2FC_fun <-function(Input_data,
     all_vs_all = FALSE
   }
 
-
   #7. Are sample numbers enough?
   Num <- Input_data %>%
     filter(Input_SettingsFile$Conditions %in% numerator) %>%
@@ -678,12 +722,7 @@ Log2FC_fun <-function(Input_data,
     stop("There is no sample available for ", denominator, ".")
   }
 
-
-
-  ## ------------ Check Missingness ------------- ##
-  #7.
-  # If missing value imputation has not been performed the input data will most likely contain NA or 0 values for some metabolites, which will lead to Log2FC = NA.
-  # Here we will check how many metabolites this affects in Num and Denom, and weather all replicates of a metabolite are affected.
+  #Missingness
   Num_Miss <- replace(Num, Num==0, NA)
   Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
 
@@ -691,17 +730,13 @@ Log2FC_fun <-function(Input_data,
   Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
 
   if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
-    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(Num_Miss)
   } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
-    message("In `denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- colnames(Denom_Miss)
   } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
-    message("In `numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "),". Those metabolite(s) will return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
-  } else{
-    message("There are no NA/0 values")
+ } else{
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
   }
@@ -908,8 +943,8 @@ Log2FC_fun <-function(Input_data,
 ### ### ### DMA helper function: Internal Function to perform single comparison ### ### ###
 ##########################################################################################
 
-#' @param C1 This is the C1 (Condition 1) DF generated within the DMA function.
-#' @param C2 This is the C2 (Condition 2) DF generated within the DMA function.
+#' @param Input_data Passed to DMA
+#' @param Input_SettingsFile_Sample Passed to DMA, column containing conditions already renamed to "Conditions".
 #' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
 #' @param Metabolites_Miss these are the metabolites with missing values generated within the DMA function.
 #' @param STAT_pval Passed to DMA
@@ -919,8 +954,17 @@ Log2FC_fun <-function(Input_data,
 #' @noRd
 #'
 
-DMA_Stat_single <- function(C1, C2, Log2FC_table, Metabolites_Miss, STAT_pval, STAT_padj){
+DMA_Stat_single <- function(Input_data, Input_SettingsFile_Sample, Log2FC_table, Metabolites_Miss, STAT_pval, STAT_padj){
   ## ------------ Perform Hypothesis testing ----------- ##
+  for(column in 1:dim(comparisons)[2]){
+    C1 <- Input_data %>% # Numerator
+      filter(Input_SettingsFile_Sample$Conditions %in% comparisons[1,column]) %>%
+      select_if(is.numeric)#only keep numeric columns with metabolite values
+    C2 <- Input_data %>% # Denominator
+      filter(Input_SettingsFile_Sample$Conditions %in%  comparisons[2,column]) %>%
+      select_if(is.numeric)
+  }
+
   # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
   C1[is.na(C1)] <- 0
   C2[is.na(C2)] <- 0
@@ -1294,7 +1338,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
   targets <- Input_SettingsFile_Sample%>%
     rownames_to_column("sample")
-  targets<- targets[,c("sample", Input_SettingsInfo[["conditions"]])]%>%
+  targets<- targets[,c("sample", "Conditions")]%>%
     dplyr::rename("condition"=2)%>%
     arrange(sample)#Order the column "sample" alphabetically
   targets$condition_limma_compatible <-make.names(targets$condition)#make appropriate condition names accepted by limma
@@ -1490,7 +1534,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     old_name <- name_match_df$`names(results_list)`[i]
     new_name <- name_match_df$New[i]
     results_list[[new_name]] <- results_list[[old_name]]
-    results_list[[old_name]] <- NULL
+    #results_list[[old_name]] <- NULL
   }
 
   if(CoRe==TRUE){
@@ -1541,8 +1585,8 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
 
 Shapiro <-function(Input_data,
                    Input_SettingsFile_Sample,
-                   Input_SettingsInfo = c(conditions="Conditions", numerator = NULL, denumerator = NULL),
-                   STAT_pval ="kruskal.test",
+                   Input_SettingsInfo,
+                   STAT_pval,
                    OutputName="",
                    CoRe=FALSE,
                    QQplots=TRUE,
@@ -1669,20 +1713,28 @@ Shapiro <-function(Input_data,
   # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. We can test the data normality using the Shapiro test.
   ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
   #Prepare the input:
-  Input_shaptest <- replace(Input_data, Input_data==0, NA) %>% #Shapiro test ignores NAs!
+  Input_shaptest <- replace(Input_data, is.na(Input_data), 0)%>% #Shapiro test can not handle NAs!
     filter(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator)%>%
     select_if(is.numeric)
-  temp<- as.vector(sapply(Input_shaptest, function(x) var(x)) == 0)#  we have to remove features with zero variance if there are any.
-  if(length(Input_shaptest)==1){
+  temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0#  we have to remove features with zero variance if there are any.
+  temp <- temp[complete.cases(temp)]  # Remove NAs from temp
+  columns_with_zero_variance <- names(temp[temp])# Extract column names where temp is TRUE
+
+  if(length(Input_shaptest)==1){#handle a specific case where after filtering and selecting numeric variables, there's only one column left in Input_shaptest
     Input_shaptest <-Input_data
   }else{
-    Input_shaptest <- Input_shaptest[,!temp]
+    if(length(columns_with_zero_variance)==0){
+      Input_shaptest <-Input_shaptest
+    }else{
+      message("The following features have zero variance and are removed prior to performing the shaprio test: ",columns_with_zero_variance)
+      Input_shaptest <- Input_shaptest[,!(names(Input_shaptest) %in% columns_with_zero_variance), drop = FALSE]#drop = FALSE argument is used to ensure that the subset operation doesn't simplify the result to a vector, preserving the data frame structure
+    }
   }
 
   Input_shaptest_Cond <-merge(data.frame(Conditions = Input_SettingsFile_Sample[, "Conditions", drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
 
   UniqueConditions <- Input_SettingsFile_Sample%>%
-    subset(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator, select = c(1))
+    subset(Input_SettingsFile_Sample$Conditions %in% numerator | Input_SettingsFile_Sample$Conditions %in% denominator, select = c("Conditions"))
   UniqueConditions <- unique(UniqueConditions$Conditions)
 
   #Generate the results
@@ -1701,7 +1753,7 @@ Shapiro <-function(Input_data,
       #shapiro_results[[i]] <- as.data.frame(sapply(subset_data[1:5000,], function(x) shapiro.test(x)))
     }else{
       # Apply Shapiro-Wilk test to each feature in the subset
-      shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+     shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
     }
   }
 
