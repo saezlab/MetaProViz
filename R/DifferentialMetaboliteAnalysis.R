@@ -1329,12 +1329,13 @@ Welch <-function(Input_data,
 #' @param CoRe Passed to DMA
 #' @param all_vs_all generated within the DMA function
 #' @param MultipleComparison generated within the DMA function
+#' @param transform TRUE or FALSE. if TRUE log2 transformation will be performed.\strong(Default = TRUE)
 #'
 #' @keywords DMA helper function
 #' @noRd
 #'
 
-DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all, MultipleComparison){
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all, MultipleComparison, transform= TRUE){
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
   targets <- Input_SettingsFile_Sample%>%
     rownames_to_column("sample")
@@ -1368,7 +1369,10 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
 
   #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other
   Limma_input <- as.data.frame(t(Limma_input%>%column_to_rownames("sample")))
-  Limma_input_log2 <- log2(Limma_input) # communicate the log2 transformation --> how does limma deals with NA when calculating the change?
+
+  if(transform==TRUE){
+    Limma_input <- log2(Limma_input) # communicate the log2 transformation --> how does limma deals with NA when calculating the change?
+  }
 
   #### ------Run limma:
   ####  Make design matrix:
@@ -1378,7 +1382,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
   colnames(design) <- levels(fcond) # Give meaningful column names to the design matrix
 
   #### Fit the linear model
-  fit <- limma::lmFit(Limma_input_log2, design)
+  fit <- limma::lmFit(Limma_input, design)
 
   ####  Make contrast matrix:
   if(all_vs_all ==TRUE & MultipleComparison==TRUE){
@@ -1400,7 +1404,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     for (condition1 in 1:(num_conditions - 1)) {
       for (condition2 in (condition1 + 1):num_conditions) {
         # Create the pairwise comparison vector
-        comparison <- rep(0, num_conditions)
+        comparison <- rep(1, num_conditions)
 
         comparison[condition2] <- -1
         # Add the comparison vector to the contrast matrix
@@ -1410,6 +1414,7 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
         i <- i + 1
       }
     }
+    cont.matrix<- t(cont.matrix)
   }else if(all_vs_all ==FALSE & MultipleComparison==TRUE){
     unique_conditions <- levels(fcond)# Get unique conditions
     denominator  <- Input_SettingsInfo[["denominator"]]
@@ -1449,47 +1454,11 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
       }
       i <- i + 1
     }
+    cont.matrix<- t(cont.matrix)
   }else if(all_vs_all ==FALSE & MultipleComparison==FALSE){
-    unique_conditions <- levels(fcond)# Get unique conditions
-
-    # Create an empty contrast matrix
-    num_conditions <- length(unique_conditions)
-    num_comparisons <- num_conditions * (num_conditions - 1) / 2
-    cont.matrix <- matrix(0, nrow = num_comparisons, ncol = num_conditions)
-
-    # Initialize an index for the column in the contrast matrix
-    i <- 1
-
-    # Initialize column and row names
-    colnames(cont.matrix) <- unique_conditions
-    rownames(cont.matrix) <- character(num_comparisons)
-
-    # Loop through all pairwise combinations of unique conditions
-    for (condition1 in 1:(num_conditions - 1)) {
-      for (condition2 in (condition1 + 1):num_conditions) {
-        # Create the pairwise comparison vector
-        comparison <- rep(0, num_conditions)
-        if(unique_conditions[condition1]==Input_SettingsInfo[["denominator"]]){
-          comparison[condition1] <- -1
-          comparison[condition2] <- 1
-          # Add the comparison vector to the contrast matrix
-          cont.matrix[i, ] <- comparison
-          # Set row name
-          rownames(cont.matrix)[i] <- paste(unique_conditions[condition2], "_vs_", unique_conditions[condition1], sep="")
-        }else{
-          comparison[condition1] <- 1
-          comparison[condition2] <- -1
-          # Add the comparison vector to the contrast matrix
-          cont.matrix[i, ] <- comparison
-          # Set row name
-          rownames(cont.matrix)[i] <- paste(unique_conditions[condition1], "_vs_", unique_conditions[condition2], sep="")
-        }
-        i <- i + 1
-      }
-    }
+    Name_Comp <- paste(Input_SettingsInfo[["numerator"]], "-", Input_SettingsInfo[["denominator"]], sep="")
+    cont.matrix <- limma::makeContrasts(contrasts=Name_Comp, levels=colnames(design))
   }
-
-  cont.matrix<- t(cont.matrix)
 
   # Fit the linear model with contrasts
   #fit2 <- limma::contrasts.fit(fit, cont.matrix)
@@ -1515,50 +1484,54 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     results_list[[contrast_name]] <- res.t
   }
 
-  #If CoRe=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
-  #Make the name_match_df
-  name_match_df <- as.data.frame(names(results_list))%>%
-    separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
+  if(is.null(Log2FC_table)==FALSE){
+    #If CoRe=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
+    #Make the name_match_df
+    name_match_df <- as.data.frame(names(results_list))%>%
+      separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
 
-  name_match_df <-merge(name_match_df, targets , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
-    dplyr::rename("Condition1"=5)
-  name_match_df <- merge(name_match_df, targets , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
-    dplyr::rename("Condition2"=7)%>%
-    unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
+    name_match_df <-merge(name_match_df, targets , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
+      dplyr::rename("Condition1"=5)
+    name_match_df <- merge(name_match_df, targets , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
+      dplyr::rename("Condition2"=7)%>%
+      unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
 
-  name_match_df<- name_match_df[,c(3,5)]%>%
-    distinct(New, .keep_all = TRUE)
+    name_match_df<- name_match_df[,c(3,5)]%>%
+      distinct(New, .keep_all = TRUE)
 
-  #Match the lists using name_match_df
-  for(i in 1:nrow(name_match_df)){
-    old_name <- name_match_df$`names(results_list)`[i]
-    new_name <- name_match_df$New[i]
-    results_list[[new_name]] <- results_list[[old_name]]
-    #results_list[[old_name]] <- NULL
-  }
-
-  if(CoRe==TRUE){
-    # Merge the data frames in list1 and list2 based on the "Metabolite" column
-    merged_list <- list()
+    #Match the lists using name_match_df
     for(i in 1:nrow(name_match_df)){
-      list_dfs <- name_match_df$New[i]
-
-      # Check if the data frames exist in both lists
-      if(list_dfs %in% names(results_list) && list_dfs %in% names(Log2FC_table)){
-        merged_df <- merge(results_list[[list_dfs]], Log2FC_table[[list_dfs]], by = "Metabolite", all = TRUE)
-        merged_list[[list_dfs]] <- merged_df
-      }
+      old_name <- name_match_df$`names(results_list)`[i]
+      new_name <- name_match_df$New[i]
+      results_list[[new_name]] <- results_list[[old_name]]
+      #results_list[[old_name]] <- NULL
     }
+
+    if(CoRe==TRUE){
+      # Merge the data frames in list1 and list2 based on the "Metabolite" column
+      merged_list <- list()
+      for(i in 1:nrow(name_match_df)){
+        list_dfs <- name_match_df$New[i]
+
+        # Check if the data frames exist in both lists
+        if(list_dfs %in% names(results_list) && list_dfs %in% names(Log2FC_table)){
+          merged_df <- merge(results_list[[list_dfs]], Log2FC_table[[list_dfs]], by = "Metabolite", all = TRUE)
+          merged_list[[list_dfs]] <- merged_df
+        }
+      }
     STAT_C1vC2 <- merged_list
   }else{
     STAT_C1vC2 <- results_list
   }
 
+
   if(MultipleComparison==FALSE){
     nameComp <- names(STAT_C1vC2)
     STAT_C1vC2 <-STAT_C1vC2[[nameComp]]
   }
-
+    }else{
+    STAT_C1vC2 <- results_list[[1]]
+  }
   return(STAT_C1vC2)
 }
 
