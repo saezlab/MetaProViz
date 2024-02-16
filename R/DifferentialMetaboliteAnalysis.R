@@ -31,9 +31,10 @@
 #' @param VST TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = FALSE}
 #' @param Perform_Shapiro TRUE or FALSE for whether to perform the shapiro.test and get informed about data distribution (normal versus not-normal distribution. \strong{Default = TRUE}
 #' @param Perform_Bartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
+#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong(Default = TRUE)
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param Plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name. \strong(Default = NULL)
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
@@ -55,6 +56,7 @@ DMA <-function(Input_data,
                VST = FALSE,
                Perform_Shapiro =TRUE,
                Perform_Bartlett =TRUE,
+               transform=TRUE,
                Save_as_Plot = "svg",
                Save_as_Results = "csv",
                Plot = TRUE,
@@ -201,6 +203,10 @@ DMA <-function(Input_data,
   if(is.logical(Perform_Bartlett) == FALSE){
     stop("Check input. The Bartlett value should be either =TRUE or =FALSE.")
   }
+  if(is.logical(transform) == FALSE){
+    stop("Check input. `transform` should be either =TRUE or =FALSE.")
+  }
+
   Save_as_Plot_options <- c("svg","pdf","png")
   if(is.null(Save_as_Plot)==FALSE){
     if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
@@ -368,12 +374,8 @@ DMA <-function(Input_data,
   Log2FC_table <- MetaProViz:::Log2FC_fun(Input_data=Input_data,
                       Input_SettingsFile=Input_SettingsFile_Sample,
                       Input_SettingsInfo=Input_SettingsInfo,
-                      OutputName='',
-                      CoRe=FALSE,
-                      Save_as_Plot = "svg",
-                      Save_as_Results = "csv",
-                      Plot = FALSE,
-                      FolderName = NULL)
+                      CoRe=CoRe,
+                      transform=transform)
 
   ################################################################################################################################################################################################
   ############### Perform Hypothesis testing ###############
@@ -386,7 +388,8 @@ DMA <-function(Input_data,
                                    Log2FC_table=Log2FC_table,
                                    CoRe=CoRe,
                                    all_vs_all=all_vs_all,
-                                   MultipleComparison=MultipleComparison)
+                                   MultipleComparison=MultipleComparison,
+                                   transform=transform)
     }else{
       STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(Input_data=Input_data,
                                                 Input_SettingsFile_Sample=Input_SettingsFile_Sample,
@@ -439,7 +442,8 @@ DMA <-function(Input_data,
                                    Log2FC_table=Log2FC_table,
                                    CoRe=CoRe,
                                    all_vs_all=all_vs_all,
-                                   MultipleComparison=MultipleComparison)
+                                   MultipleComparison=MultipleComparison,
+                                   transform=transform)
     }
   }
 
@@ -613,15 +617,8 @@ DMA <-function(Input_data,
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param Input_SettingsFile DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param Input_SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param STAT_pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
-#' @param STAT_padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
-#' @param OutputName String which is added to the output files of the DMA.
-#' @param DMA_MetaFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. \strong{Default = NULL}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{Default = FALSE}
-#' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}
-#' @param plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderName {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param transform passed to main function. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma.
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #' @noRd
@@ -631,29 +628,15 @@ DMA <-function(Input_data,
 Log2FC_fun <-function(Input_data,
                   Input_SettingsFile,
                   Input_SettingsInfo,
-                  CoRe=FALSE,
-                  Plot = TRUE,
-                  Save_as_Results = "csv",
-                  Save_as_Plot = "svg",
-                  FolderName = NULL,
-                  OutputName = NULL
+                  CoRe,
+                  transform
 ){
 
   ## 1. ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "gtools", "EnhancedVolcano")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){install.packages(new.packages)}
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    if (!require("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-    BiocManager::install(new.packages)}
-
   suppressWarnings(suppressMessages(library(tidyverse)))
 
 
   ## ------------ Check Input SettingsInfo ----------- ##
-
   if("denominator" %in% names(Input_SettingsInfo)==TRUE){
     if(Input_SettingsInfo[["denominator"]] %in% Input_SettingsFile$Conditions==FALSE){
       stop("The ",Input_SettingsInfo[["denominator"]], " column selected as denominator in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
@@ -897,8 +880,15 @@ Log2FC_fun <-function(Input_data,
       }
 
       #Calculate the Log2FC
-      Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
-      Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
+      if(transform== TRUE){#data are not log2 transformed
+        Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
+        Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
+      }
+
+      if(transform== FALSE){#data has been log2 transformed and hence we need to take this into account when calculating the log2FC
+        Mean_Merge$FC_C1vC2 <- "Empty"
+        Mean_Merge$Log2FC <- Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
+      }
 
       #Add info on Input:
       temp3 <- as.data.frame(t(C1))%>%rownames_to_column("Metabolite")
@@ -1329,13 +1319,13 @@ Welch <-function(Input_data,
 #' @param CoRe Passed to DMA
 #' @param all_vs_all generated within the DMA function
 #' @param MultipleComparison generated within the DMA function
-#' @param transform TRUE or FALSE. if TRUE log2 transformation will be performed.\strong(Default = TRUE)
+#' @param transform Passed to DMA. if TRUE log2 transformation will be performed.
 #'
 #' @keywords DMA helper function
 #' @noRd
 #'
 
-DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all, MultipleComparison, transform= TRUE){
+DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_SettingsInfo, Log2FC_table, STAT_padj, CoRe, all_vs_all, MultipleComparison, transform){
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
   targets <- Input_SettingsFile_Sample%>%
     rownames_to_column("sample")
@@ -1457,7 +1447,9 @@ DMA_Stat_limma <- function(Input_data, Input_SettingsFile_Sample, Input_Settings
     cont.matrix<- t(cont.matrix)
   }else if(all_vs_all ==FALSE & MultipleComparison==FALSE){
     Name_Comp <- paste(Input_SettingsInfo[["numerator"]], "-", Input_SettingsInfo[["denominator"]], sep="")
-    cont.matrix <- limma::makeContrasts(contrasts=Name_Comp, levels=colnames(design))
+    cont.matrix <- as.data.frame(limma::makeContrasts(contrasts=Name_Comp, levels=colnames(design)))%>%
+      dplyr::rename(!!paste(Input_SettingsInfo[["numerator"]], "_vs_", Input_SettingsInfo[["denominator"]], sep="") := 1)
+    cont.matrix <-as.matrix(cont.matrix)
   }
 
   # Fit the linear model with contrasts
