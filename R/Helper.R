@@ -87,8 +87,8 @@ MCA_rules<- function(data){
 
 #' Imports KEGG pathways into the environment
 #'
-#' @title MCA regulatory rules Import
-#' @description Import and process .csv file to create toy data.
+#' @title KEGG
+#' @description Import and process KEGG.
 #' @importFrom utils read.csv
 #' @return A data frame containing the KEGG pathways for ORA.
 #' @export
@@ -177,4 +177,183 @@ Load_KEGG<- function(){
 
   #Return into environment
   assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
+}
+
+
+
+#' SavePath is the helper function to create the folder structure and path
+#'
+#' @param FolderName Name of the folder, which can not contain any special characters.
+#'
+#'
+#' @keywords
+#' @noRd
+#'
+
+SavePath<- function(FolderName, FolderPath){
+
+  #Check if FolderName includes special characters that are not allowed
+  cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
+  if (FolderName != cleaned_FolderName){
+    message("Special characters were removed from `FolderName`.")
+  }
+
+  #Check if FolderPath exist
+  if(is.null(FolderPath)){
+    FolderPath <- getwd()
+    FolderPath <- file.path(FolderPath, "MetaProViz_Results")
+    if(!dir.exists(FolderPath)){dir.create(FolderPath)}
+  }else{
+    if(dir.exists(FolderPath)==FALSE){
+      FolderPath <- getwd()
+      message("Provided `FolderPath` does not exist and hence results are saved here: ", FolderPath, sep="")
+    }
+  }
+
+  #Create the folder name
+  Results_folder <- file.path(FolderPath, cleaned_FolderName)
+  if(!dir.exists(Results_folder)){dir.create(Results_folder)}
+
+  #Return the folder path:
+  return(invisible(Results_folder))
+}
+
+
+#' SaveRes
+#'
+#' @param FolderPath
+#' @param CoRe
+#' @param List TRUE or FALSE
+#'
+#' @keywords
+#' @noRd
+#'
+
+SaveRes<- function(InputList, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileName, CoRe, PrintPlot){
+
+  if(is.null(SaveAs_Table)==FALSE){
+    # Excel File: One file with multiple sheets:
+    if(SaveAs_Table == "xlsx"){
+      #Make FileName
+      if(CoRe==FALSE){
+        FileName <- paste0(FolderPath,"/" , OutputFileName, "_",Sys.Date(), sep = "")
+      }else{
+        FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName,"_",Sys.Date(), sep = "")
+      }
+      #Save Excel
+      writexl::write_xlsx(InputList, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
+    }else{
+      for(DF in names(InputList)){
+        #Make FileName
+        if(CoRe==FALSE){
+          FileName <- paste0(FolderPath,"/" , OutputFileName, "_", DF ,"_",Sys.Date(), sep = "")
+        }else{
+          FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName, "_", DF ,"_",Sys.Date(), sep = "")
+        }
+
+        #Save table
+        if (SaveAs_Table == "csv"){
+          write.csv(InputList[[DF]], paste0(FileName,".csv", sep = ""))
+          }else if (SaveAs_Table == "txt"){
+            write.table(InputList[[DF]], paste0(FileName,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+          }
+        }
+    }
+  }
+
+  if(is.null(SaveAs_Plot)==FALSE){
+    for(Plot in names(InputList)){
+      #Make FileName
+      if(CoRe==FALSE){
+        FileName <- paste0(FolderPath,"/" , OutputFileName,"_", Plot , "_",Sys.Date(), sep = "")
+      }else{
+        FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName,"_", Plot ,"_",Sys.Date(), sep = "")
+      }
+
+      #Save
+      ggsave(filename = paste0(FileName, ".",SaveAs_Plot, sep=""), plot = InputList[[Plot]], width = 10,  height = 8)
+
+      if(PrintPlot==TRUE){
+        suppressMessages(suppressWarnings(plot(InputList[[Plot]])))
+      }
+    }
+  }
+}
+
+
+
+#' Check input parameters
+#'
+#' @param Function Name of the MetaProViz Function that is checked.
+#' @param InputList
+#'
+#'
+#' @keywords
+#' @noRd
+#'
+#'
+
+CheckInput <- function(InputData, SettingsFile_Sample=SettingsFile_Sample, SettingsFile_Metab=SettingsFile_Metab, SaveAs_Plot=SaveAs_Plot, SaveAs_Table=SaveAs_Table, CoRe=CoRe, PrintPlot=PrintPlot){
+  ############## Parameters valid for multiple MetaProViz functions
+  #-------------InputData
+  if(class(InputData) != "data.frame"){
+    stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
+  }
+  if(any(duplicated(row.names(InputData)))==TRUE){
+    stop("Duplicated row.names of InputData, whilst row.names must be unique")
+  }
+
+  Test_num <- apply(InputData, 2, function(x) is.numeric(x))
+  if((any(Test_num) ==  FALSE) ==  TRUE){
+      stop("InputData needs to be of class numeric")
+  }
+
+  #-------------SettingsFile
+  if(is.null(SettingsFile_Sample)==FALSE){
+    Test_match <- merge(SettingsFile_Sample, InputData, by = "row.names", all =  FALSE)
+    if(nrow(Test_match) ==  0){
+        stop("row.names InputData need to match row.names SettingsFile_Sample.")
+      }
+  }
+
+  if(is.null(SettingsFile_Metab)==FALSE){
+    Test_match <- merge(SettingsFile_Metab, as.data.frame(InputData), by = "row.names", all =  FALSE)
+    if(nrow(Test_match) ==  0){
+      stop("col.names InputData need to match col.names SettingsFile_Metab.")
+    }
+  }
+
+  #-------------SettingsInfo
+  if(is.vector(SettingsInfo)==FALSE & is.null(SettingsInfo)==FALSE){
+    stop("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
+  }
+
+  if((is.null(SettingsInfo)==TRUE & is.null(SettingsFile_Sample)==TRUE) & (is.null(SettingsInfo)==TRUE & is.null(SettingsFile_Metab)==TRUE)){
+    message("No Input_Settings have been added.")
+  }
+
+
+
+  #-------------SaveAs
+  Save_as_Plot_options <- c("svg","pdf", "png")
+  if((SaveAs_Plot %in% Save_as_Plot_options == FALSE) | (is.null(SaveAs_Plot)==TRUE)){
+    stop("Check input. The selected SaveAs_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", ")," or set to NULL if no plots should be saved." )
+  }
+
+  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
+  if(is.null(SaveAs_Table)==FALSE){
+    if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
+      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+    }
+  }
+
+  #-------------CoRe
+  if(is.logical(CoRe) == FALSE | (is.null(CoRe)==TRUE)){
+    stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
+  }
+
+  #------------- general
+  if(is.logical(PrintPlot) == FALSE){
+    stop("Check input. PrintPlot should be either =TRUE or =FALSE.")
+  }
 }
