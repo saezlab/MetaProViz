@@ -1,8 +1,8 @@
 ## ---------------------------
 ##
-## Script name: Preprocessing
+## Script name: PreProcessing
 ##
-## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalization and outlier detection
+## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalization, outlier detection and QC plots
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -33,7 +33,7 @@
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. If set to NULL, plots are not saved. \strong{Default = svg}
 #' @param SaveAs_Table
-#' @param Plot  \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
+#' @param PrintPlot  \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #'
 #' @keywords 80% filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts,
@@ -50,7 +50,7 @@
 
 PreProcessing <- function(InputData,
                           SettingsFile_Sample,
-                          SettingsInfo_Sample,
+                          SettingsInfo,
                           FeatureFilt = "Modified",
                           FeatureFilt_Value = 0.8,
                           TIC = TRUE,
@@ -60,7 +60,7 @@ PreProcessing <- function(InputData,
                           CoRe = FALSE,
                           SaveAs_Plot = "svg",
                           SaveAs_Table = "csv",
-                          Plot = TRUE,
+                          PrintPlot = TRUE,
                           FolderPath = NULL
 ){
 
@@ -87,17 +87,22 @@ PreProcessing <- function(InputData,
   MetaProViz:::CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
+                          SettingsInfo= SettingsInfo,
                           SaveAs_Plot=SaveAs_Plot,
                           SaveAs_Table=SaveAs_Table,
-                          CoRe=CoRe)
+                          CoRe=CoRe,
+                          PrintPlot= PrintPlot)
 
 
   # HelperFunction `CheckInput` Specific
   MetaProViz:::CheckInput_PreProcessing(InputData=InputData,
+                                        SettingsFile_Sample=SettingsFile_Sample,
+                                        SettingsInfo=SettingsInfo,
                                         CoRe=CoRe,
                                         FeatureFilt=FeatureFilt,
                                         FeatureFilt_Value=FeatureFilt_Value,
-                                        TIC=TIC, MVI=MVI,
+                                        TIC=TIC,
+                                        MVI=MVI,
                                         MVI_Percentage=MVI_Percentage,
                                         HotellinsConfidence=HotellinsConfidence)
 
@@ -106,123 +111,140 @@ PreProcessing <- function(InputData,
     Folder <- MetaProViz:::SavePath(FolderName= "Preprocessing",
                                     FolderPath=FolderPath)
 
-    SubFolder_O <- file.path(Folder, "OutlierDetection")
-    if (!dir.exists(SubFolder_O)) {dir.create(SubFolder_O)}
-
-    SubFolder_P <- file.path(Folder, "QC_PCA")
+    SubFolder_O <- file.path(Folder, "OutlierPlots")
     if (!dir.exists(SubFolder_O)) {dir.create(SubFolder_O)}
   }
 
 
   ## ------------------ Prepare the data ------------------- ##
   #InputData files:
-  InputData <- as.matrix(mutate_all(as.data.frame(InputData), function(x) as.numeric(as.character(x))))
+  InputData <-as.data.frame(InputData)%>%
+      mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
 
-  #CoRe files:
-  if(CoRe == TRUE){
-    if("CoRe_media" %in% names(SettingsInfo)){
-      SettingsFile_Sample <- SettingsFile_Sample %>%
-        mutate(Conditions = ifelse(Conditions == paste(SettingsInfo[["CoRe_media"]]), "CoRe_media", Conditions))
-    }
-
-    if ("CoRe_norm_factor" %in% names(SettingsInfo)){
-      SettingsFile_Sample <- SettingsFile_Sample%>%
-        dplyr::rename("CoRe_norm_factor"= paste(SettingsInfo[["CoRe_norm_factor"]]) )
-      CoRe_norm_factor <-   SettingsFile_Sample %>% filter(Conditions!="CoRe_media") %>% select(CoRe_norm_factor) %>%pull()
-    }else{
-      CoRe_norm_factor <- as.numeric(rep(1,dim(SettingsFile_Sample %>% filter(Conditions!="CoRe_media"))[1]))
-    }
-  }
-
-  #Parse Information
-  if(is.null(SettingsFile_Sample)==FALSE){
-    if("Conditions" %in% names(SettingsInfo)){
-    Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
-    }else{
-      Conditions <- NULL
-    }
-    }
+  InputData <- as.data.frame(mutate_all(as.data.frame(InputData), function(x) as.numeric(as.character(x))))
 
   ###################################################################################################################################
-  ## ------------------ Feature filtering ------------------- ##
+  ## ------------------ 1. Feature filtering ------------------- ##
   if(is.null(FeatureFilt)==FALSE){
-    InputData_Filt <- MetaProViz:::FeatureFiltering(InputData=InputData,
+    InputData_Filtered <- MetaProViz:::FeatureFiltering(InputData=InputData,
                                                     FeatureFilt=FeatureFilt,
                                                     FeatureFilt_Value=FeatureFilt_Value,
                                                     SettingsFile_Sample=SettingsFile_Sample,
                                                     SettingsInfo=SettingsInfo,
                                                     CoRe=CoRe)
 
+    InputData_Filt <- InputData_Filtered[["DF"]]
   }else{
     InputData_Filt <- InputData
   }
 
-  ## ------------------ Missing value Imputation ------------------- ##
+  ## ------------------ 2. Missing value Imputation ------------------- ##
   if(MVI==TRUE){
     MVIRes<- MetaProViz:::MVImputation(InputData=InputData_Filt,
                                        SettingsFile_Sample=SettingsFile_Sample,
                                        SettingsInfo=SettingsInfo,
-                                       CoRe=CoRe)
+                                       CoRe=CoRe,
+                                       MVI_Percentage=MVI_Percentage)
   }else{
     MVIRes<- InputData_Filt
   }
 
-  ## ------------------  Total Ion Current Normalization ------------------- ##
+  ## ------------------  3. Total Ion Current Normalization ------------------- ##
   if(TIC==TRUE){
-    TICRes_List <- MetaProViz:::TICNorm(InputData=MVIRes)
+    #Perform TIC
+    TICRes_List <- MetaProViz:::TICNorm(InputData=MVIRes,
+                                        SettingsFile_Sample=SettingsFile_Sample,
+                                        TIC=TIC)
     TICRes <- TICRes_List[["DF"]][["Data_TIC"]]
+
+    #Add plots to PlotList
+    PlotList <- list()
+    PlotList[["RLAPlot"]] <- TICRes_List[["Plot"]][["RLA_BeforeTICNorm"]]
+    PlotList[["RLAPlot_TICnorm"]] <- TICRes_List[["Plot"]][["RLA_AfterTICNorm"]]
+    PlotList[["RLAPlot_BeforeAfter_TICnorm"]] <- TICRes_List[["Plot"]][["norm_plots"]]
   }else{
     TICRes <- MVIRes
+
+    #Add plots to PlotList
+    RLAPlot_List <- MetaProViz:::TICNorm(InputData=MVIRes,
+                                         SettingsFile_Sample=SettingsFile_Sample,
+                                         TIC=TIC)
+    PlotList[["RLAPlot"]] <- RLAPlot_List[["Plot"]][["RLA_BeforeTICNorm"]]
   }
 
-  ## ------------------ CoRe Normalization ------------------- ##
+  ## ------------------ 4. CoRe media QC (blank) and normalization ------------------- ##
   if(CoRe ==TRUE){
-    #Can we add MVI here?
+   data_CoReNorm <- MetaProViz:::CoReNorm(InputData= TICRes,
+                                               SettingsFile_Sample=SettingsFile_Sample,
+                                               SettingsInfo=SettingsInfo)
 
+    TICRes <- data_CoReNorm[["DF"]][["Core_Norm"]]
   }
 
-  data_norm <- Data_TIC %>% as.data.frame()
+  # ------------------ Final Output:
+  data_norm <- TICRes %>% as.data.frame()
 
-
+  ###################################################################################################################################
   ## ------------------ Sample outlier identification ------------------- ##
-
+  OutlierRes <-  MetaProViz:::OutlierDetection(InputData= data_norm,
+                                               SettingsFile_Sample=SettingsFile_Sample,
+                                               SettingsInfo=SettingsInfo,
+                                               CoRe=CoRe,
+                                               HotellinsConfidence=HotellinsConfidence)
 
   ###################################################################################################################################
   ## ------------------ Return ------------------- ##
-
-  output_list <- list()  #Here we make a list in which we will save the output
-  preprocessing_output_list <- list(Input_SettingsFile = Original_Input_SettingsFile, Raw_data = as.data.frame(Input_data), Processed_data = data_norm_filtered_full)
-
-  ##Write to file
-  preprocessing_output_list_out <- lapply(preprocessing_output_list, function(x) rownames_to_column(x, "Sample_ID")) #  # use this line to make a sample_ID column in each dataframe
-  if(CoRe ==TRUE){
-    writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output_CoRe.xlsx", sep = ""))#,showNA = TRUE)
+  ## ---- DFs
+  if(is.null(FeatureFilt)==FALSE){#Add metabolites that where removed as part of the feature filtering
+    if(length(InputData_Filtered[["RemovedMetabolites"]])==0){
+      DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% dplyr::rename("Code"="Row.names"),
+                     "Filtered_metabolites"= as.data.frame(list(FeatureFiltering = c(FeatureFilt),
+                                                            FeatureFilt_Value = c(FeatureFilt_Value),
+                                                            RemovedMetabolites = c("None"))),
+                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]]%>%rownames_to_column("Code"))
+    }else{
+      DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% dplyr::rename("Code"="Row.names"),
+                     "Filtered_metabolites"= as.data.frame(list(FeatureFiltering = rep(FeatureFilt, length(InputData_Filtered[["RemovedMetabolites"]])),
+                                                           FeatureFilt_Value = rep(FeatureFilt_Value, length(InputData_Filtered[["RemovedMetabolites"]])),
+                                                           RemovedMetabolites = InputData_Filtered[["RemovedMetabolites"]])),
+                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]]%>%rownames_to_column("Code"))
+    }
   }else{
-    writexl::write_xlsx(preprocessing_output_list_out, paste(Results_folder_Preprocessing_folder, "/Preprocessing_output.xlsx", sep = ""))#,showNA = TRUE)
+    DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% dplyr::rename("Code"="Row.names"), "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]]%>%rownames_to_column("Code"))
   }
 
-
-  # Return the result
   if(CoRe ==TRUE){
-    DFs = list("Filtered_metabolites"= features_filtered,"CV_result_table"= cv_result_df,"MediaSample_variation_Contigency_table"=contingency_data_contframe, "Preprocessing_output" = preprocessing_output_list_out)
+     DFList_CoRe <- list( "CV_CoRe_blank"= data_CoReNorm[["DF"]][["CV_CoRe_blank"]],"Variation_ContigencyTable_CoRe_blank"=data_CoReNorm[["DF"]][["Contigency_table_CoRe_blank"]])
+     DFList <- c(DFList, DFList_CoRe)
+  }
+
+  ## ---- Plots
+  if(is.null(TIC)==FALSE){
+    PlotList <- c(TICRes_List[["Plot"]], OutlierRes[["Plot"]])
   }else{
-    DFs = list("Filtered_metabolites"= features_filtered, "Preprocessing_output" = preprocessing_output_list_out)
+    PlotList <- c(RLAPlot_List[["Plot"]])
+  }
 
-    }
+  if(CoRe ==TRUE){
+    PlotList <- c(PlotList , data_CoReNorm[["Plot"]])
+  }
 
-  PlotList = list("Norm"=norm_plots, "Outlier_plots"=outlier_plot_list, "QC_plots"=qc_plot_list)
+  # Save Plots and DFs
+  # All: Folder
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF=DFList,
+                         InputList_Plot= PlotList,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=SaveAs_Plot,
+                         FolderPath= Folder,
+                         OutputFileName= "PreProcessing",
+                         CoRe=CoRe,
+                         PrintPlot=PrintPlot)))
 
-  if(Plot==TRUE){ # print plots
-    #individual plots:
-    suppressMessages(suppressWarnings(plot(norm_plots)))
-    suppressMessages(suppressWarnings(plot(PlotList[["QC_plots"]][[1]])))
-    suppressMessages(suppressWarnings(plot(PlotList[["QC_plots"]][[2]])))
-    suppressMessages(suppressWarnings(plot(pca_outlierloop1)))
-    suppressMessages(suppressWarnings(plot(scree_outlierloop1)))
-    suppressMessages(suppressWarnings(plot(hotel_outlierloop1+labs(title=paste("Hotelling ", hotelling_qcc$type ," test filtering round 1", sep="")))))
-    }
+  # OutlierPlots: SubFolder_O
 
-    invisible(return(list("DF"=DFs,"Plot" =PlotList)))
+  #Return
+  invisible(return(list("DF"= DFList ,"Plot" =PlotList)))
 }
 
 
@@ -237,7 +259,7 @@ PreProcessing <- function(InputData,
 #' @param Input Dataframe which contains unique sample identifiers as row names the Experimental design and the metabolite numerical values in columns with metabolite identifiers as column names. Needs to have Conditions, Biological_Replicates and Analytical_Replicate columns
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #'
-#' @keywords Analyrical Replicate Merge
+#' @keywords Analytical Replicate Merge
 #' @export
 
 
@@ -503,16 +525,9 @@ PoolEstimation <- function(InputData,
     DF_list <- list("InputData" = InputData, "CV" = result_df_final_out)
   }
 
- MetaProViz:::SaveRes(InputList=DF_list,
+ MetaProViz:::SaveRes(InputList_DF=DF_list,
+                      InputList_Plot = PlotList,
                       SaveAs_Table=SaveAs_Table,
-                      SaveAs_Plot=NULL,
-                      FolderPath= SubFolder,
-                      OutputFileName= "PoolEstimation",
-                      CoRe=FALSE)
-
-
- MetaProViz:::SaveRes(InputList= PlotList,
-                      SaveAs_Table=NULL,
                       SaveAs_Plot=SaveAs_Plot,
                       FolderPath= SubFolder,
                       OutputFileName= "PoolEstimation",
@@ -537,6 +552,8 @@ PoolEstimation <- function(InputData,
 #'
 
 CheckInput_PreProcessing <- function(InputData=InputData,
+                                     SettingsFile_Sample=SettingsFile_Sample,
+                                     SettingsInfo=SettingsInfo,
                                      CoRe=CoRe,
                                      FeatureFilt=FeatureFilt,
                                      FeatureFilt_Value=FeatureFilt_Value,
@@ -558,10 +575,10 @@ CheckInput_PreProcessing <- function(InputData=InputData,
       }
     }
     #CoRe
-    if(CoRe ==  TRUE){   # parse CoRe normalisation factor
+    if(CoRe == TRUE){   # parse CoRe normalisation factor
       message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
       if("CoRe_media" %in% names(SettingsInfo)){
-        if(length(grep("CoRe_media", SettingsFile_Sample$Conditions)) < 1){     # Check for CoRe_media samples
+        if(length(grep(SettingsInfo[["CoRe_media"]], SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])) < 1){     # Check for CoRe_media samples
           stop("No CoRe_media samples were provided in the 'Conditions' in the SettingsFile_Sample. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
            column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRe = FALSE for your analysis")
         }
@@ -611,20 +628,20 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
   ## ------------------ Prepare the data ------------------- ##
   feat_filt_data <- as.data.frame(replace(InputData, InputData==0, NA))
 
+  if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
+    feat_filt_data <- feat_filt_data %>% filter(!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] ==SettingsInfo[["CoRe_media"]])
+    Feature_Filtering <- paste0(FeatureFilt, "_CoRe")
+  }
+
   ## ------------------ Perform filtering ------------------ ##
   if(FeatureFilt ==  "Modified"){
     message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
     message(paste("filtering value selected:", FeatureFilt_Value))
 
-    feat_filt_Conditions <- Conditions[!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] =="CoRe_media"]
-
-    if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
-      feat_filt_data <- feat_filt_data %>% filter(!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] =="CoRe_media")
-      Feature_Filtering <- paste0(FeatureFilt, "_CoRe")
-    }
+    feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]][!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]]]
 
     if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
-      stop("Condition information is missing from the Experimental design.")
+      stop("Conditions information is missing.")
     }
     if(length(unique(feat_filt_Conditions)) ==  1){
       stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
@@ -644,21 +661,14 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
       message("There where no metabolites exluded")
       filtered_matrix <- InputData
       feat_file_res <- "There where no metabolites exluded"
-      #write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",FeatureFilt_Value*100,"%_",FeatureFilt,".csv",sep =  ""))
     }else{
       names<-unique(colnames(InputData)[miss])
       message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- InputData[,-miss]
-      #write.table(unique(colnames(InputData)[miss]),row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",FeatureFilt_Value*100,"%_",FeatureFilt,".csv",sep =  ""))
     }
   }else if(Feature_Filtering ==  "Standard"){
     message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
     message(paste("filtering value selected:", FeatureFilt_Value))
-
-    if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
-      feat_filt_data <- feat_filt_data %>% filter(!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]=="CoRe_media")
-      Feature_Filtering <- paste0(FeatureFilt, "_CoRe")
-    }
 
     split_Input <- feat_filt_data
 
@@ -670,21 +680,21 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
 
     if(length(miss) ==  0){ #remove metabolites if any are found
       message("There where no metabolites exluded")
-      filtered_matrix <- Input_data
+      filtered_matrix <- InputData
       feat_file_res <- "There where no metabolites exluded"
-      #write.table(feat_file_res,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value*100,"%_",Feature_Filtering,".csv",sep =  ""))
     }else{
       names<-unique(colnames(InputData)[miss])
       message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- InputData[,-miss]
-      #write.table(unique(colnames(Input_data)[miss]),row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/Filtered_metabolites","_",Feature_Filt_Value*100,"%_",Feature_Filtering,".csv",sep =  ""))
     }
   }
 
   ## ------------------ Return ------------------ ##
   features_filtered <- unique(colnames(InputData)[miss]) %>% as.vector()
   filtered_matrix <- as.data.frame(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
-  invisible(return(filtered_matrix))
+
+  Filtered_results <- list("DF"= filtered_matrix , "RemovedMetabolites" = features_filtered)
+  invisible(return(Filtered_results))
 }
 
 
@@ -698,7 +708,7 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
 #' @noRd
 #'
 
-MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe){
+MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_Percentage){
   ## ------------------ Prepare the data ------------------- ##
   filtered_matrix <- InputData
   filtered_matrix[filtered_matrix == 0] <- NA
@@ -728,6 +738,7 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe){
 
     # replace the samples in the original dataframe
     filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
+
   }
 
   # Do MVI for the samples
@@ -752,25 +763,17 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe){
 
 #'
 #'
-#' @param
-#' @param
+#' @param InputData Original InputData that has been Feature filtered (if FeatureFilt=TRUE) and/or MVI (if MVI=TRUE).
+#' @param TIC Logical, TRUE or FALSE. Passed to main function by user
 #'
 #' @keywords
 #' @noRd
 #'
 
-TICNorm <-function(InputData){
+TICNorm <-function(InputData, SettingsFile_Sample, TIC){
   ## ------------------ Prepare the data ------------------- ##
   NA_removed_matrix <- InputData
   NA_removed_matrix[is.na(NA_removed_matrix)] <- 0#replace NA with 0
-
-  ## ------------------ Perform TIC ------------------- ##
-  message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
-  RowSums <- rowSums(NA_removed_matrix)
-  Median_RowSums <- median(RowSums) #This will built the median
-  Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
-  Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
-  Data_TIC <- as.data.frame(Data_TIC)
 
   ## ------------------ QC plot ------------------- ##
   ### Before TIC Normalization
@@ -792,36 +795,50 @@ TICNorm <-function(InputData){
     theme_classic()+
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
+  if(TIC==TRUE){
+    ## ------------------ Perform TIC ------------------- ##
+    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    RowSums <- rowSums(NA_removed_matrix)
+    Median_RowSums <- median(RowSums) #This will built the median
+    Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
+    Data_TIC <- Data_TIC_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+    Data_TIC <- as.data.frame(Data_TIC)
 
-  ### After TIC normalization
-  log_Data_TIC <- log(Data_TIC) %>% t() %>% as.data.frame()
-  medians <- apply(log_Data_TIC, 2, median)
-  RLA_data_norm <- log_Data_TIC - medians   # Subtract the medians from each column
-  RLA_data_long <- pivot_longer(RLA_data_norm, cols = everything(), names_to = "Group")
-  names(RLA_data_long)<- c("Samples", "Intensity")
-  for (row in 1:nrow(RLA_data_long)){ # add conditions
-    RLA_data_long[row,"Conditions"] <- SettingsFile_Sample[rownames(SettingsFile_Sample) %in%RLA_data_long[row,1],"Conditions"]
+    ## ------------------ QC plot ------------------- ##
+    ### After TIC normalization
+    log_Data_TIC <- log(Data_TIC) %>% t() %>% as.data.frame()
+    medians <- apply(log_Data_TIC, 2, median)
+    RLA_data_norm <- log_Data_TIC - medians   # Subtract the medians from each column
+    RLA_data_long <- pivot_longer(RLA_data_norm, cols = everything(), names_to = "Group")
+    names(RLA_data_long)<- c("Samples", "Intensity")
+    for (row in 1:nrow(RLA_data_long)){ # add conditions
+      RLA_data_long[row,"Conditions"] <- SettingsFile_Sample[rownames(SettingsFile_Sample) %in%RLA_data_long[row,1],"Conditions"]
+    }
+
+    # Create the ggplot boxplot
+    RLA_data_norm <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity, color = Conditions)) +
+      geom_boxplot() +
+      geom_hline(yintercept = 0, color = "red", linetype = "solid") +
+      labs(title = "After TIC Normalization")+
+      theme_classic() +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
+
+    #Combine Plots
+    dev.new()
+    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+                                                           RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+                                                           ncol = 2))
+    dev.off()
+    norm_plots <- ggplot2::ggplot() +theme_minimal()+ annotation_custom(norm_plots)
+
+    ## ------------------ Return ------------------ ##
+    Output_list <- list("DF" = list("Data_TIC"=as.data.frame(Data_TIC)),"Plot"=list( "norm_plots"=norm_plots, "RLA_AfterTICNorm"=RLA_data_norm,  "RLA_BeforeTICNorm" = RLA_data_raw ))
+    invisible(return(Output_list))
+  }else{
+    ## ------------------ Return ------------------ ##
+    Output_list <- list("Plot"=list("RLA_BeforeTICNorm" = RLA_data_raw ))
+    invisible(return(Output_list))
   }
-
-  # Create the ggplot boxplot
-  RLA_data_norm <- ggplot(RLA_data_long, aes(x = Samples, y = Intensity, color = Conditions)) +
-    geom_boxplot() +
-    geom_hline(yintercept = 0, color = "red", linetype = "solid") +
-    labs(title = "After TIC Normalization")+
-    theme_classic() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
-
-  #Combine Plots
-  dev.new()
-  norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                                        RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                                        ncol = 2))
-  dev.off()
-  norm_plots <- ggplot2::ggplot() +theme_minimal()+ annotation_custom(norm_plots)
-
-  ## ------------------ Return ------------------ ##
-  Output_list <- list("DF" = list("Data_TIC"=Data_TIC),"Plot"=list( "norm_plots"=norm_plots, "RLA_AfterTICNorm"=RLA_data_norm,  "RLA_BeforeTICNorm" = RLA_data_raw ))
-  invisible(return(Output_list))
 }
 
 
@@ -839,126 +856,118 @@ TICNorm <-function(InputData){
 CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
   ## ------------------ Prepare the data ------------------- ##
   Data_TIC <- InputData
-  Data_TIC[is.na(Data_TIC)] <- 0#replace NA with 0
+  Data_TIC[is.na(Data_TIC)] <- 0
 
   ## ------------------ Perform QC ------------------- ##
-  CoRe_medias <-  Data_TIC[grep("CoRe_media", Conditions),]
+  Conditions <- SettingsFile_Sample[["Conditions"]]
+  CoRe_medias <-  Data_TIC[grep(SettingsInfo[["CoRe_media"]], Conditions),]
+
   if(dim(CoRe_medias)[1]==1){
     warning("Only 1 CoRe_media sample was found. Thus, the consistency of the CoRe_media samples cannot be checked. It is assumed that the CoRe_media samples are already summed.")
     CoRe_media_df <- CoRe_medias %>% t() %>% as.data.frame()
     colnames(CoRe_medias) <- "CoRe_mediaMeans"
   }else{
+    ######################################################################################
     ## ------------------ QC Plots
-    qc_plot_list <- list()
-    ## Media_control PCA
-    media_pca_data <- merge(SettingsFile_Sample %>% select(SettingsInfo[["Conditions"]]), Data_TIC, by=0) %>%
+    PlotList <- list()
+    ##-- 1. PCA Media_control
+    media_pca_data <- merge(x= SettingsFile_Sample %>% select(SettingsInfo[["Conditions"]]), y= Data_TIC, by=0) %>%
       column_to_rownames("Row.names") %>%
-      mutate(Sample_type = case_when(Conditions == "CoRe_media" ~ "CoRe_media",
+      mutate(Sample_type = case_when(Conditions == SettingsInfo[["CoRe_media"]] ~ "CoRe_media",
                                      TRUE ~ "Sample"))
 
+    media_pca_data[is.na( media_pca_data)] <- 0
+
     dev.new()
-    pca_QC_media <-invisible(MetaProViz::VizPCA(Input_data=media_pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
+    pca_QC_media <-invisible(MetaProViz::VizPCA(Input_data=media_pca_data %>%select(-SettingsInfo[["Conditions"]], -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
                                                 Plot_SettingsFile= media_pca_data, OutputPlotName = "QC Media_samples",
                                                 Save_as_Plot =  NULL))
     dev.off()
 
-    qc_plot_list[["CoRe PCA MediaSamples"]] <- pca_QC_media
+    PlotList[["PCA_CoReMediaSamples"]] <- pca_QC_media[["Plot_Sized"]][["QC Media_samples"]]
 
-    if(is.null(Save_as_Plot) ==  FALSE){
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Media_samples_CoRe.",Save_as_Plot), plot = pca_QC_media, width = 10,  height = 8)
-    }
-
-
-    ## Check metabolite variance
-    # Thresholds
-    Threshold_cv = 100
-    data_cv <- CoRe_medias
-
-    ## Coefficient of Variation
-    result_df <- apply(data_cv, 2,   function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 } ) %>% t()%>% as.data.frame()
+    ##-- 2. Metabolite Variance Histogram
+    # Coefficient of Variation
+    result_df <- apply(CoRe_medias, 2,   function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 } ) %>% t()%>% as.data.frame()
     result_df[1, is.na(result_df[1,])]<- 0
     rownames(result_df)[1] <- "CV"
 
+    CutoffCV <- 100
     result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-      mutate(HighVar = CV > Threshold_cv) %>% as.data.frame()
-    rownames(result_df)<- colnames(data_cv)
+      mutate(HighVar = CV > CutoffCV) %>% as.data.frame()
+    rownames(result_df)<- colnames(CoRe_medias)
 
     # calculate the NAs
-    NAvector <- apply(data_cv, 2,  function(x) { (sum(is.na(x))/length(x))*100 }  )#%>% t()%>% as.data.frame()
+    NAvector <- apply(CoRe_medias, 2,  function(x) { (sum(is.na(x))/length(x))*100 })
     result_df$MissingValuePercentage <- NAvector
 
     cv_result_df <- result_df
 
     HighVar_metabs <- sum(result_df$HighVar == TRUE)
     if(HighVar_metabs>0){
-      message(paste0(HighVar_metabs, " of variables have high variability in the CoRe_media samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
+      message(paste0(HighVar_metabs, " of variables have high variability in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
     }
 
-    ###########################
     #Make histogram of CVs
     HistCV <- invisible(ggplot(cv_result_df, aes(CV)) +
                           geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
-                          geom_vline(aes(xintercept=Threshold_cv),
-                                     color="darkred", linetype="dashed", size=1)+
+                          geom_vline(aes(xintercept=CutoffCV),
+                                     color="darkred", linetype="dashed", linewidth=1)+
                           geom_density(alpha=.2, fill="#FF6666") +
-                          labs(title="Coefficient of Variation for metabolites of Media samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                          labs(title="Coefficient of Variation for metabolites of control media samples (no cells)",x="Coefficient of variation (CV)", y = "Frequency")+
                           theme_classic())
 
-    qc_plot_list[["CoRe_Media_CV_Hist"]] <- HistCV
+    PlotList[["Histogram_CoReMediaCV"]] <- HistCV
 
+    #Make Violin of CVs
     ViolinCV <- invisible(ggplot(cv_result_df, aes(y=CV, x=HighVar, label=row.names(cv_result_df)))+
                             geom_violin(alpha = 0.5 , fill="#FF6666")+
                             geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                             #geom_point(position = position_jitter(seed = 1, width = 0.2))+
-                            geom_text(aes(label=ifelse(CV>Threshold_cv,as.character(row.names(cv_result_df)),'')), hjust=0, vjust=0)+
-                            labs(title="Coefficient of Variation for metabolites of Media samples",x="Coefficient of variation (CV)", y = "Frequency")+
+                            geom_text(aes(label=ifelse(cv_result_df$CV>CutoffCV,as.character(row.names(cv_result_df)),'')), hjust=0, vjust=0)+
+                            labs(title="Coefficient of Variation for metabolites of control media samples (no cells)",x="Coefficient of variation (CV)", y = "Frequency")+
                             theme_classic())
 
-    qc_plot_list[["CoRe_Media_CV_Violin"]] <- ViolinCV
+    PlotList[["CoRe_Media_CV_Violin"]] <- ViolinCV
 
-    #######################################################
-
-    # Do sample outlier testing
-    if(dim(CoRe_medias)[1]>3){
-
+    ######################################################################################
+    ## ------------------ Outlier testing
+    if(dim(CoRe_medias)[1]>=3){
       Outlier_data <- CoRe_medias
       Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
 
       while(HighVar_metabs>0){
-
         #remove the furthest value from the mean
         if(HighVar_metabs>1){
-          max_var_pos <-  data_cv[,result_df$HighVar == TRUE]  %>%
+          max_var_pos <-  CoRe_medias[,result_df$HighVar == TRUE]  %>%
             as.data.frame() %>%
             mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
             summarise_all(.funs = ~ which.max(abs(.)))
         }else{
-          max_var_pos <-  data_cv[,result_df$HighVar == TRUE]  %>%
+          max_var_pos <-  CoRe_medias[,result_df$HighVar == TRUE]  %>%
             as.data.frame() %>%
             mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
             summarise_all(.funs = ~ which.max(abs(.)))
-          colnames(max_var_pos)<- colnames( data_cv)[result_df$HighVar == TRUE]
-
+          colnames(max_var_pos)<- colnames(CoRe_medias)[result_df$HighVar == TRUE]
         }
 
         # Remove rows based on positions
         for(i in 1:length(max_var_pos)){
-          data_cv[max_var_pos[[i]],names(max_var_pos)[i]] <- NA
+          CoRe_medias[max_var_pos[[i]],names(max_var_pos)[i]] <- NA
           Outlier_data[max_var_pos[[i]],names(max_var_pos)[i]] <- TRUE
         }
 
         # ReCalculate coefficient of variation for each column in the filtered data
-        result_df <- apply(data_cv, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+        result_df <- apply(CoRe_medias, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
         result_df[1, is.na(result_df[1,])]<- 0
         rownames(result_df)[1] <- "CV"
 
         result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
-          mutate(HighVar = CV > Threshold_cv) %>% as.data.frame()
-        rownames(result_df)<- colnames(data_cv)
+          mutate(HighVar = CV > CutoffCV) %>% as.data.frame()
+        rownames(result_df)<- colnames(CoRe_medias)
 
         HighVar_metabs <- sum(result_df$HighVar == TRUE)
       }
-
 
       data_cont <- Outlier_data %>% t() %>% as.data.frame()
 
@@ -983,7 +992,6 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
         # Calculate the sum of "TRUE" and "FALSE" for the current sample
         large_contingency_table[1, i] <- sum(current_sample)  # Sum of "TRUE"
         large_contingency_table[2, i] <- sum(!current_sample) # Sum of "FALSE"
-
       }
 
       # Convert the matrix into a data_contframe for better readability
@@ -993,7 +1001,6 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
 
       contingency_data_contframe <- contingency_data_contframe %>% mutate(Total = rowSums(contingency_data_contframe))
       contingency_data_contframe <- rbind(contingency_data_contframe, Total= colSums(contingency_data_contframe))
-
 
       different_samples <- c()
       for (sample in colnames(data_cont)) {
@@ -1009,27 +1016,44 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
       # Filter the CoRe_media samples
       CoRe_medias <- CoRe_medias %>% filter(!rownames(CoRe_medias) %in% different_samples)
     }
-    CoRe_media_df <- as.data.frame(data.frame("CoRe_mediaMeans"=  colMeans( CoRe_medias, na.rm = TRUE)))
-
+    CoRe_media_df <- as.data.frame(data.frame("CoRe_mediaMeans"=  colMeans(CoRe_medias, na.rm = TRUE)))
   }
 
   cv_result_df <- rownames_to_column(cv_result_df, "Metabolite")
-  write.table(cv_result_df,row.names =  FALSE, file = paste(Results_folder_Preprocessing_folder,"/CV_table_CoRe",".csv",sep =  ""))
-  write.table(contingency_data_contframe,row.names =  TRUE, file = paste(Results_folder_Preprocessing_folder,"/Contigency_table_CoRe",".csv",sep =  ""))
 
-  # Remove CoRe_media samples from the data
-  Data_TIC <- Data_TIC[-grep("CoRe_media", Conditions),]
-
-  Data_TIC_CoRe <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-CoRe_media_df$CoRe_mediaMeans)))  #Subtract from each sample the CoRe_media mean
-  message("CoRe data are normalised using CoRe_norm_factor")
-  Data_TIC <- apply(Data_TIC_CoRe, 2, function(i) i*CoRe_norm_factor)
-
-  if (var(CoRe_norm_factor) ==  0){
-    warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
+  ######################################################################################
+  ##------------------------ Substract mean (media control) from samples
+  message("CoRe data are normalised by substracting mean (blank) from each sample and multiplying with the CoRe_norm_factor")
+  ##-- Check CoRe_norm_factor
+  if(("CoRe_norm_factor" %in% names(SettingsInfo))){
+    CoRe_norm_factor <-   SettingsFile_Sample %>% filter(!!as.name(SettingsInfo[["Conditions"]])!=SettingsInfo[["CoRe_media"]]) %>% select(SettingsInfo[["CoRe_norm_factor"]]) %>%pull()
+    if(var(CoRe_norm_factor) ==  0){
+      warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
+    }
+  }else{
+    CoRe_norm_factor <- as.numeric(rep(1,dim(SettingsFile_Sample %>% filter(!!as.name(SettingsInfo[["Conditions"]])!=SettingsInfo[["CoRe_media"]]))[1]))
   }
+
   # Remove CoRe_media samples from the data
-  Input_SettingsFile <- Input_SettingsFile[Input_SettingsFile$Conditions!="CoRe_media",]
-  Conditions <- Conditions[!Conditions=="CoRe_media"]
+  Data_TIC <- merge(SettingsFile_Sample, Data_TIC, by="row.names")%>%
+    filter(!!as.name(SettingsInfo[["Conditions"]])!=SettingsInfo[["CoRe_media"]])%>%
+    column_to_rownames("Row.names")%>%
+    select(-1:-ncol(SettingsFile_Sample))
+
+  Data_TIC_CoReNorm_Media <- as.data.frame(t( apply(t(Data_TIC),2, function(i) i-CoRe_media_df$CoRe_mediaMeans)))  #Subtract from each sample the CoRe_media mean
+  Data_TIC_CoReNorm <- as.data.frame(apply(Data_TIC_CoReNorm_Media, 2, function(i) i*CoRe_norm_factor))
+
+  #Remove CoRe_media samples from the data
+  #Input_SettingsFile <- Input_SettingsFile[Input_SettingsFile$Conditions!="CoRe_media",]
+  #Conditions <- Conditions[!Conditions=="CoRe_media"]
+
+  ######################################################################################
+  ##------------------------ Return Plots and Data
+  DF_list <- list("CV_CoRe_blank" = cv_result_df, "Contigency_table_CoRe_blank" = contingency_data_contframe, "Core_Norm" = Data_TIC_CoReNorm)
+
+  #Return
+  Output_list <- list("DF"= DF_list,"Plot"=PlotList)
+  invisible(return(Output_list))
 }
 
 
@@ -1043,53 +1067,68 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
 #' @noRd
 #'
 
-OutlierDetection <-function(InputData){
+OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, HotellinsConfidence){
+  # Message:
   message("Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.")
   message(paste("HotellinsConfidence value selected:", HotellinsConfidence))
 
-  Outlier_filtering_loop = 10
+  # Load the data:
+  data_norm <- InputData%>%
+    mutate_all(~ replace(., is.nan(.), 0))
+  data_norm[is.na(data_norm)] <- 0 #replace NA with 0
+
+  if(CoRe==TRUE){
+    Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]][!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]]]
+  }else{
+    Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+  }
+
+
+  # Prepare the lists to store the results:
+  Outlier_filtering_loop = 10 #Here we do 10 rounds of hotelling filtering
   sample_outliers <- list()
   scree_plot_list <- list()
   outlier_plot_list <- list()
   metabolite_zero_var_total_list <- list()
   zero_var_metab_warning = FALSE
-  #a =  1
-  for (loop in 1:Outlier_filtering_loop){   # here we do 10 rounds of hotelling filtering
 
-    #################################################
-    ### ### ### Zero variance metabolites ### ### ###
-    metabolite_var <- as.data.frame( apply(data_norm, 2, var) %>% t()) # calculate each metabolites variance
-    metabolite_zero_var_list <- list( colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metabollites with zero variance and puts them in list
+
+  #################################################
+  ##--------- Perform Outlier testing:
+  for(loop in 1:Outlier_filtering_loop){
+    ##--- Zero variance metabolites
+    metabolite_var <- as.data.frame(apply(data_norm, 2, var) %>% t()) # calculate each metabolites variance
+    metabolite_zero_var_list <- list(colnames(metabolite_var)[which(metabolite_var[1,]==0)]) # takes the names of metabolites with zero variance and puts them in list
 
     if(sum(metabolite_var[1,]==0)==0){
       metabolite_zero_var_total_list[loop] <- 0
-    } else if(sum(metabolite_var[1,]==0)>0){
+    }else if(sum(metabolite_var[1,]==0)>0){
       metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
       zero_var_metab_warning = TRUE # This is used later to print and save the zero variance metabolites if any are found.
     }
 
-    for (metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
+    for(metab in metabolite_zero_var_list){  # Remove the metabolites with zero variance from the data to do PCA
       data_norm <- data_norm %>% select(-all_of(metab))
     }
 
-    ### ### PCA  ### ###
+    ##---  PCA
     PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
     outlier_PCA_data <- data_norm
     outlier_PCA_data$Conditions <- Conditions
 
     dev.new()
-    pca_outlier <-invisible(MetaProViz::VizPCA(Input_data=data_norm, Plot_SettingsInfo= c(color="Conditions"),
+    pca_outlier <-invisible(MetaProViz::VizPCA(Input_data=data_norm, Plot_SettingsInfo= c(color=SettingsInfo[["Conditions"]]),
                                                Plot_SettingsFile= outlier_PCA_data, OutputPlotName = paste("PCA outlier test filtering round ",loop),
                                                Save_as_Plot =  NULL))
 
     if(loop==1){
       pca_outlierloop1 <- pca_outlier[["Plot_Sized"]][[1]]
     }
-    suppressMessages(plot(pca_outlier[["Plot_Sized"]][[1]]))
-    outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- recordPlot()
+    #suppressMessages(plot(pca_outlier[["Plot_Sized"]][[1]]))
+    outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- pca_outlier[["Plot_Sized"]][[1]]
     dev.off()
 
-    ### ### Scree plot ### ###
+    ##--- Scree plot
     inflect_df <- as.data.frame(c(1:length(PCA.res$sdev))) # get Scree plot values for inflection point calculation
     colnames(inflect_df) <- "x"
     inflect_df$y <- summary(PCA.res)$importance[2,]
@@ -1112,13 +1151,12 @@ OutlierDetection <-function(InputData){
       scree_outlierloop1 <-screeplot
     }
     dev.new()
-    plot(screeplot)
-    outlier_plot_list[[paste("ScreePlot_round",loop,sep="")]] <- recordPlot() # save plot
+    #plot(screeplot)
+    outlier_plot_list[[paste("ScreePlot_round",loop,sep="")]] <- screeplot # save plot
     dev.off()
 
-    ### ### HotellingT2 test for outliers ### ###
+    ##--- HotellingT2 test for outliers
     data_hot <- as.matrix(PCA.res$x[,1:npcs])
-    message("***Checking for outliers***")
     hotelling_qcc <- qcc::mqcc(data_hot, type = "T2.single",labels = rownames(data_hot),confidence.level = HotellinsConfidence, title = paste("Outlier filtering via HotellingT2 test filtering round ",loop,", with ",HotellinsConfidence, "% Confidence",  sep = ""), plot = FALSE)
     HotellingT2plot_data <- as.data.frame(hotelling_qcc$statistics)
     HotellingT2plot_data <- rownames_to_column(HotellingT2plot_data, "Samples")
@@ -1137,7 +1175,6 @@ OutlierDetection <-function(InputData){
     #draw the horizontal lines corresponding to the LCL,UCL
     HotellingT2plot <- HotellingT2plot + geom_hline(aes(yintercept = limits[,1]), color = "black", data = limits,  show.legend = F) +
       geom_hline(aes(yintercept = limits[,2], linetype = "UCL"), color = "red", data = limits, show.legend = T) +
-      #only the LCl and UCL to be shown in y axis
       scale_y_continuous(breaks = sort(c(ggplot_build(HotellingT2plot)$layout$panel_ranges[[1]]$y.major_source, c(limits[,1],limits[,2]))))
 
     HotellingT2plot <- HotellingT2plot + theme_classic()
@@ -1151,61 +1188,40 @@ OutlierDetection <-function(InputData){
       hotel_outlierloop1 <- HotellingT2plot
     }
     dev.new()
-    plot(HotellingT2plot)
-    outlier_plot_list[[paste("HotellingsPlot_round",loop,sep="")]] <- recordPlot()
+    #plot(HotellingT2plot)
+    outlier_plot_list[[paste("HotellingsPlot_round",loop,sep="")]] <- HotellingT2plot
     dev.off()
 
     a<- loop
     if(CoRe==TRUE){
       a<- paste0(a,"_CoRe")
     }
-    ### Save the outlier detection plots in the outlier detection folder
-    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/PCA_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
-           plot = pca_outlier[["Plot_Sized"]][[1]], width = 10,height = 8)
-    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "//Scree_plot_OD_round_" ,a ,".",Save_as_Plot, sep = ""),
-           plot = screeplot, width = 10,height = 8)
-    ggsave(filename = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Hotelling_OD_round_" ,a ,".", Save_as_Plot, sep = ""),
-           plot = HotellingT2plot, width = 10,height = 8)
 
-
-    # Here for the outliers we use confidence of 0.999 and p.val < 0.01.
-    if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0){ # loop for outliers until no outlier is detected
-      data_norm <- data_norm  # filter the selected outliers from the data
+    if(length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0){ # loop for outliers until no outlier is detected
+      data_norm <- data_norm
       break
-    } else if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 1){
-      data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]],]
+    }else if(length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 1){
+      data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]],]# filter the selected outliers from the data
       Conditions <- Conditions[-hotelling_qcc[["violations"]][["beyond.limits"]]]
 
       # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
       hotelling_qcc[["violations"]][["beyond.limits"]][1] <-   rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][1]]
       sample_outliers[loop] <- list(hotelling_qcc[["violations"]][["beyond.limits"]])
-
-    } else {
+    }else{
       data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]],]
       Conditions <- Conditions[-hotelling_qcc[["violations"]][["beyond.limits"]]]
 
       # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
       sm_out <- c() # list of outliers samples
       for (i in 1:length(hotelling_qcc[["violations"]][["beyond.limits"]])){
-        sm_out <-  append(sm_out, rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][i]]  )
+        sm_out <-  append(sm_out, rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][i]])
       }
       sample_outliers[loop] <- list(sm_out )
     }
   }
 
-  if(CoRe==TRUE){
-    pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing_CoRe.pdf", sep = ""), onefile = TRUE ) # or Outlier detection related plots
-  }else{
-    pdf(file = paste(Results_folder_Preprocessing_Outlier_detection_folder, "/Outlier_testing.pdf", sep = ""), onefile = TRUE ) # or Outlier detection related plots
-  }
-
-  for (plot in outlier_plot_list) {
-    replayPlot(plot)
-  }
-  dev.off()
-
-
-  # Print Outlier detection results about samples and metabolites
+  #################################################
+  ##-- Print Outlier detection results about samples and metabolites
   if(length(sample_outliers) > 0){   # Print outlier samples
     message("There are possible outlier samples in the data") #This was a warning
     for (i in 1:length(sample_outliers)  ){
@@ -1214,15 +1230,14 @@ OutlierDetection <-function(InputData){
   }else{message("No sample outliers were found")}
 
 
-  #######################################################
-  ### ### ### Zero variance metabolites part2.### ### ###
+  ##--  Print Zero variance metabolites
   zero_var_metab_export_df <- data.frame(1,2)
   names(zero_var_metab_export_df) <- c("Filtering round","Metabolite")
 
-  # Print zero variance metabolites
-  if (zero_var_metab_warning==TRUE){
+  if(zero_var_metab_warning==TRUE){
     warning("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
   }
+
   count = 1
   for (i in 1:length(metabolite_zero_var_total_list)){
     if (metabolite_zero_var_total_list[[i]] != 0){
@@ -1232,17 +1247,9 @@ OutlierDetection <-function(InputData){
       count = count +1
     }
   }
-  if (zero_var_metab_warning==TRUE){
-    if(CoRe==TRUE){
-      write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites_CoRe",".csv",sep =  "")) # save zero var metabolite list
-    }else{
-      write.table(zero_var_metab_export_df, row.names = FALSE, file =  paste(Results_folder_Preprocessing_folder,"/Zero_variance_metabolites",".csv",sep =  "")) # save zero var metabolite list
-    }
-  }
 
   #############################################
-  ### ### ### Make Output Dataframe ### ### ###
-
+  ##---- 1. Make Output DF
   total_outliers <- hash::hash() # make a dictionary
   if(length(sample_outliers) > 0){ # Create columns with outliers to merge to output dataframe
     for (i in 1:length(sample_outliers)  ){
@@ -1250,11 +1257,7 @@ OutlierDetection <-function(InputData){
     }
   }
 
-  data_norm_filtered_full <- as.data.frame(Data_TIC)
-
-  if(MVI == FALSE){ # if no MVI is selected put back the NAs in the dataframe
-    data_norm_filtered_full[stored_NA_positions] <- NA
-  }
+  data_norm_filtered_full <- as.data.frame(replace(InputData, InputData==0, NA))
 
   if(length(total_outliers) > 0){  # add outlier information to the full output dataframe
     data_norm_filtered_full$Outliers <- "no"
@@ -1268,59 +1271,50 @@ OutlierDetection <-function(InputData){
   }
 
   data_norm_filtered_full <- data_norm_filtered_full %>% relocate(Outliers) #Put Outlier columns in the front
-  data_norm_filtered_full <- merge(Input_SettingsFile, data_norm_filtered_full,  by = 0) # add the design in the output df (merge by rownames/sample names)
+  data_norm_filtered_full <- merge(SettingsFile_Sample, data_norm_filtered_full,  by = 0) # add the design in the output df (merge by rownames/sample names)
   rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
   data_norm_filtered_full$Row.names <- c()
 
-  ################################################
-  ### ### ### Quality Control (QC) PCA ### ### ###
-
-
-  dtp <- data_norm_filtered_full %>%
-    select(Conditions,Biological_Replicates, Outliers) %>%
+  ##-- 2.  Quality Control (QC) PCA
+  MetaData_Sample <- data_norm_filtered_full %>%
     mutate(Outliers = case_when(Outliers == "no" ~ 'no',
                                 Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
                                 Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
                                 Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
                                 Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
                                 TRUE ~ 'Outlier_filtering_round = or > 5'))
-  dtp$Outliers <- relevel( as.factor(dtp$Outliers), ref="no")
+  MetaData_Sample$Outliers <- relevel(as.factor(MetaData_Sample$Outliers), ref="no")
 
-  dev.new()
-  pca_QC <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(Data_TIC), Plot_SettingsInfo= c(color="Conditions", shape = "Outliers"),
-                                        Plot_SettingsFile= dtp,OutputPlotName = "Quality Control PCA Condition clustering and outlier check",
+  # 1. Shape Outliers
+  if(length(sample_outliers)>0){
+    dev.new()
+    pca_QC <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite), Plot_SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = "Outliers"),
+                                        Plot_SettingsFile= MetaData_Sample ,OutputPlotName = "Quality Control PCA Condition clustering and outlier check",
                                         Save_as_Plot =  NULL))
-  dev.off()
-  qc_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC[["Plot_Sized"]][[1]]
-
-
-  if(is.null(Save_as_Plot) ==  FALSE){
-    if(CoRe==TRUE){
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering_CoRe.",Save_as_Plot), plot = pca_QC[["Plot_Sized"]][[1]], width = 10,  height = 8)
-    }else{
-      ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_Condition_Clustering.",Save_as_Plot), plot = pca_QC[["Plot_Sized"]][[1]], width = 10,  height = 8)
-    }
+    dev.off()
+    outlier_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC[["Plot_Sized"]][[1]]
   }
 
-
-  if(is.null(Input_SettingsFile$Biological_Replicates)!= TRUE){
+  # 2. Shape Biological replicates
+  if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)){
     dev.new()
-    pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(Data_TIC), Plot_SettingsInfo= c(color="Conditions", shape = "Biological_Replicates"),
-                                               Plot_SettingsFile= dtp,OutputPlotName =  "Quality Control PCA replicate spread check",
+    pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite), Plot_SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = SettingsInfo[["Biological_Replicates"]]),
+                                               Plot_SettingsFile= MetaData_Sample,OutputPlotName =  "Quality Control PCA replicate spread check",
                                                Save_as_Plot =  NULL))
     dev.off()
 
-    qc_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
-
-    if(is.null(Save_as_Plot) ==  FALSE){
-      if(CoRe==TRUE){
-        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution_CoRe.",Save_as_Plot), plot = pca_QC_repl[["Plot_Sized"]][[1]], width = 10,  height = 8)
-      }else{
-        ggsave(filename = paste0(Results_folder_Preprocessing_folder_Quality_Control_PCA_folder, "/PCA_replicate_distribution.",Save_as_Plot), plot = pca_QC_repl[["Plot_Sized"]][[1]], width = 10,  height = 8)
-      }
-    }
+    outlier_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
   }
 
 
+
+  #############################################
+  ##--- Save and Return plots and DFs
+  DF_list <- list("Zero_variance_metabolites_CoRe" = zero_var_metab_export_df, "data_outliers" = data_norm_filtered_full)
+
+  #Return
+  Output_list <- list("DF"= DF_list,"Plot"=outlier_plot_list)
+  invisible(return(Output_list))
 }
+
 
