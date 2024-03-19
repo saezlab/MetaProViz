@@ -229,7 +229,7 @@ SavePath<- function(FolderName, FolderPath){
 #' @noRd
 #'
 
-SaveRes<- function(InputList, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileName, CoRe, PrintPlot){
+SaveRes<- function(InputList_DF, InputList_Plot, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileName, CoRe, PrintPlot){
 
   if(is.null(SaveAs_Table)==FALSE){
     # Excel File: One file with multiple sheets:
@@ -241,9 +241,9 @@ SaveRes<- function(InputList, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileNa
         FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName,"_",Sys.Date(), sep = "")
       }
       #Save Excel
-      writexl::write_xlsx(InputList, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
+      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
     }else{
-      for(DF in names(InputList)){
+      for(DF in names(InputList_DF)){
         #Make FileName
         if(CoRe==FALSE){
           FileName <- paste0(FolderPath,"/" , OutputFileName, "_", DF ,"_",Sys.Date(), sep = "")
@@ -253,16 +253,16 @@ SaveRes<- function(InputList, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileNa
 
         #Save table
         if (SaveAs_Table == "csv"){
-          write.csv(InputList[[DF]], paste0(FileName,".csv", sep = ""))
+          write.csv(InputList_DF[[DF]], paste0(FileName,".csv", sep = ""))
           }else if (SaveAs_Table == "txt"){
-            write.table(InputList[[DF]], paste0(FileName,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+            write.table(InputList_DF[[DF]], paste0(FileName,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
           }
         }
     }
   }
 
   if(is.null(SaveAs_Plot)==FALSE){
-    for(Plot in names(InputList)){
+    for(Plot in names(InputList_Plot)){
       #Make FileName
       if(CoRe==FALSE){
         FileName <- paste0(FolderPath,"/" , OutputFileName,"_", Plot , "_",Sys.Date(), sep = "")
@@ -271,10 +271,10 @@ SaveRes<- function(InputList, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileNa
       }
 
       #Save
-      ggsave(filename = paste0(FileName, ".",SaveAs_Plot, sep=""), plot = InputList[[Plot]], width = 10,  height = 8)
+      ggsave(filename = paste0(FileName, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = 10,  height = 8)
 
       if(PrintPlot==TRUE){
-        suppressMessages(suppressWarnings(plot(InputList[[Plot]])))
+        suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
       }
     }
   }
@@ -293,7 +293,14 @@ SaveRes<- function(InputList, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileNa
 #'
 #'
 
-CheckInput <- function(InputData, SettingsFile_Sample=SettingsFile_Sample, SettingsFile_Metab=SettingsFile_Metab, SaveAs_Plot=SaveAs_Plot, SaveAs_Table=SaveAs_Table, CoRe=CoRe, PrintPlot=PrintPlot){
+CheckInput <- function(InputData,
+                       SettingsFile_Sample,
+                       SettingsFile_Metab,
+                       SettingsInfo,
+                       SaveAs_Plot,
+                       SaveAs_Table,
+                       CoRe,
+                       PrintPlot){
   ############## Parameters valid for multiple MetaProViz functions
   #-------------InputData
   if(class(InputData) != "data.frame"){
