@@ -44,10 +44,6 @@
 ### ### ### Metabolomics pre-processing ### ### ###
 ###################################################
 
-#x <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
-#test <- InputData %>%
-#  filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]=="HK2")
-
 PreProcessing <- function(InputData,
                           SettingsFile_Sample,
                           SettingsInfo,
@@ -256,77 +252,95 @@ PreProcessing <- function(InputData,
 
 #' Merges the analytical replicates of an experiment
 #'
-#' @param Input Dataframe which contains unique sample identifiers as row names the Experimental design and the metabolite numerical values in columns with metabolite identifiers as column names. Needs to have Conditions, Biological_Replicates and Analytical_Replicate columns
+#' @param InputData DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#'#@param SettingsFile_Sample DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.
+#' @param SettingsInfo  \emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_SettingsFile_Sample", Analytical_Replicates="ColumnName_SettingsFile_Sample").\strong{Default = NULL}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #'
 #' @keywords Analytical Replicate Merge
 #' @export
 
 
-ReplicateSum <- function(Input_data, FolderPath = NULL){
-
+ReplicateSum <- function(InputData,
+                         SettingsFile_Sample,
+                         SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
+                         SaveAs_Table = "csv",
+                         FolderPath = NULL){
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
-  ###############################################
-  ### ### ### Check Input Information ### ### ###
+  ## ------------------ Check Input ------------------- ##
+  # HelperFunction `CheckInput`
+  MetaProViz:::CheckInput(InputData=InputData,
+                          SettingsFile_Sample=SettingsFile_Sample,
+                          SettingsFile_Metab=NULL,
+                          SettingsInfo = SettingsInfo,
+                          SaveAs_Plot=NULL,
+                          SaveAs_Table=SaveAs_Table,
+                          CoRe=FALSE,
+                          PrintPlot=PrintPlot)
 
-  if(any(duplicated(row.names(Input_data))) ==  TRUE){# Is the "Input_data" has unique IDs as row names and numeric values in columns?
-    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  }
-
-  # Parse Condition and Replicate information
-  if ( "Conditions" %in% colnames(Input_data)){
-    Conditions <- Input_data$Conditions
+  # `CheckInput` Specific
+  if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)){
+   # Conditions <- InputData[[SettingsInfo[["Conditions"]] ]]
   }else{
-    stop("Column `Condition` is required.")
+    stop("Column `Conditions` is required.")
   }
-  if ( "Biological_Replicates" %in% colnames(Input_data)){
-    Biological_Replicates <- Input_data$Biological_Replicates
+  if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)){
+    #Biological_Replicates <- InputData[[SettingsInfo[["Biological_Replicates"]]]]
   }else{
     stop("Column `Biological_Replicates` is required.")
   }
-  if ( "Analytical_Replicates" %in% colnames(Input_data)){
-    Analytical_Replicates <- Input_data$Analytical_Replicates
+  if(SettingsInfo[["Analytical_Replicates"]] %in% colnames(SettingsFile_Sample)){
+    #Analytical_Replicates <- InputData[[SettingsInfo[["Analytical_Replicates"]]]]
   }else{
     stop("Column `Analytical_Replicates` is required.")
   }
 
   ## ------------ Create Results output folder ----------- ##
-  Folder <- MetaProViz:::SavePath(Save_as_Plot=Save_as_Plot,
-                                 Save_as_Results=Save_as_Results,
-                                 FolderName= "Preprocessing",
-                                 FolderPath=FolderPath)
+  Folder <- MetaProViz:::SavePath(FolderName= "PreProcessing",
+                                  FolderPath=FolderPath)
 
   ## ------------  Load data and process  ----------- ##
-
-  #Load the data
-  Input_data_numeric <-  select_if(Input_data, is.numeric) # take only the numeric values. This includes the replicate information
-  Input_data_numeric <- merge(Input_data %>% select(Conditions), Input_data_numeric, by = 0)
-  Input_data_numeric <- column_to_rownames(Input_data_numeric, "Row.names")
+  Input <- merge(x= SettingsFile_Sample%>% select(!!SettingsInfo[["Conditions"]], !!SettingsInfo[["Biological_Replicates"]], !!SettingsInfo[["Analytical_Replicates"]]),
+                 y= InputData,
+                 by="row.names")%>%
+    column_to_rownames("Row.names")%>%
+    dplyr::rename("Conditions"=SettingsInfo[["Conditions"]],
+                  "Biological_Replicates"=SettingsInfo[["Biological_Replicates"]],
+                  "Analytical_Replicates"=SettingsInfo[["Analytical_Replicates"]])
 
   # Make the replicate Sums
-  Input_data_numeric_summed <- as.data.frame( Input_data_numeric %>%
-                                                group_by(Biological_Replicates, Conditions) %>%
-                                                summarise_all("mean") %>% select(-Analytical_Replicates))
+  Input_data_numeric_summed <- as.data.frame(Input %>%
+                                               group_by(Biological_Replicates, Conditions) %>%
+                                               summarise_all("mean") %>% select(-Analytical_Replicates))
 
   # Make a number of merged replicates column
-  nReplicates <-  Input_data_numeric %>%
+  nReplicates <-  Input %>%
     group_by(Biological_Replicates, Conditions) %>%
-    summarise_all("max") %>% ungroup() %>% select(Analytical_Replicates, Biological_Replicates, Conditions) %>% rename(n_Replicates_Summed = Analytical_Replicates)
+    summarise_all("max") %>% ungroup() %>% select(Analytical_Replicates, Biological_Replicates, Conditions) %>%
+    dplyr::rename("n_AnalyticalReplicates_Summed "= "Analytical_Replicates")
 
   Input_data_numeric_summed <- merge(nReplicates,Input_data_numeric_summed, by = c("Conditions","Biological_Replicates"))%>%
     unite(UniqueID, c("Conditions","Biological_Replicates"), sep="_", remove=FALSE)%>% # Create a uniqueID
     column_to_rownames("UniqueID")# set UniqueID to rownames
 
-  # Export result
-  writexl::write_xlsx(Input_data_numeric_summed, paste(Folder, "/ReplicateSum_output.xlsx", sep = ""))#,showNA = TRUE)
+  #--------------- return ------------------##
+  MetaProViz:::SaveRes(InputList_DF=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed),
+                       InputList_Plot = NULL,
+                       SaveAs_Table=SaveAs_Table,
+                       SaveAs_Plot=NULL,
+                       FolderPath= Folder,
+                       OutputFileName= "Sum_AnalyticalReplicates",
+                       CoRe=FALSE,
+                       PrintPlot=FALSE)
 
-  # Return the result
-  return(Input_data_numeric_summed)
+  #Return
+  invisible(return(Input_data_numeric_summed))
 }
 
 
@@ -343,7 +357,7 @@ ReplicateSum <- function(Input_data, FolderPath = NULL){
 #' @param SettingsInfo  \emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}
 #' @param CutoffCV \emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
-#' @param SaveAs_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #' @param PrintPlot \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #'
@@ -372,38 +386,19 @@ PoolEstimation <- function(InputData,
   MetaProViz:::CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
+                          SettingsInfo=SettingsInfo,
                           SaveAs_Plot=SaveAs_Plot,
                           SaveAs_Table=SaveAs_Table,
-                          CoRe=FALSE)
+                          CoRe=FALSE,
+                          PrintPlot = PrintPlot)
 
-  # HelperFunction `CheckInput` Specific
-  MetaProViz:::CheckInput_PoolEstimation()
-
-
-
-
-  # Check if the next lines work correctly in case of duplicated metabolites (colnames)
-  if(sum(duplicated(colnames(InputData))) > 0){
-    doublons <- as.character(colnames(InputData)[duplicated(colnames(InputData))])#number of duplications
-    data <-data[!duplicated(colnames(InputData)),]#remove duplications
-    warning("Input_data contained duplicates based on Metabolite! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
-  }
-
+  # `CheckInput` Specific
   if(is.null(SettingsFile_Sample)==FALSE){
-    # 2. Input_Settings
     if("Conditions" %in% names(SettingsInfo)==TRUE){
       if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)== FALSE ){
         stop("You have chosen Conditions = ",paste(SettingsInfo[["Conditions"]]), ", ", paste(SettingsInfo[["Conditions"]])," was not found in SettingsFile_Sample as column. Please insert the name of the experimental conditions as stated in the SettingsFile_Sample."   )
-      }else{
-        SettingsFile_Sample<- SettingsFile_Sample%>%
-          dplyr::rename("Conditions"= paste(SettingsInfo[["Conditions"]]))
-      }
-    }else{
-      if("Conditions" %in% colnames(SettingsFile_Sample)== FALSE ){
-        warning("Input_SettingsFile has been added while no Conditions are specified in the Input_SettingsInfo. We assume that the Conditions column exists in the Input_SettingsFile. However, no 'Conditions' column was identified in the Input_SettingsFile ")
       }
     }
-
     if("PoolSamples" %in% names(SettingsInfo)==TRUE){
       if(SettingsInfo[["PoolSamples"]] %in% SettingsFile_Sample[["Conditions"]] == FALSE ){
         stop("You have chosen PoolSamples = ",paste(SettingsInfo[["PoolSamples"]] ), ", ", paste(SettingsInfo[["PoolSamples"]] )," was not found in SettingsFile_Sample as sample condition. Please insert the name of the pool samples as stated in the Conditions column of the SettingsFile_Sample."   )
@@ -411,18 +406,13 @@ PoolEstimation <- function(InputData,
     }
   }
 
-  # 3. General parameters
-  if( is.numeric(CutoffCV)== FALSE | CutoffCV < 0){
+  if(is.numeric(CutoffCV)== FALSE | CutoffCV < 0){
     stop("Check input. The selected CutoffCV value should be a positive numeric value.")
   }
 
-
-
-
-
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "Preprocessing",
+    Folder <- MetaProViz:::SavePath(FolderName= "PreProcessing",
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "PoolEstimation")
@@ -456,7 +446,7 @@ PoolEstimation <- function(InputData,
 
   result_df_final$MissingValuePercentage <- NAvector
 
-  rownames(result_df_final)<- colnames(Input_numeric)
+  rownames(result_df_final)<- colnames(InputData)
   result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
 
   # Remove Metabolites from InputData based on CutoffCV
@@ -539,27 +529,38 @@ PoolEstimation <- function(InputData,
  invisible(return(ResList))
 }
 
+################################################################################################
+### ### ### PreProcessing helper function: Internal Function to check function input ### ### ###
+################################################################################################
 
 #' Check input parameters
 #'
-#' @param Function Name of the MetaProViz Function that is checked.
-#' @param InputList
-#'
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param CoRe Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
+#' @param TIC Passed to main function MetaProViz::PreProcessing()
+#' @param MVI Passed to main function MetaProViz::PreProcessing()
+#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
+#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
 #'
 #' @keywords
 #' @noRd
 #'
 #'
 
-CheckInput_PreProcessing <- function(InputData=InputData,
-                                     SettingsFile_Sample=SettingsFile_Sample,
-                                     SettingsInfo=SettingsInfo,
-                                     CoRe=CoRe,
-                                     FeatureFilt=FeatureFilt,
-                                     FeatureFilt_Value=FeatureFilt_Value,
-                                     TIC=TIC, MVI=MVI,
-                                     MVI_Percentage=MVI_Percentage,
-                                     HotellinsConfidence=HotellinsConfidence){
+CheckInput_PreProcessing <- function(InputData,
+                                     SettingsFile_Sample,
+                                     SettingsInfo,
+                                     CoRe,
+                                     FeatureFilt,
+                                     FeatureFilt_Value,
+                                     TIC,
+                                     MVI,
+                                     MVI_Percentage,
+                                     HotellinsConfidence){
   if(is.vector(SettingsInfo)==TRUE){
     #-------------SettingsInfo
     #Conditions
@@ -614,11 +615,18 @@ CheckInput_PreProcessing <- function(InputData=InputData,
 }
 
 
+################################################################################################
+### ### ### PreProcessing helper function: FeatureFiltering ### ### ###
+################################################################################################
 
 #' FeatureFiltering
 #'
-#' @param
-#' @param
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param CoRe Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
 #'
 #' @keywords
 #' @noRd
@@ -638,7 +646,11 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
     message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
     message(paste("filtering value selected:", FeatureFilt_Value))
 
-    feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]][!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]]]
+    if(CoRe== TRUE){
+      feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]][!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]]]
+    }else{
+      feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+    }
 
     if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
       stop("Conditions information is missing.")
@@ -699,10 +711,22 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
 
 
 
-#' FeatureFiltering
+################################################################################################
+### ### ### PreProcessing helper function: Missing Value imputation ### ### ###
+################################################################################################
+
+#' MVI
 #'
-#' @param
-#' @param
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param CoRe Passed to main function MetaProViz::PreProcessing()
+#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
+#'
+#' @keywords
+#' @noRd
+#'
+
 #'
 #' @keywords
 #' @noRd
@@ -761,10 +785,15 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
 }
 
 
+################################################################################################
+### ### ### PreProcessing helper function: Total ion Count Normalization ### ### ###
+################################################################################################
+
+#' TIC
 #'
-#'
-#' @param InputData Original InputData that has been Feature filtered (if FeatureFilt=TRUE) and/or MVI (if MVI=TRUE).
-#' @param TIC Logical, TRUE or FALSE. Passed to main function by user
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param TIC Passed to main function MetaProViz::PreProcessing()
 #'
 #' @keywords
 #' @noRd
@@ -844,10 +873,15 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
 
 
 
+################################################################################################
+### ### ### PreProcessing helper function: CoRe nomalisation ### ### ###
+################################################################################################
+
+#' CoReNorm
 #'
-#'
-#' @param
-#' @param
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
 #'
 #' @keywords
 #' @noRd
@@ -1058,10 +1092,17 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
 
 
 
+################################################################################################
+### ### ### PreProcessing helper function: Outlier detection ### ### ###
+################################################################################################
+
+#' OutlierDetection
 #'
-#'
-#' @param
-#' @param
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param CoRe Passed to main function MetaProViz::PreProcessing()
+#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
 #'
 #' @keywords
 #' @noRd
@@ -1316,5 +1357,3 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
   Output_list <- list("DF"= DF_list,"Plot"=outlier_plot_list)
   invisible(return(Output_list))
 }
-
-
