@@ -2,13 +2,13 @@
 ##
 ## Script name: HelperFunctions
 ##
-## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalisation and outlier detection
+## Purpose of script: General helper functions to check function input and save results
 ##
-## Author: Dimitrios Prymidis and Christina Schmidt
+## Author: Christina Schmidt
 ##
 ## Date Created: 2023-06-14
 ##
-## Copyright (c) Dimitrios Prymidis and Christina Schmidt
+## Copyright (c) Christina Schmidt
 ## Email:
 ##
 ## ---------------------------
@@ -57,133 +57,14 @@ toy_data <- function(data) {
 }
 
 
-#' Imports MCA regulatory rules into environment
-#'
-#' @param data Either "2Cond" or "CoRe" depending which regulatory rules you would like to load
-#' @title MCA regulatory rules Import
-#' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
-#' @return A data frame containing the toy data.
-#' @export
-#'
-MCA_rules<- function(data){
-  # Read the .csv files
-  Cond <- system.file("data", "MCA_2Cond.csv", package = "MetaProViz")
-  Cond<- read.csv( Cond, check.names=FALSE)
-
-  CoRe <- system.file("data", "MCA_CoRe.csv", package = "MetaProViz")
-  CoRe<- read.csv(CoRe, check.names=FALSE)
-
-  # Return the toy data into environment
-  if(data=="2Cond"){
-    assign("MCA_2Cond", Cond, envir=.GlobalEnv)
-  } else if(data=="CoRe"){
-    assign("MCA_CoRe", CoRe, envir=.GlobalEnv)
-  } else{
-    warning("Please choose the MCA regulatory rules you would like to load: 2Cond, CoRe")
-  }
-}
-
-
-#' Imports KEGG pathways into the environment
-#'
-#' @title KEGG
-#' @description Import and process KEGG.
-#' @importFrom utils read.csv
-#' @return A data frame containing the KEGG pathways for ORA.
-#' @export
-#'
-#'
-Load_KEGG<- function(){
-  #Get the package:
-  RequiredPackages <- c("rappdirs")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-
-  #------------------------------------------------------------------
-  #Get the directory and filepath of cache results of R
-  directory <- rappdirs::user_cache_dir()#get chache directory
-  File_path <-paste(directory, "/KEGG_Metabolite.rds", sep="")
-
-  if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
-    KEGG_Metabolite <- readRDS(File_path)
-    message("Cached file loaded from: ", File_path)
-  }else{# load from KEGG
-    RequiredPackages <- c("KEGGREST", "tidyverse")
-    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-    if(length(new.packages)) install.packages(new.packages)
-
-    suppressMessages(library(KEGGREST))
-    suppressMessages(library(tidyverse))
-
-    #--------------------------------------------------------------------------------------------
-    # 1. Make a list of all available human pathways in KEGG
-    Pathways_H <- as.data.frame(keggList("pathway", "hsa"))  # hsa = human
-
-    # 2. Initialize the result data frame
-    KEGG_H <- data.frame(KEGGPathway = character(nrow(Pathways_H)),
-                         #PathID = 1:nrow(Pathways_H),
-                         Compound = 1:nrow(Pathways_H),
-                         KEGG_CompoundID = 1:nrow(Pathways_H),
-                         stringsAsFactors = FALSE)
-
-    # 3. Iterate over each pathway and extract the needed information
-    for (k in 1:nrow(Pathways_H)) {
-      path <- rownames(Pathways_H)[k]
-
-      tryCatch({#try-catch block is used to catch any errors that occur during the query process
-        # Query the pathway information
-        query <- keggGet(path)
-
-        # Extract the necessary information and store it in the result data frame
-        KEGG_H[k, "KEGGPathway"] <- Pathways_H[k,]
-        #KEGG_H[k, "PathID"] <- path
-        KEGG_H[k, "Compound"] <- paste(query[[1]]$COMPOUND, collapse = ";")
-        KEGG_H[k, "KEGG_CompoundID"] <- paste(names(query[[1]]$COMPOUND), collapse = ";")
-      }, error = function(e) {
-        # If an error occurs, store "error" in the corresponding row and continue to the next query
-        KEGG_H[k, "KEGGPathway"] <- "error"
-        message(paste("`Error in .getUrl(url, .flatFileParser) : Not Found (HTTP 404).` for pathway", path, "- Skipping and continuing to the next query."))
-      })
-    }
-
-    # 3. Remove the pathways that do not have any metabolic compounds associated to them
-    KEGG_H_Select <-KEGG_H%>%
-      subset(!KEGG_CompoundID=="")%>%
-      subset(!KEGGPathway=="")
-
-    # 4. Make the Metabolite DF
-    KEGG_Metabolite <- separate_longer_delim(KEGG_H_Select[,-5], c(Compound, KEGG_CompoundID), delim = ";")
-
-    # 5. Remove Metabolites
-    ### 5.1. Ions should be removed
-    Remove_Ions <- c("Calcium cation","Potassium cation","Sodium cation","H+","Cl-", "Fatty acid", "Superoxide","H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+",  "Zinc cation", "Nickel", "NH4+")
-    ### 5.2. Unspecific small molecules
-    Remove_Small <- c("Nitric oxide","Hydrogen peroxide", "Superoxide","H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-",  "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
-
-    KEGG_Metabolite <- KEGG_Metabolite[!(KEGG_Metabolite$Compound %in% c(Remove_Ions, Remove_Small)), ]
-
-    #Change syntax as required for ORA
-    KEGG_Metabolite <- KEGG_Metabolite%>%
-      dplyr::rename("term"=1,
-                    "Metabolite"=2,
-                    "MetaboliteID"=3)
-    KEGG_Metabolite$Description <- KEGG_Metabolite$term
-
-    #Save the results as an RDS file in the Cache directory of R
-    if(!dir.exists(directory)) {dir.create(directory)}
-    saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
-  }
-
-  #Return into environment
-  assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
-}
-
-
+################################################################################################
+### ### ### General helper function: Save folder path ### ### ###
+################################################################################################
 
 #' SavePath is the helper function to create the folder structure and path
 #'
-#' @param FolderName Name of the folder, which can not contain any special characters.
+#' @param FolderName Name of the folder, which can not contain any special characters. Created within  the individual MetaProViz functions and can not be changed by the user.
+#' @param FolderPath Passed to main function by the user
 #'
 #'
 #' @keywords
@@ -191,7 +72,6 @@ Load_KEGG<- function(){
 #'
 
 SavePath<- function(FolderName, FolderPath){
-
   #Check if FolderName includes special characters that are not allowed
   cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
   if (FolderName != cleaned_FolderName){
@@ -219,11 +99,20 @@ SavePath<- function(FolderName, FolderPath){
 }
 
 
-#' SaveRes
+################################################################################################
+### ### ### General helper function: Save tables and plot ### ### ###
+################################################################################################
+
+#' SaveRes is the helper function to create the folder structure and path
 #'
-#' @param FolderPath
-#' @param CoRe
-#' @param List TRUE or FALSE
+#' @param InputList_DF Generated within the MetaProViz function. Contains named DFs.
+#' @param InputList_Plot Generated within the MetaProViz function. Contains named Plots.
+#' @param SaveAs_Table Passed to main function by the user. If not avalailable can be set to NULL.
+#' @param SaveAs_Plot Passed to main function by the user.If not avalailable can be set to NULL.
+#' @param FolderPath Passed to main function by the user
+#' @param OutputFileName Passed to main function by the user
+#' @param CoRe Passed to main function by the user. If not avalailable can be set to NULL.
+#' @param PrintPlot Passed to main function by the user. If not avalailable can be set to NULL.
 #'
 #' @keywords
 #' @noRd
@@ -282,7 +171,20 @@ SaveRes<- function(InputList_DF, InputList_Plot, SaveAs_Table,SaveAs_Plot, Folde
 
 
 
+################################################################################################
+### ### ### PreProcessing helper function: Internal Function to check function input ### ### ###
+################################################################################################
+
 #' Check input parameters
+#'
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Metab Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param SaveAs_Plot Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#' @param SaveAs_Table Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#' @param CoRe Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#' @param PrintPlot Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
 #'
 #' @param Function Name of the MetaProViz Function that is checked.
 #' @param InputList
@@ -315,6 +217,12 @@ CheckInput <- function(InputData,
       stop("InputData needs to be of class numeric")
   }
 
+  if(sum(duplicated(colnames(InputData))) > 0){
+    doublons <- as.character(colnames(InputData)[duplicated(colnames(InputData))])#number of duplications
+    #data <-data[!duplicated(colnames(InputData)),]#remove duplications
+    stop("Input_data contained duplicates based on Metabolite: ", length(doublons), " duplicates.")
+  }
+
   #-------------SettingsFile
   if(is.null(SettingsFile_Sample)==FALSE){
     Test_match <- merge(SettingsFile_Sample, InputData, by = "row.names", all =  FALSE)
@@ -343,9 +251,12 @@ CheckInput <- function(InputData,
 
   #-------------SaveAs
   Save_as_Plot_options <- c("svg","pdf", "png")
-  if((SaveAs_Plot %in% Save_as_Plot_options == FALSE) | (is.null(SaveAs_Plot)==TRUE)){
+  if(is.null(SaveAs_Plot)==FALSE){
+    if(SaveAs_Plot %in% Save_as_Plot_options == FALSE){
     stop("Check input. The selected SaveAs_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", ")," or set to NULL if no plots should be saved." )
   }
+  }
+
 
   SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
   if(is.null(SaveAs_Table)==FALSE){
