@@ -39,7 +39,7 @@
 #' @keywords Barplot, Boxplot, Violinplot, superplot
 #' @export
 
-Vizsuperplot <- function(Input_data,
+VizSuperplot <- function(Input_data,
                      Plot_SettingsFile,
                      Plot_SettingsInfo = c(conditions="Conditions", superplot = NULL),
                      Graph_Style = "Box", # Bar, Box, Violin
