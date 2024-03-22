@@ -563,18 +563,6 @@ CheckInput_PreProcessing <- function(InputData,
                                      HotellinsConfidence){
   if(is.vector(SettingsInfo)==TRUE){
     #-------------SettingsInfo
-    #Conditions
-    if ("Conditions" %in% names(SettingsInfo)){
-      if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ", SettingsInfo[["Conditions"]], " column selected as Conditions in Input_SettingsInfo was not found in Input_SettingsFile. Please check your input.")
-      }
-    }
-    #Biological replicates
-    if ("Biological_Replicates" %in% names(SettingsInfo)){
-      if( SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
-      }
-    }
     #CoRe
     if(CoRe == TRUE){   # parse CoRe normalisation factor
       message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
