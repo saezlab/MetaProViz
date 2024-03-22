@@ -232,7 +232,7 @@ CheckInput <- function(InputData,
   }
 
   if(is.null(SettingsFile_Metab)==FALSE){
-    Test_match <- merge(SettingsFile_Metab, as.data.frame(InputData), by = "row.names", all =  FALSE)
+    Test_match <- merge(SettingsFile_Metab, as.data.frame(t(InputData)), by = "row.names", all =  FALSE)
     if(nrow(Test_match) ==  0){
       stop("col.names InputData need to match col.names SettingsFile_Metab.")
     }
@@ -247,7 +247,40 @@ CheckInput <- function(InputData,
     message("No Input_Settings have been added.")
   }
 
+  if(is.null(SettingsInfo)==FALSE){
+    #Conditions
+    if("Conditions" %in% names(SettingsInfo)){
+      if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ", SettingsInfo[["Conditions"]], " column selected as Conditions in SettingsInfo was not found in SettingsFile. Please check your input.")
+      }
+    }
 
+    #Biological replicates
+    if("Biological_Replicates" %in% names(SettingsInfo)){
+      if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Numerator
+    if("Numerator" %in% names(SettingsInfo)==TRUE){
+      if(SettingsInfo[["Numerator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
+        stop("The ",SettingsInfo[["Numerator"]], " column selected as numerator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+   #Denominator
+    if("Denominator" %in% names(SettingsInfo)==TRUE){
+      if(SettingsInfo[["Denominator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
+        stop("The ",SettingsInfo[["Denominator"]], " column selected as denominator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Denominator & Numerator
+    if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==TRUE){
+      stop("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
+    }
+  }
 
   #-------------SaveAs
   Save_as_Plot_options <- c("svg","pdf", "png")
