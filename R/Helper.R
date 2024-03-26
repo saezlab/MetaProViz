@@ -220,7 +220,7 @@ CheckInput <- function(InputData,
   if(sum(duplicated(colnames(InputData))) > 0){
     doublons <- as.character(colnames(InputData)[duplicated(colnames(InputData))])#number of duplications
     #data <-data[!duplicated(colnames(InputData)),]#remove duplications
-    stop("Input_data contained duplicates based on Metabolite: ", length(doublons), " duplicates.")
+    stop("InputData contained duplicates column names, whilst col.names must be unique.")
   }
 
   #-------------SettingsFile
