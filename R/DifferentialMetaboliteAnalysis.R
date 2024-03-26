@@ -145,7 +145,7 @@ DMA <-function(InputData,
   if(PerformBartlett==TRUE){
     if(Settings[["MultipleComparison"]]==TRUE){#if we only have two conditions, which can happen even tough multiple comparison (C1 versus C2 and C2 versus C1 is done)
       UniqueConditions <- SettingsFile_Sample%>%
-        subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator, select = c("Conditions"))
+        subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% Settings[["numerator"]] | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% Settings[["denominator"]], select = c("Conditions"))
       UniqueConditions <- unique(UniqueConditions[[SettingsInfo[["Conditions"]]]])
 
     if(length(UniqueConditions)>2){
@@ -166,7 +166,7 @@ DMA <-function(InputData,
   ###############################################################################################################################################################################################################
   #### Prepare the data ######
   #1. Metabolite names:
-  savedMetaboliteNames <-  data.frame("InnputName"=colnames(InputData))
+  savedMetaboliteNames <-  data.frame("InputName"=colnames(InputData))
   savedMetaboliteNames$Metabolite <- paste0("M", seq(1,length(colnames(InputData))))
   colnames(InputData) <- savedMetaboliteNames$Metabolite
 
@@ -209,7 +209,7 @@ DMA <-function(InputData,
     if(Settings[["all_vs_all"]] ==TRUE){
       message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(StatPval), ".")
     }else{# for 1 vs all
-      message("No condition was specified as numerator and ",paste(denominator), " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(StatPval), ".")
+      message("No condition was specified as numerator and ", Settings[["denominator"]], " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(StatPval), ".")
     }
 
     if(StatPval=="aov"){
@@ -257,7 +257,7 @@ DMA <-function(InputData,
   ################################################################################################################################################################################################
   ###############  Add the metabolite Metadata if available ###############
   if(is.null(SettingsFile_Metab) == FALSE){
-    if(MultipleComparison==FALSE){
+    if(Settings[["MultipleComparison"]]==FALSE){
       DMA_Output <- merge(DMA_Output, SettingsFile_Metab%>%rownames_to_column("Metabolite"), by="Metabolite", all.y = TRUE)
     }else{
       DMA_Output <- lapply(DMA_Output, function(df){
@@ -306,9 +306,9 @@ DMA <-function(InputData,
                                                       Theme= NULL,
                                                       Save_as_Plot= NULL))
 
-      volplotList[[DF]]<- VolcanoPlot[["Plot_Sized"]][[1]]
-
       DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
+      volplotList[[DF_save]]<- VolcanoPlot[["Plot_Sized"]][[1]]
+
       dev.off()
     }
   }else{
@@ -321,7 +321,7 @@ DMA <-function(InputData,
                                                     y= "p.adj",
                                                     x= x,
                                                     AdditionalInput_data= NULL,
-                                                    OutputPlotName= paste0(toString(numerator)," versus ",toString(denominator)),
+                                                    OutputPlotName= paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]])),
                                                     Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
                                                     xlab= NULL,#"~Log[2]~FC"
                                                     ylab= NULL,#"~-Log[10]~p.adj"
@@ -334,7 +334,7 @@ DMA <-function(InputData,
                                                     Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     Theme= NULL,
                                                     Save_as_Plot= NULL))
-    volplotList[[paste0(toString(numerator)," versus ",toString(denominator))]]<- VolcanoPlot[["Plot_Sized"]][[1]]
+    volplotList[[paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]]))]]<- VolcanoPlot[["Plot_Sized"]][[1]]
     dev.off()
     #plot(VolcanoPlot)
   }
@@ -353,7 +353,7 @@ DMA <-function(InputData,
                            CoRe=CoRe,
                            PrintPlot=PrintPlot)))
 
-    DMA_Output <- list("ShapiroTest"=Shapiro_output)
+    DMA_Output_List <- list("ShapiroTest"=Shapiro_output)
   }
 
   if(PerformBartlett==TRUE & exists("Bartlett_output")==TRUE){
@@ -367,7 +367,7 @@ DMA <-function(InputData,
                            CoRe=CoRe,
                            PrintPlot=PrintPlot)))
 
-    DMA_Output <- c(DMA_Output, list("BartlettTest"=Bartlett_output))
+    DMA_Output_List <- c(DMA_Output_List, list("BartlettTest"=Bartlett_output))
   }
 
   if(VST==TRUE & exists("VST_res")==TRUE){
@@ -381,13 +381,11 @@ DMA <-function(InputData,
                            CoRe=CoRe,
                            PrintPlot=PrintPlot)))
 
-    DMA_Output <- c(DMA_Output, list("VSTres"=Bartlett_output))
+    DMA_Output_List <- c(DMA_Output_List, list("VSTres"=Bartlett_output))
   }
 
-
-
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=STAT_C1vC2,
+    MetaProViz:::SaveRes(InputList_DF=DMA_Output,
                          InputList_Plot= volplotList,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,
@@ -396,9 +394,9 @@ DMA <-function(InputData,
                          CoRe=CoRe,
                          PrintPlot=PrintPlot)))
 
-  DMA_Output <- c(DMA_Output, list("DMA"=STAT_C1vC2, "VolcanoPlot"=volplotList))
+  DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
 
-  return(invisible(DMA_Output))
+  return(invisible(DMA_Output_List))
 }
 
 
@@ -549,7 +547,7 @@ CheckInput_DMA <- function(InputData,
   }
 
   ## -------- Return settings ---------##
-  Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss)
+  Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss, "denominator"=denominator, "numerator"=numerator)
   return(invisible(Settings))
 }
 
@@ -577,7 +575,44 @@ Log2FC_fun <-function(InputData,
                       CoRe,
                       Transform
 ){
+  if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
+    # all-vs-all: Generate all pairwise combinations
+    conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+    denominator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
+    numerator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
+    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = TRUE
+  }else if("Denominator" %in% names(SettingsInfo)==TRUE  & "Numerator" %in% names(SettingsInfo)==FALSE){
+    #all-vs-one: Generate the pairwise combinations
+    conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+    denominator <- SettingsInfo[["Denominator"]]
+    numerator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
+    # Remove denom from num
+    numerator <- numerator[!numerator %in% denominator]
+    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = FALSE
+  }else if("Denominator" %in% names(SettingsInfo)==TRUE  & "Numerator" %in% names(SettingsInfo)==TRUE){
+    # one-vs-one: Generate the comparisons
+    denominator <- SettingsInfo[["Denominator"]]
+    numerator <- SettingsInfo[["Numerator"]]
+    comparisons <- matrix(c(SettingsInfo[["Denominator"]], SettingsInfo[["Numerator"]]))
+    #Settings:
+    MultipleComparison = FALSE
+    all_vs_all = FALSE
+  }
+
   ## ------------ Check Missingness ------------- ##
+  Num <- InputData %>%#Are sample numbers enough?
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
+    select_if(is.numeric)#only keep numeric columns with metabolite values
+  Denom <- InputData %>%
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+    select_if(is.numeric)
+
   Num_Miss <- replace(Num, Num==0, NA)
   Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
 
