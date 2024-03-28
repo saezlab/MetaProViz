@@ -172,7 +172,7 @@ SaveRes<- function(InputList_DF, InputList_Plot, SaveAs_Table,SaveAs_Plot, Folde
 
 
 ################################################################################################
-### ### ### PreProcessing helper function: Internal Function to check function input ### ### ###
+### ### ### Helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
 #' Check input parameters
