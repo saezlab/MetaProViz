@@ -151,7 +151,7 @@ ClusterORA <- function(InputData,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
                          FolderPath= Folder,
-                         OutputFileName= paste("ClusterGoSummary",PathwayName, sep="_"),
+                         FileName= paste("ClusterGoSummary",PathwayName, sep="_"),
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
 
@@ -306,7 +306,7 @@ StandardORA <- function(InputData,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
                          FolderPath= Folder,
-                         OutputFileName= paste(PathwayName),
+                         FileName= paste(PathwayName),
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
 
