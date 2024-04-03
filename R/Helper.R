@@ -28,7 +28,7 @@
 #' @return A data frame containing the toy data.
 #' @export
 #'
-toy_data <- function(data) {
+ToyData <- function(data) {
   # Read the .csv files
   Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
   Intra<- read.csv(Intra, check.names=FALSE)
@@ -110,24 +110,43 @@ SavePath<- function(FolderName, FolderPath){
 #' @param SaveAs_Table Passed to main function by the user. If not avalailable can be set to NULL.
 #' @param SaveAs_Plot Passed to main function by the user.If not avalailable can be set to NULL.
 #' @param FolderPath Passed to main function by the user
-#' @param OutputFileName Passed to main function by the user
+#' @param FileName Passed to main function by the user
 #' @param CoRe Passed to main function by the user. If not avalailable can be set to NULL.
 #' @param PrintPlot Passed to main function by the user. If not avalailable can be set to NULL.
+#' @param PlotHeight Parameter for ggsave.
+#' @param PlotWidth Parameter for ggsave.
+#' @param PlotUnit Parameter for ggsave.
 #'
 #' @keywords
 #' @noRd
 #'
 
-SaveRes<- function(InputList_DF, InputList_Plot, SaveAs_Table,SaveAs_Plot, FolderPath, OutputFileName, CoRe, PrintPlot){
+SaveRes<- function(InputList_DF,
+                   InputList_Plot,
+                   SaveAs_Table,
+                   SaveAs_Plot=SaveAs_Plot,
+                   FolderPath,
+                   FileName,
+                   CoRe=FALSE,
+                   PrintPlot=TRUE,
+                   PlotHeight=NULL,
+                   PlotWidth=NULL,
+                   PlotUnit=NULL){
+
+  RequiredPackages <- c("tidyverse", "writexl")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+
 
   if(is.null(SaveAs_Table)==FALSE){
     # Excel File: One file with multiple sheets:
     if(SaveAs_Table == "xlsx"){
       #Make FileName
       if(CoRe==FALSE){
-        FileName <- paste0(FolderPath,"/" , OutputFileName, "_",Sys.Date(), sep = "")
+        FileName <- paste0(FolderPath,"/" , FileName, "_",Sys.Date(), sep = "")
       }else{
-        FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName,"_",Sys.Date(), sep = "")
+        FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_",Sys.Date(), sep = "")
       }
       #Save Excel
       writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
@@ -135,9 +154,9 @@ SaveRes<- function(InputList_DF, InputList_Plot, SaveAs_Table,SaveAs_Plot, Folde
       for(DF in names(InputList_DF)){
         #Make FileName
         if(CoRe==FALSE){
-          FileName <- paste0(FolderPath,"/" , OutputFileName, "_", DF ,"_",Sys.Date(), sep = "")
+          FileName <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }else{
-          FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName, "_", DF ,"_",Sys.Date(), sep = "")
+          FileName <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }
 
         #Save table
@@ -154,13 +173,23 @@ SaveRes<- function(InputList_DF, InputList_Plot, SaveAs_Table,SaveAs_Plot, Folde
     for(Plot in names(InputList_Plot)){
       #Make FileName
       if(CoRe==FALSE){
-        FileName <- paste0(FolderPath,"/" , OutputFileName,"_", Plot , "_",Sys.Date(), sep = "")
+        FileName <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
       }else{
-        FileName <- paste0(FolderPath,"/CoRe_" , OutputFileName,"_", Plot ,"_",Sys.Date(), sep = "")
+        FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
       }
 
       #Save
-      ggsave(filename = paste0(FileName, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = 10,  height = 8)
+      if(is.null(PlotHeight)){
+        PlotHeight <- 8
+      }
+      if(is.null(PlotWidth)){
+        PlotWidth <- 10
+      }
+      if(is.null(PlotUnit)){
+        PlotUnit <- "cm"
+      }
+
+      ggsave(filename = paste0(FileName, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
 
       if(PrintPlot==TRUE){
         suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
@@ -204,6 +233,11 @@ CheckInput <- function(InputData,
                        CoRe,
                        PrintPlot){
   ############## Parameters valid for multiple MetaProViz functions
+  RequiredPackages <- c("tidyverse")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+
   #-------------InputData
   if(class(InputData) != "data.frame"){
     stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
@@ -280,6 +314,61 @@ CheckInput <- function(InputData,
     if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==TRUE){
       stop("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
     }
+
+    #Plot colour
+    if("color" %in% names(SettingsInfo)){
+      if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Plot colour sample
+    if("color_Sample" %in% names(SettingsInfo)){
+      if(SettingsInfo[["color_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["color_Sample"]], " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Plot colour Metab
+    if("color_Metab" %in% names(SettingsInfo)){
+      if(SettingsInfo[["color_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+        stop("The ",SettingsInfo[["color_Metab"]], " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+      }
+      if(sum(colnames(InputData) %in% SettingsFile_Metab$Metabolite) < length(InputData)  ){
+        warning("The InputData contains metabolites not found in SettingsFile_Metab.")
+      }
+    }
+
+    #Plot shape
+    if("shape" %in% names(SettingsInfo)){
+      if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Plot individual
+    if("individual" %in% names(SettingsInfo)){
+      if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Plot individual_Metab
+    if("individual_Metab" %in% names(SettingsInfo)){
+      if(SettingsInfo[["individual_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+        stop("The ",SettingsInfo[["individual_Metab"]], " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+      }
+    }
+
+    #Plot individual_Sample
+    if("individual_Sample" %in% names(SettingsInfo)){
+      if(SettingsInfo[["individual_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["individual_Sample"]], " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+
+
   }
 
   #-------------SaveAs
