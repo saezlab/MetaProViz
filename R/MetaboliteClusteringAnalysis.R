@@ -397,7 +397,7 @@ MCA_2Cond <- function(InputData_C1,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
                          FolderPath= Folder,
-                         OutputFileName= "MCA_2Cond",
+                         FileName= "MCA_2Cond",
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
 
@@ -1002,7 +1002,7 @@ MCA_CoRe <- function(InputData_Intra,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
                          FolderPath= Folder,
-                         OutputFileName= "MCA_2Cond",
+                         FileName= "MCA_2Cond",
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
 
@@ -1015,14 +1015,14 @@ MCA_CoRe <- function(InputData_Intra,
 
 #' Imports MCA regulatory rules into environment
 #'
-#' @param data Either "2Cond" or "CoRe" depending which regulatory rules you would like to load
+#' @param Method Either "2Cond" or "CoRe" depending which regulatory rules you would like to load
 #' @title MCA regulatory rules Import
 #' @description Import and process .csv file to create toy data.
 #' @importFrom utils read.csv
 #' @return A data frame containing the toy data.
 #' @export
 #'
-MCA_rules<- function(data){
+MCA_rules<- function(Method){
   # Read the .csv files
   Cond <- system.file("data", "MCA_2Cond.csv", package = "MetaProViz")
   Cond<- read.csv( Cond, check.names=FALSE)
@@ -1031,9 +1031,9 @@ MCA_rules<- function(data){
   CoRe<- read.csv(CoRe, check.names=FALSE)
 
   # Return the toy data into environment
-  if(data=="2Cond"){
+  if(Method=="2Cond"){
     assign("MCA_2Cond", Cond, envir=.GlobalEnv)
-  } else if(data=="CoRe"){
+  } else if(Method=="CoRe"){
     assign("MCA_CoRe", CoRe, envir=.GlobalEnv)
   } else{
     warning("Please choose the MCA regulatory rules you would like to load: 2Cond, CoRe")
