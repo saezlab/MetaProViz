@@ -233,7 +233,7 @@ PreProcessing <- function(InputData,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,
                          FolderPath= Folder,
-                         OutputFileName= "PreProcessing",
+                         FileName= "PreProcessing",
                          CoRe=CoRe,
                          PrintPlot=PrintPlot)))
 
@@ -282,7 +282,7 @@ ReplicateSum <- function(InputData,
                           SaveAs_Plot=NULL,
                           SaveAs_Table=SaveAs_Table,
                           CoRe=FALSE,
-                          PrintPlot=PrintPlot)
+                          PrintPlot=FALSE)
 
   # `CheckInput` Specific
   if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)){
@@ -335,7 +335,7 @@ ReplicateSum <- function(InputData,
                        SaveAs_Table=SaveAs_Table,
                        SaveAs_Plot=NULL,
                        FolderPath= Folder,
-                       OutputFileName= "Sum_AnalyticalReplicates",
+                       FileName= "Sum_AnalyticalReplicates",
                        CoRe=FALSE,
                        PrintPlot=FALSE)
 
@@ -469,16 +469,20 @@ PoolEstimation <- function(InputData,
   dev.new()
   if(is.null(SettingsFile_Sample)==TRUE){
     pca_data <- PoolData
-    pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data, OutputPlotName = "QC Pool samples",Save_as_Plot =  NULL))
+    pca_QC_pool <-invisible(MetaProViz::VizPCA(InputData=pca_data,
+                                               PlotName = "QC Pool samples",
+                                               SaveAs_Plot =  NULL))
   }else{
     pca_data <- merge(SettingsFile_Sample %>% select(Conditions), InputData, by=0) %>%
       column_to_rownames("Row.names") %>%
       mutate(Sample_type = case_when(Conditions == SettingsInfo[["PoolSamples"]] ~ "Pool",
                                      TRUE ~ "Sample"))
 
-    pca_QC_pool <-invisible(MetaProViz::VizPCA(Input_data=pca_data %>%select(-Conditions, -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
-                                               Plot_SettingsFile= pca_data, OutputPlotName = "QC Pool samples",
-                                               Save_as_Plot =  NULL))
+    pca_QC_pool <-invisible(MetaProViz::VizPCA(InputData=pca_data %>%select(-Conditions, -Sample_type),
+                                               SettingsInfo= c(color="Sample_type"),
+                                               SettingsFile_Sample= pca_data,
+                                               PlotName = "QC Pool samples",
+                                               SaveAs_Plot =  NULL))
   }
   dev.off()
   PlotList [["PCAPlot_PoolSamples"]] <- pca_QC_pool[["Plot_Sized"]][["QC Pool samples"]]
@@ -520,7 +524,7 @@ PoolEstimation <- function(InputData,
                       SaveAs_Table=SaveAs_Table,
                       SaveAs_Plot=SaveAs_Plot,
                       FolderPath= SubFolder,
-                      OutputFileName= "PoolEstimation",
+                      FileName= "PoolEstimation",
                       CoRe=FALSE,
                       PrintPlot=PrintPlot)
 
@@ -901,9 +905,11 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
     media_pca_data[is.na( media_pca_data)] <- 0
 
     dev.new()
-    pca_QC_media <-invisible(MetaProViz::VizPCA(Input_data=media_pca_data %>%select(-SettingsInfo[["Conditions"]], -Sample_type), Plot_SettingsInfo= c(color="Sample_type"),
-                                                Plot_SettingsFile= media_pca_data, OutputPlotName = "QC Media_samples",
-                                                Save_as_Plot =  NULL))
+    pca_QC_media <-invisible(MetaProViz::VizPCA(InputData=media_pca_data %>%select(-SettingsInfo[["Conditions"]], -Sample_type),
+                                                SettingsInfo= c(color="Sample_type"),
+                                                SettingsFile_Sample= media_pca_data,
+                                                PlotName = "QC Media_samples",
+                                                SaveAs_Plot =  NULL))
     dev.off()
 
     PlotList[["PCA_CoReMediaSamples"]] <- pca_QC_media[["Plot_Sized"]][["QC Media_samples"]]
@@ -1146,9 +1152,11 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
     outlier_PCA_data$Conditions <- Conditions
 
     dev.new()
-    pca_outlier <-invisible(MetaProViz::VizPCA(Input_data=data_norm, Plot_SettingsInfo= c(color=SettingsInfo[["Conditions"]]),
-                                               Plot_SettingsFile= outlier_PCA_data, OutputPlotName = paste("PCA outlier test filtering round ",loop),
-                                               Save_as_Plot =  NULL))
+    pca_outlier <-invisible(MetaProViz::VizPCA(InputData=data_norm,
+                                               SettingsInfo= c(color=SettingsInfo[["Conditions"]]),
+                                               SettingsFile_Sample= outlier_PCA_data,
+                                               PlotName = paste("PCA outlier test filtering round ",loop),
+                                               SaveAs_Plot =  NULL))
 
     if(loop==1){
       pca_outlierloop1 <- pca_outlier[["Plot_Sized"]][[1]]
@@ -1317,9 +1325,11 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
   # 1. Shape Outliers
   if(length(sample_outliers)>0){
     dev.new()
-    pca_QC <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite), Plot_SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = "Outliers"),
-                                        Plot_SettingsFile= MetaData_Sample ,OutputPlotName = "Quality Control PCA Condition clustering and outlier check",
-                                        Save_as_Plot =  NULL))
+    pca_QC <-invisible(MetaProViz::VizPCA(InputData=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite),
+                                          SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = "Outliers"),
+                                          SettingsFile_Sample= MetaData_Sample ,
+                                          PlotName = "Quality Control PCA Condition clustering and outlier check",
+                                          SaveAs_Plot =  NULL))
     dev.off()
     outlier_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC[["Plot_Sized"]][[1]]
   }
@@ -1327,9 +1337,11 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
   # 2. Shape Biological replicates
   if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)){
     dev.new()
-    pca_QC_repl <-invisible(MetaProViz::VizPCA(Input_data=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite), Plot_SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = SettingsInfo[["Biological_Replicates"]]),
-                                               Plot_SettingsFile= MetaData_Sample,OutputPlotName =  "Quality Control PCA replicate spread check",
-                                               Save_as_Plot =  NULL))
+    pca_QC_repl <-invisible(MetaProViz::VizPCA(InputData=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite),
+                                               SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = SettingsInfo[["Biological_Replicates"]]),
+                                               SettingsFile_Sample= MetaData_Sample,
+                                               PlotName =  "Quality Control PCA replicate spread check",
+                                               SaveAs_Plot =  NULL))
     dev.off()
 
     outlier_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
