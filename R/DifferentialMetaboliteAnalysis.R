@@ -349,7 +349,7 @@ DMA <-function(InputData,
                            SaveAs_Table=SaveAs_Table,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= SubFolder_S ,
-                           OutputFileName= "ShapiroTest",
+                           FileName= "ShapiroTest",
                            CoRe=CoRe,
                            PrintPlot=PrintPlot)))
 
@@ -363,7 +363,7 @@ DMA <-function(InputData,
                            SaveAs_Table=SaveAs_Table,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= SubFolder_B ,
-                           OutputFileName= "BartlettTest",
+                           FileName= "BartlettTest",
                            CoRe=CoRe,
                            PrintPlot=PrintPlot)))
 
@@ -377,7 +377,7 @@ DMA <-function(InputData,
                            SaveAs_Table=SaveAs_Table,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= SubFolder_V ,
-                           OutputFileName= "VST_res",
+                           FileName= "VST_res",
                            CoRe=CoRe,
                            PrintPlot=PrintPlot)))
 
@@ -390,7 +390,7 @@ DMA <-function(InputData,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,
                          FolderPath= Folder,
-                         OutputFileName= "DMA",
+                         FileName= "DMA",
                          CoRe=CoRe,
                          PrintPlot=PrintPlot)))
 
