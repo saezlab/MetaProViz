@@ -84,19 +84,9 @@ VizPCA <- function(InputData,
     stop("Check input. The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
   }
 
-
-  # Theme check
-  if(is.null(Theme)==FALSE){
-    Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
-    if (Theme %in% Theme_options == FALSE){
-      stop("Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
-    }
-  }
-
-
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "PCA_Plots",
+    Folder <- MetaProViz:::SavePath(FolderName= "PCAPlots",
                                     FolderPath=FolderPath)
   }
 
@@ -206,6 +196,7 @@ VizPCA <- function(InputData,
 
   ## ----------- Make the  plot based on the choosen parameters ------------ ##
   PlotList <- list()#Empty list to store all the plots
+  PlotList_adaptedGrid <- list()
 
   #Make the plot:
   PCA <- autoplot(prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),
@@ -243,7 +234,7 @@ VizPCA <- function(InputData,
   }
 
   ## Store the plot in the 'plots' list
-  PlotList[[Plot]] <- PCA
+  PlotList[["Plot"]] <- PCA
 
   #Set the total heights and widths
   Plot_Sized <- MetaProViz:::PlotGrob_PCA(InputPlot=PCA, SettingsInfo=SettingsInfo, PlotName=PlotName)
@@ -251,7 +242,7 @@ VizPCA <- function(InputData,
   PCA <- ggplot2::ggplot() +
     annotation_custom(PCA)
   PCA  <-PCA  + theme(panel.background = element_rect(fill = "transparent"))
-  PlotList[[Plot_Sized]] <- PCA
+  PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
 
   ######################################################################################################################################################################
@@ -259,7 +250,7 @@ VizPCA <- function(InputData,
   #Here we make a list in which we will save the outputs:
   suppressMessages(suppressWarnings(
       MetaProViz:::SaveRes(InputList_DF=NULL,
-                           InputList_Plot= PlotList[[Plot_Sized]],
+                           InputList_Plot= PlotList_adaptedGrid,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= Folder,
@@ -325,7 +316,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     }
   }else if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
     #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
+    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
 
     #-----Plot widths
@@ -383,7 +374,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     }
   }else if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
     #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
+    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
 
     #----- Plot widths
