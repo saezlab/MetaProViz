@@ -285,26 +285,15 @@ DMA <-function(InputData,
       Volplotdata<- DMA_Output[[DF]]
 
       dev.new()
-      VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
-                                                      Input_data=Volplotdata,
-                                                      Plot_SettingsInfo=VolPlot_SettingsInfo,
-                                                      Plot_SettingsFile=VOlPlot_SettingsFile[[DF]],
+      VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
+                                                      InputData=Volplotdata%>%column_to_rownames("Metabolite"),
+                                                      SettingsInfo=VolPlot_SettingsInfo,
+                                                      SettingsFile_Metab=VOlPlot_SettingsFile[[DF]],
                                                       y= "p.adj",
                                                       x= x,
-                                                      AdditionalInput_data= NULL,
-                                                      OutputPlotName= DF,
-                                                      Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                                                      xlab= NULL,#"~Log[2]~FC"
-                                                      ylab= NULL,#"~-Log[10]~p.adj"
-                                                      pCutoff= 0.05,
-                                                      FCcutoff= 0.5,
-                                                      color_palette= NULL,
-                                                      shape_palette=NULL,
-                                                      SelectLab= "",
-                                                      Connectors=  FALSE,
+                                                      PlotName= DF,
                                                       Subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                      Theme= NULL,
-                                                      Save_as_Plot= NULL))
+                                                      SaveAs_Plot= NULL))
 
       DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
       volplotList[[DF_save]]<- VolcanoPlot[["Plot_Sized"]][[1]]
@@ -314,26 +303,15 @@ DMA <-function(InputData,
   }else{
     # Make a simple Volcano plot
     dev.new()
-    VolcanoPlot <- invisible(MetaProViz::VizVolcano(Plot_Settings="Standard",
-                                                    Input_data=DMA_Output,
-                                                    Plot_SettingsInfo=VolPlot_SettingsInfo,
-                                                    Plot_SettingsFile=VOlPlot_SettingsFile,
+    VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
+                                                    InputData=DMA_Output,
+                                                    SettingsInfo=VolPlot_SettingsInfo,
+                                                    SettingsFile_Metab=VOlPlot_SettingsFile,
                                                     y= "p.adj",
                                                     x= x,
-                                                    AdditionalInput_data= NULL,
-                                                    OutputPlotName= paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]])),
-                                                    Comparison_name= c(Input_data="Cond1", AdditionalInput_data= "Cond2"),
-                                                    xlab= NULL,#"~Log[2]~FC"
-                                                    ylab= NULL,#"~-Log[10]~p.adj"
-                                                    pCutoff= 0.05,
-                                                    FCcutoff= 0.5,
-                                                    color_palette= NULL,
-                                                    shape_palette=NULL,
-                                                    SelectLab= "",
-                                                    Connectors=  FALSE,
+                                                    PlotName= paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]])),
                                                     Subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                    Theme= NULL,
-                                                    Save_as_Plot= NULL))
+                                                    SaveAs_Plot= NULL))
     volplotList[[paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]]))]]<- VolcanoPlot[["Plot_Sized"]][[1]]
     dev.off()
     #plot(VolcanoPlot)
