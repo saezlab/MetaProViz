@@ -143,7 +143,7 @@ SaveRes<- function(InputList_DF,
     # Excel File: One file with multiple sheets:
     if(SaveAs_Table == "xlsx"){
       #Make FileName
-      if(CoRe==FALSE){
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
         FileName <- paste0(FolderPath,"/" , FileName, "_",Sys.Date(), sep = "")
       }else{
         FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_",Sys.Date(), sep = "")
@@ -153,17 +153,17 @@ SaveRes<- function(InputList_DF,
     }else{
       for(DF in names(InputList_DF)){
         #Make FileName
-        if(CoRe==FALSE){
-          FileName <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+        if(CoRe==FALSE | is.null(CoRe)==TRUE){
+          FileName_Save <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }else{
-          FileName <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+          FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }
 
         #Save table
         if (SaveAs_Table == "csv"){
-          write.csv(InputList_DF[[DF]], paste0(FileName,".csv", sep = ""))
+          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""))
           }else if (SaveAs_Table == "txt"){
-            write.table(InputList_DF[[DF]], paste0(FileName,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+            write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
           }
         }
     }
@@ -172,10 +172,10 @@ SaveRes<- function(InputList_DF,
   if(is.null(SaveAs_Plot)==FALSE){
     for(Plot in names(InputList_Plot)){
       #Make FileName
-      if(CoRe==FALSE){
-        FileName <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
       }else{
-        FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
+        FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
       }
 
       #Save
@@ -189,7 +189,7 @@ SaveRes<- function(InputList_DF,
         PlotUnit <- "cm"
       }
 
-      ggsave(filename = paste0(FileName, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
 
       if(PrintPlot==TRUE){
         suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
@@ -206,14 +206,17 @@ SaveRes<- function(InputList_DF,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
-#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
-#' @param SaveAs_Plot Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
-#' @param SaveAs_Table Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
-#' @param CoRe Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
-#' @param PrintPlot Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#' @param InputData Passed to main function MetaProViz::Function()
+#' @paramInputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
+#' @param SettingsFile_Sample Passed to main function MetaProViz::Function()
+#' @param SettingsFile_Metab Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param SettingsInfo Passed to main function MetaProViz::Function()
+#' @param SaveAs_Plot Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param SaveAs_Table Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param CoRe \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param PrintPlot Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param Theme \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.  \strong{Default = NULL}
+#' @param PlotSettings \emph{Optional: } Needs to be set for MetaProViz::VizX functions. Options are "Sample", "Feature", Both". This refers to SettingsInfo color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
 #'
 #' @param Function Name of the MetaProViz Function that is checked.
 #' @param InputList
@@ -225,13 +228,16 @@ SaveRes<- function(InputList_DF,
 #'
 
 CheckInput <- function(InputData,
+                       InputData_Num=TRUE,
                        SettingsFile_Sample,
                        SettingsFile_Metab,
                        SettingsInfo,
                        SaveAs_Plot,
                        SaveAs_Table,
-                       CoRe,
-                       PrintPlot){
+                       CoRe=FALSE,
+                       PrintPlot,
+                       Theme=NULL,
+                       PlotSettings=NULL){
   ############## Parameters valid for multiple MetaProViz functions
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -246,10 +252,13 @@ CheckInput <- function(InputData,
     stop("Duplicated row.names of InputData, whilst row.names must be unique")
   }
 
-  Test_num <- apply(InputData, 2, function(x) is.numeric(x))
-  if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("InputData needs to be of class numeric")
+  if(InputData_Num==TRUE){
+     Test_num <- apply(InputData, 2, function(x) is.numeric(x))
+     if((any(Test_num) ==  FALSE) ==  TRUE){
+       stop("InputData needs to be of class numeric")
+       }
   }
+
 
   if(sum(duplicated(colnames(InputData))) > 0){
     doublons <- as.character(colnames(InputData)[duplicated(colnames(InputData))])#number of duplications
@@ -275,10 +284,6 @@ CheckInput <- function(InputData,
   #-------------SettingsInfo
   if(is.vector(SettingsInfo)==FALSE & is.null(SettingsInfo)==FALSE){
     stop("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
-  }
-
-  if((is.null(SettingsInfo)==TRUE & is.null(SettingsFile_Sample)==TRUE) & (is.null(SettingsInfo)==TRUE & is.null(SettingsFile_Metab)==TRUE)){
-    message("No Input_Settings have been added.")
   }
 
   if(is.null(SettingsInfo)==FALSE){
@@ -315,61 +320,98 @@ CheckInput <- function(InputData,
       stop("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
     }
 
-    #Plot colour
-    if("color" %in% names(SettingsInfo)){
-      if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+    if(is.null(PlotSettings)==FALSE){
+      if(PlotSettings== "Sample"){
+        #Plot colour
+        if("color" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot shape
+        if("shape" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot individual
+        if("individual" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+      }else if(PlotSettings== "Feature"){
+        if("color" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        #Plot shape
+        if("shape" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        #Plot individual
+        if("individual" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+      }else if(PlotSettings== "Both"){
+        #Plot colour sample
+        if("color_Sample" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["color_Sample"]], " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot colour Metab
+        if("color_Metab" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["color_Metab"]], " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+          if(sum(colnames(InputData) %in% SettingsFile_Metab$Metabolite) < length(InputData)  ){
+            warning("The InputData contains metabolites not found in SettingsFile_Metab.")
+          }
+        }
+
+       # Plot shape_metab
+        if("shape_Metab" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["shape_Metab"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        # Plot shape_metab
+        if("shape_Sample" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape_Sample"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["shape_Sample"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot individual_Metab
+        if("individual_Metab" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["individual_Metab"]], " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        #Plot individual_Sample
+        if("individual_Sample" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["individual_Sample"]], " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
       }
+
     }
-
-    #Plot colour sample
-    if("color_Sample" %in% names(SettingsInfo)){
-      if(SettingsInfo[["color_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["color_Sample"]], " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
-      }
-    }
-
-    #Plot colour Metab
-    if("color_Metab" %in% names(SettingsInfo)){
-      if(SettingsInfo[["color_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
-        stop("The ",SettingsInfo[["color_Metab"]], " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
-      }
-      if(sum(colnames(InputData) %in% SettingsFile_Metab$Metabolite) < length(InputData)  ){
-        warning("The InputData contains metabolites not found in SettingsFile_Metab.")
-      }
-    }
-
-    #Plot shape
-    if("shape" %in% names(SettingsInfo)){
-      if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
-      }
-    }
-
-    #Plot individual
-    if("individual" %in% names(SettingsInfo)){
-      if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
-      }
-    }
-
-    #Plot individual_Metab
-    if("individual_Metab" %in% names(SettingsInfo)){
-      if(SettingsInfo[["individual_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
-        stop("The ",SettingsInfo[["individual_Metab"]], " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
-      }
-    }
-
-    #Plot individual_Sample
-    if("individual_Sample" %in% names(SettingsInfo)){
-      if(SettingsInfo[["individual_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["individual_Sample"]], " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
-      }
-    }
-
-
-
-  }
+   }
 
   #-------------SaveAs
   Save_as_Plot_options <- c("svg","pdf", "png")
@@ -388,10 +430,17 @@ CheckInput <- function(InputData,
   }
 
   #-------------CoRe
-  if(is.logical(CoRe) == FALSE | (is.null(CoRe)==TRUE)){
+  if(is.logical(CoRe) == FALSE){
     stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
   }
 
+  #-------------Theme
+  if(is.null(Theme)==FALSE){
+    Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
+    if (Theme %in% Theme_options == FALSE){
+      stop("Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
+    }
+  }
   #------------- general
   if(is.logical(PrintPlot) == FALSE){
     stop("Check input. PrintPlot should be either =TRUE or =FALSE.")
