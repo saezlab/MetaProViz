@@ -145,7 +145,7 @@ DMA <-function(InputData,
   if(PerformBartlett==TRUE){
     if(Settings[["MultipleComparison"]]==TRUE){#if we only have two conditions, which can happen even tough multiple comparison (C1 versus C2 and C2 versus C1 is done)
       UniqueConditions <- SettingsFile_Sample%>%
-        subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% Settings[["numerator"]] | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% Settings[["denominator"]], select = c("Conditions"))
+        subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% Settings[["numerator"]] | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% Settings[["denominator"]], select = c(SettingsInfo[["Conditions"]]))
       UniqueConditions <- unique(UniqueConditions[[SettingsInfo[["Conditions"]]]])
 
     if(length(UniqueConditions)>2){
@@ -241,31 +241,22 @@ DMA <-function(InputData,
 
   ################################################################################################################################################################################################
   ###############  Add the previous metabolite names back ###############
-  if(Settings[["MultipleComparison"]]==FALSE){
-    DMA_Output <- merge(savedMetaboliteNames, STAT_C1vC2, by="Metabolite")
-    DMA_Output$Metabolite <- NULL
-    colnames(DMA_Output)[1] <- "Metabolite"
-  }else{
-    DMA_Output <- lapply(STAT_C1vC2, function(df){
-      merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
-      merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
-        dplyr::rename("Metabolite"=1)
-      return(merged_df)
+  DMA_Output <- lapply(STAT_C1vC2, function(df){
+    merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
+    merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
+      dplyr::rename("Metabolite"=1)
+    return(merged_df)
     })
-  }
+
 
   ################################################################################################################################################################################################
   ###############  Add the metabolite Metadata if available ###############
   if(is.null(SettingsFile_Metab) == FALSE){
-    if(Settings[["MultipleComparison"]]==FALSE){
-      DMA_Output <- merge(DMA_Output, SettingsFile_Metab%>%rownames_to_column("Metabolite"), by="Metabolite", all.y = TRUE)
-    }else{
       DMA_Output <- lapply(DMA_Output, function(df){
         merged_df <- merge(df,SettingsFile_Metab%>%rownames_to_column("Metabolite") , by = "Metabolite", all.y = TRUE)
         return(merged_df)
       })
     }
-  }
 
   ################################################################################################################################################################################################
   ###############  Plots ###############
@@ -280,45 +271,29 @@ DMA <-function(InputData,
   }
 
   volplotList = list()
-  if(Settings[["MultipleComparison"]]==TRUE){
-    for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
-      Volplotdata<- DMA_Output[[DF]]
+  for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
+    Volplotdata<- DMA_Output[[DF]]
 
-      dev.new()
-      VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
-                                                      InputData=Volplotdata%>%column_to_rownames("Metabolite"),
-                                                      SettingsInfo=VolPlot_SettingsInfo,
-                                                      SettingsFile_Metab=VOlPlot_SettingsFile[[DF]],
-                                                      y= "p.adj",
-                                                      x= x,
-                                                      PlotName= DF,
-                                                      Subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                      SaveAs_Plot= NULL))
-
-      DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
-      volplotList[[DF_save]]<- VolcanoPlot[["Plot_Sized"]][[1]]
-
-      dev.off()
-    }
-  }else{
-    # Make a simple Volcano plot
     dev.new()
     VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
-                                                    InputData=DMA_Output,
+                                                    InputData=Volplotdata%>%column_to_rownames("Metabolite"),
                                                     SettingsInfo=VolPlot_SettingsInfo,
-                                                    SettingsFile_Metab=VOlPlot_SettingsFile,
+                                                    SettingsFile_Metab=VOlPlot_SettingsFile[[DF]],
                                                     y= "p.adj",
                                                     x= x,
-                                                    PlotName= paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]])),
+                                                    PlotName= DF,
                                                     Subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     SaveAs_Plot= NULL))
-    volplotList[[paste0(toString(Settings[["numerator"]])," versus ",toString(Settings[["denominator"]]))]]<- VolcanoPlot[["Plot_Sized"]][[1]]
+
+    DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
+    volplotList[[DF_save]]<- VolcanoPlot[["Plot_Sized"]][[1]]
+
     dev.off()
-    #plot(VolcanoPlot)
-  }
+    }
 
   ######################################################################################################################################################################
   ##----- Save and Return
+  DMA_Output_List <- list()
   #Here we make a list in which we will save the outputs:
   if(PerformShapiro==TRUE & exists("Shapiro_output")==TRUE){
     suppressMessages(suppressWarnings(
@@ -363,7 +338,7 @@ DMA <-function(InputData,
   }
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DMA_Output,
+    MetaProViz:::SaveRes(InputList_DF=DMA_Output,#This needs to be a list, also for single comparisons
                          InputList_Plot= volplotList,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,
@@ -395,7 +370,7 @@ DMA <-function(InputData,
 #' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
 #' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords Input check
 #' @noRd
 #'
 #'
@@ -833,6 +808,13 @@ DMA_Stat_single <- function(InputData,
                             StatPadj){
 
   ## ------------ Check Missingness ------------- ##
+  Num <- InputData %>%#Are sample numbers enough?
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
+    select_if(is.numeric)#only keep numeric columns with metabolite values
+  Denom <- InputData %>%
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+    select_if(is.numeric)
+
   Num_Miss <- replace(Num, Num==0, NA)
   Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
 
@@ -895,7 +877,7 @@ DMA_Stat_single <- function(InputData,
   PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
   #perform adjustment
-  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = STAT_padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
+  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = StatPadj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   Metabolite <- PVal_C1vC2[,1]
   PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
@@ -914,7 +896,11 @@ DMA_Stat_single <- function(InputData,
   #order for t.value
   STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
 
-  return(invisible(STAT_C1vC2))
+  #list
+  results_list <- list()
+  results_list[[paste(SettingsInfo[["Numerator"]], "_vs_", SettingsInfo[["Denominator"]])]] <- STAT_C1vC2
+
+  return(invisible(results_list))
 }
 
 
@@ -1508,15 +1494,8 @@ DMA_Stat_limma <- function(InputData,
   }else{
     STAT_C1vC2 <- results_list
   }
-
-
-  if(MultipleComparison==FALSE){
-    nameComp <- names(STAT_C1vC2)
-    STAT_C1vC2 <-STAT_C1vC2[[nameComp]]
   }
-    }else{
-    STAT_C1vC2 <- results_list[[1]]
-  }
+
   return(invisible(STAT_C1vC2))
 }
 
@@ -1607,7 +1586,7 @@ Shapiro <-function(InputData,
   Input_shaptest_Cond <-merge(data.frame(Conditions = SettingsFile_Sample[, SettingsInfo[["Conditions"]], drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
 
   UniqueConditions <- SettingsFile_Sample%>%
-    subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator, select = c("Conditions"))
+    subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator, select = c(SettingsInfo[["Conditions"]]))
   UniqueConditions <- unique(UniqueConditions[[SettingsInfo[["Conditions"]]]])
 
   #Generate the results
@@ -1616,7 +1595,7 @@ Shapiro <-function(InputData,
     # Subset the data for the current condition
     subset_data <- Input_shaptest_Cond%>%
       column_to_rownames("Row.names")%>%
-      subset(Conditions == i, select = -c(1))
+      subset(get(SettingsInfo[["Conditions"]]) == i, select = -c(1))
 
     #Check the sample size (shapiro.test(x) : sample size must be between 3 and 5000):
     if(nrow(subset_data)<3){
@@ -1670,24 +1649,24 @@ Shapiro <-function(InputData,
       #### Make Group wise data distribution plot and QQ plots
       subset_data <- Input_shaptest_Cond%>%
         column_to_rownames("Row.names")%>%
-        subset(Conditions ==  colnames(transpose), select = -c(1))
+        subset(get(SettingsInfo[["Conditions"]]) ==  colnames(transpose), select = -c(1))
       all_data <- unlist(subset_data)
 
       plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-        geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white")  +
+        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white")  +
         geom_density(alpha = 0.2, fill = "grey45")
 
       density_values <- ggplot_build(plot)$data[[2]]
 
       plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-        geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
+        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
         geom_density(alpha=.2, fill="grey45") +
         scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
 
       density_values2 <- ggplot_build(plot)$data[[2]]
 
       suppressWarnings(sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
-                        geom_histogram(aes(y=..density..), binwidth=.5, colour="black", fill="white") +
+                        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
                         geom_density(alpha=.2, fill="grey45") +
                         scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
                         theme_minimal()+
