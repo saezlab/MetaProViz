@@ -1063,7 +1063,7 @@ MCA_rules<- function(Method){
 #' @param InputList
 #'
 #'
-#' @keywords
+#' @keywords Input check
 #' @noRd
 #'
 #'
