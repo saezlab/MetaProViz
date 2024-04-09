@@ -31,16 +31,19 @@
 ToyData <- function(data) {
   # Read the .csv files
   Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
-  Intra<- read.csv(Intra, check.names=FALSE)
+  Intra<- read.csv(Intra, check.names=FALSE)%>%
+    column_to_rownames("Code")
 
   Intra_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
   Intra_DMA<- read.csv(Intra_DMA, check.names=FALSE)
 
   Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
-  Media<- read.csv(Media, check.names=FALSE)
+  Media<- read.csv(Media, check.names=FALSE)%>%
+    column_to_rownames("Code")
 
   Pathways <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
-  Pathways<- read.csv(Pathways, check.names=FALSE)
+  Pathways<- read.csv(Pathways, check.names=FALSE)%>%
+    column_to_rownames("Metabolite")
 
   # Return the toy data into environment
   if(data=="Standard"){
@@ -67,7 +70,7 @@ ToyData <- function(data) {
 #' @param FolderPath Passed to main function by the user
 #'
 #'
-#' @keywords
+#' @keywords Create folder and path
 #' @noRd
 #'
 
@@ -117,7 +120,7 @@ SavePath<- function(FolderName, FolderPath){
 #' @param PlotWidth Parameter for ggsave.
 #' @param PlotUnit Parameter for ggsave.
 #'
-#' @keywords
+#' @keywords Save
 #' @noRd
 #'
 
@@ -207,7 +210,7 @@ SaveRes<- function(InputList_DF,
 #' Check input parameters
 #'
 #' @param InputData Passed to main function MetaProViz::Function()
-#' @paramInputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
+#' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
 #' @param SettingsFile_Sample Passed to main function MetaProViz::Function()
 #' @param SettingsFile_Metab Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
 #' @param SettingsInfo Passed to main function MetaProViz::Function()
@@ -218,11 +221,8 @@ SaveRes<- function(InputList_DF,
 #' @param Theme \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.  \strong{Default = NULL}
 #' @param PlotSettings \emph{Optional: } Needs to be set for MetaProViz::VizX functions. Options are "Sample", "Feature", Both". This refers to SettingsInfo color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
 #'
-#' @param Function Name of the MetaProViz Function that is checked.
-#' @param InputList
 #'
-#'
-#' @keywords
+#' @keywords Input check
 #' @noRd
 #'
 #'
