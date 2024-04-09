@@ -326,7 +326,7 @@ StandardORA <- function(InputData,
 #' @param InputData Passed to main function MetaProViz::PreProcessing()
 #' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords Input check
 #' @noRd
 #'
 #'
