@@ -43,7 +43,7 @@
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param FolderPath {Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
@@ -71,7 +71,7 @@ VizVolcano <- function(PlotSettings="Standard",
                        ShapePalette=NULL,
                        Theme= NULL,
                        SaveAs_Plot= "svg",
-                       Folder_Name = NULL,
+                       FolderPath = NULL,
                        Features="Metabolites",
                        PrintPlot=TRUE){
 
@@ -217,13 +217,16 @@ VizVolcano <- function(PlotSettings="Standard",
   ## ----------- Set the plot parameters: ------------ ##
   ##--- Prepare colour and shape palette
   if(is.null(ColorPalette)){
-    safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
-    safe_colorblind_palette_four <- c("#888888", "#44AA99", "#44AA99","#CC6677")
+    if("color" %in% names(SettingsInfo)==TRUE){
+      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+    }else{
+      safe_colorblind_palette <- c("#888888", "#44AA99", "#44AA99","#CC6677")
+    }
+
     #check that length is enough for what the user wants to colour
     #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
   } else{
     safe_colorblind_palette <-color_palette
-    safe_colorblind_palette_four<-color_palette
     #check that length is enough for what the user wants to colour
   }
   if(is.null(ShapePalette)){
@@ -255,6 +258,8 @@ VizVolcano <- function(PlotSettings="Standard",
                                       ShapePalette=safe_shape_palette,
                                       Theme= Theme,
                                       Features=Features,
+                                      SaveAs_Plot=SaveAs_Plot,
+                                      PrintPlot=PrintPlot,
                                       Folder=Folder)
 
   }else if(PlotSettings=="Compare"){#####--- 2. Compare
@@ -276,6 +281,8 @@ VizVolcano <- function(PlotSettings="Standard",
                                       ShapePalette=safe_shape_palette,
                                       Theme= Theme,
                                       Features=Features,
+                                      SaveAs_Plot=SaveAs_Plot,
+                                      PrintPlot=PrintPlot,
                                       Folder=Folder)
 
   } else if(PlotSettings=="PEA"){#####--- 3. PEA
@@ -297,6 +304,8 @@ VizVolcano <- function(PlotSettings="Standard",
                                  ShapePalette=safe_shape_palette,
                                  Theme= Theme,
                                  Features=Features,
+                                 SaveAs_Plot=SaveAs_Plot,
+                                 PrintPlot=PrintPlot,
                                  Folder=Folder)
   }
   return(invisible(VolcanoRes))
@@ -325,10 +334,12 @@ VizVolcano <- function(PlotSettings="Standard",
 #' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
+#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
 #' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
 #'
 
-#' @keywords
+#' @keywords Standard volcano plots
 #' @noRd
 #'
 #'
@@ -350,6 +361,8 @@ VizVolcano_Standard <- function(InputData,
                                 ShapePalette,
                                 Theme= NULL,
                                 Features="Metabolites",
+                                SaveAs_Plot,
+                                PrintPlot,
                                 Folder){
 
   #Pass colours/shapes
@@ -419,7 +432,7 @@ VizVolcano_Standard <- function(InputData,
                                                 titleLabSize = 12,
                                                 subtitleLabSize = 11,
                                                 captionLabSize = 10,
-                                                col=safe_colorblind_palette_four,
+                                                col=safe_colorblind_palette,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
@@ -530,7 +543,7 @@ VizVolcano_Standard <- function(InputData,
                                               titleLabSize = 12,
                                               subtitleLabSize = 11,
                                               captionLabSize = 10,
-                                              col=safe_colorblind_palette_four,
+                                              col=safe_colorblind_palette,
                                               colCustom = keyvals,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
@@ -610,10 +623,12 @@ VizVolcano_Standard <- function(InputData,
 #' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
+#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
 #' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
 #'
 #'
-#' @keywords
+#' @keywords Compare volcano plots
 #' @noRd
 #'
 #'
@@ -636,6 +651,8 @@ VizVolcano_Compare <- function(InputData,
                                ShapePalette,
                                Theme= NULL,
                                Features="Metabolites",
+                               SaveAs_Plot,
+                               PrintPlot,
                                Folder){
 
   #####################
@@ -752,7 +769,7 @@ VizVolcano_Compare <- function(InputData,
                                                 titleLabSize = 12,
                                                 subtitleLabSize = 11,
                                                 captionLabSize = 10,
-                                                col=safe_colorblind_palette_four,
+                                                col=safe_colorblind_palette,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
@@ -881,7 +898,7 @@ VizVolcano_Compare <- function(InputData,
                                               titleLabSize = 12,
                                               subtitleLabSize = 11,
                                               captionLabSize = 10,
-                                              col=safe_colorblind_palette_four,
+                                              col=safe_colorblind_palette,
                                               colCustom = keyvals,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
@@ -961,9 +978,11 @@ VizVolcano_Compare <- function(InputData,
 #' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
+#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
 #' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
 #'
-#' @keywords
+#' @keywords Volcano plots of pathway enrichment results
 #' @noRd
 #'
 #'
@@ -986,6 +1005,8 @@ VizVolcano_PEA <- function(InputData,
                            ShapePalette,
                            Theme= NULL,
                            Features="Metabolites",
+                           SaveAs_Plot,
+                           PrintPlot,
                            Folder){
   #####################
   ##--- Check PEA settings
@@ -1077,7 +1098,7 @@ VizVolcano_PEA <- function(InputData,
                                               titleLabSize = 12,
                                               subtitleLabSize = 11,
                                               captionLabSize = 10,
-                                              col=safe_colorblind_palette_four,
+                                              col=safe_colorblind_palette,
                                               colCustom = keyvals,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
