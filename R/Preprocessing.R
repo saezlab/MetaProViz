@@ -32,7 +32,7 @@
 #' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated. Please consider providing a Normalisation factor column called "CoRe_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "CoRe_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. If set to NULL, plots are not saved. \strong{Default = svg}
-#' @param SaveAs_Table
+#' @param SaveAs_Table \emph{Optional: } Select the file type of output table. Options are "csv", "xlsx", "txt". If set to NULL, plots are not saved. \strong{Default = "csv"}
 #' @param PrintPlot  \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #'
@@ -193,20 +193,20 @@ PreProcessing <- function(InputData,
   ## ---- DFs
   if(is.null(FeatureFilt)==FALSE){#Add metabolites that where removed as part of the feature filtering
     if(length(InputData_Filtered[["RemovedMetabolites"]])==0){
-      DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% dplyr::rename("Code"="Row.names"),
+      DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% column_to_rownames("Row.names"),
                      "Filtered_metabolites"= as.data.frame(list(FeatureFiltering = c(FeatureFilt),
                                                             FeatureFilt_Value = c(FeatureFilt_Value),
                                                             RemovedMetabolites = c("None"))),
-                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]]%>%rownames_to_column("Code"))
+                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
     }else{
-      DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% dplyr::rename("Code"="Row.names"),
+      DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% column_to_rownames("Row.names"),
                      "Filtered_metabolites"= as.data.frame(list(FeatureFiltering = rep(FeatureFilt, length(InputData_Filtered[["RemovedMetabolites"]])),
                                                            FeatureFilt_Value = rep(FeatureFilt_Value, length(InputData_Filtered[["RemovedMetabolites"]])),
                                                            RemovedMetabolites = InputData_Filtered[["RemovedMetabolites"]])),
-                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]]%>%rownames_to_column("Code"))
+                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
     }
   }else{
-    DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% dplyr::rename("Code"="Row.names"), "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]]%>%rownames_to_column("Code"))
+    DFList <- list("InputData_RawData"= merge(as.data.frame(SettingsFile_Sample), as.data.frame(InputData), by="row.names")%>% column_to_rownames("Row.names"), "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
   }
 
   if(CoRe ==TRUE){
@@ -550,7 +550,7 @@ PoolEstimation <- function(InputData,
 #' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
 #' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords Input check
 #' @noRd
 #'
 #'
@@ -620,7 +620,7 @@ CheckInput_PreProcessing <- function(InputData,
 #' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
 #' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords feature filtering
 #' @noRd
 #'
 
@@ -715,12 +715,7 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
 #' @param CoRe Passed to main function MetaProViz::PreProcessing()
 #' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
-#' @noRd
-#'
-
-#'
-#' @keywords
+#' @keywords Half minimum missing value imputation
 #' @noRd
 #'
 
@@ -787,7 +782,7 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
 #' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
 #' @param TIC Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords total ion count normalisation
 #' @noRd
 #'
 
@@ -875,7 +870,7 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
 #' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
 #' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords Consumption Release Normalisation
 #' @noRd
 #'
 
@@ -1098,7 +1093,7 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
 #' @param CoRe Passed to main function MetaProViz::PreProcessing()
 #' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
 #'
-#' @keywords
+#' @keywords Hotellins T2 outlier detection
 #' @noRd
 #'
 
