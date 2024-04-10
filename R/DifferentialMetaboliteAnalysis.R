@@ -253,7 +253,7 @@ DMA <-function(InputData,
   ###############  Add the metabolite Metadata if available ###############
   if(is.null(SettingsFile_Metab) == FALSE){
       DMA_Output <- lapply(DMA_Output, function(df){
-        merged_df <- merge(df,SettingsFile_Metab%>%rownames_to_column("Metabolite") , by = "Metabolite", all.y = TRUE)
+        merged_df <- merge(df,SettingsFile_Metab%>%rownames_to_column("Metabolite") , by = "Metabolite", all.x = TRUE)
         return(merged_df)
       })
     }
@@ -1455,47 +1455,66 @@ DMA_Stat_limma <- function(InputData,
     results_list[[contrast_name]] <- res.t
   }
 
-  if(is.null(Log2FC_table)==FALSE){
-    #If CoRe=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
-    #Make the name_match_df
-    name_match_df <- as.data.frame(names(results_list))%>%
-      separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
+  #Make the name_match_df
+  name_match_df <- as.data.frame(names(results_list))%>%
+    separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
 
-    name_match_df <-merge(name_match_df, targets , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
-      dplyr::rename("Condition1"=5)
-    name_match_df <- merge(name_match_df, targets , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
-      dplyr::rename("Condition2"=7)%>%
-      unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
+  name_match_df <-merge(name_match_df, targets[,-c(1)] , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
+    dplyr::rename("Condition1"=4)
+  name_match_df <- merge(name_match_df, targets[,-c(1)] , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
+    dplyr::rename("Condition2"=5)%>%
+    unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
 
-    name_match_df<- name_match_df[,c(3,5)]%>%
-      distinct(New, .keep_all = TRUE)
+  name_match_df<- name_match_df[,c(3,4)]%>%
+    distinct(New, .keep_all = TRUE)
 
-    #Match the lists using name_match_df
-    for(i in 1:nrow(name_match_df)){
-      old_name <- name_match_df$`names(results_list)`[i]
-      new_name <- name_match_df$New[i]
-      results_list[[new_name]] <- results_list[[old_name]]
-      #results_list[[old_name]] <- NULL
+  results_list_new <- list()
+  #Match the lists using name_match_df
+  for(i in 1:nrow(name_match_df)){
+    old_name <- name_match_df$`names(results_list)`[i]
+    new_name <- name_match_df$New[i]
+    results_list_new[[new_name]] <- results_list[[old_name]]
     }
 
-    if(CoRe==TRUE){
+  if(is.null(Log2FC_table)==FALSE){
+    if(CoRe==TRUE){#If CoRe=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
       # Merge the data frames in list1 and list2 based on the "Metabolite" column
       merged_list <- list()
       for(i in 1:nrow(name_match_df)){
         list_dfs <- name_match_df$New[i]
 
         # Check if the data frames exist in both lists
-        if(list_dfs %in% names(results_list) && list_dfs %in% names(Log2FC_table)){
-          merged_df <- merge(results_list[[list_dfs]], Log2FC_table[[list_dfs]], by = "Metabolite", all = TRUE)
+        if(list_dfs %in% names(results_list_new) && list_dfs %in% names(Log2FC_table)){
+          merged_df <- merge(results_list_new[[list_dfs]], Log2FC_table[[list_dfs]], by = "Metabolite", all = TRUE)
           merged_list[[list_dfs]] <- merged_df
         }
       }
     STAT_C1vC2 <- merged_list
   }else{
-    STAT_C1vC2 <- results_list
+    STAT_C1vC2 <- results_list_new
   }
   }
 
+  #Add input data
+  Cond <- SettingsFile_Sample%>%
+    rownames_to_column("Code")
+
+  InputReturn <- merge(Cond[,c("Code",SettingsInfo[["Conditions"]])], as.data.frame(t(Limma_input)),by.x="Code", by.y=0, all.y=TRUE)
+
+  for(DFs in names(STAT_C1vC2)){
+    parts <- unlist(strsplit(DFs, "_vs_"))
+    C1 <- parts[1]
+    C2 <- parts[2]
+    InputReturn_Filt <- InputReturn%>%
+      filter(get(SettingsInfo[["Conditions"]])==C1 | get(SettingsInfo[["Conditions"]])==C2)%>%
+      column_to_rownames("Code")
+    InputReturn_Filt <-as.data.frame(t(InputReturn_Filt[,-c(1)]))
+
+    InputReturn_Merge <- merge(STAT_C1vC2[[DFs]], InputReturn_Filt, by.x="Metabolite", by.y=0, all.x=TRUE)
+    STAT_C1vC2[[DFs]] <- InputReturn_Merge
+  }
+
+  #return
   return(invisible(STAT_C1vC2))
 }
 
