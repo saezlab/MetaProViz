@@ -222,7 +222,7 @@ VizPCA <- function(InputData,
 
     if(ColorScale=="discrete"){
       PCA <-PCA + scale_color_manual(values=color_select)
-    }else if(ColorScale=="continuous" & is.null(color_palette)){
+    }else if(ColorScale=="continuous" & is.null(ColorPalette)){
       PCA <-PCA + color_select
     }
 

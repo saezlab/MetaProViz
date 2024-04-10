@@ -37,8 +37,8 @@
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
 #' @param xCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
 #' @param yCutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
-#' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
+#' @param ColorPalette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
+#' @param ShapePalette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param SelectLab \emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}
 #' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } \strong{Default = ""}
@@ -177,28 +177,33 @@ VizVolcano <- function(PlotSettings="Standard",
 
 
     ##--- Merge InputData with SettingsFile:
-    common_columns <- intersect(colnames(InputData[, c(x, y)]), colnames(SettingsFile_Metab))#check for overlapping names
-    SettingsFile_Metab <- SettingsFile_Metab%>%#rename those column since they otherwise will cause issues when we merge the DFs later
+     common_columns <- character(0)  # Initialize an empty character vector
+     for(col_name in colnames(InputData[, c(x, y)])) {
+       if(col_name %in% colnames(SettingsFile_Metab)) {
+         common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
+       }
+     }
+     SettingsFile_Metab <- SettingsFile_Metab%>%#rename those column since they otherwise will cause issues when we merge the DFs later
       dplyr::rename_at(vars(common_columns), ~ paste0(., "_SettingsFile_Metab"))
 
     if(PlotSettings=="PEA"){
-      VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x= , by.y=0, all.x=TRUE)%>%
+      VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x= , by.y=0, all.y=TRUE)%>%
         remove_rownames()%>%
         column_to_rownames("Row.names")%>%
         mutate(FeatureNames = rownames(InputData))%>%
-        na.omit()
+        filter(!is.na(x) | !is.na(x))
     }else{
-     VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by=0, all.x=TRUE)%>%
+     VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by=0, all.y=TRUE)%>%
       remove_rownames()%>%
       column_to_rownames("Row.names")%>%
       mutate(FeatureNames = rownames(InputData))%>%
-      na.omit()
+      filter(!is.na(x) | !is.na(x))
     }
 
    }else{
      VolcanoData <- InputData[, c(x, y)]%>%
        mutate(FeatureNames = rownames(InputData))%>%
-       na.omit()
+       filter(!is.na(x) | !is.na(x))
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -226,7 +231,7 @@ VizVolcano <- function(PlotSettings="Standard",
     #check that length is enough for what the user wants to colour
     #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
   } else{
-    safe_colorblind_palette <-color_palette
+    safe_colorblind_palette <-ColorPalette
     #check that length is enough for what the user wants to colour
   }
   if(is.null(ShapePalette)){
@@ -378,8 +383,7 @@ VizVolcano_Standard <- function(InputData,
     PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
-      InputVolcano <- subset(InputData, individual == paste(i))%>%
-        na.omit()
+      InputVolcano <- subset(InputData, individual == paste(i))
 
       if(nrow(InputVolcano)>=1){
         if("color" %in% names(SettingsInfo)==TRUE ){
@@ -470,23 +474,21 @@ VizVolcano_Standard <- function(InputData,
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot
 
-        #----- Save
-        suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
-                               InputList_Plot= list(cleaned_i=PlotList_adaptedGrid[[cleaned_i]]),
-                               SaveAs_Table=NULL,
-                               SaveAs_Plot=SaveAs_Plot,
-                               FolderPath= Folder,
-                               FileName= paste("Volcano_",cleaned_i,"_",PlotName, sep=""),
-                               CoRe=FALSE,
-                               PrintPlot=PrintPlot,
-                               PlotHeight=Plot_Sized[[1]],
-                               PlotWidth=Plot_Sized[[2]],
-                               PlotUnit="cm")))
       }
     }
-    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
-
+    #----- Save
+    suppressMessages(suppressWarnings(
+      MetaProViz:::SaveRes(InputList_DF=NULL,
+                           InputList_Plot= PlotList_adaptedGrid,
+                           SaveAs_Table=NULL,
+                           SaveAs_Plot=SaveAs_Plot,
+                           FolderPath= Folder,
+                           FileName= paste("Volcano_",PlotName, sep=""),
+                           CoRe=FALSE,
+                           PrintPlot=PrintPlot,
+                           PlotHeight=Plot_Sized[[1]],
+                           PlotWidth=Plot_Sized[[2]],
+                           PlotUnit="cm")))
   }else if("individual" %in% names(SettingsInfo)==FALSE){
     PlotList <- list()#Empty list to store all the plots
     PlotList_adaptedGrid <- list()#Empty list to store all the plots
@@ -580,7 +582,7 @@ VizVolcano_Standard <- function(InputData,
 
       #----- Save
       suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
+      MetaProViz:::SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -698,8 +700,7 @@ VizVolcano_Compare <- function(InputData,
     PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
-      InputVolcano <- subset(InputCompare, individual == paste(i))%>%
-        na.omit()
+      InputVolcano <- subset(InputCompare, individual == paste(i))
 
       if(nrow(InputVolcano)>=1){
         #Prepare the colour scheme:
@@ -807,24 +808,22 @@ VizVolcano_Compare <- function(InputData,
         #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot
-
-        #----- Save
-        suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
-                               InputList_Plot= list(cleaned_i=PlotList_adaptedGrid[[cleaned_i]]),
-                               SaveAs_Table=NULL,
-                               SaveAs_Plot=SaveAs_Plot,
-                               FolderPath= Folder,
-                               FileName= paste("Volcano_",cleaned_i,"_",PlotName, sep=""),
-                               CoRe=FALSE,
-                               PrintPlot=PrintPlot,
-                               PlotHeight=Plot_Sized[[1]],
-                               PlotWidth=Plot_Sized[[2]],
-                               PlotUnit="cm")))
       }
     }
-    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 
+    #----- Save
+    suppressMessages(suppressWarnings(
+      MetaProViz:::SaveRes(InputList_DF=NULL,
+                           InputList_Plot= PlotList_adaptedGrid,
+                           SaveAs_Table=NULL,
+                           SaveAs_Plot=SaveAs_Plot,
+                           FolderPath= Folder,
+                           FileName= paste("Volcano_",PlotName, sep=""),
+                           CoRe=FALSE,
+                           PrintPlot=PrintPlot,
+                           PlotHeight=Plot_Sized[[1]],
+                           PlotWidth=Plot_Sized[[2]],
+                           PlotUnit="cm")))
   } else if("individual" %in% names(SettingsInfo)==FALSE){
     PlotList <- list()#Empty list to store all the plots
     PlotList_adaptedGrid <- list()#Empty list to store all the plots
@@ -935,7 +934,7 @@ VizVolcano_Compare <- function(InputData,
 
       #----- Save
       suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
+      MetaProViz:::SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -946,10 +945,10 @@ VizVolcano_Compare <- function(InputData,
                              PlotHeight=Plot_Sized[[1]],
                              PlotWidth=Plot_Sized[[2]],
                              PlotUnit="cm")))
+
     }
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
-
 }
 
 
@@ -1041,8 +1040,7 @@ VizVolcano_PEA <- function(InputData,
   PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
   for (i in IndividualPlots){
-    InputVolcano <- subset(InputData, individual == paste(i))%>%
-      na.omit()
+    InputVolcano <- subset(InputData, individual == paste(i))
 
     InputData2_Select<- subset(InputData2, PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
 
@@ -1138,22 +1136,23 @@ VizVolcano_PEA <- function(InputData,
       #save plot and get rid of extra signs before saving
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
       PlotList_adaptedGrid[[cleaned_i]] <- Plot
-
-      #----- Save
-      suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
-                             InputList_Plot= list(cleaned_i=PlotList_adaptedGrid[[cleaned_i]]),
-                             SaveAs_Table=NULL,
-                             SaveAs_Plot=SaveAs_Plot,
-                             FolderPath= Folder,
-                             FileName= paste("Volcano_",cleaned_i,"_",PlotName, sep=""),
-                             CoRe=FALSE,
-                             PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
-                             PlotUnit="cm")))
     }
   }
+
+  #----- Save
+  suppressMessages(suppressWarnings(
+  MetaProViz:::SaveRes(InputList_DF=NULL,
+                         InputList_Plot= PlotList_adaptedGrid,
+                         SaveAs_Table=NULL,
+                         SaveAs_Plot=SaveAs_Plot,
+                         FolderPath= Folder,
+                         FileName= paste("Volcano_",PlotName, sep=""),
+                         CoRe=FALSE,
+                         PrintPlot=PrintPlot,
+                         PlotHeight=Plot_Sized[[1]],
+                         PlotWidth=Plot_Sized[[2]],
+                         PlotUnit="cm")))
+
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 
 }
