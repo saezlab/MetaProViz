@@ -104,11 +104,11 @@ PreProcessing <- function(InputData,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "Preprocessing",
+    Folder <- MetaProViz:::SavePath(FolderName= "Processing",
                                     FolderPath=FolderPath)
 
-    SubFolder_O <- file.path(Folder, "OutlierPlots")
-    if (!dir.exists(SubFolder_O)) {dir.create(SubFolder_O)}
+    SubFolder_P <- file.path(Folder, "PreProcessing")
+    if (!dir.exists(SubFolder_P)) {dir.create(SubFolder_P)}
   }
 
 
@@ -225,22 +225,26 @@ PreProcessing <- function(InputData,
     PlotList <- c(PlotList , data_CoReNorm[["Plot"]])
   }
 
+  Res_List <- list("DF"= DFList ,"Plot" =PlotList)
+
   # Save Plots and DFs
-  # All: Folder
+  #As row names are not saved we need to make row.names to column for the DFs that needs this:
+  DFList[["InputData_RawData"]] <- DFList[["InputData_RawData"]]%>%rownames_to_column("Code")
+  DFList[["Preprocessing_output"]] <- DFList[["Preprocessing_output"]]%>%rownames_to_column("Code")
+
   suppressMessages(suppressWarnings(
     MetaProViz:::SaveRes(InputList_DF=DFList,
                          InputList_Plot= PlotList,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,
-                         FolderPath= Folder,
+                         FolderPath= SubFolder_P,
                          FileName= "PreProcessing",
                          CoRe=CoRe,
                          PrintPlot=PrintPlot)))
 
-  # OutlierPlots: SubFolder_O
 
   #Return
-  invisible(return(list("DF"= DFList ,"Plot" =PlotList)))
+  invisible(return(Res_List))
 }
 
 
@@ -302,8 +306,12 @@ ReplicateSum <- function(InputData,
   }
 
   ## ------------ Create Results output folder ----------- ##
-  Folder <- MetaProViz:::SavePath(FolderName= "PreProcessing",
-                                  FolderPath=FolderPath)
+  if(is.null(SaveAs_Table)==FALSE ){
+    Folder <- MetaProViz:::SavePath(FolderName= "Processing",
+                                    FolderPath=FolderPath)
+    SubFolder <- file.path(Folder, "ReplicateSum")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+  }
 
   ## ------------  Load data and process  ----------- ##
   Input <- merge(x= SettingsFile_Sample%>% select(!!SettingsInfo[["Conditions"]], !!SettingsInfo[["Biological_Replicates"]], !!SettingsInfo[["Analytical_Replicates"]]),
@@ -330,11 +338,11 @@ ReplicateSum <- function(InputData,
     column_to_rownames("UniqueID")# set UniqueID to rownames
 
   #--------------- return ------------------##
-  MetaProViz:::SaveRes(InputList_DF=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed),
+  MetaProViz:::SaveRes(InputList_DF=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed%>%rownames_to_column("Code")),
                        InputList_Plot = NULL,
                        SaveAs_Table=SaveAs_Table,
                        SaveAs_Plot=NULL,
-                       FolderPath= Folder,
+                       FolderPath= SubFolder,
                        FileName= "Sum_AnalyticalReplicates",
                        CoRe=FALSE,
                        PrintPlot=FALSE)
@@ -412,7 +420,7 @@ PoolEstimation <- function(InputData,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "PreProcessing",
+    Folder <- MetaProViz:::SavePath(FolderName= "Processing",
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "PoolEstimation")
@@ -518,8 +526,12 @@ PoolEstimation <- function(InputData,
   }else{
     DF_list <- list("InputData" = InputData, "CV" = result_df_final_out)
   }
+  ResList <- list("DF"= DF_list,"Plot"=PlotList)
 
- MetaProViz:::SaveRes(InputList_DF=DF_list,
+  #Save
+  DF_list[["InputData"]]<-  DF_list[["InputData"]]%>%rownames_to_column("Code")
+
+  MetaProViz:::SaveRes(InputList_DF=DF_list,
                       InputList_Plot = PlotList,
                       SaveAs_Table=SaveAs_Table,
                       SaveAs_Plot=SaveAs_Plot,
@@ -528,9 +540,8 @@ PoolEstimation <- function(InputData,
                       CoRe=FALSE,
                       PrintPlot=PrintPlot)
 
- #Return
- ResList <- list("DF"= DF_list,"Plot"=PlotList)
- invisible(return(ResList))
+  #Return
+  invisible(return(ResList))
 }
 
 ################################################################################################
