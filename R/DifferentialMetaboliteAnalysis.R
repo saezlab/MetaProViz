@@ -552,7 +552,7 @@ Log2FC_fun <-function(InputData,
     # one-vs-one: Generate the comparisons
     denominator <- SettingsInfo[["Denominator"]]
     numerator <- SettingsInfo[["Numerator"]]
-    comparisons <- matrix(c(SettingsInfo[["Denominator"]], SettingsInfo[["Numerator"]]))
+    comparisons <- matrix(c(numerator, denominator))
     #Settings:
     MultipleComparison = FALSE
     all_vs_all = FALSE
@@ -834,7 +834,7 @@ DMA_Stat_single <- function(InputData,
   }
 
   # Comparisons
-  comparisons <- matrix(c(SettingsInfo[["Denominator"]], SettingsInfo[["Numerator"]]))
+  comparisons <- matrix(c(SettingsInfo[["Numerator"]], SettingsInfo[["Denominator"]]))
 
   ## ------------ Perform Hypothesis testing ----------- ##
   for(column in 1:dim(comparisons)[2]){
