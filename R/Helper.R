@@ -152,7 +152,7 @@ SaveRes<- function(InputList_DF,
         FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_",Sys.Date(), sep = "")
       }
       #Save Excel
-      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
+      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE, rownames = FALSE)
     }else{
       for(DF in names(InputList_DF)){
         #Make FileName
@@ -164,7 +164,7 @@ SaveRes<- function(InputList_DF,
 
         #Save table
         if (SaveAs_Table == "csv"){
-          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""))
+          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""), row.names = FALSE)
           }else if (SaveAs_Table == "txt"){
             write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
           }
@@ -183,10 +183,10 @@ SaveRes<- function(InputList_DF,
 
       #Save
       if(is.null(PlotHeight)){
-        PlotHeight <- 8
+        PlotHeight <- 12
       }
       if(is.null(PlotWidth)){
-        PlotWidth <- 10
+        PlotWidth <- 16
       }
       if(is.null(PlotUnit)){
         PlotUnit <- "cm"
