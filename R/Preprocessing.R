@@ -730,26 +730,31 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
 
     # find metabolites with NA
     na_percentage <- colMeans(is.na(replaceNAdf)) * 100
-    highNA_metabs <- na_percentage[na_percentage>20]
+    highNA_metabs <- na_percentage[na_percentage>20 & na_percentage<100]
+    OnlyNA_metabs <- na_percentage[na_percentage==100]
 
     # report metabolites with NA
     if(sum(na_percentage)>0){
-      message("NA values were found in Control_media samples for metabolites.")
-      if(sum(na_percentage>20)>0){
-        message("Metabolites with high NA load in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      message("NA values were found in Control_media samples for metabolites. For metabolites including NAs MVI is performed unless all samples of a metabolite are NA.")
+      if(sum(na_percentage>20 & na_percentage<100)>0){
+        message("Metabolites with high NA load (>20%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+      }
+      if(sum(na_percentage==100)>0){
+        message("Metabolites with only NAs (=100%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ". Those NAs are set zero as we consider them true zeros")
       }
     }
 
     # if all values are NA set to 0
-    replaceNAdf[,which(sapply(replaceNAdf, function(x)all(is.na(x))))]=0
+    replaceNAdf_zero <- as.data.frame(lapply(replaceNAdf, function(x) if(all(is.na(x))) replace(x, is.na(x), 0) else x))
+    colnames( replaceNAdf_zero) <-  colnames(replaceNAdf)
+
     # If there is at least 1 value use the half minimum per feature
-    replaceNAdf <- apply(replaceNAdf, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
+    replaceNAdf_Zero_MVI <- apply( replaceNAdf_zero, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
     return(x)
     }) %>% as.data.frame()
 
     # replace the samples in the original dataframe
-    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf), ] <- replaceNAdf
-
+    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf_Zero_MVI), ] <- replaceNAdf_Zero_MVI
   }
 
   # Do MVI for the samples
