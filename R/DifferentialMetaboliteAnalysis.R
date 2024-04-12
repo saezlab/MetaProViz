@@ -117,7 +117,6 @@ DMA <-function(InputData,
       SubFolder_V <- file.path(Folder, "VST")
       if (!dir.exists(SubFolder_V)) {dir.create(SubFolder_V)}
     }
-
   }
 
   ###############################################################################################################################################################################################################
@@ -196,8 +195,7 @@ DMA <-function(InputData,
                                                 SettingsInfo=SettingsInfo,
                                                 Log2FC_table=Log2FC_table,
                                                 StatPval=StatPval,
-                                                StatPadj=StatPadj,
-      )
+                                                StatPadj=StatPadj)
     }
   }else{ # MultipleComparison = TRUE
     #Correct data heteroscedasticity
@@ -791,7 +789,7 @@ Log2FC_fun <-function(InputData,
 
 #' @param InputData Passed to DMA
 #' @param SettingsFile_Sample Passed to DMA.
-#' @param SettingsInfoPassed Passed to DMA.
+#' @param SettingsInfo Passed to DMA.
 #' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
 #' @param StatPval Passed to DMA
 #' @param StatPadj Passed to DMA
@@ -809,10 +807,10 @@ DMA_Stat_single <- function(InputData,
 
   ## ------------ Check Missingness ------------- ##
   Num <- InputData %>%#Are sample numbers enough?
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Numerator"]]) %>%
     select_if(is.numeric)#only keep numeric columns with metabolite values
   Denom <- InputData %>%
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Denominator"]]) %>%
     select_if(is.numeric)
 
   Num_Miss <- replace(Num, Num==0, NA)
@@ -1373,9 +1371,10 @@ DMA_Stat_limma <- function(InputData,
     for (condition1 in 1:(num_conditions - 1)) {
       for (condition2 in (condition1 + 1):num_conditions) {
         # Create the pairwise comparison vector
-        comparison <- rep(1, num_conditions)
+        comparison <- rep(0, num_conditions)
 
         comparison[condition2] <- -1
+        comparison[condition1] <- 1
         # Add the comparison vector to the contrast matrix
         cont.matrix[i, ] <- comparison
         # Set row name
@@ -1386,7 +1385,7 @@ DMA_Stat_limma <- function(InputData,
     cont.matrix<- t(cont.matrix)
   }else if(all_vs_all ==FALSE & MultipleComparison==TRUE){
     unique_conditions <- levels(fcond)# Get unique conditions
-    denominator  <- SettingsInfo[["Denominator"]]
+    denominator  <- make.names(SettingsInfo[["Denominator"]])
 
     # Create an empty contrast matrix
     num_conditions <- length(unique_conditions)
@@ -1405,7 +1404,7 @@ DMA_Stat_limma <- function(InputData,
     for(condition in 2:num_conditions){
       # Create the pairwise comparison vector
       comparison <- rep(0, num_conditions)
-      if(unique_conditions[1]==SettingsInfo[["Denominator"]]){
+      if(unique_conditions[1]== make.names(SettingsInfo[["Denominator"]])){
         comparison[1] <- -1
         comparison[condition] <- 1
         # Add the comparison vector to the contrast matrix
@@ -1425,9 +1424,9 @@ DMA_Stat_limma <- function(InputData,
     }
     cont.matrix<- t(cont.matrix)
   }else if(all_vs_all ==FALSE & MultipleComparison==FALSE){
-    Name_Comp <- paste(SettingsInfo[["Numerator"]], "-", SettingsInfo[["Denominator"]], sep="")
+    Name_Comp <- paste(make.names(SettingsInfo[["Numerator"]]), "-", make.names(SettingsInfo[["Denominator"]]), sep="")
     cont.matrix <- as.data.frame(limma::makeContrasts(contrasts=Name_Comp, levels=colnames(design)))%>%
-      dplyr::rename(!!paste(SettingsInfo[["Numerator"]], "_vs_", SettingsInfo[["Denominator"]], sep="") := 1)
+      dplyr::rename(!!paste(make.names(SettingsInfo[["Numerator"]]), "_vs_", make.names(SettingsInfo[["Denominator"]]), sep="") := 1)
     cont.matrix <-as.matrix(cont.matrix)
   }
 
@@ -1510,7 +1509,12 @@ DMA_Stat_limma <- function(InputData,
       column_to_rownames("Code")
     InputReturn_Filt <-as.data.frame(t(InputReturn_Filt[,-c(1)]))
 
+    if(Transform==TRUE){#Add prefix & suffix to each column since the data have been log2 transformed!
+      colnames(InputReturn_Filt) <- paste0("log2(", colnames(InputReturn_Filt), ")")
+      }
+
     InputReturn_Merge <- merge(STAT_C1vC2[[DFs]], InputReturn_Filt, by.x="Metabolite", by.y=0, all.x=TRUE)
+
     STAT_C1vC2[[DFs]] <- InputReturn_Merge
   }
 
@@ -1545,6 +1549,16 @@ Shapiro <-function(InputData,
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0){
     install.packages(new.packages)
+  }
+
+  ## ------------- Checks --------------##
+  if(grepl("[[:space:]()-./\\\\]", SettingsInfo[["Conditions"]])==TRUE){
+    message("In SettingsInfo=c(Conditions= ColumnName): ColumnName contains special charaters, hence this is renamed.")
+    ColumnNameCondition_clean <- gsub("[[:space:]()-./\\\\]", "_", SettingsInfo[["Conditions"]])
+    SettingsFile_Sample <- SettingsFile_Sample%>%
+      dplyr::rename(!!paste(ColumnNameCondition_clean):= SettingsInfo[["Conditions"]])
+
+    SettingsInfo[["Conditions"]] <- ColumnNameCondition_clean
   }
 
   ## ------------ Denominator/numerator ----------- ##
@@ -1734,9 +1748,9 @@ Shapiro <-function(InputData,
     ##-------- Return
     #Here we make a list
     if(QQplots==TRUE){
-      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
+      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
     }else{
-      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results),"Plot"=list( "Distributions"=Density_plots))
+      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots))
     }
 
     suppressWarnings(invisible(return(Shapiro_output_list)))
