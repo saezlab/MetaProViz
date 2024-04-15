@@ -90,9 +90,23 @@ VizHeatmap <- function(InputData,
   }
 
   #####################################################
-  ## -------------- Plot --------------- ##
+  ## -------------- Load Data --------------- ##
   data <- InputData
 
+  if(is.null(SettingsFile_Metab)==FALSE){#removes information about metabolites that are not included in the InputData
+    SettingsFile_Metab <- merge(x=SettingsFile_Metab, y=as.data.frame(t(InputData)), by=0, all.y=TRUE)%>%
+      column_to_rownames("Row.names")
+    SettingsFile_Metab <- SettingsFile_Metab[,-c((ncol(SettingsFile_Metab)-nrow(InputData)+1):ncol(SettingsFile_Metab))]
+  }
+
+    if(is.null(SettingsFile_Sample)==FALSE){#removes information about samples that are not included in the InputData
+      SettingsFile_Sample <- merge(x=SettingsFile_Sample, y=InputData, by=0, all.y=TRUE)%>%
+        column_to_rownames("Row.names")
+      SettingsFile_Sample <- SettingsFile_Sample[,-c((ncol(SettingsFile_Sample)-ncol(InputData)+1):ncol(SettingsFile_Sample))]
+    }
+
+
+  ## -------------- Plot --------------- ##
   if("individual_Metab" %in% names(SettingsInfo)==TRUE & "individual_Sample" %in% names(SettingsInfo)==FALSE){
     #Ensure that groups that are assigned NAs do not cause problems:
     SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]] <-ifelse(is.na(SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]]), "NA", SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]])
@@ -100,7 +114,7 @@ VizHeatmap <- function(InputData,
 
     for (i in unique_paths){# Check pathways with 1 metabolite
       selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
-      selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+      selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
       if(length(selected_path_metabs)==1 ){
         warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
         unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
@@ -114,7 +128,7 @@ VizHeatmap <- function(InputData,
 
     for (i in IndividualPlots){
       selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
-      selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+      selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
       data_path <- data %>% select(all_of(selected_path_metabs))
 
       # Column annotation
@@ -140,7 +154,8 @@ VizHeatmap <- function(InputData,
           row_annot <- row_annot %>% as.data.frame()
           names(row_annot)[y] <- annot_sel
         }
-        rownames(row_annot) <- SettingsFile_Metab[["Metabolite"]]
+        row_annot<- as.data.frame(row_annot)
+        rownames(row_annot) <- rownames(SettingsFile_Metab)
       }
 
       #Check number of features:
@@ -209,11 +224,11 @@ VizHeatmap <- function(InputData,
         #----- Save
         suppressMessages(suppressWarnings(
           MetaProViz:::SaveRes(InputList_DF=NULL,
-                               InputList_Plot= PlotList_adaptedGrid[[cleaned_i]],
+                               InputList_Plot= PlotList_adaptedGrid,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
                                FolderPath= Folder,
-                               FileName= paste("Heatmap_",cleaned_i,"_",PlotName, sep=""),
+                               FileName=paste("Heatmap_",PlotName, sep=""),
                                CoRe=FALSE,
                                PrintPlot=PrintPlot,
                                PlotHeight=Plot_Sized[[1]],
@@ -221,7 +236,7 @@ VizHeatmap <- function(InputData,
                                PlotUnit="cm")))
 
       }else{
-          message(i , " includes >= 2 objects and is hence not plotted.")
+          message(i , " includes <= 2 objects and is hence not plotted.")
         }
     }
     #Return if assigned:
@@ -235,7 +250,7 @@ VizHeatmap <- function(InputData,
 
       for (i in unique_paths_Sample){# Check pathways with 1 metabolite
         selected_path <- SettingsFile_Sample %>% filter(get(SettingsInfo[["individual_Sample"]]) == i)
-        selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+        selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
         if(length(selected_path_metabs)==1 ){
           warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
           unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
@@ -281,7 +296,8 @@ VizHeatmap <- function(InputData,
             row_annot <- row_annot %>% as.data.frame()
             names(row_annot)[y] <- annot_sel
           }
-          rownames(row_annot) <- SettingsFile_Metab[["Metabolite"]]
+          row_annot<- as.data.frame(row_annot)
+          rownames(row_annot) <- rownames(SettingsFile_Metab)
         }
 
         #Check number of features:
@@ -344,18 +360,18 @@ VizHeatmap <- function(InputData,
         #----- Save
         suppressMessages(suppressWarnings(
           MetaProViz:::SaveRes(InputList_DF=NULL,
-                               InputList_Plot= PlotList_adaptedGrid[[cleaned_i]],
+                               InputList_Plot= PlotList_adaptedGrid,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
                                FolderPath= Folder,
-                               FileName= paste("Heatmap_",cleaned_i,"_",PlotName, sep=""),
+                               FileName= paste("Heatmap_",PlotName, sep=""),
                                CoRe=FALSE,
                                PrintPlot=PrintPlot,
                                PlotHeight=Plot_Sized[[1]],
                                PlotWidth=Plot_Sized[[2]],
                                PlotUnit="cm")))
         }else{
-          message(i , " includes >= 2 objects and is hence not plotted.")
+          message(i , " includes <= 2 objects and is hence not plotted.")
         }
         }
       #Return if assigned:
@@ -369,7 +385,7 @@ VizHeatmap <- function(InputData,
 
         for (i in unique_paths){# Check pathways with 1 metabolite
           selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
-          selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+          selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           if(length(selected_path_metabs)==1 ){
             warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
             unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
@@ -383,7 +399,7 @@ VizHeatmap <- function(InputData,
 
         for (i in unique_paths_Sample){# Check pathways with 1 metabolite
           selected_path <- SettingsFile_Sample %>% filter(get(SettingsInfo[["individual_Sample"]]) == i)
-          selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+          selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           if(length(selected_path_metabs)==1 ){
             warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
             unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
@@ -398,7 +414,7 @@ VizHeatmap <- function(InputData,
 
         for (i in IndividualPlots_Metab){
           selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
-          selected_path_metabs <-  colnames(data) [colnames(data) %in% selected_path$Metabolite]
+          selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           data_path_metab <- data %>% select(all_of(selected_path_metabs))
 
           # Row annotation
@@ -411,7 +427,8 @@ VizHeatmap <- function(InputData,
               row_annot <- row_annot %>% as.data.frame()
               names(row_annot)[y] <- annot_sel
             }
-            rownames(row_annot) <- SettingsFile_Metab[["Metabolite"]]
+            row_annot<- as.data.frame(row_annot)
+            rownames(row_annot) <- rownames(SettingsFile_Metab)
           }
 
           #Col annotation:
@@ -502,11 +519,11 @@ VizHeatmap <- function(InputData,
             #----- Save
             suppressMessages(suppressWarnings(
               MetaProViz:::SaveRes(InputList_DF=NULL,
-                                   InputList_Plot= PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]],
+                                   InputList_Plot= PlotList_adaptedGrid,
                                    SaveAs_Table=NULL,
                                    SaveAs_Plot=SaveAs_Plot,
                                    FolderPath= Folder,
-                                   FileName= paste("Heatmap_",cleaned_i,"_",cleaned_s, "_",PlotName, sep=""),
+                                   FileName=paste("Heatmap_",PlotName, sep=""),
                                    CoRe=FALSE,
                                    PrintPlot=PrintPlot,
                                    PlotHeight=Plot_Sized[[1]],
@@ -516,7 +533,7 @@ VizHeatmap <- function(InputData,
 
             }
             else{
-              message(i , " includes >= 2 objects and is hence not plotted.")
+              message(i , " includes <= 2 objects and is hence not plotted.")
             }
           }
         }
@@ -549,7 +566,8 @@ VizHeatmap <- function(InputData,
         row_annot <- row_annot %>% as.data.frame()
         names(row_annot)[i] <- annot_sel
       }
-      rownames(row_annot) <- SettingsFile_Metab[["Metabolite"]]
+      row_annot<- as.data.frame(row_annot)
+      rownames(row_annot) <- rownames(SettingsFile_Metab)
     }
 
     #Check number of features:
@@ -612,7 +630,7 @@ VizHeatmap <- function(InputData,
     #----- Save
     suppressMessages(suppressWarnings(
       MetaProViz:::SaveRes(InputList_DF=NULL,
-                           InputList_Plot= PlotList_adaptedGrid[[PlotName]],
+                           InputList_Plot= PlotList_adaptedGrid,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= Folder,
@@ -626,7 +644,7 @@ VizHeatmap <- function(InputData,
 
 
     }else{
-      message(i , " includes >= 2 objects and is hence not plotted.")
+      message(i , " includes <= 2 objects and is hence not plotted.")
     }
     }
    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
