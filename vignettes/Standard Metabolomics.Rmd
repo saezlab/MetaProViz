@@ -492,12 +492,13 @@ MetaData_Sample%>%
 \
 Moreover, we can use MetaData for our features (=Metabolites), which we loaded with the `MappingInfo` and we can also add the information on which cluster a metabolite was assigned to in the `MetaProViz::MCA()` analysis above:\
 ```{r}
-MetaData_Metab <-merge(MappingInfo%>%rownames_to_column("Metabolite"), MCAres[["MCA_2Cond_Results"]][,c(1, 14,15)], by="Metabolite", all.y=TRUE)
+MetaData_Metab <-merge(MappingInfo%>%rownames_to_column("Metabolite"), MCAres[["MCA_2Cond_Results"]][,c(1, 14,15)], by="Metabolite", all.y=TRUE)%>%
+  column_to_rownames("Metabolite")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
 MetaData_Metab[c(3:4,6,24:26),]%>%
-  kableExtra::kbl(caption = "Metadata table including additional information about the Metabolites.", row.names=FALSE) %>%
+  kableExtra::kbl(caption = "Metadata table including additional information about the Metabolites.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
@@ -622,18 +623,19 @@ Lastly, by generate individual plot for e.g. each pathway or the metabolite clus
 # individual: One individual plot for each pathway, col annotation: Colour for samples
 MetaProViz::VizHeatmap(InputData = Input_Heatmap, 
                        SettingsFile_Sample = MetaData_Sample,
-                       SettingsInfo = c(individual_Metab = "RG2_Significant",
+                       SettingsInfo = c(individual_Metab = "Pathway",
                                         color_Sample = list("Conditions","Biological_Replicates"),
                                         color_Metab = list("RG2_Significant")),
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName = "Pathway")
-
 ```
 <div class="vscroll-plot">
 ```{r, echo=FALSE, fig.width=9, fig.height=7.5, warning=FALSE, fig.align="left"}
 MetaProViz::VizHeatmap(InputData = Input_Heatmap, 
                        SettingsFile_Sample = MetaData_Sample,
-                       SettingsInfo = c(individual_Metab = "Pathway", color_Sample = list("Conditions","Biological_Replicates"), color_Metab = list("RG2_Significant")),
+                       SettingsInfo = c(individual_Metab = "Pathway",
+                                        color_Sample = list("Conditions","Biological_Replicates"),
+                                        color_Metab = list("RG2_Significant")),
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName = "Pathway")
 ```
