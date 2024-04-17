@@ -84,7 +84,7 @@ ClusterORA <- function(InputData,
   ## ------------ Prepare Data ----------- ##
   # open the data
   if(RemoveBackground==TRUE){
-    df <- subset(InputData, !InputData$BG_Method == "FALSE")%>%
+    df <- subset(InputData, !InputData[[SettingsInfo[["BackgroundColumn"]]]] == "FALSE")%>%
       rownames_to_column("Metabolite")
   } else{
     df <- InputData%>%
