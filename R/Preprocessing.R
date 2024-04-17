@@ -751,18 +751,20 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
         message("Metabolites with high NA load (>20%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
       }
       if(sum(na_percentage==100)>0){
-        message("Metabolites with only NAs (=100%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ". Those NAs are set zero as we consider them true zeros")
+        message("Metabolites with only NAs (=100%) in Control_media samples are: ",paste(names(OnlyNA_metabs), collapse = ", "), ". Those NAs are set zero as we consider them true zeros")
       }
     }
 
     # if all values are NA set to 0
     replaceNAdf_zero <- as.data.frame(lapply(replaceNAdf, function(x) if(all(is.na(x))) replace(x, is.na(x), 0) else x))
-    colnames( replaceNAdf_zero) <-  colnames(replaceNAdf)
+    colnames(replaceNAdf_zero) <-  colnames(replaceNAdf)
+    rownames(replaceNAdf_zero) <-  rownames(replaceNAdf)
 
     # If there is at least 1 value use the half minimum per feature
     replaceNAdf_Zero_MVI <- apply( replaceNAdf_zero, 2,  function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE)/2
     return(x)
     }) %>% as.data.frame()
+    rownames(replaceNAdf_Zero_MVI) <-  rownames(replaceNAdf)
 
     # replace the samples in the original dataframe
     filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf_Zero_MVI), ] <- replaceNAdf_Zero_MVI
@@ -778,7 +780,14 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
 
     imputed_feature_data <- feature_data %>%
       group_by(Conditions) %>%
-      mutate(across(all_of(feature), ~replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100))))
+      mutate(across(all_of(feature), ~{
+        if(all(is.na(.))) {
+          message("For some conditions all measured samples are NA for " , feature, ". Hence we can not perform half-minimum value imputation per condition for this metabolite and will assume it is a true biological 0 in those cases.")
+          return(0)  # Return NA if all values are missing
+        } else {
+          return(replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100)))
+        }
+      }))
 
     NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
   }
