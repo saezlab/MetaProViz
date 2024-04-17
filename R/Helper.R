@@ -277,7 +277,7 @@ CheckInput <- function(InputData,
   if(is.null(SettingsFile_Metab)==FALSE){
     Test_match <- merge(SettingsFile_Metab, as.data.frame(t(InputData)), by = "row.names", all =  FALSE)
     if(nrow(Test_match) ==  0){
-      stop("col.names InputData need to match col.names SettingsFile_Metab.")
+      stop("col.names InputData need to match row.names SettingsFile_Metab.")
     }
   }
 
