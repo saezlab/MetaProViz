@@ -276,7 +276,7 @@ DMA <-function(InputData,
     VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
                                                     InputData=Volplotdata%>%column_to_rownames("Metabolite"),
                                                     SettingsInfo=VolPlot_SettingsInfo,
-                                                    SettingsFile_Metab=VOlPlot_SettingsFile[[DF]],
+                                                    SettingsFile_Metab=VOlPlot_SettingsFile[[DF]]%>%column_to_rownames("Metabolite"),
                                                     y= "p.adj",
                                                     x= x,
                                                     PlotName= DF,
@@ -1801,7 +1801,7 @@ Bartlett <-function(InputData,
   DF_bartlett_results <- DF_bartlett_results %>% mutate(`Var homogeneity`= case_when(`Bartlett p.val`< 0.05~ FALSE,
                                                                                      `Bartlett p.val`>=0.05 ~ TRUE))
   # if p<0.05 then unequal variances
-  message("For",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
+  message("For ",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
 
   DF_bartlett_results <- DF_bartlett_results %>% rownames_to_column("Metabolite") %>% relocate("Metabolite")
   DF_Bartlett_results_out <- DF_bartlett_results
