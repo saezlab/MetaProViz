@@ -60,6 +60,10 @@ library(MetaProViz)
 
 #dependencies
 library(tidyverse)
+
+#Please install the Biocmanager Dependencies:
+#BiocManager::install("clusterProfiler")
+#BiocManager::install("EnhancedVolcano")
 ```
 \
 \

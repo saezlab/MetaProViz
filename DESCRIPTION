@@ -23,8 +23,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: 
     BiocManager,
-    clusterProfiler (>= 4.10.0),
-    EnhancedVolcano (>= 1.20.0),
     factoextra,
     ggfortify,
     ggplot2,
@@ -39,6 +37,3 @@ Imports:
     reshape,
     tidyverse,
     writexl
-Remotes:  
-    BiocManager::install("clusterProfiler"),
-    BiocManager::install("EnhancedVolcano")
