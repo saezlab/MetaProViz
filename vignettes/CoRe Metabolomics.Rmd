@@ -55,9 +55,8 @@ First if you have not done yet, install the required dependencies and load the l
 ```{r, message=FALSE, warning=FALSE}
 #MetaProViz
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
-devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")#only loaded until package is online
 
-#library(MetaProViz)
+library(MetaProViz)
 
 #dependencies
 library(tidyverse)
