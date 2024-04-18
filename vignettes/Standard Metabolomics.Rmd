@@ -455,7 +455,7 @@ MappingInfo[1:6,]%>%
 ```
 
 ```{r, include=FALSE, warning=FALSE}
-MC_ORA_result <- MetaProViz:::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%column_to_rownames("Metabolite"),
+MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%column_to_rownames("Metabolite"),
                                          SettingsInfo=c(ClusterColumn="RG2_Significant", 
                                                         BackgroundColumn="BG_Method", 
                                                         PathwayTerm= "Pathway", #This is the column name including the pathways names
