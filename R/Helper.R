@@ -2,13 +2,13 @@
 ##
 ## Script name: HelperFunctions
 ##
-## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalisation and outlier detection
+## Purpose of script: General helper functions to check function input and save results
 ##
-## Author: Dimitrios Prymidis and Christina Schmidt
+## Author: Christina Schmidt
 ##
 ## Date Created: 2023-06-14
 ##
-## Copyright (c) Dimitrios Prymidis and Christina Schmidt
+## Copyright (c) Christina Schmidt
 ## Email:
 ##
 ## ---------------------------
@@ -28,19 +28,22 @@
 #' @return A data frame containing the toy data.
 #' @export
 #'
-toy_data <- function(data) {
+ToyData <- function(data) {
   # Read the .csv files
   Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
-  Intra<- read.csv(Intra, check.names=FALSE)
+  Intra<- read.csv(Intra, check.names=FALSE)%>%
+    column_to_rownames("Code")
 
   Intra_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
   Intra_DMA<- read.csv(Intra_DMA, check.names=FALSE)
 
   Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
-  Media<- read.csv(Media, check.names=FALSE)
+  Media<- read.csv(Media, check.names=FALSE)%>%
+    column_to_rownames("Code")
 
   Pathways <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
-  Pathways<- read.csv(Pathways, check.names=FALSE)
+  Pathways<- read.csv(Pathways, check.names=FALSE)%>%
+    column_to_rownames("Metabolite")
 
   # Return the toy data into environment
   if(data=="Standard"){
@@ -57,124 +60,389 @@ toy_data <- function(data) {
 }
 
 
-#' Imports MCA regulatory rules into environment
-#'
-#' @param data Either "2Cond" or "CoRe" depending which regulatory rules you would like to load
-#' @title MCA regulatory rules Import
-#' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
-#' @return A data frame containing the toy data.
-#' @export
-#'
-MCA_rules<- function(data){
-  # Read the .csv files
-  Cond <- system.file("data", "MCA_2Cond.csv", package = "MetaProViz")
-  Cond<- read.csv( Cond, check.names=FALSE)
+################################################################################################
+### ### ### General helper function: Save folder path ### ### ###
+################################################################################################
 
-  CoRe <- system.file("data", "MCA_CoRe.csv", package = "MetaProViz")
-  CoRe<- read.csv(CoRe, check.names=FALSE)
+#' SavePath is the helper function to create the folder structure and path
+#'
+#' @param FolderName Name of the folder, which can not contain any special characters. Created within  the individual MetaProViz functions and can not be changed by the user.
+#' @param FolderPath Passed to main function by the user
+#'
+#'
+#' @keywords Create folder and path
+#' @noRd
+#'
 
-  # Return the toy data into environment
-  if(data=="2Cond"){
-    assign("MCA_2Cond", Cond, envir=.GlobalEnv)
-  } else if(data=="CoRe"){
-    assign("MCA_CoRe", CoRe, envir=.GlobalEnv)
-  } else{
-    warning("Please choose the MCA regulatory rules you would like to load: 2Cond, CoRe")
+SavePath<- function(FolderName, FolderPath){
+  #Check if FolderName includes special characters that are not allowed
+  cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
+  if (FolderName != cleaned_FolderName){
+    message("Special characters were removed from `FolderName`.")
+  }
+
+  #Check if FolderPath exist
+  if(is.null(FolderPath)){
+    FolderPath <- getwd()
+    FolderPath <- file.path(FolderPath, "MetaProViz_Results")
+    if(!dir.exists(FolderPath)){dir.create(FolderPath)}
+  }else{
+    if(dir.exists(FolderPath)==FALSE){
+      FolderPath <- getwd()
+      message("Provided `FolderPath` does not exist and hence results are saved here: ", FolderPath, sep="")
+    }
+  }
+
+  #Create the folder name
+  Results_folder <- file.path(FolderPath, cleaned_FolderName)
+  if(!dir.exists(Results_folder)){dir.create(Results_folder)}
+
+  #Return the folder path:
+  return(invisible(Results_folder))
+}
+
+
+################################################################################################
+### ### ### General helper function: Save tables and plot ### ### ###
+################################################################################################
+
+#' SaveRes is the helper function to create the folder structure and path
+#'
+#' @param InputList_DF Generated within the MetaProViz function. Contains named DFs.
+#' @param InputList_Plot Generated within the MetaProViz function. Contains named Plots.
+#' @param SaveAs_Table Passed to main function by the user. If not avalailable can be set to NULL.
+#' @param SaveAs_Plot Passed to main function by the user.If not avalailable can be set to NULL.
+#' @param FolderPath Passed to main function by the user
+#' @param FileName Passed to main function by the user
+#' @param CoRe Passed to main function by the user. If not avalailable can be set to NULL.
+#' @param PrintPlot Passed to main function by the user. If not avalailable can be set to NULL.
+#' @param PlotHeight Parameter for ggsave.
+#' @param PlotWidth Parameter for ggsave.
+#' @param PlotUnit Parameter for ggsave.
+#'
+#' @keywords Save
+#' @noRd
+#'
+
+SaveRes<- function(InputList_DF,
+                   InputList_Plot,
+                   SaveAs_Table,
+                   SaveAs_Plot=SaveAs_Plot,
+                   FolderPath,
+                   FileName,
+                   CoRe=FALSE,
+                   PrintPlot=TRUE,
+                   PlotHeight=NULL,
+                   PlotWidth=NULL,
+                   PlotUnit=NULL){
+
+  RequiredPackages <- c("tidyverse", "writexl")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+
+
+  if(is.null(SaveAs_Table)==FALSE){
+    # Excel File: One file with multiple sheets:
+    if(SaveAs_Table == "xlsx"){
+      #Make FileName
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName <- paste0(FolderPath,"/" , FileName, "_",Sys.Date(), sep = "")
+      }else{
+        FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_",Sys.Date(), sep = "")
+      }
+      #Save Excel
+      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE, rownames = FALSE)
+    }else{
+      for(DF in names(InputList_DF)){
+        #Make FileName
+        if(CoRe==FALSE | is.null(CoRe)==TRUE){
+          FileName_Save <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+        }else{
+          FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+        }
+
+        #Save table
+        if (SaveAs_Table == "csv"){
+          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""), row.names = FALSE)
+          }else if (SaveAs_Table == "txt"){
+            write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+          }
+        }
+    }
+  }
+
+  if(is.null(SaveAs_Plot)==FALSE){
+    for(Plot in names(InputList_Plot)){
+      #Make FileName
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
+      }else{
+        FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
+      }
+
+      #Save
+      if(is.null(PlotHeight)){
+        PlotHeight <- 12
+      }
+      if(is.null(PlotWidth)){
+        PlotWidth <- 16
+      }
+      if(is.null(PlotUnit)){
+        PlotUnit <- "cm"
+      }
+
+      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+
+      if(PrintPlot==TRUE){
+        suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
+      }
+    }
   }
 }
 
 
-#' Imports KEGG pathways into the environment
+
+################################################################################################
+### ### ### Helper function: Internal Function to check function input ### ### ###
+################################################################################################
+
+#' Check input parameters
 #'
-#' @title MCA regulatory rules Import
-#' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
-#' @return A data frame containing the KEGG pathways for ORA.
-#' @export
+#' @param InputData Passed to main function MetaProViz::Function()
+#' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
+#' @param SettingsFile_Sample Passed to main function MetaProViz::Function()
+#' @param SettingsFile_Metab Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param SettingsInfo Passed to main function MetaProViz::Function()
+#' @param SaveAs_Plot Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param SaveAs_Table Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param CoRe \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param PrintPlot Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.
+#' @param Theme \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.  \strong{Default = NULL}
+#' @param PlotSettings \emph{Optional: } Needs to be set for MetaProViz::VizX functions. Options are "Sample", "Feature", Both". This refers to SettingsInfo color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
 #'
 #'
-Load_KEGG<- function(){
-  #Get the package:
-  RequiredPackages <- c("rappdirs")
+#' @keywords Input check
+#' @noRd
+#'
+#'
+
+CheckInput <- function(InputData,
+                       InputData_Num=TRUE,
+                       SettingsFile_Sample,
+                       SettingsFile_Metab,
+                       SettingsInfo,
+                       SaveAs_Plot,
+                       SaveAs_Table,
+                       CoRe=FALSE,
+                       PrintPlot,
+                       Theme=NULL,
+                       PlotSettings=NULL){
+  ############## Parameters valid for multiple MetaProViz functions
+  RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
 
-  #------------------------------------------------------------------
-  #Get the directory and filepath of cache results of R
-  directory <- rappdirs::user_cache_dir()#get chache directory
-  File_path <-paste(directory, "/KEGG_Metabolite.rds", sep="")
-
-  if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
-    KEGG_Metabolite <- readRDS(File_path)
-    message("Cached file loaded from: ", File_path)
-  }else{# load from KEGG
-    RequiredPackages <- c("KEGGREST", "tidyverse")
-    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-    if(length(new.packages)) install.packages(new.packages)
-
-    suppressMessages(library(KEGGREST))
-    suppressMessages(library(tidyverse))
-
-    #--------------------------------------------------------------------------------------------
-    # 1. Make a list of all available human pathways in KEGG
-    Pathways_H <- as.data.frame(keggList("pathway", "hsa"))  # hsa = human
-
-    # 2. Initialize the result data frame
-    KEGG_H <- data.frame(KEGGPathway = character(nrow(Pathways_H)),
-                         #PathID = 1:nrow(Pathways_H),
-                         Compound = 1:nrow(Pathways_H),
-                         KEGG_CompoundID = 1:nrow(Pathways_H),
-                         stringsAsFactors = FALSE)
-
-    # 3. Iterate over each pathway and extract the needed information
-    for (k in 1:nrow(Pathways_H)) {
-      path <- rownames(Pathways_H)[k]
-
-      tryCatch({#try-catch block is used to catch any errors that occur during the query process
-        # Query the pathway information
-        query <- keggGet(path)
-
-        # Extract the necessary information and store it in the result data frame
-        KEGG_H[k, "KEGGPathway"] <- Pathways_H[k,]
-        #KEGG_H[k, "PathID"] <- path
-        KEGG_H[k, "Compound"] <- paste(query[[1]]$COMPOUND, collapse = ";")
-        KEGG_H[k, "KEGG_CompoundID"] <- paste(names(query[[1]]$COMPOUND), collapse = ";")
-      }, error = function(e) {
-        # If an error occurs, store "error" in the corresponding row and continue to the next query
-        KEGG_H[k, "KEGGPathway"] <- "error"
-        message(paste("`Error in .getUrl(url, .flatFileParser) : Not Found (HTTP 404).` for pathway", path, "- Skipping and continuing to the next query."))
-      })
-    }
-
-    # 3. Remove the pathways that do not have any metabolic compounds associated to them
-    KEGG_H_Select <-KEGG_H%>%
-      subset(!KEGG_CompoundID=="")%>%
-      subset(!KEGGPathway=="")
-
-    # 4. Make the Metabolite DF
-    KEGG_Metabolite <- separate_longer_delim(KEGG_H_Select[,-5], c(Compound, KEGG_CompoundID), delim = ";")
-
-    # 5. Remove Metabolites
-    ### 5.1. Ions should be removed
-    Remove_Ions <- c("Calcium cation","Potassium cation","Sodium cation","H+","Cl-", "Fatty acid", "Superoxide","H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+",  "Zinc cation", "Nickel", "NH4+")
-    ### 5.2. Unspecific small molecules
-    Remove_Small <- c("Nitric oxide","Hydrogen peroxide", "Superoxide","H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-",  "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
-
-    KEGG_Metabolite <- KEGG_Metabolite[!(KEGG_Metabolite$Compound %in% c(Remove_Ions, Remove_Small)), ]
-
-    #Change syntax as required for ORA
-    KEGG_Metabolite <- KEGG_Metabolite%>%
-      dplyr::rename("term"=1,
-                    "Metabolite"=2,
-                    "MetaboliteID"=3)
-    KEGG_Metabolite$Description <- KEGG_Metabolite$term
-
-    #Save the results as an RDS file in the Cache directory of R
-    if(!dir.exists(directory)) {dir.create(directory)}
-    saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
+  #-------------InputData
+  if(class(InputData) != "data.frame"){
+    stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
+  }
+  if(any(duplicated(row.names(InputData)))==TRUE){
+    stop("Duplicated row.names of InputData, whilst row.names must be unique")
   }
 
-  #Return into environment
-  assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
+  if(InputData_Num==TRUE){
+     Test_num <- apply(InputData, 2, function(x) is.numeric(x))
+     if((any(Test_num) ==  FALSE) ==  TRUE){
+       stop("InputData needs to be of class numeric")
+       }
+  }
+
+
+  if(sum(duplicated(colnames(InputData))) > 0){
+    doublons <- as.character(colnames(InputData)[duplicated(colnames(InputData))])#number of duplications
+    #data <-data[!duplicated(colnames(InputData)),]#remove duplications
+    stop("InputData contained duplicates column names, whilst col.names must be unique.")
+  }
+
+  #-------------SettingsFile
+  if(is.null(SettingsFile_Sample)==FALSE){
+    Test_match <- merge(SettingsFile_Sample, InputData, by = "row.names", all =  FALSE)
+    if(nrow(Test_match) ==  0){
+        stop("row.names InputData need to match row.names SettingsFile_Sample.")
+      }
+  }
+
+  if(is.null(SettingsFile_Metab)==FALSE){
+    Test_match <- merge(SettingsFile_Metab, as.data.frame(t(InputData)), by = "row.names", all =  FALSE)
+    if(nrow(Test_match) ==  0){
+      stop("col.names InputData need to match row.names SettingsFile_Metab.")
+    }
+  }
+
+  #-------------SettingsInfo
+  if(is.vector(SettingsInfo)==FALSE & is.null(SettingsInfo)==FALSE){
+    stop("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
+  }
+
+  if(is.null(SettingsInfo)==FALSE){
+    #Conditions
+    if("Conditions" %in% names(SettingsInfo)){
+      if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ", SettingsInfo[["Conditions"]], " column selected as Conditions in SettingsInfo was not found in SettingsFile. Please check your input.")
+      }
+    }
+
+    #Biological replicates
+    if("Biological_Replicates" %in% names(SettingsInfo)){
+      if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Numerator
+    if("Numerator" %in% names(SettingsInfo)==TRUE){
+      if(SettingsInfo[["Numerator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
+        stop("The ",SettingsInfo[["Numerator"]], " column selected as numerator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+   #Denominator
+    if("Denominator" %in% names(SettingsInfo)==TRUE){
+      if(SettingsInfo[["Denominator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
+        stop("The ",SettingsInfo[["Denominator"]], " column selected as denominator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
+    #Denominator & Numerator
+    if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==TRUE){
+      stop("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
+    }
+
+    if(is.null(PlotSettings)==FALSE){
+      if(PlotSettings== "Sample"){
+        #Plot colour
+        if("color" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot shape
+        if("shape" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot individual
+        if("individual" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+      }else if(PlotSettings== "Feature"){
+        if("color" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        #Plot shape
+        if("shape" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        #Plot individual
+        if("individual" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+      }else if(PlotSettings== "Both"){
+        #Plot colour sample
+        if("color_Sample" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["color_Sample"]], " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot colour Metab
+        if("color_Metab" %in% names(SettingsInfo)){
+          if(SettingsInfo[["color_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["color_Metab"]], " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+          if(sum(colnames(InputData) %in% SettingsFile_Metab$Metabolite) < length(InputData)  ){
+            warning("The InputData contains metabolites not found in SettingsFile_Metab.")
+          }
+        }
+
+       # Plot shape_metab
+        if("shape_Metab" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["shape_Metab"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        # Plot shape_metab
+        if("shape_Sample" %in% names(SettingsInfo)){
+          if(SettingsInfo[["shape_Sample"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["shape_Sample"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+        #Plot individual_Metab
+        if("individual_Metab" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
+            stop("The ",SettingsInfo[["individual_Metab"]], " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+          }
+        }
+
+        #Plot individual_Sample
+        if("individual_Sample" %in% names(SettingsInfo)){
+          if(SettingsInfo[["individual_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
+            stop("The ",SettingsInfo[["individual_Sample"]], " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+          }
+        }
+
+      }
+
+    }
+   }
+
+  #-------------SaveAs
+  Save_as_Plot_options <- c("svg","pdf", "png")
+  if(is.null(SaveAs_Plot)==FALSE){
+    if(SaveAs_Plot %in% Save_as_Plot_options == FALSE){
+    stop("Check input. The selected SaveAs_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", ")," or set to NULL if no plots should be saved." )
+  }
+  }
+
+
+  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
+  if(is.null(SaveAs_Table)==FALSE){
+    if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
+      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+    }
+  }
+
+  #-------------CoRe
+  if(is.logical(CoRe) == FALSE){
+    stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
+  }
+
+  #-------------Theme
+  if(is.null(Theme)==FALSE){
+    Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
+    if (Theme %in% Theme_options == FALSE){
+      stop("Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
+    }
+  }
+  #------------- general
+  if(is.logical(PrintPlot) == FALSE){
+    stop("Check input. PrintPlot should be either =TRUE or =FALSE.")
+  }
 }

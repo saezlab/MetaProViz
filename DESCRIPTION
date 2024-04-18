@@ -1,6 +1,6 @@
 Package: MetaProViz
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 1.0.1
+Version: 2.0.0
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
@@ -20,10 +20,11 @@ Description: MetaProViz can analyse standard metabolomics and
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports: 
-    clusterProfiler,
-    EnhancedVolcano,
+    BiocManager,
+    clusterProfiler (>= 4.10.0),
+    EnhancedVolcano (>= 1.20.0),
     factoextra,
     ggfortify,
     ggplot2,
@@ -38,3 +39,6 @@ Imports:
     reshape,
     tidyverse,
     writexl
+Remotes:  
+    BiocManager::install("clusterProfiler"),
+    BiocManager::install("EnhancedVolcano")

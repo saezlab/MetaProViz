@@ -5,52 +5,34 @@
 \title{MCA_CoRe}
 \usage{
 MCA_CoRe(
-  Intra_File,
-  CoRe_File,
-  MetaboliteID = "Metabolite",
-  IntraValueCol = "Log2FC",
-  IntraPadjCol = "p.adj",
-  CoReValueCol = "Log2(Distance)",
-  CoReDirectionCol = "CoRe",
-  CoRePadjCol = "p.adj",
-  Intra_padj_cutoff = 0.05,
-  CoRe_padj_cutoff = 0.05,
-  Intra_FC_cutoff = 1,
-  Save_as_Results = "xlsx",
-  CoRe_FC_cutoff = 20,
-  backgroundMethod = "Intra&CoRe",
-  OutputFileName = "MCA_",
-  Folder_Name = NULL
+  InputData_Intra,
+  InputData_CoRe,
+  SettingsInfo_Intra = c(ValueCol = "Log2FC", StatCol = "p.adj", StatCutoff = 0.05,
+    ValueCutoff = 1),
+  SettingsInfo_CoRe = c(DirectionCol = "CoRe", ValueCol = "Log2(Distance)", StatCol =
+    "p.adj", StatCutoff = 0.05, ValueCutoff = 1),
+  FeatureID = "Metabolite",
+  SaveAs_Table = "csv",
+  BackgroundMethod = "Intra&CoRe",
+  FolderPath = NULL
 )
 }
 \arguments{
-\item{Intra_File}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{InputData_Intra}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
 
-\item{CoRe_File}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require}
+\item{InputData_CoRe}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require}
 
-\item{MetaboliteID}{Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.}
+\item{SettingsInfo_Intra}{\emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_Intra,StatCol=ColumnName_InputData_Intra, StatCutoff= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}}
 
-\item{IntraValueCol}{Column name of Log2FC in IntraFile}
+\item{SettingsInfo_CoRe}{\emph{Optional: } Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_InputData_CoRe,ValueCol=ColumnName_InputData_CoRe,StatCol=ColumnName_InputData_CoRe, StatCutoff= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(DirectionCol="CoRe", ValueCol="Log2(Distance)",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}}
 
-\item{IntraPadjCol}{Column name of adjusted p-value in IntraFile. Can also be you p-value column if you want to use this instead.}
+\item{FeatureID}{\emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}}
 
-\item{CoReValueCol}{Column name of Log2(Distance) in CoReFile}
+\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 
-\item{CoRePadjCol}{Column name of adjusted p-value in CoReFile. Can also be you p-value column if you want to use this instead.}
+\item{BackgroundMethod}{\emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}}
 
-\item{Intra_padj_cutoff}{\emph{Optional: } adjusted p-value cutoff for IntraFile. \strong{Default=0.05}}
-
-\item{CoRe_padj_cutoff}{\emph{Optional: } adjusted p-value cutoff for CoReFile. \strong{Default=0.05}}
-
-\item{Intra_FC_cutoff}{\emph{Optional: } Log2FC cutoff for IntraFile. \strong{Default=0.5}}
-
-\item{CoRe_FC_cutoff}{\emph{Optional: } Log2FC cutoff for CoReFile. \strong{Default=20}}
-
-\item{backgroundMethod}{\emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}}
-
-\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
-
-\item{outputFileName}{\emph{Optional: } Output filename \strong{Default="MCA_"}}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 MCA an instance of the MetaProViz package

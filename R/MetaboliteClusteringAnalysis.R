@@ -23,21 +23,14 @@
 #'
 #' This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between two conditions (e.g. KO versus WT in Hypoxia = Cond1 and KO versus WT in Normoxia = Cond2).
 #'
-#' @param Cond1_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param Cond2_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param MetaboliteID Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.
-#' @param Cond1ValueCol Column name of Log2FC in Cond1File
-#' @param Cond1PadjCol Column name of adjusted p-value in Cond1File. Can also be you p-value column if you want to use this instead.
-#' @param Cond2ValueCol  Column name of Log2FC in Cond2File
-#' @param Cond2PadjCol Column name of adjusted p-value in Cond2File. Can also be you p-value column if you want to use this instead.
-#' @param Cond1_padj_cutoff  \emph{Optional: } adjusted p-value cutoff for Cond1File. \strong{Default=0.05}
-#' @param Cond1_FC_cutoff \emph{Optional: } Log2FC cutoff for Cond1File. \strong{Default=0.5}
-#' @param Cond2_padj_cutoff \emph{Optional: } adjusted p-value cutoff for Cond2File. \strong{Default=0.05}
-#' @param Cond2_FC_cutoff \emph{Optional: } Log2FC cutoff for Cond2File. \strong{Default=0.5}
-#' @param backgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
-#' @param outputFileName \emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}
-#' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param InputData_C1 DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param InputData_C2 DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param SettingsInfo_C1  \emph{Optional: } Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_C1,StatCol=ColumnName_InputData_C1, StatCutoff= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
+#' @param SettingsInfo_C2  \emph{Optional: } Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_C2,StatCol=ColumnName_InputData_C2, StatCutoff= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
+#' @param FeatureID \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
+#' @param BackgroundMethod \emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #' @return MCA an instance of the MetaProViz package
 #' @export
 #'
@@ -46,107 +39,88 @@
 ### ### ### Metabolite Clustering Analysis: 2 Conditions ### ### ###
 ##################################################
 
-MCA_2Cond <- function(Cond1_File,
-                      Cond2_File,
-                      MetaboliteID= "Metabolite",
-                      Cond1ValueCol="Log2FC",
-                      Cond1PadjCol="p.adj",
-                      Cond2ValueCol="Log2FC",
-                      Cond2PadjCol="p.adj",
-                      Cond1_padj_cutoff= 0.05,
-                      Cond2_padj_cutoff = 0.05,
-                      Cond1_FC_cutoff= 1,
-                      Cond2_FC_cutoff = 1,
-                      Save_as_Results = "xlsx", # txt or csv
-                      backgroundMethod="C1&C2",
-                      OutputFileName = "MCA_2Cond_",
-                      Folder_Name = NULL
+MCA_2Cond <- function(InputData_C1,
+                      InputData_C2,
+                      SettingsInfo_C1=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                      SettingsInfo_C2=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                      FeatureID = "Metabolite",
+                      SaveAs_Table = "csv",
+                      BackgroundMethod="C1&C2",
+                      FolderPath=NULL
                       ){
   ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "alluvial")
+  RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0){
     install.packages(new.packages)
   }
   suppressMessages(library(tidyverse))
 
-
+  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
+  MetaProViz:::CheckInput_MCA(InputData_C1=InputData_C1,
+                              InputData_C2=InputData_C2,
+                              InputData_CoRe=NULL,
+                              InputData_Intra=NULL,
+                              SettingsInfo_C1=SettingsInfo_C1,
+                              SettingsInfo_C2=SettingsInfo_C2,
+                              SettingsInfo_CoRe=NULL,
+                              SettingsInfo_Intra=NULL,
+                              BackgroundMethod=BackgroundMethod,
+                              FeatureID=FeatureID,
+                              SaveAs_Table=SaveAs_Table)
 
-  if( is.numeric(Cond1_padj_cutoff)== FALSE |Cond1_padj_cutoff > 1 | Cond1_padj_cutoff < 0 | is.numeric(Cond2_padj_cutoff)== FALSE |Cond2_padj_cutoff > 1 | Cond2_padj_cutoff < 0){
-    stop("Check input. The selected Cond_padj_cutoff value should be numeric and between 0 and 1.")
-  }
-  if( is.numeric(Cond1_FC_cutoff)== FALSE  | Cond1_FC_cutoff < 0 | is.numeric(Cond2_FC_cutoff)== FALSE  | Cond2_FC_cutoff < 0){
-    stop("Check input. The selected Cond_FC_cutoff value should be numeric and positive (absolute value).")
+  ## ------------ Create Results output folder ----------- ##
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- MetaProViz:::SavePath(FolderName= "MCA2Cond",
+                                    FolderPath=FolderPath)
   }
 
+  ################################################################################################################################################################################################
+  ## ------------ Prepare the Input -------- ##
   #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
-  Cond2_DF <- as.data.frame(Cond2_File)%>%
-    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
-                  "ValueCol"=paste(Cond2ValueCol),
-                  "PadjCol"=paste(Cond2PadjCol))
-  Cond1_DF<- as.data.frame(Cond1_File)%>%
-    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
-                  "ValueCol"=paste(Cond1ValueCol),
-                  "PadjCol"=paste(Cond1PadjCol))
+  Cond1_DF <- as.data.frame(InputData_C1)%>%
+    dplyr::rename("MetaboliteID"=paste(FeatureID),
+                  "ValueCol"=SettingsInfo_C1[["ValueCol"]],
+                  "PadjCol"=SettingsInfo_C1[["StatCol"]])
+  Cond1_DF <- Cond1_DF[complete.cases(Cond1_DF$ValueCol, Cond1_DF$PadjCol), ]
 
-  #First check for duplicates in "MetaboliteID" and drop if there are any
-  if(length(Cond2_DF[duplicated(Cond2_DF$MetaboliteID), "MetaboliteID"]) > 0){
-    doublons <- as.character(Cond2_DF[duplicated(Cond2_DF$MetaboliteID), "MetaboliteID"])#number of duplications
-    Cond2_DF <-Cond2_DF[!duplicated(Cond2_DF$MetaboliteID),]#remove duplications
-    warning("Cond2 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running MCA.")
-  }
-  if(length(Cond1_DF[duplicated(Cond1_DF$MetaboliteID), "MetaboliteID"]) > 0){
-    doublons <- as.character(Cond1_DF[duplicated(Cond1_DF$MetaboliteID), "MetaboliteID"])#number of duplications
-    Cond1_DF <-Cond1_DF[!duplicated(Cond1_DF$MetaboliteID),]#remove duplications
-    warning("Cond1 dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates. Note that you should do this before running MCA.")
-  }
+  Cond2_DF<- as.data.frame(InputData_C2)%>%
+    dplyr::rename("MetaboliteID"=paste(FeatureID),
+                  "ValueCol"=SettingsInfo_C2[["ValueCol"]],
+                  "PadjCol"=SettingsInfo_C2[["StatCol"]])
+  Cond2_DF <- Cond2_DF[complete.cases(Cond2_DF$ValueCol, Cond2_DF$PadjCol), ]
 
-  ## -------- Create Results output folder ---------- ##
-  if(is.null(Folder_Name)){
-    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
-  }else{
-    if(grepl('[^[:alnum:]]', Folder_Name)){
-      stop("The 'Folder_Name' must not contain any special character.")
-    }else{
-      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
-    }
-  }
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  Results_folder_MCA_folder = file.path(Results_folder, "MCA") # select name of result directory
-  if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
-
+  #Tag genes that are detected in each data layer
+  Cond1_DF$Detected <- "TRUE"
+  Cond2_DF$Detected <- "TRUE"
 
 
   ## ------------ Assign Groups -------- ##
-  #Tag genes that are detected in each data layer
-  Cond2_DF$Detected <- "TRUE"
-  Cond1_DF$Detected <- "TRUE"
-
   #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
-  Cond2_DF <- Cond2_DF%>%
-    mutate(Cutoff = case_when(Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol > Cond2_FC_cutoff ~ 'UP',
-                              Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol < -Cond2_FC_cutoff ~ 'DOWN',
-                              TRUE ~ 'No Change')) %>%
-    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
-                                       Cutoff == "DOWN" ~ 'DOWN',
-                                       Cutoff == "No Change" & Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol > 0 ~ 'Significant Positive',
-                                       Cutoff == "No Change" & Cond2_DF$PadjCol < Cond2_padj_cutoff & Cond2_DF$ValueCol < 0 ~ 'Significant Negative',
-                                       Cutoff == "No Change" & Cond2_DF$PadjCol > Cond2_padj_cutoff ~ 'Not Significant',
-                                       TRUE ~ 'FALSE'))
-
   Cond1_DF <-Cond1_DF%>%
-    mutate(Cutoff = case_when(Cond1_DF$PadjCol <Cond1_padj_cutoff &Cond1_DF$ValueCol >Cond1_FC_cutoff ~ 'UP',
-                              Cond1_DF$PadjCol <Cond1_padj_cutoff &Cond1_DF$ValueCol < -Cond1_FC_cutoff ~ 'DOWN',
+    mutate(Cutoff = case_when(Cond1_DF$PadjCol <= as.numeric(SettingsInfo_C1[["StatCutoff"]]) & Cond1_DF$ValueCol > as.numeric(SettingsInfo_C1[["ValueCutoff"]]) ~ 'UP',
+                              Cond1_DF$PadjCol <= as.numeric(SettingsInfo_C1[["StatCutoff"]]) & Cond1_DF$ValueCol < - as.numeric(SettingsInfo_C1[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change'))%>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
-                                       Cutoff == "No Change" & Cond1_DF$PadjCol < Cond1_padj_cutoff & Cond1_DF$ValueCol > 0 ~ 'Significant Positive',
-                                       Cutoff == "No Change" & Cond1_DF$PadjCol < Cond1_padj_cutoff & Cond1_DF$ValueCol < 0 ~ 'Significant Negative',
-                                       Cutoff == "No Change" & Cond1_DF$PadjCol > Cond1_padj_cutoff ~ 'Not Significant',
-                                       TRUE ~ 'FALSE'))
+                                       Cutoff == "No Change" & Cond1_DF$PadjCol <= as.numeric(SettingsInfo_C1[["StatCutoff"]]) & Cond1_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & Cond1_DF$PadjCol <= as.numeric(SettingsInfo_C1[["StatCutoff"]]) & Cond1_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & Cond1_DF$PadjCol > as.numeric(SettingsInfo_C1[["StatCutoff"]]) ~ 'Not Significant',
+                                       TRUE ~ 'NA'))
+
+  Cond2_DF <- Cond2_DF%>%
+    mutate(Cutoff = case_when(Cond2_DF$PadjCol <= as.numeric(SettingsInfo_C2[["StatCutoff"]]) & Cond2_DF$ValueCol > as.numeric(SettingsInfo_C2[["ValueCutoff"]]) ~ 'UP',
+                              Cond2_DF$PadjCol <= as.numeric(SettingsInfo_C2[["StatCutoff"]]) & Cond2_DF$ValueCol < - as.numeric(SettingsInfo_C2[["ValueCutoff"]]) ~ 'DOWN',
+                              TRUE ~ 'No Change')) %>%
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
+                                       Cutoff == "DOWN" ~ 'DOWN',
+                                       Cutoff == "No Change" & Cond2_DF$PadjCol <= as.numeric(SettingsInfo_C2[["StatCutoff"]]) & Cond2_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & Cond2_DF$PadjCol <= as.numeric(SettingsInfo_C2[["StatCutoff"]]) & Cond2_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & Cond2_DF$PadjCol > as.numeric(SettingsInfo_C2[["StatCutoff"]]) ~ 'Not Significant',
+                                       TRUE ~ 'NA'))
+
+
 
   #Merge the dataframes together: Merge the supplied Cond1 and Cond2 dataframes together.
   ##Add prefix to column names to distinguish the different data types after merge
@@ -168,30 +142,30 @@ MCA_2Cond <- function(Cond1_File,
     mutate_at(c("Cond2_DF_Cutoff_Specific", "Cond1_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))
 
   #Apply Background filter (label genes that will be removed based on choosen background)
-  if(backgroundMethod == "C1|C2"){# C1|C2 = Cond2 OR Cond1
+  if(BackgroundMethod == "C1|C2"){# C1|C2 = Cond2 OR Cond1
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
                                    Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "C1&C2"){ # Cond2 AND Cond1
+  }else if(BackgroundMethod == "C1&C2"){ # Cond2 AND Cond1
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "C2"){ # Cond2 has to be there
+  }else if(BackgroundMethod == "C2"){ # Cond2 has to be there
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "C1"){ #Cond1 has to be there
+  }else if(BackgroundMethod == "C1"){ #Cond1 has to be there
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "*"){ # Use all genes as the background
+  }else if(BackgroundMethod == "*"){ # Use all genes as the background
     MergeDF$BG_Method <- "TRUE"
   }else{
-    stop("Please use one of the following backgroundMethods: C1|C2, C1&C2, C2, C1, *")#error message
+    stop("Please use one of the following BackgroundMethods: C1|C2, C1&C2, C2, C1, *")#error message
   }
 
   #Assign SiRCle cluster names to the genes
@@ -374,10 +348,10 @@ MCA_2Cond <- function(Cond1_File,
   ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
   MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Cond1_DF_Detected","Cond1_DF_ValueCol","Cond1_DF_PadjCol","Cond1_DF_Cutoff", "Cond1_DF_Cutoff_Specific", "Cond2_DF_Detected", "Cond2_DF_ValueCol","Cond2_DF_PadjCol","Cond2_DF_Cutoff", "Cond2_DF_Cutoff_Specific", "BG_Method", "RG1_All", "RG2_Significant", "RG3_SignificantChange")]
 
-  Cond2ValueCol_Unique<-paste("Cond2_DF_",Cond2ValueCol)
-  Cond2PadjCol_Unique <-paste("Cond2_DF_",Cond2PadjCol)
-  Cond1ValueCol_Unique<-paste("Cond1_DF_",Cond1ValueCol)
-  Cond1PadjCol_Unique <-paste("Cond1_DF_",Cond1PadjCol)
+  Cond2ValueCol_Unique<-paste("Cond2_DF_",SettingsInfo_C2[["ValueCol"]])
+  Cond2PadjCol_Unique <-paste("Cond2_DF_",SettingsInfo_C2[["StatCol"]])
+  Cond1ValueCol_Unique<-paste("Cond1_DF_",SettingsInfo_C1[["ValueCol"]])
+  Cond1PadjCol_Unique <-paste("Cond1_DF_",SettingsInfo_C1[["StatCol"]])
 
   MergeDF_Select2<- subset(MergeDF, select=-c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_Method, RG1_All, RG2_Significant, RG3_SignificantChange))%>%
     dplyr::rename(!!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
@@ -389,49 +363,46 @@ MCA_2Cond <- function(Cond1_File,
   MergeDF_Rearrange <-MergeDF_Rearrange%>%
     dplyr::rename("Metabolite"="MetaboliteID")
 
-
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    count(RG1_All, name="Number of Genes")%>%
+    count(RG1_All, name="Number of Features")%>%
     dplyr::rename("SiRCle cluster Name"= "RG1_All")
   ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
 
   ClusterSummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    count(RG2_Significant, name="Number of Genes")%>%
+    count(RG2_Significant, name="Number of Features")%>%
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
   ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
-    count(RG3_SignificantChange, name="Number of Genes")%>%
+    count(RG3_SignificantChange, name="Number of Features")%>%
     dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
   ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
 
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
 
+  ## Rename FeatureID
+  MergeDF_Rearrange <-MergeDF_Rearrange%>%
+    dplyr::rename(!!FeatureID := "Metabolite")
 
-  if (Save_as_Results == "xlsx"){
-    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.xlsx", sep = "") # Save the DMA results table
-    writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
+  ######################################################################################################################################################################
+  ##----- Save and Return
+  #Here we make a list in which we will save the outputs:
+  DF_List <- list("MCA_2Cond_Summary"=ClusterSummary, "MCA_2Cond_Results"=MergeDF_Rearrange)
 
-    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".xlsx", sep = "") # Save the DMA results table
-    writexl::write_xlsx(MergeDF_Rearrange,xlsMCA, col_names = TRUE) # save the DMA result DF
-  }else if (Save_as_Results == "csv"){
-    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.csv", sep = "")
-    write.csv(ClusterSummary,csvMCA) # save the DMA result DF
-
-    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".csv", sep = "")
-    write.csv(MergeDF_Rearrange,csvMCA) # save the DMA result DF
-  }else if (Save_as_Results == "txt"){
-    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary.txt", sep = "")
-    write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
-
-    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,".txt", sep = "")
-    write.table(MergeDF_Rearrange,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
-  }
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF=DF_List,
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= Folder,
+                         FileName= "MCA_2Cond",
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
 
   #Return:
-  invisible(return(list("DF"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
+  invisible(return(DF_List))
 }
 
 
@@ -441,20 +412,14 @@ MCA_2Cond <- function(Cond1_File,
 #'
 #' This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (CoRe experiment).
 #'
-#' @param Intra_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param CoRe_File DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
-#' @param MetaboliteID Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.
-#' @param IntraValueCol Column name of Log2FC in IntraFile
-#' @param IntraPadjCol Column name of adjusted p-value in IntraFile. Can also be you p-value column if you want to use this instead.
-#' @param CoReValueCol  Column name of Log2(Distance) in CoReFile
-#' @param CoRePadjCol Column name of adjusted p-value in CoReFile. Can also be you p-value column if you want to use this instead.
-#' @param Intra_padj_cutoff  \emph{Optional: } adjusted p-value cutoff for IntraFile. \strong{Default=0.05}
-#' @param Intra_FC_cutoff \emph{Optional: } Log2FC cutoff for IntraFile. \strong{Default=0.5}
-#' @param CoRe_padj_cutoff \emph{Optional: } adjusted p-value cutoff for CoReFile. \strong{Default=0.05}
-#' @param CoRe_FC_cutoff \emph{Optional: } Log2FC cutoff for CoReFile. \strong{Default=20}
-#' @param backgroundMethod \emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}
-#' @param outputFileName \emph{Optional: } Output filename \strong{Default="MCA_"}
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param InputData_Intra DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param InputData_CoRe DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
+#' @param SettingsInfo_Intra  \emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_Intra,StatCol=ColumnName_InputData_Intra, StatCutoff= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
+#' @param SettingsInfo_CoRe  \emph{Optional: } Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_InputData_CoRe,ValueCol=ColumnName_InputData_CoRe,StatCol=ColumnName_InputData_CoRe, StatCutoff= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(DirectionCol="CoRe", ValueCol="Log2(Distance)",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
+#' @param FeatureID \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
+#' @param BackgroundMethod \emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #' @return MCA an instance of the MetaProViz package
 #' @export
 #'
@@ -463,111 +428,88 @@ MCA_2Cond <- function(Cond1_File,
 ### ### ### Metabolite Clustering Analysis ### ### ###
 ##################################################
 
-MCA_CoRe <- function(Intra_File,
-                     CoRe_File,
-                     MetaboliteID= "Metabolite",
-                     IntraValueCol="Log2FC",
-                     IntraPadjCol="p.adj",
-                     CoReValueCol="Log2(Distance)",
-                     CoReDirectionCol="CoRe",
-                     CoRePadjCol="p.adj",
-                     Intra_padj_cutoff= 0.05,
-                     CoRe_padj_cutoff = 0.05,
-                     Intra_FC_cutoff= 1,
-                     Save_as_Results = "xlsx",
-                     CoRe_FC_cutoff = 20,
-                     backgroundMethod="Intra&CoRe",
-                     OutputFileName = "MCA_",
-                     Folder_Name = NULL){
+MCA_CoRe <- function(InputData_Intra,
+                     InputData_CoRe,
+                     SettingsInfo_Intra=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                     SettingsInfo_CoRe=c(DirectionCol="CoRe", ValueCol="Log2(Distance)",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                     FeatureID= "Metabolite",
+                     SaveAs_Table = "csv",
+                     BackgroundMethod="Intra&CoRe",
+                     FolderPath=NULL
+                     ){
+
   ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "alluvial")
+  RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0){
     install.packages(new.packages)
   }
   suppressMessages(library(tidyverse))
 
-
+  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
+  MetaProViz:::CheckInput_MCA(InputData_C1=NULL,
+                              InputData_C2=NULL,
+                              InputData_CoRe= InputData_CoRe,
+                              InputData_Intra=InputData_Intra,
+                              SettingsInfo_C1=NULL,
+                              SettingsInfo_C2=NULL,
+                              SettingsInfo_CoRe=SettingsInfo_CoRe,
+                              SettingsInfo_Intra=SettingsInfo_Intra,
+                              BackgroundMethod=BackgroundMethod,
+                              FeatureID=FeatureID,
+                              SaveAs_Table=SaveAs_Table)
 
-  if( is.numeric(Intra_padj_cutoff)== FALSE |Intra_padj_cutoff > 1 | Intra_padj_cutoff < 0 | is.numeric(CoRe_padj_cutoff)== FALSE |CoRe_padj_cutoff > 1 | CoRe_padj_cutoff < 0){
-    stop("Check input. The selected Cond_padj_cutoff value should be numeric and between 0 and 1.")
-  }
-  if( is.numeric(Intra_FC_cutoff)== FALSE  | Intra_FC_cutoff < 0 | is.numeric(CoRe_FC_cutoff)== FALSE  | CoRe_FC_cutoff < 0){
-    stop("Check input. The selected Cond_FC_cutoff value should be numeric and positive (absolute value).")
+
+  ## ------------ Create Results output folder ----------- ##
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- MetaProViz:::SavePath(FolderName= "MCACoRe",
+                                    FolderPath=FolderPath)
   }
 
+
+  ################################################################################################################################################################################################
+  ## ------------ Prepare the Input -------- ##
   #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
-  CoRe_DF <- as.data.frame(CoRe_File)%>%
-    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
-                  "ValueCol"=paste(CoReValueCol),
-                  "PadjCol"=paste(CoRePadjCol),
-                  "CoRe_Direction"=paste(CoReDirectionCol))
-  Intra_DF<- as.data.frame(Intra_File)%>%
-    dplyr::rename("MetaboliteID"=paste(MetaboliteID),
-                  "ValueCol"=paste(IntraValueCol),
-                  "PadjCol"=paste(IntraPadjCol))
+  CoRe_DF <-  as.data.frame(InputData_CoRe)%>%
+    dplyr::rename("MetaboliteID"=paste(FeatureID),
+                  "ValueCol"=SettingsInfo_CoRe[["ValueCol"]],
+                  "PadjCol"=SettingsInfo_CoRe[["StatCol"]],
+                  "CoRe_Direction"=SettingsInfo_CoRe[["DirectionCol"]])
+  CoRe_DF <- CoRe_DF[complete.cases(CoRe_DF$ValueCol, CoRe_DF$PadjCol), ]
 
-   #First check for duplicates in "MetaboliteID" and drop if there are any
-  if(length(CoRe_DF[duplicated(CoRe_DF$MetaboliteID), "MetaboliteID"]) > 0){
-    doublons <- as.character(CoRe_DF[duplicated(CoRe_DF$MetaboliteID), "MetaboliteID"])#number of duplications
-    CoRe_DF <-CoRe_DF[!duplicated(CoRe_DF$MetaboliteID),]#remove duplications
-    warning("CoRe dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
-    warning("Note that you should do this before running MCA.")
-  }
-  if(length(Intra_DF[duplicated(Intra_DF$MetaboliteID), "MetaboliteID"]) > 0){
-    doublons <- as.character(Intra_DF[duplicated(Intra_DF$MetaboliteID), "MetaboliteID"])#number of duplications
-    Intra_DF <-Intra_DF[!duplicated(Intra_DF$MetaboliteID),]#remove duplications
-    warning("Intra dataset contained duplicates based on MetaboliteID! Dropping duplicate IDs and kept only the first entry. You had ", length(doublons), " duplicates.")
-    warning("Note that you should do this before running MCA.")
-  }
+  Intra_DF<- as.data.frame(InputData_Intra)%>%
+    dplyr::rename("MetaboliteID"=paste(FeatureID),
+                  "ValueCol"=SettingsInfo_Intra[["ValueCol"]],
+                  "PadjCol"=SettingsInfo_Intra[["StatCol"]])
+  Intra_DF <- Intra_DF[complete.cases(Intra_DF$ValueCol, Intra_DF$PadjCol), ]
 
-
-  ## -------- Create Results output folder ---------- ##
-  if(is.null(Folder_Name)){
-    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
-  }else{
-    if(grepl('[^[:alnum:]]', Folder_Name)){
-      stop("The 'Folder_Name' must not contain any special character.")
-    }else{
-      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
-    }
-  }
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)}
-  Results_folder_MCA_folder = file.path(Results_folder, "MCA") # select name of result directory
-  if (!dir.exists(Results_folder_MCA_folder)) {dir.create(Results_folder_MCA_folder)}  # check and create folder
-
-
-
-  ## ------------ Assign Groups -------- ##
   #Tag genes that are detected in each data layer
   CoRe_DF$Detected <- "TRUE"
   Intra_DF$Detected <- "TRUE"
 
   #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
   CoRe_DF <- CoRe_DF%>%
-    mutate(Cutoff = case_when(CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol > CoRe_FC_cutoff ~ 'UP',
-                              CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol < -CoRe_FC_cutoff ~ 'DOWN',
+    mutate(Cutoff = case_when(CoRe_DF$PadjCol <= as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) & CoRe_DF$ValueCol > as.numeric(SettingsInfo_CoRe[["ValueCutoff"]]) ~ 'UP',
+                              CoRe_DF$PadjCol <= as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) & CoRe_DF$ValueCol < - as.numeric(SettingsInfo_CoRe[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change')) %>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
-                                       Cutoff == "No Change" & CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol > 0 ~ 'Significant Positive',
-                                       Cutoff == "No Change" & CoRe_DF$PadjCol < CoRe_padj_cutoff & CoRe_DF$ValueCol < 0 ~ 'Significant Negative',
-                                       Cutoff == "No Change" & CoRe_DF$PadjCol > CoRe_padj_cutoff ~ 'Not Significant',
-                                       TRUE ~ 'FALSE'))
+                                       Cutoff == "No Change" & CoRe_DF$PadjCol <= as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) & CoRe_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & CoRe_DF$PadjCol <= as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) & CoRe_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & CoRe_DF$PadjCol > as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) ~ 'Not Significant',
+                                       TRUE ~ 'NA'))
 
   Intra_DF <-Intra_DF%>%
-    mutate(Cutoff = case_when(Intra_DF$PadjCol <Intra_padj_cutoff &Intra_DF$ValueCol >Intra_FC_cutoff ~ 'UP',
-                              Intra_DF$PadjCol <Intra_padj_cutoff &Intra_DF$ValueCol < -Intra_FC_cutoff ~ 'DOWN',
+    mutate(Cutoff = case_when(Intra_DF$PadjCol <= as.numeric(SettingsInfo_Intra[["StatCutoff"]]) & Intra_DF$ValueCol > as.numeric(SettingsInfo_Intra[["ValueCutoff"]]) ~ 'UP',
+                              Intra_DF$PadjCol <= as.numeric(SettingsInfo_Intra[["StatCutoff"]]) & Intra_DF$ValueCol < - as.numeric(SettingsInfo_Intra[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change'))%>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
-                                       Cutoff == "No Change" & Intra_DF$PadjCol < Intra_padj_cutoff & Intra_DF$ValueCol > 0 ~ 'Significant Positive',
-                                       Cutoff == "No Change" & Intra_DF$PadjCol < Intra_padj_cutoff & Intra_DF$ValueCol < 0 ~ 'Significant Negative',
-                                       Cutoff == "No Change" & Intra_DF$PadjCol > Intra_padj_cutoff ~ 'Not Significant',
-                                       TRUE ~ 'FALSE'))
+                                       Cutoff == "No Change" & Intra_DF$PadjCol <= as.numeric(SettingsInfo_Intra[["StatCutoff"]]) & Intra_DF$ValueCol > 0 ~ 'Significant Positive',
+                                       Cutoff == "No Change" & Intra_DF$PadjCol <= as.numeric(SettingsInfo_Intra[["StatCutoff"]]) & Intra_DF$ValueCol < 0 ~ 'Significant Negative',
+                                       Cutoff == "No Change" & Intra_DF$PadjCol > as.numeric(SettingsInfo_Intra[["StatCutoff"]]) ~ 'Not Significant',
+                                       TRUE ~ 'NA'))
 
   #Merge the dataframes together: Merge the supplied Intra and CoRe dataframes together.
   ##Add prefix to column names to distinguish the different data types after merge
@@ -590,30 +532,30 @@ MCA_CoRe <- function(Intra_File,
     mutate_at(c("CoRe_DF_CoRe_Direction"), ~replace_na(.,"Not Detected"))
 
   #Apply Background filter (label metabolites that will be removed based on chosen background)
-  if(backgroundMethod == "Intra|CoRe"){# C1|C2 = CoRe OR Intra
+  if(BackgroundMethod == "Intra|CoRe"){# C1|C2 = CoRe OR Intra
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
                                    Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
                                    Intra_DF_Detected=="FALSE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', # Just CoRe
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "Intra&CoRe"){ # CoRe AND Intra
+  }else if(BackgroundMethod == "Intra&CoRe"){ # CoRe AND Intra
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "CoRe"){ # CoRe has to be there
+  }else if(BackgroundMethod == "CoRe"){ # CoRe has to be there
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
                                    Intra_DF_Detected=="FALSE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', # Just CoRe
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "Intra"){ #Intra has to be there
+  }else if(BackgroundMethod == "Intra"){ #Intra has to be there
     MergeDF <- MergeDF%>%
       mutate(BG_Method = case_when(Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="TRUE" ~ 'TRUE', #Intra & CoRe
                                    Intra_DF_Detected=="TRUE" & CoRe_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
                                    TRUE ~ 'FALSE'))
-  }else if(backgroundMethod == "*"){ # Use all metabolites as the background
+  }else if(BackgroundMethod == "*"){ # Use all metabolites as the background
     MergeDF$BG_Method <- "TRUE"
   }else{
-    stop("Please use one of the following backgroundMethods: Intra|CoRe, Intra&CoRe, CoRe, Intra, *")#error message
+    stop("Please use one of the following BackgroundMethods: Intra|CoRe, Intra&CoRe, CoRe, Intra, *")#error message
   }
 
   #Assign Metabolite cluster names to the metabolites
@@ -1010,10 +952,10 @@ MCA_CoRe <- function(Intra_File,
   ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
   MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Intra_DF_Detected","Intra_DF_ValueCol","Intra_DF_PadjCol","Intra_DF_Cutoff", "Intra_DF_Cutoff_Specific", "CoRe_DF_Detected", "CoRe_DF_ValueCol","CoRe_DF_PadjCol","CoRe_DF_Cutoff", "CoRe_DF_Cutoff_Specific", "BG_Method", "RG1_All", "RG2_Significant", "RG3_Change")]
 
-  CoReValueCol_Unique<-paste("CoRe_DF_",CoReValueCol)
-  CoRePadjCol_Unique <-paste("CoRe_DF_",CoRePadjCol)
-  IntraValueCol_Unique<-paste("Intra_DF_",IntraValueCol)
-  IntraPadjCol_Unique <-paste("Intra_DF_",IntraPadjCol)
+  CoReValueCol_Unique<-paste("Cond2_DF_",SettingsInfo_CoRe[["ValueCol"]])
+  CoRePadjCol_Unique <-paste("Cond2_DF_",SettingsInfo_CoRe[["StatCol"]])
+  IntraValueCol_Unique<-paste("Cond1_DF_",SettingsInfo_Intra[["ValueCol"]])
+  IntraPadjCol_Unique <-paste("Cond1_DF_",SettingsInfo_Intra[["StatCol"]])
 
   MergeDF_Select2<- subset(MergeDF, select=-c(Intra_DF_Detected,Intra_DF_Cutoff, CoRe_DF_Detected,CoRe_DF_Cutoff, CoRe_DF_Cutoff_Specific, BG_Method, RG1_All, RG2_Significant, RG3_Change))%>%
     dplyr::rename(!!CoReValueCol_Unique :="CoRe_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
@@ -1028,47 +970,290 @@ MCA_CoRe <- function(Intra_File,
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    count(RG1_All, name="Number of Genes")%>%
-    dplyr::rename("SiRCle cluster Name"= "RG1_All")
+    group_by(RG1_All) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG1_All, .keep_all = TRUE) %>%
+    dplyr::rename("SiRCle cluster Name" = "RG1_All")
   ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
+  ClusterSummary_RG1 <- ClusterSummary_RG1[-c(1)]
 
   ClusterSummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    count(RG2_Significant, name="Number of Genes")%>%
+    group_by(RG2_Significant) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG2_Significant, .keep_all = TRUE) %>%
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
+  ClusterSummary_RG2 <- ClusterSummary_RG2[-c(1)]
 
   ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_Change")]%>%
-    count(RG3_Change, name="Number of Genes")%>%
+    group_by(RG3_Change) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG3_Change, .keep_all = TRUE) %>%
     dplyr::rename("SiRCle cluster Name"= "RG3_Change")
   ClusterSummary_RG3$`Regulation Grouping` <- "RG3_Change"
+  ClusterSummary_RG3 <- ClusterSummary_RG3[-c(1)]
 
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
 
+  ## Rename FeatureID
+  MergeDF_Rearrange <-MergeDF_Rearrange%>%
+    dplyr::rename(!!FeatureID := "Metabolite")
 
-  if (Save_as_Results == "xlsx"){
-    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary_CoRe.xlsx", sep = "") # Save the DMA results table
-    writexl::write_xlsx(ClusterSummary,xlsMCA, col_names = TRUE) # save the DMA result DF
+  ######################################################################################################################################################################
+  ##----- Save and Return
+  #Here we make a list in which we will save the outputs:
+  DF_List <- list("MCA_CoRe_Summary"=ClusterSummary, "MCA_CoRe_Results"=MergeDF_Rearrange)
 
-    xlsMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_CoRe.xlsx", sep = "") # Save the DMA results table
-    writexl::write_xlsx(MergeDF_Rearrange,xlsMCA, col_names = TRUE) # save the DMA result DF
-  }else if (Save_as_Results == "csv"){
-    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary_CoRe.csv", sep = "")
-    write.csv(ClusterSummary,csvMCA) # save the DMA result DF
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF=DF_List,
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= Folder,
+                         FileName= "MCA_2Cond",
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
 
-    csvMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_CoRe.csv", sep = "")
-    write.csv(MergeDF_Rearrange,csvMCA) # save the DMA result DF
-  }else if (Save_as_Results == "txt"){
-    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_Summary_CoRe.txt", sep = "")
-    write.table(ClusterSummary,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+  invisible(return(DF_List))
+}
 
-    txtMCA <-  paste0(Results_folder_MCA_folder,"/MCA_Output_",OutputFileName,"_CoRe.txt", sep = "")
-    write.table(MergeDF_Rearrange,txtMCA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
+########################################
+### ### ### Import MCA rules ### ### ###
+########################################
+
+#' Imports MCA regulatory rules into environment
+#'
+#' @param Method Either "2Cond" or "CoRe" depending which regulatory rules you would like to load
+#' @title MCA regulatory rules Import
+#' @description Import and process .csv file to create toy data.
+#' @importFrom utils read.csv
+#' @return A data frame containing the toy data.
+#' @export
+#'
+MCA_rules<- function(Method){
+  # Read the .csv files
+  Cond <- system.file("data", "MCA_2Cond.csv", package = "MetaProViz")
+  Cond<- read.csv( Cond, check.names=FALSE)
+
+  CoRe <- system.file("data", "MCA_CoRe.csv", package = "MetaProViz")
+  CoRe<- read.csv(CoRe, check.names=FALSE)
+
+  # Return the toy data into environment
+  if(Method=="2Cond"){
+    assign("MCA_2Cond", Cond, envir=.GlobalEnv)
+  } else if(Method=="CoRe"){
+    assign("MCA_CoRe", CoRe, envir=.GlobalEnv)
+  } else{
+    warning("Please choose the MCA regulatory rules you would like to load: 2Cond, CoRe")
   }
-
-
-  invisible(return(list("DF"=list("MCA_result"=MergeDF_Rearrange, "ClusterSummary"= ClusterSummary))))
 }
 
 
+################################################################################################
+### ### ### MCA Helper function: Internal Function to check function input ### ### ###
+################################################################################################
 
+#' Check input parameters
+#'
+#' @param InputData_C1 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param InputData_C2 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param InputData_Intra Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param InputData_CoRe Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_C1 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_C2 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_Intra Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_CoRe Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
+#' @param BackgroundMethod Passed to main function MetaProViz::MCA.
+#' @param FeatureID Passed to main function MetaProViz::MCA.
+#' @param SaveAs_Table Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#'
+#' @param Function Name of the MetaProViz Function that is checked.
+#' @param InputList
+#'
+#'
+#' @keywords Input check
+#' @noRd
+#'
+#'
+
+CheckInput_MCA <- function(InputData_C1,
+                           InputData_C2,
+                           InputData_CoRe,
+                           InputData_Intra,
+                           SettingsInfo_C1,
+                           SettingsInfo_C2,
+                           SettingsInfo_CoRe,
+                           SettingsInfo_Intra,
+                           BackgroundMethod,
+                           FeatureID,
+                           SaveAs_Table
+                           ){
+  #------------- InputData
+  if(is.null(InputData_C1)==FALSE){
+    if(class(InputData_C1) != "data.frame"| class(InputData_C2) != "data.frame"){
+    stop("InputData_C1 and InputData_C2 should be a data.frame. It's currently a ", paste(class(InputData_C1)), paste(class(InputData_C2)), ".",sep = "")
+    }
+    if(length(InputData_C1[duplicated(InputData_C1[[FeatureID]]), FeatureID]) > 0){
+      stop("Duplicated FeatureIDs of InputData_C1, whilst features must be unique")
+    }
+    if(length(InputData_C2[duplicated(InputData_C2[[FeatureID]]), FeatureID]) > 0){
+      stop("Duplicated FeatureIDs of InputData_C2, whilst features must be unique")
+    }
+
+  }else{
+    if(class(InputData_Intra) != "data.frame"| class(InputData_CoRe) != "data.frame"){
+      stop("InputData_Intra and InputData_CoRe should be a data.frame. It's currently a ", paste(class(InputData_Intra)), paste(class(InputData_CoRe)), ".",sep = "")
+    }
+    if(length(InputData_Intra[duplicated(InputData_Intra[[FeatureID]]), FeatureID]) > 0){
+      stop("Duplicated FeatureIDs of InputData_Intra, whilst features must be unique")
+    }
+    if(length(InputData_CoRe[duplicated(InputData_CoRe[[FeatureID]]), FeatureID]) > 0){
+      stop("Duplicated FeatureIDs of InputData_CoRe, whilst features must be unique")
+    }
+  }
+
+
+  #------------- SettingsInfo
+  if(is.null(SettingsInfo_C1)==FALSE){
+    ## C1
+    #ValueCol
+    if("ValueCol" %in% names(SettingsInfo_C1)){
+      if(SettingsInfo_C1[["ValueCol"]] %in% colnames(InputData_C1)== FALSE){
+        stop("The ", SettingsInfo_C1[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
+      }
+    }
+    #StatCol
+    if("StatCol" %in% names(SettingsInfo_C1)){
+      if(SettingsInfo_C1[["StatCol"]] %in% colnames(InputData_C1)== FALSE){
+        stop("The ", SettingsInfo_C1[["StatCol"]], " column selected as StatCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
+      }
+    }
+
+    ## C2
+    #ValueCol
+    if("ValueCol" %in% names(SettingsInfo_C2)){
+      if(SettingsInfo_C2[["ValueCol"]] %in% colnames(InputData_C2)== FALSE){
+        stop("The ", SettingsInfo_C2[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
+      }
+    }
+    #StatCol
+    if("StatCol" %in% names(SettingsInfo_C2)){
+      if(SettingsInfo_C2[["StatCol"]] %in% colnames(InputData_C2)== FALSE){
+        stop("The ", SettingsInfo_C2[["StatCol"]], " column selected as StatCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
+      }
+    }
+  }else{
+    ## Intra
+    #ValueCol
+    if("ValueCol" %in% names(SettingsInfo_Intra)){
+      if(SettingsInfo_Intra[["ValueCol"]] %in% colnames(InputData_Intra)== FALSE){
+        stop("The ", SettingsInfo_Intra[["ValueCol"]], " column selected as ValueCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
+      }
+    }
+    #StatCol
+    if("StatCol" %in% names(SettingsInfo_Intra)){
+      if(SettingsInfo_Intra[["StatCol"]] %in% colnames(InputData_Intra)== FALSE){
+        stop("The ", SettingsInfo_Intra[["StatCol"]], " column selected as StatCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
+      }
+    }
+
+    ## CoRe
+    #ValueCol
+    if("ValueCol" %in% names(SettingsInfo_CoRe)){
+      if(SettingsInfo_CoRe[["ValueCol"]] %in% colnames(InputData_CoRe)== FALSE){
+        stop("The ", SettingsInfo_CoRe[["ValueCol"]], " column selected as ValueCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+      }
+    }
+    #StatCol
+    if("StatCol" %in% names(SettingsInfo_CoRe)){
+      if(SettingsInfo_CoRe[["StatCol"]] %in% colnames(InputData_CoRe)== FALSE){
+        stop("The ", SettingsInfo_CoRe[["StatCol"]], " column selected as StatCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+      }
+    }
+
+    #StatCol
+    if("DirectionCol" %in% names(SettingsInfo_CoRe)){
+      if(SettingsInfo_CoRe[["DirectionCol"]] %in% colnames(InputData_CoRe)== FALSE){
+        stop("The ", SettingsInfo_CoRe[["DirectionCol"]], " column selected as DirectionCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+      }
+    }
+
+  }
+
+  #------------- SettingsInfo Cutoffs:
+  if(is.null(SettingsInfo_C1)==FALSE){
+    if(is.na(as.numeric(SettingsInfo_C1[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_C1[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_C1[["StatCutoff"]]) < 0){
+      stop("Check input. The selected StatCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
+    }
+
+    if(is.na(as.numeric(SettingsInfo_C2[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_C2[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_C2[["StatCutoff"]]) < 0){
+      stop("Check input. The selected StatCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
+    }
+
+    if(is.na(as.numeric(SettingsInfo_C1[["ValueCutoff"]])) == TRUE){
+      stop("Check input. The selected ValueCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
+    }
+
+    if(is.na(as.numeric(SettingsInfo_C2[["ValueCutoff"]])) == TRUE){
+      stop("Check input. The selected ValueCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
+    }
+
+  }else{
+    if(is.na(as.numeric(SettingsInfo_Intra[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_Intra[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_Intra[["StatCutoff"]]) < 0){
+      stop("Check input. The selected StatCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
+    }
+
+    if(is.na(as.numeric(SettingsInfo_CoRe[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) < 0){
+      stop("Check input. The selected StatCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
+    }
+
+    if(is.na(as.numeric(SettingsInfo_Intra[["ValueCutoff"]])) == TRUE){
+      stop("Check input. The selected ValueCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
+    }
+
+    if(is.na(as.numeric(SettingsInfo_CoRe[["ValueCutoff"]])) == TRUE){
+      stop("Check input. The selected ValueCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
+    }
+  }
+
+  #------------ NAs in data
+  if(is.null(InputData_C1)==FALSE){
+    if(nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) < nrow(InputData_C1)){
+      warning("InputData_C1 includes NAs in ", SettingsInfo_C1[["ValueCol"]], " and/or in ", SettingsInfo_C1[["StatCol"]], ". ", nrow(InputData_C1)- nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    }
+
+    if(nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) < nrow(InputData_C2)){
+      warning("InputData_C2 includes NAs in ", SettingsInfo_C2[["ValueCol"]], " and/or in", SettingsInfo_C2[["StatCol"]], ". ", nrow(InputData_C2)- nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    }
+  }else{
+    if(nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) < nrow(InputData_Intra)){
+      warning("InputData_Intra includes NAs in ", SettingsInfo_Intra[["ValueCol"]], " and/or in ", SettingsInfo_Intra[["StatCol"]], ". ", nrow(InputData_Intra)- nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    }
+
+    if(nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) < nrow(InputData_CoRe)){
+      warning("InputData_CoRe includes NAs in ", SettingsInfo_CoRe[["ValueCol"]], " and/or in ", SettingsInfo_CoRe[["StatCol"]], ". ", nrow(InputData_CoRe)- nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    }
+  }
+
+ #------------- BackgroundMethod
+  if(is.null(SettingsInfo_C1)==FALSE){
+    options <- c("C1|C2", "C1&C2", "C2", "C1" , "*")
+    if(any(options %in% BackgroundMethod) == FALSE){
+        stop("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+    }
+  }else{
+    options <- c("Intra|CoRe", "Intra&CoRe", "CoRe", "Intra" , "*")
+    if(any(options %in% BackgroundMethod) == FALSE){
+      stop("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+    }
+  }
+
+  #------------- SaveAs
+  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
+  if(is.null(SaveAs_Table)==FALSE){
+    if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
+      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+    }
+  }
+}

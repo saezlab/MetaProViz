@@ -8,53 +8,34 @@ MCA_2Cond
 }}
 \usage{
 MCA_2Cond(
-  Cond1_File,
-  Cond2_File,
-  MetaboliteID = "Metabolite",
-  Cond1ValueCol = "Log2FC",
-  Cond1PadjCol = "p.adj",
-  Cond2ValueCol = "Log2FC",
-  Cond2PadjCol = "p.adj",
-  Cond1_padj_cutoff = 0.05,
-  Cond2_padj_cutoff = 0.05,
-  Cond1_FC_cutoff = 1,
-  Cond2_FC_cutoff = 1,
-  Save_as_Results = "xlsx",
-  backgroundMethod = "C1&C2",
-  OutputFileName = "MCA_2Cond_",
-  Folder_Name = NULL
+  InputData_C1,
+  InputData_C2,
+  SettingsInfo_C1 = c(ValueCol = "Log2FC", StatCol = "p.adj", StatCutoff = 0.05,
+    ValueCutoff = 1),
+  SettingsInfo_C2 = c(ValueCol = "Log2FC", StatCol = "p.adj", StatCutoff = 0.05,
+    ValueCutoff = 1),
+  FeatureID = "Metabolite",
+  SaveAs_Table = "csv",
+  BackgroundMethod = "C1&C2",
+  FolderPath = NULL
 )
 }
 \arguments{
-\item{Cond1_File}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{InputData_C1}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
 
-\item{Cond2_File}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{InputData_C2}{DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
 
-\item{MetaboliteID}{Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files.}
+\item{SettingsInfo_C1}{\emph{Optional: } Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_C1,StatCol=ColumnName_InputData_C1, StatCutoff= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}}
 
-\item{Cond1ValueCol}{Column name of Log2FC in Cond1File}
+\item{SettingsInfo_C2}{\emph{Optional: } Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_C2,StatCol=ColumnName_InputData_C2, StatCutoff= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}}
 
-\item{Cond1PadjCol}{Column name of adjusted p-value in Cond1File. Can also be you p-value column if you want to use this instead.}
+\item{FeatureID}{\emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}}
 
-\item{Cond2ValueCol}{Column name of Log2FC in Cond2File}
+\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 
-\item{Cond2PadjCol}{Column name of adjusted p-value in Cond2File. Can also be you p-value column if you want to use this instead.}
+\item{BackgroundMethod}{\emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}}
 
-\item{Cond1_padj_cutoff}{\emph{Optional: } adjusted p-value cutoff for Cond1File. \strong{Default=0.05}}
-
-\item{Cond2_padj_cutoff}{\emph{Optional: } adjusted p-value cutoff for Cond2File. \strong{Default=0.05}}
-
-\item{Cond1_FC_cutoff}{\emph{Optional: } Log2FC cutoff for Cond1File. \strong{Default=0.5}}
-
-\item{Cond2_FC_cutoff}{\emph{Optional: } Log2FC cutoff for Cond2File. \strong{Default=0.5}}
-
-\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "xlsx"}}
-
-\item{backgroundMethod}{\emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}}
-
-\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
-
-\item{outputFileName}{\emph{Optional: } Output filename \strong{Default=SiRCle_RCM.csv}}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 MCA an instance of the MetaProViz package
