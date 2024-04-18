@@ -31,7 +31,7 @@
 #' @export
 #'
 #'
-Load_KEGG<- function(){
+LoadKEGG <- function(){
   #Get the package:
   RequiredPackages <- c("rappdirs")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -206,4 +206,4 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   }
 
   return(invisible(GeneMetabSet))
-  }
+}
