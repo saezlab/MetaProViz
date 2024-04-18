@@ -365,17 +365,17 @@ MCA_2Cond <- function(InputData_C1,
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    count(RG1_All, name="Number of Genes")%>%
+    count(RG1_All, name="Number of Features")%>%
     dplyr::rename("SiRCle cluster Name"= "RG1_All")
   ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
 
   ClusterSummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    count(RG2_Significant, name="Number of Genes")%>%
+    count(RG2_Significant, name="Number of Features")%>%
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
   ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
-    count(RG3_SignificantChange, name="Number of Genes")%>%
+    count(RG3_SignificantChange, name="Number of Features")%>%
     dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
   ClusterSummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
 
@@ -414,7 +414,7 @@ MCA_2Cond <- function(InputData_C1,
 #'
 #' @param InputData_Intra DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
 #' @param InputData_CoRe DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
-#' @param SettingsInfo_Intra  \emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_Input,StatCol=ColumnName_InputData_Input, StatCutoff= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
+#' @param SettingsInfo_Intra  \emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_Intra,StatCol=ColumnName_InputData_Intra, StatCutoff= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
 #' @param SettingsInfo_CoRe  \emph{Optional: } Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_InputData_CoRe,ValueCol=ColumnName_InputData_CoRe,StatCol=ColumnName_InputData_CoRe, StatCutoff= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(DirectionCol="CoRe", ValueCol="Log2(Distance)",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1)}
 #' @param FeatureID \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
 #' @param BackgroundMethod \emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}
@@ -463,7 +463,7 @@ MCA_CoRe <- function(InputData_Intra,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MCA_CoRe",
+    Folder <- MetaProViz:::SavePath(FolderName= "MCACoRe",
                                     FolderPath=FolderPath)
   }
 
@@ -970,19 +970,28 @@ MCA_CoRe <- function(InputData_Intra,
 
   ##Summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   ClusterSummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    count(RG1_All, name="Number of Genes")%>%
-    dplyr::rename("SiRCle cluster Name"= "RG1_All")
+    group_by(RG1_All) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG1_All, .keep_all = TRUE) %>%
+    dplyr::rename("SiRCle cluster Name" = "RG1_All")
   ClusterSummary_RG1$`Regulation Grouping` <- "RG1_All"
+  ClusterSummary_RG1 <- ClusterSummary_RG1[-c(1)]
 
   ClusterSummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    count(RG2_Significant, name="Number of Genes")%>%
+    group_by(RG2_Significant) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG2_Significant, .keep_all = TRUE) %>%
     dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
   ClusterSummary_RG2$`Regulation Grouping` <- "RG2_Significant"
+  ClusterSummary_RG2 <- ClusterSummary_RG2[-c(1)]
 
   ClusterSummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_Change")]%>%
-    count(RG3_Change, name="Number of Genes")%>%
+    group_by(RG3_Change) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG3_Change, .keep_all = TRUE) %>%
     dplyr::rename("SiRCle cluster Name"= "RG3_Change")
   ClusterSummary_RG3$`Regulation Grouping` <- "RG3_Change"
+  ClusterSummary_RG3 <- ClusterSummary_RG3[-c(1)]
 
   ClusterSummary <- rbind(ClusterSummary_RG1, ClusterSummary_RG2,ClusterSummary_RG3)
   ClusterSummary <- ClusterSummary[,c(3,1,2)]
@@ -1218,8 +1227,8 @@ CheckInput_MCA <- function(InputData_C1,
       warning("InputData_C2 includes NAs in ", SettingsInfo_C2[["ValueCol"]], " and/or in", SettingsInfo_C2[["StatCol"]], ". ", nrow(InputData_C2)- nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
     }
   }else{
-    if(nrow(InputData_Input[complete.cases(InputData_Input[[SettingsInfo_Input[["ValueCol"]]]], InputData_Input[[SettingsInfo_Input[["StatCol"]]]]), ]) < nrow(InputData_Input)){
-      warning("InputData_Input includes NAs in ", SettingsInfo_Input[["ValueCol"]], " and/or in ", SettingsInfo_Input[["StatCol"]], ". ", nrow(InputData_Input)- nrow(InputData_Input[complete.cases(InputData_Input[[SettingsInfo_Input[["ValueCol"]]]], InputData_Input[[SettingsInfo_Input[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    if(nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) < nrow(InputData_Intra)){
+      warning("InputData_Intra includes NAs in ", SettingsInfo_Intra[["ValueCol"]], " and/or in ", SettingsInfo_Intra[["StatCol"]], ". ", nrow(InputData_Intra)- nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
     }
 
     if(nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) < nrow(InputData_CoRe)){
