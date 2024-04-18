@@ -37,7 +37,7 @@ VizHeatmap(
 
 \item{Enforce_SampleNames}{\emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}}
 
-\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
+\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis

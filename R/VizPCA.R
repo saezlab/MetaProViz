@@ -37,7 +37,7 @@
 #' @param PlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @keywords PCA
 #' @export

@@ -33,7 +33,7 @@
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param Enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param Enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
 #' @keywords Volcano plot, pathways
 #' @export

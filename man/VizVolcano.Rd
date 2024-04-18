@@ -65,7 +65,7 @@ VizVolcano(
 
 \item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
-\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 
 \item{Features}{\emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}}
 

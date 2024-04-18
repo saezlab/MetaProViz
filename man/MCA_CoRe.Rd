@@ -32,7 +32,7 @@ MCA_CoRe(
 
 \item{BackgroundMethod}{\emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 MCA an instance of the MetaProViz package

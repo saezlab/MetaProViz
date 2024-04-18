@@ -48,12 +48,12 @@ PreProcessing(
 
 \item{PrintPlot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \description{
 Applies 80\%-filtering rule, total-ion count normalization, missing value imputation and HotellingT2 outlier detection
 }
-\keyword{80%}
+\keyword{80}
 \keyword{Count}
 \keyword{HotellingT2,}
 \keyword{Imputation,}
@@ -67,5 +67,6 @@ Applies 80\%-filtering rule, total-ion count normalization, missing value imputa
 \keyword{filtering}
 \keyword{multivariate}
 \keyword{normalization,}
+\keyword{percent}
 \keyword{quality}
 \keyword{rule,}

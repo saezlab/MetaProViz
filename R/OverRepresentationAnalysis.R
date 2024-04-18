@@ -36,7 +36,7 @@
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return Saves results as individual .csv files.
 #' @export
@@ -180,7 +180,7 @@ ClusterORA <- function(InputData,
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param Save_as_Results \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return Saves results as individual .csv files.
 #' @export

@@ -21,7 +21,7 @@ ReplicateSum(
 
 \item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \description{
 Merges the analytical replicates of an experiment

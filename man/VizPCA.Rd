@@ -43,7 +43,7 @@ VizPCA(
 
 \item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 
 \item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
 }

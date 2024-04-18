@@ -35,7 +35,7 @@ MCA_2Cond(
 
 \item{BackgroundMethod}{\emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 MCA an instance of the MetaProViz package

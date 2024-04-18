@@ -49,7 +49,7 @@ DMA(
 
 \item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 
 \item{SaveAs_Table\emph{Optional:}{} File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 }
