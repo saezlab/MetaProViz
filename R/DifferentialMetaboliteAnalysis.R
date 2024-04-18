@@ -272,11 +272,15 @@ DMA <-function(InputData,
   for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
     Volplotdata<- DMA_Output[[DF]]
 
+    if(CoRe==TRUE){
+      VOlPlot_SettingsFile <- VOlPlot_SettingsFile[[DF]]%>%column_to_rownames("Metabolite")
+    }
+
     dev.new()
     VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
                                                     InputData=Volplotdata%>%column_to_rownames("Metabolite"),
                                                     SettingsInfo=VolPlot_SettingsInfo,
-                                                    SettingsFile_Metab=VOlPlot_SettingsFile[[DF]]%>%column_to_rownames("Metabolite"),
+                                                    SettingsFile_Metab=VOlPlot_SettingsFile,
                                                     y= "p.adj",
                                                     x= x,
                                                     PlotName= DF,

@@ -36,7 +36,7 @@ PreProcessing(
 
 \item{MVI}{\emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}}
 
-\item{MVI_Percentage}{\emph(Optional: ) Percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}}
+\item{MVI_Percentage}{\emph{Optional: } Percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}}
 
 \item{HotellinsConfidence}{\emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}}
 
