@@ -25,8 +25,9 @@
 ### ### ### MetaData-PC correlation ### ### ###
 ###############################################
 
-#' @param Plot_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
-#' @param Plot_SettingsFile \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
+#' @param Input_SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
+#' @param Input_SettingsFile_Feature \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
+#' @param Input_SettingsInfo_Feature \emph{Optional: } DF which contains information about the features (=metabolites)
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
 #' @param OutputPlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
@@ -45,7 +46,8 @@ Meta_Corr <- function(Input_SettingsInfo= NULL,
                    percentage = 0.1,#Top/Bottom features
                    OutputName= '',
                    Save_as_Results = "svg",
-                   Folder_Name = NULL
+                   Folder_Name = NULL,
+                   path = NULL
 
 ){
 
@@ -195,6 +197,14 @@ Meta_Corr <- function(Input_SettingsInfo= NULL,
 
   #Add top/bottom related features to this
 
+
+
+
+
+
+
+
+
   ## ---------- ULM ------------##
   # Use the Sample metadata for this:
   if(is.null(Input_SettingsInfo)==TRUE){
@@ -230,7 +240,6 @@ Meta_Corr <- function(Input_SettingsInfo= NULL,
   ULM_res <- merge(ULM_res, prop_var_ex,  by.x="condition",by.y="PC",all.x=TRUE)
 
   #Add top/bottom related features (= e.g. metabolites) to this
-
   ## Create a data frame for top and bottom features for each PC
   TopBottom_Features <- lapply(2:ncol(PCA.res_Loadings), function(i){
      #Make input
@@ -281,19 +290,14 @@ Meta_Corr <- function(Input_SettingsInfo= NULL,
         writexl::write_xlsx(output_dfs, paste0(Results_folder_Preprocessing_folder, "/MetaData_Analysis", OutputName, ".xlsx", sep = ""))   # Save the DMA results table
         }
       if(Save_as_Results == "csv"){
-        for(i in output_dfs){
-          write.csv(DMA_Output,paste0(Results_folder_Conditions,paste0(Results_folder_Preprocessing_folder, "/MetaData_Analysis", OutputName, ".csv", sep = ""))
-        }
+        #for(i in output_dfs){
+        #  write.csv(DMA_Output,paste0(Results_folder_Conditions,paste0(Results_folder_Preprocessing_folder, "/MetaData_Analysis", OutputName, ".csv", sep = ""))
+        #}
         }
       if(Save_as_Results == "txt"){
           txtDMA <- file.path(Results_folder_Conditions,paste0("DMA_Output_",toString(numerator),"_vs_",toString(denominator), OutputName, ".txt"))
           write.table(DMA_Output,txtDMA, col.names = TRUE, row.names = FALSE) # save the DMA result DF
     }
     }
-
-
-
-
-
 
 }
