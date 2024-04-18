@@ -43,15 +43,15 @@ DMA(
 
 \item{PerformBartlett}{TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}}
 
-\item{Transform}{TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong(Default = TRUE)}
+\item{Transform}{TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{default: NULL}}
 
 \item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
+
+\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
 \item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
-
-\item{SaveAs_Table\emph{Optional:}{} File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 }
 \description{
 This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
