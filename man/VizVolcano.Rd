@@ -25,8 +25,8 @@ VizVolcano(
   ShapePalette = NULL,
   Theme = NULL,
   SaveAs_Plot = "svg",
-  Folder_Name = NULL,
-  Features = "Metabolites",
+  FolderPath = NULL,
+  Features = "metabolites",
   PrintPlot = TRUE
 )
 }
@@ -55,13 +55,19 @@ VizVolcano(
 
 \item{Subtitle}{\emph{Optional: } \strong{Default = ""}}
 
+\item{ComparisonName}{\emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(InputData="Cond1", InputData2= "Cond2")}}
+
+\item{ColorPalette}{\emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}}
+
+\item{ShapePalette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
+
 \item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
 
 \item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
-\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
+\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
 
-\item{Features}{\emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}}
+\item{Features}{\emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}}
 
 \item{Settings}{\emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}}
 
@@ -70,12 +76,6 @@ VizVolcano(
 \item{FeatureID}{{Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}}
 
 \item{AdditionalInput_data}{\emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}}
-
-\item{Comparison_name}{\emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(InputData="Cond1", InputData2= "Cond2")}}
-
-\item{color_palette}{\emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}}
-
-\item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis

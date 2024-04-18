@@ -5,23 +5,31 @@
 \title{This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis}
 \usage{
 VizSuperplot(
-  Input_data,
-  Plot_SettingsFile,
-  Plot_SettingsInfo = c(conditions = "Conditions", superplot = NULL),
-  Graph_Style = "Box",
-  STAT_pval = NULL,
-  STAT_padj = NULL,
-  OutputPlotName = "",
-  Selected_Conditions = NULL,
-  Selected_Comparisons = NULL,
-  Individual_plots = FALSE,
+  InputData,
+  SettingsFile_Sample,
+  SettingsInfo = c(conditions = "Conditions", superplot = NULL),
+  GraphStyle = "Box",
+  StatPval = NULL,
+  StatPadj = NULL,
+  PlotName = "",
+  SelectedConditions = NULL,
+  SelectedComparisons = NULL,
+  IndividualPlots = FALSE,
   Theme = theme_classic(),
-  color_palette = NULL,
-  color_palette_dot = NULL,
-  Save_as_Plot = "svg"
+  ColorPalette = NULL,
+  ColorPalette_Dot = NULL,
+  SaveAs_Plot = "svg",
+  PrintPlot,
+  FolderPath = NULL
 )
 }
 \arguments{
+\item{Theme}{\emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic}}
+
+\item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
+
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+
 \item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.}
 
 \item{Plot_SettingsFile}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
@@ -34,21 +42,19 @@ VizSuperplot(
 
 \item{STAT_padj}{\emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = NULL}}
 
-\item{Selected_Conditions}{Vector with names of selected Conditions for the plot. \strong{Default = NULL}}
-
-\item{Selected_Comparisons}{List of numeric vectors containing Condition pairs to compare based on the order of the Selected_Conditions vector. \strong{Default = NULL}}
+\item{Output_Name}{\emph{Optional: } String which is added to the output files of the plot.}
 
 \item{Individual_plots}{\emph{Optional: }  Logical, TRUE to save each plot individually. \strong{Default = FALSE}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plot. \strong{Default = theme_classic}}
+\item{Selected_Conditions}{Vector with names of selected Conditions for the plot. \strong{Default = NULL}}
+
+\item{Selected_Comparisons}{List of numeric vectors containing Condition pairs to compare based on the order of the Selected_Conditions vector. \strong{Default = NULL}}
 
 \item{color_palette}{\emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}}
 
 \item{color_palette_dot}{\emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}}
 
 \item{Save_as_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}}
-
-\item{Output_Name}{\emph{Optional: } String which is added to the output files of the plot.}
 }
 \description{
 This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
