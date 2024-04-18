@@ -35,24 +35,28 @@
 #' @param color_palette \emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}
 #' @param color_palette_dot \emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}
 #' @param Save_as_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
+#' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
 #'
 #' @keywords Barplot, Boxplot, Violinplot, superplot
 #' @export
 
-VizSuperplot <- function(Input_data,
-                     Plot_SettingsFile,
-                     Plot_SettingsInfo = c(conditions="Conditions", superplot = NULL),
-                     Graph_Style = "Box", # Bar, Box, Violin
-                     STAT_pval =NULL,
-                     STAT_padj=NULL,
-                     OutputPlotName = "",
-                     Selected_Conditions = NULL,
-                     Selected_Comparisons = NULL,
-                     Individual_plots = FALSE,
-                     Theme = theme_classic(),
-                     color_palette = NULL,
-                     color_palette_dot=NULL,
-                     Save_as_Plot = "svg"
+VizSuperplot <- function(InputData,
+                         SettingsFile_Sample,
+                         SettingsInfo = c(conditions="Conditions", superplot = NULL),
+                         GraphStyle = "Box", # Bar, Box, Violin
+                         StatPval =NULL,
+                         StatPadj=NULL,
+                         PlotName = "",
+                         SelectedConditions = NULL,
+                         SelectedComparisons = NULL,
+                         IndividualPlots = FALSE,
+                         Theme = theme_classic(),
+                         ColorPalette = NULL,
+                         ColorPalette_Dot =NULL,
+                         SaveAs_Plot = "svg",
+                         PrintPlot,
+                         FolderPath = NULL
 ){
 
   ## ------------ Setup and installs ----------- ##
@@ -61,39 +65,32 @@ VizSuperplot <- function(Input_data,
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
+  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  #1. Input_data and Conditions
-  if(any(duplicated(row.names(Input_data)))==TRUE){
-    stop("Duplicated row.names of Input_data, whilst row.names must be unique")
-  } else if(Plot_SettingsInfo[["conditions"]] %in% colnames(Plot_SettingsFile)==FALSE){
-    stop("There is no column named `Conditions` in Plot_SettingsFile to obtain Condition1 and Condition2.")
-  } else{
-    Test_num <- apply(Input_data, 2, function(x) is.numeric(x))
-    if((any(Test_num) ==  FALSE) ==  TRUE){
-      stop("Input_data needs to be of class numeric")
-    } else{
-      Test_match <- merge(Plot_SettingsFile, Input_data, by.x = "row.names",by.y = "row.names", all =  FALSE) # Do the unique IDs of the "Input_data" match the row names of the "Plot_SettingsFile"?
-      if(nrow(Test_match) ==  0){
-        stop("row.names Input_data need to match row.names Plot_SettingsFile.")
-      } else(
-        data <- Input_data
-      )
-    }
-    Plot_SettingsFile <- Plot_SettingsFile
+  # HelperFunction `CheckInput`
+  MetaProViz:::CheckInput(InputData=InputData,
+                          SettingsFile_Sample=SettingsFile_Sample,
+                          SettingsFile_Metab=NULL,
+                          SettingsInfo=SettingsInfo,
+                          SaveAs_Plot=SaveAs_Plot,
+                          SaveAs_Table=NULL,
+                          CoRe=FALSE,
+                          PrintPlot= PrintPlot)
+
+  # CheckInput` Specific
+  if(Graph_Style %in% c("Box", "Bar", "Violin") == FALSE){
+    stop("Graph_Style must be either Box, Bar ot Violin.")
   }
 
+
+
+
+
   ## ------------ Check Input SettingsInfo ----------- ##
-    #2. Plot_SettingsInfo
-  if(Plot_SettingsInfo[["conditions"]] %in% Plot_SettingsInfo==TRUE){
-    if(Plot_SettingsInfo[["conditions"]] %in% colnames(Plot_SettingsFile)== TRUE){
-      Plot_SettingsFile<- Plot_SettingsFile%>%
+
+  Plot_SettingsFile<- Plot_SettingsFile%>%
         dplyr::rename("Conditions"= paste(Plot_SettingsInfo[["conditions"]]) )
-    }else{# if true rename to Conditions
-      stop("The ",Plot_SettingsInfo[["conditions"]], " column selected as conditions in Plot_SettingsInfo was not found in Plot_SettingsFile. Please check your input.")
-    }
-  }else{
-    stop("You have to provide a Plot_SettingsInfo for conditions.")
-  }
+
 
   if("superplot" %in% names(Plot_SettingsInfo)){
      if(Plot_SettingsInfo[["superplot"]] %in% colnames(Plot_SettingsFile)== TRUE){
@@ -109,11 +106,6 @@ VizSuperplot <- function(Input_data,
 
 
   ## ------------ Check other plot parameters ----------- ##
-  #3. Plot options
-  if(Graph_Style %in% c("Box", "Bar", "Violin") == FALSE){
-    stop("Graph_Style must be either Box, Bar ot Violin.")
-  }
-
   #4. Comparison options
   if(is.null(Selected_Conditions) == FALSE){
     for (Condition in Selected_Conditions){
@@ -140,13 +132,7 @@ VizSuperplot <- function(Input_data,
       }
   }
 
-  #5. Check other plot-specific parameters:
-  if (!is.null(Save_as_Plot)) {
-    Save_as_Plot_options <- c("svg","pdf","png")
-    if(Save_as_Plot %in% Save_as_Plot_options == FALSE){
-      stop("Check input. The selected Save_as_Plot option is not valid. Please select one of the following: ",paste(Save_as_Plot_options,collapse = ", "),"." )
-    }
-  }
+
 
   #6. Check color_palette:
   if(is.null(color_palette)){
@@ -182,13 +168,7 @@ VizSuperplot <- function(Input_data,
     }
   }
 
-  #8. Check Stat values:
-  STAT_pval_options <- c("t.test", "wilcox.test", "aov", "kruskal.test")
-  if(is.null(STAT_pval)==FALSE){
-    if(STAT_pval %in% STAT_pval_options == FALSE & is.null(STAT_pval)==FALSE){
-      stop("Check input. The selected STAT_pval option for Hypothesis testing is not valid. Please select NULL or one of the following: ",paste(STAT_pval_options,collapse = ", "),"." )
-    }
-    }
+
 
   if(is.null(STAT_pval)==FALSE){
     if(MultipleComparison == TRUE & (STAT_pval=="t.test" | STAT_pval=="wilcox.test")){
@@ -243,13 +223,13 @@ VizSuperplot <- function(Input_data,
   }
 
   ## ------------ Create plots ----------- ##
-  data <- Input_data
+  data <- InputData
   Metabolite_Names <- colnames(data)
-  if("superplot" %in% names(Plot_SettingsInfo)){
-    data <- merge(Plot_SettingsFile[c("Conditions","superplot")] ,data, by=0)
+  if("superplot" %in% names(SettingsInfo)){
+    data <- merge(SettingsFile[c("Conditions","superplot")] ,data, by=0)
     data <- column_to_rownames(data, "Row.names")
   }else{
-    data <- merge(Plot_SettingsFile[c("Conditions")] ,data, by=0)
+    data <- merge(SettingsFile[c("Conditions")] ,data, by=0)
     data <- column_to_rownames(data, "Row.names")
   }
 
@@ -465,7 +445,11 @@ VizSuperplot <- function(Input_data,
 #' @keywords PCA helper function
 #' @noRd
 
-plotGrob_Superplot <- function(Input, Plot_SettingsInfo, Plot_SettingsFile, MetaboliteName, Graph_Style){
+plotGrob_Superplot <- function(Input,
+                               SettingsInfo,
+                               SettingsFile,
+                               MetaboliteName,
+                               GraphStyle){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable <- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
