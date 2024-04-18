@@ -553,33 +553,6 @@ MetaProViz::VizPCA(SettingsInfo= c(color="Celltype", shape="Status"),
 ```
 Lastly, its worth mentioning that one can also change many style parameters to customize the plot.
 
-### SuperPlots
-
-
-individual plots = TRUE/FALSE
-
-Add to description of this, that this exported list can be used to combine plots into a single plot using facet_grid or patchwork::wrap_plots. This could be done randomly or using additional information about the metabolites (e.g. pathways, ...)
-
-Write a function that can use the ggplots from the list and create the facet grids
-
-use results list and make grid of metabolites of a specific pathway!
-```{r, eval=FALSE}
-MetaProViz::Vizsuperplot(Input_data = Intra_Preprocessed[,-c(1:3, 10:182)],
-                          Plot_SettingsFile = Intra_Preprocessed[,c(1:2)],
-                          Plot_SettingsInfo = c(conditions="Conditions", superplot = "Biological_Replicates"),
-                          Graph_Style = "Box", #Bar, Box, Violin
-                          STAT_pval ="kruskal.test",
-                          STAT_padj="fdr",
-                          OutputPlotName = "",
-                          Individual_plots = TRUE,
-                          Selected_Conditions = c("HK2", "786-M1A", "786-M2A","786-O"),
-                          Selected_Comparisons = list(c(1,2), c(1,3), c(1,4)),
-                          Theme = theme_classic(),
-                          Save_as_Plot = "pdf") #for together it always pdf
-
-
-```
-
 ### Heatmaps
 Clustered heatmaps can be useful to understand the patterns in the data, which will be showcased on different examples.\
 As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
