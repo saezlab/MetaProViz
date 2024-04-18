@@ -273,7 +273,7 @@ DMA <-function(InputData,
     Volplotdata<- DMA_Output[[DF]]
 
     if(CoRe==TRUE){
-      VOlPlot_SettingsFile <- VOlPlot_SettingsFile[[DF]]%>%column_to_rownames("Metabolite")
+      VOlPlot_SettingsFile <- DMA_Output[[DF]]%>%column_to_rownames("Metabolite")
     }
 
     dev.new()
