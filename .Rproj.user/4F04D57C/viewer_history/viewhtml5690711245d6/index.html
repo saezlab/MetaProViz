@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="lib/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lib/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="lib/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="lib/kePrint-0.0.1/kePrint.js"></script>
+<link href="lib/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+</head>
+<body>
+<table class=" lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">Input_data for `MetaProViz::VizPCA()`, with samples as rownames and metabolites as column names.</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> hippuric acid-d5 </th>
+   <th style="text-align:right;"> 2/3-phosphoglycerate </th>
+   <th style="text-align:right;"> 2-aminoadipic acid </th>
+   <th style="text-align:right;"> 2-hydroxyglutarate </th>
+   <th style="text-align:right;"> 2-ketoglutarate </th>
+   <th style="text-align:right;"> 4-guanidinobutanoate </th>
+   <th style="text-align:right;"> 4-hydroxyphenyllactate </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 786-M1A_1 </td>
+   <td style="text-align:right;"> 4629332172 </td>
+   <td style="text-align:right;"> 56926513 </td>
+   <td style="text-align:right;"> 7523262 </td>
+   <td style="text-align:right;"> 424773945 </td>
+   <td style="text-align:right;"> 960112993 </td>
+   <td style="text-align:right;"> 1921602 </td>
+   <td style="text-align:right;"> 2202889 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-M1A_2 </td>
+   <td style="text-align:right;"> 4344689204 </td>
+   <td style="text-align:right;"> 48391908 </td>
+   <td style="text-align:right;"> 7802414 </td>
+   <td style="text-align:right;"> 433248034 </td>
+   <td style="text-align:right;"> 980130169 </td>
+   <td style="text-align:right;"> 1886961 </td>
+   <td style="text-align:right;"> 2040746 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-M1A_3 </td>
+   <td style="text-align:right;"> 4218419637 </td>
+   <td style="text-align:right;"> 45848651 </td>
+   <td style="text-align:right;"> 7249191 </td>
+   <td style="text-align:right;"> 417901363 </td>
+   <td style="text-align:right;"> 1004430291 </td>
+   <td style="text-align:right;"> 2002094 </td>
+   <td style="text-align:right;"> 2207484 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-M2A_1 </td>
+   <td style="text-align:right;"> 4800921532 </td>
+   <td style="text-align:right;"> 45829441 </td>
+   <td style="text-align:right;"> 6142860 </td>
+   <td style="text-align:right;"> 438809273 </td>
+   <td style="text-align:right;"> 845124514 </td>
+   <td style="text-align:right;"> 2625730 </td>
+   <td style="text-align:right;"> 2255774 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-M2A_2 </td>
+   <td style="text-align:right;"> 3850001995 </td>
+   <td style="text-align:right;"> 44285426 </td>
+   <td style="text-align:right;"> 6234439 </td>
+   <td style="text-align:right;"> 432668677 </td>
+   <td style="text-align:right;"> 886775267 </td>
+   <td style="text-align:right;"> 1982761 </td>
+   <td style="text-align:right;"> 2337265 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-M2A_3 </td>
+   <td style="text-align:right;"> 4121917117 </td>
+   <td style="text-align:right;"> 44464750 </td>
+   <td style="text-align:right;"> 6352492 </td>
+   <td style="text-align:right;"> 463539257 </td>
+   <td style="text-align:right;"> 898862621 </td>
+   <td style="text-align:right;"> 1638469 </td>
+   <td style="text-align:right;"> 2247034 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-O_1 </td>
+   <td style="text-align:right;"> 3900419287 </td>
+   <td style="text-align:right;"> 36968914 </td>
+   <td style="text-align:right;"> 8977305 </td>
+   <td style="text-align:right;"> 390323670 </td>
+   <td style="text-align:right;"> 888809328 </td>
+   <td style="text-align:right;"> 2393129 </td>
+   <td style="text-align:right;"> 2002372 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-O_2 </td>
+   <td style="text-align:right;"> 4501256250 </td>
+   <td style="text-align:right;"> 30523496 </td>
+   <td style="text-align:right;"> 9099066 </td>
+   <td style="text-align:right;"> 463781490 </td>
+   <td style="text-align:right;"> 1058406623 </td>
+   <td style="text-align:right;"> 2331351 </td>
+   <td style="text-align:right;"> 2115981 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 786-O_3 </td>
+   <td style="text-align:right;"> 4141232360 </td>
+   <td style="text-align:right;"> 29334597 </td>
+   <td style="text-align:right;"> 9034721 </td>
+   <td style="text-align:right;"> 408324655 </td>
+   <td style="text-align:right;"> 1013301175 </td>
+   <td style="text-align:right;"> 1697183 </td>
+   <td style="text-align:right;"> 2195370 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HK2_1 </td>
+   <td style="text-align:right;"> 3174566793 </td>
+   <td style="text-align:right;"> 30962487 </td>
+   <td style="text-align:right;"> 5807611 </td>
+   <td style="text-align:right;"> 188606001 </td>
+   <td style="text-align:right;"> 326693903 </td>
+   <td style="text-align:right;"> 4423234 </td>
+   <td style="text-align:right;"> 3967063 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HK2_2 </td>
+   <td style="text-align:right;"> 3183656156 </td>
+   <td style="text-align:right;"> 32597393 </td>
+   <td style="text-align:right;"> 7329704 </td>
+   <td style="text-align:right;"> 229054002 </td>
+   <td style="text-align:right;"> 367069890 </td>
+   <td style="text-align:right;"> 4138012 </td>
+   <td style="text-align:right;"> 3975926 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HK2_3 </td>
+   <td style="text-align:right;"> 3369292371 </td>
+   <td style="text-align:right;"> 29536635 </td>
+   <td style="text-align:right;"> 7166290 </td>
+   <td style="text-align:right;"> 251312598 </td>
+   <td style="text-align:right;"> 460404941 </td>
+   <td style="text-align:right;"> 4370603 </td>
+   <td style="text-align:right;"> 4230915 </td>
+  </tr>
+</tbody>
+</table> <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [["$","$"]]}})</script><script async src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

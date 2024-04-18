@@ -25,16 +25,16 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/reference/DMA.html</loc>
+    <loc>/reference/ClusterORA.html</loc>
   </url>
   <url>
-    <loc>/reference/DM_ORA.html</loc>
+    <loc>/reference/DMA.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/Load_KEGG.html</loc>
+    <loc>/reference/LoadKEGG.html</loc>
   </url>
   <url>
     <loc>/reference/MCA_2Cond.html</loc>
@@ -46,19 +46,19 @@
     <loc>/reference/MCA_rules.html</loc>
   </url>
   <url>
-    <loc>/reference/MC_ORA.html</loc>
+    <loc>/reference/PoolEstimation.html</loc>
   </url>
   <url>
-    <loc>/reference/Pool_Estimation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Preprocessing.html</loc>
+    <loc>/reference/PreProcessing.html</loc>
   </url>
   <url>
     <loc>/reference/ReplicateSum.html</loc>
   </url>
   <url>
-    <loc>/reference/toy_data.html</loc>
+    <loc>/reference/StandardORA.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ToyData.html</loc>
   </url>
   <url>
     <loc>/reference/VizHeatmap.html</loc>
