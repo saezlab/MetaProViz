@@ -622,8 +622,8 @@ Log2FC_fun <-function(InputData,
       Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
         rownames_to_column("Metabolite")
       Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        rename("C1"=2,
-               "C2"=3)
+        dplyr::rename("C1"=2,
+                      "C2"=3)
 
       #Deal with NA/0s
       Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
