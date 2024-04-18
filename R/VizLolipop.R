@@ -272,7 +272,6 @@ VizLolipop<- function(Plot_Settings="Standard",
       PlotList <- list()#Empty list to store all the plots
 
       for (i in IndividualPlots){
-        # i = IndividualPlots[1]
         Plot_SettingsInfo_indi <- Plot_SettingsInfo
         Plot_SettingsFile_Select <- subset(Plot_SettingsFile, individual == paste(i))
         InputLolipop  <- merge(x=Plot_SettingsFile_Select,y=Input_data, by="Metabolite", all.x=TRUE)%>%
@@ -291,7 +290,6 @@ VizLolipop<- function(Plot_Settings="Standard",
           Plot_SettingsInfo_indi= c(Plot_SettingsInfo_indi,size="p.adj")
           keyvalssize <- loli.data$size
         }
-
 
         if("label_dot" %in% names(Plot_SettingsInfo)==TRUE ){
           label <-  Plot_SettingsInfo[["label_dot"]]
