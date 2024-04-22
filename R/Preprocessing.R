@@ -493,7 +493,7 @@ PoolEstimation <- function(InputData,
                                                SaveAs_Plot =  NULL))
   }
   dev.off()
-  PlotList [["PCAPlot_PoolSamples"]] <- pca_QC_pool[["Plot_Sized"]][["QC Pool samples"]]
+  PlotList [["PCAPlot_PoolSamples"]] <- pca_QC_pool[["Plot_Sized"]][["Plot_Sized"]]
 
 
   # 2. Histogram of CVs
@@ -736,6 +736,34 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
   filtered_matrix[filtered_matrix == 0] <- NA
 
   ## ------------------ Perform MVI ------------------ ##
+  # Do MVI for the samples
+  message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+
+  if(CoRe==TRUE){#remove blank samples
+    NA_removed_matrix <- filtered_matrix%>% filter(!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]])
+
+  }else{
+    NA_removed_matrix <- filtered_matrix %>% as.data.frame()
+  }
+
+  for (feature  in colnames(NA_removed_matrix)){
+    feature_data <- merge(NA_removed_matrix[feature] , SettingsFile_Sample %>% select(Conditions), by= 0)
+    feature_data <-column_to_rownames(feature_data, "Row.names")
+
+    imputed_feature_data <- feature_data %>%
+      group_by(Conditions) %>%
+      mutate(across(all_of(feature), ~{
+        if(all(is.na(.))) {
+          message("For some conditions all measured samples are NA for " , feature, ". Hence we can not perform half-minimum value imputation per condition for this metabolite and will assume it is a true biological 0 in those cases.")
+          return(0)  # Return NA if all values are missing
+        } else {
+          return(replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100)))
+        }
+      }))
+
+    NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+  }
+
   if(CoRe==TRUE){
     replaceNAdf <- filtered_matrix%>% filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]])
 
@@ -766,34 +794,15 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
     }) %>% as.data.frame()
     rownames(replaceNAdf_Zero_MVI) <-  rownames(replaceNAdf)
 
-    # replace the samples in the original dataframe
-    filtered_matrix[rownames(filtered_matrix) %in% rownames(replaceNAdf_Zero_MVI), ] <- replaceNAdf_Zero_MVI
+    # add the samples in the original dataframe
+    filtered_matrix_res <- rbind(NA_removed_matrix, replaceNAdf_Zero_MVI)
+  }else{
+    filtered_matrix_res <- NA_removed_matrix
   }
 
-  # Do MVI for the samples
-  message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
-
-  NA_removed_matrix <- filtered_matrix %>% as.data.frame()
-  for (feature  in colnames(NA_removed_matrix)){
-    feature_data <- merge(NA_removed_matrix[feature] , SettingsFile_Sample %>% select(Conditions), by= 0)
-    feature_data <-column_to_rownames(feature_data, "Row.names")
-
-    imputed_feature_data <- feature_data %>%
-      group_by(Conditions) %>%
-      mutate(across(all_of(feature), ~{
-        if(all(is.na(.))) {
-          message("For some conditions all measured samples are NA for " , feature, ". Hence we can not perform half-minimum value imputation per condition for this metabolite and will assume it is a true biological 0 in those cases.")
-          return(0)  # Return NA if all values are missing
-        } else {
-          return(replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100)))
-        }
-      }))
-
-    NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
-  }
 
   ## ------------------ Return ------------------ ##
-  invisible(return(NA_removed_matrix))
+  invisible(return(filtered_matrix_res))
 }
 
 
