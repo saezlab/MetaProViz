@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -808,7 +808,7 @@ the chosen parameters and results are documented in messages. All the
 results data tables, the Quality Control (QC) plots and outlier
 detection plots are returned and can be easily viewed.<br></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">PreprocessingResults</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/PreProcessing.html">PreProcessing</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Intra</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span><span class="op">:</span><span class="fl">58</span><span class="op">)</span> ,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#remove pool samples and columns with sample information</span></span>
+<code class="sourceCode R"><span><span class="va">PreprocessingResults</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/Preprocessing.html">PreProcessing</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Intra</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span><span class="op">:</span><span class="fl">58</span><span class="op">)</span> ,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#remove pool samples and columns with sample information</span></span>
 <span>                                                  SettingsFile_Sample<span class="op">=</span><span class="va">Intra</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span><span class="op">:</span><span class="fl">58</span><span class="op">)</span> , <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#remove pool samples and columns with metabolite measurements</span></span>
 <span>                                                  SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions <span class="op">=</span> <span class="st">"Conditions"</span>,</span>
 <span>                                                                    Biological_Replicates <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
@@ -4786,7 +4786,7 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  collate  English_United Kingdom.utf8</span></span>
 <span><span class="co">#&gt;  ctype    English_United Kingdom.utf8</span></span>
 <span><span class="co">#&gt;  tz       Europe/Berlin</span></span>
-<span><span class="co">#&gt;  date     2024-04-18</span></span>
+<span><span class="co">#&gt;  date     2024-04-22</span></span>
 <span><span class="co">#&gt;  pandoc   3.1.1 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
