@@ -84,6 +84,12 @@ VizPCA <- function(InputData,
     stop("Check input. The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
   }
 
+  if(any(is.na(InputData))==TRUE){
+     InputData[is.na(InputData)] <- 0#replace NA with 0
+     message("NA values are included in InputData that were set to 0 prior to performing PCA.")
+  }
+
+
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
     Folder <- MetaProViz:::SavePath(FolderName= "PCAPlots",
