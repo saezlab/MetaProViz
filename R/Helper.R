@@ -320,6 +320,13 @@ CheckInput <- function(InputData,
       stop("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
     }
 
+    #Superplot
+    if("Superplot" %in% names(SettingsInfo)){
+      if(SettingsInfo[["Superplot"]] %in% colnames(SettingsFile_Sample)== FALSE){
+        stop("The ",SettingsInfo[["Superplot"]], " column selected as Superplot column in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+      }
+    }
+
     if(is.null(PlotSettings)==FALSE){
       if(PlotSettings== "Sample"){
         #Plot colour
