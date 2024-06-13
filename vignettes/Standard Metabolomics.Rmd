@@ -615,6 +615,90 @@ MetaProViz::VizHeatmap(InputData = Input_Heatmap,
                        PlotName = "Pathway")
 ```
 
+### Superplots
+Sometimes one might be interested to create individual plots for each metabolite to understand the differences between specific conditions. For this common plot types are bargraphs, boxplots or violin plots. 
+As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
+```{r}
+Input_Superplot <-  Intra_Preprocessed[,-c(1:4)]#remove columns that include Metadata such as cell type,...
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Input_Superplot[,1:7]%>%
+  kableExtra::kbl(caption = "Input for `MetaProViz::VizSuperplot()`, with samples as rownames and metabolites as column names.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+We also need the Metadata as we will need to know which conditions to plot for together. If you have further information such as replicates or patient ID, we can use this for the colour of the plotted samples per condition as in the superplots style as described in by Lord et al [@Lord2020]. \
+\
+```{r, eval=FALSE}
+MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
+                                           SettingsFile_Sample =MetaData_Sample,
+                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                                           PlotType = "Bar", #Bar, Box, Violin
+                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
+                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+
+```
+
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
+                                           SettingsFile_Sample =MetaData_Sample,
+                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                                           PlotType = "Bar", #Bar, Box, Violin
+                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
+                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+```
+</div>
+\
+\
+\
+Now, if we for instance prefer boxplots over bargraphs we can simply change the parameter `PlotType`:
+```{r, eval=FALSE}
+MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
+                                           SettingsFile_Sample =MetaData_Sample,
+                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                                           PlotType = "Box", #Bar, Box, Violin
+                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
+                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+```
+
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
+                                           SettingsFile_Sample =MetaData_Sample,
+                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                                           PlotType = "Box", #Bar, Box, Violin
+                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
+                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+```
+</div>
+\
+\
+\
+We can also change it to violin plots:
+```{r, eval=FALSE}
+MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
+                                           SettingsFile_Sample =MetaData_Sample,
+                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                                           PlotType = "Violin", #Bar, Box, Violin
+                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
+                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+```
+
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
+                                           SettingsFile_Sample =MetaData_Sample,
+                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                                           PlotType = "Violin", #Bar, Box, Violin
+                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
+                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+```
+</div>
+\
+\
+\
+
 ### Volcano plot
 In general,we have three different `Plot_Settings`, which will also be used for other plot types such as lollipop graphs.\
 `1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
