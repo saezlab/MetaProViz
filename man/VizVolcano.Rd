@@ -14,8 +14,8 @@ VizVolcano(
   x = "Log2FC",
   xlab = NULL,
   ylab = NULL,
-  xCutoff = 0.05,
-  yCutoff = 0.5,
+  xCutoff = 0.5,
+  yCutoff = 0.05,
   Connectors = FALSE,
   SelectLab = "",
   PlotName = "",
@@ -26,7 +26,7 @@ VizVolcano(
   Theme = NULL,
   SaveAs_Plot = "svg",
   FolderPath = NULL,
-  Features = "metabolites",
+  Features = "Metabolites",
   PrintPlot = TRUE
 )
 }
@@ -34,6 +34,8 @@ VizVolcano(
 \item{SettingsInfo}{\emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}}
 
 \item{SettingsFile_Metab}{\emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}}
+
+\item{InputData2}{\emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}}
 
 \item{y}{\emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}}
 
@@ -43,9 +45,9 @@ VizVolcano(
 
 \item{ylab}{\emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}}
 
-\item{xCutoff}{\emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}}
+\item{xCutoff}{\emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}}
 
-\item{yCutoff}{\emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}}
+\item{yCutoff}{\emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}}
 
 \item{Connectors}{\emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}}
 
@@ -74,8 +76,6 @@ VizVolcano(
 \item{Input_data}{DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.}
 
 \item{FeatureID}{{Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}}
-
-\item{AdditionalInput_data}{\emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}}
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis
