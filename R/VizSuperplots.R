@@ -376,7 +376,7 @@ VizSuperplot <- function(InputData,
 
     ####################################################################################################################################
     ## --------------- save -----------------##
-    cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+    cleaned_i <- gsub("[[:space:],/\\\\*]", "-", i)#removes empty spaces and replaces /,\ with -
     PlotList_adaptedGrid[[cleaned_i]] <- Plot
 
     SaveList <- list()
