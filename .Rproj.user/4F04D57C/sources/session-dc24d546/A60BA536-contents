@@ -1,0 +1,72 @@
+## ---------------------------
+##
+## Script name: Load_GeneSet
+##
+## Purpose of script: 
+##
+## Author: Christina Schmidt
+##
+## Date Created: 
+##
+## Copyright (c) 
+## Email:
+##
+## ---------------------------
+##
+## Notes:
+##
+##
+## ---------------------------
+
+#' 
+#'
+#' Function to load gene sets
+#'
+#' @param File Is either "gmt" or "csv" depending of the InputFile type that will be loaded
+#' @param InputFile "FileName.csv" or "FileName.gmt"
+#' @param GenesetName Name of the gene set that is loaded, e.g. "KEGG"
+#' @param save TRUE or FALSE weather .csv file should be saved.
+#'
+#' @export
+
+Load_GeneSet <- function(File, InputFile, GenesetName, Save=FALSE){
+  #Open the gmt or csv file:
+  if(File=="gmt"){
+    library(GSEABase)
+    gmtfile <- InputFile
+    genesets = GSEABase::getGmt(con = gmtfile)
+    genesets = unlist(genesets)
+    
+    gene_to_term =plyr::ldply(genesets,function(geneset){
+      temp <- geneIds(geneset)
+      temp2 <- setName(geneset)
+      temp3 <- as.data.frame(cbind(temp,rep(temp2,length(temp))))
+    },.progress = plyr::progress_text())
+    names(gene_to_term) <- c("gene","term")
+    #return(gene_to_term[complete.cases(gene_to_term),])
+    DF <- gene_to_term
+  }
+  else if(File=="csv"){
+    DF <- read.csv(paste(InputFile))
+  }
+  else{
+    paste("File is either gmt or csv and InputFile type needs to match File")
+  }
+  #Add the number of genes present in each pathway
+  DF$Count <- 1
+  DF_Mean <- aggregate(DF$Count, by=list(term=DF$term), FUN=sum)
+  names(DF_Mean)[names(DF_Mean) == "x"] <- "Genes_in_Pathway"
+  DF <- merge(x= DF[,-3], y=DF_Mean,by="term", all.x=TRUE)
+  #Return and save the DF as .csv
+  if(Save==FALSE){
+    Output <- DF
+  }
+  else if(Save==TRUE){
+    dir.create("Output_GeneSets")
+    write.csv(DF, paste("Output_GeneSets/", GenesetName, ".csv"))
+    Output <- DF
+  }
+  else{
+    paste("Please select Save=TRUE or Save=FALSE")
+  }
+}

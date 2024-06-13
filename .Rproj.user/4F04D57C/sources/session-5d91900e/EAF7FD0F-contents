@@ -1,0 +1,78 @@
+##Install Packages needed:
+#install.packages("devtools")
+#install.packages("roxygen2")
+
+################## Create the package ####################################################################################
+devtools::create("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
+
+################## Create the documentation ##############################################################################
+# 1. Add things to the documentation of the function, which is the helpfile others can use in R:
+devtools::document("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
+
+# 2. Adapt the general documentation file "DESCRIPTION"
+list <- list( #usethis::use_description_defaults() for more info
+  "Package" = "MetaProViz",
+  "Title"= "METabolomics pre-PRocessing, functiOnal analysis and VIZualisation",
+  "Description"="MetaProViz can analyse standard metabolomics and exometabolomics data (CoRe).It performs pre-processing including feature filtering, missimg value imputation, normalisation and outlier detection. It perform functional analysis including differential metabolite analysis (DMA), clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs and saves them in a publication ready format.",
+  "Authors@R" = c(
+    utils::person("Christina", "Schmidt",
+    email = "christina.schmidt@uni-heidelberg.de",
+    role = c("aut", "cre"),# cre= creator, aut=author, ctb=contributor, cph=copyright holder, fnd=funder
+    comment = c(ORCID = "0000-0002-3867-0881")),
+  utils::person("Dimitrios", "Prymidis",
+                   role = c("aut")),
+  utils::person("Julio", "Saez-Rodriguez",
+                role = c("aut"),# cre= creator, aut=author, ctb=contributor, cph=copyright holder, fnd=funder
+                comment = c(ORCID = "0000-0002-8552-8976")),
+  utils::person("Christian", "Frezza",
+                role = c("aut"),# cre= creator, aut=author, ctb=contributor, cph=copyright holder, fnd=funder
+                comment = c(ORCID = "0000-0002-3293-7397"))),
+  Version= "2.0.0",
+  #URL = https://github.com/,
+  #BugReports: https://github.com/ccc/issues,
+  License = "GPL-3 + file LICENSE"
+)
+
+setwd("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
+usethis::use_description(fields = list,
+                         check_name = TRUE, #check if the name is valid for CRAN and throw an error if not.
+                         roxygen = TRUE) # If TRUE, sets RoxygenNote to current roxygen2 version
+
+
+# 3. Add packages to Imports or Suggests is with usethis::use_package()
+usethis::use_package("tidyverse", "imports") # 'arg' should be one of “depends”, “imports”, “suggests”, “enhances”, “linkingto”
+usethis::use_package("ggplot2", "imports")
+usethis::use_package("factoextra", "imports")
+usethis::use_package("qcc", "imports")
+usethis::use_package("hash", "imports")
+usethis::use_package("reshape", "imports")
+usethis::use_package("gridExtra", "imports")
+usethis::use_package("inflection", "imports")
+usethis::use_package("patchwork", "imports")
+#usethis::use_package("clusterProfiler", "imports")
+usethis::use_package("ggupset", "imports")
+usethis::use_package("gtools", "imports")
+#usethis::use_package("EnhancedVolcano", "imports")
+usethis::use_package("writexl", "imports")
+usethis::use_package("pheatmap", "imports")
+usethis::use_package("ggfortify", "imports")
+usethis::use_package("BiocManager", "imports")
+#usethis::use_dev_package("clusterProfiler", type="imports", remote="BiocManager::install(\"clusterProfiler\")")
+#usethis::use_dev_package("EnhancedVolcano", type="imports", remote="BiocManager::install(\"EnhancedVolcano\")")
+
+#"alluvial"
+#list <- c("tidyverse","ggplot2","factoextra","qcc","hash","reshape","gridExtra","inflection","patchwork","clusterProfiler","ggupset","alluvial","gtools","EnhancedVolcano","writexl","pheatmap","ggfortify" )
+
+
+################## Create the liscence files ##############################################################################
+#use_mit_license()
+
+#To test packages functions, we first load it:
+#devtools::load_all("C:/Users/chris/Documents/GitHub/MetaProViz")
+
+# Check that file passes R CMD check cleanly: 0 errors, 0 warnings, 0 notes.
+#devtools::check("C:/Users/chris/Documents/GitHub/MetabolomicsAnalysisPipeline_private/R-package/MetaProViz")
+
+#Install package:
+#devtools::install("C:/Users/chris/Documents/GitHub/MetabolomicsAnalysisPipeline_private/R-package/MetaProViz")
+#library(MetaProViz)

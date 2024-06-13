@@ -1,0 +1,29 @@
+{
+    "id": "0ED62989",
+    "path": "~/GitHub/MetaProViz/vignettes/Standard Metabolomics.Rmd",
+    "project_path": "vignettes/Standard Metabolomics.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": true,
+    "created": 1711612172035.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "806,64",
+        "scrollLine": "772",
+        "docOutlineVisible": "1",
+        "docOutlineSize": "153"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712315218,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712316494752,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,27 @@
+{
+    "id": "E9C47EC6",
+    "path": "~/GitHub/MetaProViz/R/PreProcessing.R",
+    "project_path": "R/PreProcessing.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712218307248.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "docOutlineVisible": "1",
+        "cursorPosition": "526,48",
+        "scrollLine": "494"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712144134,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712144134,
+    "read_only": false,
+    "read_only_alternatives": []
+}

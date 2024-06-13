@@ -1,0 +1,27 @@
+{
+    "id": "CFBCC91B",
+    "path": "~/GitHub/MetaProViz/R/Helper.R",
+    "project_path": "R/Helper.R",
+    "type": "r_source",
+    "hash": "1419715275",
+    "contents": "",
+    "dirty": false,
+    "created": 1712214480491.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "wvf2tsjjipdaw",
+        "Source": "Source",
+        "cursorPosition": "286,3",
+        "scrollLine": "224",
+        "docOutlineVisible": "1"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712318405,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712318405097,
+    "read_only": false,
+    "read_only_alternatives": []
+}

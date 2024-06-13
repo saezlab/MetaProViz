@@ -1,0 +1,27 @@
+{
+    "id": "134228A9",
+    "path": "~/GitHub/MetaProViz/R/DifferentialMetaboliteAnalysis.R",
+    "project_path": "R/DifferentialMetaboliteAnalysis.R",
+    "type": "r_source",
+    "hash": "2904371181",
+    "contents": "",
+    "dirty": false,
+    "created": 1712235356730.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "docOutlineVisible": "1",
+        "cursorPosition": "295,71",
+        "scrollLine": "256"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712236739,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712236739621,
+    "read_only": false,
+    "read_only_alternatives": []
+}

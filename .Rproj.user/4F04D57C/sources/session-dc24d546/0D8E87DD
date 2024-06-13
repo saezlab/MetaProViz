@@ -1,0 +1,28 @@
+{
+    "id": "0D8E87DD",
+    "path": "~/GitHub/MetaProViz/vignettes/CoRe Metabolomics.Rmd",
+    "project_path": "vignettes/CoRe Metabolomics.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712221320100.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "407,0",
+        "scrollLine": "359",
+        "docOutlineVisible": "1"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1711017288,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1711017288,
+    "read_only": false,
+    "read_only_alternatives": []
+}

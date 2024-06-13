@@ -1,0 +1,27 @@
+{
+    "id": "AA224DF4",
+    "path": "~/GitHub/MetaProViz/R/VizHeatmap.R",
+    "project_path": "R/VizHeatmap.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712301606555.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "source_window_id": "wlifekgcijcfq",
+        "Source": "Source",
+        "cursorPosition": "220,47",
+        "scrollLine": "179",
+        "docOutlineVisible": "1"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712145110,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712145110,
+    "read_only": false,
+    "read_only_alternatives": []
+}

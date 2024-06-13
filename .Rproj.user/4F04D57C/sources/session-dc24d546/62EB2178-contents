@@ -1,0 +1,141 @@
+---
+title: "PriorKnowledge"
+author: "Christina Schmidt"
+date: "25 November 2023"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+  html_document:
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+editor_options:
+  chunk_output_type: console
+---
+```{r, include=FALSE, message=FALSE, warnibng=FALSE}
+library(tidyverse)
+library(rmarkdown)
+
+knitr::opts_chunk$set(warning=FALSE)
+```
+
+# Prior Knowledge
+1. Gene sets downloaded from [MsigDB](http://software.broadinstitute.org/gsea/msigdb) on 09.10.2023 including "KEGG", "Reactome", "Biocarta", "Hallmarks" "GO-terms", "Oncogenic Signature" and "Cell Type Signature".\
+2. Gene sets curated from papers: "Metabolic pathways" are based on Recon2 that has been developed aspart of the work of [Gaude et al](https://www.nature.com/articles/ncomms13041#Sec16).\
+\
+Load the gene sets:
+```{r}
+#Load the gmt files, combine the signatures and save the files.
+source("HelperFunctions/Load_GeneSet.R")#path to helper function
+
+#1. Load gene sets
+GO_BP <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c5.go.bp.v2023.1.Hs.symbols.gmt")
+
+GO_CC <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c5.go.cc.v2023.1.Hs.symbols.gmt")
+
+GO_MF <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c5.go.mf.v2023.1.Hs.symbols.gmt")
+
+KEGG <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c2.cp.kegg.v2023.1.Hs.symbols.gmt")
+
+Hallmarks <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/h.all.v2023.1.Hs.symbols.gmt")
+
+Biocarta <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c2.cp.biocarta.v2023.1.Hs.symbols.gmt")
+
+Reactome <-Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
+
+OncogenicSig <- Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c6.all.v2023.1.Hs.symbols.gmt")
+
+CellType <- Load_GeneSet(File="gmt", 
+                InputFile="Input/PK_GeneSets/c8.all.v2023.1.Hs.symbols.gmt")
+  
+MetabolicSig <-Load_GeneSet(File="csv", 
+                InputFile="Input/PK_GeneSets/41467_2016_BFncomms13041_MOESM340_ESM.csv")
+
+# For the MetabolicSig we will also add a column informing us if the enzyme is unique for the pathway:
+Correction_MetabolicSig <- read.csv("Input/PK_GeneSets/41467_2016_BFncomms13041_MOESM341_ESM.csv")%>% 
+    mutate(Unique = case_when(pathway =="1" ~ 'Unique',
+                                  TRUE ~ 'In multiple Pathways'))
+MetabolicSig <-merge(x=MetabolicSig, y=Correction_MetabolicSig[,-2], by ="gene", all.x=TRUE)
+
+
+# 2. Combine Gene sets that should be run together and save them:
+GO_Terms <- rbind(GO_BP, GO_CC, GO_MF)
+write.csv(GO_Terms,paste("Input/PK_Genesets/Compilled_GO-terms_", Sys.Date(), ".csv", sep=""), row.names=FALSE)
+
+KHBRO<- rbind(KEGG, Hallmarks, Biocarta, Reactome, OncogenicSig)
+write.csv(KHBRO, paste("Input/PK_Genesets/Compilled_KEGG-Hallmarks-Reactome-OncogenicSig_", Sys.Date(), ".csv", sep=""), row.names=FALSE)
+
+write.csv(MetabolicSig, paste( "Input/PK_Genesets/Compilled_MetabolicSig_", Sys.Date(), ".csv", sep=""), row.names=FALSE)
+
+write.csv(CellType, paste( "Input/PK_Genesets/Compilled_CellType_", Sys.Date(), ".csv", sep=""), row.names=FALSE)
+```
+\
+3. [PROGENy](https://saezlab.github.io/progeny/index.html) is resource that leverages a large compendium of publicly available signaling perturbation experiments to yield a common core of pathway responsive genes, which can be used to infer pathway activities.
+```{r}
+#Add PROGENy to the list:
+Pathway_List_decoupleR[["PROGENy_Top500"]]<- decoupleR::get_progeny(organism = 'human', top = 500)%>%
+  dplyr::rename("term"=1,
+                "gene"=2)
+
+#Save PROGENy to keep tap of PK used:
+write.csv(as.data.frame(Pathway_List_decoupleR[["PROGENy_Top500"]]), paste("Input/PK_GeneSets/PROGENy_Top500_", Sys.Date(), ".csv", sep=""), row.names=FALSE)
+
+```
+
+## Map gene to metabolite IDs
+This only makes sense for datasets containing many metabolic pathways such as Hallmarks, Metabolic Signature from Gaude, Reactome and KEGG. The mapping of gene names to metabolite HMDB IDs is done by using the cosmosR network.
+```{r}
+# Load helper function
+source("HelperFunctions/Make_GeneMetabSet.R")#path to helper function
+
+#Make GeneMetabSets
+genesets_List <- list(Hallmarks=Hallmarks, MetabolicSig=MetabolicSig, KEGG=KEGG, Reactome=Reactome)
+
+GeneMetabSet <- list()
+for(geneset in names(genesets_List)){
+ Input <- genesets_List[[geneset]]
+ GeneMetabSet[[geneset]]  <- Make_GeneMetabSet(Input_GeneSet=Input[,c(1:2)], target="gene", OutputName = geneset)
+}
+
+```
+
+* make get_hallmarks, get_gaude for MetaProViz. At best we do this via Omnipath.
+* here we use the pkn of cosmosR, but we could also combine it with the PKN of metalinks, so transporters are also maintained!
+
+## Colinearity
+In pathways we can have regulators which are correlated and hence are colinear. Linear models (e.g. mlm) can not be fitted when colinear covariables are present. 
+```{r, eval=FALSE, include=FALSE}
+
+##----- Remove colinear variables from pathways (needed for mlm) or we use ulm.
+for(PK in names(Pathway_List_decoupleR)){
+  #1. check which regulators are correlated to enable the fit of the linear model (Cannot fit a linear model with colinear covariables)
+  corr_res <- decoupleR::check_corr(network=Pathway_List_decoupleR[[PK]],
+                          .source = 'term',
+                          .target = 'gene',
+                          .mor = 'weight')
+  #2. Remove colinear variables: --> 0.8?
+  if((test_select$correlation>=0.9)==TRUE){
+    message("In ",PK, " are sources in the network that are colinear with other sources.")
+    
+    
+  }else {
+    message("In ",PK, " no source in the network is colinear with other sources.")
+  }
+}
+
+```
+
+# Package information
+```{r}
+#Info about R packages:
+sessionInfo()
+```

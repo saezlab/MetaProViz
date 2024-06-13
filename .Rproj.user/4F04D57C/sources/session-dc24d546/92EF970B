@@ -1,0 +1,28 @@
+{
+    "id": "92EF970B",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712302708196.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "id": "1c2f88a247be4fdea191927e7491b9a7",
+        "name": "PlotList",
+        "title": "PlotList",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 7310575183465750629,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712302708196,
+    "read_only": false,
+    "read_only_alternatives": []
+}

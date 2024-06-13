@@ -1,0 +1,26 @@
+{
+    "id": "A60BA536",
+    "path": "~/GitHub/SmartCare_MethodDevelopmentCohort/HelperFunctions/Load_GeneSet.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712216219180.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "source_window_id": "wvf2tsjjipdaw",
+        "Source": "Source",
+        "cursorPosition": "71,1",
+        "scrollLine": "14"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712216236,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712216236563,
+    "read_only": false,
+    "read_only_alternatives": []
+}

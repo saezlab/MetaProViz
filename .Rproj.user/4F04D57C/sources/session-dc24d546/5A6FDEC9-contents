@@ -1,0 +1,1397 @@
+---
+title: "Proteomics"
+author: "Christina Schmidt"
+date: "25 September 2023"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+  html_document:
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+editor_options:
+  chunk_output_type: console
+---
+```{r, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rmarkdown)
+
+#devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")#only loaded until package is online
+
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE)
+```
+
+```{r}
+## ------------ Create Output folders ----------- ##
+#1. Output folder
+Output_folder <- file.path(getwd(), "Output")
+if (!dir.exists(Output_folder)) {dir.create(Output_folder)} # Make Results folder
+
+#2. DIA_Proteomics folder
+Prot_folder <- file.path(Output_folder, "DIA_Proteomics")
+if (!dir.exists(Prot_folder)) {dir.create(Prot_folder)}  # check and create folder
+
+```
+
+# Load the data
+***Method Development Cohort: SmartCare Lung Cancer***
+
+## Processed data
+The processed data were downloaded from OpenBis (24.01.2024) and are stored as a SummarizedExperiment file:\
+ETL_DATASET : 20231215094311929-15877 "THRX_DATA_ALL.Updated_MethodDev_LungCancer_Datasets.RData (7.7 Mb)"
+```{r}
+#===================== Load the SummarizedExperiment file
+load("Input/OpenBis_24.01.2024/THRX_DATA_ALL.Updated_MethodDev_LungCancer_Datasets.RData")
+
+#Since we are only interested in DIA proteomics, we will only maintain thos:
+MethodDev_LungCancer_DIA <- MethodDev_LungCancer_Datasets[grep("DIA", names(MethodDev_LungCancer_Datasets))]
+
+#==================== Adjust column names and Conditions 
+Datasets <- names(MethodDev_LungCancer_DIA)
+
+for(item in Datasets){
+  #rename MetaData Condition in Plasma data:
+  if(sub(".*\\.(Tissue|Plasma)\\..*", "\\1", item)=="Plasma"){#For the Plasma data we need to adjust the metaInformation
+    SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[item]])$Condition <- factor(case_when(
+      SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[item]])$Condition == "Baseline" ~ 'Baseline',
+      SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[item]])$Condition == "Follow-up" | SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[item]])$Condition == "Recurrence" ~ 'FollowUp',
+      TRUE ~ 'NA'))
+    }
+  
+  #rename the column with the gene names:
+  gene_columns <- grep("(Gene|gene)", colnames(SummarizedExperiment::rowData(MethodDev_LungCancer_DIA[[item]])), ignore.case = TRUE)
+  colnames(SummarizedExperiment::rowData(MethodDev_LungCancer_DIA[[item]]))[gene_columns] <- "Gene"
+  }
+
+#==================== Save Summarized Experiment Selection:
+saveRDS(MethodDev_LungCancer_DIA, file = paste("Output/DIA_Proteomics/DIA_Proteomics_Processed_",format(Sys.Date(), "%d.%m.%Y") ,".Rdata", sep=""))
+```
+
+## Differential analysis results
+The DA results were downloaded from OpenBis (24.01.2024):\
+ETL_DATASET : 20240117103421611-16582 "THRX_RES_DIA_PRO_TARG_METAB.DIA_Pro.xlsx (1.8 Mb)" = Proteomics\
+
+The following comparisons have been performed:\
+1. Tumour versus Normal (Tissue)\
+  1.1. Recurrence\
+  1.2. Non-Recurrence\
+2. Follow-Up versus Basal (Plasma)\
+  2.1. Recurrence\
+  2.2. Non-Recurrence\
+3. Recurrence versus Non-Recurrence\
+  3.1. Tumour (Tissue)\
+  3.2. Normal (Tissue)\
+  3.3. Follow-Up (Plasma)\
+  3.4. Basal (Plasma)
+  
+```{r}
+#===================== Load the Excel file
+excel_file <- "Input/OpenBis_24.01.2024/THRX_RES_DIA_PRO_TARG_METAB.DIA_Pro.xlsx"#file
+sheet_names <- readxl::excel_sheets(excel_file)# Get the sheet names
+
+# Load each sheet into a data frame and add it to the list
+dfs <- list()# Create a list to store data frames
+for(sheet in sheet_names) {
+  dfs[[sheet]] <- readxl::read_excel(excel_file, sheet = sheet)
+}
+
+#==================== #Check and remove duplicated gene names (keep the entry with the higher absolute Log2FC)
+datasets <- names(dfs)
+
+dfs_NoDubl <- list()
+for(dataset in datasets){
+  MyData <- dfs[[dataset]]
+  #Assign the correct column name
+  FeatureID <- "Gene"
+  
+  #Remove doublons and Keep the entry with the greatest Log2FC:
+   MyData <- MyData%>%
+      subset(!FeatureID=="NA")
+   MyData <- MyData[complete.cases(MyData),] 
+   doublons <- as.character(MyData[duplicated(MyData[FeatureID]), FeatureID])
+   message("Duplicated genes in ", dataset, ":")
+   if(doublons =="character(0)"){
+     print("")
+   }else{
+     print(doublons)
+   }
+   
+   MyData$absLog2FC <- abs(MyData$log2FC)
+   MyData <- MyData[ order(MyData$absLog2FC), ]
+   MyData_Select <- MyData[!duplicated(MyData[FeatureID]), !grepl("absLog2FC", colnames(MyData))]
+    
+  #Return into new list of dfs
+  dfs_NoDubl[[dataset]]<-MyData_Select
+}
+
+```
+\
+Next, we will do some data wrangling:\
+1. Rename the comparisons to be biological meaningful and to reduce miss-interpretation.\
+2. Merge the DA results with the processed samples that were used as the input to enable different types of visualization specific for a DA.
+```{r}
+######-------- Add processed samples:
+#Get the processed data with metadata:
+Tissue.Pro.Klin <- merge(x= as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[["DIA.Tissue.Proteomics_Klingmueller"]])),
+                   y= as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[["DIA.Tissue.Proteomics_Klingmueller"]]))), 
+                   by = "row.names", all = TRUE)
+
+Tissue.Pro.Krij <- merge(x= as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[["New_DIA.Tissue.Proteomics_Krijgsveld"]])),
+                   y= as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[["New_DIA.Tissue.Proteomics_Krijgsveld"]]))), 
+                   by = "row.names", all = TRUE)
+
+Plasma.Pro.Krij <- merge(x= as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[["New_DIA.Plasma.Proteomics_Krijgsveld"]])),
+                   y= as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[["New_DIA.Plasma.Proteomics_Krijgsveld"]]))), 
+                   by = "row.names", all = TRUE)
+
+#Select Samples for DA
+Recur_DIA.Tumor.Tissue.Pro.Klin <-Tissue.Pro.Klin%>%
+  filter(Condition =="Tumor")
+Recur_DIA.Norm.Tissue.Pro.Klin <-Tissue.Pro.Klin%>%
+  filter(Condition =="Normal")
+Condi_DIA.Recur.Tissue.Pro.Klin <-Tissue.Pro.Klin%>%
+  filter(Recurrence =="Yes")
+Condi_DIA.NonRe.Tissue.Pro.Klin <- Tissue.Pro.Klin%>%
+  filter(Recurrence =="No")
+
+Recur_DIA.Tumor.Tissue.Pro.Krij <-Tissue.Pro.Krij%>%
+  filter(Condition =="Tumor")
+Recur_DIA.Norm.Tissue.Pro.Krij <-Tissue.Pro.Krij%>%
+  filter(Condition =="Normal")
+Condi_DIA.Recur.Tissue.Pro.Krij <-Tissue.Pro.Krij%>%
+  filter(Recurrence =="Yes")
+Condi_DIA.NonRe.Tissue.Pro.Krij <- Tissue.Pro.Krij%>%
+  filter(Recurrence =="No")
+
+Recur_DIA.Base.Plasma.Pro.Krij <-Plasma.Pro.Krij%>%
+  filter(Condition =="Baseline")
+Recur_DIA.Folo.Plasma.Pro.Krij <-Plasma.Pro.Krij%>%
+  filter(Condition =="Follow-up")
+Time_DIA.Recur.Plasma.Pro.Krij <-Plasma.Pro.Krij%>%
+  filter(Recurrence =="Yes")
+Time_DIA.NonRe.Plasma.Pro.Krij <- Plasma.Pro.Krij%>%
+  filter(Recurrence =="No")
+
+Processed_Select_list <- list("Recur_DIA.Tumor.Tissue.Pro.Klin"=Recur_DIA.Tumor.Tissue.Pro.Klin, 
+                              "Recur_DIA.Norm.Tissue.Pro.Klin" =Recur_DIA.Norm.Tissue.Pro.Klin, 
+                              "Recur_DIA.Tumor.Tissue.Pro.Krij" = Recur_DIA.Tumor.Tissue.Pro.Krij,
+                              "Recur_DIA.Norm.Tissue.Pro.Krij" = Recur_DIA.Norm.Tissue.Pro.Krij, 
+                              "Recur_DIA.Base.Plasma.Pro.Krij"= Recur_DIA.Base.Plasma.Pro.Krij , 
+                              "Recur_DIA.Folo.Plasma.Pro.Krij"= Recur_DIA.Folo.Plasma.Pro.Krij, 
+                              "Condi_DIA.Recur.Tissue.Pro.Klin"= Condi_DIA.Recur.Tissue.Pro.Klin, 
+                              "Condi_DIA.NonRe.Tissue.Pro.Klin" = Condi_DIA.NonRe.Tissue.Pro.Klin ,
+                              "Condi_DIA.Recur.Tissue.Pro.Krij"= Condi_DIA.Recur.Tissue.Pro.Krij, 
+                              "Condi_DIA.NonRe.Tissue.Pro.Krij"= Condi_DIA.NonRe.Tissue.Pro.Krij,
+                              "Time_DIA.Recur.Plasma.Pro.Krij"= Time_DIA.Recur.Plasma.Pro.Krij,  
+                              "Time_DIA.NonRe.Plasma.Pro.Krij" = Time_DIA.NonRe.Plasma.Pro.Krij)
+
+#Merge with DA
+datasets <- names(dfs_NoDubl)
+merged_df_list <- list()
+
+for(item in datasets){
+  Processed_Select <- as.data.frame(Processed_Select_list[[item]])%>%
+    column_to_rownames("Row.names")
+  Processed_Select <- as.data.frame(t(Processed_Select[, sapply(Processed_Select, is.numeric)]))
+  
+  merged_df_list[[item]] <- merge(dfs_NoDubl[[item]], Processed_Select ,by.x="Feature" ,  by.y = "row.names", all.x  = TRUE)
+  
+}
+
+######-------- Rename sheets
+# Check the current names
+print(datasets)
+
+#New names:
+NewNames <- c("Recur_DIA.Tumor.Tissue.Pro.Klin"="RECvsNREC_TumourTissue_NP40",
+              "Recur_DIA.Norm.Tissue.Pro.Klin"="RECvsNREC_NormalTissue_NP40",
+              "Recur_DIA.Tumor.Tissue.Pro.Krij"="RECvsNREC_TumourTissue_SDS",
+              "Recur_DIA.Norm.Tissue.Pro.Krij"="RECvsNREC_NormalTissue_SDS",
+              "Recur_DIA.Base.Plasma.Pro.Krij" ="RECvsNREC_BaselinePlasma_SDS",
+              "Recur_DIA.Folo.Plasma.Pro.Krij"="RECvsNREC_FollowUpPlasma_SDS",
+              "Condi_DIA.Recur.Tissue.Pro.Klin" ="TvsN_Rec_NP40",
+              "Condi_DIA.NonRe.Tissue.Pro.Klin"="TvsN_NRec_NP40",
+              "Condi_DIA.Recur.Tissue.Pro.Krij"="TvsN_Rec_SDS",
+              "Condi_DIA.NonRe.Tissue.Pro.Krij"="TvsN_NRec_SDS",
+              "Time_DIA.Recur.Plasma.Pro.Krij"="FUvsB_Rec_SDS",
+              "Time_DIA.NonRe.Plasma.Pro.Krij"="FUvsB_NRec_SDS")
+
+#Rename sheets:
+Prot_DA <- setNames(merged_df_list, NewNames)
+
+#Replace NA with 0, rename columns
+Prot_DA <- lapply(Prot_DA, function(df) {
+  df[is.na(df)] <- 0
+  df <- df%>%
+    dplyr::rename("t.val"= "tStat (proDA)")
+  return(df)
+})
+
+```
+
+*Add the metadata back and make a summarized experiment file? --> We should check with QuianWu if he could do this whilst running ProDa anyways.(Also the comparison below and the naming of the comparisons)
+\
+Additionally to the above comparisons we will also compare:\
+1. Tumour versus Normal (Tissue)\
+2. Follow-Up versus Basal (Plasma)\
+\
+Here we use limma for the differential analysis using the MetaProViz helper function: `MetaProViz:::DMA_Stat_limma`.
+```{r}
+#Differential analysis using limma
+#Are the data log2 transformed --> yes
+
+######----- Perform this on each dataset:
+Datasets <- names(MethodDev_LungCancer_DIA)
+
+for(item in Datasets){
+  if(sub(".*\\.(Tissue|Plasma)\\..*", "\\1", item)=="Plasma"){#For the Plasma data we need to adjust the metaInformation
+    TvN <- MetaProViz:::DMA_Stat_limma (Input_data = as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[[item]]))) ,
+                                     Input_SettingsFile_Sample = as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[item]]))%>% dplyr::rename("Conditions"="Condition"),
+                                     Input_SettingsInfo = c(conditions="Conditions", numerator = "FollowUp", denominator  = "Baseline"),
+                                     Log2FC_table = NULL,
+                                     STAT_padj = "fdr",
+                                     CoRe = FALSE,
+                                     all_vs_all = FALSE,
+                                     MultipleComparison = FALSE, 
+                                     transform = FALSE)#if TRUE log2 transformation would be done.
+  } else{
+    TvN <- MetaProViz:::DMA_Stat_limma (Input_data = as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[[item]]))) ,
+                                     Input_SettingsFile_Sample = as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[item]]))%>% dplyr::rename("Conditions"="Condition"),
+                                     Input_SettingsInfo = c(conditions="Conditions", numerator = "Tumor", denominator  = "Normal"),
+                                     Log2FC_table = NULL,
+                                     STAT_padj = "fdr",
+                                     CoRe = FALSE,
+                                     all_vs_all = FALSE,
+                                     MultipleComparison = FALSE, 
+                                     transform = FALSE)#if TRUE log2 transformation would be done.
+  }
+  
+  
+  #Add gene names
+  TvN <- merge(x= as.data.frame(SummarizedExperiment::rowData(MethodDev_LungCancer_DIA[[item]]))%>%rownames_to_column("Protein"), 
+               y= TvN%>%dplyr::rename("Protein"=1),
+               by="Protein",
+               all=TRUE)
+  
+  #Remove doublons and Keep the entry with the greatest Log2FC:
+  FeatureID <- "Gene"
+  
+  MyData <- TvN%>%
+      subset(!FeatureID=="NA")
+   MyData <- MyData[complete.cases(MyData),] 
+   doublons <- as.character(MyData[duplicated(MyData[FeatureID]), FeatureID])
+   message("Duplicated genes in ", dataset, ":")
+   if((length(doublons)>1) ==FALSE){
+     print("")
+   }else{
+     print(doublons)
+   }
+   
+  MyData$absLog2FC <- abs(MyData$Log2FC)
+  MyData <- MyData[ order(MyData$absLog2FC), ]
+  TvN_Select <- MyData[!duplicated(MyData[FeatureID]), !grepl("absLog2FC", colnames(MyData))]
+  
+  #Add input data
+  TvN_Select <- merge (x= TvN_Select, 
+                y= as.data.frame(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[[item]]))%>%rownames_to_column("Protein"), 
+                by="Protein",
+                all.x=TRUE)
+  
+  #Replace NA with 0
+  TvN_Select[is.na(TvN_Select)] <- 0
+  
+  #rename columns to match the other DA
+  TvN_Select<- TvN_Select%>%
+    dplyr::rename("pValAdj"="p.adj",
+                  "pVal"="p.val",
+                  "log2FC"="Log2FC")
+  
+  
+  #Export into the list of differential dataframes:
+  DF_Name <- paste(ifelse(grepl("Tissue", item, ignore.case = TRUE), "TvsN", "FUvsB"),#name comaprison
+                   sub(".*\\.(Tissue|Plasma)\\..*", "\\1", item),#name Tissue or Plasma
+                   ifelse(grepl("Klin", item, ignore.case = TRUE), "NP40", "SDS"),#rename Lab
+                   sep="_")
+  Prot_DA[[DF_Name]]<- TvN_Select
+}
+ 
+```
+\
+Save the all the differential analysis results as `.xlsx` and `.RDS`:
+```{r}
+######-------- Save
+#1. RDS
+saveRDS(Prot_DA, file = paste("Output/DIA_Proteomics/DIA_Proteomics_Differential-Analysis_",format(Sys.Date(), "%d.%m.%Y") ,".Rdata", sep=""))
+
+
+#2. EXCEL
+writexl::write_xlsx(Prot_DA,
+                    paste("Output/DIA_Proteomics/DIA_Proteomics_Differential-Analysis_",format(Sys.Date(), "%d.%m.%Y") ,".xlsx", sep=""))
+
+```
+
+# Comparison of the feature space
+For the DIA total proteomics, we have two different datasets obtained using different extraction methods and run on different machines. The Klingmueller dataset uses NP40 extraction buffer with 0.1% SDS and hence favouring membrane proteins (hydrophobic parts are solubilised better) to be included, whilst the Kriegsveld lab uses SDS for extraction favouring nuclear proteins to be included. Here I will compare the feature space, meaning the proteins detected with those two methods.\
+Here we focus on the tissue proteomics:\
+```{r}
+###################################### Load ######################################
+##----- Results folder:
+Comp_folder <- file.path(Prot_folder, "ComparisonFeatureSpace")
+if (!dir.exists(Comp_folder)) {dir.create(Comp_folder)}  # check and create folder
+
+##----- Load the two datasets:
+TP_DIA_NP40 <- as.data.frame(Prot_DA[["TvsN_Tissue_NP40"]][["Gene"]])%>%
+  dplyr::rename("Gene"=1)
+TP_DIA_NP40$NP40 <- "NP40"
+
+TP_DIA_SDS <- as.data.frame(Prot_DA[["TvsN_Tissue_SDS"]][["Gene"]])%>%
+  dplyr::rename("Gene"=1)
+TP_DIA_SDS$SDS <- "SDS"
+
+TP_DIA <- merge(TP_DIA_NP40, TP_DIA_SDS, by=1, all=TRUE)%>%
+    mutate(Reagent = case_when(SDS == "SDS" & NP40 =="NP40"  ~ 'Reagent independent detection',
+                               SDS == "SDS" ~ 'SDS dependent detection',
+                               NP40 =="NP40"  ~ 'NP40 dependent detection',
+                               TRUE ~ 'FALSE'))%>%
+  dplyr::rename("Gene"=1)
+
+##-------- Average Log2FC: (StDev, Mean)
+mean((Prot_DA[["TvsN_Tissue_NP40"]][["log2FC"]]))
+sd((Prot_DA[["TvsN_Tissue_NP40"]][["log2FC"]]))
+mean((Prot_DA[["TvsN_Tissue_SDS"]][["log2FC"]]))
+sd((Prot_DA[["TvsN_Tissue_SDS"]][["log2FC"]]))
+
+x <- merge(TP_DIA%>%subset(Reagent == "NP40 dependent detection"), as.data.frame(Prot_DA[["TvsN_Tissue_NP40"]]), by="Gene", all.x=TRUE)
+mean(x$log2FC)
+sd(x$log2FC)
+
+y <- merge(TP_DIA%>%subset(Reagent == "SDS dependent detection"), as.data.frame(Prot_DA[["TvsN_Tissue_SDS"]]), by="Gene", all.x=TRUE)
+mean(y$log2FC)
+sd(y$log2FC)
+
+###################################### Plots ######################################
+##------ Make a Venn 
+Venn <- ggVennDiagram::ggVennDiagram(list(TP_DIA_NP40=TP_DIA_NP40$Gene, TP_DIA_SDS=TP_DIA_SDS$Gene),
+                             label_alpha = 0)+
+  ggplot2::scale_fill_gradient(low = "#006384", high = "#DC954B") 
+  
+ggsave(file=paste("Output/DIA_Proteomics/ComparisonFeatureSpace/", "Venn_FeatureSpace-Tissue", ".svg", sep=""), plot=Venn, width=4, height=4)
+plot(Venn)
+
+##------ Make a correlation plot of the overlap and report R2
+Correlation <- merge(x=as.data.frame(Prot_DA[["TvsN_Tissue_NP40"]]), 
+                     y=as.data.frame(Prot_DA[["TvsN_Tissue_SDS"]]),
+                     by="Gene",
+                     all=TRUE)%>%
+  column_to_rownames("Gene")
+
+message("The common features (" , nrow(Correlation[,c(2,46)]%>% drop_na()), ") have a correlation of the Log2FC comapring Tumour versus Normal of R2 = ", cor(as.matrix(Correlation[,c(2,46)]%>% drop_na()))[[2]], ".", sep="")
+
+InputPlot <- Correlation[,c(2,46)]%>%
+  drop_na()%>%
+  dplyr::rename("NP40[Log2FC(TvsN)]"=1,
+                "SDS[Log2FC(TvsN)]"=2)
+
+Scatter <- ggplot(InputPlot, aes(`NP40[Log2FC(TvsN)]`, `SDS[Log2FC(TvsN)]`)) +
+  geom_point(aes(color = ifelse((`NP40[Log2FC(TvsN)]` >= 0 & `SDS[Log2FC(TvsN)]` >= 0) | (`NP40[Log2FC(TvsN)]` < 0 & `SDS[Log2FC(TvsN)]` < 0), "Correlation",
+                         "Anticorrelation"))) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "#5D6364") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "#5D6364") +
+  #geom_smooth(method = "lm", se = FALSE, color = "#5D6364", linewidth=0.5) +  # Linear regression line
+  ggpmisc::stat_poly_eq(ggpmisc::use_label(c("R2", "p"))) +
+  scale_color_manual(values = c("Correlation" = "#DC954B", "Anticorrelation" = "#006384")) +  # Customize quadrant colors
+  scale_x_continuous(breaks = seq(floor(min(InputPlot$`NP40[Log2FC(TvsN)]`)), ceiling(max(InputPlot$`NP40[Log2FC(TvsN)]`)), by = 1)) +  # Set x-axis ticks
+  scale_y_continuous(breaks = seq(floor(min(InputPlot$`SDS[Log2FC(TvsN)]`)), ceiling(max(InputPlot$`SDS[Log2FC(TvsN)]`)), by = 1)) +  # Set y-axis ticks
+ 
+  labs(title = "Comparison of protein Log2FC (Tumour vs Normal)",
+       subtitle = paste(nrow(InputPlot) , " proteins", sep=""),
+       x = expression(paste("NP40 ", Log[2], "FC (TvsN)")),
+       y = expression(paste("SDS ", Log[2], "FC (TvsN)")),
+       color = "") +
+  theme_bw()
+
+ggsave(file=paste("Output/DIA_Proteomics/ComparisonFeatureSpace/", "ScatterPlot_FeatureSpace-Tissue", ".svg", sep=""), plot=Scatter, width=5, height=4)
+plot(Scatter)
+
+##------ Make Volcano Plots
+clusters <- unlist(unique(TP_DIA["Reagent"]))
+for(cluster in clusters){
+  data <-TP_DIA%>%
+    subset(Reagent == cluster)
+  if(grepl("NP40", cluster, ignore.case = TRUE)){
+    data <- merge(data, as.data.frame(Prot_DA[["TvsN_Tissue_NP40"]]), by="Gene", all.x=TRUE)
+  }else if(grepl("SDS", cluster, ignore.case = TRUE)){
+    data <- merge(data, as.data.frame(Prot_DA[["TvsN_Tissue_SDS"]]), by="Gene", all.x=TRUE)
+  }
+  
+  if((grepl("NP40", cluster, ignore.case = TRUE)) | (grepl("SDS", cluster, ignore.case = TRUE))){
+    MetaProViz::VizVolcano(Input_data=data,
+                       y = "pValAdj",
+                       x = "log2FC",
+                       xlab = "Log2FC (Tumour vs Normal)",
+                       FeatureID = "Gene",
+                       color_palette =c("#5D6364", "#006384","#6D9EB6","#DC954B"),
+                       OutputPlotName = paste(cluster),
+                       Save_as_Plot = "svg",
+                       Features = "proteins")
+    
+    MetaProViz::VizVolcano(Input_data=data,
+                       y = "pValAdj",
+                       x = "log2FC",
+                       xlab = "Log2FC (Tumour vs Normal)",
+                       FeatureID = "Gene",
+                       color_palette =c("#5D6364", "#006384","#6D9EB6","#DC954B"),
+                       OutputPlotName = paste(cluster, "_Labels"),
+                       Save_as_Plot = "svg",
+                       Features = "proteins",
+                       SelectLab = NULL)
+  }
+}
+
+
+
+###################################### Pathway enrichment analysis ######################################
+##------ Check Biology of the clusters:
+GO_CC <- read.csv("Input/PK_GeneSets/Compilled_GO-terms_2023-10-09.csv")%>%
+  filter(grepl("^GOCC", term))# Get GO cellular components pathways
+GO_CC$Description <- GO_CC$term
+
+clusters <- unlist(unique(TP_DIA["Reagent"]))
+ORA_res<-list()
+
+
+set.seed(100)
+for(cluster in clusters){
+  #input
+  df <-TP_DIA
+  
+  # PK
+  Pathway <- GO_CC[,-c(3)]
+  Term2gene <- Pathway[,c("term", "gene")]# term and geneID (e.g. ENTEREZ, must match enricher_geneID)
+  term2name <- Pathway[,c("term", "Description")]# geneID and description
+  #Add the number of genes present in each pathway
+  Pathway$Count <- 1
+  Pathway_Mean <- aggregate(Pathway$Count, by=list(term=Pathway$term), FUN=sum)
+  names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Genes_in_Pathway"
+  Pathway <- merge(x= Pathway[,-4], y=Pathway_Mean,by="term", all.x=TRUE)
+  
+  #Select universe and clusters genes
+  allGenes <- as.character(df[["Gene"]]) #
+  grpGenes <- subset(df, df[["Reagent"]] == cluster)
+  
+  #Run ORA
+  clusterGo <- clusterProfiler::enricher(gene=as.character(grpGenes[["Gene"]]),
+                                            pvalueCutoff = 1,
+                                            pAdjustMethod = "BH",
+                                            universe = allGenes,
+                                            minGSSize=10,
+                                            maxGSSize=1000,
+                                            qvalueCutoff = 1,
+                                            #gson  = NULL,
+                                            TERM2GENE=Term2gene ,
+                                            TERM2NAME = term2name)
+  clusterGoSummary <- data.frame(clusterGo)
+  
+  #Save:
+  if(!(dim(clusterGoSummary)[1] == 0)){
+    #Add pathway information (% of genes in pathway detected)
+    clusterGoSummary <- merge(x= clusterGoSummary[,-2], y=Pathway[,-2],by.x="ID",by.y="term", all=TRUE)
+    clusterGoSummary$Count[is.na(clusterGoSummary$Count)] <- 0
+    clusterGoSummary$Percentage_of_Pathway_detected <-round(((clusterGoSummary$Count/clusterGoSummary$Genes_in_Pathway)*100),digits=2)
+    clusterGoSummary <- clusterGoSummary[!duplicated(clusterGoSummary$ID),]
+    clusterGoSummary <- clusterGoSummary[order(clusterGoSummary$p.adjust),]
+    clusterGoSummary <- clusterGoSummary[,c(1,9,2:8, 10:11)]
+    #Safe file
+    write.csv(clusterGoSummary, paste("Output/DIA_Proteomics/ComparisonFeatureSpace/ClusterGoSummary_GO-CC_Tissue_", cluster, ".csv", sep=""), row.names = FALSE)
+    
+    #return
+    ORA_res[[cluster]]<-clusterGoSummary  
+    
+    
+    if(any(clusterGoSummary$p.adjust <= 0.05, na.rm = TRUE)==TRUE){
+     #Save plots:
+     #Select which pathways to show on the plot based on percentage detected, remove GOCC_ from legend name, 
+     PlotData <- clusterGoSummary%>%
+       subset(p.adjust <= 0.05) #&  Percentage_of_Pathway_detected<= 10)
+     rownames(PlotData) <- PlotData$Description
+    
+     clusterGo@result <-  PlotData
+     
+     x2 <- enrichplot::pairwise_termsim(clusterGo) #https://rdrr.io/github/GuangchuangYu/enrichplot/man/emapplot.html
+     Emapplot <- enrichplot::emapplot(x2, 
+                                     showCategory = nrow(PlotData),
+                                     color = "p.adjust",
+                                     layout = "nicely",
+                                     min_edge = 0.01,# minimum percentage of overlap genes to display the edge, should between 0 and 1
+                                     node_label_size = NULL,
+                                     direction = "both",
+                                     shadowtext= FALSE,#text style
+                                     cex_label_category = 0.5,#size of labels
+                                     cex_category = 2.5,#size of the circles
+                                     cex_line = 1.5)+
+       ggplot2::ggtitle(paste("GO-term Cellular Component: ", cluster, sep=""))+
+       ggplot2::labs(subtitle = paste(nrow(PlotData), " pathways with p.adjust <0.05. Edges > 1% of overlapping genes between pathways.", sep=""))+
+       ggplot2::theme(plot.title =  ggplot2::element_text(color="black", size=12, face="bold"),
+                       legend.title = ggplot2::element_text(color = "black", size = 10))
+     
+       ggplot2::ggsave(file=paste("Output/DIA_Proteomics/ComparisonFeatureSpace/GO-CellularComponent_", cluster, ".svg", sep="" ), plot=Emapplot, width=8, height=6)
+       ggplot2::ggsave(file=paste("Output/DIA_Proteomics/ComparisonFeatureSpace/GO-CellularComponent_", cluster, "1.svg", sep="" ), plot=Emapplot, width=16, height=12)
+       plot(Emapplot) 
+      }
+    }else{
+    #return
+    ORA_res[[cluster]]<-clusterGoSummary
+  }
+}
+
+```
+\
+We find that the genes in the reagent independent detection includes many nuclear proteins, which could be the reason why the SDS detection has only one cellular component. On the other hand the NP40 detection has many significant cellular components including many membrane complexes. having noted this, there are multiple nuclear related cellular components specific for the SDS detection, yet those do not come up as significant (p.adj <0.05) in the ORA.
+
+*Shall we merge the proteins of the two methods after having calculated the Log2FC?
+
+# Quality Control
+## General Overview
+### PCA plots
+***1. Understand the sample and patient clustering by using PCA***\
+Principal component analysis (PCA) reduces the data and helps us to understand which different demographic features (status, gender, recurrence,etc..) are associated with different feature (=protein) expression.\
+```{r}
+# Here we can directly input the summarized experiment
+DIA_datasets <- names(MethodDev_LungCancer_DIA)
+
+for(DIA_dataset in DIA_datasets){
+  # Generate Input data and metadata:
+  Input_PCA <- as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[[DIA_dataset]])))
+  Input_PCA[is.na(Input_PCA)] <- 0
+  MetaData_Sample_PCA <- as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[[DIA_dataset]]))
+
+  #colour code plots in SmartCare colours.
+  SmartCare_Colour <- c("#DC954B","#006384", "#5D6364","#6D9EB6")
+
+  # Overview PCA plot:
+  MetaProViz::VizPCA(Plot_SettingsInfo= c(shape="Condition", color="Recurrence"),
+                   Plot_SettingsFile= MetaData_Sample_PCA,
+                   Input_data= Input_PCA,
+                   color_palette = SmartCare_Colour,
+                   OutputPlotName = paste0(DIA_dataset,"-General" ,sep=""))
+
+  # Other PCA plots:
+  MetaProViz::VizPCA(Plot_SettingsInfo= c(shape="Condition", color="Stage"),
+                   Plot_SettingsFile= MetaData_Sample_PCA,
+                   Input_data= Input_PCA,
+                   color_palette = SmartCare_Colour,
+                   OutputPlotName = paste0(DIA_dataset,"-Stage" ,sep=""))
+
+  MetaProViz::VizPCA(Plot_SettingsInfo= c(shape="Condition", color="Smoking"),
+                   Plot_SettingsFile= MetaData_Sample_PCA,
+                   Input_data= Input_PCA,
+                   color_palette = SmartCare_Colour,
+                   OutputPlotName = paste0(DIA_dataset,"-Smoking" ,sep=""))
+  
+  MetaProViz::VizPCA(Plot_SettingsInfo= c(shape="Condition", color="Gender"),
+                   Plot_SettingsFile= MetaData_Sample_PCA,
+                   Input_data= Input_PCA,
+                   color_palette = SmartCare_Colour,
+                   OutputPlotName = paste0(DIA_dataset,"-Gender" ,sep=""))
+  
+  MetaProViz::VizPCA(Plot_SettingsInfo= c(shape="Condition", color="Age"),
+                   Plot_SettingsFile= MetaData_Sample_PCA,
+                   Input_data= Input_PCA,
+                   color_scale= "continuous",
+                   OutputPlotName = paste0(DIA_dataset,"-Age" ,sep=""))
+}
+
+```
+\
+Here, we notice that in the Plasma proteomics "New_DIA.Plasma.Proteomics_Kriegsveld" the Sample K03F80GD_B drives the main difference on PC1 with 43.61%.
+*What is QuianWu's opinion on this?  (If you remove the sample `rows_to_remove <- c("K03F80GD_B", "JH3K67HG_R", "JH3K67HG_B", "J03P4", ) Input_PCA <- Input_PCA[!(rownames(Input_PCA) %in% rows_to_remove) ,]` there will just be other samples driving the variance on PC1. Hence the data seems to be extremely variable, probably because of the high missingness in the Plasma samples(?).
+
+### Volcano Plots
+***2. Understand the proportion of significantly changed features by plotting them as Volcano plots.***
+Given we only have 20 patients (10 with and 10 without tumour-recurrence), it is not surprising that we do not find any significantly changing genes (p.adj < 0.05) when comparing recurrence versus non-recurrence.\
+```{r}
+#devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")#only loaded until package is online
+
+#colour code Plots in SmartCare colours.
+SmartCare_Colour <- c("#5D6364", "#006384","#6D9EB6","#DC954B")
+
+#Plots
+datasets <- names(Prot_DA)
+
+for(dataset in datasets){
+  MetaProViz::VizVolcano(Input_data=Prot_DA[[dataset]],
+                       y = "pValAdj",
+                       x = "log2FC",
+                       FeatureID = "Gene",
+                       color_palette =SmartCare_Colour,
+                       OutputPlotName = paste(dataset, "_p.adj", sep=""),
+                       Save_as_Plot = "svg",
+                       Features = "proteins")
+  MetaProViz::VizVolcano(Input_data=Prot_DA[[dataset]],
+                       y = "pVal",
+                       x = "log2FC",
+                       FeatureID = "Gene",
+                       color_palette =SmartCare_Colour,
+                       OutputPlotName = paste(dataset, "_p.val", sep=""),
+                       Save_as_Plot = "svg",
+                       Features = "proteins")
+}
+```
+\
+Given the variability observed in the Plasma data it is not surprising that only a few proteins change with a p.val <0.05 and none with a p.adj <0.05.
+
+### Heatmaps
+Next, we will extract the top and bottom 1% of changed proteins based on the Log2FC and further filtering this selection for significance p.adj < 0.05. If there are no significant proteins, we will filter for p.value <0.05. We plot the results as a heatmap:
+```{r, eval=FALSE}
+
+#*Problem: The TvN from limma has more columns than QuianWus Output.
+
+
+#------ Load MetaInformation:
+SampleSummary <- openxlsx::read.xlsx("Output/CohortMetadata_2024-01-31/Metadata_Lung_METHOD_DEVELOPMENT_COHORT.xlsx", sheet = "SampleMetadata")
+  
+#------ Create Heatmaps
+Comparisons <- names(Prot_DA)
+for(item in Comparisons){
+  #Select the top/bottom 10%
+  res <- Prot_DA[[item]] %>%
+  arrange(desc(log2FC)) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= n() * 0.01 | rank > n() * 0.99) %>%
+  select(-rank)
+  
+  #Keep only rows where "p.adj" < 0.05
+  res_p.adj <- res %>%
+    filter(pValAdj < 0.05)
+  
+  #If no genes left after Step 2, use Step 1 and keep only rows where "p.val" < 0.05
+  if(nrow(res_p.adj) == 0){
+    res_select <- res %>%
+    filter(pVal < 0.05)
+  }else{
+    res_select <-res_p.adj
+    }
+
+  #Plots:
+  if(nrow(res_select) > 2){
+    #prepare DF: patients as rownames, genes as columns
+    Input <- res_select%>%
+      column_to_rownames("Gene")
+    Input <-as.data.frame(t(Input[,-c(1:5)]))
+    
+    # Add metainformation
+    Input_meta <- merge(SampleSummary[,1:7], Input%>%rownames_to_column("Samples"), by="Samples", all.y=TRUE)%>% #Sample identifier are the rownames
+      column_to_rownames("Samples")
+    
+    # Heatmaps with sample metadata information:
+    MetaProViz::VizHeatmap(Input_data = Input,
+                           Plot_SettingsFile_Sample = Input_meta,
+                           Plot_SettingsInfo = c(color_Sample = list("Stage", "Recurrence", "Gender", "SmokingStatus")),
+                           OutputPlotName = paste(item))
+  }else{
+    message(item, " has no significant p-values")
+    #Make Superplots of top/bottom 0.1%
+    
+  }
+}
+```
+
+*Add the feature option to MetaProViz, so we can use it here?
+*Check the grey space when there is no legend. In this case also enable to use the colour palette!
+
+## Biological QC
+Adenocarcinoma of the lung usually evolves from the mucosal glands and represents about 40% of all lung cancers. It is the most common subtype to be diagnosed in people who have never smoked. Lung adenocarcinoma usually occurs in the lung periphery, and in many cases, may be found in scars or areas of chronic inflammation.\
+To understand if we find expected signatures/pathways of lung cancer (e.g. GO-terms lung development), we compare tumour versus normal irrespective of other know patients parameters (e.g. recurrence, gender, stage, etc.).\
+\
+***Prior Knowledge***\
+1. Gene sets downloaded from [MsigDB](http://software.broadinstitute.org/gsea/msigdb) on 09.10.2023 including "KEGG", "Reactome", "Biocarta", "Hallmarks" "GO-terms", "Oncogenic Signature" and "Cell Type Signature".\
+2. Gene sets curated from papers: "Metabolic pathways" are based on Recon2 that has been developed aspart of the work of [Gaude et al](https://www.nature.com/articles/ncomms13041#Sec16).\
+3. [PROGENy](https://saezlab.github.io/progeny/index.html) is resource that leverages a large compendium of publicly available signaling perturbation experiments to yield a common core of pathway responsive genes, which can be used to infer pathway activities.\
+\
+For details on how the genesets were compiled see `GeneSets.Rmd`.
+```{r}
+#Open the compiled and processed gene sets:
+GO <- read.csv("Input/PK_GeneSets/Compilled_GO-terms_2023-10-09.csv")# Has colinear variables!
+KHBRO_Sig <- read.csv("Input/PK_GeneSets/Compilled_KEGG-Hallmarks-Reactome-OncogenicSig_2023-10-09.csv")# Has colinear variables!
+CellType_Sig <- read.csv("Input/PK_GeneSets/Compilled_CellType_2023-10-09.csv")
+MetSig <- read.csv("Input/PK_GeneSets/Compilled_MetabolicSig_2024-02-12.csv")
+PROGENy_Top500 <- read.csv("Input/PK_GeneSets/PROGENy_Top500_2024-02-12.csv")
+
+Pathway_List <- list(GO=GO, KHBRO_Sig=KHBRO_Sig, CellType_Sig=CellType_Sig, MetSig=MetSig, PROGENy_Top500=PROGENy_Top500)
+
+##############################
+##----- Prepare pathways for ulm/mlm
+#To perform ulm/mlm amongst other methods that can model interaction weights, we need to add column with mode of regulation (mor). We can set this to 1, as in reality we can not distinguish.
+Pathway_List_decoupleR <- lapply(Pathway_List, function(df){
+  df$weight <- 1
+  return(df)
+})
+```
+\
+Now we will infer pathway enrichment scores using a Multivariate Linear Model (MLM). For each gene in our dataset, MLM fits a linear model that predicts the observed gene expression based on all Pathway-Gene interactions weights. Once fitted, the obtained t-values of the slopes are the scores. If it is positive, we interpret that the pathway is active and if it is negative we interpret that it is inactive.\
+
+```{r}
+##----- Load helper functions needed:
+source("HelperFunctions/decoupleRAddInfo.R")#path to helper function
+    
+##----- Results folder:
+MLM_folder <- file.path(Prot_folder, "MLM_res")
+if (!dir.exists(MLM_folder)) {dir.create(MLM_folder)}  # check and create folder
+
+ULM_folder <- file.path(Prot_folder, "ULM_res")
+if (!dir.exists(ULM_folder)) {dir.create(ULM_folder)}  # check and create folder
+
+##----- Prepare decoupleR input matrix
+Prot_DA_decoupleR <- lapply(Prot_DA, function(df){
+    data.frame(gene = df$Gene, tStat = df$t.val)
+})
+
+
+############## Perform pathway analysis using decoupleR #######################
+#### Run decoupleR mlm
+set.seed(100)
+Proteomics_MLM_res<- list()
+for(dataset in names(Prot_DA_decoupleR)){
+  #prepare input for decoupleR
+  input <- Prot_DA_decoupleR[[dataset]]%>%column_to_rownames("gene")
+  
+  #Run decoupleR with each Pathways
+  #pathways <- names(Pathway_List_decoupleR)
+  pathways <- c("CellType_Sig", "MetSig", "PROGENy_Top500")#those do not have colinearity, hence we can run mlm!
+  
+  Pathway_res <- list()
+  for(pathway in pathways){
+    #prepare pathway input:
+    network <- Pathway_List_decoupleR[[pathway]]
+    
+    #Run decoupleR
+    decoupler_res <- decoupleR::run_mlm(mat=as.matrix(input), 
+                                        net=network, 
+                                        .source='term', 
+                                        .target='gene',
+                                        .mor='weight', 
+                                        minsize = 5) # Minimum of target features per biological entity. If less, sources are removed to prevent obtaining noisy activities from biological entities with very few matching target features in matrix.
+    
+    #Add % of genes detected column (use helper function decoupleRAddInfo):
+    Pathway_res[[pathway]] <- decoupleRAddInfo(mat= as.matrix(input),
+                                               net = network ,
+                                               res= decoupler_res,
+                                               .source='term',
+                                               .target='gene',
+                                               complete=TRUE)
+  }
+  Proteomics_MLM_res[[dataset]] <-Pathway_res
+  
+  #---- Save results:
+  #1. RDS
+  saveRDS(Pathway_res, file = paste("Output/DIA_Proteomics/MLM_res/MLM_",dataset,"_",pathway,"_", format(Sys.Date(), "%d.%m.%Y") ,".Rdata", sep=""))
+  
+  #2. EXCEL
+  writexl::write_xlsx(Pathway_res, paste("Output/DIA_Proteomics/MLM_res/MLM_",dataset,"_" ,pathway,"_",format(Sys.Date(), "%d.%m.%Y") ,".xlsx", sep=""))
+}
+
+
+#### Run decoupleR ulm
+set.seed(100)
+Proteomics_ULM_res<- list()
+for(dataset in names(Prot_DA_decoupleR)){
+  #prepare input for decoupleR
+  input <- Prot_DA_decoupleR[[dataset]]%>%column_to_rownames("gene")
+  
+  #Run decoupleR with each Pathways
+  #pathways <- names(Pathway_List_decoupleR)
+  pathways <- c("GO", "KHBRO_Sig")#those do not have colinearity, hence we can run mlm!
+  
+  Pathway_res <- list()
+  for(pathway in pathways){
+    #prepare pathway input:
+    network <- Pathway_List_decoupleR[[pathway]]
+    
+    #Run decoupleR
+    decoupler_res <- decoupleR::run_ulm(mat=as.matrix(input), 
+                                        net=network, 
+                                        .source='term', 
+                                        .target='gene',
+                                        .mor='weight', 
+                                        minsize = 5) # Minimum of target features per biological entity. If less, sources are removed to prevent obtaining noisy activities from biological entities with very few matching target features in matrix.
+    
+    #Add % of genes detected column (use helper function decoupleRAddInfo):
+    Pathway_res[[pathway]] <- decoupleRAddInfo(mat= as.matrix(input),
+                                               net = network ,
+                                               res= decoupler_res,
+                                               .source='term',
+                                               .target='gene',
+                                               complete=TRUE)
+  }
+  Proteomics_ULM_res[[dataset]] <-Pathway_res
+  
+  #---- Save results:
+  #1. RDS
+  saveRDS(Pathway_res, file = paste("Output/DIA_Proteomics/ULM_res/ULM_",dataset,"_",pathway,"_",format(Sys.Date(), "%d.%m.%Y") ,".Rdata", sep=""))
+  
+  #2. EXCEL
+  writexl::write_xlsx(Pathway_res, paste("Output/DIA_Proteomics/ULM_res/ULM_",dataset,"_" ,pathway,"_",format(Sys.Date(), "%d.%m.%Y") ,".xlsx", sep=""))
+}
+```
+
+```{r}
+#### Plots
+#Lets focus on TvsN Tissue here and check out the QC plots
+dataset <- "TvsN_Tissue_NP40"
+
+########---------
+#1. CellType
+CellType_Plot <- as.data.frame(Proteomics_MLM_res[[dataset]][["CellType_Sig"]])%>%
+    filter(p_value <=0.05)
+
+if(nrow(CellType_Plot)>1){
+  CellType_Plot_select <- CellType_Plot%>%
+      filter(str_detect(source, "LUNG"))
+  PercentageLung <- round(((nrow(CellType_Plot_select)/nrow(CellType_Plot))*100), 2)
+    
+  #Lollipop graphs (1. All significant results, 2. Lung results)
+  P <- ggplot(CellType_Plot_select%>% arrange(desc(score)) %>% mutate(source = factor(source, levels = source)), aes(x = score, y = source, fill = p_value)) +
+      geom_bar(stat = "identity", width = 0.5) +
+      scale_fill_gradient(low = "#006384", high = "#DC954B") +  # Adjust the color scale as needed
+      geom_vline(xintercept = 0, linetype = "dashed", color = "black", size = 0.7) +  # Add a line at y = 0
+      labs(title = paste(dataset, "(Lung = ", PercentageLung, "%)"), x = "ULM score", y = "", fill = "P-Value") +
+      theme_classic() + 
+      theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 0, hjust = 1))
+   
+  plottable <- ggplot2::ggplotGrob(P) # Convert the plot to a gtable
+
+  ## widths (adapt for number of conditions)
+  plottable$widths[5] <- unit(4, "cm")#controls x-axis
+  plottable$widths[c(1)] <- unit(10,"cm")#controls margins --> y-axis label is there
+  plottable$widths[c(4)] <- unit(1,"cm")#controls margins --> y-axis label is there
+  plottable$widths[c(6)] <- unit(2,"cm")#controls margins --> start Figure legend
+  plottable$widths[c(2,3,7,8,9,10)] <- unit(0,"cm")#controls margins --> not needed
+  plottable$widths[c(11)] <- unit(2,"cm")
+  plot_widths <- 19 
+
+  ##heigths
+  plottable$heights[7] <- unit(nrow(CellType_Plot_select) * 0.35, "cm")#controls x-axis
+  plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
+  plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+  plottable$heights[c(6,9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+  plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> Some space above the plot
+  plottable$heights[c(1,2,4,5)] <- unit(0,"cm")#controls margins --> not needed
+  plot_heights <- (nrow(CellType_Plot_select) * 0.35) +3
+
+  #Return nice plot
+  Plot_Sized<- list(plot_heights, plot_widths, plottable)
+  Plot <- Plot_Sized[[3]]
+  Plot <- ggplot2::ggplot() +
+        annotation_custom(Plot)
+  plot(Plot)
+      
+  #save
+  ggsave(file=paste("Output/DIA_Proteomics/MLM_res/BarGraph_p0.05_",dataset ,"_LungCellType.svg", sep=""), plot=Plot, width=plot_widths, height=plot_heights , unit="cm")
+    
+
+#Volcano plot of Lung pathways
+MetaProViz::VizVolcano(Plot_Settings="PEA",
+                           Plot_SettingsInfo= c(individual="term", PEA_Pathway="source", PEA_stat="p_value", PEA_score="score"),
+                           Plot_SettingsFile= Pathway_List_decoupleR[["CellType_Sig"]]%>%
+                                                filter(term %in% CellType_Plot_select$source)%>%
+                                                dplyr::rename("Gene"="gene"),#Must be the pathways used for pathway analysis
+                           Input_data= Prot_DA[[dataset]],
+                           AdditionalInput_data= CellType_Plot_select,
+                           y = "pValAdj",
+                           x = "log2FC",
+                           FeatureID = "Gene",
+                           color_palette =SmartCare_Colour,
+                           Save_as_Plot = "svg",
+                           Features = "proteins",
+                           OutputPlotName= paste(dataset, "_CellType"),
+                           SelectLab = NULL)
+    
+  }
+
+
+########---------   
+#2. Progeny
+Progeny_Plot <- as.data.frame(Proteomics_MLM_res[[dataset]][["PROGENy_Top500"]])%>%
+    filter(p_value <=0.1)
+
+MetaProViz::VizVolcano(Plot_Settings="PEA",
+                           Plot_SettingsInfo= c(individual="term",  PEA_Pathway="source", PEA_stat="p_value", PEA_score="score"),
+                           Plot_SettingsFile= Pathway_List_decoupleR[["PROGENy_Top500"]]%>%
+                                                filter(term %in% Progeny_Plot$source)%>%
+                                                dplyr::rename("Gene"="gene"),#Must be the pathways used for pathway analysis
+                           Input_data= Prot_DA[[dataset]],
+                           AdditionalInput_data= Progeny_Plot,
+                           y = "pValAdj",
+                           x = "log2FC",
+                           FeatureID = "Gene",
+                           color_palette =SmartCare_Colour,
+                           Save_as_Plot = "svg",
+                           Features = "proteins",
+                           OutputPlotName= paste(dataset, "_PROGENy_Top500"),
+                           SelectLab = NULL)
+
+
+
+########---------
+#3. Metabolism
+Metab_Plot <- as.data.frame(Proteomics_MLM_res[[dataset]][["MetSig"]])%>%
+    filter(p_value <=0.5)
+
+MetaProViz::VizVolcano(Plot_Settings="PEA",
+                           Plot_SettingsInfo= c(individual="term", shape="Unique",  PEA_Pathway="source", PEA_stat="p_value", PEA_score="score"),
+                           Plot_SettingsFile= Pathway_List_decoupleR[["MetSig"]]%>%
+                                                filter(term %in% Metab_Plot$source)%>%
+                                                dplyr::rename("Gene"="gene"),#Must be the pathways used for pathway analysis
+                           Input_data= Prot_DA[[dataset]],
+                           AdditionalInput_data= Metab_Plot,
+                           y = "pValAdj",
+                           x = "log2FC",
+                           FeatureID = "Gene",
+                           color_palette =SmartCare_Colour,
+                           Save_as_Plot = "svg",
+                           Features = "proteins",
+                           OutputPlotName= paste(dataset, "_MetSig"),
+                           SelectLab = NULL)
+
+
+```
+
+* Shall I do colinearity correction or just run ulm for the once that have colinearity?
+
+* There is the paper with markers defining subtypes and survival of LUAD patients --> can we use this as signatures here? (https://febs.onlinelibrary.wiley.com/doi/10.1002/1878-0261.13550)
+
+Review:
+Diagnostic, Predictive, and Prognostic Biomarkers in Non-Small Cell Lung Cancer (NSCLC) Management (https://www.mdpi.com/2075-4426/11/11/1102)
+
+
+--> check if the pathways coming up are to be expected for lung cancer. What do we know about this?
+--> check if the cell-types that come up as significant correlates with the % of tumour content.
+
+Are there known/expected pathways coming up in the comparison Tumour versus Normal? 
+
+
+### Prognostic Biomarkers
+There is a review that lists biomarkers in LUAD ( https://www.mdpi.com/2075-4426/11/11/1102). 
+Lets plot those as graphs:
+
+```{r}
+#Biomarkers based on expression (not mutation)
+PrognosticBiomarkers <- c("VEGF", "TUBB3", "Ki-67", "ERCC1", "TGFb", "LAG-3", "KIAA1522", "NLR", "PLR")
+Opposite <- c("EEF1AKMT4", "FKBP14", "MRPS10", "NAA40")#sircle
+
+# Extract the biomarkers from the data
+input <- as.data.frame(t(Prot_DA[["TvsN_Tissue_NP40"]]%>%
+  column_to_rownames("Gene")))
+
+input <- merge(x= as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[["DIA.Tissue.Proteomics_Klingmueller"]])),
+               y= input%>%select(starts_with(PrognosticBiomarkers)), 
+               by = "row.names", all.x = TRUE)%>%
+  unite(Condition_Recurrence, c("Condition", "Recurrence"), sep="_", remove=FALSE)%>%
+  column_to_rownames("Row.names")
+
+
+# plot boxplot of tumour and normal. Colour code the dots for recurrence/non-recurrence
+
+MetaProViz::Vizsuperplot(Input_data = input[,-c(1:15)]%>% mutate_all(as.numeric),
+                          Plot_SettingsFile = input[,c(1:15)],
+                          Plot_SettingsInfo = c(conditions="Condition", superplot = "Recurrence"),
+                          Graph_Style = "Box", #Bar, Box, Violin
+                          STAT_pval ="t.test",
+                          STAT_padj="fdr",
+                          OutputPlotName = "Condition",
+                          Individual_plots = TRUE,
+                          Selected_Conditions = c("Tumor", "Normal"),
+                          Selected_Comparisons = list(c(1,2)),
+                          Theme = theme_classic(),
+                          Save_as_Plot = "svg") #for together it always pdf
+
+MetaProViz::Vizsuperplot(Input_data = input[,-c(1:15)]%>% mutate_all(as.numeric),
+                          Plot_SettingsFile = input[,c(1:15)],
+                          Plot_SettingsInfo = c(conditions="Condition_Recurrence", superplot = "Smoking"),
+                          Graph_Style = "Box", #Bar, Box, Violin
+                          STAT_pval ="t.test",
+                          STAT_padj="fdr",
+                          OutputPlotName = "Conditon_Recurrence",
+                          Individual_plots = TRUE,
+                          #Selected_Conditions = c("HK2", "786-M1A", "786-M2A","786-O"),
+                          #Selected_Comparisons = list(c(1,2), c(1,3), c(1,4)),
+                          Theme = theme_classic(),
+                          Save_as_Plot = "svg") #for together it always pdf
+
+
+MetaProViz::VizHeatmap(Input_data = input[,-c(1:15)]%>% mutate_all(as.numeric),
+                       Plot_SettingsFile_Sample = input[,c(1:15)],
+                       Plot_SettingsInfo = c(color_Sample = list("Condition","Recurrence")),
+                       OutputPlotName = "Colour Samples")
+
+```
+
+## Patients demographics
+
+Next, we can also ***export the features (=proteins) that drive the changes found on the different principal components (PCs) and are the main drivers***.\
+I grouped the values for each PC (PC1 - PC100) based on the demographics (e.g. male and female) and than performed an anova test.  Afterwards, I performed p-value adjustment using false discovery rate (FDR) across the results for the different PCs across one comparison (e.g. male and female).\
+Using an ANOVA model will answer the question whether any group means differ from another, meaning a significant p-value indicates that some of the group means are different, and one needs to perform a multiple comparison test to understand which exact comparison has been responsible (e.g in terms of Smoker, there are three different comparisons possible: Smoker-Non-Smoker, Smoker-Ex-Smoker, Non-Smoker-Ex-Smoker).\
+In R the most basic and common functions we can use to perform ANOVA are aov() and lm(). Since ANOVA is a type of linear model, we also can use the lm() function. Here is a good summary of the [Anova analysis in R](https://bookdown.org/steve_midway/DAR/understanding-anova-in-r.html).\
+\
+1. ANOVA to obtain the estimated proportion of explained variance associated with the different covariates (e.g. sex, recurrence,...) in the different PCs. \
+  + Here I used aov() to obtain p.val\
+  + fdr to obtain p.adj across the results for the different PCs across one comparison (e.g. male and female)\
+  + p.adj <= 0.05 was assigned the estimated proportion of explained variance associated with the PC\
+  + Since we already observed in the PCA plots that sex seems to be a parameter separating the cancer samples, I added a group combining Status and sex (e.g. Cancer_female)\
+  + This analysis concept is explained in more details in those [supplementary methods](https://www.ahajournals.org/doi/full/10.1161/JAHA.120.019667)\
+  
+2. ANOVA using lm() and multiple comparison test using fdr to obtain the responsible comparisons for the explained variance. \
+  + Here I used lm() to obtain p.val and lsmeans() to obtain the p.adj\
+
+```{r}
+
+Input_data <- as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[["New_DIA.Plasma.Proteomics_Krijgsveld"]])))
+Input_data[is.na(Input_data)] <- 0
+Scaling = TRUE
+OutputPlotName= ''
+Save_as_Results = "svg"
+Folder_Name = NULL
+Input_SettingsFile_Sample <- as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[["New_DIA.Plasma.Proteomics_Krijgsveld"]]))
+Input_SettingsInfo_Sample <- c("Condition", "Recurrence", "Gender", "Age", "Smoking")
+InputSettingsFile_Feature <- DIA_dfs_list[["New_DIA.Plasma.Proteomics_Krijgsveld"]]
+InputSettingsFile_Feature <- InputSettingsFile_Feature[,-c(2, 4:43)]
+Input_SettingsInfo_Feature <- c(FeatureID = "Protein")
+
+
+
+
+```  
+
+
+* Compare to QuianWu's findings
+
+***Check the top drivers connected to patients demographics***
+--> Bar graphs of top changed genes that drive the metadata on a PC (e.g. gender)! --> SuperPlot Style
+
+
+
+# SiRCle clustering and ORA
+General description: XXX
+
+*Update package, because of issue with p<0.5 and p.val <=0.5! (at the moment p.val exaclty 0.5 are not considered.)
+
+*Combine the two proteomics results?
+*I use Klingmueller for now as they have more proteins detected!
+
+* compare the sircle factors with MOFA factors --> correlation plot!
+
+## Tumour versus Normal
+Biological explanation and thoughts
+
+Add the concept plot I made for the poster (?)
+
+```{r}
+##----- Results folder:
+sircle_folder <- file.path(Prot_folder, "sircleRCM_2Cond")
+if (!dir.exists(sircle_folder)) {dir.create(sircle_folder)}  # check and create folder
+
+sircle_folder_ora <- file.path(sircle_folder, "ORA")
+if (!dir.exists(sircle_folder_ora)) {dir.create(sircle_folder_ora)}  # check and create folder
+
+##### --- Load the data
+TvN_Rec <- Prot_DA[["TvsN_Rec_NP40"]]
+TvN_NRec <- Prot_DA[["TvsN_NRec_NP40" ]]
+
+#ggVennDiagram::ggVennDiagram(list(TvN_Rec=TvN_Rec$Gene, TvN_NRec=TvN_NRec$Gene), label_alpha = 0)
+
+
+#### --- Biological clustering
+#devtools::install_github("https://github.com/ArianeMora/SiRCleR") 
+
+# Recurrence versus Non-recurrence 
+sircle_RECvNREC <- SiRCleR::sircleRCM_2Cond(Cond1_File=TvN_Rec,
+                                            Cond2_File=TvN_NRec,
+                                            geneID="Gene",
+                                            Cond1ValueCol="log2FC",
+                                            Cond1PadjCol="pValAdj",
+                                            Cond2ValueCol="log2FC",
+                                            Cond2PadjCol="pValAdj",
+                                            Cond1_padj_cutoff= 0.05,
+                                            Cond2_padj_cutoff = 0.05,
+                                            Cond1_FC_cutoff= 1,
+                                            Cond2_FC_cutoff = 1,
+                                            backgroundMethod="C1&C2", #As they have 100% overlap in the genes anyways!
+                                            OutputFileName = "Output/DIA_Proteomics/sircleRCM_2Cond/Sircle_RCM_C1ANDC2_Cond1-Recurrence vs Cond2-Non-Recurrence_")
+
+#*Also return summary into the environment!
+
+#### --- ORA on clusters
+#Load Helper function
+source("HelperFunctions/sircleORA_Enrich.R")#path to helper function
+
+# make sure the PK is in the right format: Pathway file must include column "term" with the pathway name, column "gene" with the gene name and column "Description" with pathway description that will be depicted on the plots.
+Pathway_List_ORA <- lapply(Pathway_List, function(df){
+   df$Description <- df$term
+   df <- df[,c("Description", "term", "gene")]
+   return(df)
+})
+
+# Run ORA
+pathways <- names(Pathway_List_ORA)
+  
+for(pathway in pathways){
+  sircleORA_Enrich(filename=sircle_RECvNREC, 
+               enricher_geneID="geneID", 
+               regLabels="RG3_SignificantChange", 
+               enricher_Pathways=Pathway_List_ORA[[pathway]], 
+               enricher_PathwayName=pathway,
+               RemoveBackgroundGenes="TRUE", 
+               OutputFileName = paste("Output/DIA_Proteomics/sircleRCM_2Cond/ORA/RG3_Cond1-Recurrence vs Cond2-Non-Recurrence_", sep=""))
+}
+
+for(pathway in pathways){
+  sircleORA_Enrich(filename=sircle_RECvNREC, 
+               enricher_geneID="geneID", 
+               regLabels="RG2_Significant", 
+               enricher_Pathways=Pathway_List_ORA[[pathway]], 
+               enricher_PathwayName=pathway,
+               RemoveBackgroundGenes="TRUE", 
+               OutputFileName = paste("Output/DIA_Proteomics/sircleRCM_2Cond/ORA/RG2_Cond1-Recurrence vs Cond2-Non-Recurrence_", sep=""))
+}
+```
+
+```{r}
+#Plots:
+sircle_prot <- read.csv("Output/DIA_Proteomics/sircleRCM_2Cond/Sircle_RCM_C1ANDC2_Cond1-Recurrence vs Cond2-Non-Recurrence_.csv")
+sircle_prot_summary <- read.csv("Output/DIA_Proteomics/sircleRCM_2Cond/Sircle_RCM_C1ANDC2_Cond1-Recurrence vs Cond2-Non-Recurrence__Summary.csv")
+
+##----------- BarGraph of the Summary
+for(RG in unique(sircle_prot_summary$Regulation.Grouping)){
+  Plot_Data <- sircle_prot_summary%>%
+    filter(Regulation.Grouping== RG)%>%
+    filter(!SiRCle.cluster.Name=="None")
+  
+  Plot <- ggplot(Plot_Data, aes(x = SiRCle.cluster.Name, y = Number.of.Genes, fill = SiRCle.cluster.Name, pattern=Feature)) +
+    geom_bar(stat = "identity")+
+    scale_fill_manual(values=c(Cond1_DOWN="#1095B6",Cond1_UP="#ECE854", Cond2_DOWN="#0DC2F3",Cond2_UP="#DC954B",Core_DOWN="#006384", Core_UP="#BD2638",Opposite="#0CB394", None= "#5D6364"), name="Biological Cluster")  +
+    labs(title = RG, x = "Biological Regulatory Clusters", y = "Number of features") +
+    theme_classic() + 
+    theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1), panel.background = element_rect(fill = "transparent"))+
+    scale_y_continuous(breaks=c(100,200,300,400,500,600,700,800, 900, 1000), expand = c(0, 0))
+  
+  # Make plot into nice format:
+  plottable <- ggplot2::ggplotGrob(Plot) # Convert the plot to a gtable
+
+  ## widths (adapt for number of conditions)
+  Number_Conditions <- Plot_Data%>%
+    dplyr::distinct(SiRCle.cluster.Name) %>%
+    nrow()
+
+  plottable$widths[5] <- unit(Number_Conditions * 0.5, "cm")#controls x-axis
+  plottable$widths[c(1)] <- unit(0.5,"cm")#controls margins --> y-axis label is there
+  plottable$widths[c(4)] <- unit(1,"cm")#controls margins --> y-axis label is there
+  plottable$widths[c(6)] <- unit((Number_Conditions * 0.5)-1,"cm")#controls margins --> start Figure legend
+  plottable$widths[c(2,3,7,8,9,10)] <- unit(0,"cm")#controls margins --> not needed
+  plottable$widths[c(11)] <- unit(2,"cm")
+  plot_widths <- as.numeric(plottable$widths[5])+5
+
+  ##heigths
+  plottable$heights[7] <- unit(8, "cm")#controls x-axis
+  plottable$heights[c(8)] <- unit(2.8,"cm")#controls margins --> x-axis label
+  plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
+  plottable$heights[c(6,9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+  plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> Some space above the plot
+  plottable$heights[c(1,2,4,5)] <- unit(0,"cm")#controls margins --> not needed
+  plot_heights <- 11
+
+  #Return nice plot
+  Plot_Sized<- list(plot_heights, plot_widths, plottable)
+  Plot <- Plot_Sized[[3]]
+  Plot <- ggplot2::ggplot() +
+      annotation_custom(Plot)+
+      theme(panel.background = element_rect(fill = "transparent"))
+  plot(Plot)
+
+  #save
+  ggsave(file=paste("Output/DIA_Proteomics/sircleRCM_2Cond/BarGraph_SiRCleClusters-",RG ,".svg", sep=""), plot=Plot, width=4, height=5)
+}
+
+##-----------Heatmaps of clusters
+
+
+
+
+
+
+
+##----------Lollipop graph of `Opposite`
+
+Plot_Select_C1 <- sircle_prot[,-c(39)]%>%
+  filter(RG2_Significant=="Opposite")%>%
+  column_to_rownames("geneID")%>%
+  select(starts_with("Cond1"))%>%
+  rename_all(~sub("^Cond1_DF_", "", .))%>%
+  mutate(Condition = paste0("Cond1: Recurrence"))%>%
+  dplyr::rename("Cutoff_Specific"="Cutoff_Specific.x")%>%
+  rownames_to_column("gene")
+
+
+Plot_Select_C2 <- sircle_prot%>%
+  filter(RG2_Significant=="Opposite")%>%
+  column_to_rownames("geneID")%>%
+  select(starts_with("Cond2"))%>%
+  rename_all(~sub("^Cond2_DF_", "", .))%>%
+  mutate(Condition = paste0("Cond2: Non-Recurrence"))%>%
+  rownames_to_column("gene")
+
+
+Combined_Input <- rbind(Plot_Select_C1[,c(1:11, 30)], Plot_Select_C2[,c(1:11, 30)])
+
+lolipop_plot <- ggplot(Combined_Input, aes(x=reorder(gene, `.log2FC`), y=`.log2FC`, label=`.pValAdj`)) +
+          geom_point(stat = 'identity', aes(size = `.pValAdj`, col = Condition))  +
+          geom_segment(aes(y =(Reduce(max,`.log2FC`)), 
+                   x = gene, 
+                   yend = `.log2FC`,
+                   xend = gene), 
+               color = "black")  +
+  geom_hline(yintercept = 0) +
+  coord_flip()+
+  scale_size(name="p.adj",range = c(2,14), trans = 'reverse')+
+  labs(title="RG2 cluster: Opposite", 
+        subtitle= "Tumour vs Normal",
+       x="",
+       y="Log2FC") + 
+  theme_bw() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(color = "black", size=10),
+        plot.caption = element_text(color = "black",size=9, face = "italic", hjust = 2.5))
+  
+ggsave(file="Output/DIA_Proteomics/sircleRCM_2Cond/LollipopGraph_RG2Opposite.svg", plot=lolipop_plot, width=7.5, height=3)
+  
+  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tissue.Pro.Klin <- merge(x= as.data.frame(SummarizedExperiment::colData(MethodDev_LungCancer_DIA[["DIA.Tissue.Proteomics_Klingmueller"]])),
+                   y= as.data.frame(t(SummarizedExperiment::assay(MethodDev_LungCancer_DIA[["DIA.Tissue.Proteomics_Klingmueller"]]))), 
+                   by = "row.names", all = TRUE)
+
+Tissue.Pro.Klin <- merge(x=  as.data.frame(SummarizedExperiment::rowData(MethodDev_LungCancer_DIA[["DIA.Tissue.Proteomics_Klingmueller"]])),
+                   y= as.data.frame(t(Tissue.Pro.Klin)), 
+                   by = "row.names", all = TRUE)
+
+
+RG <- "RG2_Significant"
+
+for(cluster in Clusters){
+  cluster <- "Opposite"
+  
+  Input_Heatmap <- sircle_prot%>%
+    filter(sircle_prot[[RG]] == cluster)%>%
+    column_to_rownames("geneID")
+  
+  Input_Heatmap <- as.data.frame(t(Input_Heatmap))%>%
+    rownames_to_column("names")%>%
+    separate("names", into=c("x", "PatientID"), sep="_DF_")
+  
+  Input_Heatmap <-merge(x=Tissue.Pro.Klin[,c(1:14)], y=Input_Heatmap[,-1], by.x="Row.names", by.y="PatientID")%>%
+    column_to_rownames("Row.names")
+  
+  MetaProViz::VizHeatmap(Input_data = Input_Heatmap[,-c(1:13)]%>% mutate_all(~ifelse(is.character(.), as.numeric(.), .)), 
+                         OutputPlotName = "Overview")
+  
+  
+}
+
+
+```
+
+## Rec versus Non-Rec
+Biological explanation and thoughts
+
+We use the p.val as all adjusted p.values are 1
+```{r}
+#### --- Load the data
+RecvNrec_T <- dfs_NoDubl[["Recur_DIA.Tumor.Tissue.Pro.Klin"]]
+
+RecvNrec_N <- dfs_NoDubl[["Recur_DIA.Norm.Tissue.Pro.Klin"]]
+
+#ggVennDiagram::ggVennDiagram(list(RecvNrec_T=RecvNrec_T$Gene, RecvNrec_N=RecvNrec_N$Gene), label_alpha = 0)
+
+
+#### --- Biological clustering
+# Tumour versus Normal
+sircle_TvN <- SiRCleR::sircleRCM_2Cond(Cond1_File=RecvNrec_T,
+                                            Cond2_File=RecvNrec_N,
+                                            geneID="Gene",
+                                            Cond1ValueCol="log2FC",
+                                            Cond1PadjCol="pVal",
+                                            Cond2ValueCol="log2FC",
+                                            Cond2PadjCol="pVal",
+                                            Cond1_padj_cutoff= 0.05,
+                                            Cond2_padj_cutoff = 0.05,
+                                            Cond1_FC_cutoff= 1,
+                                            Cond2_FC_cutoff = 1,
+                                            backgroundMethod="C1&C2", #As they have 100% overlap in the genes anyways!
+                                            OutputFileName = "Output/Sircle_RCM_C1ANDC2_Cond1-Tumour vs Cond2-Normal_")
+
+```
+\
+We only find small clusters of genes probably due to small patient numbers and high variability.\
+\
+Maybe we should calculate the distance of tumour Log2FC to normal Log2FC --> lollipop graphs of top and bottom Log2FC?
+We can still make the biological baskets, but here it doesn't make that much sense, cause even if a protein is UP in both, doesn't mean it hasn't changed.
+
+```{r}
+# Calculate distance between Log2FC Tumour to Log2FC Normal
+DistanceFunction <- function(C1, C2, Log2FC=Log2FC, p.adj = p.adj){
+  
+  
+}
+
+
+# Select the Proteins that have the biggest distance and significant change in Tumour
+
+
+# Make lollipop graph
+
+
+```
+
+# MetaLinks
+* select MetaLinks for the tissue of interest. For now just download from webserver and note down settings
+
+```{r}
+
+```
+
+
+
+Collectri is the example where Sebastian has written a proper vignette on how to assemble the knowledge locally in a docker and hence this will be frozen in time and versioned. --> Check this out and see if I can make it work for MetaLinks. (This can be useful to built MetSigDB)
+https://github.com/biocypher/collectri
+
+
+
+# Other analysis?
+* Maybe there is a way to select kinases and infer activity for the time being as we do not have phosphodata yet. Plus in the future it will be unlikely that one usually will obtain phosphoproteomics data of patients.
+* Metabolic enzyme activity - maybe infer based on metabolic pathway result (ORA on top versus ORA on bottom proteins)?
+* Check with Barbara on TGFB status they measured for these patients and generate some plots
+
+
+
+
+# Package information
+```{r}
+#Info about R packages:
+sessionInfo()
+
+```
+
+

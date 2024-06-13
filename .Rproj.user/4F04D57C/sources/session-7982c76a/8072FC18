@@ -1,0 +1,27 @@
+{
+    "id": "8072FC18",
+    "path": "~/GitHub/MetaProViz/R/VizVolcano.R",
+    "project_path": "R/VizVolcano.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": true,
+    "created": 1712584682587.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "docOutlineVisible": "1",
+        "cursorPosition": "216,30",
+        "scrollLine": "198"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712584931,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712584976661,
+    "read_only": false,
+    "read_only_alternatives": []
+}

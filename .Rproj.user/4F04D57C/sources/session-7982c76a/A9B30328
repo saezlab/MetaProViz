@@ -1,0 +1,27 @@
+{
+    "id": "A9B30328",
+    "path": "~/GitHub/MetaProViz/R/Helper.R",
+    "project_path": "R/Helper.R",
+    "type": "r_source",
+    "hash": "1062711524",
+    "contents": "",
+    "dirty": false,
+    "created": 1712579928468.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "45,34",
+        "scrollLine": "23",
+        "docOutlineVisible": "1"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712584105,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712584105877,
+    "read_only": false,
+    "read_only_alternatives": []
+}

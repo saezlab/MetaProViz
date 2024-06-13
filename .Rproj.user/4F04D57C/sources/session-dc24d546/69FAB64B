@@ -1,0 +1,28 @@
+{
+    "id": "69FAB64B",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712305171432.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {
+        "id": "15cccf30cbe94f37a50d05555551dcb5",
+        "name": "DMA_Annova",
+        "title": "DMA_Annova",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 8462108815257509920,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712305171432,
+    "read_only": false,
+    "read_only_alternatives": []
+}

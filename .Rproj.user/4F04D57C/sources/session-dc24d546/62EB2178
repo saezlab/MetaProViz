@@ -1,0 +1,27 @@
+{
+    "id": "62EB2178",
+    "path": "~/GitHub/SmartCare_MethodDevelopmentCohort/Scripts/GeneSets.Rmd",
+    "project_path": null,
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1712216390193.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "wvf2tsjjipdaw",
+        "Source": "Source",
+        "cursorPosition": "30,0",
+        "scrollLine": "24"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1709198553,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1709198553,
+    "read_only": false,
+    "read_only_alternatives": []
+}
