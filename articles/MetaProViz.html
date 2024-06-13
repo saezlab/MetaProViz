@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,7 +131,7 @@ interpretable graphs. Currently, <strong>MetaProViz</strong> contains
 four different modules, which include different methods and can be used
 independently from each other or in combination
 (<strong>Fig.1</strong>). The first module of
-<strong>MetaProViz</strong>, <code>Preprocessing</code>, allows the
+<strong>MetaProViz</strong>, <code>Processing</code>, allows the
 customized processing of raw peak metabolomics data from different
 experimental setups, including options to perform feature filtering due
 to missingness, Total Ion Count (TIC) normalisation, Missing Value
@@ -146,11 +146,11 @@ whereby the user can choose all the test statistics. The input can
 either be the output of the <code>Preprocessing</code> module or any DF
 including metabolite values and information about the conditions that
 should be compared. The third module of <strong>MetaProViz</strong>,
-<code>Metabolite Clustering Analysis (MCA)</code>, includes different
-methods to create clusters of metabolites based on their distribution
-across the data. This clustering is either based on k-means or based on
-logical regulatory rules. Here, the user can either input the output of
-the <code>Preprocessing</code> or
+<code>Functional Analysis</code>, includes different methods to create
+clusters of metabolites based on their distribution across the data
+using logical regulatory rules, prior knowledge for enrichment analysis
+and functions to perform over representation analysis (ORA). Here, the
+user can either input the output of the <code>Processing</code> or
 <code>Differential Metabolite Analysis (DMA)</code> module, or any other
 DF including Log2FC and statistics or metabolite values. The fourth
 module of <strong>MetaProViz</strong>, <code>Visualization</code>, can
@@ -255,7 +255,7 @@ them.<br><div class="progress progress-striped active">
   title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
   author = {Christina Schmidt and Dimitrios Prymidis and Julio Saez-Rodriguez and Christian Frezza},
   year = {2023},
-  note = {R package version 0.0.0.9000},
+  note = {R package version 2.0.2},
 }</code></pre>
 </div>
 <div class="section level3">
@@ -271,7 +271,7 @@ them.<br><div class="progress progress-striped active">
 <span><span class="co">#&gt;  collate  English_United Kingdom.utf8</span></span>
 <span><span class="co">#&gt;  ctype    English_United Kingdom.utf8</span></span>
 <span><span class="co">#&gt;  tz       Europe/Berlin</span></span>
-<span><span class="co">#&gt;  date     2024-04-22</span></span>
+<span><span class="co">#&gt;  date     2024-06-13</span></span>
 <span><span class="co">#&gt;  pandoc   3.1.1 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>

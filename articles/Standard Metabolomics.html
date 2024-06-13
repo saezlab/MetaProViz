@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -684,13 +684,14 @@ data.<br></p>
 <span>                                                     SettingsInfo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                                                     CutoffCV <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
-<pre><code><span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span>
-<span><span class="co">#&gt; Bin width defaults to 1/30 of the range of the data. Pick better value with</span></span>
+<pre><code><span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre>
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-9-1.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
+<pre><code><span><span class="co">#&gt; Bin width defaults to 1/30 of the range of the data. Pick better value with</span></span>
 <span><span class="co">#&gt; `binwidth`.</span></span></code></pre>
-<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-9-1.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-9-2.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-9-2.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-9-3.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_SettingsInfo  </span></span>
 <span><span class="va">Pool_Estimation_result</span><span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/PoolEstimation.html">PoolEstimation</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Intra</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>                                                     SettingsFile_Sample <span class="op">=</span> <span class="va">Intra</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>,</span>
@@ -699,10 +700,11 @@ data.<br></p>
 <span></span>
 <span><span class="va">Pool_Estimation_result_DF_CV</span> <span class="op">&lt;-</span><span class="va">Pool_Estimation_result</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"CV"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <div class="vscroll-plot">
-<pre><code><span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span>
-<span><span class="co">#&gt; Bin width defaults to 1/30 of the range of the data. Pick better value with</span></span>
+<pre><code><span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre>
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
+<pre><code><span><span class="co">#&gt; Bin width defaults to 1/30 of the range of the data. Pick better value with</span></span>
 <span><span class="co">#&gt; `binwidth`.</span></span></code></pre>
-<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-11-2.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-11-2.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-11-3.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <br><br><br><table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -807,8 +809,8 @@ data and have a look at the output produced. You will notice that all
 the chosen parameters and results are documented in messages. All the
 results data tables, the Quality Control (QC) plots and outlier
 detection plots are returned and can be easily viewed.<br></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">PreprocessingResults</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/Preprocessing.html">PreProcessing</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Intra</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span><span class="op">:</span><span class="fl">58</span><span class="op">)</span> ,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#remove pool samples and columns with sample information</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">PreprocessingResults</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/PreProcessing.html">PreProcessing</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Intra</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span><span class="op">:</span><span class="fl">58</span><span class="op">)</span> ,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#remove pool samples and columns with sample information</span></span>
 <span>                                                  SettingsFile_Sample<span class="op">=</span><span class="va">Intra</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span><span class="op">:</span><span class="fl">58</span><span class="op">)</span> , <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#remove pool samples and columns with metabolite measurements</span></span>
 <span>                                                  SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions <span class="op">=</span> <span class="st">"Conditions"</span>,</span>
 <span>                                                                    Biological_Replicates <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
@@ -1019,7 +1021,7 @@ easily further customize the PCA plot and adapt color and shape for the
 information of interest. You can see more below for the
 <code><a href="../reference/VizPCA.html">VizPCA()</a></code> function.<br>
 Before we proceed, we will remove the outlier:<br></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Intra_Preprocessed</span> <span class="op">&lt;-</span> <span class="va">Intra_Preprocessed</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Outliers</span><span class="op">==</span><span class="st">"no"</span><span class="op">)</span><span class="co">#remove MS55_29</span></span></code></pre></div>
 <p><br>
@@ -1029,7 +1031,7 @@ which can be termed as analytical replicates. The
 <strong>MetaProViz</strong> pre-processing module includes the function
 <code><a href="../reference/ReplicateSum.html">ReplicateSum()</a></code>, which will do this task and save the
 results:<br></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Intra_Preprocessed</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ReplicateSum.html">ReplicateSum</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>                                               SettingsFile_Sample<span class="op">=</span><span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>                                               SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Biological_Replicates<span class="op">=</span><span class="st">"Biological_Replicates"</span>, Analytical_Replicates<span class="op">=</span><span class="st">"Analytical_Replicates"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1090,7 +1092,7 @@ multiple different comparisons. The results can be automatically saved
 and all the results are returned in a list with the different data
 frames. If parameter Plot=TRUE, an overview Volcano plot is generated
 and saved.<br></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform multiple comparison All_vs_One using annova:</span></span>
 <span><span class="va">DMA_Annova</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/DMA.html">DMA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="co">#we need to remove columns that do not include metabolite measurements</span></span>
 <span>                              SettingsFile_Sample<span class="op">=</span><span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>,<span class="co">#only maintain the information about condition and replicates</span></span>
@@ -1521,7 +1523,7 @@ trivial names. In general, the <code>PathwayFile</code> requirements are
 column “term”, “Metabolite” and “Description”, and the
 <code>Input_data</code> requirements are column “t.val” and column
 “Metabolite”.<br></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
 <span><span class="va">DM_ORA_res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -1800,7 +1802,7 @@ clusters using different Regulation Groupings (RG): 1. RG1_All<br>
 DOWN, significant positive, significant negative)<br>
 3. RG3_SignificantChange only takes into account genes that have
 significant changes (UP, DOWN).<br><br></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Example of all possible flows:</span></span>
 <span><span class="va">MCA_2Cond</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_rules.html">MCA_rules</a></span><span class="op">(</span>Method<span class="op">=</span><span class="st">"2Cond"</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -2441,7 +2443,7 @@ Cond1_UP
 </table>
 <p><br>
 Now let’s use the data and do clustering:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MCAres</span> <span class="op">&lt;-</span>  <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_2Cond.html">MCA_2Cond</a></span><span class="op">(</span>InputData_C1<span class="op">=</span><span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                                 InputData_C2<span class="op">=</span><span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-M1A_vs_HK2"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                                 SettingsInfo_C1<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ValueCol<span class="op">=</span><span class="st">"Log2FC"</span>,StatCol<span class="op">=</span><span class="st">"p.adj"</span>, StatCutoff<span class="op">=</span> <span class="fl">0.05</span>, ValueCutoff<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,</span>
@@ -2773,7 +2775,7 @@ enable to plot individual plots where applicable based on those MetaData
 (e.g. one plot for each metabolic pathway).<br>
 For this we need a metadata table including information about our
 samples that could be relevant to e.g. color code:<br></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MetaData_Sample</span> <span class="op">&lt;-</span> <span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Celltype <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">Conditions</span><span class="op">==</span><span class="st">"HK2"</span> <span class="op">~</span> <span class="st">'Healthy'</span>,</span>
 <span>                               <span class="va">Conditions</span><span class="op">==</span><span class="st">"786-O"</span> <span class="op">~</span> <span class="st">'Primary Tumour'</span>,</span>
@@ -3012,7 +3014,7 @@ Moreover, we can use MetaData for our features (=Metabolites), which we
 loaded with the <code>MappingInfo</code> and we can also add the
 information on which cluster a metabolite was assigned to in the
 <code>MetaProViz::MCA()</code> analysis above:<br></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MetaData_Metab</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">MappingInfo</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>, <span class="va">MCAres</span><span class="op">[[</span><span class="st">"MCA_2Cond_Results"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">14</span>,<span class="fl">15</span><span class="op">)</span><span class="op">]</span>, by<span class="op">=</span><span class="st">"Metabolite"</span>, all.y<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -3200,7 +3202,7 @@ but of course it offers us many more opportunities, which will be
 showcased here.<br><br>
 As input, we need a DF that contains the samples as rownames and the
 features (=metabolites) as column names:<br></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Input_PCA</span> <span class="op">&lt;-</span> <span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">]</span><span class="co">#remove columns that include Metadata such as cell type,...</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -3549,7 +3551,7 @@ HK2_3
 </table>
 <p><br>
 Now lets check out the standard plot:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizPCA.html">VizPCA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Input_PCA</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
 <img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-35-1.png" alt="Figure: Standard Settings." width="576"><p class="caption">
@@ -3563,7 +3565,7 @@ demographics (e.g. age, gender, medication,…) for this. First lets check
 if we have any batch effect by colour coding for the biological
 replicates, which would be the case if the replicates cluster
 together.<br></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizPCA.html">VizPCA</a></span><span class="op">(</span>SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
 <span>                   SettingsFile_Sample <span class="op">=</span> <span class="va">MetaData_Sample</span> ,</span>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
@@ -3575,7 +3577,7 @@ Figure: Do we have a batch effect?
 </div>
 <p>Next, we can colour code for condition and use the biological
 replicates in the shape parameter:<br></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizPCA.html">VizPCA</a></span><span class="op">(</span>SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Conditions"</span>, shape<span class="op">=</span><span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
 <span>                   SettingsFile_Sample<span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
@@ -3588,7 +3590,7 @@ Figure: Do the samples cluster for the conditions?
 <p>The different cell lines we have are either control or cancerous, so
 we can display this too. Here is becomes apparent that the cell status
 is responsible for 64% of the variance (x-axis).<br></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizPCA.html">VizPCA</a></span><span class="op">(</span>SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Status"</span><span class="op">)</span>,</span>
 <span>                   SettingsFile_Sample<span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
@@ -3601,7 +3603,7 @@ Figure: Do the samples cluster for the Cell status?
 <p>We can separate the cancerous cell lines further into metastatic or
 primary. This shows us that this is separated on the y-axis and accounts
 for 30%of the variance.<br></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizPCA.html">VizPCA</a></span><span class="op">(</span>SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Celltype"</span>, shape<span class="op">=</span><span class="st">"Status"</span><span class="op">)</span>,</span>
 <span>                   SettingsFile_Sample<span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
@@ -3621,7 +3623,7 @@ parameters to customize the plot.</p>
 data, which will be showcased on different examples.<br>
 As input, we need a DF that contains the samples as rownames and the
 features (=metabolites) as column names:<br></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Input_Heatmap</span> <span class="op">&lt;-</span>  <span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span><span class="co">#remove columns that include Metadata such as cell type,...</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -3973,7 +3975,7 @@ Now we can generate an overview heatmap. Since we plot all metabolites
 the metabolite names are not plotted since this would get too crowded
 (You can enforce this by changing the parameter
 <code>enforce_FeatureNames = TRUE</code>).</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>, </span>
 <span>                       PlotName <span class="op">=</span> <span class="st">"Overview"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
@@ -3989,7 +3991,7 @@ Overview heatmap.
 <p><br>
 Here we can add as many sample metadata information as needed at the
 same time:<br></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>                       SettingsFile_Sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>                       SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color_Sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Conditions"</span>,<span class="st">"Biological_Replicates"</span>, <span class="st">"Celltype"</span>, <span class="st">"Status"</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -4006,7 +4008,7 @@ Colour for sample metadata.
 </div>
 <p><br>
 Moreover, we can also add metabolite metadata information:<br></p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># row annotation: Color for Metabolites</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>                       SettingsFile_Sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
@@ -4033,7 +4035,7 @@ biological conclusions about the different pathways: Indeed, we can
 observe for the <code>D-Amino acid metabolism</code> many metabolites
 fall into the MCA-Cluster <code>Core_DOWN</code>, meaning in comparison
 to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># individual: One individual plot for each pathway, col annotation: Colour for samples</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>, </span>
 <span>                       SettingsFile_Sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
@@ -4044,6 +4046,402 @@ to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.</p>
 <span>                       PlotName <span class="op">=</span> <span class="st">"Pathway"</span><span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
 <p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-1.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-2.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-3.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-4.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-5.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-6.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-7.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-8.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-9.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-10.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-11.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-12.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-13.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-14.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-15.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-16.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-17.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-18.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-19.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-20.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-21.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-22.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-23.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-24.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-25.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-26.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-27.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-28.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-29.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-30.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-31.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-32.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-33.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-34.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-35.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-36.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-37.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-38.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-39.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-40.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-41.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-42.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-43.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-44.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-45.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-46.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-47.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-48.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-49.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-50.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-51.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-52.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-53.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-54.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-55.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-56.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-57.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-58.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-59.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-60.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-61.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-62.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-63.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-64.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-65.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-66.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-67.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-68.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-69.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-70.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-71.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-72.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-73.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-74.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-75.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-76.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-77.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-78.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-79.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-80.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-81.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-82.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-83.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-84.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-85.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-86.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-87.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-88.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-89.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-90.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-91.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-92.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-93.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-94.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-95.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-96.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-97.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-98.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-99.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-100.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-101.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-102.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-103.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-104.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-105.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-106.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-107.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-108.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-109.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-110.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-111.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-112.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-113.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-114.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-115.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-116.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-117.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-118.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-119.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-120.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-121.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-122.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-123.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-124.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-125.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-126.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-127.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-128.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-129.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-130.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-131.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-132.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-133.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-134.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-135.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-136.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-137.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-138.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-139.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-140.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-141.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-142.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-143.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-144.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-145.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-146.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-147.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-148.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-149.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-150.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-151.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-152.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-153.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-154.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-155.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-156.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-157.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-158.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-159.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-160.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-161.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-162.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-163.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-164.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-165.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-166.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-167.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-168.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-169.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-46-170.png" width="864" style="display: block; margin: auto auto auto 0;"></p>
+</div>
+<div class="section level4">
+<h4 id="superplots">Superplots<a class="anchor" aria-label="anchor" href="#superplots"></a>
+</h4>
+<p>Sometimes one might be interested to create individual plots for each
+metabolite to understand the differences between specific conditions.
+For this common plot types are bargraphs, boxplots or violin plots. As
+input, we need a DF that contains the samples as rownames and the
+features (=metabolites) as column names:<br></p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Input_Superplot</span> <span class="op">&lt;-</span>  <span class="va">Intra_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span><span class="co">#remove columns that include Metadata such as cell type,...</span></span></code></pre></div>
+<table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">
+Input for <code><a href="../reference/VizSuperplot.html">MetaProViz::VizSuperplot()</a></code>, with samples as
+rownames and metabolites as column names.
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+hippuric acid-d5
+</th>
+<th style="text-align:right;">
+2/3-phosphoglycerate
+</th>
+<th style="text-align:right;">
+2-aminoadipic acid
+</th>
+<th style="text-align:right;">
+2-hydroxyglutarate
+</th>
+<th style="text-align:right;">
+2-ketoglutarate
+</th>
+<th style="text-align:right;">
+4-guanidinobutanoate
+</th>
+<th style="text-align:right;">
+4-hydroxyphenyllactate
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+786-M1A_1
+</td>
+<td style="text-align:right;">
+4624712907
+</td>
+<td style="text-align:right;">
+56869710
+</td>
+<td style="text-align:right;">
+7515755
+</td>
+<td style="text-align:right;">
+424350094
+</td>
+<td style="text-align:right;">
+959154968
+</td>
+<td style="text-align:right;">
+1919685
+</td>
+<td style="text-align:right;">
+2200691
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-M1A_2
+</td>
+<td style="text-align:right;">
+4340353963
+</td>
+<td style="text-align:right;">
+48343621
+</td>
+<td style="text-align:right;">
+7794629
+</td>
+<td style="text-align:right;">
+432815728
+</td>
+<td style="text-align:right;">
+979152171
+</td>
+<td style="text-align:right;">
+1885079
+</td>
+<td style="text-align:right;">
+2038710
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-M1A_3
+</td>
+<td style="text-align:right;">
+4214210391
+</td>
+<td style="text-align:right;">
+45802902
+</td>
+<td style="text-align:right;">
+7241957
+</td>
+<td style="text-align:right;">
+417484370
+</td>
+<td style="text-align:right;">
+1003428045
+</td>
+<td style="text-align:right;">
+2000096
+</td>
+<td style="text-align:right;">
+2205282
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-M2A_1
+</td>
+<td style="text-align:right;">
+4796131050
+</td>
+<td style="text-align:right;">
+45783712
+</td>
+<td style="text-align:right;">
+6136730
+</td>
+<td style="text-align:right;">
+438371418
+</td>
+<td style="text-align:right;">
+844281227
+</td>
+<td style="text-align:right;">
+2623110
+</td>
+<td style="text-align:right;">
+2253523
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-M2A_2
+</td>
+<td style="text-align:right;">
+3846160365
+</td>
+<td style="text-align:right;">
+44241237
+</td>
+<td style="text-align:right;">
+6228218
+</td>
+<td style="text-align:right;">
+432236949
+</td>
+<td style="text-align:right;">
+885890420
+</td>
+<td style="text-align:right;">
+1980782
+</td>
+<td style="text-align:right;">
+2334933
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-M2A_3
+</td>
+<td style="text-align:right;">
+4164512249
+</td>
+<td style="text-align:right;">
+42973150
+</td>
+<td style="text-align:right;">
+6389024
+</td>
+<td style="text-align:right;">
+463135059
+</td>
+<td style="text-align:right;">
+884908893
+</td>
+<td style="text-align:right;">
+1478488
+</td>
+<td style="text-align:right;">
+2226276
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-O_1
+</td>
+<td style="text-align:right;">
+3896527350
+</td>
+<td style="text-align:right;">
+36932026
+</td>
+<td style="text-align:right;">
+8968347
+</td>
+<td style="text-align:right;">
+389934195
+</td>
+<td style="text-align:right;">
+887922452
+</td>
+<td style="text-align:right;">
+2390741
+</td>
+<td style="text-align:right;">
+2000374
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-O_2
+</td>
+<td style="text-align:right;">
+4496764782
+</td>
+<td style="text-align:right;">
+30493039
+</td>
+<td style="text-align:right;">
+9089987
+</td>
+<td style="text-align:right;">
+463318717
+</td>
+<td style="text-align:right;">
+1057350518
+</td>
+<td style="text-align:right;">
+2329025
+</td>
+<td style="text-align:right;">
+2113869
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+786-O_3
+</td>
+<td style="text-align:right;">
+4137100133
+</td>
+<td style="text-align:right;">
+29305326
+</td>
+<td style="text-align:right;">
+9025706
+</td>
+<td style="text-align:right;">
+407917219
+</td>
+<td style="text-align:right;">
+1012290078
+</td>
+<td style="text-align:right;">
+1695489
+</td>
+<td style="text-align:right;">
+2193180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HK2_1
+</td>
+<td style="text-align:right;">
+3171399130
+</td>
+<td style="text-align:right;">
+30931592
+</td>
+<td style="text-align:right;">
+5801816
+</td>
+<td style="text-align:right;">
+188417805
+</td>
+<td style="text-align:right;">
+326367919
+</td>
+<td style="text-align:right;">
+4418820
+</td>
+<td style="text-align:right;">
+3963104
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HK2_2
+</td>
+<td style="text-align:right;">
+3180479423
+</td>
+<td style="text-align:right;">
+32564867
+</td>
+<td style="text-align:right;">
+7322390
+</td>
+<td style="text-align:right;">
+228825446
+</td>
+<td style="text-align:right;">
+366703618
+</td>
+<td style="text-align:right;">
+4133883
+</td>
+<td style="text-align:right;">
+3971958
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HK2_3
+</td>
+<td style="text-align:right;">
+3365930405
+</td>
+<td style="text-align:right;">
+29507162
+</td>
+<td style="text-align:right;">
+7159140
+</td>
+<td style="text-align:right;">
+251061831
+</td>
+<td style="text-align:right;">
+459945537
+</td>
+<td style="text-align:right;">
+4366242
+</td>
+<td style="text-align:right;">
+4226693
+</td>
+</tr>
+</tbody>
+</table>
+<p>We also need the Metadata as we will need to know which conditions to
+plot for together. If you have further information such as replicates or
+patient ID, we can use this for the colour of the plotted samples per
+condition as in the superplots style as described in by Lord et al <span class="citation">(Lord et al. 2020)</span>.<br><br></p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">:::</span><span class="fu"><a href="../reference/VizSuperplot.html">VizSuperplot</a></span><span class="op">(</span>InputData <span class="op">=</span><span class="va">Input_Superplot</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>,<span class="co">#We just plot six metabolites</span></span>
+<span>                                           SettingsFile_Sample <span class="op">=</span><span class="va">MetaData_Sample</span>,</span>
+<span>                                           SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Superplot <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
+<span>                                           PlotType <span class="op">=</span> <span class="st">"Bar"</span>, <span class="co">#Bar, Box, Violin</span></span>
+<span>                                           PlotConditions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HK2"</span>, <span class="st">"786-O"</span>, <span class="st">"786-M1A"</span>, <span class="st">"786-M2A"</span><span class="op">)</span>,<span class="co">#sets the order in which the samples should be plotted</span></span>
+<span>                                           StatComparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#Stat comparisons to be included on the plot</span></span></code></pre></div>
+<div class="vscroll-plot">
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+</div>
+<p><br><br><br>
+Now, if we for instance prefer boxplots over bargraphs we can simply
+change the parameter <code>PlotType</code>:</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">:::</span><span class="fu"><a href="../reference/VizSuperplot.html">VizSuperplot</a></span><span class="op">(</span>InputData <span class="op">=</span><span class="va">Input_Superplot</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>,<span class="co">#We just plot six metabolites</span></span>
+<span>                                           SettingsFile_Sample <span class="op">=</span><span class="va">MetaData_Sample</span>,</span>
+<span>                                           SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Superplot <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
+<span>                                           PlotType <span class="op">=</span> <span class="st">"Box"</span>, <span class="co">#Bar, Box, Violin</span></span>
+<span>                                           PlotConditions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HK2"</span>, <span class="st">"786-O"</span>, <span class="st">"786-M1A"</span>, <span class="st">"786-M2A"</span><span class="op">)</span>,<span class="co">#sets the order in which the samples should be plotted</span></span>
+<span>                                           StatComparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#Stat comparisons to be included on the plot</span></span></code></pre></div>
+<div class="vscroll-plot">
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+</div>
+<p><br><br><br>
+We can also change it to violin plots:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">:::</span><span class="fu"><a href="../reference/VizSuperplot.html">VizSuperplot</a></span><span class="op">(</span>InputData <span class="op">=</span><span class="va">Input_Superplot</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>,<span class="co">#We just plot six metabolites</span></span>
+<span>                                           SettingsFile_Sample <span class="op">=</span><span class="va">MetaData_Sample</span>,</span>
+<span>                                           SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Superplot <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
+<span>                                           PlotType <span class="op">=</span> <span class="st">"Violin"</span>, <span class="co">#Bar, Box, Violin</span></span>
+<span>                                           PlotConditions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HK2"</span>, <span class="st">"786-O"</span>, <span class="st">"786-M1A"</span>, <span class="st">"786-M2A"</span><span class="op">)</span>,<span class="co">#sets the order in which the samples should be plotted</span></span>
+<span>                                           StatComparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#Stat comparisons to be included on the plot</span></span></code></pre></div>
+<div class="vscroll-plot">
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+</div>
+<p><br><br><br></p>
 </div>
 <div class="section level4">
 <h4 id="volcano-plot">Volcano plot<a class="anchor" aria-label="anchor" href="#volcano-plot"></a>
@@ -4568,11 +4966,11 @@ Percentage_of_Pathway_detected
 <p>Here we will first look into the results from the differential
 analysis (see section <code>DMA</code> above) for the comparison of
 <code>786-M1A_vs_HK2</code>:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-49-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-57-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -4580,24 +4978,24 @@ Figure: Standard figure displaying DMA results.
 If you seek to plot the metabolite names you can change the paramter
 <code>SelectLab</code> from its default (<code>SelectLab=""</code>) to
 NULL and the metabolite names will be plotted randomly.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       SelectLab <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-50-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-58-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
 <p><br>
 With the parameter <code>SelectLab</code> you can also pass a vector
 with Metabolite names that should be labeled:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       SelectLab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"N-acetylaspartylglutamate"</span>, <span class="st">"cystathionine"</span>, <span class="st">"orotidine"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-51-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -4608,7 +5006,7 @@ this we can provide a Plot_SettingsFile with this additional information
 and use this information to color code and/or to shape the dots on the
 volcano plot. In order to choose the right column we need to provide a
 vector Plot_SettingsInfo with this information.<br></p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">#Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
@@ -4618,12 +5016,12 @@ vector Plot_SettingsInfo with this information.<br></p>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Colour coded for metabolic clusters"</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-1.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-60-1.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded/shaped for
 metabolic clusters from MCA results.
 </p>
 </div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">#If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
@@ -4633,12 +5031,12 @@ metabolic clusters from MCA results.
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Shape for metabolic clusters, color for significance."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-2.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-60-2.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded/shaped for
 metabolic clusters from MCA results.
 </p>
 </div>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">#Of course, we can also adapt both, color and shape for the same parameter:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
@@ -4648,7 +5046,7 @@ metabolic clusters from MCA results.
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Shape and color for metabolic clusters."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-52-3.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-60-3.png" alt="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded/shaped for
 metabolic clusters from MCA results.
 </p>
@@ -4664,7 +5062,7 @@ the column “Pathway” also in our Input_data you can also pass
 default <code>Plot_SettingsFile=NULL</code>, in which case the
 <code>Plot_SettingsInfo</code> information (here <code>color</code>)
 will be used from Input_data.<br></p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
@@ -4673,7 +5071,7 @@ will be used from Input_data.<br></p>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2 Results of DMA. Colour for metabolic pathways."</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Colour for metabolic pathways."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-53-1.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-61-1.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded for
 metabolic pathways and shaped for metabolic clusters from MCA results.
 </p>
@@ -4682,7 +5080,7 @@ metabolic pathways and shaped for metabolic clusters from MCA results.
 We immediately see that there are many pathways displayed on the plot,
 which can make it difficult to interpret. Hence, we will change our plot
 settings in order to get individual plots for each of the pathways:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Now we can generate a plot for each pathway and color for the metabolite clusters:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"RG2_Significant"</span>, individual<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
@@ -4699,7 +5097,7 @@ settings in order to get individual plots for each of the pathways:</p>
 <h5 id="comparison">
 <strong>Comparison</strong><a class="anchor" aria-label="anchor" href="#comparison"></a>
 </h5>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
@@ -4707,12 +5105,12 @@ settings in order to get individual plots for each of the pathways:</p>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A vs HK2 compared to 7860 vs HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA"</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-54-1.png" alt="Figure: Comparison." width="672"><p class="caption">
+<img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-62-1.png" alt="Figure: Comparison." width="672"><p class="caption">
 Figure: Comparison.
 </p>
 </div>
 <p>Now we do individual plots again:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MappingInfo</span>,</span>
@@ -4721,7 +5119,7 @@ Figure: Comparison.
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A vs HK2 compared to 7860 vs HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA"</span> <span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-56-16.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-64-16.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br></p>
 </div>
@@ -4736,7 +5134,7 @@ For this we need to prepare the correct input data including the
 pathways used to run the pathway analysis, the differential metabolite
 data used as input for the pathway analysis and the results of the
 pathway analysis:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Prepare the Input:</span></span>
 <span><span class="co">#1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab. </span></span>
 <span><span class="va">InputPEA</span> <span class="op">&lt;-</span> <span class="va">DMA_786M1A_vs_HK2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -4750,7 +5148,7 @@ pathway analysis:</p>
 <span><span class="co">#3. SettingsFile_Metab= Pathways used for pathway analysis: Must have same column names as SettingsFile_Metab for Pathway name and feature names need to match features in the InputData. PEA_Feature passes this column name!</span></span></code></pre></div>
 <p><br>
 Now we can produce the plots:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"PEA"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>PEA_Pathway<span class="op">=</span><span class="st">"term"</span>,<span class="co"># Needs to be the same in both, SettingsFile_Metab and InputData2.</span></span>
 <span>                                       PEA_stat<span class="op">=</span><span class="st">"p.adjust"</span>,<span class="co">#Column InputData2</span></span>
@@ -4763,7 +5161,7 @@ Now we can produce the plots:</p>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"PEA"</span> ,</span>
 <span>                       SelectLab <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-16.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-17.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-18.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-19.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-20.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-21.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-22.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-23.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-24.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-25.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-26.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-27.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-28.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-29.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-30.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-31.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-32.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-33.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-34.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-35.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-36.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-37.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-38.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-39.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-40.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-41.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-42.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-43.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-44.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-45.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-46.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-47.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-48.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-49.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-50.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-51.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-52.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-53.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-54.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-55.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-56.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-57.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-58.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-59.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-60.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-61.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-62.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-63.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-64.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-65.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-66.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-67.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-68.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-69.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-70.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-71.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-72.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-73.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-74.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-75.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-76.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-77.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-78.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-79.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-80.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-81.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-82.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-83.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-84.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-85.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-86.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-87.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-88.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-89.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-90.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-91.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-92.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-93.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-94.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-95.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-96.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-97.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-98.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-99.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-100.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-101.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-102.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-103.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-104.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-105.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-106.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-107.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-108.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-59-109.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-16.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-17.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-18.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-19.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-20.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-21.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-22.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-23.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-24.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-25.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-26.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-27.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-28.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-29.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-30.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-31.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-32.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-33.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-34.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-35.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-36.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-37.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-38.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-39.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-40.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-41.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-42.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-43.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-44.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-45.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-46.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-47.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-48.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-49.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-50.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-51.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-52.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-53.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-54.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-55.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-56.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-57.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-58.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-59.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-60.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-61.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-62.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-63.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-64.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-65.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-66.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-67.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-68.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-69.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-70.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-71.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-72.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-73.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-74.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-75.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-76.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-77.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-78.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-79.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-80.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-81.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-82.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-83.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-84.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-85.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-86.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-87.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-88.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-89.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-90.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-91.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-92.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-93.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-94.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-95.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-96.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-97.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-98.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-99.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-100.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-101.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-102.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-103.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-104.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-105.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-106.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-107.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-108.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="Standard%20Metabolomics_files/figure-html/unnamed-chunk-67-109.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <br><br><div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 100%">
@@ -4786,7 +5184,7 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  collate  English_United Kingdom.utf8</span></span>
 <span><span class="co">#&gt;  ctype    English_United Kingdom.utf8</span></span>
 <span><span class="co">#&gt;  tz       Europe/Berlin</span></span>
-<span><span class="co">#&gt;  date     2024-04-22</span></span>
+<span><span class="co">#&gt;  date     2024-06-13</span></span>
 <span><span class="co">#&gt;  pandoc   3.1.1 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
@@ -4796,6 +5194,7 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  ape                5.7-1     <span style="color: #555555;">2023-03-13</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  aplot              0.2.2     <span style="color: #555555;">2023-10-06</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  backports          1.4.1     <span style="color: #555555;">2021-12-13</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">#&gt;  beeswarm           0.4.0     <span style="color: #555555;">2021-06-01</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">#&gt;  Biobase            2.62.0    <span style="color: #555555;">2023-10-24</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
 <span><span class="co">#&gt;  BiocGenerics       0.48.1    <span style="color: #555555;">2023-11-01</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
 <span><span class="co">#&gt;  BiocParallel       1.36.0    <span style="color: #555555;">2023-10-24</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
@@ -4835,6 +5234,7 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  generics           0.1.3     <span style="color: #555555;">2022-07-05</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  GenomeInfoDb       1.38.5    <span style="color: #555555;">2023-12-28</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor 3.18 (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  GenomeInfoDbData   1.2.11    <span style="color: #555555;">2024-01-08</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
+<span><span class="co">#&gt;  ggbeeswarm         0.7.2     <span style="color: #555555;">2023-04-29</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  ggforce            0.4.1     <span style="color: #555555;">2022-10-04</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  ggfortify        * 0.4.16    <span style="color: #555555;">2023-03-20</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  ggfun              0.1.4     <span style="color: #555555;">2024-01-19</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
@@ -4877,7 +5277,7 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  MASS               7.3-60    <span style="color: #555555;">2023-05-04</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  Matrix             1.6-1.1   <span style="color: #555555;">2023-09-18</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  memoise            2.0.1     <span style="color: #555555;">2021-11-26</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
-<span><span class="co">#&gt;  MetaProViz       * 2.0.0     <span style="color: #555555;">2024-04-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Github (saezlab/MetaProViz@5a365e2)</span></span></span>
+<span><span class="co">#&gt;  MetaProViz       * 2.0.2     <span style="color: #555555;">2024-06-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Github (saezlab/MetaProViz@ddbe87c)</span></span></span>
 <span><span class="co">#&gt;  munsell            0.5.1     <span style="color: #555555;">2024-04-01</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.3)</span></span></span>
 <span><span class="co">#&gt;  nlme               3.1-163   <span style="color: #555555;">2023-08-09</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  patchwork          1.2.0     <span style="color: #555555;">2024-01-08</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
@@ -4927,6 +5327,7 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  tzdb               0.4.0     <span style="color: #555555;">2023-05-12</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  utf8               1.2.4     <span style="color: #555555;">2023-10-22</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  vctrs              0.6.5     <span style="color: #555555;">2023-12-01</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
+<span><span class="co">#&gt;  vipor              0.4.7     <span style="color: #555555;">2023-12-18</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  viridis            0.6.5     <span style="color: #555555;">2024-01-29</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  viridisLite        0.4.2     <span style="color: #555555;">2023-05-02</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
 <span><span class="co">#&gt;  withr              3.0.0     <span style="color: #555555;">2024-01-16</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">CRAN (R 4.3.2)</span></span></span>
@@ -4968,6 +5369,12 @@ Ratio.”</span> <em>The Annals of Mathematical Statistics</em> 2 (3):
 <div id="ref-Kanehisa2000" class="csl-entry">
 Kanehisa, M, and S Goto. 2000. <span>“KEGG: Kyoto Encyclopedia of Genes
 and Genomes.”</span> <em>Nucleic Acids Research</em> 28 (1): 27–30. <a href="https://doi.org/10.1093/nar/28.1.27" class="external-link">https://doi.org/10.1093/nar/28.1.27</a>.
+</div>
+<div id="ref-Lord2020" class="csl-entry">
+Lord, Samuel J, Katrina B Velle, R Dyche Mullins, and Lillian K
+Fritz-Laylin. 2020. <span>“SuperPlots: Communicating Reproducibility and
+Variability in Cell Biology.”</span> <em>The Journal of Cell
+Biology</em>, no. 6 (June). <a href="https://doi.org/10.1083/jcb.202001064" class="external-link">https://doi.org/10.1083/jcb.202001064</a>.
 </div>
 <div id="ref-Mora_Schmidt2022" class="csl-entry">
 Mora, Ariane N, Christina Schmidt, Brad Balderson, Christian Frezza, and

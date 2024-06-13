@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,8 +104,8 @@
 <span>  x <span class="op">=</span> <span class="st">"Log2FC"</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  xCutoff <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  yCutoff <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  xCutoff <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  yCutoff <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  Connectors <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  SelectLab <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  PlotName <span class="op">=</span> <span class="st">""</span>,</span>
@@ -116,7 +116,7 @@
 <span>  Theme <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  SaveAs_Plot <span class="op">=</span> <span class="st">"svg"</span>,</span>
 <span>  FolderPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  Features <span class="op">=</span> <span class="st">"metabolites"</span>,</span>
+<span>  Features <span class="op">=</span> <span class="st">"Metabolites"</span>,</span>
 <span>  PrintPlot <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -129,6 +129,10 @@
 
 <dt>SettingsFile_Metab</dt>
 <dd><p><em>Optional: </em> DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. <strong>Default = NULL</strong></p></dd>
+
+
+<dt>InputData2</dt>
+<dd><p><em>Optional: </em> DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). <strong>Default = NULL</strong></p></dd>
 
 
 <dt>y</dt>
@@ -148,11 +152,11 @@
 
 
 <dt>xCutoff</dt>
-<dd><p><em>Optional: </em> Number of the desired p value cutoff for assessing significance. <strong>Default = 0.05</strong></p></dd>
+<dd><p><em>Optional: </em> Number of the desired log fold change cutoff for assessing significance. <strong>Default = 0.5</strong></p></dd>
 
 
 <dt>yCutoff</dt>
-<dd><p><em>Optional: </em> Number of the desired log fold change cutoff for assessing significance. <strong>Default = 0.5</strong></p></dd>
+<dd><p><em>Optional: </em> Number of the desired p value cutoff for assessing significance. <strong>Default = 0.05</strong></p></dd>
 
 
 <dt>Connectors</dt>
@@ -209,10 +213,6 @@
 
 <dt>FeatureID</dt>
 <dd><p>Optional:  Column name including the feature names, e.g. metabolite names. <strong>Default = "Metabolite"</strong></p></dd>
-
-
-<dt>AdditionalInput_data</dt>
-<dd><p><em>Optional: </em> DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). <strong>Default = NULL</strong></p></dd>
 
 </dl></div>
 
