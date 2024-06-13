@@ -37,7 +37,7 @@
 #' @param ColorPalette_Dot \emph{Optional: } Provide customized ColorPalette in vector format. \strong{Default = NULL}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #' @export
