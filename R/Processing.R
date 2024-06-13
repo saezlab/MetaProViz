@@ -408,7 +408,7 @@ PoolEstimation <- function(InputData,
       }
     }
     if("PoolSamples" %in% names(SettingsInfo)==TRUE){
-      if(SettingsInfo[["PoolSamples"]] %in% SettingsFile_Sample[["Conditions"]] == FALSE ){
+      if(SettingsInfo[["PoolSamples"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == FALSE ){
         stop("You have chosen PoolSamples = ",paste(SettingsInfo[["PoolSamples"]] ), ", ", paste(SettingsInfo[["PoolSamples"]] )," was not found in SettingsFile_Sample as sample condition. Please insert the name of the pool samples as stated in the Conditions column of the SettingsFile_Sample."   )
       }
     }
@@ -435,7 +435,7 @@ PoolEstimation <- function(InputData,
     PoolData <- InputData
     PoolData[PoolData == 0] <- NA
   }else{
-    PoolData <- InputData[SettingsFile_Sample[["Conditions"]] == SettingsInfo[["PoolSamples"]],]
+    PoolData <- InputData[SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["PoolSamples"]],]
     PoolData[PoolData == 0] <- NA
   }
 
@@ -481,12 +481,12 @@ PoolEstimation <- function(InputData,
                                                PlotName = "QC Pool samples",
                                                SaveAs_Plot =  NULL))
   }else{
-    pca_data <- merge(SettingsFile_Sample %>% select(Conditions), InputData, by=0) %>%
+    pca_data <- merge(SettingsFile_Sample %>% select(SettingsInfo[["Conditions"]]), InputData, by=0) %>%
       column_to_rownames("Row.names") %>%
-      mutate(Sample_type = case_when(Conditions == SettingsInfo[["PoolSamples"]] ~ "Pool",
+      mutate(Sample_type = case_when(.data[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["PoolSamples"]] ~ "Pool",
                                      TRUE ~ "Sample"))
 
-    pca_QC_pool <-invisible(MetaProViz::VizPCA(InputData=pca_data %>%select(-Conditions, -Sample_type),
+    pca_QC_pool <-invisible(MetaProViz::VizPCA(InputData=pca_data %>%select(-all_of(SettingsInfo[["Conditions"]]), -Sample_type),
                                                SettingsInfo= c(color="Sample_type"),
                                                SettingsFile_Sample= pca_data,
                                                PlotName = "QC Pool samples",

@@ -27,16 +27,16 @@
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}
 #' @param SettingsFile_Metab \emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param Input_data DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param InputData2 \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}
 #' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
 #' @param FeatureID {Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}
-#' @param AdditionalInput_data \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}
 #' @param PlotName \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
 #' @param ComparisonName \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(InputData="Cond1", InputData2= "Cond2")}
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
-#' @param yCutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param xCutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param yCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
 #' @param ColorPalette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
 #' @param ShapePalette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param SelectLab \emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}
@@ -60,8 +60,8 @@ VizVolcano <- function(PlotSettings="Standard",
                        x= "Log2FC",
                        xlab= NULL,#"~Log[2]~FC"
                        ylab= NULL,#"~-Log[10]~p.adj"
-                       xCutoff= 0.05,
-                       yCutoff= 0.5,
+                       xCutoff= 0.5,
+                       yCutoff= 0.05,
                        Connectors=  FALSE,
                        SelectLab= "",
                        PlotName= "",
@@ -72,7 +72,7 @@ VizVolcano <- function(PlotSettings="Standard",
                        Theme= NULL,
                        SaveAs_Plot= "svg",
                        FolderPath = NULL,
-                       Features="metabolites",
+                       Features="Metabolites",
                        PrintPlot=TRUE){
 
   ## ------------ Setup and installs ----------- ##
@@ -114,11 +114,11 @@ VizVolcano <- function(PlotSettings="Standard",
                           PlotSettings="Feature")
 
   # CheckInput` Specific:
-  if(is.numeric(xCutoff)== FALSE |xCutoff > 1 | xCutoff < 0){
-      stop("Check input. The selected xCutoff value should be numeric and between 0 and 1.")
+  if(is.numeric(yCutoff)== FALSE |yCutoff > 1 | yCutoff < 0){
+      stop("Check input. The selected yCutoff value should be numeric and between 0 and 1.")
     }
-  if(is.numeric(yCutoff)== FALSE  | yCutoff < 0){
-      stop("Check input. The selected yCutoff value should be numeric and between 0 and +oo.")
+  if(is.numeric(xCutoff)== FALSE  | xCutoff < 0){
+      stop("Check input. The selected xCutoff value should be numeric and between 0 and +oo.")
     }
   if(paste(x) %in% colnames(InputData)==FALSE | paste(y) %in% colnames(InputData)==FALSE){
     stop("Check your input. The column name of x and/ore y does not exist in Input_data.")
@@ -330,8 +330,8 @@ VizVolcano <- function(PlotSettings="Standard",
 #' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
 #' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
 #' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
+#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
+#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
 #' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
 #' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
@@ -356,8 +356,8 @@ VizVolcano_Standard <- function(InputData,
                                 x= "Log2FC",
                                 xlab= NULL,#"~Log[2]~FC"
                                 ylab= NULL,#"~-Log[10]~p.adj"
-                                xCutoff= 0.05,
-                                yCutoff= 0.5,
+                                xCutoff= 0.5,
+                                yCutoff= 0.05,
                                 Connectors=  FALSE,
                                 SelectLab= "",
                                 PlotName= "",
@@ -428,8 +428,8 @@ VizVolcano_Standard <- function(InputData,
                                                 y = paste(y),
                                                 xlab  =xlab,
                                                 ylab =ylab,
-                                                pCutoff = xCutoff,
-                                                FCcutoff = yCutoff,#Cut off Log2FC, automatically 2
+                                                pCutoff = yCutoff,
+                                                FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
                                                 axisLabSize = 10,
@@ -448,7 +448,7 @@ VizVolcano_Standard <- function(InputData,
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
-                                                legendLabels=c(paste(x," < |", yCutoff, "|"), paste(x," > |", yCutoff, "|"), paste(y, ' < ', xCutoff) , paste(y, ' < ', xCutoff,' & ',x," < |", yCutoff, "|")),
+                                                legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
                                                 legendPosition = LegendPos,
                                                 legendLabSize = 7,
                                                 legendIconSize =4,
@@ -618,8 +618,8 @@ VizVolcano_Standard <- function(InputData,
 #' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
 #' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
 #' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
+#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
+#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
 #' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
 #' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
@@ -646,8 +646,8 @@ VizVolcano_Compare <- function(InputData,
                                x= "Log2FC",
                                xlab= NULL,#"~Log[2]~FC"
                                ylab= NULL,#"~-Log[10]~p.adj"
-                               xCutoff= 0.05,
-                               yCutoff= 0.5,
+                               xCutoff= 0.5,
+                               yCutoff= 0.05,
                                Connectors=  FALSE,
                                SelectLab= "",
                                PlotName= "",
@@ -770,8 +770,8 @@ VizVolcano_Compare <- function(InputData,
                                                 y = paste(y),
                                                 xlab  =xlab,
                                                 ylab =ylab,
-                                                pCutoff = xCutoff,
-                                                FCcutoff = yCutoff,#Cut off Log2FC, automatically 2
+                                                pCutoff = yCutoff,
+                                                FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
                                                 axisLabSize = 10,
@@ -790,7 +790,7 @@ VizVolcano_Compare <- function(InputData,
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
-                                                legendLabels=c(paste(x," < |", yCutoff, "|"), paste(x," > |", yCutoff, "|"), paste(y, ' < ', xCutoff) , paste(y, ' < ', xCutoff,' & ',x," < |", yCutoff, "|")),
+                                                legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
                                                 legendPosition = 'right',
                                                 legendLabSize = 7,
                                                 legendIconSize =4,
@@ -980,8 +980,8 @@ VizVolcano_Compare <- function(InputData,
 #' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
 #' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
 #' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param yCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
+#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
+#' @param yCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
 #' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
 #' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
 #' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
@@ -1006,8 +1006,8 @@ VizVolcano_PEA <- function(InputData,
                            x= "Log2FC",
                            xlab= NULL,#"~Log[2]~FC"
                            ylab= NULL,#"~-Log[10]~p.adj"
-                           xCutoff= 0.05,
-                           yCutoff= 0.5,
+                           xCutoff= 0.5,
+                           yCutoff= 0.05,
                            Connectors=  FALSE,
                            SelectLab= "",
                            PlotName= "",
@@ -1039,17 +1039,17 @@ VizVolcano_PEA <- function(InputData,
 
   #Prepare data:
   InputData <- InputData%>%
-    dplyr::rename("PEA_Feature"="Metabolite")
+    dplyr::rename("PEA_Feature"= !!SettingsInfo[["PEA_Feature"]])
 
 
   InputData2 <- InputData2%>%
-    dplyr::rename("PEA_score"=paste(SettingsInfo[["PEA_score"]]),
-                  "PEA_stat"=paste(SettingsInfo[["PEA_stat"]]),
-                  "PEA_Pathway"=paste(SettingsInfo[["PEA_Pathway"]]))
+    dplyr::rename("PEA_score"= !!SettingsInfo[["PEA_score"]],
+                  "PEA_stat"= !!SettingsInfo[["PEA_stat"]],
+                  "PEA_Pathway"= !!SettingsInfo[["PEA_Pathway"]])
 
   SettingsFile_Metab <- SettingsFile_Metab%>%
-    dplyr::rename("PEA_Pathway"=paste(SettingsInfo[["PEA_Pathway"]]),
-                  "PEA_Feature"=paste(SettingsInfo[["PEA_Feature"]]))
+    dplyr::rename("PEA_Pathway"= !!SettingsInfo[["PEA_Pathway"]],
+                  "PEA_Feature"= !!SettingsInfo[["PEA_Feature"]])
 
   #################
   ##--- Plot
@@ -1066,7 +1066,9 @@ VizVolcano_PEA <- function(InputData,
     SettingsFile_Metab_Select <- SettingsFile_Metab%>%
       filter(PEA_Pathway == paste(i))
 
-    InputVolcano <-merge(SettingsFile_Metab_Select, InputData, by="PEA_Feature")
+    InputVolcano <-merge(SettingsFile_Metab_Select, InputData, by="PEA_Feature", all.x=TRUE)%>%
+      distinct(PEA_Feature, .keep_all = TRUE) %>%
+      filter(!is.na(!!sym(y)) & !is.na(!!sym(x)))
 
     if(nrow(InputVolcano)>=1){
       #Prepare the colour scheme:
@@ -1112,8 +1114,8 @@ VizVolcano_PEA <- function(InputData,
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              pCutoff = xCutoff,
-                                              FCcutoff = yCutoff,#Cut off Log2FC, automatically 2
+                                              pCutoff = yCutoff,
+                                              FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
                                               axisLabSize = 10,
@@ -1132,7 +1134,7 @@ VizVolcano_PEA <- function(InputData,
                                               cutoffLineType = "dashed",
                                               cutoffLineCol = "black",
                                               cutoffLineWidth = 0.5,
-                                              legendLabels=c(paste(x," < |", yCutoff, "|"), paste(x," > |", yCutoff, "|"), paste(y, ' < ', xCutoff) , paste(y, ' < ', xCutoff,' & ',x," < |", yCutoff, "|")),
+                                              legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
                                               legendPosition = LegendPos,
                                               legendLabSize = 7,
                                               legendIconSize =4,
