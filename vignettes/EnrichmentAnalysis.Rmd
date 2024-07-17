@@ -1,0 +1,222 @@
+---
+title: "Enrichment Analysis"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg Universiy
+output: 
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 1000px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+\
+In this vignette we focus on accessing prior knowledge needed to for example run pathway enrichment analysis or compound class enrichment analysis and showcase the enrichment analysis using example data.\
+\
+<span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
+
+* To process raw peak data and identify outliers.\
+* To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+* To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
+* To use specific visualizations to aid biological interpretation of the results.\
+\
+First if you have not done yet, install the required dependencies and load the libraries:
+```{r message=FALSE, warning=FALSE}
+# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). 
+# 2. Install the latest development version from GitHub using devtools
+#devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+library(MetaProViz)
+
+#dependencies that need to be loaded:
+library(tidyverse)
+
+#Please install the Biocmanager Dependencies:
+#BiocManager::install("clusterProfiler")
+#BiocManager::install("EnhancedVolcano")
+```
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+# 1. Loading the example data
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+\
+<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
+`1.` Intracellular experiment **(Intra)** \
+The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+here we load the processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
+```{r}
+#Load the Pre-processed intracellular data:
+MetaProViz::ToyData(data="Standard_DMA")
+```
+```{r, echo=FALSE}
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+# Check how our data looks like:
+Intra_DMA_786M1A_vs_HK2[1:5, c(1:12)]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Intra_DMA_786M1A_vs_HK2` differential metaboilite analysis results.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+# 2. Loading prior knowledge
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
+## KEGG pathway-metabolite sets
+KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000]. **(KEGG_Pathways)**\
+```{r}
+#This will use KEGGREST to query the KEGG API to load the pathways:
+MetaProViz::LoadKEGG()
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+KEGG_Pathways[c(1:3,52:54),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+
+## Create pathway-metabolite sets
+CosmosR
+
+## MetaLinksDB Metabolite-receptor sets
+
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+# 3. Run enrichment analysis
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+### ORA using the DMA results
+Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
+Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites (see MCA below). If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
+\
+Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+```{r}
+#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+DM_ORA_res<- list()
+
+comparisons <- names(DMA_Annova[["DMA"]])
+for(comparison in comparisons){
+  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
+  DMA <- DMA_Annova[["DMA"]][[comparison]]
+  DMA <- DMA[complete.cases(DMA),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
+  dplyr::rename("Metabolite"="KEGGCompound")#We use the KEGG trivial names to match with the KEGG pathways
+  
+  #Perform ORA
+  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA%>%remove_rownames()%>%column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
+                                                       SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+                                                       PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                                       PathwayName="KEGG",
+                                                       minGSSize=3,
+                                                       maxGSSize=1000,
+                                                       pCutoff=0.01,
+                                                       PercentageCutoff=10)
+                                                
+                                                 
+}
+
+#Lets check how the results look like:
+DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGoSummary"]]
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
+  kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+*implementation to also apply to clsuters!
+
+
+### ORA on each metabolite cluster
+As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method. As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites). In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
+
+```{r, eval=FALSE}
+MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%column_to_rownames("Metabolite"),
+                                         SettingsInfo=c(ClusterColumn="RG2_Significant", 
+                                                        BackgroundColumn="BG_Method", 
+                                                        PathwayTerm= "Pathway", #This is the column name including the pathways names
+                                                        PathwayFeature= "Metabolite"),
+                                         RemoveBackground=TRUE,
+                                         PathwayFile=MappingInfo%>%rownames_to_column("Metabolite"),
+                                         PathwayName="KEGG",
+                                         minGSSize=3,
+                                         maxGSSize=1000 ,
+                                         SaveAs_Table= "csv")
+```
+
+# 4. Visualisation of results
+
+## Heatmaps
+
+
+## Volcano plot
+In general,we have three different `Plot_Settings`, which will also be used for other plot types such as lollipop graphs.\
+`1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
+`2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
+`3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+
+</div>
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
+```
+
+# Bibliography
