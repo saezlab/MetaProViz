@@ -123,17 +123,17 @@ LoadKEGG <- function(){
 #'
 #' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
 #'
-#' @param Input_GeneSet Dataframe with two columns for source (=term) and target (=gene), e.g. Hallmarks.
-#' @param target \emph{Optional: }  Column name of target in Input_GeneSet. \strong{Default = "gene}
+#' @param Input_GeneSet Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
+#' @param Target \emph{Optional: }  Column name of Target in Input_GeneSet. \strong{Default = "gene}
 #' @param OutputName {Optional:} String which is added to the output files name.\strong(Default = NULL)
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @export
 
 Make_GeneMetabSet <- function(Input_GeneSet,
-                              target=c("gene"),
+                              Target=c("gene"),
                               OutputName=NULL,
-                              Folder_Name = NULL){
+                              FolderPath = NULL){
 
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","cosmosR")
@@ -144,22 +144,22 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
   if(is.data.frame(Input_GeneSet)==FALSE){
-    stop("`Input_GeneSet` must be of class data.frame with columns for source (=term) and target (=gene). Please check your input")
+    stop("`Input_GeneSet` must be of class data.frame with columns for source (=term) and Target (=gene). Please check your input")
   }
-  # 2. target:
+  # 2. Target:
 
-  if(is.character(target)==FALSE | (length(target) ==1)==FALSE){
-    stop("`target` must be of class character withonly one entry. Please check your input")
+  if(is.character(Target)==FALSE | (length(Target) ==1)==FALSE){
+    stop("`Target` must be of class character withonly one entry. Please check your input")
   }
 
   ## ------------ Folder ----------- ##
-  if(is.null(Folder_Name)){
+  if(is.null(FolderPath)){
     name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
   }else{
-    if(grepl('[^[:alnum:]]', Folder_Name)){
-      stop("The 'Folder_Name' must not contain any special character.")
+    if(grepl('[^[:alnum:]]', FolderPath)){
+      stop("The 'FolderPath' must not contain any special character.")
     }else{
-      name <- paste("MetaProViz_Results",Sys.Date(),Folder_Name,sep = "_" )
+      name <- paste("MetaProViz_Results",Sys.Date(),FolderPath,sep = "_" )
     }
   }
   WorkD <- getwd()
@@ -172,15 +172,15 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   ##-------------- Cosmos PKN
   #load the network from cosmos
   data("meta_network", package = "cosmosR")
-  meta_network <- meta_network[which(meta_network$source != meta_network$target),]
+  meta_network <- meta_network[which(meta_network$source != meta_network$Target),]
 
   #adapt to our needs extracting the metabolites:
-  meta_network_metabs <- meta_network[grepl("Metab__HMDB", meta_network$source) | grepl("Metab__HMDB", meta_network$target),-2]#extract entries with metabolites in source or target
-  meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target),]#extract entries with genes in source or target
+  meta_network_metabs <- meta_network[grepl("Metab__HMDB", meta_network$source) | grepl("Metab__HMDB", meta_network$Target),-2]#extract entries with metabolites in source or Target
+  meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$Target),]#extract entries with genes in source or Target
 
   #Get reactant and product
   meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),]%>% dplyr::rename("metab"=1, "gene"=2)
-  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),]%>% dplyr::rename("gene"=1, "metab"=2)
+  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$Target),]%>% dplyr::rename("gene"=1, "metab"=2)
 
   meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
   meta_network_metabs$gene <- gsub("Gene.*__","",meta_network_metabs$gene)
@@ -192,10 +192,10 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
   ##-------------- Combine with Input_GeneSet
   #add pathway names --> File that can be used for metabolite pathway analysis
-  MetabSet <- merge(meta_network_metabs,Input_GeneSet, by.x="gene", by.y=target)
+  MetabSet <- merge(meta_network_metabs,Input_GeneSet, by.x="gene", by.y=Target)
 
   #combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
-  GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=target), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
+  GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=Target), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
 
   ##-------------- Save and return
   if(is.null(OutputName)){
