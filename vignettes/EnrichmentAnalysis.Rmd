@@ -250,7 +250,6 @@ LoadMetalinks <- function(){
   columns_query <- "PRAGMA table_info(metalinks)"
   columns_info <-  DBI::dbGetQuery(con, columns_query)
 
-
 }
 
 
