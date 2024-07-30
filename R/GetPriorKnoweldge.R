@@ -118,6 +118,27 @@ LoadKEGG <- function(){
 
 
 ##########################################################################################
+### ### ### Load Hallmark prior knowledge ### ### ###
+##########################################################################################
+#'
+#' @title Toy Data Import
+#' @description Import and process .csv file to create toy data.
+#' @importFrom utils read.csv
+#' @return A data frame containing the toy data.
+#' @export
+#'
+LoadHallmarks <- function() {
+  # Read the .csv files
+  Hallmark <- system.file("data", "Hallmarks.csv", package = "MetaProViz")
+  Hallmark <- read.csv(Hallmark, check.names=FALSE)
+
+  # Return into environment
+  assign("Hallmark_Pathways", Hallmark, envir=.GlobalEnv)
+}
+
+
+
+##########################################################################################
 ### ### ### Get Metabolite Pathways using Cosmos prior knowledge ### ### ###
 ##########################################################################################
 #'
