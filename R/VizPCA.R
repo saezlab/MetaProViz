@@ -286,6 +286,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
+  #gtable::gtable_show_layout(plottable)
   if(is.null(SettingsInfo)==TRUE){
     #-----widths
     plottable$widths[5] <- unit(8, "cm")#controls x-axis
