@@ -230,3 +230,42 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
 
 
+##########################################################################################
+### ### ### Load MetaLinksDB prior knowledge ### ### ###
+##########################################################################################
+#'
+#' Function to
+#'
+#' @param x test
+#'
+#' @export
+
+LoadMetalinks <- function(){
+  #https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
+
+  metalinks_db_url <- "https://figshare.com/ndownloader/files/47567597"
+
+  # Download the Metalinks database file
+  download.file(metalinks_db_url, destfile = "metalinks.db")
+
+  # Connect to the SQLite database
+  con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
+  tables <- DBI::dbListTables(con)
+
+  query <- "SELECT * FROM metalinks"
+  metalinks_data <- DBI::dbGetQuery(con, query)
+
+
+  columns_query <- "PRAGMA table_info(metalinks)"
+  columns_info <-  DBI::dbGetQuery(con, columns_query)
+
+  # Close the connection
+  DBI::dbDisconnect(con)
+
+  #try to delete sqlite and then see if error is not there anymore (Error: database disk image is malformed)
+  #file.remove("metalinks.db")
+
+
+}
+
+
