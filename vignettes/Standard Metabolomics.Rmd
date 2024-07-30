@@ -84,7 +84,7 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 We can load the `ToyData`, which includes columns with Sample information and columns with the measured metabolite integrated peaks.\
 ```{r}
-MetaProViz::ToyData(data="Standard")
+MetaProViz::ToyData(data="IntraCells_Raw")
 ```
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
@@ -97,7 +97,7 @@ Intra[1:5, c(1:4,21,44)]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MetaProViz::ToyData(data="MappingInfo")
+MetaProViz::ToyData(data="Cells_MetaData")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:

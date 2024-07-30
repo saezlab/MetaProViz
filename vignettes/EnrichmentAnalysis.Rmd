@@ -93,7 +93,17 @@ Intra_DMA_786M1A_vs_HK2[1:5, c(1:12)]%>%
 ```
 
 * update toy_data to include the HMDB IDs!
-* Add ccRCC Hakimi et all toy data --> more interesting for metadata analysis --> more interesting in terms of duplicated HMDB IDs
+
+Here we load publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
+
+```{r}
+devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
+
+# Load the example data:
+MetaProViz::ToyData(data="Tissue_Norm")
+
+```
+
 * Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
 
 * Add MetaProViz::CheckNames --> showcase with other data maybe (data where we do have doublons or missing IDs?) --> explain here why this is needed in metabolomics

@@ -85,7 +85,7 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 `1.` CoRe experiment **(CoRe)** \
 The raw data are available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
 ```{r}
-MetaProViz::ToyData(data="CoRe")
+MetaProViz::ToyData(data="CultureMedia_Raw")
 
 ```
 ```{r, echo=FALSE}
@@ -98,7 +98,7 @@ Media[6:12, 1:8]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MetaProViz::ToyData(data="MappingInfo")
+MetaProViz::ToyData(data="Cells_MetaData")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -403,7 +403,7 @@ MCA_CORE[,1:6]%>%
 Now we can load the corresponding pre-processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
 ```{r}
 #Load the Pre-processed intracellular data:
-MetaProViz::ToyData(data="Standard_DMA")
+MetaProViz::ToyData(data="IntraCells_DMA")
 
 #Perform metabolite clustering:
 MCA_CoRe_res <- MetaProViz::MCA_CoRe(InputData_Intra =Intra_DMA_786M1A_vs_HK2 ,

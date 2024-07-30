@@ -21,7 +21,7 @@
 
 #' Imports toy data into environment
 #'
-#' @param data Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load
+#' @param data Either "IntraCells_Raw", "IntraCells_DMA", "CultureMedia_Raw", "Cells_MetaData", "Tissue_Norm" or "Tissue_MetaData" depending which data you would like to load
 #' @title Toy Data Import
 #' @description Import and process .csv file to create toy data.
 #' @importFrom utils read.csv
@@ -30,32 +30,44 @@
 #'
 ToyData <- function(data) {
   # Read the .csv files
-  Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
-  Intra<- read.csv(Intra, check.names=FALSE)%>%
+  IntraCells <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
+  IntraCells<- read.csv(IntraCells, check.names=FALSE)%>%
     column_to_rownames("Code")
 
-  Intra_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
-  Intra_DMA<- read.csv(Intra_DMA, check.names=FALSE)
+  IntraCells_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
+  IntraCells_DMA<- read.csv(IntraCells_DMA, check.names=FALSE)
 
   Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
   Media<- read.csv(Media, check.names=FALSE)%>%
     column_to_rownames("Code")
 
-  Pathways <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
-  Pathways<- read.csv(Pathways, check.names=FALSE)%>%
+  Cells_MetaData <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
+  Cells_MetaData<- read.csv(Cells_MetaData, check.names=FALSE)%>%
+    column_to_rownames("Metabolite")
+
+  Tissue_Norm <- system.file("data", "Hakimi_ccRCC-Tissue_Data.csv", package = "MetaProViz")
+  Tissue_Norm<- read.csv(Tissue_Norm, check.names=FALSE)%>%
+    column_to_rownames("Code")
+
+  Tissue_MetaData <- system.file("data", "Hakimi_ccRCC-Tissue_FeatureMetaData.csv", package = "MetaProViz")
+  Tissue_MetaData<- read.csv(Tissue_MetaData, check.names=FALSE)%>%
     column_to_rownames("Metabolite")
 
   # Return the toy data into environment
-  if(data=="Standard"){
-    assign("Intra", Intra, envir=.GlobalEnv)
-  } else if(data=="Standard_DMA"){
-    assign("Intra_DMA_786M1A_vs_HK2",  Intra_DMA, envir=.GlobalEnv)
-  }else if(data=="CoRe"){
+  if(data=="IntraCells_Raw"){
+    assign("Intra", IntraCells, envir=.GlobalEnv)
+  } else if(data=="IntraCells_DMA"){
+    assign("Intra_DMA_786M1A_vs_HK2",  IntraCells_DMA, envir=.GlobalEnv)
+  }else if(data=="CultureMedia_Raw"){
     assign("Media", Media, envir=.GlobalEnv)
-  } else if(data=="MappingInfo"){
-    assign("MappingInfo", Pathways, envir=.GlobalEnv)
+  } else if(data=="Cells_MetaData"){
+    assign("MappingInfo", Cells_MetaData, envir=.GlobalEnv)
+  } else if(data=="Tissue_Norm"){
+    assign("Tissue_Norm", Tissue_Norm, envir=.GlobalEnv)
+  } else if(data=="Tissue_MetaData"){
+    assign("Tissue_MetaData", Tissue_MetaData, envir=.GlobalEnv)
   } else{
-    warning("Please choose a toy dataset you would like to use: Standard, CoRe, Pathways")
+    warning("Please choose a toy dataset you would like to use: IntraCells_Raw, IntraCells_DMA, CultureMedia_Raw, Cells_MetaData, Tissue_Norm, Tissue_MetaData")
   }
 }
 
