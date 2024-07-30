@@ -242,20 +242,21 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
 LoadMetalinks <- function(){
   #https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
-
+  #library(RSQLite)
   metalinks_db_url <- "https://figshare.com/ndownloader/files/47567597"
 
   # Download the Metalinks database file
-  download.file(metalinks_db_url, destfile = "metalinks.db")
+  download.file(metalinks_db_url, destfile = "metalinks.db", mode = "wb")#WB: This mode is used for writing binary files. It opens the destination file for writing in binary mode.
 
   # Connect to the SQLite database
   con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
   tables <- DBI::dbListTables(con)
 
-  query <- "SELECT * FROM metalinks"
+  # Query the database for a specific table
+  query <- "SELECT * FROM cell_location"
   metalinks_data <- DBI::dbGetQuery(con, query)
 
-
+  # Query the database for the columns of a specific table
   columns_query <- "PRAGMA table_info(metalinks)"
   columns_info <-  DBI::dbGetQuery(con, columns_query)
 
