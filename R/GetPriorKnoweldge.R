@@ -145,7 +145,7 @@ LoadHallmarks <- function() {
 #' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
 #'
 #' @param Input_GeneSet Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
-#' @param Target \emph{Optional: }  Column name of Target in Input_GeneSet. \strong{Default = "gene}
+#' @param Target \emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = "gene")
 #' @param OutputName {Optional:} String which is added to the output files name.\strong(Default = NULL)
 #' @param FolderPath {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
@@ -236,35 +236,214 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 #'
 #' Function to
 #'
-#' @param x test
+#' @param  types Desired edge types. Options are: "lr", "pd", where 'lr' stands for 'ligand-receptor' and 'pd' stands for 'production-degradation'.\strong(Default = NULL)
+#' @param  cell_location Desired metabolite cell locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Cytoplasm", "Endoplasmic reticulum", "Extracellular", "Lysosome" , "Mitochondria", "Peroxisome", "Membrane", "Nucleus", "Golgi apparatus" , "Inner mitochondrial membrane". \strong(Default = NULL)
+#' @param  tissue_location Desired metabolite tissue locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Placenta", "Adipose Tissue","Bladder", "Brain", "Epidermis","Kidney", "Liver", "Neuron", "Pancreas", "Prostate", "Skeletal Muscle", "Spleen", "Testis", "Thyroid Gland", "Adrenal Medulla", "Erythrocyte","Fibroblasts", "Intestine", "Ovary", "Platelet", "All Tissues", "Semen", "Adrenal Gland", "Adrenal Cortex", "Heart", "Lung", "Hair", "Eye Lens", "Leukocyte", Retina", "Smooth Muscle", "Gall Bladder", "Bile",  "Bone Marrow", "Blood", "Basal Ganglia", "Cartilage". \strong(Default = NULL)
+#' @param  biospecimen_location Desired metabolite biospecimen locations.Pass selection using c("Select1", "Select2", "Selectn").View options setting "?".  "Blood", "Feces", "Saliva", "Sweat", "Urine", "Breast Milk", "Cellular Cytoplasm", "Cerebrospinal Fluid (CSF)", "Amniotic Fluid" , "Aqueous Humour", "Ascites Fluid", "Lymph", "Tears", "Breath", "Bile", "Semen", "Pericardial Effusion".\strong(Default = NULL)
+#' @param  disease Desired metabolite diseases.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". \strong(Default = NULL)
+#' @param  pathway Desired metabolite pathways.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
+#' @param  hmdb_ids Desired HMDB IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
+#' @param  uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
 #'
 #' @export
 
-LoadMetalinks <- function(){
-  #https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
-  #library(RSQLite)
-  metalinks_db_url <- "https://figshare.com/ndownloader/files/47567597"
+LoadMetalinks <- function(types = NULL,
+                          cell_location = NULL,
+                          tissue_location = NULL,
+                          biospecimen_location = NULL,
+                          disease = NULL,
+                          pathway = NULL,
+                          hmdb_ids = NULL,
+                          uniprot_ids = NULL){
+  #------------------------------------------------------------------
+  #Get the package:
+  RequiredPackages <- c("rappdirs")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
 
-  # Download the Metalinks database file
-  download.file(metalinks_db_url, destfile = "metalinks.db", mode = "wb")#WB: This mode is used for writing binary files. It opens the destination file for writing in binary mode.
+  #------------------------------------------------------------------
+  if((any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids)=="?"))==FALSE){
+  #Check Input parameters
 
-  # Connect to the SQLite database
-  con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
+
+
+    }
+
+
+  #------------------------------------------------------------------
+  #Get the directory and filepath of cache results of R
+  directory <- rappdirs::user_cache_dir()#get chache directory
+  File_path <-paste(directory, "/metalinks.db", sep="")
+
+  if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
+    # Connect to the SQLite database
+    con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
+    message("Cached file loaded from: ", File_path)
+  }else{# load from API
+    RequiredPackages <- c("tidyverse", "RSQLite", "DBI")
+    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+    if(length(new.packages)) install.packages(new.packages)
+
+    suppressMessages(library(tidyverse))
+
+    #--------------------------------------------------------------------------------------------
+    #Python availability via Liana: https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
+    metalinks_db_url <- "https://figshare.com/ndownloader/files/47567597"
+    # Download the Metalinks database file and save where the cache is stored
+    download.file(metalinks_db_url, destfile =  File_path , mode = "wb")#WB: This mode is used for writing binary files. It opens the destination file for writing in binary mode.
+    message("Metalinks database downloaded and saved to: ", File_path)
+
+    # Connect to the SQLite database
+    con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
+  }
+
+  #------------------------------------------------------------------
+  #Query the database for a specific tables
   tables <- DBI::dbListTables(con)
 
-  # Query the database for a specific table
-  query <- "SELECT * FROM cell_location"
-  metalinks_data <- DBI::dbGetQuery(con, query)
-
-  # Query the database for the columns of a specific table
-  columns_query <- "PRAGMA table_info(metalinks)"
-  columns_info <-  DBI::dbGetQuery(con, columns_query)
+  TablesList <- list()
+  for(table in tables){
+    query <- paste("SELECT * FROM", table)
+    data <- DBI::dbGetQuery(con, query)
+    TablesList[[table]] <- data
+  }
 
   # Close the connection
   DBI::dbDisconnect(con)
 
-  #try to delete sqlite and then see if error is not there anymore (Error: database disk image is malformed)
-  #file.remove("metalinks.db")
+  MetalinksDB <- TablesList[["edges"]]#extract the edges table
+  #------------------------------------------------------------------
+  # Answer questions about the database
+  #if any parameter is ? then return the data
+  if(any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids)=="?")){
+    Questions <- which(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids)=="?")
+    #Check tables where the user has questions
+    if(length(Questions)>0){
+      for(i in Questions){
+        if(i==1){
+          print("Types:")
+          print(unique(MetalinksDB$type))
+        }
+        if(i==2){
+          print("Cell Location:")
+          CellLocation <- TablesList[["cell_location"]]
+          print(unique(CellLocation$cell_location))
+        }
+        if(i==3){
+          print("Tissue Location:")
+          TissueLocation <- TablesList[["tissue_location"]]
+          print(unique(TissueLocation$tissue_location))
+        }
+        if(i==4){
+          print("Biospecimen Location:")
+          BiospecimenLocation <- TablesList[["biospecimen_location"]]
+          print(unique(BiospecimenLocation$biospecimen_location))
+        }
+        if(i==5){
+          print("Disease:")
+          Disease <- TablesList[["disease"]]
+          print(unique(Disease$disease))
+        }
+        if(i==6){
+          print("Pathway:")
+          Pathway <- TablesList[["pathway"]]
+          print(unique(Pathway$pathway))
+        }
+        if(i==7){
+          print("HMDB IDs:")
+          print(unique(MetalinksDB$hmdb))
+        }
+        if(i==8){
+          print("UniProt IDs:")
+          print(unique(MetalinksDB$uniprot))
+        }
+      }
+    }
+    stop("Please use possible options for your selections.")
+  }
+
+  #------------------------------------------------------------------
+  #Extract specific connections based on parameter settings. If any parameter is not NULL, filter the data:
+  ## types
+  if(!is.null(types)){
+    MetalinksDB <- MetalinksDB[MetalinksDB$type %in% types,]
+  }
+
+  ## cell_location
+  if(!is.null(cell_location)){
+    CellLocation <- TablesList[["cell_location"]]
+    CellLocation <- CellLocation[CellLocation$cell_location %in% cell_location,]#Filter the cell location
+
+    #Get unique HMDB IDs
+    CellLocation_HMDB <- unique(CellLocation$hmdb)
+
+    #Only keep selected HMDB IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  CellLocation_HMDB,]
+  }
+
+  ## tissue_location
+  if(!is.null(tissue_location)){# "All Tissues"?
+    TissueLocation <- TablesList[["tissue_location"]]
+    TissueLocation <- TissueLocation[TissueLocation$tissue_location %in% tissue_location,]#Filter the tissue location
+
+    #Get unique HMDB IDs
+    TissueLocation_HMDB <- unique(TissueLocation$hmdb)
+
+    #Only keep selected HMDB IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  TissueLocation_HMDB,]
+  }
+
+  ## biospecimen_location
+  if(!is.null(biospecimen_location)){
+    BiospecimenLocation <- TablesList[["biospecimen_location"]]
+    BiospecimenLocation <- BiospecimenLocation[BiospecimenLocation$biospecimen_location %in% biospecimen_location,]#Filter the biospecimen location
+
+    #Get unique HMDB IDs
+    BiospecimenLocation_HMDB <- unique(BiospecimenLocation$hmdb)
+
+    #Only keep selected HMDB IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  BiospecimenLocation_HMDB,]
+  }
+
+  ## disease
+  if(!is.null(disease)){
+    Disease <- TablesList[["disease"]]
+    Disease <- Disease[Disease$disease %in% disease,]#Filter the disease
+
+    #Get unique HMDB IDs
+    Disease_HMDB <- unique(Disease$hmdb)
+
+    #Only keep selected HMDB IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  Disease_HMDB,]
+  }
+
+  ## pathway
+  if(!is.null(pathway)){
+    Pathway <- TablesList[["pathway"]]
+    Pathway <- Pathway[Pathway$pathway %in% pathway,]#Filter the pathway
+
+    #Get unique HMDB IDs
+    Pathway_HMDB <- unique(Pathway$hmdb)
+
+    #Only keep selected HMDB IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  Pathway_HMDB,]
+  }
+
+  ## hmdb_ids
+  if(!is.null(hmdb_ids)){
+    #Only keep selected HMDB IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  hmdb_ids,]
+  }
+
+  ## uniprot_ids
+  if(!is.null(uniprot_ids)){
+    #Only keep selected UniProt IDs
+    MetalinksDB <- MetalinksDB[MetalinksDB$uniprot %in%  uniprot_ids,]
+  }
+
+
+  #Return into environment
+  assign("MetalinksDB", MetalinksDB, envir=.GlobalEnv)
 
 
 }
