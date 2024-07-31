@@ -112,6 +112,10 @@ LoadKEGG <- function(){
     saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
   }
 
+
+  #Use translate ID function to add other ID types (HMDB, ChEBI, PubChem)
+
+
   #Return into environment
   assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
 }
@@ -218,6 +222,10 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   #combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
   GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=Target), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
 
+
+  ## Add other ID types (HMDB, ChEBI, PubChem)
+
+
   ##-------------- Save and return
   if(is.null(OutputName)){
     write.csv(GeneMetabSet, paste(Results_folder_GeneMetabSet_folder, "/GeneMetabSet.csv", sep = ""), row.names = FALSE)
@@ -268,6 +276,10 @@ LoadMetalinks <- function(types = NULL,
 
 
     }
+
+  #Python version enables the user to add their own link to the database dump (probably to obtain a specific version. Lets check how the link was generated and see if it would make sense for us to do the same.)
+  # --> At the moment abritrary!
+  # We could provide the user the aboility to point to their own path were they already dumpled/stored qa version of metalinks they like to use!
 
 
   #------------------------------------------------------------------
@@ -440,6 +452,9 @@ LoadMetalinks <- function(types = NULL,
     #Only keep selected UniProt IDs
     MetalinksDB <- MetalinksDB[MetalinksDB$uniprot %in%  uniprot_ids,]
   }
+
+  #------------------------------------------------------------------
+  #Decide on useful selections term-metabolite for MetaProViz. return multiple dfs.
 
 
   #Return into environment
