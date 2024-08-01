@@ -80,6 +80,7 @@ devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
 \
 <span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
+
 `1.`Cell line experiment **(CellLine)** \
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 Here we load the processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
@@ -106,8 +107,10 @@ MetaProViz::ToyData(data="Tissue_Norm")
 
 ```
 
-`3.` 
+
+`3.`  
 * Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
+* Maybe add the data from the paper of the 3D cell culture model of ccRCC
 
 
 \
@@ -197,11 +200,13 @@ Test <- MetaProViz:::Make_GeneMetabSet(Input_GeneSet,
 * Enable the same MetaLinks accessibility as Daniel did in python within Liana!
 
 ```{r}
-# Issue: metalinks seems corrupted!
-
-
-
-
+MetaProViz:::LoadMetalinks()
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetalinksDB[c(1:8),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `MetaLinks` including metabolite-receptor sets.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
 ```
 

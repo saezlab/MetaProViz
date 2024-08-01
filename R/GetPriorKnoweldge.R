@@ -244,15 +244,17 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 #'
 #' Function to
 #'
-#' @param  types Desired edge types. Options are: "lr", "pd", where 'lr' stands for 'ligand-receptor' and 'pd' stands for 'production-degradation'.\strong(Default = NULL)
-#' @param  cell_location Desired metabolite cell locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Cytoplasm", "Endoplasmic reticulum", "Extracellular", "Lysosome" , "Mitochondria", "Peroxisome", "Membrane", "Nucleus", "Golgi apparatus" , "Inner mitochondrial membrane". \strong(Default = NULL)
-#' @param  tissue_location Desired metabolite tissue locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Placenta", "Adipose Tissue","Bladder", "Brain", "Epidermis","Kidney", "Liver", "Neuron", "Pancreas", "Prostate", "Skeletal Muscle", "Spleen", "Testis", "Thyroid Gland", "Adrenal Medulla", "Erythrocyte","Fibroblasts", "Intestine", "Ovary", "Platelet", "All Tissues", "Semen", "Adrenal Gland", "Adrenal Cortex", "Heart", "Lung", "Hair", "Eye Lens", "Leukocyte", Retina", "Smooth Muscle", "Gall Bladder", "Bile",  "Bone Marrow", "Blood", "Basal Ganglia", "Cartilage". \strong(Default = NULL)
-#' @param  biospecimen_location Desired metabolite biospecimen locations.Pass selection using c("Select1", "Select2", "Selectn").View options setting "?".  "Blood", "Feces", "Saliva", "Sweat", "Urine", "Breast Milk", "Cellular Cytoplasm", "Cerebrospinal Fluid (CSF)", "Amniotic Fluid" , "Aqueous Humour", "Ascites Fluid", "Lymph", "Tears", "Breath", "Bile", "Semen", "Pericardial Effusion".\strong(Default = NULL)
-#' @param  disease Desired metabolite diseases.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". \strong(Default = NULL)
-#' @param  pathway Desired metabolite pathways.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
-#' @param  hmdb_ids Desired HMDB IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
-#' @param  uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
-#'
+#' @param types Desired edge types. Options are: "lr", "pd", where 'lr' stands for 'ligand-receptor' and 'pd' stands for 'production-degradation'.\strong(Default = NULL)
+#' @param cell_location Desired metabolite cell locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Cytoplasm", "Endoplasmic reticulum", "Extracellular", "Lysosome" , "Mitochondria", "Peroxisome", "Membrane", "Nucleus", "Golgi apparatus" , "Inner mitochondrial membrane". \strong(Default = NULL)
+#' @param tissue_location Desired metabolite tissue locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Placenta", "Adipose Tissue","Bladder", "Brain", "Epidermis","Kidney", "Liver", "Neuron", "Pancreas", "Prostate", "Skeletal Muscle", "Spleen", "Testis", "Thyroid Gland", "Adrenal Medulla", "Erythrocyte","Fibroblasts", "Intestine", "Ovary", "Platelet", "All Tissues", "Semen", "Adrenal Gland", "Adrenal Cortex", "Heart", "Lung", "Hair", "Eye Lens", "Leukocyte", Retina", "Smooth Muscle", "Gall Bladder", "Bile",  "Bone Marrow", "Blood", "Basal Ganglia", "Cartilage". \strong(Default = NULL)
+#' @param biospecimen_location Desired metabolite biospecimen locations.Pass selection using c("Select1", "Select2", "Selectn").View options setting "?".  "Blood", "Feces", "Saliva", "Sweat", "Urine", "Breast Milk", "Cellular Cytoplasm", "Cerebrospinal Fluid (CSF)", "Amniotic Fluid" , "Aqueous Humour", "Ascites Fluid", "Lymph", "Tears", "Breath", "Bile", "Semen", "Pericardial Effusion".\strong(Default = NULL)
+#' @param disease Desired metabolite diseases.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". \strong(Default = NULL)
+#' @param pathway Desired metabolite pathways.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
+#' @param hmdb_ids Desired HMDB IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
+#' @param uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong(Default = NULL)
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+
 #' @export
 
 LoadMetalinks <- function(types = NULL,
@@ -262,7 +264,9 @@ LoadMetalinks <- function(types = NULL,
                           disease = NULL,
                           pathway = NULL,
                           hmdb_ids = NULL,
-                          uniprot_ids = NULL){
+                          uniprot_ids = NULL,
+                          SaveAs_Table="csv",
+                          FolderPath=NULL){
   #------------------------------------------------------------------
   #Get the package:
   RequiredPackages <- c("rappdirs")
@@ -289,7 +293,7 @@ LoadMetalinks <- function(types = NULL,
 
   if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
     # Connect to the SQLite database
-    con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
+    con <- DBI::dbConnect(RSQLite::SQLite(), File_path, synchronous = NULL)
     message("Cached file loaded from: ", File_path)
   }else{# load from API
     RequiredPackages <- c("tidyverse", "RSQLite", "DBI")
@@ -306,7 +310,7 @@ LoadMetalinks <- function(types = NULL,
     message("Metalinks database downloaded and saved to: ", File_path)
 
     # Connect to the SQLite database
-    con <- DBI::dbConnect(RSQLite::SQLite(), "metalinks.db", synchronous = NULL)
+    con <- DBI::dbConnect(RSQLite::SQLite(), File_path, synchronous = NULL)
   }
 
   #------------------------------------------------------------------
@@ -454,7 +458,33 @@ LoadMetalinks <- function(types = NULL,
   }
 
   #------------------------------------------------------------------
-  #Decide on useful selections term-metabolite for MetaProViz. return multiple dfs.
+  #Add other ID types:
+  ## Metabolite Name
+  MetalinksDB <- merge(MetalinksDB, TablesList[["metabolites"]], by="hmdb", all.x=TRUE)
+
+  ## Gene Name
+  MetalinksDB <- merge(MetalinksDB, TablesList[["proteins"]], by="uniprot", all.x=TRUE)
+
+  ## Rearrange columns:
+  MetalinksDB <- MetalinksDB[,c(2,10:12, 1, 13:14, 3:9)]%>%
+    mutate(type = case_when(
+      type == "lr" ~ "Ligand-Receptor",
+      type == "pd" ~ "Production-Degradation",
+      TRUE ~ type  # this keeps the original value if it doesn't match any condition
+    ))
+  #------------------------------------------------------------------
+  #Remove metabolites that are not detectable by mass spectrometry
+
+
+
+  #------------------------------------------------------------------
+  #Decide on useful selections term-metabolite for MetaProViz.
+
+
+
+
+  #------------------------------------------------------------------
+  #Save results in folder
 
 
   #Return into environment
