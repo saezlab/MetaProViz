@@ -19,44 +19,42 @@
 ## ---------------------------
 
 
-#' Imports toy data into environment
+#' Access built-in example data
 #'
-#' @param data Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load
-#' @title Toy Data Import
-#' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
+#' @param name Character: name of a built-in dataset; "Intra",
+#'    "Intra_DMA", "Media" or "Pathways" are availale.
+#'
 #' @return A data frame containing the toy data.
-#' @export
 #'
-ToyData <- function(data) {
+#' @description Import and process .csv file to create toy data.
+#'
+#' @examples
+#' intra <- ToyData("Intra")
+#'
+#' @importFrom readr read_csv cols
+#' @importFrom magrittr %>% extract2
+#' @importFrom tibble column_to_rownames
+#' @export
+ToyData <- function(name) {
   # Read the .csv files
-  Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
-  Intra<- read.csv(Intra, check.names=FALSE)%>%
-    column_to_rownames("Code")
 
-  Intra_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
-  Intra_DMA<- read.csv(Intra_DMA, check.names=FALSE)
+  datasets <- list(
+        Intra = "MS55_RawPeakData.csv",
+        Intra_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
+        Media = "MS51_RawPeakData.csv",
+        Pathways = "MappingTable_SelectPathways.csv"
+  )
 
-  Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
-  Media<- read.csv(Media, check.names=FALSE)%>%
-    column_to_rownames("Code")
-
-  Pathways <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
-  Pathways<- read.csv(Pathways, check.names=FALSE)%>%
-    column_to_rownames("Metabolite")
-
-  # Return the toy data into environment
-  if(data=="Standard"){
-    assign("Intra", Intra, envir=.GlobalEnv)
-  } else if(data=="Standard_DMA"){
-    assign("Intra_DMA_786M1A_vs_HK2",  Intra_DMA, envir=.GlobalEnv)
-  }else if(data=="CoRe"){
-    assign("Media", Media, envir=.GlobalEnv)
-  } else if(data=="MappingInfo"){
-    assign("MappingInfo", Pathways, envir=.GlobalEnv)
-  } else{
-    warning("Please choose a toy dataset you would like to use: Standard, CoRe, Pathways")
+  if (!name %in% names(datasets)) {
+    stop(sprintf("No such dataset: `%s`.", name))
   }
+
+  datasets %>%
+  extract2(name) %>%
+  system.file("data", ., package = "MetaProViz") %>%
+  read_csv(col_types = cols()) %>%
+  column_to_rownames(`if`(name == "Pathways", "Metabolite", "Code"))
+
 }
 
 
@@ -72,8 +70,6 @@ ToyData <- function(data) {
 #'
 #' @keywords Create folder and path
 #' @noRd
-#'
-
 SavePath<- function(FolderName, FolderPath){
   #Check if FolderName includes special characters that are not allowed
   cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
