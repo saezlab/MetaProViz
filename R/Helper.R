@@ -39,13 +39,16 @@ ToyData <- function(name) {
   # Read the .csv files
 
   datasets <- list(
-        Intra = "MS55_RawPeakData.csv",
-        Intra_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
-        Media = "MS51_RawPeakData.csv",
-        Pathways = "MappingTable_SelectPathways.csv"
+        IntraCells_Raw = "MS55_RawPeakData.csv",
+        IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
+        CultureMedia_Raw = "MS51_RawPeakData.csv",
+        Cells_MetaData = "MappingTable_SelectPathways.csv",
+        Tissue_Norm = ,
+        Tissue_MetaData =
   )
 
   if (!name %in% names(datasets)) {
+    # TODO: show names of available
     stop(sprintf("No such dataset: `%s`.", name))
   }
 
