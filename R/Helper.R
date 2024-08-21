@@ -19,56 +19,42 @@
 ## ---------------------------
 
 
-#' Imports toy data into environment
+#' Access built-in example data
 #'
-#' @param data Either "IntraCells_Raw", "IntraCells_DMA", "CultureMedia_Raw", "Cells_MetaData", "Tissue_Norm" or "Tissue_MetaData" depending which data you would like to load
-#' @title Toy Data Import
-#' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
+#' @param name Character: name of a built-in dataset; "Intra",
+#'    "Intra_DMA", "Media" or "Pathways" are availale.
+#'
 #' @return A data frame containing the toy data.
-#' @export
 #'
-ToyData <- function(data) {
+#' @description Import and process .csv file to create toy data.
+#'
+#' @examples
+#' intra <- ToyData("Intra")
+#'
+#' @importFrom readr read_csv cols
+#' @importFrom magrittr %>% extract2
+#' @importFrom tibble column_to_rownames
+#' @export
+ToyData <- function(name) {
   # Read the .csv files
-  IntraCells <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
-  IntraCells<- read.csv(IntraCells, check.names=FALSE)%>%
-    column_to_rownames("Code")
 
-  IntraCells_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
-  IntraCells_DMA<- read.csv(IntraCells_DMA, check.names=FALSE)
+  datasets <- list(
+        Intra = "MS55_RawPeakData.csv",
+        Intra_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
+        Media = "MS51_RawPeakData.csv",
+        Pathways = "MappingTable_SelectPathways.csv"
+  )
 
-  Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
-  Media<- read.csv(Media, check.names=FALSE)%>%
-    column_to_rownames("Code")
-
-  Cells_MetaData <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
-  Cells_MetaData<- read.csv(Cells_MetaData, check.names=FALSE)%>%
-    column_to_rownames("Metabolite")
-
-  Tissue_Norm <- system.file("data", "Hakimi_ccRCC-Tissue_Data.csv", package = "MetaProViz")
-  Tissue_Norm<- read.csv(Tissue_Norm, check.names=FALSE)%>%
-    column_to_rownames("Code")
-
-  Tissue_MetaData <- system.file("data", "Hakimi_ccRCC-Tissue_FeatureMetaData.csv", package = "MetaProViz")
-  Tissue_MetaData<- read.csv(Tissue_MetaData, check.names=FALSE)%>%
-    column_to_rownames("Metabolite")
-
-  # Return the toy data into environment
-  if(data=="IntraCells_Raw"){
-    assign("Intra", IntraCells, envir=.GlobalEnv)
-  } else if(data=="IntraCells_DMA"){
-    assign("Intra_DMA_786M1A_vs_HK2",  IntraCells_DMA, envir=.GlobalEnv)
-  }else if(data=="CultureMedia_Raw"){
-    assign("Media", Media, envir=.GlobalEnv)
-  } else if(data=="Cells_MetaData"){
-    assign("MappingInfo", Cells_MetaData, envir=.GlobalEnv)
-  } else if(data=="Tissue_Norm"){
-    assign("Tissue_Norm", Tissue_Norm, envir=.GlobalEnv)
-  } else if(data=="Tissue_MetaData"){
-    assign("Tissue_MetaData", Tissue_MetaData, envir=.GlobalEnv)
-  } else{
-    warning("Please choose a toy dataset you would like to use: IntraCells_Raw, IntraCells_DMA, CultureMedia_Raw, Cells_MetaData, Tissue_Norm, Tissue_MetaData")
+  if (!name %in% names(datasets)) {
+    stop(sprintf("No such dataset: `%s`.", name))
   }
+
+  datasets %>%
+  extract2(name) %>%
+  system.file("data", ., package = "MetaProViz") %>%
+  read_csv(col_types = cols()) %>%
+  column_to_rownames(`if`(name == "Pathways", "Metabolite", "Code"))
+
 }
 
 
@@ -84,8 +70,6 @@ ToyData <- function(data) {
 #'
 #' @keywords Create folder and path
 #' @noRd
-#'
-
 SavePath<- function(FolderName, FolderPath){
   #Check if FolderName includes special characters that are not allowed
   cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
