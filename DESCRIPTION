@@ -21,8 +21,10 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-Imports: 
-    BiocManager,
+Depends:
+    R (>= 4.0)
+Imports:
+    dplyr,
     factoextra,
     ggfortify,
     ggplot2,
@@ -31,9 +33,10 @@ Imports:
     gtools,
     hash,
     inflection,
+    magrittr,
     patchwork,
     pheatmap,
     qcc,
+    readr,
     reshape,
-    tidyverse,
     writexl
