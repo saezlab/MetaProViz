@@ -21,42 +21,57 @@
 
 #' Access built-in example data
 #'
-#' @param name Character: name of a built-in dataset; "Intra",
-#'    "Intra_DMA", "Media" or "Pathways" are availale.
+#' @param name Character: name of a built-in dataset:
+#'     \itemize{
+#'         \item{\code{"IntraCells_Raw"}: }
+#'         \item{\code{"IntraCells_DMA"}: }
+#'         \item{\code{"CultureMedia_Raw"}: }
+#'         \item{\code{"Cells_MetaData"}: }
+#'         \item{\code{"Tissue_Norm"}: }
+#'         \item{\code{"Tissue_MetaData"}: }
+#'     }
 #'
 #' @return A data frame containing the toy data.
 #'
 #' @description Import and process .csv file to create toy data.
 #'
 #' @examples
-#' intra <- ToyData("Intra")
+#' intra <- ToyData("IntraCells_Raw")
 #'
 #' @importFrom readr read_csv cols
 #' @importFrom magrittr %>% extract2
 #' @importFrom tibble column_to_rownames
 #' @export
 ToyData <- function(name) {
-  # Read the .csv files
 
   datasets <- list(
-        IntraCells_Raw = "MS55_RawPeakData.csv",
-        IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
-        CultureMedia_Raw = "MS51_RawPeakData.csv",
-        Cells_MetaData = "MappingTable_SelectPathways.csv",
-        Tissue_Norm = ,
-        Tissue_MetaData =
+    IntraCells_Raw = "MS55_RawPeakData.csv",
+    IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
+    CultureMedia_Raw = "MS51_RawPeakData.csv",
+    Cells_MetaData = "MappingTable_SelectPathways.csv",
+    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv",
+    Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv"
   )
 
+  rncols <- c("Code", "Metabolite")
+
   if (!name %in% names(datasets)) {
-    # TODO: show names of available
-    stop(sprintf("No such dataset: `%s`.", name))
+    stop(sprintf(
+      "No such dataset: `%s`. Available datasets: %s",
+      name,
+      paste(names(datasets), collapse = ", ")
+    ))
   }
 
   datasets %>%
   extract2(name) %>%
   system.file("data", ., package = "MetaProViz") %>%
   read_csv(col_types = cols()) %>%
-  column_to_rownames(`if`(name == "Pathways", "Metabolite", "Code"))
+  {`if`(
+    (rncol <- names(.) %>% intersect(rncols)) %>% length,
+    column_to_rownames(., rncol),
+    .
+  )}
 
 }
 
