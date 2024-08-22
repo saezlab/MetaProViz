@@ -2,12 +2,13 @@
 % Please edit documentation in R/Helper.R
 \name{ToyData}
 \alias{ToyData}
-\title{Toy Data Import}
+\title{Access built-in example data}
 \usage{
-ToyData(data)
+ToyData(name)
 }
 \arguments{
-\item{data}{Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load}
+\item{name}{Character: name of a built-in dataset; "Intra",
+"Intra_DMA", "Media" or "Pathways" are availale.}
 }
 \value{
 A data frame containing the toy data.
@@ -15,6 +16,7 @@ A data frame containing the toy data.
 \description{
 Import and process .csv file to create toy data.
 }
-\details{
-Imports toy data into environment
+\examples{
+intra <- ToyData("Intra")
+
 }

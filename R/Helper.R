@@ -101,11 +101,23 @@ SavePath<- function(FolderName, FolderPath){
 }
 
 
+#' Make sure the results directory exists
+#'
+#' @importFrom magrittr %>%
+#' @noRd
+ResultsDir <- function(path = 'MetaProViz_Results') {
+
+  # TODO: options?
+  path %>% {`if`(!dir.exists(.), {dir.create(.); .}, .) }
+
+}
+
+
 ################################################################################################
 ### ### ### General helper function: Save tables and plot ### ### ###
 ################################################################################################
 
-#' SaveRes is the helper function to create the folder structure and path
+#' Create directory structure and path
 #'
 #' @param InputList_DF Generated within the MetaProViz function. Contains named DFs.
 #' @param InputList_Plot Generated within the MetaProViz function. Contains named Plots.

@@ -20,7 +20,6 @@ Description: MetaProViz can analyse standard metabolomics and
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
 Depends:
     R (>= 4.0)
 Imports:
@@ -40,3 +39,4 @@ Imports:
     readr,
     reshape,
     writexl
+RoxygenNote: 7.3.2
