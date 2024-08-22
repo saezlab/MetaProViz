@@ -7,8 +7,15 @@
 ToyData(name)
 }
 \arguments{
-\item{name}{Character: name of a built-in dataset; "Intra",
-"Intra_DMA", "Media" or "Pathways" are availale.}
+\item{name}{Character: name of a built-in dataset:
+\itemize{
+\item{\code{"IntraCells_Raw"}: }
+\item{\code{"IntraCells_DMA"}: }
+\item{\code{"CultureMedia_Raw"}: }
+\item{\code{"Cells_MetaData"}: }
+\item{\code{"Tissue_Norm"}: }
+\item{\code{"Tissue_MetaData"}: }
+}}
 }
 \value{
 A data frame containing the toy data.
@@ -17,6 +24,6 @@ A data frame containing the toy data.
 Import and process .csv file to create toy data.
 }
 \examples{
-intra <- ToyData("Intra")
+intra <- ToyData("IntraCells_Raw")
 
 }
