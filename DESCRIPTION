@@ -17,8 +17,12 @@ Description: MetaProViz can analyse standard metabolomics and
     metabolite analysis (DMA), clustering based on regulatory rules (MCA)
     and contains different visualisation methods to extract biological
     interpretable graphs and saves them in a publication ready format.
+URL: https://saezlab.github.io/MetaProViz
+BugReports: https://github.com/saezlab/MetaProViz/issues
+BiocViews: Metabolomics, QualityControl, SystemsBiology, Visualization
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
+VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.0)
@@ -39,4 +43,9 @@ Imports:
     readr,
     reshape,
     writexl
+Suggests:
+    BiocStyle,
+    knitr,
+    pkgdown,
+    testthat
 RoxygenNote: 7.3.2
