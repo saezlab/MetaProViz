@@ -37,6 +37,7 @@ Imports:
     hash,
     inflection,
     magrittr,
+    OmnipathR,
     patchwork,
     pheatmap,
     qcc,
@@ -48,4 +49,5 @@ Suggests:
     knitr,
     pkgdown,
     testthat
+Remotes: saezlab/OmnipathR
 RoxygenNote: 7.3.2
