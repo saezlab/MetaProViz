@@ -18,6 +18,52 @@
 ##
 ## ---------------------------
 
+
+##########################################################################################
+### ### ### Translate IDs to/from KEGG, PubChem, Chebi ### ### ###
+##########################################################################################
+#'
+#' @title Translate IDs
+#' @description Translate IDs to and from KEGG, PubChem, Chebi.
+#' @return A data frame containing the original data and the new column of translated ids, with only the first instance of each.
+#' @export
+#'
+TranslateID <- function(df, idcolname='MetaboliteID', from='kegg', to='pubchem'){
+  start_message <- glue::glue("Translating the {idcolname} column from <{from}> format to <{to}>. \nWARNING: Only the first translated ID from <{to}> will be returned for each unique ID from <{from}>.")
+  message(start_message)
+  suppressMessages(library(OmnipathR))
+  suppressMessages(library(tidyverse))
+
+  # Rename and use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings.
+  df_translated <- df %>%
+    dplyr::rename(!!from := idcolname) %>% #dplyr::rename(!!from := idcolname) %>%
+    OmnipathR::translate_ids(!!from, !!to, ramp = TRUE)
+
+  # Group by the 'from' column and summarize to get the count of items in each group (i.e. number of mappings per unique 'from' ID)
+  # Note that this currently assumes that the values are unique in the groupby column -
+  # which we have seen is NOT the case for the pathways... will need to be corrected!
+  group_counts <- df_translated %>%
+    group_by(!!sym(from)) %>%
+    summarize(count = n())
+
+  # Count how many groups have each number of items
+  group_summary <- group_counts %>%
+    count(count)
+
+  # Print the number of groups for each count
+  for (i in seq_len(nrow(group_summary))) {
+    message(glue::glue("{group_summary$n[i]} original ID row(s) from <{from}> were mapped to {group_summary$count[i]} <{to}> ID(s) each"))
+  }
+
+  # Group by 'group' and select the first row of each group
+  df_translated_first <- df_translated %>%
+    group_by(!!sym(from)) %>%
+    slice_head(n = 1)
+
+  return(df_translated_first)
+}
+
+
 ##########################################################################################
 ### ### ### Get KEGG prior knowledge ### ### ###
 ##########################################################################################
@@ -111,14 +157,20 @@ LoadKEGG <- function(){
     if(!dir.exists(directory)) {dir.create(directory)}
     saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
   }
-
-
+  print(dim(KEGG_Metabolite))
   #Use translate ID function to add other ID types (HMDB, ChEBI, PubChem)
-
+  #Note - have made this sequential, may need to change to keep the original idcolname (MetaboliteID) if downstream functions require it
+  #Should also be noted that currently translate ID only keeps the first mapped metabolite from the other source
+  #KEGG_Pathways_translated_first <- TranslateID(KEGG_Metabolite, idcolname='MetaboliteID', from='kegg', to='pubchem')
+  #KEGG_Pathways_translated_first <- TranslateID(KEGG_Pathways_translated_first, idcolname='kegg', from='kegg', to='chebi')
+  #KEGG_Pathways_translated_first <- TranslateID(KEGG_Pathways_translated_first, idcolname='kegg', from='kegg', to='hmdb')
 
   #Return into environment
+  #assign("KEGG_Pathways", KEGG_Pathways_translated_first, envir=.GlobalEnv) # will implement this once the groupby is better handled
   assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
+  print(dim(KEGG_Pathways))
 }
+
 
 
 ##########################################################################################
