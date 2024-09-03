@@ -49,6 +49,7 @@ Suggests:
     BiocStyle,
     knitr,
     pkgdown,
+    svglite,
     testthat
 Remotes: saezlab/OmnipathR
 RoxygenNote: 7.3.2
