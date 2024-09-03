@@ -29,7 +29,7 @@
 #' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}
 #' @param SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
 #' @param PlotName \emph{Optional: } String which is added to the output files of the plot
-#' @param Scale \emph{Optional: } String with the information for Scale row or column. \strong{Default = row}
+#' @param Scale \emph{Optional: } String with the information for Scale row, column or none. \strong{Default = row}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param Enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param Enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
@@ -77,7 +77,7 @@ VizHeatmap <- function(InputData,
     stop("Check input. The Enforce_FeatureNames and Enforce_SampleNames value should be either =TRUE or = FALSE.")
   }
 
-  Scale_options <- c("row","column")
+  Scale_options <- c("row","column", "none")
   if(Scale %in% Scale_options == FALSE){
       stop("Check input. The selected Scale option is not valid. Please select one of the folowwing: ",paste(Scale_options,collapse = ", "),"." )
     }
