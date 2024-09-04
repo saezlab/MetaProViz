@@ -38,17 +38,23 @@ TranslateID <- function(df, idcolname='MetaboliteID', from='kegg', to='pubchem')
   df_translated <- df %>%
     dplyr::rename(!!from := idcolname) %>% #dplyr::rename(!!from := idcolname) %>%
     OmnipathR::translate_ids(!!from, !!to, ramp = TRUE)
+  #return(df_translated)
 
   # Group by the 'from' column and summarize to get the count of items in each group (i.e. number of mappings per unique 'from' ID)
   # Note that this currently assumes that the values are unique in the groupby column -
   # which we have seen is NOT the case for the pathways... will need to be corrected!
   group_counts <- df_translated %>%
-    group_by(!!sym(from)) %>%
-    summarize(count = n())
+    group_by(across(c(!!sym(from), term))) %>% #in this case, we also want to group by the term for pathways, in the likely event some metabolites come from multiple pathways
+    summarize(count = n()) %>%
+    slice_head(n=1) %>% #take the first instance of each (i.e. pathway)
+    select(-term) %>% count(count) %>% select(-n)
 
   # Count how many groups have each number of items
   group_summary <- group_counts %>%
+    ungroup %>%
+    select(count) %>%
     count(count)
+  #return(group_counts)
 
   # Print the number of groups for each count
   for (i in seq_len(nrow(group_summary))) {
@@ -57,7 +63,7 @@ TranslateID <- function(df, idcolname='MetaboliteID', from='kegg', to='pubchem')
 
   # Group by 'group' and select the first row of each group
   df_translated_first <- df_translated %>%
-    group_by(!!sym(from)) %>%
+    group_by(across(c(!!sym(from), term))) %>% # here we are also grouping by the 'term' i.e. the pathway from KEGG. May need to make into a parameter at a later stage for more versatility.
     slice_head(n = 1)
 
   return(df_translated_first)
