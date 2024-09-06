@@ -1,0 +1,247 @@
+---
+title: "Tissue Metabolomics"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg Universiy
+output: 
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 1000px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+\
+Tissue metabolomics experiment is a standard metabolomics experiment using tissue samples (e.g. from animals or patients).\
+\
+<span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
+
+* To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+* To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors based on patients demographics like age, gender and tumour stage.\
+* Find the main metabolite drivers that separate patients based on their demographics like age, gender and tumour stage.\
+\
+First if you have not done yet, install the required dependencies and load the libraries:
+```{r message=FALSE, warning=FALSE}
+# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). 
+# 2. Install the latest development version from GitHub using devtools
+#devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+library(MetaProViz)
+
+#dependencies that need to be loaded:
+library(tidyverse)
+
+#Please install the Biocmanager Dependencies:
+#BiocManager::install("clusterProfiler")
+#BiocManager::install("EnhancedVolcano")
+```
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+# 1. Loading the example data
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
+Here we choose an example datasets, which is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs. Metabolomics was done using The company Metabolon, so this is untargeted metabolomics. Here we use the median normalised data from the supplementary table 2 of the paper. We have combined the metainformation about the patients with the metabolite measurements and removed not identified metabolites. Lastly, we have added a column "Stage" where Stage1 and Stage2 patients are summarised to "EARLY-STAGE" and Stage3 and Stage4 patients to "LATE-STAGE". Moreover, we have added a column "Age", where patients with "AGE AT SURGERY" <42 are defined as "Young" and patients with AGE AT SURGERY >58 as "Old" and the remaining patients as "Middle".\
+
+#<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
+`1.` Tissue experiment **(Intra)** \
+We can load the `ToyData`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
+```{r}
+devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
+
+# Load the example data:
+MetaProViz::ToyData(data="Tissue_Norm")
+
+```
+```{r, echo=FALSE}
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+# Check how our data looks like:
+Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Tissue_Norm` including columns with sample information and metabolite ids with their measured values.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+
+`2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
+```{r}
+MetaProViz::ToyData(data="Tissue_MetaData")
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Tissue_MetaData[1:5,c(1:2, 7:10)]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Tissue_MetaData` including the trivial metabolite identifiers used in the experiment as well as IDs and pathway information.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+# 2. Run MetaProViz Analysis
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+
+## Pre-processing
+This has been done by the authors of the paper and we will use the median normalise data. If you want to know how you can use the **MetaProViz** pre-processing module, please check out the vignette:\
+- [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
+- [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
+
+## Metadata analysis
+We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
+This is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs and in turn perform annova to find the main metabolite drivers that separate patients based on their demographics.\
+```{r}
+#Would it make sense here to separate tumour and normal for stage? --> meaning Normal-Stage1. Would this be useful for the other demographics too? --> e.g. Young-Stage1 
+#If yes, should we enable the user to pass a primary separator and secondary separators?
+
+MetaRes <- MetaProViz:::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
+                                    SettingsFile_Sample= Tissue_Norm[,c(2,4:5,7:8,11:13)]%>%dplyr::rename("Type_Stage"="TYPE-STAGE"),
+                                    Scaling = TRUE,
+                                    Percentage = 0.1,
+                                    SaveAs_Table = "csv",
+                                    SaveAs_Plot = "svg",
+                                    PrintPlot= TRUE,
+                                    FolderPath = NULL)
+
+
+```
+
+Now we can make individual heatmap of each demographic comparison of interest using the `MetaProViz::Heatmap()` function.\
+```{r}
+
+```
+
+```{r}
+
+# Move to prior knowledge!
+
+## ---------- ULM ------------##
+# Use the Sample metadata for this:
+if(is.null(SettingsInfo)==TRUE){
+  MetaData <- names(SettingsFile_Sample)
+  SettingsFile_Sample <- SettingsFile_Sample%>%
+    rownames_to_column("SampleID")
+}else{
+  MetaData <- SettingsInfo
+  SettingsFile_Sample_subset <- SettingsFile_Sample[, MetaData, drop = FALSE]%>%
+    rownames_to_column("SampleID")
+}
+
+# Convert into a pathway DF
+Metadata_df <- SettingsFile_Sample_subset %>%
+  pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry")%>%
+  unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
+Metadata_df$mor <- 1
+
+#Run ULM using decoupleR (input=PCs from prcomp and pkn=Metadata_df)
+ULM_res <- decoupleR::run_ulm(mat=as.matrix(PCA.res$x),
+                              net=Metadata_df,
+                              .source='term',
+                              .target='SampleID',
+                              .mor='mor',
+                              minsize = 5)
+
+#Add explained variance into the table:
+prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
+  rownames_to_column("PC")%>%
+  mutate(PC = paste("PC", PC, sep=""))%>%
+  dplyr::rename("Explained_Variance"=2)
+
+ULM_res <- merge(ULM_res, prop_var_ex,  by.x="condition",by.y="PC",all.x=TRUE)
+
+#Add top/bottom related features (= e.g. metabolites) to this
+## Create a data frame for top and bottom features for each PC
+TopBottom_Features <- lapply(2:ncol(PCA.res_Loadings), function(i){
+  #Make input
+  pc_loadings <- PCA.res_Loadings[, c("FeatureID", names(PCA.res_Loadings)[i])]
+  #get top and bottom features
+  n_features <- nrow(pc_loadings)
+  n_selected <- round(Percentage * n_features)
+
+  top_features <- as.data.frame(head(arrange(pc_loadings, desc(!!sym(names(pc_loadings)[2]))), n_selected)$FeatureID)%>%
+    dplyr::rename("FeatureID"=1)
+  bottom_features <- as.data.frame(head(arrange(pc_loadings, !!sym(names(pc_loadings)[2])), n_selected)$FeatureID) %>%
+    dplyr::rename("FeatureID"=1)
+
+  #Add other ID types if applicable
+  if(is.null(SettingsFile_Sample)==FALSE){
+    top_features <- merge(x=SettingsFile_Sample, y=top_features, by.x=SettingsInfo_Feature[["FeatureID"]], by.y="FeatureID", all.y=TRUE)%>%
+      summarise_all(~toString(unique(.)))%>%
+      rename_all(~paste(paste("Top", Percentage*100, "%_", sep=""), ., sep = ""))
+
+    bottom_features <- merge(x=SettingsFile_Sample, y=bottom_features, by.x=SettingsInfo_Feature[["FeatureID"]], by.y="FeatureID", all.y=TRUE)%>%
+      summarise_all(~toString(unique(.)))%>%
+      rename_all(~paste(paste("Bottom", Percentage*100, "%_", sep=""), ., sep = ""))
+  }
+
+  #Return
+  res <- cbind(data.frame(PC=paste("PC", i, sep = "")), top_features, bottom_features)
+  return(res)
+}) %>%
+  bind_rows(.id = "PC")%>%
+  mutate(PC = paste("PC", PC, sep=""))
+
+## Add to results DF
+ULM_res <- merge(ULM_res, TopBottom_Features,  by.x="condition",by.y="PC",all.x=TRUE)
+```
+
+## DMA
+Focus on different demographics (age, gender), dependent on the PCs we found above with the metadata analysis.
+
+
+### ORA using the DMA results
+
+
+</div>
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
+```
+
+# Bibliography
