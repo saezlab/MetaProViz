@@ -21,7 +21,7 @@
 
 #' Access built-in example data
 #'
-#' @param name Character: name of a built-in dataset:
+#' @param Dataset Character: name of a built-in dataset:
 #'     \itemize{
 #'         \item{\code{"IntraCells_Raw"}: }
 #'         \item{\code{"IntraCells_DMA"}: }
@@ -42,7 +42,7 @@
 #' @importFrom magrittr %>% extract2
 #' @importFrom tibble column_to_rownames
 #' @export
-ToyData <- function(name) {
+ToyData <- function(Dataset) {
 
   datasets <- list(
     IntraCells_Raw = "MS55_RawPeakData.csv",
@@ -55,23 +55,23 @@ ToyData <- function(name) {
 
   rncols <- c("Code", "Metabolite")
 
-  if (!name %in% names(datasets)) {
+  if (!Dataset %in% names(datasets)) {
     stop(sprintf(
       "No such dataset: `%s`. Available datasets: %s",
-      name,
+      Dataset,
       paste(names(datasets), collapse = ", ")
     ))
   }
 
   datasets %>%
-  extract2(name) %>%
-  system.file("data", ., package = "MetaProViz") %>%
-  read_csv(col_types = cols()) %>%
-  {`if`(
+  magrittr::extract2(Dataset) %>%
+    system.file("data", ., package = "MetaProViz") %>%
+    read_csv(col_types = cols()) %>%
+    {`if`(
     (rncol <- names(.) %>% intersect(rncols)) %>% length,
     column_to_rownames(., rncol),
     .
-  )}
+    )}
 
 }
 
