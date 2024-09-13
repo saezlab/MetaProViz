@@ -79,10 +79,14 @@ Here we choose an example datasets, which is publicly available in the [paper](h
 `1.` Tissue experiment **(Intra)** \
 We can load the `ToyData`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
 ```{r}
+#Newer OmnipathR version needed than I have
+# aaa.R (creates new environment) and zzz.R (.onLoad will be done when package is loaded)--> commom practice
+#log and options (is the config file --> new configuration by using a parameter) connects them and can go into one file
+
 devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 # Load the example data:
-MetaProViz::ToyData(data="Tissue_Norm")
+Tissue_Norm <- MetaProViz:::ToyData("Tissue_Norm")
 
 ```
 ```{r, echo=FALSE}
@@ -96,7 +100,7 @@ Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
 
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
 ```{r}
-MetaProViz::ToyData(data="Tissue_MetaData")
+Tissue_MetaData <- MetaProViz::ToyData("Tissue_MetaData")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -119,7 +123,7 @@ Tissue_MetaData[1:5,c(1:2, 7:10)]%>%
 
 
 ## Pre-processing
-This has been done by the authors of the paper and we will use the median normalise data. If you want to know how you can use the **MetaProViz** pre-processing module, please check out the vignette:\
+This has been done by the authors of the paper and we will use the median normalized data. If you want to know how you can use the **MetaProViz** pre-processing module, please check out the vignette:\
 - [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
 - [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
 
@@ -127,21 +131,116 @@ This has been done by the authors of the paper and we will use the median normal
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
 This is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
 The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs and in turn perform annova to find the main metabolite drivers that separate patients based on their demographics.\
+\
+Since often a combination of demographics is driving the separation of the samples, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. In order to do this we can use the parameter `SettingsInfo` and provide the column name of our main separator.\
 ```{r}
 #Would it make sense here to separate tumour and normal for stage? --> meaning Normal-Stage1. Would this be useful for the other demographics too? --> e.g. Young-Stage1 
 #If yes, should we enable the user to pass a primary separator and secondary separators?
 
 MetaRes <- MetaProViz:::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
-                                    SettingsFile_Sample= Tissue_Norm[,c(2,4:5,7:8,11:13)]%>%dplyr::rename("Type_Stage"="TYPE-STAGE"),
-                                    Scaling = TRUE,
-                                    Percentage = 0.1,
-                                    SaveAs_Table = "csv",
-                                    SaveAs_Plot = "svg",
-                                    PrintPlot= TRUE,
-                                    FolderPath = NULL)
+                                     SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)],
+                                     #SettingInfo= c(MainSeparator = "TISSUE_TYPE), # enable this parameter in the function!
+                                     Scaling = TRUE,
+                                     Percentage = 0.1,
+                                     SaveAs_Table = "csv",
+                                     SaveAs_Plot = "svg",
+                                     PrintPlot= TRUE,
+                                     FolderPath = NULL)
 
 
 ```
+\
+Ultimately, this is leading to clusters of metabolites that are driving the separation of the different demographics.\
+
+* Return it the other way around: having the metabolites as row names and than the demographics they separate in some sort of cluster column! --> biological regulatory clustering based on demographics! --> how to deal with metabolites targeting multiple demographics?\
+
+```{r}
+Test_Top <- MetaRes[["res_aov"]]%>%
+  filter(tukeyHSD_p.adjusted< 0.05)%>%
+  separate_rows(`Features (Top 0.1%)`, sep = ", ")%>% # Separate 'Features (Top 0.1%)'
+  dplyr::rename("FeatureID"="Features (Top 0.1%)")%>%
+  select(-`Features (Bottom 0.1%)`)
+  
+Test_Bottom <- MetaRes[["res_aov"]]%>%
+  filter(tukeyHSD_p.adjusted< 0.05)%>%
+  separate_rows(`Features (Bottom 0.1%)`, sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
+  dplyr::rename("FeatureID"="Features (Bottom 0.1%)")%>%
+  select(-`Features (Top 0.1%)`)
+
+Test <- rbind(Test_Top, Test_Bottom)%>%
+  group_by(FeatureID, term) %>%            # Group by FeatureID and term
+  summarise(
+    PC = paste(unique(PC), collapse = ", "), # Concatenate unique PC entries with commas
+    `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE) # Sum Explained_Variance
+  ) %>%
+  ungroup()%>%  # Remove previous grouping
+  group_by(FeatureID) %>%  # Group by FeatureID for MainDriver calculation
+  mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>% # Mark TRUE for the highest value
+  ungroup()  # Remove grouping
+
+Test_summary <- Test%>%
+  group_by(FeatureID) %>%
+  summarise(
+    term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
+    `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
+   MainDriver = paste(MainDriver, collapse = ", ")  # Extract the term where MainDriver is TRUE
+  ) %>%
+  ungroup()%>%
+  rowwise() %>%
+  mutate(  # Extract the term where MainDriver is TRUE
+    MainDriver_Term = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
+                             strsplit(term, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]],
+                             NA),
+    # Extract the Sum(Explained_Variance) where MainDriver is TRUE
+    `MainDriver_Sum(VarianceExplained)` = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
+                                                 as.numeric(strsplit(`Sum(Explained_Variance)`, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]]),
+                                                 NA)
+  ) %>%
+  ungroup()
+
+#Add input data to the results = measured values for each sample
+
+
+
+#calculate Log2FC and p-value (t.test) for each metabolite comparing the demographics --> If one demographic paramteter like age has more than two options, we would need to do multiple comparison
+
+
+#Set threshold on variance explained --> probably based on percentage of total!
+
+```
+
+
+
+```{r}
+
+
+##############################################################################
+#Heatmap: Metabolites that separate the different demographics:
+##1. Tissue_Type
+TissueTypeList <- Test_summary%>%
+  filter(MainDriver_Term == "RACE")%>%
+  filter(`MainDriver_Sum(VarianceExplained)`>15)%>%
+  select(FeatureID)%>%
+  pull()
+
+#select columns Tissue_norm that are in TissueTypeList if they exist
+Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
+
+MetaProViz:::VizHeatmap(InputData = Input_Heatmap,
+                       SettingsFile_Sample = Tissue_Norm[,c(1:13)],
+                       SettingsInfo = c(color_Sample = list("AGE","STAGE", "TISSUE_TYPE", "GENDER", "RACE")),
+                       Scale ="column",
+                       PlotName = "MainDriver_RACE and MainDriver_Sum(VarianceExplained) >15")
+
+MetaProViz::VizSuperplot(InputData = Input_Heatmap,
+                       SettingsFile_Sample = Tissue_Norm[,c(1:13)],
+                       SettingsInfo = c(Conditions="STAGE"))
+
+
+
+```
+
+*Issue in metadata white and White --> should be the same!
 
 Now we can make individual heatmap of each demographic comparison of interest using the `MetaProViz::Heatmap()` function.\
 ```{r}
@@ -224,6 +323,12 @@ ULM_res <- merge(ULM_res, TopBottom_Features,  by.x="condition",by.y="PC",all.x=
 
 ## DMA
 Focus on different demographics (age, gender), dependent on the PCs we found above with the metadata analysis.
+```{r}
+
+```
+
+
+## Biological regulated clustering
 
 
 ### ORA using the DMA results
