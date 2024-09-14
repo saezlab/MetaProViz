@@ -305,12 +305,17 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   if(is.null(SettingsInfo)==TRUE){
     #-----widths
     plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+    plottable$widths[3] <- unit(2,"cm")#controls margins --> y-axis label is there
     plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(10)] <- unit(0,"cm")#controls margins --> Figure legend
-    plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-    plot_widths <- 11
+    plottable$widths[6] <- unit(1,"cm")#controls margins --> start Figure legend
+    plottable$widths[10] <- unit(0,"cm")#controls margins --> Figure legend
+    # if we set the element #7 to zero, that apparently renders the plotting
+    # area to zero width, so the plot itself won't have space, and this is the
+    # cause of the error
+    # plottable$widths[7] <- unit(7, "cm")
+    plottable$widths[c(8,9,11)] <- unit(0,"cm")#controls margins --> not needed
+    # apparently the total width has to be at least this large
+    plot_widths <- 11.6
 
     if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
       character_count <- nchar(PlotName)
@@ -323,18 +328,24 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
     #-----heigths
     plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+    plottable$heights[8] <- unit(1,"cm")#controls margins --> x-axis label
+    plottable$heights[10] <- unit(1,"cm")#controls margins --> Figure caption
+    # if we set the element #9 to zero, that apparently renders the plotting
+    # area to zero height, so the plot itself won't have space, and this is the
+    # cause of the error
+    # plottable$heights[9] <- unit(0, "cm")
+    plottable$heights[c(11,12)] <- unit(0,"cm")#controls margins --> not needed
 
     if(PlotName==""){
       plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
       plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 10.5
+      # apparently the total height has to be slightly larger than the sum of
+      # heights
+      plot_heights <- 12
     } else{
       plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
       plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <-11
+      plot_heights <- 13
     }
   }else if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
     #------- Legend heights
