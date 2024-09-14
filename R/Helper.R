@@ -147,10 +147,11 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 #' @param PlotUnit Parameter for ggsave.
 #'
 #' @keywords Save
+#' @importFrom logger log_info log_trace
 #' @noRd
 #'
 
-SaveRes<- function(InputList_DF,
+SaveRes <- function(InputList_DF,
                    InputList_Plot,
                    SaveAs_Table,
                    SaveAs_Plot=SaveAs_Plot,
@@ -200,12 +201,14 @@ SaveRes<- function(InputList_DF,
 
   if(is.null(SaveAs_Plot)==FALSE){
     for(Plot in names(InputList_Plot)){
+
       #Make FileName
       if(CoRe==FALSE | is.null(CoRe)==TRUE){
         FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
       }else{
         FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
       }
+
 
       #Save
       if(is.null(PlotHeight)){
@@ -218,7 +221,11 @@ SaveRes<- function(InputList_DF,
         PlotUnit <- "cm"
       }
 
-      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+      FileName_Save <- paste0(FileName_Save, ".",SaveAs_Plot, sep="")
+      log_info('Saving plot `%s` to `%s`.', Plot, FileName_Save)
+      log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
+
+      ggsave(filename = FileName_Save, plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
 
       if(PrintPlot==TRUE){
         suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
