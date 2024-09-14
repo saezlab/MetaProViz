@@ -161,7 +161,7 @@ FYI: See code I used to access via API
 
 
 ## Create pathway-metabolite sets
-Description CosmosR PK
+The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names. This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB. The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.
 
 \
 First we load an example gene-set available in the package `MetaProViz`. \
