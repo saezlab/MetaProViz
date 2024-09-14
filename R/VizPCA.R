@@ -25,6 +25,10 @@
 ### ### ### PCA Plots ### ### ###
 #################################
 
+
+# REFACT: Each docstring should start with a title that fits a single line,
+# i.e. <77 characters long
+
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
@@ -38,8 +42,11 @@
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+# REFACT: use the @return directive to describe the return value of the function
 #'
 #' @keywords PCA
+# REFACT: use @importFrom and cover all third party functions required in the
+# function below
 #' @export
 
 VizPCA <- function(InputData,
@@ -57,6 +64,9 @@ VizPCA <- function(InputData,
                    FolderPath = NULL
 ){
 
+  # REFACT: dependencies shoould be handled by @importFrom, roxygen2,
+  # DESCRIPTION and NAMESPACE; procedures like below should never be part of a
+  # function in a package
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","ggfortify", "ggplot2")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -76,6 +86,10 @@ VizPCA <- function(InputData,
                           CoRe=FALSE,
                           PrintPlot= PrintPlot)
 
+  # REFACT: What is the likelihood that these simple logical parameters have a
+  # wrong type of value? Even if that happens, we don't even tell the user here
+  # in which function the error happened, and which other function called it with
+  # the wrong arguments.
   # CheckInput` Specific
   if(is.logical(ShowLoadings) == FALSE){
     stop("Check input. The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")

@@ -235,6 +235,8 @@ SaveRes<- function(InputList_DF,
 
 #' Check input parameters
 #'
+# REFACT: Description of each argument should start with its type; e.g.
+# "@param x Character: name of the variable mapped to the x axis."
 #' @param InputData Passed to main function MetaProViz::Function()
 #' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
 #' @param SettingsFile_Sample Passed to main function MetaProViz::Function()
@@ -265,12 +267,16 @@ CheckInput <- function(InputData,
                        Theme=NULL,
                        PlotSettings=NULL){
   ############## Parameters valid for multiple MetaProViz functions
+  # REFACT: Do not use tidyverse as a dependency, it is only a meta package and
+  # it is huge.
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
   #-------------InputData
+  # REFACT: this will fail with "condition has length > 1" error, and also
+  # gives wrong result. Use is.data.frame() instead.
   if(class(InputData) != "data.frame"){
     stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
   }
