@@ -268,13 +268,14 @@ VizPCA <- function(InputData,
   ######################################################################################################################################################################
   ##----- Save and Return
   #Here we make a list in which we will save the outputs:
+  FileName <- `if`(nchar(PlotName), sprintf('PCA_%s', PlotName),'PCA')
   suppressMessages(suppressWarnings(
       MetaProViz:::SaveRes(InputList_DF=NULL,
                            InputList_Plot= PlotList_adaptedGrid,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= Folder,
-                           FileName= paste("PCA_", PlotName),
+                           FileName= FileName,
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
                            PlotHeight=Plot_Sized[[1]],
