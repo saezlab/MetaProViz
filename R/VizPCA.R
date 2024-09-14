@@ -303,6 +303,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
   #gtable::gtable_show_layout(plottable)
   if(is.null(SettingsInfo)==TRUE){
+    log_trace('No SettingsInfo')
     #-----widths
     plottable$widths[5] <- unit(8, "cm")#controls x-axis
     plottable$widths[3] <- unit(2,"cm")#controls margins --> y-axis label is there
@@ -348,6 +349,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       plot_heights <- 13
     }
   }else if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
+    log_trace('Color and shape in SettingsInfo')
     #------- Legend heights
     Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
@@ -406,6 +408,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       }
     }
   }else if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+    log_trace('Color or shape in SettingsInfo')
     #------- Legend heights
     Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
@@ -450,6 +453,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
         plot_heights <- 10.5
       }
     }else{#If we do have Title and or subtitle
+      log_trace('Title or subtitle')
       plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
       plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
       if(Legend_heights>11){#If the legend requires more heights than the Plot
@@ -464,6 +468,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       }
     }
   }
+
   #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
   Output<- list(plot_heights, plot_widths, plottable)
 }
