@@ -322,13 +322,32 @@ ULM_res <- merge(ULM_res, TopBottom_Features,  by.x="condition",by.y="PC",all.x=
 ```
 
 ## DMA
-Focus on different demographics (age, gender), dependent on the PCs we found above with the metadata analysis.
+Here we use Differential Metabolite Analysis (`DMA`) to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value.\
+For more information please see the vignette:\
+- [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
+- [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
+\
+We will perform multiple comparisons based on the different patient demographics available:
+1. Tumour versus Normal: All patients
+2. Tumour versus Normal: Subset of `Early Stage` patients 
+3. Tumour versus Normal: Subset of `Late Stage` patients
+4. Tumour versus Normal: Subset of `Young` patients
+5. Tumour versus Normal: Subset of `Old` patients
+\
 ```{r}
+
+```
+\
+We can see from the different Volcano plots that the XXXxxxxxxxxxxxxx comparison have more (number) and more severe (Log2FC range) changes.\
+Here we can also use the VizVolcano to plot comparisons together on the same plot, such as Tumour versus normal of young and old patients:\
+```{r}
+#Make one example Volcano plot
 
 ```
 
 
 ## Biological regulated clustering
+To understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age, 
 
 
 ### ORA using the DMA results
