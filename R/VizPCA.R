@@ -25,6 +25,10 @@
 ### ### ### PCA Plots ### ### ###
 #################################
 
+
+# REFACT: Each docstring should start with a title that fits a single line,
+# i.e. <77 characters long
+
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
@@ -38,8 +42,11 @@
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+# REFACT: use the @return directive to describe the return value of the function
 #'
 #' @keywords PCA
+# REFACT: use @importFrom and cover all third party functions required in the
+# function below
 #' @export
 
 VizPCA <- function(InputData,
@@ -57,6 +64,9 @@ VizPCA <- function(InputData,
                    FolderPath = NULL
 ){
 
+  # REFACT: dependencies shoould be handled by @importFrom, roxygen2,
+  # DESCRIPTION and NAMESPACE; procedures like below should never be part of a
+  # function in a package
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse","ggfortify", "ggplot2")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -76,6 +86,10 @@ VizPCA <- function(InputData,
                           CoRe=FALSE,
                           PrintPlot= PrintPlot)
 
+  # REFACT: What is the likelihood that these simple logical parameters have a
+  # wrong type of value? Even if that happens, we don't even tell the user here
+  # in which function the error happened, and which other function called it with
+  # the wrong arguments.
   # CheckInput` Specific
   if(is.logical(ShowLoadings) == FALSE){
     stop("Check input. The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
@@ -254,13 +268,14 @@ VizPCA <- function(InputData,
   ######################################################################################################################################################################
   ##----- Save and Return
   #Here we make a list in which we will save the outputs:
+  FileName <- `if`(nchar(PlotName), sprintf('PCA_%s', PlotName),'PCA')
   suppressMessages(suppressWarnings(
       MetaProViz:::SaveRes(InputList_DF=NULL,
                            InputList_Plot= PlotList_adaptedGrid,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
                            FolderPath= Folder,
-                           FileName= paste("PCA_", PlotName),
+                           FileName= FileName,
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
                            PlotHeight=Plot_Sized[[1]],
@@ -286,16 +301,23 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
+  ptb <<- plottable
   #gtable::gtable_show_layout(plottable)
   if(is.null(SettingsInfo)==TRUE){
+    log_trace('No SettingsInfo')
     #-----widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
+    plottable$widths[7] <- unit(8, "cm")#controls x-axis
+    plottable$widths[5] <- unit(1,"cm")#controls margins --> y-axis label is there
     plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(10)] <- unit(0,"cm")#controls margins --> Figure legend
-    plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-    plot_widths <- 11
+    plottable$widths[6] <- unit(1,"cm")#controls margins --> start Figure legend
+    plottable$widths[10] <- unit(0,"cm")#controls margins --> Figure legend
+    # if we set the element #7 to zero, that apparently renders the plotting
+    # area to zero width, so the plot itself won't have space, and this is the
+    # cause of the error
+    # plottable$widths[7] <- unit(7, "cm")
+    plottable$widths[c(8,9,11)] <- unit(0,"cm")#controls margins --> not needed
+    # apparently the total width has to be at least this large
+    plot_widths <- 11.6
 
     if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
       character_count <- nchar(PlotName)
@@ -307,21 +329,28 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     }
 
     #-----heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+    plottable$heights[9] <- unit(8, "cm")#controls x-axis
+    plottable$heights[10] <- unit(1,"cm")#controls margins --> x-axis label
+    plottable$heights[11] <- unit(1,"cm")#controls margins --> Figure caption
+    # if we set the element #9 to zero, that apparently renders the plotting
+    # area to zero height, so the plot itself won't have space, and this is the
+    # cause of the error
+    # plottable$heights[9] <- unit(0, "cm")
+    plottable$heights[c(11,12)] <- unit(0,"cm")#controls margins --> not needed
 
     if(PlotName==""){
       plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
       plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 10.5
+      # apparently the total height has to be slightly larger than the sum of
+      # heights
+      plot_heights <- 12
     } else{
       plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
       plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <-11
+      plot_heights <- 13
     }
   }else if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
+    log_trace('Color and shape in SettingsInfo')
     #------- Legend heights
     Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
@@ -380,6 +409,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       }
     }
   }else if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+    log_trace('Color or shape in SettingsInfo')
     #------- Legend heights
     Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
@@ -424,6 +454,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
         plot_heights <- 10.5
       }
     }else{#If we do have Title and or subtitle
+      log_trace('Title or subtitle')
       plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
       plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
       if(Legend_heights>11){#If the legend requires more heights than the Plot
@@ -438,6 +469,8 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       }
     }
   }
+  ptb1 <<- plottable
+
   #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
   Output<- list(plot_heights, plot_widths, plottable)
 }

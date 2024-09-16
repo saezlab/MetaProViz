@@ -54,3 +54,13 @@ metaproviz_set_loglevel <- function(level, target = 'logfile'){
     set_loglevel(level, target = target, pkg = 'MetaProViz')
 
 }
+
+
+#' Set the console log level to "trace"
+#'
+#' @noRd
+.mpvtrace <- function() {
+
+    metaproviz_set_loglevel('trace', target = 'console')
+
+}

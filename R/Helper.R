@@ -147,10 +147,11 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 #' @param PlotUnit Parameter for ggsave.
 #'
 #' @keywords Save
+#' @importFrom logger log_info log_trace
 #' @noRd
 #'
 
-SaveRes<- function(InputList_DF,
+SaveRes <- function(InputList_DF,
                    InputList_Plot,
                    SaveAs_Table,
                    SaveAs_Plot=SaveAs_Plot,
@@ -200,12 +201,14 @@ SaveRes<- function(InputList_DF,
 
   if(is.null(SaveAs_Plot)==FALSE){
     for(Plot in names(InputList_Plot)){
+
       #Make FileName
       if(CoRe==FALSE | is.null(CoRe)==TRUE){
         FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
       }else{
         FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
       }
+
 
       #Save
       if(is.null(PlotHeight)){
@@ -218,7 +221,11 @@ SaveRes<- function(InputList_DF,
         PlotUnit <- "cm"
       }
 
-      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+      FileName_Save <- paste0(FileName_Save, ".",SaveAs_Plot, sep="")
+      log_info('Saving plot `%s` to `%s`.', Plot, FileName_Save)
+      log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
+
+      ggsave(filename = FileName_Save, plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
 
       if(PrintPlot==TRUE){
         suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
@@ -235,6 +242,8 @@ SaveRes<- function(InputList_DF,
 
 #' Check input parameters
 #'
+# REFACT: Description of each argument should start with its type; e.g.
+# "@param x Character: name of the variable mapped to the x axis."
 #' @param InputData Passed to main function MetaProViz::Function()
 #' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
 #' @param SettingsFile_Sample Passed to main function MetaProViz::Function()
@@ -265,12 +274,16 @@ CheckInput <- function(InputData,
                        Theme=NULL,
                        PlotSettings=NULL){
   ############## Parameters valid for multiple MetaProViz functions
+  # REFACT: Do not use tidyverse as a dependency, it is only a meta package and
+  # it is huge.
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
   suppressMessages(library(tidyverse))
 
   #-------------InputData
+  # REFACT: this will fail with "condition has length > 1" error, and also
+  # gives wrong result. Use is.data.frame() instead.
   if(class(InputData) != "data.frame"){
     stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
   }
