@@ -301,12 +301,13 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
+  ptb <<- plottable
   #gtable::gtable_show_layout(plottable)
   if(is.null(SettingsInfo)==TRUE){
     log_trace('No SettingsInfo')
     #-----widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[3] <- unit(2,"cm")#controls margins --> y-axis label is there
+    plottable$widths[7] <- unit(8, "cm")#controls x-axis
+    plottable$widths[5] <- unit(1,"cm")#controls margins --> y-axis label is there
     plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
     plottable$widths[6] <- unit(1,"cm")#controls margins --> start Figure legend
     plottable$widths[10] <- unit(0,"cm")#controls margins --> Figure legend
@@ -328,9 +329,9 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     }
 
     #-----heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[8] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[10] <- unit(1,"cm")#controls margins --> Figure caption
+    plottable$heights[9] <- unit(8, "cm")#controls x-axis
+    plottable$heights[10] <- unit(1,"cm")#controls margins --> x-axis label
+    plottable$heights[11] <- unit(1,"cm")#controls margins --> Figure caption
     # if we set the element #9 to zero, that apparently renders the plotting
     # area to zero height, so the plot itself won't have space, and this is the
     # cause of the error
@@ -468,6 +469,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       }
     }
   }
+  ptb1 <<- plottable
 
   #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
   Output<- list(plot_heights, plot_widths, plottable)
