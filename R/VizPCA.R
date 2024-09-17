@@ -316,7 +316,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   plot_widths <- 12
 
   #############################################
-  #-----heigths general
+  #-----heights general
   plottable$heights[9] <- unit(8, "cm")#controls x-axis
   plottable$heights[10] <- unit(1,"cm")#controls margins --> Distance x-axis label to axis
   plottable$heights[11] <- unit(0.5,"cm")#controls margins --> x-axis label
