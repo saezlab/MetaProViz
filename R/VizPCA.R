@@ -301,175 +301,97 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
-  ptb <<- plottable
-  #gtable::gtable_show_layout(plottable)
-  if(is.null(SettingsInfo)==TRUE){
-    log_trace('No SettingsInfo')
-    #-----widths
-    plottable$widths[7] <- unit(8, "cm")#controls x-axis
-    plottable$widths[5] <- unit(1,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[6] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[10] <- unit(0,"cm")#controls margins --> Figure legend
-    # if we set the element #7 to zero, that apparently renders the plotting
-    # area to zero width, so the plot itself won't have space, and this is the
-    # cause of the error
-    # plottable$widths[7] <- unit(7, "cm")
-    plottable$widths[c(8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-    # apparently the total width has to be at least this large
-    plot_widths <- 11.6
+  #ptb <<- plottable
+  #gtable::gtable_show_layout(ptb)
 
-    if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      character_count <- nchar(PlotName)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
+  ##############################################
+  #-----widths general
+  plottable$widths[7] <- unit(8, "cm")#controls x-axis
+  plottable$widths[6] <- unit(1,"cm")#controls margins --> Distance y-axis label to axis
+  plottable$widths[5] <- unit(1,"cm")#controls margins --> start Figure legend
+  plottable$widths[4] <- unit(1,"cm")#Space to left side
+  plottable$widths[11] <- unit(1,"cm")#Space to right side
+  plottable$widths[c(1,2,3,8,9, 10)] <- unit(0,"cm")#controls margins --> not needed
+  # Sum up total width:
+  plot_widths <- 12
 
-    #-----heigths
-    plottable$heights[9] <- unit(8, "cm")#controls x-axis
-    plottable$heights[10] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[11] <- unit(1,"cm")#controls margins --> Figure caption
-    # if we set the element #9 to zero, that apparently renders the plotting
-    # area to zero height, so the plot itself won't have space, and this is the
-    # cause of the error
-    # plottable$heights[9] <- unit(0, "cm")
-    plottable$heights[c(11,12)] <- unit(0,"cm")#controls margins --> not needed
+  #############################################
+  #-----heigths general
+  plottable$heights[9] <- unit(8, "cm")#controls x-axis
+  plottable$heights[10] <- unit(1,"cm")#controls margins --> Distance x-axis label to axis
+  plottable$heights[11] <- unit(0.5,"cm")#controls margins --> x-axis label
+  plottable$heights[12] <- unit(0.5,"cm")#controls margins --> Space to bottom
+  plottable$heights[c(1,2,3,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+  # Sum up total heights:
+  plot_heights <- 10
 
-    if(PlotName==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      # apparently the total height has to be slightly larger than the sum of
-      # heights
-      plot_heights <- 12
-    } else{
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 13
-    }
-  }else if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
-    log_trace('Color and shape in SettingsInfo')
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
+  #############################################
+  #----- Plot Name
+  if(PlotName==""){
+    #------ Height
+    plottable$heights[3] <- unit(1,"cm")#controls margins --> Some space above the plot
+    # Sum up total heights:
+    plot_heights <-  plot_heights+1
+  }else{
+    #------ Height
+    plottable$heights[3] <- unit(1.5,"cm")#controls margins --> PlotName and subtitle
+    # Sum up total heights:
+    plot_heights <- plot_heights+1.5
 
-    #-----Plot widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 11+Value
-
-    if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      character_count <- nchar(PlotName)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>10.5){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-10.5)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 10.5
-      }
-    } else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }
-  }else if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
-    log_trace('Color or shape in SettingsInfo')
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
-
-    #----- Plot widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 11+Value
-
-    if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      character_count <- nchar(PlotName)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>10.5){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-10.5)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 10.5
-      }
-    }else{#If we do have Title and or subtitle
-      log_trace('Title or subtitle')
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
+    #------- Width: Check how much width is needed for the figure title/subtitle
+    character_count <- nchar(PlotName)
+    Titles_width <- (character_count*0.25)+0.8
+    if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
+      plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#If Figure legend is longer that the x0axis, space will be added to the right
+      plot_widths <- Titles_width
     }
   }
-  ptb1 <<- plottable
+
+  #############################################
+  #-------- Figure legend
+  if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+    log_trace('color and/or shape in SettingsInfo')
+    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
+    #leg <<- Legend
+    #gtable::gtable_show_layout(leg)
+    #plot(leg)
+
+    #------- Legend widths
+    ## Legend titles:
+    if("color" %in% names(SettingsInfo)==TRUE){
+      Cchar<- (nchar(SettingsInfo["color"])*0.25)
+    }
+    if("shape" %in% names(SettingsInfo)==TRUE){
+      Schar<- (nchar(SettingsInfo["shape"])*0.25)
+    }
+    if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+      Char<- max(Cchar,Schar)+1
+    }
+
+    Legend_width <- (round(as.numeric(Legend$width[3]),1))
+    if(Legend_width<Char){
+      Legend_width <- Char
+    }
+
+    ## Legend space:
+    if(grid::convertUnit(plottable$widths[11], "cm", valueOnly = TRUE) < Legend_width){
+      original_width <- grid::convertUnit(plottable$widths[11], "cm", valueOnly = TRUE)
+      plottable$widths[11] <- unit(Legend_width,"cm")
+      plot_widths  <- plot_widths + Legend_width - original_width
+    }
+
+    #------- Legend heights
+    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))+2 #+2 to secure space above and below plot
+    if(plot_heights < Legend_heights){
+      Add <- (Legend_heights-plot_heights)/2
+      plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
+      plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
+      plot_heights <- Legend_heights
+    }
+    }else{
+      log_trace('No SettingsInfo')# = No figure legend
+    }
+  #ptb1 <<- plottable
 
   #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
   Output<- list(plot_heights, plot_widths, plottable)
