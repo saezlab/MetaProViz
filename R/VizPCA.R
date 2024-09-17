@@ -330,7 +330,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #-----heigths general
   plottable %<>%
     set_height("axis-l", unit(8, "cm")) %>%
-    set_height("axis_b", unit(1, "cm")) %>%
+    set_height("axis-b", unit(1, "cm")) %>%
     set_height("xlab-b", unit(.5, "cm")) %>%
     set_height("xlab-b", unit(1, "cm"), offset = 1L) %>%
     set_height("title", unit(0, "cm"), offset = -2L, ifempty = FALSE) %>%
