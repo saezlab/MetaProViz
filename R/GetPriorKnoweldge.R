@@ -29,8 +29,9 @@
 #' @export
 #'
 TranslateID <- function(Input_DataFrame,
-                        SettingsInfo = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem"), Method="GetAll", GroupingVariable="term")
+                        SettingsInfo = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem","chebi","hmdb"), Method="GetAll", GroupingVariable="term")
                         ){
+  suppressMessages(library(tidyverse))
 
   Output_DataFrame <- Input_DataFrame
   idcolname <- SettingsInfo[['IdColumn']]
@@ -58,8 +59,10 @@ TranslateID <- function(Input_DataFrame,
     # now collapse the desired translated column rows into a single row for each group (e.g. by path term and metaboliteID), so that it looks like: "16680, 57856, 181457", for example
     # we will also make the prefix '_collapsed' to distinguish it from other columns that might not be collapsed
     df_translated <- df_translated %>% group_by(!!sym(from), !!sym(groupvar)) %>% summarize(!!paste0(to_singular, '_collapsed') := paste(!!sym(to_singular), collapse = ', '))
+    #return(df_translated)
     # now let's select just the collapsed column, and ungroup it so that we don't keep the other grouping columns when we select
-    collapsed_col <- df_translated %>% ungroup() %>% select(ends_with('_collapsed'))
+    #collapsed_col <- df_translated %>% ungroup() %>% select(ends_with('_collapsed'))
+    collapsed_col <- df_translated %>% ungroup()
 
     if (method == 'GetAll') {
       print('Using method GetAll')
@@ -76,23 +79,25 @@ TranslateID <- function(Input_DataFrame,
           !is.na(!!sym(paste0(to_singular, '_collapsed'))),
           sapply(strsplit(!!sym(paste0(to_singular, '_collapsed')), ", "), `[`, 1), # Split and get the first element
           NA))
-      firstItem_col <- firstItem_cols %>%
-        select(!!paste0(to_singular, '_first'))
-      new_col <- firstItem_col
+      firstItem_cols <- firstItem_cols %>%
+        select(-!!paste0(to_singular, '_collapsed')) #note this removes the 'collapsed' columns. If we wanted to keep these we could comment this part out...
+      new_col <- firstItem_cols
 
     } else {
       print('You may want to check the Method you are trying to use is implemented.')
     }
 
-    Output_DataFrame <- cbind(Output_DataFrame, new_col) #note if we change the grouping variable this might go kaputt
+    #Output_DataFrame <- cbind(Output_DataFrame, new_col) # removed this due to problems with different orders
+
+    # Now update the results from each type of ID translation into one main table, based off the users input table
+    #note if we change the grouping variable this might go kaputt
+    Output_DataFrame <- merge(x=Output_DataFrame, y=new_col,
+                              by.x=c(idcolname, groupvar),
+                              by.y=c(from,groupvar),
+                              all.x=TRUE)
+
   }
   return(Output_DataFrame)
-
-
-  # to do the multi collapsed values column...
-  # OmnipathR::translate_ids(kegg, chebi, ramp = TRUE) %>% group_by(MetaboliteID, term) %>% summarize(collapsed_values = paste(chebi, collapse = ', '))
-
-
 }
 
 
