@@ -295,33 +295,56 @@ VizPCA <- function(InputData,
 #' @param PlotName Passed to VizPCA
 #'
 #' @keywords PCA helper function
+#' @importFrom magrittr %<>% %>%
 #' @noRd
-
 PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
-  #ptb <<- plottable
+  ptb <<- plottable
   #gtable::gtable_show_layout(ptb)
 
   ##############################################
   #-----widths general
-  plottable$widths[7] <- unit(8, "cm")#controls x-axis
-  plottable$widths[6] <- unit(1,"cm")#controls margins --> Distance y-axis label to axis
-  plottable$widths[5] <- unit(1,"cm")#controls margins --> start Figure legend
-  plottable$widths[4] <- unit(1,"cm")#Space to left side
-  plottable$widths[11] <- unit(1,"cm")#Space to right side
-  plottable$widths[c(1,2,3,8,9, 10)] <- unit(0,"cm")#controls margins --> not needed
+  plottable %<>%
+    set_width("axis-b", unit(8, "cm")) %>%
+    set_width("ylab-l", unit(0, "cm"), offset = -4L, ifempty = FALSE) %>%
+    set_width("axis-l", unit(1, "cm")) %>%
+    set_width("ylab-l", unit(1, "cm")) %>%
+    set_width("guide-box-left", unit(0, "cm")) %>%
+    set_width("axis-r", unit(0, "cm")) %>%
+    set_width("ylab-r", unit(0, "cm")) %>%
+    set_width("ylab-l", unit(1, "cm"), offset = -1L) %>%
+    set_width("guide-box-right", unit(1, "cm"))
+
+  # plottable$widths[7] <- unit(8, "cm")#controls x-axis
+  # plottable$widths[6] <- unit(1,"cm")#controls margins --> Distance y-axis label to axis
+  # plottable$widths[5] <- unit(1,"cm")#controls margins --> start Figure legend
+  # plottable$widths[4] <- unit(1,"cm")#Space to left side
+  # plottable$widths[11] <- unit(1,"cm")#Space to right side
+  # plottable$widths[c(1,2,3,8,9, 10)] <- unit(0,"cm")#controls margins --> not needed
   # Sum up total width:
   plot_widths <- 12
 
   #############################################
   #-----heigths general
-  plottable$heights[9] <- unit(8, "cm")#controls x-axis
-  plottable$heights[10] <- unit(1,"cm")#controls margins --> Distance x-axis label to axis
-  plottable$heights[11] <- unit(0.5,"cm")#controls margins --> x-axis label
-  plottable$heights[12] <- unit(0.5,"cm")#controls margins --> Space to bottom
-  plottable$heights[c(1,2,3,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
+  plottable %<>%
+    set_height("axis-l", unit(8, "cm")) %>%
+    set_height("axis_b", unit(1, "cm")) %>%
+    set_height("xlab-b", unit(.5, "cm")) %>%
+    set_height("xlab-b", unit(1, "cm"), offset = 1L) %>%
+    set_height("title", unit(0, "cm"), offset = -2L, ifempty = FALSE) %>%
+    set_height("title", unit(0, "cm"), offset = -1L) %>%
+    set_height("title", unit(0, "cm")) %>%
+    set_height("subtitle", unit(0, "cm")) %>%
+    set_height("guide-box-top", unit(0, "cm")) %>%
+    set_height("xlab-t", unit(0, "cm"), offset = -1L)
+
+  # plottable$heights[9] <- unit(8, "cm")#controls x-axis
+  # plottable$heights[10] <- unit(1,"cm")#controls margins --> Distance x-axis label to axis
+  # plottable$heights[11] <- unit(0.5,"cm")#controls margins --> x-axis label
+  # plottable$heights[12] <- unit(0.5,"cm")#controls margins --> Space to bottom
+  # plottable$heights[c(1,2,3,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
   # Sum up total heights:
   plot_heights <- 10
 
@@ -350,6 +373,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #############################################
   #-------- Figure legend
   if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+
     log_trace('color and/or shape in SettingsInfo')
     Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
     #leg <<- Legend
@@ -390,10 +414,11 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
       plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
       plot_heights <- Legend_heights
     }
-    }else{
-      log_trace('No SettingsInfo')# = No figure legend
-    }
-  #ptb1 <<- plottable
+
+  }else{
+    log_trace('No SettingsInfo')# = No figure legend
+  }
+  ptb1 <<- plottable
 
   #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
   Output<- list(plot_heights, plot_widths, plottable)
