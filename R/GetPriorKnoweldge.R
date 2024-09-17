@@ -30,11 +30,7 @@
 #'
 TranslateID <- function(Input_DataFrame,
                         SettingsInfo = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem"), Method="GetAll", GroupingVariable="term")
-                        #idcolname='MetaboliteID',
-                        #from='kegg',
-                        #to='pubchem'
                         ){
-  #SettingsInfo <- list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem","chebi"), Method="GetAll")
 
   Output_DataFrame <- Input_DataFrame
   idcolname <- SettingsInfo[['IdColumn']]
@@ -83,49 +79,7 @@ TranslateID <- function(Input_DataFrame,
       firstItem_col <- firstItem_cols %>%
         select(!!paste0(to_singular, '_first'))
       new_col <- firstItem_col
-      #return(firstItem_col)
 
-      # start_message <- glue::glue("Translating the {idcolname} column from <{from}> format to <{to}>. \nWARNING: Only the first translated ID from <{to}> will be returned for each unique ID from <{from}>.")
-      # message(start_message)
-      # suppressMessages(library(OmnipathR))
-      # suppressMessages(library(tidyverse))
-      #
-      # # Rename and use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings.
-      # if (!from %in% names(Input_DataFrame)) {
-      #   Input_DataFrame <- Input_DataFrame %>%
-      #     dplyr::mutate(!!from := .[[idcolname]]) # This is used to keep the original column of the idcolname, otherwise we could use dplyr::rename(!!from := idcolname)
-      #   message("Created '", from, "' as a colname.")
-      # } else {
-      #   message("Column '", from, "' already exists in the dataframe.")
-      # }
-      # df_translated <- Input_DataFrame %>%
-      #   OmnipathR::translate_ids(!!from, !!to, ramp = TRUE)
-      #
-      # # Group by the 'from' column and summarize to get the count of items in each group (i.e. number of mappings per unique 'from' ID)
-      # group_counts <- df_translated %>%
-      #   group_by(across(c(!!sym(from), term))) %>% #in this case, we also want to group by the term for pathways, in the likely event some metabolites come from multiple pathways
-      #   summarize(count = n()) %>%
-      #   slice_head(n=1) %>% #take the first instance of each (i.e. pathway)
-      #   select(-term) %>% count(count) %>% select(-n)
-      #
-      # # Count how many groups have each number of items
-      # group_summary <- group_counts %>%
-      #   ungroup %>%
-      #   select(count) %>%
-      #   count(count)
-      # #return(group_counts)
-      #
-      # # Print the number of groups for each count
-      # for (i in seq_len(nrow(group_summary))) {
-      #   message(glue::glue("{group_summary$n[i]} original ID row(s) from <{from}> were mapped to {group_summary$count[i]} <{to}> ID(s) each"))
-      # }
-      #
-      # # Group by 'group' and select the first row of each group
-      # df_translated_first <- df_translated %>%
-      #   group_by(across(c(!!sym(from), term))) %>% # here we are also grouping by the 'term' i.e. the pathway from KEGG. May need to make into a parameter at a later stage for more versatility.
-      #   slice_head(n = 1)
-      #
-      # return(df_translated_first)
     } else {
       print('You may want to check the Method you are trying to use is implemented.')
     }
