@@ -33,16 +33,12 @@ TranslateID <- function(Input_DataFrame,
                         ){
   suppressMessages(library(tidyverse))
 
-  Output_DataFrame <- Input_DataFrame
+  Output_DataFrame <- Input_DataFrame # making a copy of Input Dataframe so we can merge the results later
   idcolname <- SettingsInfo[['IdColumn']]
   from <- SettingsInfo[['FromFormat']]
   to <- SettingsInfo[['ToFormat']]
   method <- SettingsInfo[['Method']]
   groupvar <- SettingsInfo[['GroupingVariable']]
-
-  for (to_singular in to) {
-    print(to_singular)
-  }
 
   for (to_singular in to) {
     # Rename and use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings.
@@ -59,8 +55,7 @@ TranslateID <- function(Input_DataFrame,
     # now collapse the desired translated column rows into a single row for each group (e.g. by path term and metaboliteID), so that it looks like: "16680, 57856, 181457", for example
     # we will also make the prefix '_collapsed' to distinguish it from other columns that might not be collapsed
     df_translated <- df_translated %>% group_by(!!sym(from), !!sym(groupvar)) %>% summarize(!!paste0(to_singular, '_collapsed') := paste(!!sym(to_singular), collapse = ', '))
-    #return(df_translated)
-    # now let's select just the collapsed column, and ungroup it so that we don't keep the other grouping columns when we select
+    # previously we selected just the collapsed column, and ungroup it so that we don't keep the other grouping columns when we select, now we want to keep them so we can merge effectively
     #collapsed_col <- df_translated %>% ungroup() %>% select(ends_with('_collapsed'))
     collapsed_col <- df_translated %>% ungroup()
 
@@ -86,8 +81,6 @@ TranslateID <- function(Input_DataFrame,
     } else {
       print('You may want to check the Method you are trying to use is implemented.')
     }
-
-    #Output_DataFrame <- cbind(Output_DataFrame, new_col) # removed this due to problems with different orders
 
     # Now update the results from each type of ID translation into one main table, based off the users input table
     #note if we change the grouping variable this might go kaputt
@@ -194,18 +187,13 @@ LoadKEGG <- function(){
     if(!dir.exists(directory)) {dir.create(directory)}
     saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
   }
-  #print(dim(KEGG_Metabolite))
+
   #Use translate ID function to add other ID types (HMDB, ChEBI, PubChem)
-  #Note - have made this sequential. Currently MetaboliteID is kept.
-  #Should also be noted that currently translate ID only keeps the first mapped metabolite from the other source
-  #KEGG_Pathways_translated_first <- TranslateID(KEGG_Metabolite, idcolname='MetaboliteID', from='kegg', to='pubchem')
-  #KEGG_Pathways_translated_first <- TranslateID(KEGG_Pathways_translated_first, idcolname='MetaboliteID', from='kegg', to='chebi')
-  #KEGG_Pathways_translated_first <- TranslateID(KEGG_Pathways_translated_first, idcolname='MetaboliteID', from='kegg', to='hmdb')
+  #Note - not implemented here atm beacuse I think it is best left to the other functions. Can discuss or come back to this later. Leaving as placeholder just in case.
+  #assign("KEGG_Pathways", KEGG_Pathways_translated_first, envir=.GlobalEnv) # previously had this kind of approach for assigning translated results to KEGG Pathways. Leaving as placeholder just in case.
 
   #Return into environment
-  #assign("KEGG_Pathways", KEGG_Pathways_translated_first, envir=.GlobalEnv) # will implement this once the groupby is better handled
   assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
-  #print(dim(KEGG_Pathways))
 }
 
 

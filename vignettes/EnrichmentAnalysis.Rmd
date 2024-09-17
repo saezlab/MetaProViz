@@ -236,7 +236,7 @@ For pathway analysis we would want to keep only one metabolite for each pathway.
 But we would probably want to keep our metabolite choice across pathways, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our input data.
 This leads us to the next function: Filter IDs.
 
-*Notes from previously:*
+*Previous notes from Christina:*
 
 -   *Maybe add HMDB IDs and CheBI IDs (only if trial shows its somewhat straight forward - maybe let's use RampDB for this!)*
 -   *If using RaMP to translate is easy, maybe we can transform this into a helper function that we reuse for the other translations we could/should do (comments below) --\> Either via API or via their functions!*
