@@ -32,6 +32,7 @@ Imports:
     ggfortify,
     ggplot2,
     ggupset,
+    grid,
     gridExtra,
     gtools,
     hash,
@@ -41,9 +42,12 @@ Imports:
     OmnipathR,
     patchwork,
     pheatmap,
+    purrr,
     qcc,
     readr,
     reshape,
+    rlang,
+    stringr,
     writexl
 Suggests:
     BiocStyle,
