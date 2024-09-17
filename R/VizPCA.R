@@ -360,11 +360,13 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     ## Legend titles:
     if("color" %in% names(SettingsInfo)==TRUE){
       Cchar<- (nchar(SettingsInfo["color"])*0.25)
+      Char <- Cchar
     }
     if("shape" %in% names(SettingsInfo)==TRUE){
       Schar<- (nchar(SettingsInfo["shape"])*0.25)
+      Char <- Schar
     }
-    if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+    if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
       Char<- max(Cchar,Schar)+1
     }
 
