@@ -249,7 +249,7 @@ Now we can make individual heatmap of each demographic comparison of interest us
 
 ```{r}
 
-# Move to prior knowledge!
+# Move to metaData analysis in order to make own pathways. Showcase in enrichment analysis vignette.
 
 ## ---------- ULM ------------##
 # Use the Sample metadata for this:
@@ -335,21 +335,65 @@ We will perform multiple comparisons based on the different patient demographics
 5. Tumour versus Normal: Subset of `Old` patients
 \
 ```{r}
+#Prepare the different selections
+EarlyStage <- Tissue_Norm%>%
+  filter(STAGE== "EARLY-STAGE")
+LateStage <- Tissue_Norm%>%
+  filter(STAGE=="LATE-STAGE")
+Old <- Tissue_Norm%>%
+  filter(AGE=="Old")
+Young <- Tissue_Norm%>%
+  filter(AGE=="Young")
+
+DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+
+#Run DMA
+ResList <- list()
+for(item in names(DFs)){
+  #Get the right DF:
+  InputData <- DFs[[item]]
+  #Perform DMA
+  message(paste("Running DMA for", item))
+  TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
+                   SettingsFile_Sample =  InputData[,c(1:13)],
+                   SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
+                   PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+  #Add Results to list
+  ResList[[item]] <- TvN
+}
+
 
 ```
 \
-We can see from the different Volcano plots that the XXXxxxxxxxxxxxxx comparison have more (number) and more severe (Log2FC range) changes.\
+We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
 Here we can also use the VizVolcano to plot comparisons together on the same plot, such as Tumour versus normal of young and old patients:\
 ```{r}
-#Make one example Volcano plot
+#Early versus Late Stage
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["EarlyStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData2= ResList[["LateStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="EarlyStage", InputData2= "LateStage"),
+                       PlotName= "EarlyStage-TUMOR_vs_NORMAL compared to LateStage-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA" )
 
+# Young versus Old
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="Young", InputData2= "Old"),
+                       PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA" )
 ```
-
+\
+Here we can observe that Tumour versus Normal has lower signifcance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
 
 ## Biological regulated clustering
 To understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age, 
+we can use the `MetaProViz::BiologicalRegulatedClustering()` function.\
+```{r}
 
 
+```
 ### ORA using the DMA results
 
 

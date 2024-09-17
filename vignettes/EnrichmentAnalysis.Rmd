@@ -18,8 +18,11 @@ vignette: >
 bibliography: bibliography.bib
 editor_options: 
   chunk_output_type: console
+  markdown: 
+    wrap: sentence
 ---
 
+```{=html}
 <style>
 .vscroll-plot {
     width: 1000px;
@@ -28,7 +31,7 @@ editor_options:
     overflow-x: hidden;
 }
 </style>
-
+```
 ```{r chunk_setup, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
@@ -36,17 +39,20 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="Hexagon_MetaProViz.png" align="right" width="200"/>
+
 \
 In this vignette we focus on accessing prior knowledge needed to for example run pathway enrichment analysis or compound class enrichment analysis and showcase the enrichment analysis using example data.\
-\
-<span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
 
-* To access metabolite prior knowledge.\
-* To deal with many-to-many mapping in your metabolite identifiers.\
-* To perform pathway enrichment analysis.\
 \
-First if you have not done yet, install the required dependencies and load the libraries:
+[In this tutorial we showcase how to use **MetaProViz**]{style="text-decoration:underline"}:\
+
+-   To access metabolite prior knowledge.\
+-   To deal with many-to-many mapping in your metabolite identifiers.\
+-   To perform pathway enrichment analysis.\
+    \
+    First if you have not done yet, install the required dependencies and load the libraries:
+
 ```{r message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). 
 # 2. Install the latest development version from GitHub using devtools
@@ -63,31 +69,40 @@ library(tidyverse)
 
 
 #Load package locally:
-devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
+devtools::load_all() #"C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz"
 ```
+
 \
 \
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
 
 # 1. Loading the example data
 
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
-\
-Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
-\
-<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
 
-`1.`Cell line experiment **(CellLine)** \
+\
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
+Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
+
+\
+[As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`]{style="text-decoration:underline"}:\
+
+`1.`Cell line experiment **(CellLine)**\
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 Here we load the processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
+
 ```{r}
 #Load the Pre-processed intracellular data:
 MetaProViz::ToyData(data="IntraCells_DMA")
 ```
+
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 # Check how our data looks like:
@@ -97,49 +112,51 @@ Intra_DMA_786M1A_vs_HK2[1:5, c(1:12)]%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 
-* update toy_data to include the HMDB IDs!
+-   update toy_data to include the HMDB IDs!
 
 `2.` Tissue experiment **(Tissue)**\
 Here we load publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
+
 ```{r}
 # Load the example data:
 MetaProViz::ToyData(data="Tissue_Norm")
 
 ```
 
-
-`3.`  
-* Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
-* Maybe add the data from the paper of the 3D cell culture model of ccRCC
-
+`3.`\
+\* Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
+\* Maybe add the data from the paper of the 3D cell culture model of ccRCC
 
 \
 \
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-</div>
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
 
 # 2. Loading prior knowledge
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
 \
 
-
-Describe some general things such as:
-* removal of items from the PK: e.g. extract ions from HMDB to enable the removal of ions from the pathways, same for xenobiotics and masspec unspecific molecules (H2O, CO2, etc.)
-* The addition of other metabolite ID types 9maybe using RaMP?
-* 
-
-
-
+Describe some general things such as: \* removal of items from the PK: e.g. extract ions from HMDB to enable the removal of ions from the pathways, same for xenobiotics and masspec unspecific molecules (H2O, CO2, etc.) \* The addition of other metabolite ID types 9maybe using RaMP?
+\*
 
 ## KEGG pathway-metabolite sets
-KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000]. **(KEGG_Pathways)**\
+
+KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000].
+**(KEGG_Pathways)**\
+
 ```{r}
 #This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::LoadKEGG()
 ```
+
 ```{r, echo=FALSE}
 # Check how our data looks like:
 KEGG_Pathways[c(1:3,52:54),]%>%
@@ -147,34 +164,123 @@ KEGG_Pathways[c(1:3,52:54),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-* Maybe add HMDB IDs and CheBI IDs (only if trial shows its somewhat straight forward - maybe let's use RampDB for this!)
-* If using RaMP to translate is easy, maybe we can transform this into a helper function that we reuse for the other translations we could/should do (comments below) --> Either via API or via their functions!
-* Make Ion file and unspecific molecules file in an automated manner (at the moment it is manual in the LoadKEGG): Also extract ions from HMDB to enable the removal of ions from the pathways, same for xenobiotics and masspec unspecific molecules (H2O, CO2, etc.) --> should be helper function that also communicates removal --> Can be set TRUE/FALSE dependent on the users wihses (default=TRUE)
+## Translate IDs
 
+As seen above, we have just loaded the KEGG pathways.
+Currently however, the MetaboliteID is in the form of a KEGG identifier.
+What if we want to convert or 'translate' this ID to another commonly used form of ID, for instance because our measured data uses another type of ID?
+
+Currently we support ID translation of metabolites to and from the following formats:
+
+-   KEGG
+
+-   HMDB
+
+-   ChEBI
+
+-   PubChem
+
+To achieve this, we use [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function.
+
+```{r, echo=FALSE}
+TranslateID(KEGG_Pathways[39,]) %>%
+  kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (besides HMDB)") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+However there are some important caveats with the standard TranslateID function, which we will discuss briefly here.
+
+Using the default translation settings for a single ID, we can see that we receive back a single PubChem ID and ChEBI ID. However the HMDB column has two HMDBs associated with it (HMDB0001022, HMDB01022).
+In this case this difference is trivial and due to HMDB formatting conventions: the longer version appears to be from the original HMDB ID format versus the shorter more concise version.
+To avoid this we could change the settings to remove HMDB completely, like so:
+
+```{r, echo=FALSE}
+TranslateID(KEGG_Pathways[39,], 
+            SettingsInfo = list(IdColumn="MetaboliteID", 
+                                FromFormat=c("kegg"), 
+                                ToFormat=c("pubchem","chebi"), 
+                                Method="GetAll", 
+                                GroupingVariable="term")) %>%
+  kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (besides HMDB)") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+Or, we could keep just the first item of every translation by changing the \`Method='GetFirst'\` parameter like so:
+
+```{r}
+TranslateID(KEGG_Pathways[39,], 
+            SettingsInfo = list(IdColumn="MetaboliteID", 
+                                FromFormat=c("kegg"), 
+                                ToFormat=c("pubchem","chebi", "hmdb"), 
+                                Method="GetFirst", 
+                                GroupingVariable="term")) %>% 
+  kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (taking only the first hits)") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+Ideally we would want a smarter more consistent way to filter these out (more on this soon).
+However, it is important to note that this translation process is rarely as straightforward as the one-to-one translation above (at least for PubChem and ChEBI IDs in the example).
+Very commonly, an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs).
+Occasionally, it could also be a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).
+We can inspect instances of where this is the case in our data:
+
+```{r}
+KEGG_Pathways %>% filter(MetaboliteID == 'C00009') %>% first() %>%
+  TranslateID() %>%
+  kableExtra::kbl(caption = "Example of 1-to-many translation of `KEGG_Pathways`") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+The above example of the Orthophosphate metabolite (KEGG ID C00009) shows the complexity of this one-to-many multi-mapping issue: for the single KEGG ID, it returns 4 different PubChem IDs, 4 different ChEBI IDs, and 10 different HMDB IDs.
+For pathway analysis we would want to keep only one metabolite for each pathway.
+But we would probably want to keep our metabolite choice across pathways, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our input data.
+This leads us to the next function: Filter IDs.
+
+*Previous notes from Christina:*
+
+-   *Maybe add HMDB IDs and CheBI IDs (only if trial shows its somewhat straight forward - maybe let's use RampDB for this!)*
+-   *If using RaMP to translate is easy, maybe we can transform this into a helper function that we reuse for the other translations we could/should do (comments below) --\> Either via API or via their functions!*
+-   *Make Ion file and unspecific molecules file in an automated manner (at the moment it is manual in the LoadKEGG): Also extract ions from HMDB to enable the removal of ions from the pathways, same for xenobiotics and masspec unspecific molecules (H2O, CO2, etc.) --\> should be helper function that also communicates removal --\> Can be set TRUE/FALSE dependent on the users wihses (default=TRUE)*
+
+## Filter IDs
+
+TODO
+
+Use cases:
+
+1.  Filter out translations with clear redundancy (e.g. different HMDB formats)
+2.  Filter based on user provided data (aka measured data)
+3.  Filter based on many-many mapping
 
 ## Reactome
-* As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
-* Remove unspecific metabolites
-* Translate ChEBI to HMDB and KEGG
+
+-   As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
+-   Remove unspecific metabolites
+-   Translate ChEBI to HMDB and KEGG
 
 FYI: See code I used to access via API
 
-
 ## Create pathway-metabolite sets
-The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names. This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB. The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.
+
+The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names.
+This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB.
+The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.
 
 \
-First we load an example gene-set available in the package `MetaProViz`. \
+First we load an example gene-set available in the package `MetaProViz`.\
+
 ```{r}
 #Load the example data:
 MetaProViz:::LoadHallmarks()
 ```
+
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
+
 \
 Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.\
 
@@ -187,21 +293,29 @@ Test <- MetaProViz:::Make_GeneMetabSet(Input_GeneSet,
 
 ```
 
-* Download a Geneset from MSigDB and provide trough example data --> hallmarks as this has many metabolic pathways! --> plot out how the metabolite set size is different from the original gene-set size
-* Enable to output pathway-metabolite-set or pathway-metabolite-gene set
-* Add CosmosR dependency to function built
+-   Download a Geneset from MSigDB and provide trough example data --\> hallmarks as this has many metabolic pathways!
+    --\> plot out how the metabolite set size is different from the original gene-set size
 
-* Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
-* Show bar graph of the size of the gene set versus the metabolite set
-* Maybe add KEGG IDs and CheBI IDs
-* Discuss option to run metabolite-gene set analysis together.Discuss implications of size this poses
+-   Enable to output pathway-metabolite-set or pathway-metabolite-gene set
+
+-   Add CosmosR dependency to function built
+
+-   Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
+
+-   Show bar graph of the size of the gene set versus the metabolite set
+
+-   Maybe add KEGG IDs and CheBI IDs
+
+-   Discuss option to run metabolite-gene set analysis together.Discuss implications of size this poses
 
 ## MetaLinksDB Metabolite-receptor sets
-* Enable the same MetaLinks accessibility as Daniel did in python within Liana!
+
+-   Enable the same MetaLinks accessibility as Daniel did in python within Liana!
 
 ```{r}
 MetaProViz:::LoadMetalinks()
 ```
+
 ```{r, echo=FALSE}
 # Check how our data looks like:
 MetalinksDB[c(1:8),]%>%
@@ -211,38 +325,41 @@ MetalinksDB[c(1:8),]%>%
 ```
 
 ## ocean PK
-* Add HMDB and CheBI IDs to the KEGG IDs.
-* Make ocean PK accessible via MetaProViz
+
+-   Add HMDB and CheBI IDs to the KEGG IDs.
+-   Make ocean PK accessible via MetaProViz
 
 `MetaProViz::LoadOcean`
 
 ## Summary
 
-
 ### Clustering
-* Summarize the PK based on overlap between terms --> hierarchical clustering (maybe enable multiple options here)
-* Summarize PK based on term-names and/or overlap?
-* Create function that can be used to cluster the results of the pathway analysis --> basically adds column ClusterName to pathway results file --> ClusterName is either `No Cluster` or the main words from the pathway names that are combined.
+
+-   Summarize the PK based on overlap between terms --\> hierarchical clustering (maybe enable multiple options here)
+-   Summarize PK based on term-names and/or overlap?
+-   Create function that can be used to cluster the results of the pathway analysis --\> basically adds column ClusterName to pathway results file --\> ClusterName is either `No Cluster` or the main words from the pathway names that are combined.
 
 Almost like cleaning of prior knowledge
 
 ### Lipid prediction
+
 This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
-* linex2 PKN is manually curated - instead of using this we may want to make am updateable version. 
-* Now we can at least do understand the classes present
-* LipidMaps IDs, can we link other ID types?
+\* linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
+\* Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
 
-
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-</div>
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
 
 # Check Names
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-</div>
 
-* Add MetaProViz::CheckNames --> showcase with other data maybe (data where we do have doublons or missing IDs?) --> explain here why this is needed in metabolomics
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
+
+-   Add MetaProViz::CheckNames --\> showcase with other data maybe (data where we do have doublons or missing IDs?) --\> explain here why this is needed in metabolomics
 
 ```{r}
 
@@ -312,21 +429,32 @@ CheckNames <- function(InputData,
 
 \
 \
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-</div>
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
 
 # 3. Run enrichment analysis
 
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-</div>
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
 
 ## ORA using the DMA results
-Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
-Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites. If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
+
+Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test.
+The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
+Of course, there are many other PEA methods such as the well known GSEA.
+Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites.
+If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
+
 \
-Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+Here we will use the KEGG pathways [@Kanehisa2000].
+Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names.
+In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+
 ```{r}
 #Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
@@ -354,6 +482,7 @@ for(comparison in comparisons){
 #Lets check how the results look like:
 DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGoSummary"]]
 ```
+
 ```{r, echo=FALSE}
 # Check how our data looks like:
 DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
@@ -361,11 +490,13 @@ DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-*implementation to also apply to clusters!
-
+\*implementation to also apply to clusters!
 
 ## ORA on each metabolite cluster
-As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method. As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites). In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
+
+As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method.
+As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites).
+In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
 
 ```{r, eval=FALSE}
 MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%column_to_rownames("Metabolite"),
@@ -382,35 +513,37 @@ MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%
 ```
 
 ## decoupleR
+
 Just as an example if people want to use different forms of statistical test
 
-
-
 ## Run footprinting analysis
-* Maybe move to extra vignette
-* ocean method --> MetaProViz::RunOcean
 
+-   Maybe move to extra vignette
+-   ocean method --\> MetaProViz::RunOcean
 
 # 4. Visualisation of results
 
 ## Heatmaps
+
 Add parameter `Plot_Settings` and enable "PEA" versus "Standard"
 
-
-
 ## Volcano plot
+
 In general,we have three different `Plot_Settings`, which will also be used for other plot types such as lollipop graphs.\
 `1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
-`2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
+`2.` `"Conditions"` here two or more datasets will be plotted together.
+How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
 
 </div>
-\
-\
-<div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-</div>
 
+\
+\
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
 
 # Session information
 
