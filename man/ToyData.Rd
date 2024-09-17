@@ -4,10 +4,10 @@
 \alias{ToyData}
 \title{Access built-in example data}
 \usage{
-ToyData(name)
+ToyData(Dataset)
 }
 \arguments{
-\item{name}{Character: name of a built-in dataset:
+\item{Dataset}{Character: name of a built-in dataset:
 \itemize{
 \item{\code{"IntraCells_Raw"}: }
 \item{\code{"IntraCells_DMA"}: }
