@@ -307,17 +307,17 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   ##############################################
   #-----widths general
   plottable %<>%
-    set_width("axis-b", unit(8, "cm")) %>%
-    set_width("ylab-l", unit(0, "cm"), offset = -4L, ifempty = FALSE) %>%
-    set_width("axis-l", unit(1, "cm")) %>%
-    set_width("ylab-l", unit(1, "cm")) %>%
-    set_width("guide-box-left", unit(0, "cm")) %>%
-    set_width("axis-r", unit(0, "cm")) %>%
-    set_width("ylab-r", unit(0, "cm")) %>%
-    set_width("ylab-l", unit(1, "cm"), offset = -1L) %>%
-    set_width("guide-box-right", unit(1, "cm"))
+    set_width("axis-b", "8cm") %>%
+    set_width("ylab-l", "0cm", offset = -4L, ifempty = FALSE) %>%
+    set_width("axis-l", "1cm") %>%
+    set_width("ylab-l", "1cm") %>%
+    set_width("guide-box-left", "0cm") %>%
+    set_width("axis-r", "0cm") %>%
+    set_width("ylab-r", "0cm") %>%
+    set_width("ylab-l", "1cm", offset = -1L) %>%
+    set_width("guide-box-right", "1cm")
 
-  # plottable$widths[7] <- unit(8, "cm")#controls x-axis
+  # plottable$widths[7] <- "8cm"#controls x-axis
   # plottable$widths[6] <- unit(1,"cm")#controls margins --> Distance y-axis label to axis
   # plottable$widths[5] <- unit(1,"cm")#controls margins --> start Figure legend
   # plottable$widths[4] <- unit(1,"cm")#Space to left side
@@ -329,16 +329,16 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #############################################
   #-----heigths general
   plottable %<>%
-    set_height("axis-l", unit(8, "cm")) %>%
-    set_height("axis-b", unit(1, "cm")) %>%
-    set_height("xlab-b", unit(.5, "cm")) %>%
-    set_height("xlab-b", unit(1, "cm"), offset = 1L) %>%
-    set_height("title", unit(0, "cm"), offset = -2L, ifempty = FALSE) %>%
-    set_height("title", unit(0, "cm"), offset = -1L) %>%
-    set_height("title", unit(0, "cm")) %>%
-    set_height("subtitle", unit(0, "cm")) %>%
-    set_height("guide-box-top", unit(0, "cm")) %>%
-    set_height("xlab-t", unit(0, "cm"), offset = -1L)
+    set_height("axis-l", "8cm") %>%
+    set_height("axis-b", "1cm") %>%
+    set_height("xlab-b", ".5cm") %>%
+    set_height("xlab-b", "1cm", offset = 1L) %>%
+    set_height("title", "0cm", offset = -2L, ifempty = FALSE) %>%
+    set_height("title", "0cm", offset = -1L) %>%
+    set_height("title", "0cm") %>%
+    set_height("subtitle", "0cm") %>%
+    set_height("guide-box-top", "0cm") %>%
+    set_height("xlab-t", "0cm", offset = -1L)
 
   # plottable$heights[9] <- unit(8, "cm")#controls x-axis
   # plottable$heights[10] <- unit(1,"cm")#controls margins --> Distance x-axis label to axis

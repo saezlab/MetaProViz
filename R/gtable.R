@@ -27,6 +27,7 @@ set_size <- function(
         callback = partial(switch, TRUE)
     ) {
 
+    size %<>% parse_unit
     col <- list(heights = 't', widths = 'l') %>% extract2(dim)
 
     idx <-
@@ -101,3 +102,32 @@ set_height <- partial(set_size, dim = 'heights')
 #' @importFrom purrr partial
 #' @noRd
 set_width <- partial(set_size, dim = 'widths')
+
+#' Parse a unit from a string
+#'
+#' @param u Character: unit as a string, e.g. "1in".
+#'
+#' @importFrom magrittr %>%
+#' @importFrom stringr str_trim str_match
+#' @importFrom rlang !!! exec
+#' @importFrom grid unit
+#' @noRd
+parse_unit <- function(u) {
+
+    u %>%
+    {`if`(
+        is.character(.),
+        str_trim(.) %>%
+        str_match('^([0-9.]+)([a-z]+)$') %>%
+        {`if`(
+            !any(is.na(.)),
+            exec(unit, !!!.[-1L]),
+            {
+                log_warn('Could not parse unit %s', u)
+                unit(1, 'null')
+            }
+        )},
+        .
+    )}
+
+}
