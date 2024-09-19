@@ -229,3 +229,89 @@ MetaAnalysis <- function(InputData,
     invisible(return(ResList))
 
 }
+
+
+###############################################
+### ### ### MetaPriorKnowlegde ### ### ###
+###############################################
+
+
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
+#' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
+#' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#'
+#' @keywords prior knowledge
+#' @export
+
+
+
+MetaPK <- function(InputData,
+                   SettingsFile_Sample,
+                   SaveAs_Table = "csv",
+                   FolderPath = NULL){
+
+  ## ------------ Setup and installs ----------- ##
+  RequiredPackages <- c("tidyverse")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
+
+  ################################################################################################################################################################################################
+  ## ------------ Check Input files ----------- ##
+  # HelperFunction `CheckInput`
+
+
+
+
+
+  ## ------------ Create Results output folder ----------- ##
+  if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
+    Folder <- MetaProViz:::SavePath(FolderName= "MetaAnalysis",
+                                    FolderPath=FolderPath)
+  }
+
+  ###############################################################################################################################################################################################################
+  ## ---------- Create Prior Knowledge file format to perform enrichment analysis ------------##
+  # Use the Sample metadata for this:
+  if(is.null(SettingsInfo)==TRUE){
+    MetaData <- names(SettingsFile_Sample)
+    SettingsFile_Sample <- SettingsFile_Sample%>%
+      rownames_to_column("SampleID")
+  }else{
+    MetaData <- SettingsInfo
+    SettingsFile_Sample_subset <- SettingsFile_Sample[, MetaData, drop = FALSE]%>%
+      rownames_to_column("SampleID")
+  }
+
+  # Convert into a pathway DF
+  Metadata_df <- SettingsFile_Sample_subset %>%
+    pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry")%>%
+    unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
+  Metadata_df$mor <- 1
+
+  #Run ULM using decoupleR (input=PCs from prcomp and pkn=Metadata_df)
+  #ULM_res <- decoupleR::run_ulm(mat=as.matrix(PCA.res$x),
+  #                              net=Metadata_df,
+  #                              .source='term',
+  #                              .target='SampleID',
+  #                              .mor='mor',
+  #                              minsize = 5)
+
+  #Add explained variance into the table:
+  #prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
+  #  rownames_to_column("PC")%>%
+   # mutate(PC = paste("PC", PC, sep=""))%>%
+   # dplyr::rename("Explained_Variance"=2)
+
+  #ULM_res <- merge(ULM_res, prop_var_ex,  by.x="condition",by.y="PC",all.x=TRUE)
+
+
+  ###############################################################################################################################################################################################################
+  ## ---------- Save ------------##
+  # Add to results DF
+  Res <- list(MetaData_PriorKnowledge = Metadata_df)
+
+}
+

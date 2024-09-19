@@ -86,7 +86,7 @@ We can load the `ToyData`, which includes columns with Sample information and co
 devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 # Load the example data:
-Tissue_Norm <- MetaProViz:::ToyData("Tissue_Norm")
+Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
 
 ```
 ```{r, echo=FALSE}
@@ -129,10 +129,12 @@ This has been done by the authors of the paper and we will use the median normal
 
 ## Metadata analysis
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
-This is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
-The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs and in turn perform annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
-Since often a combination of demographics is driving the separation of the samples, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. In order to do this we can use the parameter `SettingsInfo` and provide the column name of our main separator.\
+### Anova-based
+Here the metdata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
+\
+Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `SettingsInfo` and provide the column name of our main separator.\
 ```{r}
 #Would it make sense here to separate tumour and normal for stage? --> meaning Normal-Stage1. Would this be useful for the other demographics too? --> e.g. Young-Stage1 
 #If yes, should we enable the user to pass a primary separator and secondary separators?
@@ -247,79 +249,13 @@ Now we can make individual heatmap of each demographic comparison of interest us
 
 ```
 
-```{r}
+### Enrichment analysis-based
 
-# Move to metaData analysis in order to make own pathways. Showcase in enrichment analysis vignette.
+*we can make pathway file from metadata and use this to run enrichment analysis. 
+*At the moment we can just make the pathways and we need to include a standard fishers exact test.
+*Merge with function above?
 
-## ---------- ULM ------------##
-# Use the Sample metadata for this:
-if(is.null(SettingsInfo)==TRUE){
-  MetaData <- names(SettingsFile_Sample)
-  SettingsFile_Sample <- SettingsFile_Sample%>%
-    rownames_to_column("SampleID")
-}else{
-  MetaData <- SettingsInfo
-  SettingsFile_Sample_subset <- SettingsFile_Sample[, MetaData, drop = FALSE]%>%
-    rownames_to_column("SampleID")
-}
-
-# Convert into a pathway DF
-Metadata_df <- SettingsFile_Sample_subset %>%
-  pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry")%>%
-  unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
-Metadata_df$mor <- 1
-
-#Run ULM using decoupleR (input=PCs from prcomp and pkn=Metadata_df)
-ULM_res <- decoupleR::run_ulm(mat=as.matrix(PCA.res$x),
-                              net=Metadata_df,
-                              .source='term',
-                              .target='SampleID',
-                              .mor='mor',
-                              minsize = 5)
-
-#Add explained variance into the table:
-prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
-  rownames_to_column("PC")%>%
-  mutate(PC = paste("PC", PC, sep=""))%>%
-  dplyr::rename("Explained_Variance"=2)
-
-ULM_res <- merge(ULM_res, prop_var_ex,  by.x="condition",by.y="PC",all.x=TRUE)
-
-#Add top/bottom related features (= e.g. metabolites) to this
-## Create a data frame for top and bottom features for each PC
-TopBottom_Features <- lapply(2:ncol(PCA.res_Loadings), function(i){
-  #Make input
-  pc_loadings <- PCA.res_Loadings[, c("FeatureID", names(PCA.res_Loadings)[i])]
-  #get top and bottom features
-  n_features <- nrow(pc_loadings)
-  n_selected <- round(Percentage * n_features)
-
-  top_features <- as.data.frame(head(arrange(pc_loadings, desc(!!sym(names(pc_loadings)[2]))), n_selected)$FeatureID)%>%
-    dplyr::rename("FeatureID"=1)
-  bottom_features <- as.data.frame(head(arrange(pc_loadings, !!sym(names(pc_loadings)[2])), n_selected)$FeatureID) %>%
-    dplyr::rename("FeatureID"=1)
-
-  #Add other ID types if applicable
-  if(is.null(SettingsFile_Sample)==FALSE){
-    top_features <- merge(x=SettingsFile_Sample, y=top_features, by.x=SettingsInfo_Feature[["FeatureID"]], by.y="FeatureID", all.y=TRUE)%>%
-      summarise_all(~toString(unique(.)))%>%
-      rename_all(~paste(paste("Top", Percentage*100, "%_", sep=""), ., sep = ""))
-
-    bottom_features <- merge(x=SettingsFile_Sample, y=bottom_features, by.x=SettingsInfo_Feature[["FeatureID"]], by.y="FeatureID", all.y=TRUE)%>%
-      summarise_all(~toString(unique(.)))%>%
-      rename_all(~paste(paste("Bottom", Percentage*100, "%_", sep=""), ., sep = ""))
-  }
-
-  #Return
-  res <- cbind(data.frame(PC=paste("PC", i, sep = "")), top_features, bottom_features)
-  return(res)
-}) %>%
-  bind_rows(.id = "PC")%>%
-  mutate(PC = paste("PC", PC, sep=""))
-
-## Add to results DF
-ULM_res <- merge(ULM_res, TopBottom_Features,  by.x="condition",by.y="PC",all.x=TRUE)
-```
+*Advantage/disadvantage: Not specific - with annova PC we get granularity e.g. smoker-ExSmoker-PC5, whilst here we only get smoking in generall as parameter
 
 ## DMA
 Here we use Differential Metabolite Analysis (`DMA`) to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value.\
@@ -394,7 +330,25 @@ we can use the `MetaProViz::BiologicalRegulatedClustering()` function.\
 
 
 ```
+
+
+Now we can use this information to colour code our volcano plot:
+
+Make individual volcano plots:
+*Like the one from young versus old for dipeptides!
+
+We can also use this information on the heatmap:
+
+
+*Do we see that clustering somewhat matches with our assigned clusters?
+
+
 ### ORA using the DMA results
+Check dipeptides for enrichment analysis per cluster
+
+
+*Send users to enrichment vignette if there are interested in accessing and using metabolite prior knowledge for enrichmnet analysis.
+
 
 
 </div>
