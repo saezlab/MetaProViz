@@ -235,7 +235,8 @@ MetaAnalysis <- function(InputData,
 ### ### ### MetaPriorKnowlegde ### ### ###
 ###############################################
 
-
+#' Meta prior-knowledge
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
@@ -244,9 +245,6 @@ MetaAnalysis <- function(InputData,
 #'
 #' @keywords prior knowledge
 #' @export
-
-
-
 MetaPK <- function(InputData,
                    SettingsFile_Sample,
                    SaveAs_Table = "csv",
