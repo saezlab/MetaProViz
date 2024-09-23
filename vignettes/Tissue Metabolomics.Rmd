@@ -131,7 +131,7 @@ This has been done by the authors of the paper and we will use the median normal
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
 \
 ### Anova-based
-Here the metdata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
 The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
 Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `SettingsInfo` and provide the column name of our main separator.\
@@ -302,7 +302,7 @@ for(item in names(DFs)){
 ```
 \
 We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
-Here we can also use the VizVolcano to plot comparisons together on the same plot, such as Tumour versus normal of young and old patients:\
+Here we can also use the `MetaproViz::VizVolcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
 ```{r}
 #Early versus Late Stage
 MetaProViz::VizVolcano(PlotSettings="Compare",
@@ -321,11 +321,11 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
                        Subtitle= "Results of DMA" )
 ```
 \
-Here we can observe that Tumour versus Normal has lower signifcance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
+Here we can observe that Tumour versus Normal has lower significance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
 
 ## Biological regulated clustering
 To understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age, 
-we can use the `MetaProViz::BiologicalRegulatedClustering()` function.\
+we can use the `MetaProViz::MCA_2Cond()` function.\
 ```{r}
 
 
@@ -347,7 +347,12 @@ We can also use this information on the heatmap:
 Check dipeptides for enrichment analysis per cluster
 
 
-*Send users to enrichment vignette if there are interested in accessing and using metabolite prior knowledge for enrichmnet analysis.
+*Send users to enrichment vignette if there are interested in accessing and using metabolite prior knowledge for enrichment analysis.
+
+
+
+*can we use metadata analysis to find separators of one cell type from the rest (e.g. when multiple cell lines are plotted on the PCA)
+* can we extract confounding factors, as in demographics that change together.
 
 
 
