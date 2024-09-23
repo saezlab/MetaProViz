@@ -118,7 +118,7 @@ parse_unit <- function(u) {
     {`if`(
         is.character(.),
         str_trim(.) %>%
-        str_match('^([0-9.]+)([a-z]+)$') %>%
+        str_match('^(-?[0-9.]+)([a-z]+)$') %>%
         {`if`(
             !any(is.na(.)),
             exec(unit, !!!.[-1L]),
