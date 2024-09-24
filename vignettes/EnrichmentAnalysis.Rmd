@@ -4,6 +4,9 @@ author:
   - name: Christina Schmidt
     affiliation:
     - Heidelberg Universiy
+    - name: Macabe Daley
+    affiliation:
+    - Heidelberg Universiy
 output: 
   html_document:
     self_contained: true
@@ -59,6 +62,7 @@ In this vignette we focus on accessing prior knowledge needed to for example run
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
+devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 #dependencies that need to be loaded:
 library(tidyverse)
@@ -66,12 +70,7 @@ library(tidyverse)
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
 #BiocManager::install("EnhancedVolcano")
-
-
-#Load package locally:
-devtools::load_all() #"C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz"
 ```
-
 \
 \
 
@@ -100,7 +99,7 @@ Here we load the processed intracellular example data for the comparison of 786M
 
 ```{r}
 #Load the Pre-processed intracellular data:
-MetaProViz::ToyData(data="IntraCells_DMA")
+Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 ```
 
 ```{r, echo=FALSE}
@@ -119,7 +118,7 @@ Here we load publicly available data from the [paper](https://www.cell.com/cance
 
 ```{r}
 # Load the example data:
-MetaProViz::ToyData(data="Tissue_Norm")
+MetaProViz::ToyData(Data="Tissue_Norm")
 
 ```
 
@@ -135,7 +134,7 @@ MetaProViz::ToyData(data="Tissue_Norm")
 :::
 :::
 
-# 2. Loading prior knowledge
+# 2. Accessing Prior Knowledge
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -143,20 +142,19 @@ MetaProViz::ToyData(data="Tissue_Norm")
 :::
 
 \
+Metabolite prior knowledge (PK) is essential for the interpretation of metabolomics data. It can be used to perform pathway enrichment analysis, compound class enrichment analysis, and by using specific PK databases, it can be used to study the connection of metabolites and receptors or transporters.Since the quality and content of the PK will dictate the success of the downstream analysis and biological interpretation, it is important to ensure the PK is used correctly.\
+Specifically in metabolite PK, the many different PK databases and resources pose several issues. Indeed, the metabolite identifiers (e.g. KEGG, HMDB, PubChem, etc.) are not standardized across databases, and the same metabolite can have multiple identifiers in different databases. This is known as the many-to-many mapping problem (REF).\
+Moreover, metabolic pathways that are the basis of the PK databases also includes co-factors such as ions or other small molecules that are not only part of most reactions, but can also not be detected in experimentallly acquired data (e.g. H2O, CO2, etc).
 
-Describe some general things such as: \* removal of items from the PK: e.g. extract ions from HMDB to enable the removal of ions from the pathways, same for xenobiotics and masspec unspecific molecules (H2O, CO2, etc.) \* The addition of other metabolite ID types 9maybe using RaMP?
-\*
 
 ## KEGG pathway-metabolite sets
-
 KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000].
 **(KEGG_Pathways)**\
-
 ```{r}
 #This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::LoadKEGG()
 ```
-
+\
 ```{r, echo=FALSE}
 # Check how our data looks like:
 KEGG_Pathways[c(1:3,52:54),]%>%
@@ -164,7 +162,72 @@ KEGG_Pathways[c(1:3,52:54),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-## Translate IDs
+## Create pathway-metabolite sets
+The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names by using a PK network of metabolic reactions calles CosmosR (REF). This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB (REF). Moroever, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
+The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.\
+```{r}
+#Load the example data:
+MetaProViz::LoadHallmarks()
+```
+\
+```{r, echo=FALSE}
+# Check how our data looks like:
+Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.\
+```{r}
+# *Add save function!!!! 
+# * Enable to output pathway-metabolite-set or pathway-metabolite-gene set
+
+#Translate gene names to metabolite names
+Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
+                                      Target=c("gene"),
+                                      OutputName=NULL,
+                                      FolderPath = NULL)
+
+```
+
+```{r}
+# Check how our data looks like:
+Hallmarks_GeneMetab[c(2833,2854,2786,8009),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+
+```
+
+```{r}
+#plot out how the metabolite set size is different from the original gene-set size
+#Show bar graph of the size of the gene set versus the metabolite set
+
+
+```
+
+-   Add CosmosR dependency to function built
+
+-   Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
+
+-   Discuss option to run metabolite-gene set analysis together.Discuss implications of size this poses
+
+## MetaLinksDB Metabolite-receptor sets
+The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters (REF).\
+
+```{r}
+MetaProViz:::LoadMetalinks()
+```
+
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetalinksDB[c(1:8),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `MetaLinks` including metabolite-receptor sets.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+
+```
+
+
+# 3. Translate IDs
 
 As seen above, we have just loaded the KEGG pathways.
 Currently however, the MetaboliteID is in the form of a KEGG identifier.
@@ -260,69 +323,7 @@ Use cases:
 
 FYI: See code I used to access via API
 
-## Create pathway-metabolite sets
 
-The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names.
-This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB.
-The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.
-
-\
-First we load an example gene-set available in the package `MetaProViz`.\
-
-```{r}
-#Load the example data:
-MetaProViz:::LoadHallmarks()
-```
-
-```{r, echo=FALSE}
-# Check how our data looks like:
-Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-\
-Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.\
-
-```{r}
-#Translate gene names to metabolite names
-Test <- MetaProViz:::Make_GeneMetabSet(Input_GeneSet,
-                                       Target=c("gene"),
-                                       OutputName=NULL,
-                                       FolderPath = NULL)
-
-```
-
--   Download a Geneset from MSigDB and provide trough example data --\> hallmarks as this has many metabolic pathways!
-    --\> plot out how the metabolite set size is different from the original gene-set size
-
--   Enable to output pathway-metabolite-set or pathway-metabolite-gene set
-
--   Add CosmosR dependency to function built
-
--   Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
-
--   Show bar graph of the size of the gene set versus the metabolite set
-
--   Maybe add KEGG IDs and CheBI IDs
-
--   Discuss option to run metabolite-gene set analysis together.Discuss implications of size this poses
-
-## MetaLinksDB Metabolite-receptor sets
-
--   Enable the same MetaLinks accessibility as Daniel did in python within Liana!
-
-```{r}
-MetaProViz:::LoadMetalinks()
-```
-
-```{r, echo=FALSE}
-# Check how our data looks like:
-MetalinksDB[c(1:8),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `MetaLinks` including metabolite-receptor sets.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-
-```
 
 ## ocean PK
 
