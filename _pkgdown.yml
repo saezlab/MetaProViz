@@ -17,7 +17,7 @@ navbar:
   bg: primary #If you want a different style you can check on bootstrap, e.g. for bootswatch: flatly = https://bootswatch.com/flatly/
   structure:
     left: [home, intro, articles, reference, tutorials, news] #intro: “Get Started”, which links to a vignette with the same name as the package.#reference, if there are any .Rd files. #articles, if there are any vignettes or articles.#tutorials, if there any tutorials. #news, if NEWS.md exists.
-    right: [search, github, twitter,twitter2, homepage, homepage2]
+    right: [search, github, homepage, homepage2]
   components:
     #Customize articles:
     articles:
@@ -29,27 +29,14 @@ navbar:
       - text: CoRe Metabolomics
         href: articles/CoRe Metabolomics.html
     #customize intro:
-    intro:
-      text: Introduction
-      icon: fa-home
-      href: articles/MetaProViz.html
-    #customize intro:
     reference:
       text: Reference
       icon: "fa-solid fa-rocket"
       href: reference/index.html
-    #Customize twitter:
+    #Customize github:
     github:
       icon: "fa-brands fa-github"
-      href: https://github.com/saezlab
-    #Customize twitter:
-    twitter:
-      icon: "fab fa-twitter fa-lg"
-      href: https://twitter.com/saezlab
-    #Customize twitter:
-    twitter2:
-      icon: "fab fa-twitter fa-lg"
-      href: https://twitter.com/FrezzaLab/
+      href: https://github.com/saezlab/MetaProViz
     #Customize homepage:
     homepage:
       icon: "fas fa-university"
@@ -57,7 +44,6 @@ navbar:
     homepage2:
       icon: "fas fa-university" # Add the icon you want
       href: https://frezza.cecad-labs.uni-koeln.de/home
-
 
 home:
   sidebar:
