@@ -274,15 +274,15 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   ##-------------- Cosmos PKN
   #load the network from cosmos
   data("meta_network", package = "cosmosR")
-  meta_network <- meta_network[which(meta_network$source != meta_network$Target),]
+  meta_network <- meta_network[which(meta_network$source != meta_network$target),]
 
   #adapt to our needs extracting the metabolites:
-  meta_network_metabs <- meta_network[grepl("Metab__HMDB", meta_network$source) | grepl("Metab__HMDB", meta_network$Target),-2]#extract entries with metabolites in source or Target
-  meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$Target),]#extract entries with genes in source or Target
+  meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target),-2]#extract entries with metabolites in source or Target
+  meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target),]#extract entries with genes in source or Target
 
   #Get reactant and product
   meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),]%>% dplyr::rename("metab"=1, "gene"=2)
-  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$Target),]%>% dplyr::rename("gene"=1, "metab"=2)
+  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),]%>% dplyr::rename("gene"=1, "metab"=2)
 
   meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
   meta_network_metabs$gene <- gsub("Gene.*__","",meta_network_metabs$gene)
