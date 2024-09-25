@@ -286,124 +286,56 @@ VizPCA <- function(InputData,
 }
 
 
-##############################################################
-### ### ### PCA helper function: Internal Function ### ### ###
-##############################################################
+PCA_PARAM <- list(
+  widths = list(
+    list("axis-b", "8cm"),
+    list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+    list("axis-l", "1cm"),
+    list("ylab-l", "1cm"),
+    list("guide-box-left", "0cm"),
+    list("axis-r", "0cm"),
+    list("ylab-r", "0cm"),
+    list("ylab-l", "1cm", offset = -1L),
+    list("guide-box-right", "1cm")
+  ),
+  heights = list(
+    list("axis-l", "8cm"),
+    list("axis-b", "1cm"),
+    list("xlab-b", ".5cm"),
+    list("xlab-b", "1cm", offset = 1L),
+    list("title", "0cm", offset = -2L, ifempty = FALSE),
+    list("title", "0cm", offset = -1L),
+    list("title", "1cm"),
+    list("subtitle", "0cm"),
+    list("guide-box-top", "0cm"),
+    list("xlab-t", "0cm", offset = -1L)
+  )
+)
 
+
+#' PCA helper function: Internal Function
+#'
 #' @param InputPlot This is the ggplot object generated within the VizPCA function.
 #' @param SettingsInfo Passed to VizPCA
 #' @param PlotName Passed to VizPCA
 #'
 #' @keywords PCA helper function
 #' @importFrom ggplot2 ggplotGrob
-#' @importFrom magrittr %<>% %>% add multiply_by
-#' @importFrom grid convertUnit unit
-#' @importFrom ggpubr get_legend
-#' @importFrom logger log_trace
-#' @importFrom purrr map
+#' @importFrom magrittr %>%
 #' @noRd
 PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
-  #------- Set the total heights and widths
-  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable <-
-    ggplotGrob(InputPlot) %>%
-    withCanvasSize(width = 12, height = 11) # Convert the plot to a gtable
-  ptb <<- plottable
+  InputPlot %>%
+  ggplotGrob %>%
+  withCanvasSize(width = 12, height = 11) %>%
+  adjust_layout(PCA_PARAM) %>%
+  adjust_title(PlotName) %>%
+  adjust_legend(
+    InputPlot,
+    sections = c("color", "shape"),
+    SettingsInfo = SettingsInfo
+  )
 
-  plottable %<>%
-    ##############################################
-    #-----widths general
-    set_width("axis-b", "8cm") %>%
-    set_width("ylab-l", "0cm", offset = -4L, ifempty = FALSE) %>%
-    set_width("axis-l", "1cm") %>%
-    set_width("ylab-l", "1cm") %>%
-    set_width("guide-box-left", "0cm") %>%
-    set_width("axis-r", "0cm") %>%
-    set_width("ylab-r", "0cm") %>%
-    set_width("ylab-l", "1cm", offset = -1L) %>%
-    set_width("guide-box-right", "1cm") %>%
-    #############################################
-    #-----heigths general
-    set_height("axis-l", "8cm") %>%
-    set_height("axis-b", "1cm") %>%
-    set_height("xlab-b", ".5cm") %>%
-    set_height("xlab-b", "1cm", offset = 1L) %>%
-    set_height("title", "0cm", offset = -2L, ifempty = FALSE) %>%
-    set_height("title", "0cm", offset = -1L) %>%
-    set_height("title", "1cm") %>%
-    set_height("subtitle", "0cm") %>%
-    set_height("guide-box-top", "0cm") %>%
-    set_height("xlab-t", "0cm", offset = -1L)
-
-  #############################################
-  #----- Plot Name
-    #------ Height
-  if (nchar(PlotName) > 0L) {
-    plottable %<>% set_height("title", "1.5cm")#controls margins --> PlotName and subtitle
-    # Sum up total heights:
-    plottable$height %<>% add(unit(.5, "cm"))
-
-    #------- Width: Check how much width is needed for the figure title/subtitle
-    title_width <- unit(nchar(PlotName) * .25 + .8, "cm")
-    plottable %<>% set_width(
-      "guide-box-right",
-      sprintf('%.02fcm', title_width - plottable$width),
-      callback = max
-    )
-    plottable$width %<>% max(title_width)
-
-  }
-
-  #############################################
-  #-------- Figure legend
-  legend_sections <- c("color", "shape")
-  if(any(legend_sections %in% names(SettingsInfo))) {
-
-    log_trace('color and/or shape in SettingsInfo')
-    Legend <- get_legend(InputPlot) # Extract legend to adjust separately
-    leg <<- Legend
-    #gtable::gtable_show_layout(leg)
-    #plot(leg)
-
-    #------- Legend widths
-    ## Legend titles:
-    legend_nchar <-
-       legend_sections %>%
-       map(nchar) %>%
-       unlist %>%
-       max %>%
-       multiply_by(.25)
-
-    legend_width <-
-      Legend$width[3L] %>%
-      as.numeric %>%
-      round(1L) %>%
-      max(legend_nchar)
-
-    ## Legend space:
-    plottable %<>% set_width(
-      "guide-box-right",
-      sprintf('%.02fcm', legend_width),
-      callback = max,
-      grow = TRUE
-    )
-
-    #------- Legend heights
-    Legend_heights <- (round(as.numeric(Legend$heights[3L]), 1L))+(round(as.numeric(Legend$heights[5L]), 1L)) + 2 #+2 to secure space above and below plot
-    if(as.numeric(plottable$height) < Legend_heights){
-      Add <- (Legend_heights-plottable$height) / 2
-      plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-      plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-      plottable$height <- unit(Legend_heights, "cm")
-    }
-
-  }else{
-    log_trace('No SettingsInfo')# = No figure legend
-  }
-  ptb1 <<- plottable
-
-  plottable
 }
 
 

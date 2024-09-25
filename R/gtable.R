@@ -40,7 +40,7 @@ set_size <- function(
     col <- dim %>% gtable_col
     tdim <- dim %>% str_sub(end = -2L)
 
-    idx <- gtable_idx(gtbl, name, offset, dim)
+    idx <- gtable_idx(gtbl, name, dim, offset = offset)
 
     name_miss <- length(idx) == 0L
 
@@ -81,7 +81,7 @@ set_size <- function(
         original <- gtbl[[dim]][idx]
         size %<>% callback(original)
 
-        if (grow && tdim %in% names(gtbl) && size != original) {
+        if (grow && tdim %in% names(gtbl)) {
             grow %<>% {`if`(is.numeric(.), ., size - original)}
             log_trace(
                 paste0(
@@ -120,6 +120,40 @@ set_height <- partial(set_size, dim = 'heights')
 #' @noRd
 set_width <- partial(set_size, dim = 'widths')
 
+
+#' Apply simple width and height adjustments to gtable layout
+#'
+#' @importFrom magrittr %>%
+#' @importFrom purrr reduce
+#' @noRd
+adjust_layout <- function(gtbl, param) {
+
+    c('widths', 'heights') %>%
+    reduce(
+        ~set_sizes(.x, .y, param[[.y]]),
+        .init = gtbl
+    )
+
+}
+
+
+#' Apply simple adjustments along one dimension of a gtable layout
+#'
+#' @importFrom magrittr %>%
+#' @importFrom purrr reduce
+#' @importFrom rlang !!!
+#' @noRd
+set_sizes <- function(gtbl, dim, param) {
+
+    param %>%
+    reduce(
+        ~exec(set_size, .x, !!!.y, dim = dim),
+        .init = gtbl
+    )
+
+}
+
+
 #' Parse a unit from a string
 #'
 #' @param u Character: unit as a string, e.g. "1in".
@@ -130,6 +164,8 @@ set_width <- partial(set_size, dim = 'widths')
 #' @importFrom logger log_warn
 #' @noRd
 parse_unit <- function(u) {
+
+    log_trace('Parsing unit from `%s`', u)
 
     u %>%
     {`if`(
@@ -144,7 +180,7 @@ parse_unit <- function(u) {
                 unit(1, 'null')
             }
         )},
-       `if`(is.numeric(.), unit(., 'cm'), .)
+       `if`(is.numeric(.), cm(.), .)
     )}
 
 }
@@ -198,5 +234,123 @@ gtable_idx <- function(gtbl, name, dim, offset = 0L) {
 gtable_col <- function(dim) {
 
     list(heights = 't', widths = 'l') %>% extract2(dim) %||% dim
+
+}
+
+
+#' Adjust gtable paremeters to accommodate title(s)
+#'
+#' @param gtbl A TableGrob (gtable) object.
+#' @param titles Character: titles to be added to the plot. Most commonly we
+#'     have one title, sometimes there is also a subtitle.
+#'
+#' @importFrom magrittr %<>% %>% add
+#' @importFrom logger log_trace
+#' @noRd
+adjust_title <- function(gtbl, titles) {
+
+    print(titles)
+    if (titles %>% nchar %>% as.logical %>% any) {
+
+        log_trace('The plot has title, adjusting layout to accommodate it.')
+
+        gtbl %<>% set_height('title', '1.5cm')#controls margins --> PlotName and subtitle
+        # Sum up total heights:
+        gtbl$height %<>% add(cm(.5))
+
+        #------- Width: Check how much width is needed for the figure title/subtitle
+        title_width <- titles %>% char2cm %>% max %>% cm
+        gtbl %<>% set_width(
+            'guide-box-right',
+            sprintf('%.02fcm', title_width - gtbl$width),
+            callback = max
+        )
+        gtbl$width %<>% max(title_width)
+
+    }
+
+    invisible(gtbl)
+
+}
+
+
+#' Adjust gtable paremeters to accommodate legend(s)
+#'
+#' @importFrom ggpubr get_legend
+#' @importFrom magrittr %<>% %>% extract add multiply_by
+#' @importFrom logger log_trace
+#' @importFrom purrr map_int
+#' @noRd
+adjust_legend <- function(
+        gtbl,
+        InputPlot,
+        sections = FALSE,
+        SettingsInfo = NULL
+    ) {
+
+    if(
+        any(sections %in% names(SettingsInfo)) ||
+        identical(sections, TRUE)
+    ) {
+
+        log_trace('The plot has legend, adjusting layout to accommodate it.')
+        log_trace('Sections: %s', paste0(sections, collapse = ', '))
+
+        Legend <- get_legend(InputPlot) # Extract legend to adjust separately
+        leg <<- Legend
+
+        #------- Legend widths
+        ## Legend titles:
+        legend_nchar <-
+            SettingsInfo %>%
+            as.list %>%
+            extract(sections) %>%
+            unlist %>%
+            map_int(nchar) %>%
+            max(0L) %>%
+            multiply_by(.25)
+
+        legend_width <-
+            Legend$widths[3L] %>%
+            as.numeric %>%
+            round(1L) %>%
+            max(legend_nchar)
+
+        log_trace('Legend nchar: %.02fcm, Legend width: %.02fcm', legend_nchar, legend_width)
+
+        ## Legend space:
+        gtbl %<>%
+            set_width(
+                'guide-box-right',
+                sprintf('%.02fcm', legend_width),
+                callback = max,
+                # here we have a bug, this should be TRUE
+                grow = FALSE
+            )
+
+        #------- Legend heights
+        Legend_heights <-
+            Legend$heights %>%
+            extract(c(3L, 5L)) %>%
+            as.numeric %>%
+            sum(2) #+2 to secure space above and below plot
+
+        if(as.numeric(gtbl$height) < Legend_heights){
+
+            Add <- (Legend_heights - gtbl$height) / 2
+
+            gtbl %<>%
+                #controls margins --> Can be increased if Figure legend needs more space on the top
+                set_height('background', cm(Add)) %>%
+                #controls margins --> Can be increased if Figure legend needs more space on the bottom
+                set_height('xlab-b', cm(Add), offset = 1L)
+
+            gtbl$height <- cm(Legend_heights)
+
+        }
+
+    }
+
+    invisible(gtbl)
 
 }
