@@ -188,10 +188,6 @@ LoadKEGG <- function(){
     saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
   }
 
-  #Use translate ID function to add other ID types (HMDB, ChEBI, PubChem)
-  #Note - not implemented here atm beacuse I think it is best left to the other functions. Can discuss or come back to this later. Leaving as placeholder just in case.
-  #assign("KEGG_Pathways", KEGG_Pathways_translated_first, envir=.GlobalEnv) # previously had this kind of approach for assigning translated results to KEGG Pathways. Leaving as placeholder just in case.
-
   #Return into environment
   assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
 }
@@ -226,15 +222,17 @@ LoadHallmarks <- function() {
 #' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
 #'
 #' @param Input_GeneSet Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
-#' @param Target \emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = "gene")
-#' @param OutputName {Optional:} String which is added to the output files name.\strong(Default = NULL)
+#' @param SettingsInfo \emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = c(Target="gene"))
+#' @param PKName \emph{Optional: } Name of the prior knowledge resource. \strong(Default = NULL)
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
 #'
 #' @export
 
 Make_GeneMetabSet <- function(Input_GeneSet,
-                              Target=c("gene"),
-                              OutputName=NULL,
+                              SettingsInfo=c(Target="gene"),
+                              PKName= NULL,
+                              SaveAs_Table = "csv",
                               FolderPath = NULL){
 
   ## ------------ Setup and installs ----------- ##
@@ -249,40 +247,37 @@ Make_GeneMetabSet <- function(Input_GeneSet,
     stop("`Input_GeneSet` must be of class data.frame with columns for source (=term) and Target (=gene). Please check your input")
   }
   # 2. Target:
+  if("Target" %in% names(SettingsInfo)){
+    if(SettingsInfo[["Target"]] %in% colnames(Input_GeneSet)== FALSE){
+      stop("The ", SettingsInfo[["Target"]], " column selected as Conditions in SettingsInfo was not found in Input_GeneSet. Please check your input.")
+    }
+  }else{
+    stop("Please provide a column name for the Target in SettingsInfo.")
+  }
 
-  if(is.character(Target)==FALSE | (length(Target) ==1)==FALSE){
-    stop("`Target` must be of class character withonly one entry. Please check your input")
+  if(is.null(PKName)){
+    PKName <- "GeneMetabSet"
   }
 
   ## ------------ Folder ----------- ##
-  if(is.null(FolderPath)){
-    name <- paste("MetaProViz_Results",Sys.Date(),sep = "_" )
-  }else{
-    if(grepl('[^[:alnum:]]', FolderPath)){
-      stop("The 'FolderPath' must not contain any special character.")
-    }else{
-      name <- paste("MetaProViz_Results",Sys.Date(),FolderPath,sep = "_" )
-    }
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+                                    FolderPath=FolderPath)
   }
-  WorkD <- getwd()
-  Results_folder <- file.path(WorkD, name)
-  if (!dir.exists(Results_folder)) {dir.create(Results_folder)} # Make Results folder
-  Results_folder_GeneMetabSet_folder = file.path(Results_folder, "GeneMetabSets")  # This searches for a folder called "GeneMetabSet" within the "Results" folder in the current working directory and if its not found it creates one
-  if (!dir.exists(Results_folder_GeneMetabSet_folder )) {dir.create(Results_folder_GeneMetabSet_folder)}  # check and create folder
 
   ######################################################
   ##-------------- Cosmos PKN
   #load the network from cosmos
   data("meta_network", package = "cosmosR")
-  meta_network <- meta_network[which(meta_network$source != meta_network$Target),]
+  meta_network <- meta_network[which(meta_network$source != meta_network$target),]
 
   #adapt to our needs extracting the metabolites:
-  meta_network_metabs <- meta_network[grepl("Metab__HMDB", meta_network$source) | grepl("Metab__HMDB", meta_network$Target),-2]#extract entries with metabolites in source or Target
-  meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$Target),]#extract entries with genes in source or Target
+  meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target),-2]#extract entries with metabolites in source or Target
+  meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target),]#extract entries with genes in source or Target
 
   #Get reactant and product
   meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),]%>% dplyr::rename("metab"=1, "gene"=2)
-  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$Target),]%>% dplyr::rename("gene"=1, "metab"=2)
+  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),]%>% dplyr::rename("gene"=1, "metab"=2)
 
   meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
   meta_network_metabs$gene <- gsub("Gene.*__","",meta_network_metabs$gene)
@@ -294,23 +289,31 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
   ##-------------- Combine with Input_GeneSet
   #add pathway names --> File that can be used for metabolite pathway analysis
-  MetabSet <- merge(meta_network_metabs,Input_GeneSet, by.x="gene", by.y=Target)
+  MetabSet <- merge(meta_network_metabs,Input_GeneSet, by.x="gene", by.y=SettingsInfo[["Target"]])
 
   #combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
-  GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=Target), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
+  GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=SettingsInfo[["Target"]]), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
 
 
-  ## Add other ID types (HMDB, ChEBI, PubChem)
+  ##------------ Select metabolites only
+  MetabSet <-  GeneMetabSet %>%
+    filter(grepl("HMDB", feature))
 
 
   ##-------------- Save and return
-  if(is.null(OutputName)){
-    write.csv(GeneMetabSet, paste(Results_folder_GeneMetabSet_folder, "/GeneMetabSet.csv", sep = ""), row.names = FALSE)
-  }else{
-    write.csv(GeneMetabSet, paste(Results_folder_GeneMetabSet_folder, "/GeneMetabSet_",   OutputName ,".csv", sep = ""), row.names = FALSE)
-  }
+  DF_List <- list("GeneMetabSet"=GeneMetabSet,
+                  "MetabSet"=MetabSet)
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= Folder,
+                         FileName= PKName,
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
 
-  return(invisible(GeneMetabSet))
+  return(invisible(DF_List))
 }
 
 
@@ -360,8 +363,13 @@ LoadMetalinks <- function(types = NULL,
 
   #Python version enables the user to add their own link to the database dump (probably to obtain a specific version. Lets check how the link was generated and see if it would make sense for us to do the same.)
   # --> At the moment abritrary!
-  # We could provide the user the aboility to point to their own path were they already dumpled/stored qa version of metalinks they like to use!
+  # We could provide the user the ability to point to their own path were they already dumpled/stored qa version of metalinks they like to use!
 
+  ## ------------ Folder ----------- ##
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+                                    FolderPath=FolderPath)
+  }
 
   #------------------------------------------------------------------
   #Get the directory and filepath of cache results of R
@@ -553,20 +561,30 @@ LoadMetalinks <- function(types = NULL,
   #Remove metabolites that are not detectable by mass spectrometry
 
 
-
   #------------------------------------------------------------------
   #Decide on useful selections term-metabolite for MetaProViz.
-
+  MetalinksDB_Pathways <-
 
 
 
   #------------------------------------------------------------------
   #Save results in folder
-
+  ##-------------- Save and return
+  DF_List <- list("GeneMetabSet"=GeneMetabSet,
+                  "MetabSet"=MetabSet)
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= Folder,
+                         FileName= PKName,
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
 
   #Return into environment
   assign("MetalinksDB", MetalinksDB, envir=.GlobalEnv)
-
+  #return(invisible(DF_List))
 
 }
 

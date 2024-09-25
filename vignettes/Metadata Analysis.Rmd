@@ -1,5 +1,5 @@
 ---
-title: "Tissue Metabolomics"
+title: "Metadata Analysis"
 author:
   - name: Christina Schmidt
     affiliation:
@@ -52,7 +52,8 @@ First if you have not done yet, install the required dependencies and load the l
 # 2. Install the latest development version from GitHub using devtools
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
-library(MetaProViz)
+#library(MetaProViz)
+devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 #dependencies that need to be loaded:
 library(tidyverse)
@@ -79,12 +80,6 @@ Here we choose an example datasets, which is publicly available in the [paper](h
 `1.` Tissue experiment **(Intra)** \
 We can load the `ToyData`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
 ```{r}
-#Newer OmnipathR version needed than I have
-# aaa.R (creates new environment) and zzz.R (.onLoad will be done when package is loaded)--> commom practice
-#log and options (is the config file --> new configuration by using a parameter) connects them and can go into one file
-
-devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
-
 # Load the example data:
 Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
 
@@ -130,132 +125,58 @@ This has been done by the authors of the paper and we will use the median normal
 ## Metadata analysis
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
 \
-### Anova-based
-Here the metdata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
 The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
-Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `SettingsInfo` and provide the column name of our main separator.\
 ```{r}
-#Would it make sense here to separate tumour and normal for stage? --> meaning Normal-Stage1. Would this be useful for the other demographics too? --> e.g. Young-Stage1 
-#If yes, should we enable the user to pass a primary separator and secondary separators?
-
 MetaRes <- MetaProViz:::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
                                      SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)],
-                                     #SettingInfo= c(MainSeparator = "TISSUE_TYPE), # enable this parameter in the function!
                                      Scaling = TRUE,
                                      Percentage = 0.1,
+                                     StatCutoff= 0.05,
                                      SaveAs_Table = "csv",
                                      SaveAs_Plot = "svg",
                                      PrintPlot= TRUE,
                                      FolderPath = NULL)
 
-
 ```
 \
 Ultimately, this is leading to clusters of metabolites that are driving the separation of the different demographics.\
-
-* Return it the other way around: having the metabolites as row names and than the demographics they separate in some sort of cluster column! --> biological regulatory clustering based on demographics! --> how to deal with metabolites targeting multiple demographics?\
-
-```{r}
-Test_Top <- MetaRes[["res_aov"]]%>%
-  filter(tukeyHSD_p.adjusted< 0.05)%>%
-  separate_rows(`Features (Top 0.1%)`, sep = ", ")%>% # Separate 'Features (Top 0.1%)'
-  dplyr::rename("FeatureID"="Features (Top 0.1%)")%>%
-  select(-`Features (Bottom 0.1%)`)
-  
-Test_Bottom <- MetaRes[["res_aov"]]%>%
-  filter(tukeyHSD_p.adjusted< 0.05)%>%
-  separate_rows(`Features (Bottom 0.1%)`, sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
-  dplyr::rename("FeatureID"="Features (Bottom 0.1%)")%>%
-  select(-`Features (Top 0.1%)`)
-
-Test <- rbind(Test_Top, Test_Bottom)%>%
-  group_by(FeatureID, term) %>%            # Group by FeatureID and term
-  summarise(
-    PC = paste(unique(PC), collapse = ", "), # Concatenate unique PC entries with commas
-    `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE) # Sum Explained_Variance
-  ) %>%
-  ungroup()%>%  # Remove previous grouping
-  group_by(FeatureID) %>%  # Group by FeatureID for MainDriver calculation
-  mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>% # Mark TRUE for the highest value
-  ungroup()  # Remove grouping
-
-Test_summary <- Test%>%
-  group_by(FeatureID) %>%
-  summarise(
-    term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
-    `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
-   MainDriver = paste(MainDriver, collapse = ", ")  # Extract the term where MainDriver is TRUE
-  ) %>%
-  ungroup()%>%
-  rowwise() %>%
-  mutate(  # Extract the term where MainDriver is TRUE
-    MainDriver_Term = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
-                             strsplit(term, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]],
-                             NA),
-    # Extract the Sum(Explained_Variance) where MainDriver is TRUE
-    `MainDriver_Sum(VarianceExplained)` = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
-                                                 as.numeric(strsplit(`Sum(Explained_Variance)`, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]]),
-                                                 NA)
-  ) %>%
-  ungroup()
-
-#Add input data to the results = measured values for each sample
-
-
-
-#calculate Log2FC and p-value (t.test) for each metabolite comparing the demographics --> If one demographic paramteter like age has more than two options, we would need to do multiple comparison
-
-
-#Set threshold on variance explained --> probably based on percentage of total!
-
+\
+We generated the general anova output DF:\
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetaRes[["res_aov"]][c(1:2, 1777:1778, 3191:3192), -c(10:11)]%>%
+  kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_aov`]] including the main metabolite drivers that separate patients based on their demographics.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
-
-
-
+\
+We generated the summarised results output DF, where each feature (=metabolite) was assigned a main demographics parameter this feature is separating:\
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetaRes[["res_summary"]][c(1:6), ]%>%
+  kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_summary`]] including the metabolite drivers in rows and list the patients demographics they can separate.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
 ```{r}
-
-
-##############################################################################
-#Heatmap: Metabolites that separate the different demographics:
 ##1. Tissue_Type
-TissueTypeList <- Test_summary%>%
-  filter(MainDriver_Term == "RACE")%>%
-  filter(`MainDriver_Sum(VarianceExplained)`>15)%>%
+TissueTypeList <- MetaRes[["res_summary"]]%>%
+  filter(MainDriver_Term == "TISSUE_TYPE")%>%
+  filter(`MainDriver_Sum(VarianceExplained)`>30)%>%
   select(FeatureID)%>%
   pull()
 
 #select columns Tissue_norm that are in TissueTypeList if they exist
 Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
 
+#Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
 MetaProViz:::VizHeatmap(InputData = Input_Heatmap,
                        SettingsFile_Sample = Tissue_Norm[,c(1:13)],
-                       SettingsInfo = c(color_Sample = list("AGE","STAGE", "TISSUE_TYPE", "GENDER", "RACE")),
+                       SettingsInfo = c(color_Sample = list("TISSUE_TYPE")),
                        Scale ="column",
-                       PlotName = "MainDriver_RACE and MainDriver_Sum(VarianceExplained) >15")
-
-MetaProViz::VizSuperplot(InputData = Input_Heatmap,
-                       SettingsFile_Sample = Tissue_Norm[,c(1:13)],
-                       SettingsInfo = c(Conditions="STAGE"))
-
-
-
+                       PlotName = "MainDrivers")
 ```
-
-*Issue in metadata white and White --> should be the same!
-
-Now we can make individual heatmap of each demographic comparison of interest using the `MetaProViz::Heatmap()` function.\
-```{r}
-
-```
-
-### Enrichment analysis-based
-
-*we can make pathway file from metadata and use this to run enrichment analysis. 
-*At the moment we can just make the pathways and we need to include a standard fishers exact test.
-*Merge with function above?
-
-*Advantage/disadvantage: Not specific - with annova PC we get granularity e.g. smoker-ExSmoker-PC5, whilst here we only get smoking in generall as parameter
 
 ## DMA
 Here we use Differential Metabolite Analysis (`DMA`) to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value.\
@@ -270,7 +191,7 @@ We will perform multiple comparisons based on the different patient demographics
 4. Tumour versus Normal: Subset of `Young` patients
 5. Tumour versus Normal: Subset of `Old` patients
 \
-```{r}
+```{r Display_Not_Run, eval=FALSE}
 #Prepare the different selections
 EarlyStage <- Tissue_Norm%>%
   filter(STAGE== "EARLY-STAGE")
@@ -297,12 +218,46 @@ for(item in names(DFs)){
   #Add Results to list
   ResList[[item]] <- TvN
 }
-
-
 ```
 \
+<div class="vscroll-plot">
+```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+#Prepare the different selections
+EarlyStage <- Tissue_Norm%>%
+  filter(STAGE== "EARLY-STAGE")
+LateStage <- Tissue_Norm%>%
+  filter(STAGE=="LATE-STAGE")
+Old <- Tissue_Norm%>%
+  filter(AGE=="Old")
+Young <- Tissue_Norm%>%
+  filter(AGE=="Young")
+
+DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+
+#Run DMA
+ResList <- list()
+for(item in names(DFs)){
+  #Get the right DF:
+  InputData <- DFs[[item]]
+  #Perform DMA
+  message(paste("Running DMA for", item))
+  TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
+                         SettingsFile_Sample =  InputData[,c(1:13)],
+                         SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
+                         SettingsFile_Metab = Tissue_MetaData,
+                         PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+  #Add Results to list
+  ResList[[item]] <- TvN
+}
+```
+</div>
+\
+\
+\
+
+
 We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
-Here we can also use the VizVolcano to plot comparisons together on the same plot, such as Tumour versus normal of young and old patients:\
+Here we can also use the `MetaproViz::VizVolcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
 ```{r}
 #Early versus Late Stage
 MetaProViz::VizVolcano(PlotSettings="Compare",
@@ -321,36 +276,110 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
                        Subtitle= "Results of DMA" )
 ```
 \
-Here we can observe that Tumour versus Normal has lower signifcance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
-
-## Biological regulated clustering
-To understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age, 
-we can use the `MetaProViz::BiologicalRegulatedClustering()` function.\
+Here we can observe that Tumour versus Normal has lower significance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
+Lastly, we can also check if the top changed metabolites comparing Tumour versus Normal correlate with the main metabolite drivers that separate patients based on their `TISSUE_TYPE`, which are Tumour or Normal.\
 ```{r}
+#Get the top changed metabolites
+top_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>% 
+  arrange(desc(t.val)) %>% 
+  slice(1:25)%>%
+  select(Metabolite)%>%
+  pull()
+bottom_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>% 
+  arrange(desc(t.val)) %>%
+  slice((n()-24):n())%>%
+  select(Metabolite)  %>%
+  pull()
 
+#Check if those overlap with the top demographics drivers
+ggVennDiagram::ggVennDiagram(list(Top = top_entries,
+                                  Bottom = bottom_entries,
+                                  TissueTypeList = TissueTypeList))+
+  scale_fill_gradient(low = "blue", high = "red") 
+
+
+MetaData_Metab <- merge(x=Tissue_MetaData,
+                   y= MetaRes[["res_summary"]][, c(1,5:6) ]%>%column_to_rownames("FeatureID"),
+                   by=0,
+                   all.y=TRUE)%>%
+  column_to_rownames("Row.names")
+
+#Make a Volcano plot:
+MetaProViz::VizVolcano(PlotSettings="Standard",
+                       InputData=ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       SettingsFile_Metab =  MetaData_Metab,
+                       SettingsInfo = c(color = "MainDriver_Term"),
+                       PlotName= "TISSUE_TYPE-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA" )
 
 ```
 
 
+## Biological regulated clustering
+To understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age, 
+we can use the `MetaProViz::MCA_2Cond()` function.\
+Metabolite Clustering Analysis (`MCA`) enables clustering of metabolites into groups based on logical regulatory rules. Here we set two different thresholds, one for the differential metabolite abundance (Log2FC) and one for the significance (e.g. p.adj). This will define if a feature (= metabolite) is assigned into:\
+1. “UP”, which means a metabolite is significantly up-regulated in the underlying comparison.\
+2. “DOWN”, which means a metabolite is significantly down-regulated in the underlying comparison.\
+3. “No Change”, which means a metabolite does not change significantly in the underlying comparison and/or is not defined as up-regulated/down-regulated based on the Log2FC threshold chosen.\
+\
+Thereby “No Change” is further subdivided into four states:\
+1. “Not Detected”, which means a metabolite is not detected in the underlying comparison.\
+2. “Not Significant”, which means a metabolite is not significant in the underlying comparison.\
+3. “Significant positive”, which means a metabolite is significant in the underlying comparison and the differential metabolite abundance is positive, yet does not meet the threshold set for “UP” (e.g. Log2FC >1 = “UP” and we have a significant Log2FC=0.8).\
+4. “Significant negative”, which means a metabolite is significant in the underlying comparison and the differential metabolite abundance is negative, yet does not meet the threshold set for “DOWN”.\
+\
+For more information you can also check out the other vignettes.
+```{r}
+MCAres <-  MetaProViz::MCA_2Cond(InputData_C1=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]],
+                                 InputData_C2=ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]],
+                                 SettingsInfo_C1=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                                 SettingsInfo_C2=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                                 FeatureID = "Metabolite",
+                                 SaveAs_Table = "csv",
+                                 BackgroundMethod="C1&C2"#Most stringend background setting, only includes metabolites detected in both comparisons
+                                 )
+```
+\
 Now we can use this information to colour code our volcano plot:
+```{r, eval=FALSE}
+#Add metabolite information such as KEGG ID or pathway to results
+MetaData_Metab <- merge(x=Tissue_MetaData,
+                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%column_to_rownames("Metabolite"),
+                   by=0,
+                   all.y=TRUE)%>%
+  column_to_rownames("Row.names")
 
-Make individual volcano plots:
-*Like the one from young versus old for dipeptides!
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="Young", InputData2= "Old"),
+                       SettingsFile_Metab =  MetaData_Metab,
+                       PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA",
+                       SettingsInfo = c(individual = "SUPER_PATHWAY",
+                                        color = "RG2_Significant"))
+```
+\
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+#Add metabolite information such as KEGG ID or pathway to results
+MetaData_Metab <- merge(x=Tissue_MetaData,
+                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%column_to_rownames("Metabolite"),
+                   by=0,
+                   all.y=TRUE)%>%
+  column_to_rownames("Row.names")
 
-We can also use this information on the heatmap:
-
-
-*Do we see that clustering somewhat matches with our assigned clusters?
-
-
-### ORA using the DMA results
-Check dipeptides for enrichment analysis per cluster
-
-
-*Send users to enrichment vignette if there are interested in accessing and using metabolite prior knowledge for enrichmnet analysis.
-
-
-
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="Young", InputData2= "Old"),
+                       SettingsFile_Metab =  MetaData_Metab,
+                       PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA",
+                       SettingsInfo = c(individual = "SUPER_PATHWAY",
+                                        color = "RG2_Significant"))
+```
 </div>
 \
 \

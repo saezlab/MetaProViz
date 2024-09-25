@@ -4,6 +4,9 @@ author:
   - name: Christina Schmidt
     affiliation:
     - Heidelberg Universiy
+    - name: Macabe Daley
+    affiliation:
+    - Heidelberg Universiy
 output: 
   html_document:
     self_contained: true
@@ -50,15 +53,15 @@ In this vignette we focus on accessing prior knowledge needed to for example run
 -   To access metabolite prior knowledge.\
 -   To deal with many-to-many mapping in your metabolite identifiers.\
 -   To perform pathway enrichment analysis.\
-    \
-    First if you have not done yet, install the required dependencies and load the libraries:
-
+\
+First if you have not done yet, install the required dependencies and load the libraries:
 ```{r message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). 
 # 2. Install the latest development version from GitHub using devtools
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
+devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 #dependencies that need to be loaded:
 library(tidyverse)
@@ -66,12 +69,7 @@ library(tidyverse)
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
 #BiocManager::install("EnhancedVolcano")
-
-
-#Load package locally:
-devtools::load_all() #"C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz"
 ```
-
 \
 \
 
@@ -87,45 +85,34 @@ devtools::load_all() #"C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz"
 :::
 :::
 
-\
-Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
-Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
-
-\
 [As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`]{style="text-decoration:underline"}:\
-
 `1.`Cell line experiment **(CellLine)**\
-The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
-Here we load the processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
-
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+We have performed pre-processing and differential analysis (details can be found in the vignette "Standard Metabolomics") and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
 ```{r}
 #Load the Pre-processed intracellular data:
-MetaProViz::ToyData(data="IntraCells_DMA")
+Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 ```
 
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 # Check how our data looks like:
-Intra_DMA_786M1A_vs_HK2[1:5, c(1:12)]%>%
+Intra_DMA_786M1A_vs_HK2[1:5, c(1:13)]%>%
   kableExtra::kbl(caption = "Preview of the DF `Intra_DMA_786M1A_vs_HK2` differential metaboilite analysis results.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 
--   update toy_data to include the HMDB IDs!
-
 `2.` Tissue experiment **(Tissue)**\
-Here we load publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
-
+Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
+We have performed differential analysis (details can be found in the vignette "Metadata Analysis") and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
 ```{r}
 # Load the example data:
-MetaProViz::ToyData(data="Tissue_Norm")
+Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
+Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
+Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
 
 ```
-
-`3.`\
-\* Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
-\* Maybe add the data from the paper of the 3D cell culture model of ccRCC
 
 \
 \
@@ -135,7 +122,7 @@ MetaProViz::ToyData(data="Tissue_Norm")
 :::
 :::
 
-# 2. Loading prior knowledge
+# 2. Accessing Prior Knowledge
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -143,20 +130,19 @@ MetaProViz::ToyData(data="Tissue_Norm")
 :::
 
 \
+Metabolite prior knowledge (PK) is essential for the interpretation of metabolomics data. It can be used to perform pathway enrichment analysis, compound class enrichment analysis, and by using specific PK databases, it can be used to study the connection of metabolites and receptors or transporters.Since the quality and content of the PK will dictate the success of the downstream analysis and biological interpretation, it is important to ensure the PK is used correctly.\
+Specifically in metabolite PK, the many different PK databases and resources pose several issues. Indeed, the metabolite identifiers (e.g. KEGG, HMDB, PubChem, etc.) are not standardized across databases, and the same metabolite can have multiple identifiers in different databases. This is known as the many-to-many mapping problem (REF).\
+Moreover, metabolic pathways that are the basis of the PK databases also includes co-factors such as ions or other small molecules that are not only part of most reactions, but can also not be detected in experimentallly acquired data (e.g. H2O, CO2, etc).
 
-Describe some general things such as: \* removal of items from the PK: e.g. extract ions from HMDB to enable the removal of ions from the pathways, same for xenobiotics and masspec unspecific molecules (H2O, CO2, etc.) \* The addition of other metabolite ID types 9maybe using RaMP?
-\*
 
 ## KEGG pathway-metabolite sets
-
 KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000].
 **(KEGG_Pathways)**\
-
 ```{r}
 #This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::LoadKEGG()
 ```
-
+\
 ```{r, echo=FALSE}
 # Check how our data looks like:
 KEGG_Pathways[c(1:3,52:54),]%>%
@@ -164,30 +150,85 @@ KEGG_Pathways[c(1:3,52:54),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-## Translate IDs
+## Create pathway-metabolite sets
+The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names by using a PK network of metabolic reactions calls CosmosR (REF). This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB (REF). Moreover, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
+The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.\
+```{r}
+#Load the example data:
+MetaProViz::LoadHallmarks()
+```
+\
+```{r, echo=FALSE}
+# Check how our data looks like:
+Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.\
+```{r}
+#Translate gene names to metabolite names
+Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
+                                                     SettingsInfo=c(Target="gene"),
+                                                     PKName="Hallmarks")
+```
 
-As seen above, we have just loaded the KEGG pathways.
-Currently however, the MetaboliteID is in the form of a KEGG identifier.
-What if we want to convert or 'translate' this ID to another commonly used form of ID, for instance because our measured data uses another type of ID?
+```{r, echo=FALSE}
+# Check how our data looks like:
+Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
+  filter(term=="HALLMARK_GLYCOLYSIS")%>%
+   slice(c(59,142,193, 201:203))%>%
+  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
-Currently we support ID translation of metabolites to and from the following formats:
+```
 
--   KEGG
+```{r, echo=FALSE}
+#plot out how the metabolite set size is different from the original gene-set size
+#Show bar graph of the size of the gene set versus the metabolite set --> Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
 
--   HMDB
 
--   ChEBI
+```
+\
+Given that we have the gene-metabolite-sets, we can now also run enrichment analysis on combined data types, once including the metabolite Log2FC and one including gene Log2FC from e.g. transcriptomics or proteomics data. Yet, it is important to keep in mind that generally we detect less metabolites than genes and hence this may bias the results obtained from combined enrichment analysis.
 
--   PubChem
+## MetaLinksDB Metabolite-receptor sets
+The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters (REF).\
 
-To achieve this, we use [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function.
+```{r}
+MetaProViz::LoadMetalinks()
+```
 
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetalinksDB[c(1:8),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `MetaLinks` including metabolite-receptor sets.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+
+```
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
+
+# 3. Translate IDs
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+As visible from the prior knowledge tables above, it becomes clear that we require a specific metabolite ID depended on the pior knwoledge resource. Indeed, the KEGG pathways include KEGG IDs, whilst the Halmmarks metabolite sets include HMDB IDs.\
+If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::TranslateID()` function. This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function (REF) and currently supports ID translation of metabolites to and from the following formats:\
+-   KEGG\
+-   HMDB\
+-   ChEBI\
+-   PubChem\
 ```{r, echo=FALSE}
 TranslateID(KEGG_Pathways[39,]) %>%
   kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (besides HMDB)") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
-
+\
 However there are some important caveats with the standard TranslateID function, which we will discuss briefly here.
 
 Using the default translation settings for a single ID, we can see that we receive back a single PubChem ID and ChEBI ID. However the HMDB column has two HMDBs associated with it (HMDB0001022, HMDB01022).
@@ -252,183 +293,12 @@ Use cases:
 2.  Filter based on user provided data (aka measured data)
 3.  Filter based on many-many mapping
 
-## Reactome
 
--   As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
--   Remove unspecific metabolites
--   Translate ChEBI to HMDB and KEGG
-
-FYI: See code I used to access via API
-
-## Create pathway-metabolite sets
-
-The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names.
-This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB.
-The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.
-
-\
-First we load an example gene-set available in the package `MetaProViz`.\
-
-```{r}
-#Load the example data:
-MetaProViz:::LoadHallmarks()
-```
-
-```{r, echo=FALSE}
-# Check how our data looks like:
-Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-\
-Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.\
-
-```{r}
-#Translate gene names to metabolite names
-Test <- MetaProViz:::Make_GeneMetabSet(Input_GeneSet,
-                                       Target=c("gene"),
-                                       OutputName=NULL,
-                                       FolderPath = NULL)
-
-```
-
--   Download a Geneset from MSigDB and provide trough example data --\> hallmarks as this has many metabolic pathways!
-    --\> plot out how the metabolite set size is different from the original gene-set size
-
--   Enable to output pathway-metabolite-set or pathway-metabolite-gene set
-
--   Add CosmosR dependency to function built
-
--   Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
-
--   Show bar graph of the size of the gene set versus the metabolite set
-
--   Maybe add KEGG IDs and CheBI IDs
-
--   Discuss option to run metabolite-gene set analysis together.Discuss implications of size this poses
-
-## MetaLinksDB Metabolite-receptor sets
-
--   Enable the same MetaLinks accessibility as Daniel did in python within Liana!
-
-```{r}
-MetaProViz:::LoadMetalinks()
-```
-
-```{r, echo=FALSE}
-# Check how our data looks like:
-MetalinksDB[c(1:8),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `MetaLinks` including metabolite-receptor sets.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-
-```
-
-## ocean PK
-
--   Add HMDB and CheBI IDs to the KEGG IDs.
--   Make ocean PK accessible via MetaProViz
-
-`MetaProViz::LoadOcean`
-
-## Summary
-
-### Clustering
-
+Clustering:
 -   Summarize the PK based on overlap between terms --\> hierarchical clustering (maybe enable multiple options here)
 -   Summarize PK based on term-names and/or overlap?
 -   Create function that can be used to cluster the results of the pathway analysis --\> basically adds column ClusterName to pathway results file --\> ClusterName is either `No Cluster` or the main words from the pathway names that are combined.
 
-Almost like cleaning of prior knowledge
-
-### Lipid prediction
-
-This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
-\* linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
-\* Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
-
-# Check Names
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
-
--   Add MetaProViz::CheckNames --\> showcase with other data maybe (data where we do have doublons or missing IDs?) --\> explain here why this is needed in metabolomics
-
-```{r}
-
-##
-## ---------------------------
-
-#' CheckNames
-#'
-#' 
-#'
-#' @param InputData DF including column with metabolite IDs (e.g. HMDB IDs) and associated trivial metabolite names.
-#' @param SettingsInfo Named vector including the column name of the ID column and the trivial metabolite name column c(ID="ColumnName_InputData", TrivialName= "ColumnName_InputData").If Class=TRUE, columnName for class needs to be provided c(Class=ColumnName_InputData). If Network is provided, also column name for the metabolite ID must be provided IDNetwork="ColumnName_Network".
-#' @param Long \emph{Optional: } FALSE if metabolite IDs that map to multiple trivial names are separated by comma and TRUE if the InputData is already long, meaning each metabolite ID is in a separate row and hence trivial names were duplicated if multiple metabolite IDs were associated with the trivial name. \strong{Default = FALSE}
-#' @param Class \emph{Optional:} TRUE or FALSE, weather column including information about metabolite class is provided in InputData. If TRUE, also column name for the metabolite ID must be provided via SettingsInfo. \strong{Default = FALSE}
-#' @param Network Network used as input for enrichment analysis. If not available set to NULL. If Network is provided, also column name for the metabolite ID must be provided via SettingsInfo.
-#' @param 
-#'
-#' @export
-
-CheckNames <- function(InputData, 
-                       SettingsInfo, 
-                       Long=FALSE,
-                       Class=FALSE,
-                       Network=NULL){
-  
-  #----- Make long DF if needed:
-  if(Long==FALSE){
-    df_long <- InputData %>% #Make DF long based on Metablite IDs
-      rownames_to_column(SettingsInfo[["TrivialName"]])%>%
-      separate_rows(SettingsInfo[["ID"]], sep = ",")
-    
-    df_NoNA <- df_long %>%
-      filter(!is.na(.data[[SettingsInfo[["ID"]]]]))
-  }else{
-    df_long <- InputData
-    df_NoNA <- InputData%>%
-      filter(!is.na(.data[[SettingsInfo[["ID"]]]]))
-  }
-  
-  #----- Check for many to many mappings:
-  doublons_ID <- as.data.frame(df_NoNA[duplicated(df_NoNA[SettingsInfo[["ID"]]]), SettingsInfo[["ID"]]])
-  doublons_TrivialName <- as.data.frame(df_NoNA[duplicated(df_NoNA[SettingsInfo[["TrivialName"]]]), SettingsInfo[["TrivialName"]]])
-  
-  #print the information obtained
-  message("In InputData are ", nrow(df), " trivial metabolite names. For ", nrow(df_long)-nrow(df_NoNA), " metabolites no metabolite ID was mapped. Of the mapped metabolite IDs ", nrow(unique(doublons_ID)), " were mapped to multiple trivial metabolite names. ", nrow(unique(doublons_TrivialName)), " trivial metabolite names mapped to multiple metabolite IDs.")
-  
-  #----- Check if the duplications are of a specific metabolite class (e.g. lipids)
-  if(Class==TRUE){
-    doublons_ID <- merge(x= as.data.frame(unique(doublons_ID)),
-                       y= df_NoNA,
-                       by=SettingsInfo[["ID"]],
-                       all.x=TRUE)
-    doublons_Summary <-  as.data.frame(prop.table(table(doublons_ID[SettingsInfo[["Class"]]])) * 100)%>%
-      dplyr::rename(!!SettingsInfo[["TrivialName"]]:= 1)
-    print(doublons_Summary)
-  }
-  
-  #Check pathway file (if provided):
-  if(is.null(Network)==FALSE){
-    
-  }
-  
-}
-
-
-```
-
-\
-\
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 550%"}
@@ -534,6 +404,27 @@ In general,we have three different `Plot_Settings`, which will also be used for 
 `2.` `"Conditions"` here two or more datasets will be plotted together.
 How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+
+## Future
+Run metabolite-gene analysis
+- Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
+- Maybe add the data from the paper of the 3D cell culture model of ccRCC
+
+Reactome
+-   As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
+-   Remove unspecific metabolites
+-   Translate ChEBI to HMDB and KEGG
+-   FYI: See code I used to access via API
+
+ocean PK
+-   Add HMDB and CheBI IDs to the KEGG IDs.
+-   Make ocean PK accessible via MetaProViz
+
+Lipid prediction
+-   This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
+-   linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
+-   Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
+
 
 </div>
 

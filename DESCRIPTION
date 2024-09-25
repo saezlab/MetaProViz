@@ -48,7 +48,9 @@ Imports:
     reshape,
     rlang,
     stringr,
-    writexl
+    tibble,
+    writexl,
+    yaml
 Suggests:
     BiocStyle,
     knitr,

@@ -680,7 +680,7 @@ VizVolcano_Compare <- function(InputData,
   ##--- Prepare Input Data
   if(is.null(SettingsFile_Metab)==FALSE){
   InputData2 <- merge(x=SettingsFile_Metab%>%rownames_to_column("FeatureNames") , y=InputData2[, c(x, y)]%>%rownames_to_column("FeatureNames") , by="FeatureNames", all.y=TRUE)%>%
-    na.omit()
+    filter(!is.na(x) | !is.na(x))
   InputData[,"comparison"]  <- as.character(paste(ComparisonName[["InputData"]]))
   InputData2[,"comparison"]  <- as.character(paste(ComparisonName[["InputData2"]]))
   InputCompare  <- rbind(InputData,InputData2)
