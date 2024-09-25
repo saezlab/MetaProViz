@@ -2,7 +2,8 @@
 #'
 #' @param gtbl A TableGrob (gtable) object.
 #' @param name Character or integer: Name or index of the element or row.
-#' @param height Unit: the new height with its unit, e.g. ``unit(2.3, "cm")``.
+#' @param size Character, numeric or unit: the new size optinally with its
+#'     unit, e.g. ``2.3`` or ``2.3cm`` ``unit(2.3, "cm")``.
 #' @param dim Character: either ``'heights'`` or ``'widths'``.
 #' @param offset Integer: offset from ``name``.
 #' @param ifempty Logical: set the size only if the index looked up by ``name``
@@ -11,11 +12,17 @@
 #' @param callback Function: called with the new and the original value as
 #'     arguments, and its value will override the new value. By default it is
 #'     ``partial(switch, TRUE)``, which ignores the original value.
+#' @param grow Logical or numeric: if the total width or height is stored in
+#'     the plottable in the slots added by ``withCanvasSize``, increase the
+#'     relevant dimension. By default, the increment is identical to the
+#'     increase of the size adjusted here; if a number is provided, it will be
+#'     added to the existing value.
 #'
 #' @importFrom magrittr %>% extract2 add %<>%
 #' @importFrom dplyr filter
 #' @importFrom logger log_warn log_trace
 #' @importFrom purrr partial
+#' @importFrom stringr str_sub
 #' @noRd
 set_size <- function(
         gtbl,
@@ -24,20 +31,16 @@ set_size <- function(
         dim,
         offset = 0L,
         ifempty = offset != 0L,
-        callback = partial(switch, TRUE)
+        callback = partial(switch, TRUE),
+        grow = FALSE
     ) {
 
+    callback %<>% {`if`(is.character(.), get(.), .)}
     size %<>% parse_unit
-    col <- list(heights = 't', widths = 'l') %>% extract2(dim)
+    col <- dim %>% gtable_col
+    tdim <- dim %>% str_sub(end = -2L)
 
-    idx <-
-        name %>%
-        {`if`(
-            is.character(.),
-            filter(gtbl$layout, name == .) %>% extract2(col),
-            .
-        )} %>%
-        add(offset)
+    idx <- gtable_idx(gtbl, name, offset, dim)
 
     name_miss <- length(idx) == 0L
 
@@ -75,7 +78,21 @@ set_size <- function(
 
     } else if (!ifempty || !(idx %in% gtbl$layout[[col]])) {
 
-        size %<>% callback(gtbl[[dim]][idx])
+        original <- gtbl[[dim]][idx]
+        size %<>% callback(original)
+
+        if (grow && tdim %in% names(gtbl) && size != original) {
+            grow %<>% {`if`(is.numeric(.), ., size - original)}
+            log_trace(
+                paste0(
+                    'Adding %s to the total %s of the gtable, ',
+                    'growing it from %s to %s.'
+                ),
+                grow, tdim, gtbl[[tdim]], gtbl[[tdim]] + grow
+            )
+            gtbl[[tdim]] %<>% add(grow)
+        }
+
         log_trace('Setting %s[%i] to %s %s', dim, idx, size, info)
         gtbl[[dim]][idx] <- size
 
@@ -109,8 +126,8 @@ set_width <- partial(set_size, dim = 'widths')
 #'
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_trim str_match
-#' @importFrom rlang !!! exec
 #' @importFrom grid unit
+#' @importFrom logger log_warn
 #' @noRd
 parse_unit <- function(u) {
 
@@ -121,13 +138,65 @@ parse_unit <- function(u) {
         str_match('^(-?[0-9.]+)([a-z]+)$') %>%
         {`if`(
             !any(is.na(.)),
-            exec(unit, !!!.[-1L]),
+            unit(.[,2L], .[,3L]),
             {
-                log_warn('Could not parse unit %s', u)
+                log_warn('Could not parse unit %s', paste0(u, collapse = ', '))
                 unit(1, 'null')
             }
         )},
-        .
+       `if`(is.numeric(.), unit(., 'cm'), .)
     )}
+
+}
+
+
+#' Little subclass of gtable that carries the canvas width and height
+#'
+#' @importFrom magrittr %>%
+#' @noRd
+withCanvasSize <- function(gtable, width = NULL, height = NULL) {
+
+    cls <- class(gtable) %>% c('withCanvasSize')
+
+    gtable %>%
+    c(
+        list(
+            width = parse_unit(width),
+            height = parse_unit(height)
+        )
+    ) %>%
+    `class<-`(cls)
+
+}
+
+
+#' Numeric row or column index in gtable from name
+#'
+#' @importFrom dplyr filter
+#' @importFrom magrittr %>% add
+#' @noRd
+gtable_idx <- function(gtbl, name, dim, offset = 0L) {
+
+    dim %<>% gtable_col
+
+    name %>%
+    {`if`(
+        is.character(.),
+        filter(gtbl$layout, name == .) %>% extract2(dim),
+        .
+    )} %>%
+    add(offset)
+
+}
+
+
+#' Relevant column in gtable$layout for a dimension ("widths" or "heights")
+#'
+#' @importFrom magrittr %>% extract2
+#' @importFrom rlang %||%
+#' @noRd
+gtable_col <- function(dim) {
+
+    list(heights = 't', widths = 'l') %>% extract2(dim) %||% dim
 
 }
