@@ -53,9 +53,8 @@ In this vignette we focus on accessing prior knowledge needed to for example run
 -   To access metabolite prior knowledge.\
 -   To deal with many-to-many mapping in your metabolite identifiers.\
 -   To perform pathway enrichment analysis.\
-    \
-    First if you have not done yet, install the required dependencies and load the libraries:
-
+\
+First if you have not done yet, install the required dependencies and load the libraries:
 ```{r message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). 
 # 2. Install the latest development version from GitHub using devtools
@@ -86,17 +85,10 @@ library(tidyverse)
 :::
 :::
 
-\
-Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
-Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
-
-\
 [As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`]{style="text-decoration:underline"}:\
-
 `1.`Cell line experiment **(CellLine)**\
-The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
-Here we load the processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
-
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+We have performed pre-processing and differential analysis (details can be found in the vignette "Standard Metabolomics") and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
 ```{r}
 #Load the Pre-processed intracellular data:
 Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
@@ -105,26 +97,22 @@ Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 # Check how our data looks like:
-Intra_DMA_786M1A_vs_HK2[1:5, c(1:12)]%>%
+Intra_DMA_786M1A_vs_HK2[1:5, c(1:13)]%>%
   kableExtra::kbl(caption = "Preview of the DF `Intra_DMA_786M1A_vs_HK2` differential metaboilite analysis results.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 
--   update toy_data to include the HMDB IDs!
-
 `2.` Tissue experiment **(Tissue)**\
-Here we load publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
-
+Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
+We have performed differential analysis (details can be found in the vignette "Metadata Analysis") and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
 ```{r}
 # Load the example data:
-MetaProViz::ToyData(Data="Tissue_Norm")
+Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
+Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
+Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
 
 ```
-
-`3.`\
-\* Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
-\* Maybe add the data from the paper of the 3D cell culture model of ccRCC
 
 \
 \
@@ -184,15 +172,17 @@ Now we can use the function `Make_GeneMetabSet` to translate the gene names to m
 
 #Translate gene names to metabolite names
 Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
-                                      Target=c("gene"),
-                                      OutputName=NULL,
-                                      FolderPath = NULL)
+                                                     Target=c("gene"),
+                                                     OutputName=NULL,
+                                                     FolderPath = NULL)
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 # Check how our data looks like:
-Hallmarks_GeneMetab[c(2833,2854,2786,8009),]%>%
+Hallmarks_GeneMetab%>%
+  filter(term=="HALLMARK_GLYCOLYSIS")%>%
+   slice(c(59,142,193, 201:203))%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
@@ -535,6 +525,14 @@ In general,we have three different `Plot_Settings`, which will also be used for 
 `2.` `"Conditions"` here two or more datasets will be plotted together.
 How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+
+##Future
+Run metabolite-gene analysis
+\* Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
+\* Maybe add the data from the paper of the 3D cell culture model of ccRCC
+
+
+
 
 </div>
 
