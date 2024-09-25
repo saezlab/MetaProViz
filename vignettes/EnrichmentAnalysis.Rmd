@@ -151,7 +151,7 @@ KEGG_Pathways[c(1:3,52:54),]%>%
 ```
 
 ## Create pathway-metabolite sets
-The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names by using a PK network of metabolic reactions calles CosmosR (REF). This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB (REF). Moroever, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
+The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names by using a PK network of metabolic reactions calls CosmosR (REF). This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB (REF). Moreover, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
 The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.\
 ```{r}
 #Load the example data:
@@ -167,20 +167,15 @@ Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
 \
 Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.\
 ```{r}
-# *Add save function!!!! 
-# * Enable to output pathway-metabolite-set or pathway-metabolite-gene set
-
 #Translate gene names to metabolite names
 Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
-                                                     Target=c("gene"),
-                                                     OutputName=NULL,
-                                                     FolderPath = NULL)
-
+                                                     SettingsInfo=c(Target="gene"),
+                                                     PKName="Hallmarks")
 ```
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-Hallmarks_GeneMetab%>%
+Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
   filter(term=="HALLMARK_GLYCOLYSIS")%>%
    slice(c(59,142,193, 201:203))%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
@@ -188,18 +183,14 @@ Hallmarks_GeneMetab%>%
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 #plot out how the metabolite set size is different from the original gene-set size
-#Show bar graph of the size of the gene set versus the metabolite set
+#Show bar graph of the size of the gene set versus the metabolite set --> Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
 
 
 ```
-
--   Add CosmosR dependency to function built
-
--   Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
-
--   Discuss option to run metabolite-gene set analysis together.Discuss implications of size this poses
+\
+Given that we have the gene-metabolite-sets, we can now also run enrichment analysis on combined data types, once including the metabolite Log2FC and one including gene Log2FC from e.g. transcriptomics or proteomics data. Yet, it is imporant to keep in mind that generally we detect less metabolites than genes and hence this may bias the results obtained from combined enrichment analysis.
 
 ## MetaLinksDB Metabolite-receptor sets
 The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters (REF).\
@@ -216,31 +207,28 @@ MetalinksDB[c(1:8),]%>%
 
 ```
 
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 550%"}
+:::
+:::
 
 # 3. Translate IDs
-
-As seen above, we have just loaded the KEGG pathways.
-Currently however, the MetaboliteID is in the form of a KEGG identifier.
-What if we want to convert or 'translate' this ID to another commonly used form of ID, for instance because our measured data uses another type of ID?
-
-Currently we support ID translation of metabolites to and from the following formats:
-
--   KEGG
-
--   HMDB
-
--   ChEBI
-
--   PubChem
-
-To achieve this, we use [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function.
-
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+As visible from the prior knowledge tables above, it becomes clear that we require a specific metabolite ID depended on the pior knwoledge resource. Indeed, the KEGG pathways include KEGG IDs, whilst the Halmmarks metabolite sets include HMDB IDs.\
+If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::TranslateID()` function. This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function (REF) and currently supports ID translation of metabolites to and from the following formats:\
+-   KEGG\
+-   HMDB\
+-   ChEBI\
+-   PubChem\
 ```{r, echo=FALSE}
 TranslateID(KEGG_Pathways[39,]) %>%
   kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (besides HMDB)") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
-
+\
 However there are some important caveats with the standard TranslateID function, which we will discuss briefly here.
 
 Using the default translation settings for a single ID, we can see that we receive back a single PubChem ID and ChEBI ID. However the HMDB column has two HMDBs associated with it (HMDB0001022, HMDB01022).
