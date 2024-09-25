@@ -363,8 +363,13 @@ LoadMetalinks <- function(types = NULL,
 
   #Python version enables the user to add their own link to the database dump (probably to obtain a specific version. Lets check how the link was generated and see if it would make sense for us to do the same.)
   # --> At the moment abritrary!
-  # We could provide the user the aboility to point to their own path were they already dumpled/stored qa version of metalinks they like to use!
+  # We could provide the user the ability to point to their own path were they already dumpled/stored qa version of metalinks they like to use!
 
+  ## ------------ Folder ----------- ##
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+                                    FolderPath=FolderPath)
+  }
 
   #------------------------------------------------------------------
   #Get the directory and filepath of cache results of R
@@ -556,20 +561,30 @@ LoadMetalinks <- function(types = NULL,
   #Remove metabolites that are not detectable by mass spectrometry
 
 
-
   #------------------------------------------------------------------
   #Decide on useful selections term-metabolite for MetaProViz.
-
+  MetalinksDB_Pathways <-
 
 
 
   #------------------------------------------------------------------
   #Save results in folder
-
+  ##-------------- Save and return
+  DF_List <- list("GeneMetabSet"=GeneMetabSet,
+                  "MetabSet"=MetabSet)
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= Folder,
+                         FileName= PKName,
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
 
   #Return into environment
   assign("MetalinksDB", MetalinksDB, envir=.GlobalEnv)
-
+  #return(invisible(DF_List))
 
 }
 

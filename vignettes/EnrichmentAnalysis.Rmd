@@ -190,13 +190,13 @@ Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
 
 ```
 \
-Given that we have the gene-metabolite-sets, we can now also run enrichment analysis on combined data types, once including the metabolite Log2FC and one including gene Log2FC from e.g. transcriptomics or proteomics data. Yet, it is imporant to keep in mind that generally we detect less metabolites than genes and hence this may bias the results obtained from combined enrichment analysis.
+Given that we have the gene-metabolite-sets, we can now also run enrichment analysis on combined data types, once including the metabolite Log2FC and one including gene Log2FC from e.g. transcriptomics or proteomics data. Yet, it is important to keep in mind that generally we detect less metabolites than genes and hence this may bias the results obtained from combined enrichment analysis.
 
 ## MetaLinksDB Metabolite-receptor sets
 The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters (REF).\
 
 ```{r}
-MetaProViz:::LoadMetalinks()
+MetaProViz::LoadMetalinks()
 ```
 
 ```{r, echo=FALSE}
@@ -293,121 +293,12 @@ Use cases:
 2.  Filter based on user provided data (aka measured data)
 3.  Filter based on many-many mapping
 
-## Reactome
 
--   As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
--   Remove unspecific metabolites
--   Translate ChEBI to HMDB and KEGG
-
-FYI: See code I used to access via API
-
-
-
-## ocean PK
-
--   Add HMDB and CheBI IDs to the KEGG IDs.
--   Make ocean PK accessible via MetaProViz
-
-`MetaProViz::LoadOcean`
-
-## Summary
-
-### Clustering
-
+Clustering:
 -   Summarize the PK based on overlap between terms --\> hierarchical clustering (maybe enable multiple options here)
 -   Summarize PK based on term-names and/or overlap?
 -   Create function that can be used to cluster the results of the pathway analysis --\> basically adds column ClusterName to pathway results file --\> ClusterName is either `No Cluster` or the main words from the pathway names that are combined.
 
-Almost like cleaning of prior knowledge
-
-### Lipid prediction
-
-This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
-\* linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
-\* Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
-
-# Check Names
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
-
--   Add MetaProViz::CheckNames --\> showcase with other data maybe (data where we do have doublons or missing IDs?) --\> explain here why this is needed in metabolomics
-
-```{r}
-
-##
-## ---------------------------
-
-#' CheckNames
-#'
-#' 
-#'
-#' @param InputData DF including column with metabolite IDs (e.g. HMDB IDs) and associated trivial metabolite names.
-#' @param SettingsInfo Named vector including the column name of the ID column and the trivial metabolite name column c(ID="ColumnName_InputData", TrivialName= "ColumnName_InputData").If Class=TRUE, columnName for class needs to be provided c(Class=ColumnName_InputData). If Network is provided, also column name for the metabolite ID must be provided IDNetwork="ColumnName_Network".
-#' @param Long \emph{Optional: } FALSE if metabolite IDs that map to multiple trivial names are separated by comma and TRUE if the InputData is already long, meaning each metabolite ID is in a separate row and hence trivial names were duplicated if multiple metabolite IDs were associated with the trivial name. \strong{Default = FALSE}
-#' @param Class \emph{Optional:} TRUE or FALSE, weather column including information about metabolite class is provided in InputData. If TRUE, also column name for the metabolite ID must be provided via SettingsInfo. \strong{Default = FALSE}
-#' @param Network Network used as input for enrichment analysis. If not available set to NULL. If Network is provided, also column name for the metabolite ID must be provided via SettingsInfo.
-#' @param 
-#'
-#' @export
-
-CheckNames <- function(InputData, 
-                       SettingsInfo, 
-                       Long=FALSE,
-                       Class=FALSE,
-                       Network=NULL){
-  
-  #----- Make long DF if needed:
-  if(Long==FALSE){
-    df_long <- InputData %>% #Make DF long based on Metablite IDs
-      rownames_to_column(SettingsInfo[["TrivialName"]])%>%
-      separate_rows(SettingsInfo[["ID"]], sep = ",")
-    
-    df_NoNA <- df_long %>%
-      filter(!is.na(.data[[SettingsInfo[["ID"]]]]))
-  }else{
-    df_long <- InputData
-    df_NoNA <- InputData%>%
-      filter(!is.na(.data[[SettingsInfo[["ID"]]]]))
-  }
-  
-  #----- Check for many to many mappings:
-  doublons_ID <- as.data.frame(df_NoNA[duplicated(df_NoNA[SettingsInfo[["ID"]]]), SettingsInfo[["ID"]]])
-  doublons_TrivialName <- as.data.frame(df_NoNA[duplicated(df_NoNA[SettingsInfo[["TrivialName"]]]), SettingsInfo[["TrivialName"]]])
-  
-  #print the information obtained
-  message("In InputData are ", nrow(df), " trivial metabolite names. For ", nrow(df_long)-nrow(df_NoNA), " metabolites no metabolite ID was mapped. Of the mapped metabolite IDs ", nrow(unique(doublons_ID)), " were mapped to multiple trivial metabolite names. ", nrow(unique(doublons_TrivialName)), " trivial metabolite names mapped to multiple metabolite IDs.")
-  
-  #----- Check if the duplications are of a specific metabolite class (e.g. lipids)
-  if(Class==TRUE){
-    doublons_ID <- merge(x= as.data.frame(unique(doublons_ID)),
-                       y= df_NoNA,
-                       by=SettingsInfo[["ID"]],
-                       all.x=TRUE)
-    doublons_Summary <-  as.data.frame(prop.table(table(doublons_ID[SettingsInfo[["Class"]]])) * 100)%>%
-      dplyr::rename(!!SettingsInfo[["TrivialName"]]:= 1)
-    print(doublons_Summary)
-  }
-  
-  #Check pathway file (if provided):
-  if(is.null(Network)==FALSE){
-    
-  }
-  
-}
-
-
-```
-
-\
-\
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 550%"}
@@ -514,12 +405,25 @@ In general,we have three different `Plot_Settings`, which will also be used for 
 How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
 
-##Future
+## Future
 Run metabolite-gene analysis
-\* Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
-\* Maybe add the data from the paper of the 3D cell culture model of ccRCC
+- Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
+- Maybe add the data from the paper of the 3D cell culture model of ccRCC
 
+Reactome
+-   As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
+-   Remove unspecific metabolites
+-   Translate ChEBI to HMDB and KEGG
+-   FYI: See code I used to access via API
 
+ocean PK
+-   Add HMDB and CheBI IDs to the KEGG IDs.
+-   Make ocean PK accessible via MetaProViz
+
+Lipid prediction
+-   This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
+-   linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
+-   Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
 
 
 </div>
