@@ -302,11 +302,10 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
   plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
   ptb <<- plottable
-  #gtable::gtable_show_layout(ptb)
 
-  ##############################################
-  #-----widths general
   plottable %<>%
+    ##############################################
+    #-----widths general
     set_width("axis-b", "8cm") %>%
     set_width("ylab-l", "0cm", offset = -4L, ifempty = FALSE) %>%
     set_width("axis-l", "1cm") %>%
@@ -315,96 +314,71 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     set_width("axis-r", "0cm") %>%
     set_width("ylab-r", "0cm") %>%
     set_width("ylab-l", "1cm", offset = -1L) %>%
-    set_width("guide-box-right", "1cm")
-
-  # plottable$widths[7] <- "8cm"#controls x-axis
-  # plottable$widths[6] <- unit(1,"cm")#controls margins --> Distance y-axis label to axis
-  # plottable$widths[5] <- unit(1,"cm")#controls margins --> start Figure legend
-  # plottable$widths[4] <- unit(1,"cm")#Space to left side
-  # plottable$widths[11] <- unit(1,"cm")#Space to right side
-  # plottable$widths[c(1,2,3,8,9, 10)] <- unit(0,"cm")#controls margins --> not needed
-  # Sum up total width:
-  plot_widths <- 12
-
-  #############################################
-  #-----heigths general
-  plottable %<>%
+    set_width("guide-box-right", "1cm") %>%
+    #############################################
+    #-----heigths general
     set_height("axis-l", "8cm") %>%
     set_height("axis-b", "1cm") %>%
     set_height("xlab-b", ".5cm") %>%
     set_height("xlab-b", "1cm", offset = 1L) %>%
     set_height("title", "0cm", offset = -2L, ifempty = FALSE) %>%
     set_height("title", "0cm", offset = -1L) %>%
-    set_height("title", "0cm") %>%
+    set_height("title", "1cm") %>%
     set_height("subtitle", "0cm") %>%
     set_height("guide-box-top", "0cm") %>%
     set_height("xlab-t", "0cm", offset = -1L)
 
-  # plottable$heights[9] <- unit(8, "cm")#controls x-axis
-  # plottable$heights[10] <- unit(1,"cm")#controls margins --> Distance x-axis label to axis
-  # plottable$heights[11] <- unit(0.5,"cm")#controls margins --> x-axis label
-  # plottable$heights[12] <- unit(0.5,"cm")#controls margins --> Space to bottom
-  # plottable$heights[c(1,2,3,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-  # Sum up total heights:
-  plot_heights <- 10
-
   #############################################
   #----- Plot Name
-  if(PlotName==""){
     #------ Height
-    plottable$heights[3] <- unit(1,"cm")#controls margins --> Some space above the plot
+  if (nchar(PlotName) > 0L) {
+    plottable %<>% set_height("title", "1.5cm")#controls margins --> PlotName and subtitle
     # Sum up total heights:
-    plot_heights <-  plot_heights+1
-  }else{
-    #------ Height
-    plottable$heights[3] <- unit(1.5,"cm")#controls margins --> PlotName and subtitle
-    # Sum up total heights:
-    plot_heights <- plot_heights+1.5
+    plot_heights %<>% add(.5)
 
     #------- Width: Check how much width is needed for the figure title/subtitle
-    character_count <- nchar(PlotName)
-    Titles_width <- (character_count*0.25)+0.8
-    if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-      plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#If Figure legend is longer that the x0axis, space will be added to the right
-      plot_widths <- Titles_width
-    }
+    title_width <- nchar(PlotName) * .25 + .8
+    plottable %<>% set_width(
+      "guide-box-right",
+      sprintf('%.02fcm', title_width - plot_widths),
+      callback = max
+    )
+    plot_widths %<>% max(title_width)
   }
 
   #############################################
   #-------- Figure legend
-  if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
+  legend_sections <- c("color", "shape")
+  if(any(legend_sections %in% names(SettingsInfo))) {
 
     log_trace('color and/or shape in SettingsInfo')
-    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
-    #leg <<- Legend
+    Legend <- get_legend(InputPlot) # Extract legend to adjust separately
+    leg <<- Legend
     #gtable::gtable_show_layout(leg)
     #plot(leg)
 
     #------- Legend widths
     ## Legend titles:
-    if("color" %in% names(SettingsInfo)==TRUE){
-      Cchar<- (nchar(SettingsInfo["color"])*0.25)
-      Char <- Cchar
-    }
-    if("shape" %in% names(SettingsInfo)==TRUE){
-      Schar<- (nchar(SettingsInfo["shape"])*0.25)
-      Char <- Schar
-    }
-    if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
-      Char<- max(Cchar,Schar)+1
-    }
+    legend_nchar <-
+       legend_sections %>%
+       map(nchar) %>%
+       unlist %>%
+       max %>%
+       multiply_by(.25)
 
-    Legend_width <- (round(as.numeric(Legend$width[3]),1))
-    if(Legend_width<Char){
-      Legend_width <- Char
-    }
+    legend_width <-
+      Legend$width[3L] %>%
+      as.numeric %>%
+      round(1L) %>%
+      max(legend_nchar)
 
     ## Legend space:
-    if(grid::convertUnit(plottable$widths[11], "cm", valueOnly = TRUE) < Legend_width){
-      original_width <- grid::convertUnit(plottable$widths[11], "cm", valueOnly = TRUE)
-      plottable$widths[11] <- unit(Legend_width,"cm")
-      plot_widths  <- plot_widths + Legend_width - original_width
-    }
+    plottable %<>% set_width(
+      "guide-box-right",
+      sprintf('%.02fcm', legend_width),
+      callback = max,
+      grow = TRUE
+    )
 
     #------- Legend heights
     Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))+2 #+2 to secure space above and below plot
