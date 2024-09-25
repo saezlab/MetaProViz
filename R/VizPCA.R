@@ -295,7 +295,12 @@ VizPCA <- function(InputData,
 #' @param PlotName Passed to VizPCA
 #'
 #' @keywords PCA helper function
-#' @importFrom magrittr %<>% %>%
+#' @importFrom ggplot2 ggplotGrob
+#' @importFrom magrittr %<>% %>% add multiply_by
+#' @importFrom grid convertUnit unit
+#' @importFrom ggpubr get_legend
+#' @importFrom logger log_trace
+#' @importFrom purrr map
 #' @noRd
 PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
