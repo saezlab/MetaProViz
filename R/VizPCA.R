@@ -298,9 +298,12 @@ VizPCA <- function(InputData,
 #' @importFrom magrittr %<>% %>%
 #' @noRd
 PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
+
   #------- Set the total heights and widths
   #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
+  plottable <-
+    ggplotGrob(InputPlot) %>%
+    withCanvasSize(width = 12, height = 11) # Convert the plot to a gtable
   ptb <<- plottable
 
   plottable %<>%
@@ -381,9 +384,9 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     )
 
     #------- Legend heights
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))+2 #+2 to secure space above and below plot
+    Legend_heights <- (round(as.numeric(Legend$heights[3L]), 1L))+(round(as.numeric(Legend$heights[5L]), 1L)) + 2 #+2 to secure space above and below plot
     if(plot_heights < Legend_heights){
-      Add <- (Legend_heights-plot_heights)/2
+      Add <- (Legend_heights-plottable$height) / 2
       plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
       plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
       plot_heights <- Legend_heights
