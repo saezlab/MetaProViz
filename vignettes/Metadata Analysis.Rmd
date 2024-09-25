@@ -242,9 +242,10 @@ for(item in names(DFs)){
   #Perform DMA
   message(paste("Running DMA for", item))
   TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
-                   SettingsFile_Sample =  InputData[,c(1:13)],
-                   SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
-                   PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+                         SettingsFile_Sample =  InputData[,c(1:13)],
+                         SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
+                         SettingsFile_Metab = Tissue_MetaData,
+                         PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
   #Add Results to list
   ResList[[item]] <- TvN
 }
