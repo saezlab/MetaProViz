@@ -45,10 +45,12 @@
 # REFACT: use the @return directive to describe the return value of the function
 #'
 #' @keywords PCA
-# REFACT: use @importFrom and cover all third party functions required in the
-# function below
+#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom dplyr rename
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom rlang !! :=
 #' @export
-
 VizPCA <- function(InputData,
                    SettingsInfo= NULL,
                    SettingsFile_Sample = NULL,
@@ -64,17 +66,8 @@ VizPCA <- function(InputData,
                    FolderPath = NULL
 ){
 
-  # REFACT: dependencies shoould be handled by @importFrom, roxygen2,
-  # DESCRIPTION and NAMESPACE; procedures like below should never be part of a
-  # function in a package
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse","ggfortify", "ggplot2")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-  suppressMessages(library("ggfortify"))
 
-  ################################################################################################################################################################################################
+  ###########################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
@@ -111,7 +104,7 @@ VizPCA <- function(InputData,
   }
 
 
-  ############################################################################################################
+  ###########################################################################
   ## ----------- Set the plot parameters: ------------ ##
   ##--- Prepare colour and shape palette
   if(is.null(ColorPalette)){
@@ -257,32 +250,39 @@ VizPCA <- function(InputData,
   PlotList[["Plot"]] <- PCA
 
   #Set the total heights and widths
-  Plot_Sized <- MetaProViz:::PlotGrob_PCA(InputPlot=PCA, SettingsInfo=SettingsInfo, PlotName=PlotName)
-  PCA <- Plot_Sized[[3]]
-  PCA <- ggplot2::ggplot() +
-    annotation_custom(PCA)
-  PCA  <-PCA  + theme(panel.background = element_rect(fill = "transparent"))
+  PCA %<>% PlotGrob_PCA(SettingsInfo=SettingsInfo, PlotName=PlotName)
+  PlotHeight <- as.numeric(PCA$height)
+  PlotWidth <- as.numeric(PCA$width)
+  PCA %<>%
+    {ggplot2::ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
+
   PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
 
-  ######################################################################################################################################################################
+  ###########################################################################
   ##----- Save and Return
   #Here we make a list in which we will save the outputs:
-  FileName <- `if`(nchar(PlotName), sprintf('PCA_%s', PlotName),'PCA')
-  suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
-                           InputList_Plot= PlotList_adaptedGrid,
-                           SaveAs_Table=NULL,
-                           SaveAs_Plot=SaveAs_Plot,
-                           FolderPath= Folder,
-                           FileName= FileName,
-                           CoRe=FALSE,
-                           PrintPlot=PrintPlot,
-                           PlotHeight=Plot_Sized[[1]],
-                           PlotWidth=Plot_Sized[[2]],
-                           PlotUnit="cm")))
+  FileName <- PlotName %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
 
-  return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+  suppressMessages(suppressWarnings(
+    SaveRes(
+      InputList_DF=NULL,
+      InputList_Plot= PlotList_adaptedGrid,
+      SaveAs_Table=NULL,
+      SaveAs_Plot=SaveAs_Plot,
+      FolderPath= Folder,
+      FileName= FileName,
+      CoRe=FALSE,
+      PrintPlot=PrintPlot,
+      PlotHeight=PlotHeight,
+      PlotWidth=PlotWidth,
+      PlotUnit="cm"
+    )
+  ))
+
+  invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))
+
 }
 
 
@@ -342,16 +342,17 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   if (nchar(PlotName) > 0L) {
     plottable %<>% set_height("title", "1.5cm")#controls margins --> PlotName and subtitle
     # Sum up total heights:
-    plot_heights %<>% add(.5)
+    plottable$height %<>% add(unit(.5, "cm"))
 
     #------- Width: Check how much width is needed for the figure title/subtitle
-    title_width <- nchar(PlotName) * .25 + .8
+    title_width <- unit(nchar(PlotName) * .25 + .8, "cm")
     plottable %<>% set_width(
       "guide-box-right",
-      sprintf('%.02fcm', title_width - plot_widths),
+      sprintf('%.02fcm', title_width - plottable$width),
       callback = max
     )
-    plot_widths %<>% max(title_width)
+    plottable$width %<>% max(title_width)
+
   }
 
   #############################################
@@ -390,11 +391,11 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
     #------- Legend heights
     Legend_heights <- (round(as.numeric(Legend$heights[3L]), 1L))+(round(as.numeric(Legend$heights[5L]), 1L)) + 2 #+2 to secure space above and below plot
-    if(plot_heights < Legend_heights){
+    if(as.numeric(plottable$height) < Legend_heights){
       Add <- (Legend_heights-plottable$height) / 2
       plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
       plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-      plot_heights <- Legend_heights
+      plottable$height <- unit(Legend_heights, "cm")
     }
 
   }else{
@@ -402,8 +403,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
   }
   ptb1 <<- plottable
 
-  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
-  Output<- list(plot_heights, plot_widths, plottable)
+  plottable
 }
 
 
