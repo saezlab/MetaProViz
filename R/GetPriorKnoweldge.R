@@ -218,7 +218,8 @@ InspectID <- function(Input_DataFrame,
   # Join the summary with the nested table for easier user inspection
   mapping_translated_to_original$mapping_joined <- mapping_translated_to_original$mapping_nested %>%
     left_join(mapping_translated_to_original$mapping_summary, by = "ID_translated") %>%
-    rename("Original_IDs" = "ID_originals", "Translated_ID" = "ID_translated", "Original_IDs_count" = "ID_original_count")
+    rename("Original_IDs" = "ID_originals", "Translated_ID" = "ID_translated", "Original_IDs_count" = "ID_original_count",
+           "Pathways" = "pathways", "Pathways_count" = "pathway_count")
 
   # Now inspect the mapping going back from original to translated
   mapping_original_to_translated <- mapping_translated_to_original$mapping_nested %>%
@@ -237,7 +238,23 @@ InspectID <- function(Input_DataFrame,
                                   ID_original_count - 1,
                                   ID_original_count)
     ) %>%
-    rename("Translated_IDs" = "ID_originals", "Original_ID" = "ID_translated", "Translated_IDs_count" = "ID_original_count")
+    rename("Translated_IDs" = "ID_originals", "Original_ID" = "ID_translated", "Translated_IDs_count" = "ID_original_count",
+           "Pathways" = "pathways", "Pathways_count" = "pathway_count")
+
+  # Now let's add a column describing the type of relationship present... This could definitely be refactored to save the double up
+  mapping_original_to_translated$mapping_joined <- mapping_original_to_translated$mapping_joined %>%
+    mutate(Relationship = case_when(
+      Translated_IDs_count == 0 ~ "One-to-None",
+      Translated_IDs_count == 1 ~ "One-to-One",
+      Translated_IDs_count > 1 ~ "One-to-Many"
+    ))
+  mapping_translated_to_original$mapping_joined <- mapping_translated_to_original$mapping_joined %>%
+    mutate(Relationship = case_when(
+      Original_IDs_count == 0 ~ "One-to-None",
+      Original_IDs_count == 1 ~ "One-to-One",
+      Original_IDs_count > 1 ~ "One-to-Many"
+    ))
+
 
   return(list("Orig2Trans"=mapping_original_to_translated$mapping_joined, "Trans2Orig"=mapping_translated_to_original$mapping_joined))
 }
