@@ -39,6 +39,7 @@ TranslateID <- function(Input_DataFrame,
   to <- SettingsInfo[['ToFormat']]
   method <- SettingsInfo[['Method']]
   groupvar <- SettingsInfo[['GroupingVariable']]
+  DF_List <- list()
 
   for (to_singular in to) {
     # Rename and use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings.
@@ -88,9 +89,22 @@ TranslateID <- function(Input_DataFrame,
                               by.x=c(idcolname, groupvar),
                               by.y=c(from,groupvar),
                               all.x=TRUE)
+    DF_List$Translated_DataFrame <- Output_DataFrame
+
+    # Now Inspect the IDs to identify potential problems with mapping - let's do this even if the user chose the GetFirst method, because it is very important to show the limitations...
+    mapping_inspection = InspectID(new_col, SettingsInfo = list(OriginalIDcolumn = from, TranslatedCollapsedIDcolumn = paste0(to_singular, '_collapsed'), Pathway = groupvar))
+    # Now rename the columns so the user knows what exactly the Original and Translated IDs are for each DF...
+    mapping_inspection$Orig2Trans <- mapping_inspection$Orig2Trans %>%
+      rename(!!paste0("Original_ID_", from) := "Original_ID", !!paste0("Translated_IDs_", to_singular) := "Translated_IDs")
+    mapping_inspection$Trans2Orig <- mapping_inspection$Trans2Orig %>%
+      rename(!!paste0("Original_IDs_", from) := "Original_IDs", !!paste0("Translated_ID_", to_singular) := "Translated_ID")
+
+    DF_List <- c(DF_List, setNames(list(mapping_inspection$Orig2Trans), paste0("Mapping_Orig2Trans_", from, '_to_', to_singular)))
+    DF_List <- c(DF_List, setNames(list(mapping_inspection$Trans2Orig), paste0("Mapping_Trans2Orig_", to_singular, '_to_', from)))
+
 
   }
-  return(Output_DataFrame)
+  return(DF_List)
 }
 
 
