@@ -291,91 +291,23 @@ Clustering:
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 \
-
 There are two options:\
-1. Over Representation Analysis (ORA) that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. This can be applied to clusters of metabolites as for example the results from `MetaProViz::MCA_2Cond()` or `MetaProViz::CoRe()` function. If you want to have more details on these clustering methods please visit the vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html) or [CoRe Metabolomics](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html).
-
-Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test.
-The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
-Of course, there are many other PEA methods such as the well known GSEA.
-Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites.
-If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
-
+1. Over Representation Analysis (ORA) that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test `MetaProViz::ClusterORA`. This can be applied to clusters of metabolites as for example the results from `MetaProViz::MCA_2Cond()` or `MetaProViz::CoRe()` function. If you want to have more details on these clustering methods please visit the vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html) or [CoRe Metabolomics](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html).\
 \
-Here we will use the KEGG pathways [@Kanehisa2000].
-Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names.
-In general, the `PathwayFile` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+2. Enrichment analysis on standard differential analysis results. We offer ORA `MetaProViz::StandardORA`, but there are many other statistical tests that can be used for enrichment analysis. The full scope of different methods is beyond the scope of MetaProViz, but are available in [decoupleR]() (REF) packages from our group.
 
-```{r}
-#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
-DM_ORA_res<- list()
-
-comparisons <- names(DMA_Annova[["DMA"]])
-for(comparison in comparisons){
-  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
-  DMA <- DMA_Annova[["DMA"]][[comparison]]
-  DMA <- DMA[complete.cases(DMA),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
-  dplyr::rename("Metabolite"="KEGGCompound")#We use the KEGG trivial names to match with the KEGG pathways
-  
-  #Perform ORA
-  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA%>%remove_rownames()%>%column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
-                                                       SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-                                                       PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
-                                                       PathwayName="KEGG",
-                                                       minGSSize=3,
-                                                       maxGSSize=1000,
-                                                       pCutoff=0.01,
-                                                       PercentageCutoff=10)
-                                                
-                                                 
-}
-
-#Lets check how the results look like:
-DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGoSummary"]]
-```
-
-```{r, echo=FALSE}
-# Check how our data looks like:
-DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
-  kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-\*implementation to also apply to clusters!
-
-## ORA on each metabolite cluster
-
-As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method.
-As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites).
-In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
-
-```{r, eval=FALSE}
-MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%column_to_rownames("Metabolite"),
-                                         SettingsInfo=c(ClusterColumn="RG2_Significant", 
-                                                        BackgroundColumn="BG_Method", 
-                                                        PathwayTerm= "Pathway", #This is the column name including the pathways names
-                                                        PathwayFeature= "Metabolite"),
-                                         RemoveBackground=TRUE,
-                                         PathwayFile=MappingInfo%>%rownames_to_column("Metabolite"),
-                                         PathwayName="KEGG",
-                                         minGSSize=3,
-                                         maxGSSize=1000 ,
-                                         SaveAs_Table= "csv")
-```
-
-## decoupleR
 
 Just as an example if people want to use different forms of statistical test
 
-## Run footprinting analysis
 
--   Maybe move to extra vignette
--   ocean method --> MetaProViz::RunOcean
-
-## Future
+# Future
 Run metabolite-gene analysis
 - Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
 - Maybe add the data from the paper of the 3D cell culture model of ccRCC
+
+Run footprinting analysis
+-   Maybe move to extra vignette
+-   ocean method --> MetaProViz::RunOcean
 
 Reactome
 -   As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome`
@@ -396,15 +328,11 @@ Viz:
 -     Showcase specific viz options
 -     Add network plot
 
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
-
-\
-\
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
-:::
 
 # Session information
 
