@@ -172,17 +172,19 @@ Given that we have the gene-metabolite-sets, we can now also run enrichment anal
 
 ## MetaLinksDB Metabolite-receptor sets
 The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters (REF).\
-
 ```{r}
-MetaProViz::LoadMetalinks()
+MetaLinksDB_Res <- MetaProViz::LoadMetalinks()
 ```
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-MetalinksDB[c(1:8),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `MetaLinks` including metabolite-receptor sets.", row.names=FALSE) %>%
+MetaLinksDB_Res[["MetalinksDB"]][c(1:8),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB` including metabolite-receptor sets.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
+MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB_Type` including metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
 \
@@ -296,8 +298,6 @@ There are two options:\
 \
 2. Enrichment analysis on standard differential analysis results. We offer ORA `MetaProViz::StandardORA`, but there are many other statistical tests that can be used for enrichment analysis. The full scope of different methods is beyond the scope of MetaProViz, but are available in [decoupleR]() (REF) packages from our group.
 
-
-Just as an example if people want to use different forms of statistical test
 
 
 # Future
