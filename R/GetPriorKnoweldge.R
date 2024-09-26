@@ -460,7 +460,8 @@ LoadMetalinks <- function(types = NULL,
         }
       }
     }
-    stop("Please use possible options for your selections.")
+    message("No result is returned unless correct options for your selections are used. `?` is not a valid option, but only returns you the list of options.")
+    return()
   }
 
   #------------------------------------------------------------------
@@ -550,6 +551,7 @@ LoadMetalinks <- function(types = NULL,
   ## Gene Name
   MetalinksDB <- merge(MetalinksDB, TablesList[["proteins"]], by="uniprot", all.x=TRUE)
 
+
   ## Rearrange columns:
   MetalinksDB <- MetalinksDB[,c(2,10:12, 1, 13:14, 3:9)]%>%
     mutate(type = case_when(
@@ -563,28 +565,31 @@ LoadMetalinks <- function(types = NULL,
 
   #------------------------------------------------------------------
   #Decide on useful selections term-metabolite for MetaProViz.
-  MetalinksDB_Pathways <-
+  #MetalinksDB_Pathways <- merge(MetalinksDB[, c(1:3)], TablesList[["pathway"]], by="hmdb", all.x=TRUE)
 
-
+  MetalinksDB_Type <-MetalinksDB[, c(1:3, 7,13)]%>%
+    subset(!is.na(protein_type))%>%
+    mutate(term = gsub('\"', '', protein_type))%>%
+    unite(term_specific, c("term", "type"), sep = "_", remove = FALSE)%>%
+    select(-"type", -"protein_type")
 
   #------------------------------------------------------------------
   #Save results in folder
   ##-------------- Save and return
-  DF_List <- list("GeneMetabSet"=GeneMetabSet,
-                  "MetabSet"=MetabSet)
+  DF_List <- list("MetalinksDB"=MetalinksDB,
+                  "MetalinksDB_Type"=MetalinksDB_Type)
   suppressMessages(suppressWarnings(
     MetaProViz:::SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
                          FolderPath= Folder,
-                         FileName= PKName,
+                         FileName= "MetaLinksDB",
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
 
   #Return into environment
-  assign("MetalinksDB", MetalinksDB, envir=.GlobalEnv)
-  #return(invisible(DF_List))
+  return(invisible(DF_List))
 
 }
 
