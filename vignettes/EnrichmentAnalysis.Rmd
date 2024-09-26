@@ -25,7 +25,6 @@ editor_options:
     wrap: sentence
 ---
 
-```{=html}
 <style>
 .vscroll-plot {
     width: 1000px;
@@ -34,7 +33,7 @@ editor_options:
     overflow-x: hidden;
 }
 </style>
-```
+
 ```{r chunk_setup, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
@@ -45,11 +44,7 @@ knitr::opts_chunk$set(
 # <img src="Hexagon_MetaProViz.png" align="right" width="200"/>
 
 \
-In this vignette we focus on accessing prior knowledge needed to for example run pathway enrichment analysis or compound class enrichment analysis and showcase the enrichment analysis using example data.\
-
-\
-[In this tutorial we showcase how to use **MetaProViz**]{style="text-decoration:underline"}:\
-
+<span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
 -   To access metabolite prior knowledge.\
 -   To deal with many-to-many mapping in your metabolite identifiers.\
 -   To perform pathway enrichment analysis.\
@@ -72,40 +67,28 @@ library(tidyverse)
 ```
 \
 \
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
-:::
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 
 # 1. Loading the example data
 
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
-:::
-
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
 [As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`]{style="text-decoration:underline"}:\
 `1.`Cell line experiment **(CellLine)**\
 Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
-We have performed pre-processing and differential analysis (details can be found in the vignette "Standard Metabolomics") and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
+We have performed pre-processing and differential analysis (details can be found in the vignette vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)) and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
 ```{r}
 #Load the Pre-processed intracellular data:
 Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 ```
 
-```{r, echo=FALSE}
-# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
-# Check how our data looks like:
-Intra_DMA_786M1A_vs_HK2[1:5, c(1:13)]%>%
-  kableExtra::kbl(caption = "Preview of the DF `Intra_DMA_786M1A_vs_HK2` differential metaboilite analysis results.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
-  #kableExtra::scroll_box(width = "100%", height = "200px")
-```
-
 `2.` Tissue experiment **(Tissue)**\
 Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
-We have performed differential analysis (details can be found in the vignette "Metadata Analysis") and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
+We have performed differential analysis (details can be found in the vignette [Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)) and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
 ```{r}
 # Load the example data:
 Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
@@ -113,22 +96,17 @@ Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
 Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
 
 ```
-
 \
 \
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 
 # 2. Accessing Prior Knowledge
 
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
-:::
-
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 \
 Metabolite prior knowledge (PK) is essential for the interpretation of metabolomics data. It can be used to perform pathway enrichment analysis, compound class enrichment analysis, and by using specific PK databases, it can be used to study the connection of metabolites and receptors or transporters.Since the quality and content of the PK will dictate the success of the downstream analysis and biological interpretation, it is important to ensure the PK is used correctly.\
 Specifically in metabolite PK, the many different PK databases and resources pose several issues. Indeed, the metabolite identifiers (e.g. KEGG, HMDB, PubChem, etc.) are not standardized across databases, and the same metabolite can have multiple identifiers in different databases. This is known as the many-to-many mapping problem (REF).\
@@ -206,17 +184,18 @@ MetalinksDB[c(1:8),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
 ```
-
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 
 # 3. Translate IDs
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
-:::
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
 As visible from the prior knowledge tables above, it becomes clear that we require a specific metabolite ID depended on the pior knwoledge resource. Indeed, the KEGG pathways include KEGG IDs, whilst the Halmmarks metabolite sets include HMDB IDs.\
 If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::TranslateID()` function. This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function (REF) and currently supports ID translation of metabolites to and from the following formats:\
 -   KEGG\
@@ -300,19 +279,21 @@ Clustering:
 -   Create function that can be used to cluster the results of the pathway analysis --\> basically adds column ClusterName to pathway results file --\> ClusterName is either `No Cluster` or the main words from the pathway names that are combined.
 
 
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 
-# 3. Run enrichment analysis
+# 4. Run enrichment analysis
 
-::: {.progress .progress-striped .active}
-::: {.progress-bar .progress-bar-success style="width: 550%"}
-:::
-:::
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
 
-## ORA using the DMA results
+There are two options:\
+1. Over Representation Analysis (ORA) that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. This can be applied to clusters of metabolites as for example the results from `MetaProViz::MCA_2Cond()` or `MetaProViz::CoRe()` function. If you want to have more details on these clustering methods please visit the vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html) or [CoRe Metabolomics](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html).
 
 Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test.
 The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
@@ -389,21 +370,7 @@ Just as an example if people want to use different forms of statistical test
 ## Run footprinting analysis
 
 -   Maybe move to extra vignette
--   ocean method --\> MetaProViz::RunOcean
-
-# 4. Visualisation of results
-
-## Heatmaps
-
-Add parameter `Plot_Settings` and enable "PEA" versus "Standard"
-
-## Volcano plot
-
-In general,we have three different `Plot_Settings`, which will also be used for other plot types such as lollipop graphs.\
-`1.` `"Standard"` is the standard version of the plot, with one dataset being plotted.\
-`2.` `"Conditions"` here two or more datasets will be plotted together.
-How datasets can be plotted together depends on the plot type.\
-`3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
+-   ocean method --> MetaProViz::RunOcean
 
 ## Future
 Run metabolite-gene analysis
@@ -425,6 +392,9 @@ Lipid prediction
 -   linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
 -   Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
 
+Viz:
+-     Showcase specific viz options
+-     Add network plot
 
 </div>
 
