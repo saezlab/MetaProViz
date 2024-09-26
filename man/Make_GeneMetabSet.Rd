@@ -6,17 +6,20 @@
 \usage{
 Make_GeneMetabSet(
   Input_GeneSet,
-  Target = c("gene"),
-  OutputName = NULL,
+  SettingsInfo = c(Target = "gene"),
+  PKName = NULL,
+  SaveAs_Table = "csv",
   FolderPath = NULL
 )
 }
 \arguments{
 \item{Input_GeneSet}{Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.}
 
-\item{Target}{\emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = "gene")}
+\item{SettingsInfo}{\emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = c(Target="gene"))}
 
-\item{OutputName}{{Optional:} String which is added to the output files name.\strong(Default = NULL)}
+\item{PKName}{\emph{Optional: } Name of the prior knowledge resource. \strong(Default = NULL)}
+
+\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
 \item{FolderPath}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
 }

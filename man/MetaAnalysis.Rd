@@ -9,6 +9,7 @@ MetaAnalysis(
   SettingsFile_Sample,
   Scaling = TRUE,
   Percentage = 0.1,
+  StatCutoff = 0.05,
   SaveAs_Table = "csv",
   SaveAs_Plot = "svg",
   PrintPlot = TRUE,
@@ -23,6 +24,8 @@ MetaAnalysis(
 \item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
 \item{Percentage}{\emph{Optional: } Percentage of top and bottom features to be displayed in the results. \strong{Default = 0.1}}
+
+\item{StatCutoff}{\emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test. \strong{Default = 0.05}}
 
 \item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 

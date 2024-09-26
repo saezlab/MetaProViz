@@ -15,6 +15,9 @@ ToyData(Dataset)
 \item{\code{"Cells_MetaData"}: }
 \item{\code{"Tissue_Norm"}: }
 \item{\code{"Tissue_MetaData"}: }
+\item{\code{"Tissue_DMA"}: }
+\item{\code{"Tissue_DMA_Old"}: }
+\item{\code{"Tissue_DMA_Young"}: }
 }}
 }
 \value{
