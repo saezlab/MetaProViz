@@ -20,12 +20,12 @@
 
 
 ##########################################################################################
-### ### ### Translate IDs to/from KEGG, PubChem, Chebi ### ### ###
+### ### ### Translate IDs to/from KEGG, PubChem, Chebi, HMDB ### ### ###
 ##########################################################################################
 #'
 #' @title Translate IDs
 #' @description Translate IDs to and from KEGG, PubChem, Chebi.
-#' @return A data frame containing the original data and the new column of translated ids, with only the first instance of each.
+#' @return 3 data frames: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
 #' @export
 #'
 TranslateID <- function(Input_DataFrame,
@@ -92,6 +92,158 @@ TranslateID <- function(Input_DataFrame,
   }
   return(Output_DataFrame)
 }
+
+
+##########################################################################################
+### ### ### Inspect ID mapping to/from KEGG, PubChem, Chebi, HMDB ### ### ###
+##########################################################################################
+#'
+#' @title Inspect ID
+#' @description Inspect how well IDs map from the translated format (e.g. PubChem) to the original data format (e.g. KEGG), in terms of direct mapping, or one-to-many relationships.
+#' @return Two data frames, the first of which is a summary of the mapping from Original to Translated, and the second of which is the reverse, from Translated to Original, with counts per unique ID and pathway.
+#' @export
+#'
+InspectID <- function(Input_DataFrame,
+                     SettingsInfo = list(OriginalIDcolumn="MetaboliteID", TranslatedCollapsedIDcolumn="chebi_collapsed", Pathway="term")
+                     ) {
+  # note that 'translated' and 'original' could be swapped if we want to inspect the reverse mapping - this difference is mostly semantic
+  # input data frame should be what we have after the translation has occurred, and include a column with collapsed values in the case of multi-mapping (e.g. C1, C2, C3), but could be all 1-to-1 in rare cases.
+  original <- SettingsInfo[['OriginalIDcolumn']]
+  translated <- SettingsInfo[['TranslatedCollapsedIDcolumn']]
+  pathway <- SettingsInfo[['Pathway']]
+
+  suppressMessages(library(tidyverse))
+
+  # Function to process collapsed field (e.g. "C1, C2, C3, C4")
+  process_collapsed <- function(collapsed, origin_info) {
+    if (length(collapsed) == 0 || is.null(collapsed) || is.na(collapsed)) {
+      return(list(None = origin_info))
+    } else {
+      # Split the string by commas and return a named list
+      ids <- strsplit(collapsed, ",\\s*")[[1]]
+      return(setNames(rep(list(origin_info), length(ids)), ids))
+    }
+  }
+
+  # Main function to map IDs
+  map_ids <- function(df, target_col = 'collapsed', term_colname = 'term', idcolname = 'id') {
+    mapping_list <- list()
+
+    # Iterate over rows of the dataframe
+    for (i in 1:nrow(df)) {
+      collapsed <- df[[target_col]][i]
+      term <- df[[term_colname]][i]
+      row_id <- df[[idcolname]][i]
+
+      # Process the collapsed field
+      processed_data <- process_collapsed(collapsed, list(term = term, id = row_id))
+
+      # Append data to the mapping list
+      for (item in names(processed_data)) {
+        if (is.null(mapping_list[[item]])) {
+          mapping_list[[item]] <- list(processed_data[[item]])
+        } else {
+          mapping_list[[item]] <- append(mapping_list[[item]], list(processed_data[[item]]))
+        }
+      }
+    }
+
+    return(mapping_list)
+  }
+
+  # Convert the mapping list into a data frame
+  list_to_df <- function(mapping_list) {
+    rows <- list()  # Initialize a list to store the rows
+
+    # Iterate through the mapping list and extract data
+    for (key in names(mapping_list)) {
+      for (mapping in mapping_list[[key]]) {
+        # Ensure that mapping is not NULL and contains term/id
+        if (!is.null(mapping) && !is.null(mapping$term) && !is.null(mapping$id)) {
+          # Append each row as a list to the rows list
+          rows[[length(rows) + 1]] <- list(ID = key, term = mapping$term, id = mapping$id)
+        }
+      }
+    }
+
+    # Convert the list of rows into a data frame
+    df <- bind_rows(rows)
+
+    return(df)
+  }
+
+  inspect_mapping <- function(input_translated_df,
+                              target_col_inp = 'chebi_collapsed',
+                              term_colname_inp = 'term',
+                              idcolname_inp = 'MetaboliteID') {
+    mapping_results <- map_ids(input_translated_df,
+                               target_col = target_col_inp,
+                               term_colname = term_colname_inp,
+                               idcolname = idcolname_inp)
+    mapping_df <- list_to_df(mapping_results)
+    #print(colnames(mapping_df)) #usually results in "ID"   "term" "id"
+
+    mapping_df <- mapping_df %>%
+      rename(ID_translated = ID, ID_original = id, pathway = term) # assumes that term is the name of the original pathway colname, might still break, todo: fix later
+
+    ### Key result
+    # Count how many unique terms and ids are associated with each ID
+    mapping_df_summary <- mapping_df %>%
+      group_by(ID_translated) %>%
+      summarize(pathway_count = n_distinct(pathway), ID_original_count = n_distinct(ID_original)) %>%
+      filter(pathway_count > 0 | ID_original_count > 0) # was previously filter(pathway_count > 1 | ID_original_count > 1)
+    #print(mapping_df_summary)
+
+    ### Nested results
+    mapping_df_nested <- mapping_df %>%
+      group_by(ID_translated) %>%
+      summarize(pathways = toString(unique(pathway)), ID_originals = toString(unique(ID_original)))
+
+    ### Output
+    results <- list(
+      mapping = mapping_df,
+      mapping_summary = mapping_df_summary,
+      mapping_nested = mapping_df_nested
+    )
+    return(results)
+  }
+
+  # Inspect how the mapping performs going from the translated IDs to the original IDs
+  # Note that we do this before Orig2Trans, because the translated data is already in a nicely formatted manner that is already collapsed
+  # If we wanted to refactor all this to be simpler, perhaps we could just start with the Orig2Trans counts, then flip it. But end result should be the same.
+  mapping_translated_to_original <- inspect_mapping(Input_DataFrame,
+                                                   target_col_inp = translated,
+                                                   term_colname_inp = pathway,
+                                                   idcolname_inp = original)
+  # Join the summary with the nested table for easier user inspection
+  mapping_translated_to_original$mapping_joined <- mapping_translated_to_original$mapping_nested %>%
+    left_join(mapping_translated_to_original$mapping_summary, by = "ID_translated") %>%
+    rename("Original_IDs" = "ID_originals", "Translated_ID" = "ID_translated", "Original_IDs_count" = "ID_original_count")
+
+  # Now inspect the mapping going back from original to translated
+  mapping_original_to_translated <- mapping_translated_to_original$mapping_nested %>%
+    separate_rows("pathways", sep = ", ") %>%
+    inspect_mapping(target_col_inp = 'ID_originals',
+                    term_colname_inp = "pathways",
+                    idcolname_inp = 'ID_translated')
+  # Join the summary with the nested table for easier user inspection
+  # Also, correct instances of NA's that have counted towards the ID_original count...
+  # Note that the pathway count for these instances will still likely be a bit dodgy
+  # We also want to rename the columns, because the function named them anticipating we were going the other way
+  mapping_original_to_translated$mapping_joined <- mapping_original_to_translated$mapping_nested %>%
+    left_join(mapping_original_to_translated$mapping_summary, by = "ID_translated") %>%
+    mutate(
+      ID_original_count = if_else(is.na(ID_originals) | ID_originals == "NA",
+                                  ID_original_count - 1,
+                                  ID_original_count)
+    ) %>%
+    rename("Translated_IDs" = "ID_originals", "Original_ID" = "ID_translated", "Translated_IDs_count" = "ID_original_count")
+
+  return(list("Orig2Trans"=mapping_original_to_translated$mapping_joined, "Trans2Orig"=mapping_translated_to_original$mapping_joined))
+}
+
+
+
 
 
 ##########################################################################################
