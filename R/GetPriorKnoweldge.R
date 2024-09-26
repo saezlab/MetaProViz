@@ -558,8 +558,14 @@ LoadMetalinks <- function(types = NULL,
       type == "lr" ~ "Ligand-Receptor",
       type == "pd" ~ "Production-Degradation",
       TRUE ~ type  # this keeps the original value if it doesn't match any condition
-    ))
-  #------------------------------------------------------------------
+    ))%>%
+    mutate(mode_of_regulation = case_when(
+    mor == -1 ~ "Inhibiting",
+    mor == 1 ~ "Activating",
+    mor == 0 ~ "Binding",
+    TRUE ~ as.character(mor)  # this keeps the original value if it doesn't match any condition
+  ))
+  #--------------------------------------------------------
   #Remove metabolites that are not detectable by mass spectrometry
 
 
