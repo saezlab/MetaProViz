@@ -370,6 +370,7 @@ ReplicateSum <- function(InputData,
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @keywords Coefficient of Variation, high variance metabolites
+#' @importFrom logger log_info log_trace
 #' @export
 
 
@@ -382,13 +383,7 @@ PoolEstimation <- function(InputData,
                            PrintPlot=TRUE,
                            FolderPath = NULL){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
+  log_info('Starting pool estimation.')
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
@@ -424,13 +419,18 @@ PoolEstimation <- function(InputData,
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "PoolEstimation")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    log_info('Selected output directory: `%s`.', SubFolder)
+    if (!dir.exists(SubFolder)) {
+      log_trace('Creating directory: `%s`.', SubFolder)
+      dir.create(SubFolder)
+    }
   }
 
 
 
   ## ------------------ Prepare the data ------------------- ##
   #InputData files:
+  log_info('Preprocessing data.')
   if(is.null(SettingsFile_Sample)==TRUE){
     PoolData <- InputData
     PoolData[PoolData == 0] <- NA
@@ -442,6 +442,7 @@ PoolEstimation <- function(InputData,
 
   ###################################################################################################################################
   ## ------------------ Coefficient of Variation ------------------- ##
+  log_trace('Calculating coefficient of variation.')
   result_df <- apply(PoolData, 2,  function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 }  ) %>% t()%>% as.data.frame()
   rownames(result_df)[1] <- "CV"
 
@@ -458,6 +459,7 @@ PoolEstimation <- function(InputData,
   result_df_final_out <- rownames_to_column(result_df_final,"Metabolite" )
 
   # Remove Metabolites from InputData based on CutoffCV
+  log_trace('Applying CV cut-off.')
   if(is.null(SettingsFile_Sample)==FALSE){
       unstable_metabs <- rownames(result_df_final)[result_df_final[["HighVar_Metabs"]]]
       if(length(unstable_metabs)>0){
@@ -471,9 +473,11 @@ PoolEstimation <- function(InputData,
 
   ## ------------------ QC plots ------------------- ##
   # Start QC plot list
+  log_info('Plotting QC plots.')
   PlotList <- list()
 
   # 1. Pool Sample PCA
+  log_trace('Pool sample PCA.')
   dev.new()
   if(is.null(SettingsFile_Sample)==TRUE){
     pca_data <- PoolData
@@ -497,6 +501,7 @@ PoolEstimation <- function(InputData,
 
 
   # 2. Histogram of CVs
+  log_trace('CV histogram.')
   HistCV <-suppressWarnings(invisible(ggplot(result_df_final_out, aes(CV)) +
                         geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
                         geom_vline(aes(xintercept=CutoffCV),
@@ -508,6 +513,7 @@ PoolEstimation <- function(InputData,
   PlotList [["Histogram_CV-PoolSamples"]] <- HistCV
 
   # 2. ViolinPlot of CVs
+  log_trace('CV violin plot.')
   ViolinCV <- invisible(ggplot(result_df_final_out, aes(y=CV, x=HighVar, label=row.names(result_df_final_out)))+
                           geom_violin(alpha = 0.5 , fill="#FF6666")+
                           geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
@@ -521,6 +527,7 @@ PoolEstimation <- function(InputData,
   ###################################################################################################################################
   ## ------------------ Return and Save ------------------- ##
   #Save
+  log_info('Preparing saved and returned data.')
   if(is.null(filtered_Input_data)==FALSE){
     DF_list <- list("InputData" = InputData, "Filtered_InputData" = filtered_Input_data, "CV" = result_df_final_out )
   }else{
@@ -531,6 +538,12 @@ PoolEstimation <- function(InputData,
   #Save
   DF_list[["InputData"]]<-  DF_list[["InputData"]]%>%rownames_to_column("Code")
 
+  log_info(
+    'Saving results: [SaveAs_Table=%s, SaveAs_Plot=%s, FolderPath=%s].',
+    SaveAs_Table,
+    SaveAs_Plot,
+    SubFolder
+  )
   MetaProViz:::SaveRes(InputList_DF=DF_list,
                       InputList_Plot = PlotList,
                       SaveAs_Table=SaveAs_Table,
@@ -541,7 +554,9 @@ PoolEstimation <- function(InputData,
                       PrintPlot=PrintPlot)
 
   #Return
+  log_info('Finished pool estimation.')
   invisible(return(ResList))
+
 }
 
 ################################################################################################
