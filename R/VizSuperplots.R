@@ -61,13 +61,6 @@ VizSuperplot <- function(InputData,
                          FolderPath = NULL
 ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "ggplot2", "ggpubr", "ggbeeswarm")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
@@ -306,7 +299,7 @@ VizSuperplot <- function(InputData,
                           Log2FC_table=NULL)
         }else if(StatPval=="kruskal.test"){
           STAT_C1vC2 <-MetaProViz:::Kruskal(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
-                                            SettingsInfo=c(Conditions="Conditions", Numerator = unique(SettingsFile_Sample$Conditions), Denominator  = unique(SettingsFile_Sample$Conditions)),,
+                                            SettingsInfo=c(Conditions="Conditions", Numerator = unique(SettingsFile_Sample$Conditions), Denominator  = unique(SettingsFile_Sample$Conditions)),
                                             SettingsFile_Sample= SettingsFile_Sample,
                                             Log2FC_table=NULL)
         }
@@ -365,22 +358,20 @@ VizSuperplot <- function(InputData,
 
 
     # Make plot into nice format:
-    # MetaProViz:::
-    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(Input=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample, MetaboliteName=i, PlotName=PlotName, PlotType=PlotType)
-    Plot <- Plot_Sized[[3]]
+    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample,  PlotName = PlotName, Subtitle = i, PlotType=PlotType)
+    PlotHeight <- as.numeric(Plot_Sized$height)
+    PlotWidth <- as.numeric(Plot_Sized$width)
+    Plot_Sized %<>%
+      {ggplot2::ggplot() + annotation_custom(.)} %>%
+      add(theme(panel.background = element_rect(fill = "transparent")))
 
-    # First we want to convert the plot back into a ggplot object:
-    Plot <- ggplot2::ggplot() +
-      annotation_custom(Plot)
-    Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
-
-    ####################################################################################################################################
+   ####################################################################################################################################
     ## --------------- save -----------------##
     cleaned_i <- gsub("[[:space:],/\\\\*]", "-", i)#removes empty spaces and replaces /,\ with -
-    PlotList_adaptedGrid[[cleaned_i]] <- Plot
+    PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
     SaveList <- list()
-    SaveList[[cleaned_i]] <- Plot
+    SaveList[[cleaned_i]] <- Plot_Sized
     #----- Save
     suppressMessages(suppressWarnings(
       MetaProViz:::SaveRes(InputList_DF=NULL,
@@ -391,8 +382,8 @@ VizSuperplot <- function(InputData,
                            FileName= paste(PlotType, "Plots_",PlotName, sep=""),
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
-                           PlotHeight=Plot_Sized[[1]],
-                           PlotWidth=Plot_Sized[[2]],
+                           PlotHeight=PlotHeight,
+                           PlotWidth=PlotWidth,
                            PlotUnit="cm")))
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
@@ -404,102 +395,73 @@ VizSuperplot <- function(InputData,
 ### ### ### Superplots helper function: Internal Function ### ### ###
 #####################################################################
 
-#' @param Input This is the ggplot object generated within the VizSuperplots function.
+#' @param InputPlot This is the ggplot object generated within the VizSuperplots function.
 #' @param SettingsInfo Passed to VizSuperplots
 #' @param SettingsFile_Sample Passed to VizSuperplots
-#' @param MetaboliteName Passed to VizSuperplots
+#' @param Subtitle Passed to VizSuperplots
 #' @param PlotName Passed to VizSuperplots
 #' @param PlotType Passed to VizSuperplots
 #'
 #' @keywords PCA helper function
 #' @noRd
 
-plotGrob_Superplot <- function(Input,
+plotGrob_Superplot <- function(InputPlot,
                                SettingsInfo,
                                SettingsFile_Sample,
-                               MetaboliteName,
+                               Subtitle,
                                PlotName,
                                PlotType){
-  #------- Set the total heights and widths
-  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable <- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable
-
-  #-----widths (adapt for number of conditions)
+  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   Number_Conditions <- SettingsFile_Sample%>%
     dplyr::distinct(Conditions) %>%
     nrow()
 
   if(PlotType == "Bar"){
-    plottable$widths[5] <- unit(Number_Conditions * 0.5, "cm")#controls x-axis
+    UNIT <- unit(Number_Conditions * 0.5, "cm")
   }else{
-   plottable$widths[5] <- unit(Number_Conditions * 1, "cm")#controls x-axis
+    UNIT <- unit(Number_Conditions * 1, "cm")
   }
 
-  plottable$widths[c(1)] <- unit(0.5,"cm")#controls margins --> y-axis label is there
-  plottable$widths[c(4)] <- unit(2,"cm")#controls margins --> y-axis label is there
-  plottable$widths[c(2,3)] <- unit(0,"cm")#controls margins --> not needed
-  plottable$widths[c(6)] <- unit((Number_Conditions * 0.5)-1,"cm")#controls margins --> start Figure legend
-  plottable$widths[c(7,8,10)] <- unit(0,"cm")#controls margins --> not needed
-  plottable$widths[c(11)] <- unit(0,"cm")#controls margins --> width
-  plot_widths <- as.numeric(plottable$widths[5])+4
-  #plot(plottable)
+  SUPER_PARAM <- list(
+    widths = list(
+      list("axis-b", paste(UNIT)),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", "1cm"),
+      list("xlab-b", ".5cm"),
+      list("xlab-b", "1cm", offset = 1L),
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),
+      list("title", "1cm"),
+      list("subtitle", "0cm"),
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
+  )
 
-  if("Superplot" %in% names(SettingsInfo)==TRUE){#legend will be present!
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- plot_widths+Value
-  }else{
-    plottable$widths[c(9)] <- unit(0,"cm")
-    plot_widths <- plot_widths
-  }
+  #Adjust the parameters:
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(SUPER_PARAM) %>%
+    adjust_title(PlotName) %>%
+    adjust_legend(
+      InputPlot,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
 
-  character_count_M <- nchar(MetaboliteName)#Check how much width is needed for the figure title/subtitle
-  character_count_T <- nchar(PlotName)
-  if (character_count_T >= character_count_M) {
-    character_count <- character_count_T
-  } else {
-    character_count <- character_count_M
-  }
-
-  Titles_width <- (character_count*0.5)+0.8
-  if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-      plottable$widths[11] <- unit(character_count*0.125,"cm")#controls margins --> start Figure legend
-      plot_widths <- plot_widths+character_count*0.125
-      }
-
-  #-----heigths
-  plottable$heights[7] <- unit(8, "cm")#controls x-axis
-  plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-  plottable$heights[c(10)] <- unit(0.5,"cm")#controls margins --> Figure caption
-  plottable$heights[c(6,9,11,12)] <- unit(0,"cm")#controls margins --> not needed (maybe 9 is needed in cases)
-  plottable$heights[c(4)] <- unit(1,"cm")#controls margins --> Some space above the plot
-  plottable$heights[c(1)] <- unit(1,"cm")#controls margins --> not needed
-  plottable$heights[c(1,2,3,5)] <- unit(0,"cm")#controls margins --> not needed
-
-  if("Superplot" %in% names(SettingsInfo)==TRUE){#legend will be present!
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
-    if(Legend_heights>12){#If the legend requires more heights than the Plot
-      Add <- (Legend_heights-12)/2
-      plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-      plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-      plot_heights <- Legend_heights
-    }else{
-      plot_heights <- 12
-    }
-  }else{
-    plot_heights <- 12
-  }
-
-  character_counts <- sapply(as.character(unique(SettingsFile_Sample$Conditions)), nchar)
-  character_counts <- max(character_counts)# Get the longest character count
-  if(character_counts>2){#If the title needs more space than the plot offers:
-    plottable$heights[c(8)] <- unit(character_counts*0.21,"cm")
-    plot_heights <- (plot_heights+character_counts*0.5)-1
-  }
-
-  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
-  Output<- list(plot_heights, plot_widths, plottable)
+  #Return
+  Output <- Plot_Sized
 }
 
 
