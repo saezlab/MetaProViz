@@ -209,16 +209,16 @@ SaveRes <- function(InputList_DF,
 
     for (Plot in names(InputList_Plot)) {
 
-      FileName %<>% save_path(FolderPath, CoRe = CoRe, Ext = SaveAs_Plot)
+      path <- FileName %>% finalize_path(FolderPath, CoRe = CoRe, Ext = SaveAs_Plot)
       PlotHeight %<>% if_null(12)
       PlotWidth %<>% if_null(16)
       PlotUnit %<>% if_null("cm")
 
-      log_info('Saving plot `%s` to `%s`.', Plot, FileName)
+      log_info('Saving plot `%s` to `%s`.', Plot, path)
       log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
 
       ggsave(
-        filename = FileName,
+        filename = path,
         plot = InputList_Plot[[Plot]],
         width = PlotWidth,
         height = PlotHeight,
@@ -242,7 +242,7 @@ SaveRes <- function(InputList_DF,
 #' @importFrom magrittr %>% %T>%
 #' @importFrom logger log_trace
 #' @noRd
-save_path <- function(
+finalize_path <- function(
     FileName,
     FolderPath,
     CoRe = NULL,
