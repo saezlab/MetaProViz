@@ -198,7 +198,7 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 \
-As visible from the prior knowledge tables above, it becomes clear that we require a specific metabolite ID depended on the pior knwoledge resource. Indeed, the KEGG pathways include KEGG IDs, whilst the Halmmarks metabolite sets include HMDB IDs.\
+As visible from the prior knowledge tables above, it becomes clear that we require a specific metabolite ID depended on the prior knowledge resource. Indeed, the KEGG pathways include KEGG IDs, whilst the Hallmarks metabolite sets include HMDB IDs.\
 If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::TranslateID()` function. This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and [RaMP DB](https://rampdb.nih.gov/) on the backend of our function (REF) and currently supports ID translation of metabolites to and from the following formats:\
 -   KEGG\
 -   HMDB\
@@ -210,8 +210,14 @@ TranslateID(KEGG_Pathways[39,]) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-However there are some important caveats with the standard TranslateID function, which we will discuss briefly here.
+However there are some important caveats with the standard TranslateID function, which we will discuss briefly here (Fig.2).
 
+\
+<center>
+![**Fig. 2:** Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](Fig.2.png){width=50%}
+</center>
+\
+\
 Using the default translation settings for a single ID, we can see that we receive back a single PubChem ID and ChEBI ID. However the HMDB column has two HMDBs associated with it (HMDB0001022, HMDB01022).
 In this case this difference is trivial and due to HMDB formatting conventions: the longer version appears to be from the original HMDB ID format versus the shorter more concise version.
 To avoid this we could change the settings to remove HMDB completely, like so:
