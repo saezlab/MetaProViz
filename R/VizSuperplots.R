@@ -58,8 +58,7 @@ VizSuperplot <- function(InputData,
                          ColorPalette_Dot =NULL,
                          SaveAs_Plot = "svg",
                          PrintPlot=TRUE,
-                         FolderPath = NULL
-){
+                         FolderPath = NULL){
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
