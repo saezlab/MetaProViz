@@ -305,12 +305,6 @@ CheckInput <- function(InputData,
                        Theme=NULL,
                        PlotSettings=NULL){
   ############## Parameters valid for multiple MetaProViz functions
-  # REFACT: Do not use tidyverse as a dependency, it is only a meta package and
-  # it is huge.
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
 
   #-------------InputData
   # REFACT: this will fail with "condition has length > 1" error, and also
