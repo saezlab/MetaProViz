@@ -1221,7 +1221,7 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
     ggplotGrob %>%
     withCanvasSize(width = 12, height = 11) %>%
     adjust_layout(VOL_PARAM) %>%
-   adjust_title(PlotName) %>%
+   adjust_title(c(PlotName, Subtitle)) %>%
     adjust_legend(
       InputPlot,
       sections = c("color", "shape"),

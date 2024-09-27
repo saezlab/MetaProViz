@@ -661,143 +661,34 @@ VizHeatmap <- function(InputData,
 #' @noRd
 
 PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, show_colnames, SettingsFile_Sample, SettingsFile_Metab){
-  #------- Set the total heights and widths
-  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable<- InputPlot$gtable#get a gtable --> gtable::gtable_show_layout(plottable)
+  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+  HEAT_PARAM <- list(
+    widths = list(
+      list("legend", "2cm")
+    ),
+    heights = list(
+      list("main", "1cm")
+    )
+  )
 
-  #----- heights
-  plottable$heights[1] <- unit(1, "cm")#space for headline
-  plottable$heights[2] <- unit((grid::convertX(unit(as.numeric(plottable$heights[2]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#heights x-axis clustering to heatmap, do not change
-  plottable$heights[3] <- unit((grid::convertX(unit(as.numeric(plottable$heights[3]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#distance x-axis clustering to heatmap, do not change
-  plottable$heights[4] <- unit((grid::convertX(unit(as.numeric(plottable$heights[4]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#heatmap itself, do not change
+  #Adjust the parameters:
+  Input <- InputPlot$gtable
+  gtableInp <<- Input
 
-  if(sum(grepl("color_Metab", names(SettingsInfo)))>0){#We have a legend for the color on the y-axis
-    # Find the longest column name/color name and count its characters:
-    names <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
-    colour_names <- NULL
-    for (x in 1:length(names)){
-      names_sel <- names[[x]]
-      colour_names[x] <- names_sel
-    }
+  Plot_Sized <- gtableInp  %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(HEAT_PARAM) %>%
+    adjust_title(PlotName) %>%
+    adjust_legend(
+      gtableInp,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
 
-    if(show_colnames==TRUE){#check if we also display sample names
-      column_names <- c(rownames(data_path),colour_names)
-    }else{
-      column_names <- colour_names
-    }
+  plot( Plot_Sized )
 
-    longest_column_name <- column_names[which.max(nchar(column_names))]
-    character_count <- nchar(longest_column_name)
-
-    plottable$heights[5] <- unit(character_count*0.3, "cm")#sample labels on heatmap
-    plot_heights <- 1+(character_count*0.3) + (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[4])))
-  }else if(sum(grepl("color_Metab", names(SettingsInfo)))==0){
-    # Find the longest column name and count its characters:
-    if(show_colnames==TRUE){#check if we also display sample names
-      column_names <- rownames(data_path)
-      longest_column_name <- column_names[which.max(nchar(column_names))]
-      character_count <- nchar(longest_column_name)
-    }else{
-      character_count <- 2
-    }
-
-    plottable$heights[5] <- unit(character_count*0.3, "cm")#sample labels on heatmap
-
-    #Summary:
-    plot_heights <- 1+(character_count*0.3) + (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$heights[4])))
-    }
-
-  #--- widths:
-  plottable$widths[1] <- unit((grid::convertX(unit(as.numeric(plottable$widths[1]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#clustering, do not change
-  plottable$widths[2] <- unit((grid::convertX(unit(as.numeric(plottable$widths[2]), "bigpts"), "cm", valueOnly = TRUE)), "cm")##distance clustering to plot, do not change
-  plottable$widths[3] <- unit((grid::convertX(unit(as.numeric(plottable$widths[3]), "bigpts"), "cm", valueOnly = TRUE)), "cm")#heatmap itself, do not change
-  plottable$widths[5] <- unit(2, "cm")#space between heatmap colour legend and legend
-
-  #legend width
-  if((sum(grepl("color_Sample", names(SettingsInfo)))>0) | (sum(grepl("color_Metab", names(SettingsInfo)))>0)){
-    if(sum(grepl("color_Sample", names(SettingsInfo)))>0){
-      names <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
-      colour_names <- NULL
-      legend_names <- NULL
-      for (x in 1:length(names)){
-        names_sel <- names[[x]]
-        legend_names[x] <- names_sel
-        colour_names[x] <- SettingsFile_Sample[names[[x]]]
-      }
-      }else{
-        colour_names <- NULL
-        legend_names <- NULL
-        }
-
-    if(sum(grepl("color_Metab", names(SettingsInfo)))>0){
-      names <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
-      colour_names_M <- NULL
-      legend_names_M <- NULL
-      for (x in 1:length(names)){
-        names_sel <- names[[x]]
-        legend_names_M[x] <- names_sel
-        colour_names_M[x] <- SettingsFile_Metab[names[[x]]]
-      }
-      }else{
-        colour_names_M <- NULL
-        legend_names_M <- NULL
-        }
-
-    legend_head <- c(legend_names, legend_names_M)
-    longest_name <- legend_head[which.max(nchar(legend_head[[1]]))]
-    character_count_head <- nchar(longest_name)+4#This is the length of the legend title name
-
-    legend_names <- c(unlist(colour_names), unlist(colour_names_M))
-    longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
-    character_count <- nchar(longest_name)#This is the length of the legend colour names
-
-
-    plottable$widths[6] <- unit(((max(character_count_head, character_count))*0.2)+0.7, "cm")#legend space
-  }else{
-    plottable$widths[6] <- unit(0, "cm")#legend space
-  }
-
-  #heatmap labels
-  if(sum(grepl("color_Sample", names(SettingsInfo)))>0 ){#We have a legend for the color on the x-axis
-    # Find the longest column name/color name and count its characters:
-    names <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
-    colour_names <- NULL
-    for (x in 1:length(names)){
-        names_sel <- names[[x]]
-        colour_names[x] <- names_sel
-    }
-
-    if(show_rownames==TRUE){#check if we also display feature names
-      column_names <- c(colnames(data_path),colour_names)
-      longest_column_name <- column_names[which.max(nchar(column_names))]
-      character_count <- nchar(longest_column_name)
-    }else{
-      character_count <- 2
-    }
-
-    plottable$widths[4] <- unit(character_count*0.2, "cm")#feature labels on heatmap --> unit(sum(grid::convertX(unit(as.numeric(1), "grobwidth", data=plottable), "cm", valueOnly = TRUE), grid::convertX(unit(as.numeric(10), "bigpts", data=plottable), "cm", valueOnly = TRUE)), "cm")
-
-    #Summary:
-    plot_widths <- 2+(as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[4])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[1])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[6])))
-
-  }else if(sum(grepl("color_Sample", names(SettingsInfo)))==0){
-    # Find the longest column name and count its characters:
-    if(show_rownames==TRUE){#check if we also display feature names
-      column_names <- colnames(data_path)
-      longest_column_name <- column_names[which.max(nchar(column_names))]
-      character_count <- nchar(longest_column_name)
-    }else{
-      character_count <- 2
-    }
-
-    plottable$widths[4] <- unit(character_count*0.2, "cm")#feature labels on heatmap --> unit(sum(grid::convertX(unit(as.numeric(1), "grobwidth", data=plottable), "cm", valueOnly = TRUE), grid::convertX(unit(as.numeric(10), "bigpts", data=plottable), "cm", valueOnly = TRUE)), "cm")
-
-    #Summary:
-    plot_widths <- 2+(as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[4])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[1])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[2])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[3])))+ (as.numeric(gsub("^(\\d+\\.?\\d*).*", "\\1", plottable$widths[6])))
-    }
-
-  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
-  Output<- list(plot_heights, plot_widths, plottable)
+  #Return
+  Output <- Plot_Sized
 }
 
 
