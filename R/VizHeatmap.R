@@ -54,13 +54,6 @@ VizHeatmap <- function(InputData,
                        FolderPath = NULL
 ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "pheatmap")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-
-  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
@@ -658,7 +651,7 @@ VizHeatmap <- function(InputData,
 
 #' @param InputPlot This is the ggplot object generated within the VizHeatmap function.
 #' @param SettingsInfo Passed to VizHeatmap
-#' @param data Generated in VizVolcano from InputData and used to plot heatmap
+#' @param data_path Generated in VizVolcano from InputData and used to plot heatmap
 #' @param show_rownames Generated in VizVolcano, is logical TRUE or FALSE
 #' @param show_colnames Generated in VizVolcano, is logical TRUE or FALSE
 #' @param SettingsFile_Sample Passed to VizHeatmap
