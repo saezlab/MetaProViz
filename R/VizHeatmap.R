@@ -200,19 +200,16 @@ VizHeatmap <- function(InputData,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap,
-                                       SettingsInfo=SettingsInfo,
-                                       data_path=data_path,
-                                       show_rownames=show_rownames,
-                                       show_colnames=show_colnames,
-                                       SettingsFile_Sample= SettingsFile_Sample,
-                                       SettingsFile_Metab= SettingsFile_Metab)
-        heatmap <-Plot_Sized[[3]]
-        heatmap <- ggplot2::ggplot() +
-          annotation_custom(heatmap)
-        heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
 
-        PlotList_adaptedGrid[[cleaned_i]] <- heatmap
+        #Width and height according to Sample and metabolite number
+        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= cleaned_i)
+        PlotHeight <- as.numeric(Plot_Sized$height)
+        PlotWidth <- as.numeric(Plot_Sized$width)
+        Plot_Sized %<>%
+          {ggplot2::ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
+
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         #----- Save
         suppressMessages(suppressWarnings(
@@ -224,8 +221,8 @@ VizHeatmap <- function(InputData,
                                FileName=paste("Heatmap_",PlotName, sep=""),
                                CoRe=FALSE,
                                PrintPlot=PrintPlot,
-                               PlotHeight=Plot_Sized[[1]],
-                               PlotWidth=Plot_Sized[[2]],
+                               PlotHeight=PlotHeight,
+                               PlotWidth=PlotWidth,
                                PlotUnit="cm")))
 
       }else{
@@ -342,13 +339,14 @@ VizHeatmap <- function(InputData,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab)
-        heatmap <- Plot_Sized[[3]]
-        heatmap <- ggplot2::ggplot() +
-          annotation_custom(heatmap)
-        heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= cleaned_i)
+        PlotHeight <- as.numeric(Plot_Sized$height)
+        PlotWidth <- as.numeric(Plot_Sized$width)
+        Plot_Sized %<>%
+          {ggplot2::ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
-        PlotList_adaptedGrid[[cleaned_i]] <- heatmap
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         #----- Save
         suppressMessages(suppressWarnings(
@@ -360,8 +358,8 @@ VizHeatmap <- function(InputData,
                                FileName= paste("Heatmap_",PlotName, sep=""),
                                CoRe=FALSE,
                                PrintPlot=PrintPlot,
-                               PlotHeight=Plot_Sized[[1]],
-                               PlotWidth=Plot_Sized[[2]],
+                               PlotHeight=PlotHeight,
+                               PlotWidth=PlotWidth,
                                PlotUnit="cm")))
         }else{
           message(i , " includes <= 2 objects and is hence not plotted.")
@@ -501,13 +499,16 @@ VizHeatmap <- function(InputData,
 
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
-            Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab)
-            heatmap <-Plot_Sized[[3]]
-            heatmap <- ggplot2::ggplot() +
-              annotation_custom(heatmap)
-            heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+            PlotName <- paste(cleaned_i,cleaned_s, sep="_")
 
-            PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- heatmap
+            Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= PlotName)
+            PlotHeight <- as.numeric(Plot_Sized$height)
+            PlotWidth <- as.numeric(Plot_Sized$width)
+            Plot_Sized %<>%
+              {ggplot2::ggplot() + annotation_custom(.)} %>%
+              add(theme(panel.background = element_rect(fill = "transparent")))
+
+            PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- Plot_Sized
 
             #----- Save
             suppressMessages(suppressWarnings(
@@ -519,8 +520,8 @@ VizHeatmap <- function(InputData,
                                    FileName=paste("Heatmap_",PlotName, sep=""),
                                    CoRe=FALSE,
                                    PrintPlot=PrintPlot,
-                                   PlotHeight=Plot_Sized[[1]],
-                                   PlotWidth=Plot_Sized[[2]],
+                                   PlotHeight=PlotHeight,
+                                   PlotWidth= PlotWidth,
                                    PlotUnit="cm")))
 
 
@@ -612,13 +613,14 @@ VizHeatmap <- function(InputData,
 
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
-    Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab)
-    heatmap <-Plot_Sized[[3]]
-    heatmap <- ggplot2::ggplot() +
-      annotation_custom(heatmap)
-    heatmap <-heatmap + theme(panel.background = element_rect(fill = "transparent"))
+    Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= PlotName)
+    PlotHeight <- as.numeric(Plot_Sized$height)
+    PlotWidth <- as.numeric(Plot_Sized$width)
+    Plot_Sized %<>%
+      {ggplot2::ggplot() + annotation_custom(.)} %>%
+      add(theme(panel.background = element_rect(fill = "transparent")))
 
-    PlotList_adaptedGrid[[PlotName]] <- heatmap
+    PlotList_adaptedGrid[[PlotName]] <- Plot_Sized
 
     #----- Save
     suppressMessages(suppressWarnings(
@@ -630,8 +632,8 @@ VizHeatmap <- function(InputData,
                            FileName= paste("Heatmap_",PlotName, sep=""),
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
-                           PlotHeight=Plot_Sized[[1]],
-                           PlotWidth=Plot_Sized[[2]],
+                           PlotHeight=PlotHeight,
+                           PlotWidth=PlotHeight,
                            PlotUnit="cm")))
 
 
@@ -651,16 +653,12 @@ VizHeatmap <- function(InputData,
 
 #' @param InputPlot This is the ggplot object generated within the VizHeatmap function.
 #' @param SettingsInfo Passed to VizHeatmap
-#' @param data_path Generated in VizVolcano from InputData and used to plot heatmap
-#' @param show_rownames Generated in VizVolcano, is logical TRUE or FALSE
-#' @param show_colnames Generated in VizVolcano, is logical TRUE or FALSE
-#' @param SettingsFile_Sample Passed to VizHeatmap
-#' @param SettingsFile_Metab Passed to VizHeatmap
+#' @param PlotName Passed to VizHeatmap
 #'
 #' @keywords Heatmap helper function
 #' @noRd
 
-PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, show_colnames, SettingsFile_Sample, SettingsFile_Metab){
+PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, PlotName){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   HEAT_PARAM <- list(
     widths = list(
@@ -673,22 +671,14 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, 
 
   #Adjust the parameters:
   Input <- InputPlot$gtable
-  gtableInp <<- Input
-  SettingsInfo <<- SettingsInfo
-
-  Plot_Sized <- gtableInp  %>%
+  Input <<- Input
+  Plot_Sized <- Input  %>%
     withCanvasSize(width = 12, height = 11) %>%
-    adjust_layout(HEAT_PARAM) %>%
-    adjust_title(PlotName) %>%
-    adjust_legend(
-      gtableInp,
-      sections = c("color", "shape"),
-      SettingsInfo = SettingsInfo
-    )
+    adjust_layout(HEAT_PARAM)
 
-  plot( Plot_Sized )
+  # gtbl_param=c('title', 'guide-box-right')
 
-  Plot_Sized
+  Output <- Plot_Sized
 
 }
 
