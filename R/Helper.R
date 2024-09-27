@@ -207,29 +207,33 @@ SaveRes <- function(InputList_DF,
 
   if (!is.null(SaveAs_Plot)) {
 
-    for (Plot in names(InputList_Plot)) {
+    walk2(
+      .x = InputList_Plot,
+      .y = names(InputList_Plot),
+      .f = function(.x, .y) {
 
-      path <- FileName %>% finalize_path(FolderPath, CoRe = CoRe, Ext = SaveAs_Plot)
-      PlotHeight %<>% if_null(12)
-      PlotWidth %<>% if_null(16)
-      PlotUnit %<>% if_null("cm")
+        path <- FileName %>% finalize_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Plot)
+        PlotHeight %<>% if_null(12)
+        PlotWidth %<>% if_null(16)
+        PlotUnit %<>% if_null("cm")
 
-      log_info('Saving plot `%s` to `%s`.', Plot, path)
-      log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
+        log_info('Saving plot `%s` to `%s`.', .y, path)
+        log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
 
-      ggsave(
-        filename = path,
-        plot = InputList_Plot[[Plot]],
-        width = PlotWidth,
-        height = PlotHeight,
-        unit = PlotUnit
-      )
+        ggsave(
+          filename = path,
+          plot = .x,
+          width = PlotWidth,
+          height = PlotHeight,
+          unit = PlotUnit
+        )
 
-      if(PrintPlot==TRUE){
-        suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
+        if (PrintPlot) {
+          suppressMessages(suppressWarnings(plot(.x)))
+        }
+
       }
-
-    }
+    )
 
   }
 
