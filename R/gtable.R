@@ -273,19 +273,19 @@ gtable_col <- function(dim) {
 #' @noRd
 adjust_title <- function(gtbl, titles) {
 
-    print(titles)
     if (titles %>% nchar %>% as.logical %>% any) {
 
         log_trace('The plot has title, adjusting layout to accommodate it.')
 
-        gtbl %<>% set_height('title', '1.5cm')#controls margins --> PlotName and subtitle
+        gtbl %<>% set_height(c('title', 'main'), '1.5cm')#controls margins --> PlotName and subtitle
         # Sum up total heights:
         gtbl$height %<>% add(cm(.5))
 
         #------- Width: Check how much width is needed for the figure title/subtitle
         title_width <- titles %>% char2cm %>% max %>% cm
+        gtbl <<- gtbl
         gtbl %<>% set_width(
-            'guide-box-right',
+            c('guide-box-right', 'legend'),
             sprintf('%.02fcm', title_width - gtbl$width),
             callback = max
         )
