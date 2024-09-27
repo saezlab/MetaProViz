@@ -206,7 +206,8 @@ VizHeatmap <- function(InputData,
                                        show_rownames=show_rownames,
                                        show_colnames=show_colnames,
                                        SettingsFile_Sample= SettingsFile_Sample,
-                                       SettingsFile_Metab= SettingsFile_Metab)
+                                       SettingsFile_Metab= SettingsFile_Metab,
+                                       PlotName=PlotName)
         heatmap <-Plot_Sized[[3]]
         heatmap <- ggplot2::ggplot() +
           annotation_custom(heatmap)
@@ -342,7 +343,7 @@ VizHeatmap <- function(InputData,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab)
+        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab, PlotName=PlotName)
         heatmap <- Plot_Sized[[3]]
         heatmap <- ggplot2::ggplot() +
           annotation_custom(heatmap)
@@ -501,7 +502,7 @@ VizHeatmap <- function(InputData,
 
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
-            Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab)
+            Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data_path, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab, PlotName=PlotName)
             heatmap <-Plot_Sized[[3]]
             heatmap <- ggplot2::ggplot() +
               annotation_custom(heatmap)
@@ -612,7 +613,7 @@ VizHeatmap <- function(InputData,
 
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
-    Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab)
+    Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, data_path=data, show_rownames=show_rownames, show_colnames=show_colnames,  SettingsFile_Sample= SettingsFile_Sample,  SettingsFile_Metab= SettingsFile_Metab, PlotName=PlotName)
     heatmap <-Plot_Sized[[3]]
     heatmap <- ggplot2::ggplot() +
       annotation_custom(heatmap)
@@ -660,7 +661,7 @@ VizHeatmap <- function(InputData,
 #' @keywords Heatmap helper function
 #' @noRd
 
-PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, show_colnames, SettingsFile_Sample, SettingsFile_Metab){
+PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, show_colnames, SettingsFile_Sample, SettingsFile_Metab, PlotName){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   HEAT_PARAM <- list(
     widths = list(
