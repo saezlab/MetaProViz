@@ -40,6 +40,7 @@ TranslateID <- function(Input_DataFrame,
   method <- SettingsInfo[['Method']]
   groupvar <- SettingsInfo[['GroupingVariable']]
   DF_List <- list()
+  print(paste('Using method ', method))
 
   for (to_singular in to) {
     # Rename and use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings.
@@ -61,13 +62,11 @@ TranslateID <- function(Input_DataFrame,
     collapsed_col <- df_translated %>% ungroup()
 
     if (method == 'GetAll') {
-      print('Using method GetAll')
-      print(paste('Converting to', to_singular))
+      print(paste('Converting from ', from, " to ", to_singular))
       new_col <- collapsed_col
 
     } else if (method == 'GetFirst') {
-      print('Using method GetFirst')
-      print(paste('Converting to', to_singular))
+      print(paste('Converting from ', from, " to ", to_singular))
       print(glue::glue("WARNING: Only the first translated ID from <{to_singular}> will be returned for each unique ID from <{from}>."))
 
       firstItem_cols <- collapsed_col %>%
@@ -104,6 +103,40 @@ TranslateID <- function(Input_DataFrame,
 
 
   }
+  # Create a final summary table of the mapping issues
+  # Create a function to get the counts
+  get_counts <- function(table) {
+    table %>%
+      count(Relationship) %>%
+      rename(n = n)  # Rename to n for consistency
+  }
+  # Extract counts for each table and add the table name
+  summary_table <- map_dfr(
+    seq_along(DF_List)[-1],
+    function(i) {
+      table <- DF_List[[i]]
+      table_name <- names(DF_List)[i]
+      counts <- get_counts(table)
+      counts <- counts %>% mutate(Table = table_name)  # Add table name as a new column
+      return(counts)
+    }
+  )
+  # Pivot to a wider format
+  final_table_summary <- summary_table %>%
+    pivot_wider(names_from = Relationship, values_from = n, values_fill = 0)
+  # Reorder safely
+  desired_order <- c("Table", "One-to-None","One-to-One","One-to-Many")
+  existing_columns <- names(final_table_summary) # Get the existing columns in final_table
+  safe_order <- intersect(desired_order, existing_columns) # Create a safe order by intersecting desired_order with existing_columns
+  # Check if "Table" is in the safe order and ensure it's at the beginning
+  if ("Table" %in% safe_order) {
+    safe_order <- c("Table", setdiff(safe_order, "Table"))
+  }
+  final_table_summary <- final_table_summary %>%
+    select(all_of(safe_order))
+
+  DF_List <- c(DF_List, setNames(list(final_table_summary), "TranslationSummary"))
+
   return(DF_List)
 }
 
