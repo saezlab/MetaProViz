@@ -1,6 +1,6 @@
 Package: MetaProViz
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 2.0.2
+Version: 2.1.0
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
@@ -28,7 +28,8 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends:
-    R (>= 4.0)
+    R (>= 4.4.1),
+    ggplot2 (>= 3.3.5)
 Imports:
     dplyr,
     factoextra,
