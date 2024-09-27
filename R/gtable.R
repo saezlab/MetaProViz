@@ -391,3 +391,14 @@ titles_from_legend <- function(leg) {
     unname
 
 }
+
+
+#' @importFrom utils head
+#' @importFrom magrittr %>%
+#' @noRd
+in_gtable <- function(name, gtbl) {
+
+    name %>%
+    {`if`(is.character(.), intersect(., gtbl$layout$name) %>% head(1L), .)}
+
+}
