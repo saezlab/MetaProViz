@@ -61,7 +61,10 @@ set_size <- function(
     col <- dim %>% gtable_col
     tdim <- dim %>% str_sub(end = -2L)
 
-    idx <- gtable_idx(gtbl, name, dim, offset = offset)
+    idx <-
+        name %>%
+        in_gtable(gtbl) %>%
+        gtable_idx(gtbl, ., dim, offset = offset)
 
     name_miss <- length(idx) == 0L
 
@@ -72,7 +75,7 @@ set_size <- function(
     info <-
         sprintf(
             '[name=%s,offset=%i,empty=%s,original=%s]',
-            name,
+            paste0(name, collapse = ','),
             offset,
             !(idx %in% gtbl$layout[[col]]),
             `if`(name_miss || outof_range, 'NA', gtbl[[dim]][idx])
@@ -82,7 +85,7 @@ set_size <- function(
 
         log_warn(
             'No such name in gtable: %s; names available: %s',
-            name,
+            paste0(name, collapse = ', '),
             paste0(gtbl$layout$name, collapse = ', ')
         )
 
@@ -239,7 +242,7 @@ gtable_idx <- function(gtbl, name, dim, offset = 0L) {
     name %>%
     {`if`(
         is.character(.),
-        filter(gtbl$layout, name == .) %>% extract2(dim),
+        filter(gtbl$layout, name %in% .) %>% extract2(dim),
         .
     )} %>%
     add(offset)
