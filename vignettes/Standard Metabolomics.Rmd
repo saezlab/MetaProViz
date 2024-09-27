@@ -60,7 +60,8 @@ First if you have not done yet, install the required dependencies and load the l
 devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 #dependencies that need to be loaded:
-library(tidyverse)
+#library(tidyverse)
+library(magrittr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
