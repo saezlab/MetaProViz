@@ -252,6 +252,16 @@ InspectID <- function(Input_DataFrame,
                                   ID_original_count - 1,
                                   ID_original_count)
     ) %>%
+    mutate(
+      pathway_count = if_else(is.na(ID_originals) | ID_originals == "NA",
+                              0,
+                              pathway_count)
+    ) %>%
+    mutate(
+      pathways = if_else(is.na(ID_originals) | ID_originals == "NA",
+                              "NA",
+                              pathways)
+    ) %>%
     rename("Translated_IDs" = "ID_originals", "Original_ID" = "ID_translated", "Translated_IDs_count" = "ID_original_count",
            "Pathways" = "pathways", "Pathways_count" = "pathway_count")
 
