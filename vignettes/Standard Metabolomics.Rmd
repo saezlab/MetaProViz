@@ -789,7 +789,7 @@ We immediately see that there are many pathways displayed on the plot, which can
 #Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant", individual="Pathway"),
-                       SettingsFile= MetaData_Metab,
+                       SettingsFile_Metab= MetaData_Metab,
                        InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )
@@ -800,7 +800,7 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 #Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant", individual="Pathway"),
-                       SettingsFile= MetaData_Metab,
+                       SettingsFile_Metab= MetaData_Metab,
                        InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )

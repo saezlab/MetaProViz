@@ -1,3 +1,24 @@
+## ---------------------------
+##
+## Script name: Helper for figures
+##
+## Purpose of script: Make ggplot figures nice
+##
+## Author:
+##
+## Date Created: 2024-09-28
+##
+## Copyright (c) Saez Lab
+## Email:
+##
+## ---------------------------
+##
+## Notes:
+##
+##
+## ---------------------------
+#'
+
 #' Set the height or width of a row or column in a TableGrob (gtable)
 #'
 #' @param gtbl A TableGrob (gtable) object.
@@ -337,7 +358,7 @@ adjust_legend <- function(
 
         if(as.numeric(gtbl$height) < Legend_heights){
 
-            Add <- (Legend_heights - gtbl$height) / 2
+            Add <- (Legend_heights - as.numeric(gtbl$height)) / 2
 
             gtbl %<>%
                 #controls margins --> Can be increased if Figure legend needs more space on the top

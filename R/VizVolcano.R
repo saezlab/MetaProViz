@@ -75,22 +75,6 @@ VizVolcano <- function(PlotSettings="Standard",
                        Features="Metabolites",
                        PrintPlot=TRUE){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "EnhancedVolcano")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    if (!require("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-
-    BiocManager::install(new.packages)
-  }
-  suppressMessages(library(tidyverse))
-
-  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   if(PlotSettings=="PEA"){
@@ -222,7 +206,7 @@ VizVolcano <- function(PlotSettings="Standard",
   ##--- Prepare colour and shape palette
   if(is.null(ColorPalette)){
     if("color" %in% names(SettingsInfo)==TRUE){
-      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
     }else{
       safe_colorblind_palette <- c("#888888", "#44AA99", "#44AA99","#CC6677")
     }
@@ -465,17 +449,19 @@ VizVolcano_Standard <- function(InputData,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotTitle, Subtitle = Subtitle)
-        Plot <-Plot_Sized[[3]]
-        Plot <- ggplot2::ggplot() +
-          annotation_custom(Plot)
-        Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+        PlotHeight <- as.numeric(Plot_Sized$height)
+        PlotWidth <- as.numeric(Plot_Sized$width)
+        Plot_Sized %<>%
+          {ggplot2::ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        PlotList_adaptedGrid[[cleaned_i]] <- Plot
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
-        SaveList[[cleaned_i]] <- Plot
+        SaveList[[cleaned_i]] <- Plot_Sized
+
         #----- Save
         suppressMessages(suppressWarnings(
           MetaProViz:::SaveRes(InputList_DF=NULL,
@@ -486,8 +472,8 @@ VizVolcano_Standard <- function(InputData,
                                FileName= paste("Volcano_",PlotName, sep=""),
                                CoRe=FALSE,
                                PrintPlot=PrintPlot,
-                               PlotHeight=Plot_Sized[[1]],
-                               PlotWidth=Plot_Sized[[2]],
+                               PlotHeight= PlotHeight,
+                               PlotWidth=PlotWidth,
                                PlotUnit="cm")))
       }
     }
@@ -575,12 +561,14 @@ VizVolcano_Standard <- function(InputData,
       PlotList[["Plot"]] <- Plot
 
       #Set the total heights and widths
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotName, Subtitle = Subtitle)
-      Plot <-Plot_Sized[[3]]
-      Plot <- ggplot2::ggplot() +
-        annotation_custom(Plot)
-      Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
-      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot
+      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
+      PlotHeight <- as.numeric(Plot_Sized$height)
+      PlotWidth <- as.numeric(Plot_Sized$width)
+      Plot_Sized %<>%
+        {ggplot2::ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
+
+      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
       #----- Save
       suppressMessages(suppressWarnings(
@@ -592,8 +580,8 @@ VizVolcano_Standard <- function(InputData,
                              FileName= paste("Volcano_", PlotName, sep=""),
                              CoRe=FALSE,
                              PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
+                             PlotHeight=PlotHeight,
+                             PlotWidth=PlotWidth,
                              PlotUnit="cm")))
     }
   }
@@ -807,18 +795,19 @@ VizVolcano_Compare <- function(InputData,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotTitle, Subtitle = Subtitle)
-        Plot <-Plot_Sized[[3]]
-        Plot <- ggplot2::ggplot() +
-          annotation_custom(Plot)
-        Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+        PlotHeight <- as.numeric(Plot_Sized$height)
+        PlotWidth <- as.numeric(Plot_Sized$width)
+        Plot_Sized %<>%
+          {ggplot2::ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
-        #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        PlotList_adaptedGrid[[cleaned_i]] <- Plot
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
-        SaveList[[cleaned_i]] <- Plot
+        SaveList[[cleaned_i]] <- Plot_Sized
+
         #----- Save
         suppressMessages(suppressWarnings(
         MetaProViz:::SaveRes(InputList_DF=NULL,
@@ -829,8 +818,8 @@ VizVolcano_Compare <- function(InputData,
                            FileName= paste("Volcano_",PlotName, sep=""),
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
-                           PlotHeight=Plot_Sized[[1]],
-                           PlotWidth=Plot_Sized[[2]],
+                           PlotHeight=PlotHeight,
+                           PlotWidth=PlotWidth,
                            PlotUnit="cm")))
       }
     }
@@ -936,15 +925,16 @@ VizVolcano_Compare <- function(InputData,
       ## Store the plot in the 'plots' list
       PlotList[["Plot"]] <- Plot
 
-      #Set the total heights and widths
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotName, Subtitle = Subtitle)
-      Plot <-Plot_Sized[[3]]
-      Plot <- ggplot2::ggplot() +
-        annotation_custom(Plot)
-      Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
-      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot
+      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
+      PlotHeight <- as.numeric(Plot_Sized$height)
+      PlotWidth <- as.numeric(Plot_Sized$width)
+      Plot_Sized %<>%
+        {ggplot2::ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
-      #----- Save
+      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
+
+       #----- Save
       suppressMessages(suppressWarnings(
       MetaProViz:::SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
@@ -954,8 +944,8 @@ VizVolcano_Compare <- function(InputData,
                              FileName= paste("Volcano_", PlotName, sep=""),
                              CoRe=FALSE,
                              PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
+                             PlotHeight=PlotHeight,
+                             PlotWidth=PlotWidth,
                              PlotUnit="cm")))
 
     }
@@ -1151,19 +1141,18 @@ VizVolcano_PEA <- function(InputData,
 
       #Set the total heights and widths
       PlotTitle <- paste(PlotName, ": ", i, sep="")
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotTitle, Subtitle = Subtitle)
-      Plot <-Plot_Sized[[3]]
+      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+      PlotHeight <- as.numeric(Plot_Sized$height)
+      PlotWidth <- as.numeric(Plot_Sized$width)
+      Plot_Sized %<>%
+        {ggplot2::ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
-      # First we want to convert the plot back into a ggplot object:
-      Plot <- ggplot2::ggplot() +
-        annotation_custom(Plot)
-      Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
-
-      #save plot and get rid of extra signs before saving
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      PlotList_adaptedGrid[[cleaned_i]] <- Plot
+      PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
+
       SaveList <- list()
-      SaveList[[cleaned_i]] <- Plot
+      SaveList[[cleaned_i]] <- Plot_Sized
 
       #----- Save
       suppressMessages(suppressWarnings(
@@ -1175,8 +1164,8 @@ VizVolcano_PEA <- function(InputData,
                              FileName= paste("Volcano_",PlotName, sep=""),
                              CoRe=FALSE,
                              PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
+                             PlotHeight=PlotHeight,
+                             PlotWidth=PlotWidth,
                              PlotUnit="cm")))
 
     }
@@ -1190,9 +1179,8 @@ VizVolcano_PEA <- function(InputData,
 ### ### ### Volcano helper function: Internal Function ### ### ###
 ##############################################################
 
-#' @param Input This is the ggplot object generated within the VizVolcano function.
-#' @param keyvals Generated in VizVolcano
-#' @param keyvalsshape Generated in VizVolcano
+#' @param InputPlot This is the ggplot object generated within the VizVolcano function.
+#' @param SettingsInfo Passed to VizVolcano
 #' @param PlotName Passed to VizVolcano
 #' @param Subtitle
 #'
@@ -1200,167 +1188,46 @@ VizVolcano_PEA <- function(InputData,
 #' @noRd
 #'
 
-plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, PlotName, Subtitle){
-  #------- Set the total heights and widths
-  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable:  gtable::gtable_show_layout(plottable)
-  if(is.null(keyvals)==TRUE & is.null(keyvalsshape)==TRUE){
-    #-----widths
-    plottable$widths[5] <- unit(6, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(10)] <- unit(5,"cm")#controls margins --> Figure legend
-    plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-    plot_widths <- 14
+plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
+ # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+  VOL_PARAM <- list(
+    widths = list(
+      list("axis-b", "6cm"),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", "1cm"),
+      list("xlab-b", ".5cm"),
+      list("xlab-b", "1cm", offset = 1L),
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),
+      list("title", "1cm"),
+      list("subtitle", "0cm"),
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
+  )
 
-    if((PlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      Titles <- c(PlotName, Subtitle)
-      longest_title <- Titles[which.max(nchar(Titles))]
-      character_count <- nchar(longest_title)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
+  #Adjust the parameters:
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(VOL_PARAM) %>%
+   adjust_title(PlotName) %>%
+    adjust_legend(
+      InputPlot,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
 
-    #-----heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName=="" & Subtitle==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 11
-    } else{
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <-11.5
-    }
-  }else if(is.null(keyvals)==FALSE & is.null(keyvalsshape)==FALSE){
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
-
-    #-----Plot widths
-    plottable$widths[5] <- unit(6, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 9+Value
-
-    if((PlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      Titles <- c(PlotName, Subtitle)
-      longest_title <- Titles[which.max(nchar(Titles))]
-      character_count <- nchar(longest_title)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName=="" & Subtitle==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    } else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11.5){#If the legend requires more heights than the Plot (excluding title space)
-          Add <- (Legend_heights-11.5)/2
-          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-          plot_heights <- Legend_heights
-        }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11.5
-      }
-    }
-  }else if(is.null(keyvals)==FALSE | is.null(keyvalsshape)==FALSE){
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
-
-    #----- Plot widths
-    plottable$widths[5] <- unit(6, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 9+Value
-
-    if((PlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      Titles <- c(PlotName, Subtitle)
-      longest_title <- Titles[which.max(nchar(Titles))]
-      character_count <- nchar(longest_title)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName=="" & Subtitle==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot (excluding title space)
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }
-  }
-  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
-  Output<- list(plot_heights, plot_widths, plottable)
+  #Return
+  Output <- Plot_Sized
 }
