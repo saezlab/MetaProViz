@@ -40,6 +40,15 @@ TranslateID <- function(Input_DataFrame,
   method <- SettingsInfo[['Method']]
   groupvar <- SettingsInfo[['GroupingVariable']]
   DF_List <- list()
+
+  # Check that all Name types added by the user are present
+  userlist <- c(from, to)
+  allowedids <- c("kegg","pubchem","chebi","hmdb")
+  if (!all(userlist %in% allowedids)) {
+    stop(paste("We currently 'only' support ID translation between: kegg, pubchem, chebi, hmdb ;) Please also use lowercase. You entered:",
+               paste(userlist[!userlist %in% allowedids], collapse = ", ")))
+  }
+
   print(paste('Using method ', method))
 
   for (to_singular in to) {
