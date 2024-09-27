@@ -301,7 +301,7 @@ Or we could keep just the first item of every translation by changing the \`Meth
 translated_ids_example <- TranslateID(KEGG_Pathways[39,], 
             SettingsInfo = list(IdColumn="MetaboliteID", 
                                 FromFormat=c("kegg"), 
-                                ToFormat=c("pubchem","chebi, hmdb"), 
+                                ToFormat=c("pubchem","chebi", "hmdb"), 
                                 Method="GetFirst", 
                                 GroupingVariable="term"))$Translated_DataFrame
 ```
@@ -356,7 +356,7 @@ The InspectID function (which is included by default when running TranslateID) p
 
 <center>
 
-![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](Fig.2.png){alt="Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs." width="50%"}
+![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](Fig.2.png){width="50%"}
 
 </center>
 
