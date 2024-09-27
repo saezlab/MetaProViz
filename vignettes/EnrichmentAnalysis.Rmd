@@ -402,7 +402,7 @@ translated_ids_example_full$TranslationSummary
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 translated_ids_example_full$TranslationSummary %>%
-  kableExtra::kbl(caption = "Example of 1-to-many translation of `KEGG_Pathways` (besides HMDB)") %>%
+  kableExtra::kbl(caption = "TranslationSummary table from `KEGG_Pathways`") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
