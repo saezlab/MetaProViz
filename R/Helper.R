@@ -185,9 +185,9 @@ SaveRes <- function(InputList_DF,
     } else {
 
       walk2(
-        InputList_DF,
-        names(InputList_DF),
-        ~{
+        .x = InputList_DF,
+        .y = names(InputList_DF),
+        .f = function(.x, .y) {
           path <- FileName %>% save_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Table)
           log_trace('Saving %s table to `%s`.', SaveAs_Table, path)
           writer <- switch(SaveAs_Table, csv = write_csv, txt = write_tsv, tsv = write_tsv)
