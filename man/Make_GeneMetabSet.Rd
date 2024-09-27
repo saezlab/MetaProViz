@@ -15,13 +15,13 @@ Make_GeneMetabSet(
 \arguments{
 \item{Input_GeneSet}{Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.}
 
-\item{SettingsInfo}{\emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = c(Target="gene"))}
+\item{SettingsInfo}{\emph{Optional: }  Column name of Target in Input_GeneSet. \strong{Default = c(Target="gene")}}
 
-\item{PKName}{\emph{Optional: } Name of the prior knowledge resource. \strong(Default = NULL)}
+\item{PKName}{\emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}}
 
 \item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{FolderPath}{{Optional:} String which is added to the resulting folder name \strong(Default = NULL)}
+\item{FolderPath}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
 }
 \description{
 Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge

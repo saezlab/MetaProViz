@@ -83,6 +83,10 @@ you can also follow the links below:
 data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)  
 - [Consumption-Release (CoRe) metabolomics data from cell culture
 media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)  
+- [Enrichment
+Analysis](https://saezlab.github.io/MetaProViz/articles/EnrichmentAnalysis.html)  
+- [Metadata
+Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)  
   
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
@@ -146,5 +150,5 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
       title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
       author = {Christina Schmidt and Dimitrios Prymidis and Julio Saez-Rodriguez and Christian Frezza},
       year = {2023},
-      note = {R package version 2.0.2},
+      note = {R package version 2.1.0},
     }
