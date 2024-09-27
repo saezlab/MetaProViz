@@ -180,7 +180,7 @@ SaveRes <- function(InputList_DF,
       path <- FileName %>% save_path(FolderPath, CoRe = CoRe, Ext = "xlsx")
       log_trace('Saving xlsx table to `%s`.', path)
       # Save Excel
-      writexl::write_xlsx(InputList_DF, FileName, col_names = TRUE, rownames = FALSE)
+      writexl::write_xlsx(InputList_DF, path, col_names = TRUE)
 
     } else {
 
