@@ -159,6 +159,7 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 #' @importFrom ggplot2 ggsave
 #' @importFrom readr write_csv write_tsv
 #' @importFrom purrr walk2
+#' @importFrom rlang %||%
 #' @noRd
 SaveRes <- function(InputList_DF,
                    InputList_Plot,
@@ -172,30 +173,35 @@ SaveRes <- function(InputList_DF,
                    PlotWidth=NULL,
                    PlotUnit=NULL){
 
+  log_trace(
+    paste0(
+      'SaveRes: [SaveAs_Table=%s, SaveAs_Plot=%s, FolderPath=%s, ',
+      'FileName=%s, CoRe=%s, PrintPlot=%s, PlotHeight=%s, ',
+      'PlotWidth=%s, PlotUnit=%s]'
+    ),
+    SaveAs_Table,
+    SaveAs_Plot,
+    FolderPath,
+    FileName,
+    CoRe,
+    PrintPlot,
+    PlotHeight,
+    PlotWidth,
+    PlotUnit
+  )
+
   if (!is.null(SaveAs_Table)) {
 
-    # Excel File: One file with multiple sheets:
-    if (SaveAs_Table == "xlsx") {
-
-      path <- FileName %>% save_path(FolderPath, CoRe = CoRe, Ext = "xlsx")
-      log_trace('Saving xlsx table to `%s`.', path)
-      # Save Excel
-      writexl::write_xlsx(InputList_DF, path, col_names = TRUE)
-
-    } else {
-
-      walk2(
-        .x = InputList_DF,
-        .y = names(InputList_DF),
-        .f = function(.x, .y) {
-          path <- FileName %>% save_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Table)
-          log_trace('Saving %s table to `%s`.', SaveAs_Table, path)
-          writer <- switch(SaveAs_Table, csv = write_csv, txt = write_tsv, tsv = write_tsv)
-          writer(.x, path)
-        }
-      )
-
-    }
+    walk2(
+      .x = `if`(SaveAs_Table == "xlsx", list(InputList_DF), InputList_DF),
+      .y = names(InputList_DF) %||% list(NULL),
+      .f = function(.x, .y) {
+        path <- FileName %>% finalize_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Table)
+        log_info('Saving %s table to `%s`.', SaveAs_Table, path)
+        writer <- switch(SaveAs_Table, csv = write_csv, txt = write_tsv, tsv = write_tsv, xlsx = write_xlsx)
+        writer(.x, path)
+      }
+    )
 
   }
 
