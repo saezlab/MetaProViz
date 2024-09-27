@@ -256,7 +256,7 @@ finalize_path <- function(
 
     CoRe %>%
     {`if`(is.null(.) || !., NULL, 'CoRe')} %>%
-    c(FileName, as.character(Sys.Date()), SubTitle) %>%
+    c(FileName, SubTitle, as.character(Sys.Date())) %>%
     paste0(collapse = '_') %>%
     str_replace_all(' ', '-') %>%
     file.path(FolderPath, .) %>%
