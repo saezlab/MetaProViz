@@ -396,7 +396,7 @@ print(names(translated_ids_example_full))
 
 Finally, this information is summarised in the TranslationSummary table.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 translated_ids_example_full$TranslationSummary
 ```
 
