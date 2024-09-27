@@ -23,6 +23,11 @@
 ### ### ### Translate IDs to/from KEGG, PubChem, Chebi, HMDB ### ### ###
 ##########################################################################################
 #'
+#' @param Input_DataFrame Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
+#' @param SettingsInfo \emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem","chebi","hmdb"), Method="GetAll", GroupingVariable="term"))
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#'
 #' @title Translate IDs
 #' @description Translate IDs to and from KEGG, PubChem, Chebi.
 #' @return 3 data frames: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
@@ -31,7 +36,6 @@
 TranslateID <- function(Input_DataFrame,
                         SettingsInfo = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem","chebi","hmdb"), Method="GetAll", GroupingVariable="term")
                         ){
-  suppressMessages(library(tidyverse))
 
   Output_DataFrame <- Input_DataFrame # making a copy of Input Dataframe so we can merge the results later
   idcolname <- SettingsInfo[['IdColumn']]
