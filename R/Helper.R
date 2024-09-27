@@ -172,61 +172,63 @@ SaveRes <- function(InputList_DF,
                    PlotWidth=NULL,
                    PlotUnit=NULL){
 
-  if (!is.null(SaveAs_Table)) {
-
+  if(is.null(SaveAs_Table)==FALSE){
     # Excel File: One file with multiple sheets:
-    if (SaveAs_Table == "xlsx") {
-
-      path <- FileName %>% save_path(FolderPath, CoRe = CoRe, Ext = "xlsx")
-      log_trace('Saving xlsx table to `%s`.', path)
-      # Save Excel
-      writexl::write_xlsx(InputList_DF, path, col_names = TRUE)
-
-    } else {
-
-      walk2(
-        .x = InputList_DF,
-        .y = names(InputList_DF),
-        .f = function(.x, .y) {
-          path <- FileName %>% save_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Table)
-          log_trace('Saving %s table to `%s`.', SaveAs_Table, path)
-          writer <- switch(SaveAs_Table, csv = write_csv, txt = write_tsv, tsv = write_tsv)
-          writer(.x, path)
+    if(SaveAs_Table == "xlsx"){
+      #Make FileName
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName <- paste0(FolderPath,"/" , FileName, "_",Sys.Date(), sep = "")
+      }else{
+        FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_",Sys.Date(), sep = "")
+      }
+      #Save Excel
+      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE, rownames = FALSE)
+    }else{
+      for(DF in names(InputList_DF)){
+        #Make FileName
+        if(CoRe==FALSE | is.null(CoRe)==TRUE){
+          FileName_Save <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+        }else{
+          FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }
-      )
 
+        #Save table
+        if (SaveAs_Table == "csv"){
+          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""), row.names = FALSE)
+        }else if (SaveAs_Table == "txt"){
+          write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+        }
+      }
     }
-
   }
 
-  if (!is.null(SaveAs_Plot)) {
+  if(is.null(SaveAs_Plot)==FALSE){
+    for(Plot in names(InputList_Plot)){
+      #Make FileName
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
+      }else{
+        FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
+      }
 
-    for (Plot in names(InputList_Plot)) {
+      #Save
+      if(is.null(PlotHeight)){
+        PlotHeight <- 12
+      }
+      if(is.null(PlotWidth)){
+        PlotWidth <- 16
+      }
+      if(is.null(PlotUnit)){
+        PlotUnit <- "cm"
+      }
 
-      FileName %<>% save_path(FolderPath, CoRe = CoRe, Ext = SaveAs_Plot)
-      PlotHeight %<>% if_null(12)
-      PlotWidth %<>% if_null(16)
-      PlotUnit %<>% if_null("cm")
-
-      log_info('Saving plot `%s` to `%s`.', Plot, FileName)
-      log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
-
-      ggsave(
-        filename = FileName,
-        plot = InputList_Plot[[Plot]],
-        width = PlotWidth,
-        height = PlotHeight,
-        unit = PlotUnit
-      )
+      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
 
       if(PrintPlot==TRUE){
         suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
       }
-
     }
-
   }
-
 }
 
 
