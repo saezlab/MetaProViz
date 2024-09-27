@@ -674,6 +674,7 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, 
   #Adjust the parameters:
   Input <- InputPlot$gtable
   gtableInp <<- Input
+  SettingsInfo <<- SettingsInfo
 
   Plot_Sized <- gtableInp  %>%
     withCanvasSize(width = 12, height = 11) %>%
@@ -687,8 +688,8 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, data_path, show_rownames, 
 
   plot( Plot_Sized )
 
-  #Return
-  Output <- Plot_Sized
+  Plot_Sized
+
 }
 
 

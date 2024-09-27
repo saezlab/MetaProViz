@@ -375,3 +375,19 @@ adjust_legend <- function(
     invisible(gtbl)
 
 }
+
+
+#' From a legend gtable extract the titles into a character vector
+#'
+#' @importFrom magrittr %>% extract2
+#' @importFrom purrr map map_chr
+#' @noRd
+titles_from_legend <- function(leg) {
+
+    leg$grobs %>%
+    map(~{(.x$layout$name == 'title') %>% which %>% extract2(.x$grobs, .)}) %>%
+    map(~{.x$children %>% map_chr(~.x$label)}) %>%
+    unlist %>%
+    unname
+
+}
