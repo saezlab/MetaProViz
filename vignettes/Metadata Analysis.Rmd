@@ -380,6 +380,50 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
                        SettingsInfo = c(individual = "SUPER_PATHWAY",
                                         color = "RG2_Significant"))
 ```
+
+
+```{r, eval=FALSE, echo=FALSE}
+#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+DM_ORA_res<- list()
+
+LoadKEGG()
+
+comparisons <- names(ResList)
+for(comparison in comparisons){
+  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
+  DMA <- merge(Tissue_MetaData%>%rownames_to_column("Metabolite") ,ResList[[comparison]][["DMA"]][["TUMOR_vs_NORMAL"]], by="Metabolite", all.y=TRUE)
+  DMA <- DMA[,c(1,10,12:17)]
+  DMA <- DMA[complete.cases(DMA),-1]#we remove metabolites that do not have a KEGG ID/KEGG pathway
+ 
+  #remove dublons
+  DMA_Select <- DMA%>%distinct(KEGG, .keep_all = TRUE)%>%remove_rownames()%>%column_to_rownames("KEGG")
+  
+  #Perform ORA
+  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA_Select, #Input data requirements: column `t.val` and column `Metabolite`
+                                                       SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
+                                                       PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                                       PathwayName="Class",
+                                                       minGSSize=3,
+                                                       maxGSSize=1000,
+                                                       pCutoff=0.01,
+                                                       PercentageCutoff=10)
+  
+  MetaProViz::VizVolcano(PlotSettings="PEA",
+                       InputData= DMA_Select, #Must be the data you have used as an input for the pathway analysis
+                       InputData2=as.data.frame(DM_ORA_res[[comparison]][["ClusterGo"]])%>%dplyr::rename("term"="ID"),
+                       SettingsInfo= c(PEA_Pathway="term",# Needs to be the same in both, SettingsFile_Metab and InputData2.
+                                       PEA_stat="p.adjust",#Column InputData2
+                                       PEA_score="GeneRatio",#Column InputData2
+                                       PEA_Feature="MetaboliteID"),# Column SettingsFile_Metab (needs to be the same as row names in InputData)
+                       SettingsFile_Metab= KEGG_Pathways,#Must be the pathways used for pathway analysis
+                       PlotName= paste("KEGG_", comparison, sep=""),
+                       Subtitle= "PEA" )
+  
+                                                
+                                                 
+}
+```
+
 </div>
 \
 \

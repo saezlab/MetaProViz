@@ -404,10 +404,10 @@ MCA_CORE[,1:6]%>%
 Now we can load the corresponding pre-processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
 ```{r}
 #Load the Pre-processed intracellular data:
-MetaProViz::ToyData(data="IntraCells_DMA")
+Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 
 #Perform metabolite clustering:
-MCA_CoRe_res <- MetaProViz::MCA_CoRe(InputData_Intra =Intra_DMA_786M1A_vs_HK2 ,
+MCA_CoRe_res <- MetaProViz::MCA_CoRe(InputData_Intra =Intra_DMA_786M1A_vs_HK2%>%rownames_to_column("Metabolite") ,
                                      InputData_CoRe = DMA_786M1A_vs_HK2,
                                      SettingsInfo_Intra=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
                                      SettingsInfo_CoRe=c(DirectionCol="CoRe", ValueCol="Log2(Distance)",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=28),
@@ -552,6 +552,7 @@ Clustered heatmaps can be useful to understand the patterns in the data, which w
 As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
 ```{r}
 Input_Heatmap <-   Media_Preprocessed[,-c(1:4)] #remove columns that include Metadata such as cell type,...
+  
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -616,8 +617,6 @@ You can also choose to make individual plots for any Sample Metadata using `indi
 Sometimes one might be interested to create individual plots for each metabolite to understand the differences between specific conditions. For this common plot types are bargraphs, boxplots or violin plots. 
 As input, we need a DF that contains the samples as rownames and the features (=metabolites) as column names:\
 ```{r}
-devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")#only loaded until package is online
-
 Input_Superplot <-  Media_Preprocessed[,-c(1:4)]#remove columns that include Metadata such as cell type,...
 ```
 ```{r, echo=FALSE}
