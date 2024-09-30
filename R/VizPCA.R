@@ -98,6 +98,7 @@ VizPCA <- function(InputData,
 
 
   ## ------------ Create Results output folder ----------- ##
+  Folder <- NULL
   if(is.null(SaveAs_Plot)==FALSE){
     Folder <- MetaProViz:::SavePath(FolderName= "PCAPlots",
                                     FolderPath=FolderPath)

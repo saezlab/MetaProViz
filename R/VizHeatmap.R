@@ -200,8 +200,6 @@ VizHeatmap <- function(InputData,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-
-        #Width and height according to Sample and metabolite number
         Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= cleaned_i)
         PlotHeight <- as.numeric(Plot_Sized$height)
         PlotWidth <- as.numeric(Plot_Sized$width)
@@ -500,7 +498,6 @@ VizHeatmap <- function(InputData,
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
             PlotName <- paste(cleaned_i,cleaned_s, sep="_")
-
             Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= PlotName)
             PlotHeight <- as.numeric(Plot_Sized$height)
             PlotWidth <- as.numeric(Plot_Sized$width)
@@ -659,6 +656,7 @@ VizHeatmap <- function(InputData,
 #' @noRd
 
 PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, PlotName){
+
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   HEAT_PARAM <- list(
     widths = list(

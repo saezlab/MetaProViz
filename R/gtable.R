@@ -61,7 +61,10 @@ set_size <- function(
     col <- dim %>% gtable_col
     tdim <- dim %>% str_sub(end = -2L)
 
-    idx <- gtable_idx(gtbl, name, dim, offset = offset)
+    idx <-
+        name %>%
+        in_gtable(gtbl) %>%
+        gtable_idx(gtbl, ., dim, offset = offset)
 
     name_miss <- length(idx) == 0L
 
@@ -72,7 +75,7 @@ set_size <- function(
     info <-
         sprintf(
             '[name=%s,offset=%i,empty=%s,original=%s]',
-            name,
+            paste0(name, collapse = ','),
             offset,
             !(idx %in% gtbl$layout[[col]]),
             `if`(name_miss || outof_range, 'NA', gtbl[[dim]][idx])
@@ -82,7 +85,7 @@ set_size <- function(
 
         log_warn(
             'No such name in gtable: %s; names available: %s',
-            name,
+            paste0(name, collapse = ', '),
             paste0(gtbl$layout$name, collapse = ', ')
         )
 
@@ -239,7 +242,7 @@ gtable_idx <- function(gtbl, name, dim, offset = 0L) {
     name %>%
     {`if`(
         is.character(.),
-        filter(gtbl$layout, name == .) %>% extract2(dim),
+        filter(gtbl$layout, name %in% .) %>% extract2(dim),
         .
     )} %>%
     add(offset)
@@ -270,19 +273,19 @@ gtable_col <- function(dim) {
 #' @noRd
 adjust_title <- function(gtbl, titles) {
 
-    print(titles)
     if (titles %>% nchar %>% as.logical %>% any) {
 
         log_trace('The plot has title, adjusting layout to accommodate it.')
 
-        gtbl %<>% set_height('title', '1.5cm')#controls margins --> PlotName and subtitle
+        gtbl %<>% set_height(c('title', 'main'), '1.5cm')#controls margins --> PlotName and subtitle
         # Sum up total heights:
         gtbl$height %<>% add(cm(.5))
 
         #------- Width: Check how much width is needed for the figure title/subtitle
         title_width <- titles %>% char2cm %>% max %>% cm
+        gtbl <<- gtbl
         gtbl %<>% set_width(
-            'guide-box-right',
+            c('guide-box-right', 'legend'),
             sprintf('%.02fcm', title_width - gtbl$width),
             callback = max
         )
@@ -389,5 +392,16 @@ titles_from_legend <- function(leg) {
     map(~{.x$children %>% map_chr(~.x$label)}) %>%
     unlist %>%
     unname
+
+}
+
+
+#' @importFrom utils head
+#' @importFrom magrittr %>%
+#' @noRd
+in_gtable <- function(name, gtbl) {
+
+    name %>%
+    {`if`(is.character(.), intersect(., gtbl$layout$name) %>% head(1L), .)}
 
 }
