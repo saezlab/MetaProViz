@@ -24,9 +24,9 @@
 ##########################################################################################
 #'
 #' @param Input_DataFrame Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
-#' @param SettingsInfo \emph{Optional: }  Column name of Target in Input_GeneSet. \strong(Default = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem","chebi","hmdb"), Method="GetAll", GroupingVariable="term"))
+#' @param SettingsInfo \emph{Optional: }  Column name of Target in Input_GeneSet. \strong{Default = list(IdColumn="MetaboliteID", FromFormat=c("kegg"), ToFormat=c("pubchem","chebi","hmdb"), Method="GetAll", GroupingVariable="term")}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong(Default = NULL)
+#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{Default = NULL}
 #'
 #' @title Translate IDs
 #' @description Translate IDs to and from KEGG, PubChem, Chebi.
