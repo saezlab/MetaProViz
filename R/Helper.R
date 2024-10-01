@@ -138,7 +138,7 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 ### ### ### General helper function: Save tables and plot ### ### ###
 ################################################################################################
 
-#' Create directory structure and path
+#' SaveRes is the helper function to create the folder structure and path
 #'
 #' @param InputList_DF Generated within the MetaProViz function. Contains named DFs.
 #' @param InputList_Plot Generated within the MetaProViz function. Contains named Plots.
@@ -153,15 +153,10 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 #' @param PlotUnit Parameter for ggsave.
 #'
 #' @keywords Save
-#' @importFrom logger log_info log_trace
-#' @importFrom magrittr %>% %<>%
-#' @importFrom writexl write_xlsx
-#' @importFrom ggplot2 ggsave
-#' @importFrom readr write_csv write_tsv
-#' @importFrom purrr walk2
-#' @importFrom rlang %||%
 #' @noRd
-SaveRes <- function(InputList_DF,
+#'
+
+SaveRes<- function(InputList_DF,
                    InputList_Plot,
                    SaveAs_Table,
                    SaveAs_Plot=SaveAs_Plot,
@@ -173,98 +168,71 @@ SaveRes <- function(InputList_DF,
                    PlotWidth=NULL,
                    PlotUnit=NULL){
 
-  log_trace(
-    paste0(
-      'SaveRes: [SaveAs_Table=%s, SaveAs_Plot=%s, FolderPath=%s, ',
-      'FileName=%s, CoRe=%s, PrintPlot=%s, PlotHeight=%s, ',
-      'PlotWidth=%s, PlotUnit=%s]'
-    ),
-    SaveAs_Table,
-    SaveAs_Plot,
-    FolderPath,
-    FileName,
-    CoRe,
-    PrintPlot,
-    PlotHeight,
-    PlotWidth,
-    PlotUnit
-  )
+  RequiredPackages <- c("tidyverse", "writexl")
+  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)) install.packages(new.packages)
+  suppressMessages(library(tidyverse))
 
-  if (!is.null(SaveAs_Table)) {
 
-    walk2(
-      .x = `if`(SaveAs_Table == "xlsx", list(InputList_DF), InputList_DF),
-      .y = names(InputList_DF) %||% list(NULL),
-      .f = function(.x, .y) {
-        path <- FileName %>% finalize_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Table)
-        log_info('Saving %s table to `%s`.', SaveAs_Table, path)
-        writer <- switch(SaveAs_Table, csv = write_csv, txt = write_tsv, tsv = write_tsv, xlsx = write_xlsx)
-        writer(.x, path)
+  if(is.null(SaveAs_Table)==FALSE){
+    # Excel File: One file with multiple sheets:
+    if(SaveAs_Table == "xlsx"){
+      #Make FileName
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName <- paste0(FolderPath,"/" , FileName, "_",Sys.Date(), sep = "")
+      }else{
+        FileName <- paste0(FolderPath,"/CoRe_" , FileName,"_",Sys.Date(), sep = "")
       }
-    )
-
-  }
-
-  if (!is.null(SaveAs_Plot)) {
-
-    walk2(
-      .x = InputList_Plot,
-      .y = names(InputList_Plot),
-      .f = function(.x, .y) {
-
-        path <- FileName %>% finalize_path(FolderPath, CoRe = CoRe, SubTitle = .y, Ext = SaveAs_Plot)
-        PlotHeight %<>% if_null(12)
-        PlotWidth %<>% if_null(16)
-        PlotUnit %<>% if_null("cm")
-
-        log_info('Saving plot `%s` to `%s`.', .y, path)
-        log_trace('Width: %.02f %s, height: %.02f %s.', PlotWidth, PlotUnit, PlotHeight, PlotUnit)
-
-        ggsave(
-          filename = path,
-          plot = .x,
-          width = PlotWidth,
-          height = PlotHeight,
-          unit = PlotUnit
-        )
-
-        if (PrintPlot) {
-          suppressMessages(suppressWarnings(plot(.x)))
+      #Save Excel
+      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE, rownames = FALSE)
+    }else{
+      for(DF in names(InputList_DF)){
+        #Make FileName
+        if(CoRe==FALSE | is.null(CoRe)==TRUE){
+          FileName_Save <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+        }else{
+          FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }
 
+        #Save table
+        if (SaveAs_Table == "csv"){
+          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""), row.names = FALSE)
+        }else if (SaveAs_Table == "txt"){
+          write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+        }
       }
-    )
-
+    }
   }
 
+  if(is.null(SaveAs_Plot)==FALSE){
+    for(Plot in names(InputList_Plot)){
+      #Make FileName
+      if(CoRe==FALSE | is.null(CoRe)==TRUE){
+        FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
+      }else{
+        FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
+      }
+
+      #Save
+      if(is.null(PlotHeight)){
+        PlotHeight <- 12
+      }
+      if(is.null(PlotWidth)){
+        PlotWidth <- 16
+      }
+      if(is.null(PlotUnit)){
+        PlotUnit <- "cm"
+      }
+
+      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+
+      if(PrintPlot==TRUE){
+        suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
+      }
+    }
+  }
 }
 
-
-#' Set up a path for saving an output
-#'
-#' @importFrom stringr str_replace_all
-#' @importFrom magrittr %>% %T>%
-#' @importFrom logger log_trace
-#' @noRd
-finalize_path <- function(
-    FileName,
-    FolderPath,
-    CoRe = NULL,
-    SubTitle = NULL,
-    Ext = NULL
-  ) {
-
-    CoRe %>%
-    {`if`(is.null(.) || !., NULL, 'CoRe')} %>%
-    c(FileName, SubTitle, as.character(Sys.Date())) %>%
-    paste0(collapse = '_') %>%
-    str_replace_all(' ', '-') %>%
-    file.path(FolderPath, .) %>%
-    c(Ext) %>%
-    paste0(collapse = '.') %T>%
-    {log_trace('Output path: `%s`.', .)}
-
-}
 
 
 ################################################################################################
