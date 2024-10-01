@@ -450,8 +450,8 @@ VizVolcano_Standard <- function(InputData,
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
         Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
-        PlotHeight <- as.numeric(Plot_Sized$height)
-        PlotWidth <- as.numeric(Plot_Sized$width)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = element_rect(fill = "transparent")))
@@ -796,8 +796,8 @@ VizVolcano_Compare <- function(InputData,
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
         Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
-        PlotHeight <- as.numeric(Plot_Sized$height)
-        PlotWidth <- as.numeric(Plot_Sized$width)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = element_rect(fill = "transparent")))
@@ -1142,8 +1142,9 @@ VizVolcano_PEA <- function(InputData,
       #Set the total heights and widths
       PlotTitle <- paste(PlotName, ": ", i, sep="")
       Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
-      PlotHeight <- as.numeric(Plot_Sized$height)
-      PlotWidth <- as.numeric(Plot_Sized$width)
+      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
         add(theme(panel.background = element_rect(fill = "transparent")))
@@ -1227,6 +1228,12 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
       sections = c("color", "shape"),
       SettingsInfo = SettingsInfo
     )
+
+  log_trace(
+    'Sum of heights: %.02f, sum of widths: %.02f',
+    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+  )
 
   #Return
   Output <- Plot_Sized

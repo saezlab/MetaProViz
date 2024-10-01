@@ -283,7 +283,7 @@ adjust_title <- function(gtbl, titles) {
 
 
         # Sum up total heights:
-        gtbl$height %<>% add(cm(.5))
+        gtbl$height %<>% add(cm(1))
 
         #------- Width: Check how much width is needed for the figure title/subtitle
         title_width <- titles %>% char2cm %>% max %>% cm
@@ -353,7 +353,7 @@ adjust_legend <- function(
                 sprintf('%.02fcm', legend_width),
                 callback = max,
                 # here we have a bug, this should be TRUE
-                grow = FALSE
+                grow = TRUE
             )
 
         #------- Legend heights

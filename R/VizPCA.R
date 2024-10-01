@@ -252,8 +252,8 @@ VizPCA <- function(InputData,
 
   #Set the total heights and widths
   PCA %<>% PlotGrob_PCA(SettingsInfo=SettingsInfo, PlotName=PlotName)
-  PlotHeight <- as.numeric(PCA$height)
-  PlotWidth <- as.numeric(PCA$width)
+  PlotHeight <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
+  PlotWidth <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
   PCA %<>%
     {ggplot2::ggplot() + annotation_custom(.)} %>%
     add(theme(panel.background = element_rect(fill = "transparent")))
@@ -287,32 +287,6 @@ VizPCA <- function(InputData,
 }
 
 
-PCA_PARAM <- list(
-  widths = list(
-    list("axis-b", "8cm"),
-    list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
-    list("axis-l", "1cm"),
-    list("ylab-l", "1cm"),
-    list("guide-box-left", "0cm"),
-    list("axis-r", "0cm"),
-    list("ylab-r", "0cm"),
-    list("ylab-l", "1cm", offset = -1L),
-    list("guide-box-right", "1cm")
-  ),
-  heights = list(
-    list("axis-l", "8cm"),
-    list("axis-b", "1cm"),
-    list("xlab-b", ".5cm"),
-    list("xlab-b", "1cm", offset = 1L),
-    list("title", "0cm", offset = -2L, ifempty = FALSE),
-    list("title", "0cm", offset = -1L),
-    list("title", "0.25cm"),# how much space is between title and y-axis label
-    list("subtitle", "0cm"),
-    list("guide-box-top", "0cm"),
-    list("xlab-t", "0cm", offset = -1L)
-  )
-)
-
 
 #' PCA helper function: Internal Function
 #'
@@ -326,16 +300,51 @@ PCA_PARAM <- list(
 #' @noRd
 PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
-  InputPlot %>%
-  ggplotGrob %>%
-  withCanvasSize(width = 12, height = 11) %>%
-  adjust_layout(PCA_PARAM) %>%
-  adjust_title(PlotName) %>%
-  adjust_legend(
-    InputPlot,
-    sections = c("color", "shape"),
-    SettingsInfo = SettingsInfo
+  PCA_PARAM <- list(
+    widths = list(
+      list("axis-b", "8cm"),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", "1cm"),
+      list("xlab-b", ".5cm"),
+      list("xlab-b", "1cm", offset = 1L),
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),
+      list("title", "0.25cm"),# how much space is between title and y-axis label
+      list("subtitle", "0cm"),
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
   )
+
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(PCA_PARAM) %>%
+    adjust_title(PlotName) %>%
+    adjust_legend(
+      InputPlot,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
+
+  log_trace(
+    'Sum of heights: %.02f, sum of widths: %.02f',
+    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+  )
+
+  #Return
+  Output <- Plot_Sized
 
 }
 
