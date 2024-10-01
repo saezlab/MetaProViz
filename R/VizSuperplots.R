@@ -412,7 +412,7 @@ plotGrob_Superplot <- function(InputPlot,
                                PlotType){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   X_Con <- SettingsFile_Sample%>%
-    dplyr::distinct(!!sym(SettingsInfo[["Conditions"]]))
+    dplyr::distinct(Conditions)
 
   X_Tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 

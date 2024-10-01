@@ -617,6 +617,10 @@ MetaProViz::VizHeatmap(InputData = Input_Heatmap,
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName = "Pathway")
 ```
+</div>
+\
+\
+\
 
 ### Superplots
 Sometimes one might be interested to create individual plots for each metabolite to understand the differences between specific conditions. For this common plot types are bargraphs, boxplots or violin plots. 
@@ -900,6 +904,7 @@ MetaProViz::VizVolcano(PlotSettings="PEA",
 </div>
 \
 \
+
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>

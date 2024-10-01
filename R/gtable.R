@@ -353,7 +353,7 @@ adjust_legend <- function(
                 sprintf('%.02fcm', legend_width),
                 callback = max,
                 # here we have a bug, this should be TRUE
-                grow = TRUE
+                grow = FALSE
             )
 
         #------- Legend heights
