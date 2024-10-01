@@ -670,20 +670,15 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, PlotName){
   #Adjust the parameters:
   Input <- InputPlot$gtable
 
-  Input <<- Input
-
   Plot_Sized <- Input  %>%
     withCanvasSize(width = 12, height = 11) %>%
-    adjust_layout(HEAT_PARAM) %>%
-    adjust_title(c(PlotName)) %>%
-    adjust_legend(
-      Input,
-      sections = c("color_Sample", "color_Metab"),#How can we do this as here we have multiple once!
-      SettingsInfo = SettingsInfo
-    )
-
-
-  plot(Plot_Sized)
+    adjust_layout(HEAT_PARAM) #%>%
+    #adjust_title(c(PlotName)) %>%
+    #adjust_legend(
+    #  Input,
+    #  sections = c("color_Sample", "color_Metab"),#How can we do this as here we have multiple once!
+    #  SettingsInfo = SettingsInfo
+    #)
 
   Output <- Plot_Sized
 
