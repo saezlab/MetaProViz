@@ -57,7 +57,7 @@ VizSuperplot(
 
 \item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \description{
 This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
