@@ -3,10 +3,10 @@ title: "CoRe Metabolomics"
 author:
   - name: Christina Schmidt
     affiliation:
-    - Heidelberg Universiy
+    - Heidelberg University
   - name: Dimitrios Prymidis
     affiliation:
-    - Cologne Universiy
+    - Cologne University
 output: 
   html_document:
     self_contained: true
@@ -60,8 +60,10 @@ First if you have not done yet, install the required dependencies and load the l
 #library(MetaProViz)
 devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
-#dependencies
-library(tidyverse)
+#dependencies that need to be loaded:
+library(magrittr)
+library(dplyr)
+library(rlang)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
