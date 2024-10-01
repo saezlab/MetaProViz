@@ -37,7 +37,7 @@
 #' @param ColorPalette_Dot \emph{Optional: } Provide customized ColorPalette in vector format. \strong{Default = NULL}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong(Default = NULL)
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #' @export
@@ -411,14 +411,15 @@ plotGrob_Superplot <- function(InputPlot,
                                PlotName,
                                PlotType){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
-  Number_Conditions <- SettingsFile_Sample%>%
-    dplyr::distinct(Conditions) %>%
-    nrow()
+  X_Con <- SettingsFile_Sample%>%
+    dplyr::distinct(!!sym(SettingsInfo[["Conditions"]]))
+
+  X_Tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 
   if(PlotType == "Bar"){
-    UNIT <- unit(Number_Conditions * 0.5, "cm")
+    UNIT <- unit(X_Con%>%nrow() * 0.5, "cm")
   }else{
-    UNIT <- unit(Number_Conditions * 1, "cm")
+    UNIT <- unit(X_Con%>%nrow() * 1, "cm")
   }
 
   SUPER_PARAM <- list(
@@ -435,13 +436,13 @@ plotGrob_Superplot <- function(InputPlot,
     ),
     heights = list(
       list("axis-l", "8cm"),
-      list("axis-b", "1cm"),
-      list("xlab-b", ".5cm"),
-      list("xlab-b", "1cm", offset = 1L),
+      list("axis-b", X_Tick),#This is adjusted for the x-axis ticks!
+      list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
       list("title", "0cm", offset = -2L, ifempty = FALSE),
       list("title", "0cm", offset = -1L),
-      list("title", "1cm"),
+      list("title", "0.25cm"),# how much space is between title and y-axis label
       list("subtitle", "0cm"),
+      list("caption", "0.5cm"), #plots statistics information, space to bottom
       list("guide-box-top", "0cm"),
       list("xlab-t", "0cm", offset = -1L)
     )
@@ -452,10 +453,10 @@ plotGrob_Superplot <- function(InputPlot,
     ggplotGrob %>%
     withCanvasSize(width = 12, height = 11) %>%
     adjust_layout(SUPER_PARAM) %>%
-    adjust_title(PlotName) %>%
+    adjust_title(c(PlotName, Subtitle)) %>%
     adjust_legend(
       InputPlot,
-      sections = c("color", "shape"),
+      sections = c("Superplot"),#here we do not have colour and shape, but other parameters
       SettingsInfo = SettingsInfo
     )
 

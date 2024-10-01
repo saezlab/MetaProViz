@@ -306,7 +306,7 @@ PCA_PARAM <- list(
     list("xlab-b", "1cm", offset = 1L),
     list("title", "0cm", offset = -2L, ifempty = FALSE),
     list("title", "0cm", offset = -1L),
-    list("title", "1cm"),
+    list("title", "0.25cm"),# how much space is between title and y-axis label
     list("subtitle", "0cm"),
     list("guide-box-top", "0cm"),
     list("xlab-t", "0cm", offset = -1L)

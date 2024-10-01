@@ -266,18 +266,22 @@ gtable_col <- function(dim) {
 #'
 #' @param gtbl A TableGrob (gtable) object.
 #' @param titles Character: titles to be added to the plot. Most commonly we
-#'     have one title, sometimes there is also a subtitle.
+#'     have one title and a subtitle
 #'
 #' @importFrom magrittr %<>% %>% add
 #' @importFrom logger log_trace
 #' @noRd
 adjust_title <- function(gtbl, titles) {
 
+
     if (titles %>% nchar %>% as.logical %>% any) {
 
         log_trace('The plot has title, adjusting layout to accommodate it.')
 
-        gtbl %<>% set_height(c('title', 'main'), '1.5cm')#controls margins --> PlotName and subtitle
+        gtbl %<>% set_height(c('title', 'main'), '0.5cm')#controls margins --> PlotName
+        gtbl %<>% set_height(c('subtitle', 'main'), '0.5cm')#controls margins --> PlotName
+
+
         # Sum up total heights:
         gtbl$height %<>% add(cm(.5))
 

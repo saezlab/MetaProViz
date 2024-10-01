@@ -1204,12 +1204,12 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
     ),
     heights = list(
       list("axis-l", "8cm"),
-      list("axis-b", "1cm"),
-      list("xlab-b", ".5cm"),
-      list("xlab-b", "1cm", offset = 1L),
+      list("axis-b", "0.75cm"),#This is the distance to x-axis!
+      list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+      #list("xlab-b", "1cm", offset = 1L),
       list("title", "0cm", offset = -2L, ifempty = FALSE),
-      list("title", "0cm", offset = -1L),
-      list("title", "1cm"),
+      list("title", "0cm", offset = -1L),#Space above title
+      list("title", "0.25cm"),# how much space is between title and y-axis label
       list("subtitle", "0cm"),
       list("guide-box-top", "0cm"),
       list("xlab-t", "0cm", offset = -1L)
@@ -1221,7 +1221,7 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
     ggplotGrob %>%
     withCanvasSize(width = 12, height = 11) %>%
     adjust_layout(VOL_PARAM) %>%
-   adjust_title(c(PlotName, Subtitle)) %>%
+    adjust_title(c(PlotName, Subtitle)) %>%#Fix this (if there is no Subtitle!)
     adjust_legend(
       InputPlot,
       sections = c("color", "shape"),
