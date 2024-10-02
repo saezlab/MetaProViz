@@ -63,6 +63,7 @@ library(MetaProViz)
 library(magrittr)
 library(dplyr)
 library(rlang)
+library(ggfortify)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
