@@ -1,9 +1,9 @@
-pandoc: 3.1.1
-pkgdown: 2.0.7
+pandoc: '3.2'
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   CoRe Metabolomics: CoRe Metabolomics.html
-  MetaProViz: MetaProViz.html
+  EnrichmentAnalysis: EnrichmentAnalysis.html
+  Metadata Analysis: Metadata Analysis.html
   Standard Metabolomics: Standard Metabolomics.html
-last_built: 2024-06-13T13:16Z
-
+last_built: 2024-10-02T10:48Z

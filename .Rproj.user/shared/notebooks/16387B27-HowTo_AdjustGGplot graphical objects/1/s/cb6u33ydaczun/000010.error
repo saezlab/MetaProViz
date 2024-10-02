@@ -1,0 +1,1 @@
+{"frames":[{"func":"gtable::gtable_matrix(InputPlot)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0},{"func":"ncol(grobs)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in gtable::gtable_matrix(InputPlot) : \n  argument \"grobs\" is missing, with no default\n"}

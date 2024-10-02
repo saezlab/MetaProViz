@@ -1,0 +1,15 @@
+#This will use KEGGREST to query the KEGG API to load the pathways:
+MetaProViz::LoadKEGG()
+View(KEGG_Pathways)
+options(width = 120)
+sessioninfo::session_info()
+Target=c("gene")
+OutputName=NULL
+FolderPath = NULL
+#This will use KEGGREST to query the KEGG API to load the pathways:
+MetaProViz::LoadKEGG()
+p <- ggplot(mpg, aes(displ, hwy)) + geom_point()
+p <- ggplot2::ggplot(mpg, ggplot2::aes(displ, hwy)) + ggplot2::geom_point()
+library(ggplot2)
+sessioninfo::session_info()
+install.packages("ggplot2")

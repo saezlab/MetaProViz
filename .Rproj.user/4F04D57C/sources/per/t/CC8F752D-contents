@@ -1,0 +1,20 @@
+# https://pkgdown.r-lib.org/reference/build_site.html
+
+pkgdown::build_site( pkg = "C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz",#path to package --> ./ root folder if put on GitHub
+                     examples = TRUE,#Run examples?
+                     seed = 1014,#Seed used to initialize so that random examples are reproducible.
+                     lazy = FALSE,#If TRUE, will only rebuild articles and reference pages if the source is newer than the destination.
+                     override = list(),
+                     preview = TRUE,
+                     devel = FALSE, # If FALSE, will first install the package to a temporary library, and will run all examples and vignettes in a new process.
+                     new_process = TRUE,
+                     install = FALSE#If TRUE, will install the package in a temporary library so it is available for vignettes.
+                     #document = "DEPRECATED"#Deprecated Use devel instead.
+                     )
+
+#This needs to be run in the github package folder
+#usethis::use_github_action("pkgdown")
+
+#devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+#devtools::document("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")#path to package --> ./ root folder if put on GitHub
