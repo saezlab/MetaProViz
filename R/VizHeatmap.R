@@ -194,7 +194,8 @@ VizHeatmap <- function(InputData,
                                      fontsize_row= 10,
                                      fontsize_col = 10,
                                      fontsize=9,
-                                     main = paste(PlotName, " Metabolites: ", i, sep=" " ))
+                                     main = paste(PlotName, " Metabolites: ", i, sep=" " ),
+                                     silent = TRUE)
 
         ## Store the plot in the 'plots' list
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -332,7 +333,8 @@ VizHeatmap <- function(InputData,
                                       fontsize_row= 10,
                                       fontsize_col = 10,
                                       fontsize=9,
-                                      main = paste(PlotName," Samples: ", i, sep=" " ))
+                                      main = paste(PlotName," Samples: ", i, sep=" " ),
+                                      silent = TRUE)
 
         #----- Save
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -491,7 +493,8 @@ VizHeatmap <- function(InputData,
                                           fontsize_row= 10,
                                           fontsize_col = 10,
                                           fontsize=9,
-                                          main = paste(PlotName," Metabolites: ", i, " Sample:", s, sep="" ))
+                                          main = paste(PlotName," Metabolites: ", i, " Sample:", s, sep="" ),
+                                          silent = TRUE)
 
             ## Store the plot in the 'plots' list
             cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -593,7 +596,6 @@ VizHeatmap <- function(InputData,
     if(nrow(t(data))>= 2){
     set.seed(1234)
 
-    #pdf(file = NULL)# Open a null graphics device (no plotting)
     heatmap <- pheatmap::pheatmap(t(data),
                                   show_rownames = as.logical(show_rownames),
                                   show_colnames = as.logical(show_colnames),
@@ -608,8 +610,8 @@ VizHeatmap <- function(InputData,
                                   fontsize_row= 10,
                                   fontsize_col = 10,
                                   fontsize=9,
-                                  main = PlotName)
-    #dev.off()# Close the null device
+                                  main = PlotName,
+                                  silent = TRUE)
 
     ## Store the plot in the 'plots' list
     PlotList[[PlotName]] <- heatmap
