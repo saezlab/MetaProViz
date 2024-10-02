@@ -179,6 +179,7 @@ VizHeatmap <- function(InputData,
       # Make the plot
       if(nrow(t(data_path))>= 2){
         set.seed(1234)
+
         heatmap <- pheatmap::pheatmap(t(data_path),
                                      show_rownames = as.logical(show_rownames),
                                      show_colnames = as.logical(show_colnames),
@@ -201,8 +202,8 @@ VizHeatmap <- function(InputData,
 
         #Width and height according to Sample and metabolite number
         Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= cleaned_i)
-        PlotHeight <- as.numeric(Plot_Sized$height)
-        PlotWidth <- as.numeric(Plot_Sized$width)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = element_rect(fill = "transparent")))
@@ -316,6 +317,7 @@ VizHeatmap <- function(InputData,
         # Make the plot
         if(nrow(t(data_path))>= 2){
         set.seed(1234)
+
         heatmap <- pheatmap::pheatmap(t(data_path),
                                       show_rownames = as.logical(show_rownames),
                                       show_colnames = as.logical(show_colnames),
@@ -338,8 +340,8 @@ VizHeatmap <- function(InputData,
 
         #Width and height according to Sample and metabolite number
         Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= cleaned_i)
-        PlotHeight <- as.numeric(Plot_Sized$height)
-        PlotWidth <- as.numeric(Plot_Sized$width)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = element_rect(fill = "transparent")))
@@ -474,6 +476,7 @@ VizHeatmap <- function(InputData,
             # Make the plot
             if(nrow(t(data_path))>= 2){
             set.seed(1234)
+
             heatmap <- pheatmap::pheatmap(t(data_path),
                                           show_rownames = as.logical(show_rownames),
                                           show_colnames = as.logical(show_colnames),
@@ -499,8 +502,8 @@ VizHeatmap <- function(InputData,
             #Width and height according to Sample and metabolite number
             PlotName <- paste(cleaned_i,cleaned_s, sep="_")
             Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= PlotName)
-            PlotHeight <- as.numeric(Plot_Sized$height)
-            PlotWidth <- as.numeric(Plot_Sized$width)
+            PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+            PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
             Plot_Sized %<>%
               {ggplot2::ggplot() + annotation_custom(.)} %>%
               add(theme(panel.background = element_rect(fill = "transparent")))
@@ -589,6 +592,8 @@ VizHeatmap <- function(InputData,
     #Make the plot:
     if(nrow(t(data))>= 2){
     set.seed(1234)
+
+    #pdf(file = NULL)# Open a null graphics device (no plotting)
     heatmap <- pheatmap::pheatmap(t(data),
                                   show_rownames = as.logical(show_rownames),
                                   show_colnames = as.logical(show_colnames),
@@ -604,6 +609,7 @@ VizHeatmap <- function(InputData,
                                   fontsize_col = 10,
                                   fontsize=9,
                                   main = PlotName)
+    #dev.off()# Close the null device
 
     ## Store the plot in the 'plots' list
     PlotList[[PlotName]] <- heatmap
@@ -611,8 +617,8 @@ VizHeatmap <- function(InputData,
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
     Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=SettingsInfo, PlotName= PlotName)
-    PlotHeight <- as.numeric(Plot_Sized$height)
-    PlotWidth <- as.numeric(Plot_Sized$width)
+    PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+    PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = element_rect(fill = "transparent")))
@@ -630,7 +636,7 @@ VizHeatmap <- function(InputData,
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
                            PlotHeight=PlotHeight,
-                           PlotWidth=PlotHeight,
+                           PlotWidth=PlotWidth,
                            PlotUnit="cm")))
 
 
@@ -666,19 +672,71 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, PlotName){
     )
   )
 
+  #If we plot feature names on the x-axis, we need to adjust the height of the plot:
+  #if(as.logical(show_rownames)==TRUE){
+  #  Rows <- nrow(t(data))
+  #}
 
   #Adjust the parameters:
   Input <- InputPlot$gtable
 
   Plot_Sized <- Input  %>%
     withCanvasSize(width = 12, height = 11) %>%
-    adjust_layout(HEAT_PARAM) #%>%
-    #adjust_title(c(PlotName)) %>%
-    #adjust_legend(
-    #  Input,
-    #  sections = c("color_Sample", "color_Metab"),#How can we do this as here we have multiple once!
-    #  SettingsInfo = SettingsInfo
-    #)
+    adjust_layout(HEAT_PARAM) %>%
+    adjust_title(c(PlotName))
+
+  #Extract legend information and adjust:
+  color_entries <- grep("^color", names(SettingsInfo), value = TRUE)
+  if(length(color_entries)>0){#We need to adapt the plot Hights and widths
+    if(sum(grepl("color_Sample", names(SettingsInfo)))>0){
+      names <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
+      colour_names <- NULL
+      legend_names <- NULL
+      for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        legend_names[x] <- names_sel
+        colour_names[x] <- SettingsFile_Sample[names[[x]]]
+      }
+    }else{
+      colour_names <- NULL
+      legend_names <- NULL
+    }
+
+    if(sum(grepl("color_Metab", names(SettingsInfo)))>0){
+      names <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
+      colour_names_M <- NULL
+      legend_names_M <- NULL
+      for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        legend_names_M[x] <- names_sel
+        colour_names_M[x] <- SettingsFile_Metab[names[[x]]]
+      }
+    }else{
+      colour_names_M <- NULL
+      legend_names_M <- NULL
+    }
+
+    legend_head <- c(legend_names, legend_names_M)
+    longest_name <- legend_head[which.max(nchar(legend_head[[1]]))]
+    character_count_head <- nchar(longest_name)+4#This is the length of the legend title name
+
+    legend_names <- c(unlist(colour_names), unlist(colour_names_M))
+    longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
+    character_count <- nchar(longest_name)#This is the length of the legend colour names
+
+    legendWidth <-  unit(((max(character_count_head, character_count))*0.3), "cm")#legend space
+
+    # Sum up total heights:
+    Plot_Sized$width %<>% add(legendWidth)
+
+    legendHeights <- unit((sum(length(unique(legend_names_M))+length(unique(colour_names_M))+length(unique(legend_names))+length(unique(colour_names)))), "cm")
+
+    Plot_Sized$width %<>% add(legendWidth)
+    if((grid::convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
+      Plot_Sized$height <- legendHeights
+    }
+
+  }
 
   Output <- Plot_Sized
 
