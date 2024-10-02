@@ -562,8 +562,8 @@ VizVolcano_Standard <- function(InputData,
 
       #Set the total heights and widths
       Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
-      PlotHeight <- as.numeric(Plot_Sized$height)
-      PlotWidth <- as.numeric(Plot_Sized$width)
+      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
         add(theme(panel.background = element_rect(fill = "transparent")))
@@ -926,8 +926,8 @@ VizVolcano_Compare <- function(InputData,
       PlotList[["Plot"]] <- Plot
 
       Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
-      PlotHeight <- as.numeric(Plot_Sized$height)
-      PlotWidth <- as.numeric(Plot_Sized$width)
+      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
         add(theme(panel.background = element_rect(fill = "transparent")))
