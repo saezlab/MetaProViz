@@ -2,12 +2,23 @@
 % Please edit documentation in R/Helper.R
 \name{ToyData}
 \alias{ToyData}
-\title{Toy Data Import}
+\title{Access built-in example data}
 \usage{
-ToyData(data)
+ToyData(Dataset)
 }
 \arguments{
-\item{data}{Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load}
+\item{Dataset}{Character: name of a built-in dataset:
+\itemize{
+\item{\code{"IntraCells_Raw"}: }
+\item{\code{"IntraCells_DMA"}: }
+\item{\code{"CultureMedia_Raw"}: }
+\item{\code{"Cells_MetaData"}: }
+\item{\code{"Tissue_Norm"}: }
+\item{\code{"Tissue_MetaData"}: }
+\item{\code{"Tissue_DMA"}: }
+\item{\code{"Tissue_DMA_Old"}: }
+\item{\code{"Tissue_DMA_Young"}: }
+}}
 }
 \value{
 A data frame containing the toy data.
@@ -15,6 +26,7 @@ A data frame containing the toy data.
 \description{
 Import and process .csv file to create toy data.
 }
-\details{
-Imports toy data into environment
+\examples{
+intra <- ToyData("IntraCells_Raw")
+
 }

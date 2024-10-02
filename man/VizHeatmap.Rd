@@ -29,7 +29,7 @@ VizHeatmap(
 
 \item{PlotName}{\emph{Optional: } String which is added to the output files of the plot}
 
-\item{Scale}{\emph{Optional: } String with the information for Scale row or column. \strong{Default = row}}
+\item{Scale}{\emph{Optional: } String with the information for Scale row, column or none. \strong{Default = row}}
 
 \item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 

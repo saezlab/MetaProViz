@@ -1,0 +1,126 @@
+---
+title: "ccRCC_Tissue"
+author: "Christina Schmidt"
+date: "July 2024"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+editor_options:
+  chunk_output_type: console
+---
+```{r, warning=FALSE, message=FALSE}
+#load the needed:
+library(tidyverse) # used for data manipulation
+library(rmarkdown) # used for paged_table function
+```
+
+# Samples
+The [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma" includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs. Metabolomics was done using The company Metabolon, so this is untargeted metabolomics.\
+\
+Here we use the median normalised data from the supplementary table 2 of the paper. The median normalisation was done by metaboanalyst.
+
+# The Data
+```{r}
+data <- readxl::read_excel("Input/Supplementarytable2_mmc2.xlsx", sheet = "Median Normalized")
+
+#Patient MetaData:
+MetaData_Sample <- data[c(1:12),-c(1:11)]%>%
+  {colnames(.) <- .[12, ]
+    .[-12, ]
+    }%>%
+  column_to_rownames("Group HMDB")
+MetaData_Sample <- as.data.frame(t(MetaData_Sample))%>%
+    mutate(STAGE = case_when(`TYPE-STAGE`=="TUMOR-STAGE I"  ~ 'EARLY-STAGE',
+                             `TYPE-STAGE`=="TUMOR-STAGE II"  ~ 'EARLY-STAGE',
+                             `TYPE-STAGE`=="TUMOR-STAGE III"  ~ 'LATE-STAGE',
+                             `TYPE-STAGE`=="TUMOR-STAGE IV"  ~ 'LATE-STAGE',
+                             `TYPE-STAGE`=="NORMAL-STAGE I"  ~ 'EARLY-STAGE',
+                             `TYPE-STAGE`=="NORMAL-STAGE II"  ~ 'EARLY-STAGE',
+                             `TYPE-STAGE`=="NORMAL-STAGE III"  ~ 'LATE-STAGE',
+                             `TYPE-STAGE`=="NORMAL-STAGE IV"  ~ 'LATE-STAGE',
+                                  TRUE ~ 'X'))%>%
+    mutate(AGE = case_when(`AGE AT SURGERY`<42  ~ 'Young',
+                           `AGE AT SURGERY`>58  ~ 'Old',
+                                  TRUE ~ 'Middle'))%>%
+    mutate(GENDER = case_when(`GENDER`=="Male"  ~ 'Male',
+                           `GENDER`=="male"  ~ 'Male',
+                           `GENDER`=="male "  ~ 'Male',
+                           `GENDER`=="Female"  ~ 'Female',
+                           `GENDER`=="female"  ~ 'Female',
+                                  TRUE ~ 'x'))
+
+names(MetaData_Sample) <- gsub(" ", "_", names(MetaData_Sample))
+
+#Metabolite_MetaData
+MetaData_Metabolite <-  data[-c(1:11),c(2:12)]%>%
+  {colnames(.) <- .[1, ]
+    .[-1, ]
+  }%>%
+  column_to_rownames("BIOCHEMICAL NAME")
+names(MetaData_Metabolite ) <- gsub(" ", "_", names(MetaData_Metabolite ))
+
+
+#Data
+Data <-  data[-c(1:11),-c(1, 3:12)]%>%
+  {colnames(.) <- .[1, ]
+    .[-1, ]
+  }%>%
+  column_to_rownames("BIOCHEMICAL NAME")
+Data <-as.data.frame(t(Data))%>%
+  mutate(across(everything(), as.numeric))
+
+```
+\
+First we removed metabolites that where not identifiable from the dataset.\
+```{r, warning=FALSE}
+#Remove not identified metabolites:
+Data <- Data[, !grepl("^X - ", colnames(Data))]
+
+```
+`
+Next we remove constant/zero variance columns from Data
+```{r, warning=FALSE}
+#Remove constant/zero variance columns from Data
+Data_Select <- Data[, colSums(Data != 0) > 0]
+Data_Select <- Data_Select[, apply(Data_Select, 2, var) > 0]
+
+#Metabolites removed:
+Metabolites_removed <- setdiff(colnames(Data), colnames(Data_Select))
+message("Metabolites removed due to zero-variance or constant variance: ", paste0(Metabolites_removed, collapse = ", "))
+
+```
+\
+Now we check the clustering via PCA plot:\
+In detail, we want to check for outliers, how the patients samples and normal tissue samples cluster and if the different demographics separate. \
+```{r, warning=FALSE}
+#Make plot:
+MetaProViz::VizPCA(SettingsInfo= c(color="TISSUE_TYPE"),
+                   SettingsFile_Sample = MetaData_Sample ,
+                   InputData= Data_Select,
+                   PlotName = "Outlier",
+                   SaveAs_Plot=NULL)
+```
+\
+Merge Data with MetaData_Sample
+```{r}
+Data_Sample <- merge( MetaData_Sample, Data_Select, by = "row.names")%>%
+  column_to_rownames("Row.names")
+
+```
+\
+Save DF as .csv file
+```{r}
+write.csv(Data_Sample, "Hakimi_ccRCC-Tissue_Data.csv")
+write.csv(MetaData_Metabolite, "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
+```
+
+# Information about package used and versions 
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
+```

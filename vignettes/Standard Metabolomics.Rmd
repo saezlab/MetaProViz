@@ -3,10 +3,10 @@ title: "Standard Metabolomics"
 author:
   - name: Christina Schmidt
     affiliation:
-    - Heidelberg Universiy
+    - Heidelberg University
   - name: Dimitrios Prymidis
     affiliation:
-    - Cologne Universiy
+    - Cologne University
 output: 
   html_document:
     self_contained: true
@@ -25,7 +25,7 @@ editor_options:
 
 <style>
 .vscroll-plot {
-    width: 1000px;
+    width: 850px;
     height: 500px;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -59,7 +59,9 @@ First if you have not done yet, install the required dependencies and load the l
 library(MetaProViz)
 
 #dependencies that need to be loaded:
-library(tidyverse)
+library(magrittr)
+library(dplyr)
+library(rlang)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -84,7 +86,7 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 We can load the `ToyData`, which includes columns with Sample information and columns with the measured metabolite integrated peaks.\
 ```{r}
-MetaProViz::ToyData(data="Standard")
+Intra <- MetaProViz::ToyData(Data="IntraCells_Raw")
 ```
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
@@ -97,7 +99,7 @@ Intra[1:5, c(1:4,21,44)]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MetaProViz::ToyData(data="MappingInfo")
+MappingInfo <- MetaProViz::ToyData(Data="Cells_MetaData")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -145,7 +147,7 @@ It is worth mentioning that the Coefficient of variation (CV) is calculated by d
 ```{r, eval=FALSE}
 #### Select Pool samples:
 #Get the Pool data
-PoolData <- MetaProViz::ToyData(data="Standard") %>%
+PoolData <- MetaProViz::ToyData(Data="IntraCells_Raw") %>%
   subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
  
 # Check the metabolite variability
@@ -159,7 +161,7 @@ Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
 ```{r, echo=FALSE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
 #### Select Pool samples:
 #Get the Pool data
-PoolData <- MetaProViz::ToyData(data="Standard") %>%
+PoolData <- MetaProViz::ToyData(Data="IntraCells_Raw") %>%
   subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
 
 # Check the metabolite variability
@@ -614,6 +616,10 @@ MetaProViz::VizHeatmap(InputData = Input_Heatmap,
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName = "Pathway")
 ```
+</div>
+\
+\
+\
 
 ### Superplots
 Sometimes one might be interested to create individual plots for each metabolite to understand the differences between specific conditions. For this common plot types are bargraphs, boxplots or violin plots. 
@@ -788,7 +794,7 @@ We immediately see that there are many pathways displayed on the plot, which can
 #Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant", individual="Pathway"),
-                       SettingsFile= MetaData_Metab,
+                       SettingsFile_Metab= MetaData_Metab,
                        InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )
@@ -799,7 +805,7 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 #Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant", individual="Pathway"),
-                       SettingsFile= MetaData_Metab,
+                       SettingsFile_Metab= MetaData_Metab,
                        InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )
@@ -897,6 +903,7 @@ MetaProViz::VizVolcano(PlotSettings="PEA",
 </div>
 \
 \
+
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>

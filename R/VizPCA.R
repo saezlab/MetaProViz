@@ -25,6 +25,10 @@
 ### ### ### PCA Plots ### ### ###
 #################################
 
+
+# REFACT: Each docstring should start with a title that fits a single line,
+# i.e. <77 characters long
+
 #' @param Input_data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
@@ -38,10 +42,15 @@
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+# REFACT: use the @return directive to describe the return value of the function
 #'
 #' @keywords PCA
+#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom dplyr rename
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom rlang !! :=
 #' @export
-
 VizPCA <- function(InputData,
                    SettingsInfo= NULL,
                    SettingsFile_Sample = NULL,
@@ -57,14 +66,8 @@ VizPCA <- function(InputData,
                    FolderPath = NULL
 ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse","ggfortify", "ggplot2")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-  suppressMessages(library("ggfortify"))
 
-  ################################################################################################################################################################################################
+  ###########################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
@@ -76,6 +79,10 @@ VizPCA <- function(InputData,
                           CoRe=FALSE,
                           PrintPlot= PrintPlot)
 
+  # REFACT: What is the likelihood that these simple logical parameters have a
+  # wrong type of value? Even if that happens, we don't even tell the user here
+  # in which function the error happened, and which other function called it with
+  # the wrong arguments.
   # CheckInput` Specific
   if(is.logical(ShowLoadings) == FALSE){
     stop("Check input. The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
@@ -91,18 +98,19 @@ VizPCA <- function(InputData,
 
 
   ## ------------ Create Results output folder ----------- ##
+  Folder <- NULL
   if(is.null(SaveAs_Plot)==FALSE){
     Folder <- MetaProViz:::SavePath(FolderName= "PCAPlots",
                                     FolderPath=FolderPath)
   }
 
 
-  ############################################################################################################
+  ###########################################################################
   ## ----------- Set the plot parameters: ------------ ##
   ##--- Prepare colour and shape palette
   if(is.null(ColorPalette)){
     if((ColorScale=="discrete")==TRUE){
-      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+      safe_colorblind_palette <- metaproviz_palette()
     }else if(ColorScale=="continuous"){
       safe_colorblind_palette <- NULL
     }
@@ -162,7 +170,7 @@ VizPCA <- function(InputData,
       }else{
         InputPCA$color <- as.factor(InputPCA$color)
         #Overwrite color pallette
-        safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+        safe_colorblind_palette <- metaproviz_palette()
         #color that will be used for distinct
         color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
         #Overwrite color_scale
@@ -243,202 +251,101 @@ VizPCA <- function(InputData,
   PlotList[["Plot"]] <- PCA
 
   #Set the total heights and widths
-  Plot_Sized <- MetaProViz:::PlotGrob_PCA(InputPlot=PCA, SettingsInfo=SettingsInfo, PlotName=PlotName)
-  PCA <- Plot_Sized[[3]]
-  PCA <- ggplot2::ggplot() +
-    annotation_custom(PCA)
-  PCA  <-PCA  + theme(panel.background = element_rect(fill = "transparent"))
+  PCA %<>% PlotGrob_PCA(SettingsInfo=SettingsInfo, PlotName=PlotName)
+  PlotHeight <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
+  PlotWidth <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
+  PCA %<>%
+    {ggplot2::ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
+
   PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
 
-  ######################################################################################################################################################################
+  ###########################################################################
   ##----- Save and Return
   #Here we make a list in which we will save the outputs:
-  suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
-                           InputList_Plot= PlotList_adaptedGrid,
-                           SaveAs_Table=NULL,
-                           SaveAs_Plot=SaveAs_Plot,
-                           FolderPath= Folder,
-                           FileName= paste("PCA_", PlotName),
-                           CoRe=FALSE,
-                           PrintPlot=PrintPlot,
-                           PlotHeight=Plot_Sized[[1]],
-                           PlotWidth=Plot_Sized[[2]],
-                           PlotUnit="cm")))
+  FileName <- PlotName %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
 
-  return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+  suppressMessages(suppressWarnings(
+    SaveRes(
+      InputList_DF=NULL,
+      InputList_Plot= PlotList_adaptedGrid,
+      SaveAs_Table=NULL,
+      SaveAs_Plot=SaveAs_Plot,
+      FolderPath= Folder,
+      FileName= FileName,
+      CoRe=FALSE,
+      PrintPlot=PrintPlot,
+      PlotHeight=PlotHeight,
+      PlotWidth=PlotWidth,
+      PlotUnit="cm"
+    )
+  ))
+
+  invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))
+
 }
 
 
-##############################################################
-### ### ### PCA helper function: Internal Function ### ### ###
-##############################################################
 
+#' PCA helper function: Internal Function
+#'
 #' @param InputPlot This is the ggplot object generated within the VizPCA function.
 #' @param SettingsInfo Passed to VizPCA
 #' @param PlotName Passed to VizPCA
 #'
 #' @keywords PCA helper function
+#' @importFrom ggplot2 ggplotGrob
+#' @importFrom magrittr %>%
 #' @noRd
-
 PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
-  #------- Set the total heights and widths
-  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable<- ggplot2::ggplotGrob(InputPlot) # Convert the plot to a gtable
-  if(is.null(SettingsInfo)==TRUE){
-    #-----widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(10)] <- unit(0,"cm")#controls margins --> Figure legend
-    plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-    plot_widths <- 11
 
-    if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      character_count <- nchar(PlotName)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
+  PCA_PARAM <- list(
+    widths = list(
+      list("axis-b", "8cm"),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", "1cm"),
+      list("xlab-b", ".5cm"),
+      list("xlab-b", "1cm", offset = 1L),
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),
+      list("title", "0.25cm"),# how much space is between title and y-axis label
+      list("subtitle", "0cm"),
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
+  )
 
-    #-----heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(PCA_PARAM) %>%
+    adjust_title(PlotName) %>%
+    adjust_legend(
+      InputPlot,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
 
-    if(PlotName==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 10.5
-    } else{
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(1,2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <-11
-    }
-  }else if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
+  log_trace(
+    'Sum of heights: %.02f, sum of widths: %.02f',
+    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+  )
 
-    #-----Plot widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
+  #Return
+  Output <- Plot_Sized
 
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 11+Value
-
-    if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      character_count <- nchar(PlotName)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>10.5){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-10.5)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 10.5
-      }
-    } else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }
-  }else if("color" %in% names(SettingsInfo)==TRUE | "shape" %in% names(SettingsInfo)==TRUE){
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(InputPlot) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
-
-    #----- Plot widths
-    plottable$widths[5] <- unit(8, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 11+Value
-
-    if((PlotName=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      character_count <- nchar(PlotName)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>10.5){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-10.5)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 10.5
-      }
-    }else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }
-  }
-  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
-  Output<- list(plot_heights, plot_widths, plottable)
 }
 
 

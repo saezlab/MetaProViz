@@ -50,19 +50,7 @@ ClusterORA <- function(InputData,
                        maxGSSize=1000 ,
                        SaveAs_Table= "csv",
                        FolderPath = NULL){
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse","clusterProfiler")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    if (!require("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-    BiocManager::install(new.packages)
-  }
-  ################################################################################################################################################################################################
-  ## ------------ Check Input files ----------- ##
+   ## ------------ Check Input files ----------- ##
   Pathways <- MetaProViz:::CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
                                           RemoveBackground=RemoveBackground,
@@ -197,19 +185,7 @@ StandardORA <- function(InputData,
                         FolderPath = NULL
 
 ){
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse","clusterProfiler", "ggupset")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    if (!require("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-    BiocManager::install(new.packages)
-  }
-
-  ## ------------ Check Input files ----------- ##
+ ## ------------ Check Input files ----------- ##
   Pathways <- MetaProViz:::CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
                                           RemoveBackground=FALSE,

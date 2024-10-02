@@ -19,44 +19,66 @@
 ## ---------------------------
 
 
-#' Imports toy data into environment
+#' Access built-in example data
 #'
-#' @param data Either "Standard", "Standard_DMA", "CoRe" or "MappingInfo" depending which data you would like to load
-#' @title Toy Data Import
-#' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
+#' @param Dataset Character: name of a built-in dataset:
+#'     \itemize{
+#'         \item{\code{"IntraCells_Raw"}: }
+#'         \item{\code{"IntraCells_DMA"}: }
+#'         \item{\code{"CultureMedia_Raw"}: }
+#'         \item{\code{"Cells_MetaData"}: }
+#'         \item{\code{"Tissue_Norm"}: }
+#'         \item{\code{"Tissue_MetaData"}: }
+#'         \item{\code{"Tissue_DMA"}: }
+#'         \item{\code{"Tissue_DMA_Old"}: }
+#'         \item{\code{"Tissue_DMA_Young"}: }
+#'     }
+#'
 #' @return A data frame containing the toy data.
-#' @export
 #'
-ToyData <- function(data) {
-  # Read the .csv files
-  Intra <- system.file("data", "MS55_RawPeakData.csv", package = "MetaProViz")
-  Intra<- read.csv(Intra, check.names=FALSE)%>%
-    column_to_rownames("Code")
+#' @description Import and process .csv file to create toy data.
+#'
+#' @examples
+#' intra <- ToyData("IntraCells_Raw")
+#'
+#' @importFrom readr read_csv cols
+#' @importFrom magrittr %>% extract2
+#' @importFrom tibble column_to_rownames
+#' @export
+ToyData <- function(Dataset) {
 
-  Intra_DMA <- system.file("data", "MS55_DMA_786M1A_vs_HK2.csv", package = "MetaProViz")
-  Intra_DMA<- read.csv(Intra_DMA, check.names=FALSE)
+  datasets <- list(
+    IntraCells_Raw = "MS55_RawPeakData.csv",
+    IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
+    CultureMedia_Raw = "MS51_RawPeakData.csv",
+    Cells_MetaData = "MappingTable_SelectPathways.csv",
+    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv",
+    Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv",
+    Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv",
+    Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv",
+    Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv"
+  )
 
-  Media <- system.file("data", "MS51_RawPeakData.csv", package = "MetaProViz")
-  Media<- read.csv(Media, check.names=FALSE)%>%
-    column_to_rownames("Code")
+  rncols <- c("Code", "Metabolite")
 
-  Pathways <-system.file("data", "MappingTable_SelectPathways.csv", package = "MetaProViz")
-  Pathways<- read.csv(Pathways, check.names=FALSE)%>%
-    column_to_rownames("Metabolite")
-
-  # Return the toy data into environment
-  if(data=="Standard"){
-    assign("Intra", Intra, envir=.GlobalEnv)
-  } else if(data=="Standard_DMA"){
-    assign("Intra_DMA_786M1A_vs_HK2",  Intra_DMA, envir=.GlobalEnv)
-  }else if(data=="CoRe"){
-    assign("Media", Media, envir=.GlobalEnv)
-  } else if(data=="MappingInfo"){
-    assign("MappingInfo", Pathways, envir=.GlobalEnv)
-  } else{
-    warning("Please choose a toy dataset you would like to use: Standard, CoRe, Pathways")
+  if (!Dataset %in% names(datasets)) {
+    stop(sprintf(
+      "No such dataset: `%s`. Available datasets: %s",
+      Dataset,
+      paste(names(datasets), collapse = ", ")
+    ))
   }
+
+  datasets %>%
+  magrittr::extract2(Dataset) %>%
+    system.file("data", ., package = "MetaProViz") %>%
+    read_csv(col_types = cols()) %>%
+    {`if`(
+    (rncol <- names(.) %>% intersect(rncols)) %>% length,
+    column_to_rownames(., rncol),
+    .
+    )}
+
 }
 
 
@@ -72,8 +94,6 @@ ToyData <- function(data) {
 #'
 #' @keywords Create folder and path
 #' @noRd
-#'
-
 SavePath<- function(FolderName, FolderPath){
   #Check if FolderName includes special characters that are not allowed
   cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
@@ -99,6 +119,18 @@ SavePath<- function(FolderName, FolderPath){
 
   #Return the folder path:
   return(invisible(Results_folder))
+}
+
+
+#' Make sure the results directory exists
+#'
+#' @importFrom magrittr %>%
+#' @noRd
+ResultsDir <- function(path = 'MetaProViz_Results') {
+
+  # TODO: options?
+  path %>% {`if`(!dir.exists(.), {dir.create(.); .}, .) }
+
 }
 
 
@@ -165,10 +197,10 @@ SaveRes<- function(InputList_DF,
         #Save table
         if (SaveAs_Table == "csv"){
           write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""), row.names = FALSE)
-          }else if (SaveAs_Table == "txt"){
-            write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
-          }
+        }else if (SaveAs_Table == "txt"){
+          write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
         }
+      }
     }
   }
 
@@ -209,6 +241,8 @@ SaveRes<- function(InputList_DF,
 
 #' Check input parameters
 #'
+# REFACT: Description of each argument should start with its type; e.g.
+# "@param x Character: name of the variable mapped to the x axis."
 #' @param InputData Passed to main function MetaProViz::Function()
 #' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
 #' @param SettingsFile_Sample Passed to main function MetaProViz::Function()
@@ -239,12 +273,10 @@ CheckInput <- function(InputData,
                        Theme=NULL,
                        PlotSettings=NULL){
   ############## Parameters valid for multiple MetaProViz functions
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
 
   #-------------InputData
+  # REFACT: this will fail with "condition has length > 1" error, and also
+  # gives wrong result. Use is.data.frame() instead.
   if(class(InputData) != "data.frame"){
     stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
   }
