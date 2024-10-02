@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
 
 \
 <center>
-![**Fig. 1:** Overview of MetaProViz functions.](Fig.1.png){width=90%}
+![**Fig. 1:** Overview of MetaProViz functions.](vignettes/Fig.1.png){width=90%}
 
 </center>
 \

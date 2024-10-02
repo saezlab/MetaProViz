@@ -27,7 +27,7 @@ other or in combination (**Fig.1**).
 <center>
 
 <figure>
-<img src="Fig.1.png" style="width:90.0%"
+<img src="vignettes/Fig.1.png" style="width:90.0%"
 alt="Fig. 1: Overview of MetaProViz functions." />
 <figcaption aria-hidden="true"><strong>Fig. 1:</strong> Overview of
 MetaProViz functions.</figcaption>
