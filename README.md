@@ -28,7 +28,7 @@ other or in combination (**Fig.1**).
 
 <figure>
 <img
-src="https://github.com/saezlab/MetaProViz/blob/main/vignettes/Fig.1.png?raw=true"
+src="https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true"
 style="width:90.0%" alt="Fig. 1: Overview of MetaProViz functions." />
 <figcaption aria-hidden="true"><strong>Fig. 1:</strong> Overview of
 MetaProViz functions.</figcaption>
@@ -149,7 +149,7 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
     @Manual{,
       title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
-      author = {Christina Schmidt and Dimitrios Prymidis and Julio Saez-Rodriguez and Christian Frezza},
+      author = {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez-Rodriguez and Christian Frezza},
       year = {2023},
       note = {R package version 2.1.0},
     }
