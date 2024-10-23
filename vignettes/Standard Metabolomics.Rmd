@@ -57,6 +57,7 @@ First if you have not done yet, install the required dependencies and load the l
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
+#devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz")
 
 #dependencies that need to be loaded:
 library(magrittr)
@@ -155,7 +156,7 @@ PoolData <- MetaProViz::ToyData(Data="IntraCells_Raw") %>%
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
                                                      SettingsFile_Sample = NULL,
                                                      SettingsInfo = NULL,
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 ```
 
 <div class="vscroll-plot">
@@ -169,7 +170,7 @@ PoolData <- MetaProViz::ToyData(Data="IntraCells_Raw") %>%
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
                                                      SettingsFile_Sample = NULL,
                                                      SettingsInfo = NULL,
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 ```
 </div>
 \
@@ -180,7 +181,7 @@ Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = Intra[,-c(1:3)],
                                                      SettingsFile_Sample = Intra[,1:3],
                                                      SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 ```
@@ -192,7 +193,7 @@ Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = Intra[,-c(1:3)],
                                                      SettingsFile_Sample = Intra[,1:3],
                                                      SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 ```
