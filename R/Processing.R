@@ -482,7 +482,7 @@ PoolEstimation <- function(InputData,
                         labs(title="CV for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
                         theme_classic()))
 
-  HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", , PlotType= "Hist")
+  HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Hist")
   PlotList [["Histogram_CV-PoolSamples"]] <- HistCV_Sized
 
   # 2. ViolinPlot of CVs
@@ -503,7 +503,7 @@ PoolEstimation <- function(InputData,
                           labs(title="CV for metabolites of Pool samples",x="Metabolites", y = "Coefficient of variation (CV%)")+
                           theme_classic())
 
-  ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", , PlotType= "Violin")
+  ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Violin")
 
   PlotList [["ViolinPlot_CV-PoolSamples"]] <- ViolinCV_Sized
 
