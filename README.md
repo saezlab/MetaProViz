@@ -151,5 +151,5 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
       title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
       author = {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez-Rodriguez and Christian Frezza},
       year = {2023},
-      note = {R package version 2.1.0},
+      note = {R package version 2.1.1},
     }
