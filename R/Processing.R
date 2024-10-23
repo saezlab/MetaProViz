@@ -883,8 +883,8 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
 
     #Combine Plots
     dev.new()
-    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw_Sized+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                                           RLA_data_norm_Sized+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+                                                           RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
                                                            ncol = 2))
     dev.off()
     norm_plots <- ggplot2::ggplot() +theme_minimal()+ annotation_custom(norm_plots)
