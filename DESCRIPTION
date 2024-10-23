@@ -35,6 +35,7 @@ Imports:
     dplyr,
     EnhancedVolcano,
     factoextra,
+    ggbeeswarm,
     ggfortify,
     ggplot2,
     ggupset,
