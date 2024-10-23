@@ -1,7 +1,7 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples and adapted
 on:
   push:
-    branches: [main, master]
+    branches: [main]
 
 name: Build_gh-pages.yml #shown when action is run
 
