@@ -59,26 +59,7 @@ PreProcessing <- function(InputData,
                           PrintPlot = TRUE,
                           FolderPath = NULL
 ){
-
-
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", # general scripting
-                        "factoextra", # visualize PCA
-                        "qcc", # for hotelling plots
-                        "ggplot2", # For visualization PCA
-                        "hash", # Dictionary in R for making column of outliers
-                        "reshape", # for melting df for anova
-                        "gridExtra",
-                        "inflection",
-                        "patchwork" # for output plot grid
-  )
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
-  suppressMessages(library(tidyverse))
-
-  ## ------------------ Check Input ------------------- ##
+## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
@@ -88,7 +69,6 @@ PreProcessing <- function(InputData,
                           SaveAs_Table=SaveAs_Table,
                           CoRe=CoRe,
                           PrintPlot= PrintPlot)
-
 
   # HelperFunction `CheckInput` Specific
   MetaProViz:::CheckInput_PreProcessing(InputData=InputData,
@@ -110,7 +90,6 @@ PreProcessing <- function(InputData,
     SubFolder_P <- file.path(Folder, "PreProcessing")
     if (!dir.exists(SubFolder_P)) {dir.create(SubFolder_P)}
   }
-
 
   ## ------------------ Prepare the data ------------------- ##
   #InputData files:
@@ -271,11 +250,6 @@ ReplicateSum <- function(InputData,
                          SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
                          SaveAs_Table = "csv",
                          FolderPath = NULL){
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
 
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
@@ -379,7 +353,7 @@ PoolEstimation <- function(InputData,
                            SettingsInfo = NULL,
                            CutoffCV = 100,
                            SaveAs_Plot = "svg",
-                           SaveAs_Table = "csv", # txt or csv
+                           SaveAs_Table = "csv",
                            PrintPlot=TRUE,
                            FolderPath = NULL){
 
@@ -425,8 +399,6 @@ PoolEstimation <- function(InputData,
       dir.create(SubFolder)
     }
   }
-
-
 
   ## ------------------ Prepare the data ------------------- ##
   #InputData files:
@@ -507,22 +479,33 @@ PoolEstimation <- function(InputData,
                         geom_vline(aes(xintercept=CutoffCV),
                                    color="darkred", linetype="dashed", size=1)+
                         geom_density(alpha=.2, fill="#FF6666") +
-                        labs(title="Coefficient of Variation for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
+                        labs(title="CV for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
                         theme_classic()))
 
-  PlotList [["Histogram_CV-PoolSamples"]] <- HistCV
+  HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", , PlotType= "Hist")
+  PlotList [["Histogram_CV-PoolSamples"]] <- HistCV_Sized
 
   # 2. ViolinPlot of CVs
   log_trace('CV violin plot.')
-  ViolinCV <- invisible(ggplot(result_df_final_out, aes(y=CV, x=HighVar, label=row.names(result_df_final_out)))+
+  #Make Violin of CVs
+  Plot_cv_result_df <- result_df_final_out %>%
+    mutate(HighVar = ifelse((CV > CutoffCV)==TRUE, paste("> CV", CutoffCV, sep=""), paste("< CV", CutoffCV, sep="")))
+
+  ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y=CV, x=HighVar, label=Plot_cv_result_df$Metabolite))+
                           geom_violin(alpha = 0.5 , fill="#FF6666")+
                           geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-                          #geom_point(position = position_jitter(seed = 1, width = 0.2))+
-                          geom_text(aes(label=ifelse(CV>CutoffCV,as.character(row.names(result_df_final_out)),'')), hjust=0, vjust=0)+
-                          labs(title="Coefficient of Variation for metabolites of Pool samples",x="Metabolites", y = "Coefficient of variation (CV%)")+
+                          ggrepel::geom_text_repel(aes(label = ifelse(Plot_cv_result_df$CV > CutoffCV,
+                                                                      as.character(Plot_cv_result_df$Metabolite), '')),
+                                                   hjust = 0, vjust = 0,
+                                                   box.padding = 0.5, # space between text and point
+                                                   point.padding = 0.5, # space around points
+                                                   max.overlaps = Inf) + # allow for many labels
+                          labs(title="CV for metabolites of Pool samples",x="Metabolites", y = "Coefficient of variation (CV%)")+
                           theme_classic())
 
-  PlotList [["ViolinPlot_CV-PoolSamples"]] <- ViolinCV
+  ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", , PlotType= "Violin")
+
+  PlotList [["ViolinPlot_CV-PoolSamples"]] <- ViolinCV_Sized
 
   ###################################################################################################################################
   ## ------------------ Return and Save ------------------- ##
@@ -696,7 +679,7 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
       message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
       filtered_matrix <- InputData[,-miss]
     }
-  }else if(Feature_Filtering ==  "Standard"){
+  }else if(FeatureFilt ==  "Standard"){
     message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
     message(paste("filtering value selected:", FeatureFilt_Value))
 
@@ -842,7 +825,13 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
 
   ## ------------------ QC plot ------------------- ##
   ### Before TIC Normalization
-  log_NA_removed_matrix <- log(NA_removed_matrix) %>% t() %>% as.data.frame() # log tranforms the data
+  #### Log() transformation:
+  log_NA_removed_matrix <- suppressWarnings(log(NA_removed_matrix) %>% t() %>% as.data.frame()) # log tranforms the data
+  nan_count <- sum(is.nan(as.matrix(log_NA_removed_matrix)))# Count NaN values (produced by log(0))
+  if (nan_count > 0) {# Issue a custom warning if NaNs are present
+    warning(paste("For the RLA plot before/after TIC normalisation we have to perform log() transformation. This resulted in", nan_count, "NaN values due to 0s in the data."))
+  }
+
   medians <- apply(log_NA_removed_matrix, 2, median) # get median
   RLA_data_raw <- log_NA_removed_matrix - medians   # Subtract the medians from each column
   RLA_data_long <- pivot_longer(RLA_data_raw, cols = everything(), names_to = "Group")
@@ -860,6 +849,8 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
     theme_classic()+
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
+  #RLA_data_raw_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = RLA_data_raw, PlotName= "Before TIC Normalization", PlotType= "RLA")
+
   if(TIC==TRUE){
     ## ------------------ Perform TIC ------------------- ##
     message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
@@ -871,7 +862,7 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
 
     ## ------------------ QC plot ------------------- ##
     ### After TIC normalization
-    log_Data_TIC <- log(Data_TIC) %>% t() %>% as.data.frame()
+    log_Data_TIC  <- suppressWarnings(log(Data_TIC) %>% t() %>% as.data.frame()) # log tranforms the data
     medians <- apply(log_Data_TIC, 2, median)
     RLA_data_norm <- log_Data_TIC - medians   # Subtract the medians from each column
     RLA_data_long <- pivot_longer(RLA_data_norm, cols = everything(), names_to = "Group")
@@ -888,20 +879,23 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
       theme_classic() +
       theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none")
 
+    #RLA_data_norm_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = RLA_data_norm, PlotName= "After TIC Normalization", PlotType= "RLA")
+
     #Combine Plots
     dev.new()
-    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                                           RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw_Sized+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+                                                           RLA_data_norm_Sized+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
                                                            ncol = 2))
     dev.off()
     norm_plots <- ggplot2::ggplot() +theme_minimal()+ annotation_custom(norm_plots)
+
 
     ## ------------------ Return ------------------ ##
     Output_list <- list("DF" = list("Data_TIC"=as.data.frame(Data_TIC)),"Plot"=list( "norm_plots"=norm_plots, "RLA_AfterTICNorm"=RLA_data_norm,  "RLA_BeforeTICNorm" = RLA_data_raw ))
     invisible(return(Output_list))
   }else{
     ## ------------------ Return ------------------ ##
-    Output_list <- list("Plot"=list("RLA_BeforeTICNorm" = RLA_data_raw ))
+    Output_list <- list("Plot"=list("RLA_BeforeTICNorm" = RLA_data_raw))
     invisible(return(Output_list))
   }
 }
@@ -964,7 +958,7 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
     result_df[1, is.na(result_df[1,])]<- 0
     rownames(result_df)[1] <- "CV"
 
-    CutoffCV <- 100
+    CutoffCV <- 30
     result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
       mutate(HighVar = CV > CutoffCV) %>% as.data.frame()
     rownames(result_df)<- colnames(CoRe_medias)
@@ -977,7 +971,7 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
 
     HighVar_metabs <- sum(result_df$HighVar == TRUE)
     if(HighVar_metabs>0){
-      message(paste0(HighVar_metabs, " of variables have high variability in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
+      message(paste0(HighVar_metabs, " of variables have high variability (CV > 30) in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
     }
 
     #Make histogram of CVs
@@ -986,21 +980,31 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
                           geom_vline(aes(xintercept=CutoffCV),
                                      color="darkred", linetype="dashed", linewidth=1)+
                           geom_density(alpha=.2, fill="#FF6666") +
-                          labs(title="Coefficient of Variation for metabolites of control media samples (no cells)",x="Coefficient of variation (CV)", y = "Frequency")+
+                          labs(title="CV for metabolites of control media samples (no cells)",x="Coefficient of variation (CV)", y = "Frequency")+
                           theme_classic())
 
-    PlotList[["Histogram_CoReMediaCV"]] <- HistCV
+    HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = HistCV, PlotName= "CV for metabolites of control media samples (no cells)", PlotType= "Hist")
+
+    PlotList[["Histogram_CoReMediaCV"]] <- HistCV_Sized
 
     #Make Violin of CVs
-    ViolinCV <- invisible(ggplot(cv_result_df, aes(y=CV, x=HighVar, label=row.names(cv_result_df)))+
+    Plot_cv_result_df <- cv_result_df %>%
+      mutate(HighVar = ifelse(HighVar == TRUE, "> CV 30", "< CV 30"))
+
+    ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y=CV, x=HighVar, label=row.names(cv_result_df)))+
                             geom_violin(alpha = 0.5 , fill="#FF6666")+
                             geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-                            #geom_point(position = position_jitter(seed = 1, width = 0.2))+
-                            geom_text(aes(label=ifelse(cv_result_df$CV>CutoffCV,as.character(row.names(cv_result_df)),'')), hjust=0, vjust=0)+
-                            labs(title="Coefficient of Variation for metabolites of control media samples (no cells)",x="Coefficient of variation (CV)", y = "Frequency")+
+                            ggrepel::geom_text_repel(aes(label = ifelse(Plot_cv_result_df$CV > CutoffCV,
+                                                               as.character(row.names(Plot_cv_result_df)), '')),
+                                            hjust = 0, vjust = 0,
+                                            box.padding = 0.5, # space between text and point
+                                            point.padding = 0.5, # space around points
+                                            max.overlaps = Inf) + # allow for many labels
+                            labs(title="CV for metabolites of control media samples (no cells)",x="Metabolites", y = "Coefficient of variation (CV)")+
                             theme_classic())
 
-    PlotList[["CoRe_Media_CV_Violin"]] <- ViolinCV
+    ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of control media samples (no cells)", PlotType= "Violin")
+    PlotList[["CoRe_Media_CV_Violin"]] <- ViolinCV_Sized
 
     ######################################################################################
     ## ------------------ Outlier testing
@@ -1121,7 +1125,11 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
 
   ######################################################################################
   ##------------------------ Return Plots and Data
+  if(dim(CoRe_medias)[1]>=3){
   DF_list <- list("CV_CoRe_blank" = cv_result_df, "Contigency_table_CoRe_blank" = contingency_data_contframe, "Core_Norm" = Data_TIC_CoReNorm)
+  } else{
+    DF_list <- list("CV_CoRe_blank" = cv_result_df, "Core_Norm" = Data_TIC_CoReNorm)
+  }
 
   #Return
   Output_list <- list("DF"= DF_list,"Plot"=PlotList)
@@ -1205,7 +1213,6 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
     if(loop==1){
       pca_outlierloop1 <- pca_outlier[["Plot_Sized"]][[1]]
     }
-    #suppressMessages(plot(pca_outlier[["Plot_Sized"]][[1]]))
     outlier_plot_list[[paste("PCA_round",loop,sep="")]] <- pca_outlier[["Plot_Sized"]][[1]]
     dev.off()
 
@@ -1226,13 +1233,15 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
                                             barfill = "grey",
                                             barcolor = "grey",
                                             linecolor = "black",linetype = 1) + theme_classic()+ geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
-      annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 3)
+      annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 1.75)
+
+    #screeplot_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = screeplot, PlotName= paste("PCA Explained variance plot filtering round ",loop, sep = ""), PlotType= "Scree")
 
     if(loop==1){
       scree_outlierloop1 <-screeplot
     }
     dev.new()
-    #plot(screeplot)
+
     outlier_plot_list[[paste("ScreePlot_round",loop,sep="")]] <- screeplot # save plot
     dev.off()
 
@@ -1263,7 +1272,8 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
     HotellingT2plot <- HotellingT2plot + ggtitle(paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"))
     HotellingT2plot <- HotellingT2plot + scale_linetype_discrete(name = LegendTitle,)
     HotellingT2plot <- HotellingT2plot + theme(plot.title = element_text(size = 13))+#, face = "bold")) +
-      theme(axis.text = element_text(size = 12))
+      theme(axis.text = element_text(size = 7))
+    #HotellingT2plot_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = HotellingT2plot, PlotName= paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"), PlotType= "Hotellings")
 
     if(loop==1){
       hotel_outlierloop1 <- HotellingT2plot
@@ -1379,7 +1389,7 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
   }
 
   # 2. Shape Biological replicates
-  if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)){
+  if("Biological_Replicates" %in% names(SettingsInfo)){
     dev.new()
     pca_QC_repl <-invisible(MetaProViz::VizPCA(InputData=as.data.frame(InputData)%>%select(-zero_var_metab_export_df$Metabolite),
                                                SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = SettingsInfo[["Biological_Replicates"]]),
@@ -1400,4 +1410,69 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
   #Return
   Output_list <- list("DF"= DF_list,"Plot"=outlier_plot_list)
   invisible(return(Output_list))
+}
+
+
+
+##############################################################
+### ### ### Plot helper function: Internal Function ### ### ###
+##############################################################
+
+#' @param InputPlot This is the ggplot object generated within the in any of the processing functions function.
+#' @param PlotName Generated within the processing functions.
+#' @param PlotType Generated within the processing functions.
+#'
+#' @keywords Plot helper function
+#' @noRd
+#'
+
+plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
+
+  if(PlotType == "Scree"){
+    UNIT <- unit(12, "cm")
+  }else if(PlotType == "Hotellings"){
+    UNIT <- unit(12, "cm")#0.25*Sample
+  }else{#CV and Hist
+    UNIT <- unit(8, "cm")
+  }
+  # Make plot into nice format:
+  SUPER_PARAM <- list(widths = list(
+    list("axis-b", UNIT),
+    list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+    list("axis-l", "1cm"),
+    list("ylab-l", "1cm"),
+    list("guide-box-left", "0cm"),
+    list("axis-r", "0cm"),
+    list("ylab-r", "0cm"),
+    list("ylab-l", "1cm", offset = -1L),
+    list("guide-box-right", "1cm")
+  ),
+  heights = list(
+    list("axis-l", "8cm"),
+    list("axis-b", "0.5cm"),#This is adjusted for the x-axis ticks!
+    list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+    list("title", "0cm", offset = -2L, ifempty = FALSE),
+    list("title", "0cm", offset = -1L),
+    list("title", "0.25cm"),# how much space is between title and y-axis label
+    list("subtitle", "0cm"),
+    list("caption", "0.5cm"), #plots statistics information, space to bottom
+    list("guide-box-top", "0cm"),
+    list("xlab-t", "0cm", offset = -1L)
+  )
+  )
+
+  #Adjust the parameters:
+  suppressWarnings(suppressMessages(
+    Plot_Sized <- InputPlot %>%
+      ggplotGrob %>%
+      MetaProViz:::withCanvasSize(width = 12, height = 11) %>%
+      MetaProViz:::adjust_layout(SUPER_PARAM) %>%
+      MetaProViz:::adjust_title(c(PlotName))
+  ))
+
+  Plot_Sized %<>%
+    {ggplot2::ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
+
+  return(Plot_Sized)
 }
