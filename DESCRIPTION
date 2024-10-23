@@ -32,6 +32,7 @@ Depends:
     ggplot2 (>= 3.3.5)
 Imports:
     dplyr,
+    EnhancedVolcano,
     factoextra,
     ggfortify,
     ggplot2,
