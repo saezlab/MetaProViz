@@ -42,6 +42,7 @@ Imports:
     hash,
     inflection,
     kableExtra,
+    KEGGREST,
     logger,
     magrittr,
     OmnipathR,
