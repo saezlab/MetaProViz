@@ -41,6 +41,7 @@ Imports:
     gtools,
     hash,
     inflection,
+    kableExtra,
     logger,
     magrittr,
     OmnipathR,
