@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
 </h2>
 <p><strong>MetaProViz</strong> (<strong>Meta</strong>bolomics <strong>Pr</strong>ocessing, functi<strong>o</strong>nal analysis and <strong>Vi</strong>suali<strong>z</strong>ation), a free open-source R-package that provides mechanistic hypotheses from metabolomics data by integrating prior knowledge from literature with metabolomics. MetaProViz offers an interactive framework consisting of four modules: Processing, differential analysis, functional analysis and visualization of both intracellular and exometabolomics (=consumption-release (CoRe) data). Those modules and their functions can be used independently from each other or in combination (<strong>Fig.1</strong>).</p>
 <center>
-<figure><img src="https://github.com/saezlab/MetaProViz/blob/main/vignettes/Fig.1.png?raw=true" style="width:90.0%" alt="Fig. 1: Overview of MetaProViz functions."><figcaption aria-hidden="true"><strong>Fig. 1:</strong> Overview of MetaProViz functions.
+<figure><img src="https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true" style="width:90.0%" alt="Fig. 1: Overview of MetaProViz functions."><figcaption aria-hidden="true"><strong>Fig. 1:</strong> Overview of MetaProViz functions.
 </figcaption></figure>
 </center>
 <p>The first module, <strong>MetaProViz</strong>, <code>Processing</code>, allows the customized processing of raw peak metabolomics data from different experimental setups, including options to perform feature filtering due to missingness, Total Ion Count (TIC) normalisation, Missing Value Imputation (MVI) based on half-minimum and outlier detection based on Hotellin’s T2. All of these pre-processing parameters can be customized and combined as needed.<br>
@@ -91,7 +91,7 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 </h2>
 <p><strong>MetaProViz</strong> is an R package and to install the package, start R and enter:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/saezlab/MetaProViz"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"https://github.com/saezlab/MetaProViz"</span><span class="op">)</span></span></code></pre></div>
 <p>Now <strong>MetaProViz</strong> can be imported as:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span></code></pre></div>
@@ -133,9 +133,9 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 </h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">@</span>Manual{,</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  title <span class="ot">=</span> {MetaProViz<span class="sc">:</span> METabolomics pre<span class="sc">-</span>PRocessing, functiOnal analysis and VIZualisation},</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  author <span class="ot">=</span> {Christina Schmidt and Dimitrios Prymidis and Julio Saez<span class="sc">-</span>Rodriguez and Christian Frezza},</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  author <span class="ot">=</span> {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez<span class="sc">-</span>Rodriguez and Christian Frezza},</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2023</span>},</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">2</span>.<span class="fl">1.0</span>},</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">2</span>.<span class="fl">1.1</span>},</span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 </div>
