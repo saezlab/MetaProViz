@@ -482,7 +482,7 @@ PoolEstimation <- function(InputData,
                         labs(title="CV for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
                         theme_classic()))
 
-  HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", , PlotType= "Hist")
+  HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Hist")
   PlotList [["Histogram_CV-PoolSamples"]] <- HistCV_Sized
 
   # 2. ViolinPlot of CVs
@@ -503,7 +503,7 @@ PoolEstimation <- function(InputData,
                           labs(title="CV for metabolites of Pool samples",x="Metabolites", y = "Coefficient of variation (CV%)")+
                           theme_classic())
 
-  ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", , PlotType= "Violin")
+  ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Violin")
 
   PlotList [["ViolinPlot_CV-PoolSamples"]] <- ViolinCV_Sized
 
@@ -883,8 +883,8 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
 
     #Combine Plots
     dev.new()
-    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw_Sized+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                                           RLA_data_norm_Sized+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+                                                           RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
                                                            ncol = 2))
     dev.off()
     norm_plots <- ggplot2::ggplot() +theme_minimal()+ annotation_custom(norm_plots)
