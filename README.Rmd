@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
 
 \
 <center>
-![**Fig. 1:** Overview of MetaProViz functions.](C:/Users/chris/OneDrive/Documents/GitHub/MetaProViz/vignettes/Fig.1.png){width=90%}
+![**Fig. 1:** Overview of MetaProViz functions.](https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true){width=90%}
 
 </center>
 \
@@ -93,9 +93,9 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 ```
 @Manual{,
   title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
-  author = {Christina Schmidt and Dimitrios Prymidis and Julio Saez-Rodriguez and Christian Frezza},
+  author = {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez-Rodriguez and Christian Frezza},
   year = {2023},
-  note = {R package version 2.1.0},
+  note = {R package version 2.1.1},
 }
 ```
 

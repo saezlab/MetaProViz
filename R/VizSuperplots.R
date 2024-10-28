@@ -358,8 +358,8 @@ VizSuperplot <- function(InputData,
 
     # Make plot into nice format:
     Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample,  PlotName = PlotName, Subtitle = i, PlotType=PlotType)
-    PlotHeight <- as.numeric(Plot_Sized$height)
-    PlotWidth <- as.numeric(Plot_Sized$width)
+    PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+    PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = element_rect(fill = "transparent")))
@@ -412,7 +412,7 @@ plotGrob_Superplot <- function(InputPlot,
                                PlotType){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   X_Con <- SettingsFile_Sample%>%
-    dplyr::distinct(!!sym(SettingsInfo[["Conditions"]]))
+    dplyr::distinct(Conditions)
 
   X_Tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 

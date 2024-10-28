@@ -1,6 +1,6 @@
 Package: MetaProViz
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 2.1.0
+Version: 2.1.1
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
@@ -31,16 +31,24 @@ Depends:
     R (>= 4.4.1),
     ggplot2 (>= 3.3.5)
 Imports:
+    clusterProfiler,
+    cosmosR,
     dplyr,
+    EnhancedVolcano,
     factoextra,
+    ggbeeswarm,
     ggfortify,
     ggplot2,
     ggupset,
+    ggVennDiagram,
     grid,
     gridExtra,
     gtools,
     hash,
     inflection,
+    kableExtra,
+    KEGGREST,
+    limma,
     logger,
     magrittr,
     OmnipathR,
