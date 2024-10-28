@@ -61,5 +61,5 @@ Suggests:
     pkgdown,
     svglite,
     testthat
-Remotes: saezlab/OmnipathR
+Remotes: saezlab/OmnipathR, saezlab/cosmosR, git::https://code.bioconductor.org/packages/limma.git
 RoxygenNote: 7.3.2
