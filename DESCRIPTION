@@ -68,6 +68,7 @@ Suggests:
     knitr,
     pkgdown,
     svglite,
-    testthat
+    testthat (>= 3.0.0)
 Remotes: saezlab/OmnipathR, saezlab/cosmosR, git::https://code.bioconductor.org/packages/limma.git
 RoxygenNote: 7.3.2
+Config/testthat/edition: 3
