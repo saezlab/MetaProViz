@@ -2,7 +2,8 @@
 % Please edit documentation in R/VizHeatmap.R
 \name{VizHeatmap}
 \alias{VizHeatmap}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis}
+\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+Heatmap visualization}
 \usage{
 VizHeatmap(
   InputData,
@@ -39,9 +40,16 @@ VizHeatmap(
 
 \item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
 }
+\value{
+List with two elements: Plot and Plot_Sized
+}
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+Heatmap visualization
 }
-\keyword{Volcano}
-\keyword{pathways}
-\keyword{plot,}
+\examples{
+Intra <- MetaProViz::ToyData("IntraCells_Raw")
+Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
+
+}
+\keyword{Heatmap}

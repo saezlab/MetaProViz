@@ -2,7 +2,8 @@
 % Please edit documentation in R/VizSuperplots.R
 \name{VizSuperplot}
 \alias{VizSuperplot}
-\title{This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis}
+\title{This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
+Bar, Box or Violin plot in Superplot style visualization}
 \usage{
 VizSuperplot(
   InputData,
@@ -59,8 +60,17 @@ VizSuperplot(
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
+\value{
+List with two elements: Plot and Plot_Sized
+}
 \description{
 This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
+Bar, Box or Violin plot in Superplot style visualization
+}
+\examples{
+Intra <- MetaProViz::ToyData("IntraCells_Raw")[,c(1:6)]
+Res <- MetaProViz::VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
+
 }
 \keyword{Barplot,}
 \keyword{Boxplot,}
