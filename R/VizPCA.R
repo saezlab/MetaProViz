@@ -49,7 +49,7 @@
 #'
 #' @keywords PCA
 #'
-#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom ggplot2 ggplot theme element_rect autoplot
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -131,6 +131,9 @@ VizPCA <- function(InputData,
     #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
   }
 
+  logger::log_info("VizPCA: ", safe_colorblind_palette)
+  logger::log_info("VizPCA: ", safe_shape_palette)
+
   ##--- Prepare the color scheme:
   if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
     if((SettingsInfo[["shape"]] == SettingsInfo[["color"]])==TRUE){
@@ -152,7 +155,6 @@ VizPCA <- function(InputData,
         dplyr::rename("shape"=paste(SettingsInfo[["shape"]]))
    }
  }
-
 
   ##--- Prepare Input Data:
   if(is.null(SettingsFile_Sample)==FALSE){
@@ -178,11 +180,14 @@ VizPCA <- function(InputData,
         #color that will be used for distinct
         color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
         #Overwrite color_scale
-        color_scale<- "discrete"
+        ColorScale <- "discrete"
+        logger::log_info("warning: ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
         warning("ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
       }
     }
   }
+
+  logger::log_info("VizPCA ColorScale: ", ColorScale)
 
   if("shape" %in% names(SettingsFile_Sample)==TRUE){
     shape_select <- safe_shape_palette[1:length(unique(InputPCA$shape))]
@@ -217,7 +222,7 @@ VizPCA <- function(InputData,
   PlotList_adaptedGrid <- list()
 
   #Make the plot:
-  PCA <- autoplot(prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),
+  PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),
                   data= InputPCA,
                   colour = Param_Col,
                   fill =  Param_Col,
@@ -264,7 +269,6 @@ VizPCA <- function(InputData,
 
   PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
-
   ###########################################################################
   ##----- Save and Return
   #Here we make a list in which we will save the outputs:
@@ -282,12 +286,10 @@ VizPCA <- function(InputData,
       PrintPlot=PrintPlot,
       PlotHeight=PlotHeight,
       PlotWidth=PlotWidth,
-      PlotUnit="cm"
-    )
+      PlotUnit="cm")
   ))
 
   invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))
-
 }
 
 
@@ -349,7 +351,6 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
   #Return
   Output <- Plot_Sized
-
 }
 
 
