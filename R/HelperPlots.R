@@ -19,6 +19,60 @@
 ## ---------------------------
 #'
 
+#' A built in palette from MetaProViz
+#'
+#' @param name Character: name of the palette.
+#'
+#' @return Character vector of colors.
+#'
+#' @importFrom yaml read_yaml
+#' @importFrom magrittr %>%
+#' @noRd
+metaproviz_palette <- function(name = "default") {
+
+  system.file(
+    'palettes',
+    sprintf('%s.yaml', name),
+    package = 'MetaProViz',
+    mustWork = TRUE
+  ) %>%
+    read_yaml %>%
+    unlist %>%
+    unname
+
+}
+
+#' Use the second value if the first one is NULL
+#'
+#' @importFrom rlang %||%
+#' @noRd
+if_null <- function(value1, value2) {
+
+  value1 %||% value2
+
+}
+
+
+#' Convert string lengths to centimeters
+#'
+#' @noRd
+char2cm <- function(char) {
+
+  nchar(char) * .25 + .8
+
+}
+
+
+#' Convert numeric to cm unit
+#'
+#' @importFrom grid unit
+#' @noRd
+cm <- function(value) {
+
+  unit(value, 'cm')
+
+}
+
 #' Set the height or width of a row or column in a TableGrob (gtable)
 #'
 #' @param gtbl A TableGrob (gtable) object.
@@ -171,7 +225,7 @@ set_sizes <- function(gtbl, dim, param) {
 
     param %>%
     reduce(
-        ~exec(set_size, .x, !!!.y, dim = dim),
+        ~rlang::exec(set_size, .x, !!!.y, dim = dim),
         .init = gtbl
     )
 
