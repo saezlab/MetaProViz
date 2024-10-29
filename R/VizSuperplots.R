@@ -48,7 +48,9 @@
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
-#' @importFrom ggplot2 ggplot theme
+#' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot geom_bar labs scale_color_manual theme xlab ylab
+#' @importFrom ggpubr stat_pvalue_manual
+#' @importFrom grid convertUnit
 #' @importFrom dplyr rename select group_by summarise_at filter mutate n
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -73,6 +75,11 @@ VizSuperplot <- function(InputData,
                          SaveAs_Plot = "svg",
                          PrintPlot=TRUE,
                          FolderPath = NULL){
+
+  ## ------------ Create log file ----------- ##
+  MetaProViz:::MetaProViz_Init()
+
+  logger::log_info("VizSuperplot: Superplot visualization")
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
@@ -118,7 +125,6 @@ VizSuperplot <- function(InputData,
   if(is.null(ColorPalette)){
     ColorPalette <- "grey"
   }
-
 
   ## ------------ Check Input SettingsInfo ----------- ##
   #7. Check StatComparisons & PlotConditions
@@ -169,14 +175,12 @@ VizSuperplot <- function(InputData,
     StatPadj <- "fdr"
   }
 
-
-
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
     Folder <- MetaProViz:::SavePath(FolderName=  paste(PlotType, "Plots", sep=""),
                                     FolderPath=FolderPath)
   }
-
+  logger::log_info("VizSuperplot results saved at ", Folder)
 
   ###############################################################################################################################################################################################################
   ## ------------ Prepare Input ----------- ##
@@ -248,7 +252,7 @@ VizSuperplot <- function(InputData,
     }
 
     # Make the Plot
-    Plot <- ggplot(plotdata, aes(x = Conditions, y = Intensity))
+    Plot <- ggplot2::ggplot(plotdata, aes(x = Conditions, y = Intensity))
 
     # Add graph style and error bar
     data_summary <- function(x){#calculate error bar!
@@ -259,24 +263,24 @@ VizSuperplot <- function(InputData,
     }
 
     if (PlotType == "Bar"){
-      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = ColorPalette)+ stat_summary(fun.data=data_summary,
+      Plot <- Plot+  ggplot2::geom_bar(stat = "summary", fun = "mean", fill = ColorPalette)+ ggplot2::stat_summary(fun.data=data_summary,
                                                                                             geom="errorbar", color="black", width=0.2)
     } else if (PlotType == "Violin"){
-      Plot <- Plot+ geom_violin(fill = ColorPalette)+ stat_summary(fun.data=data_summary,
+      Plot <- Plot+ ggplot2::geom_violin(fill = ColorPalette)+ ggplot2::stat_summary(fun.data=data_summary,
                                                               geom="errorbar", color="black", width=0.2)
     } else if (PlotType == "Box"){
-      Plot <- Plot +  geom_boxplot(fill=ColorPalette,  width=0.5, position=position_dodge(width = 0.5))
+      Plot <- Plot +  ggplot2::geom_boxplot(fill=ColorPalette,  width=0.5, position=position_dodge(width = 0.5))
     }
 
     # Add Superplot
     if ("Superplot" %in% names(SettingsInfo)){
       if(is.null(ColorPalette_Dot)==FALSE){
         Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
-          labs(color=SettingsInfo[["Superplot"]], fill = SettingsInfo[["Superplot"]])+
-          scale_color_manual(values = ColorPalette_Dot)
+          ggplot2::labs(color=SettingsInfo[["Superplot"]], fill = SettingsInfo[["Superplot"]])+
+          ggplot2::scale_color_manual(values = ColorPalette_Dot)
       }else{
         Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
-          labs(color=SettingsInfo[["Superplot"]], fill = SettingsInfo[["Superplot"]])
+          ggplot2::labs(color=SettingsInfo[["Superplot"]], fill = SettingsInfo[["Superplot"]])
       }
     }else{
       Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity),size=2)
@@ -296,7 +300,7 @@ VizSuperplot <- function(InputData,
                                                  position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
 
       }
-      Plot <- Plot +labs(caption = paste("p.val using pairwise ", StatPval))
+      Plot <- Plot +ggplot2::labs(caption = paste("p.val using pairwise ", StatPval))
       }else{
         #All-vs-All comparisons table:
         conditions <- SettingsFile_Sample$Conditions
@@ -359,16 +363,15 @@ VizSuperplot <- function(InputData,
         }else{
           Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
         }
-        Plot <- Plot +labs(caption = paste("p.adj using ", StatPval, "and", StatPadj))
+        Plot <- Plot +ggplot2::labs(caption = paste("p.adj using ", StatPval, "and", StatPadj))
      }
 
-    Plot <- Plot + Theme+ labs(title = PlotName,
+    Plot <- Plot + Theme+ ggplot2::labs(title = PlotName,
                                 subtitle = i)# ggtitle(paste(i))
-    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab(xlab)+ ylab(ylab)
+    Plot <- Plot + ggplot2::theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ ggplot2::xlab(xlab)+ ggplot2::ylab(ylab)
 
     ## Store the plot in the 'plots' list
     PlotList[[i]] <- Plot
-
 
     # Make plot into nice format:
     Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample,  PlotName = PlotName, Subtitle = i, PlotType=PlotType)
