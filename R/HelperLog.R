@@ -88,31 +88,28 @@ MPV_trace <- function() {#MPV=MetaProViz
 
 #' Set the console log level to "trace"
 #'
-#' @param libname
-#' @param pkgname
-#'
 #' @importFrom OmnipathR set_loglevel
 #' @importFrom logger log_info
 #' @importFrom utils packageVersion
 #'
 #' @noRd
 #'
-MetaProViz_Init <- function(libname, pkgname){
+MetaProViz_Init <- function(){
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
-  if(!is.null(MetaProViz.env$init)){
+  if(!is.null(metaproviz.env$init)){
     #Initial log
-    OmnipathR:::init_config(pkg = pkgname)
-    OmnipathR:::init_log(pkg = pkgname)
+    OmnipathR:::init_config(pkg = "MetaProViz")
+    OmnipathR:::init_log(pkg = "MetaProViz")
     log_info('Welcome to MetaProViz!')
-    log_info('MetaProViz version: %s', packageVersion(pkgname))
+    log_info('MetaProViz version: %s', packageVersion("MetaProViz"))
 
     #Do we run in a build server like bioconductor?
     buildserver <- OmnipathR:::.on_buildserver()
 
     if(buildserver){
-      set_loglevel('trace', target = 'console', pkg = pkgname)
+      set_loglevel('trace', target = 'console', pkg = "MetaProViz")
     }
 
-    MetaProViz.env$init <- TRUE
+    metaproviz.env$init <- TRUE
   }
 }

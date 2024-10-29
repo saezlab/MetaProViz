@@ -1,2 +1,2 @@
 
-MetaProViz.env <- new.env(parent = emptyenv())
+metaproviz.env <- new.env(parent = emptyenv())
