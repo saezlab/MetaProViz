@@ -23,7 +23,7 @@
 ### ### ### Helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check input parameters
+#' Check input general parameters
 #'
 # REFACT: Description of each argument should start with its type; e.g.
 # "@param x Character: name of the variable mapped to the x axis."
@@ -270,9 +270,77 @@ CheckInput <- function(InputData,
   }
 }
 
+################################################################################################
+### ### ### PreProcessing helper function: Internal Function to check function input ### ### ###
+################################################################################################
 
+#' Check specific input parameters for PreProcessing()
+#'
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param CoRe Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
+#' @param TIC Passed to main function MetaProViz::PreProcessing()
+#' @param MVI Passed to main function MetaProViz::PreProcessing()
+#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
+#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
+#'
+#' @keywords Input check
+#' @noRd
+#'
+#'
 
+CheckInput_PreProcessing <- function(InputData,
+                                     SettingsFile_Sample,
+                                     SettingsInfo,
+                                     CoRe,
+                                     FeatureFilt,
+                                     FeatureFilt_Value,
+                                     TIC,
+                                     MVI,
+                                     MVI_Percentage,
+                                     HotellinsConfidence){
+  if(is.vector(SettingsInfo)==TRUE){
+    #-------------SettingsInfo
+    #CoRe
+    if(CoRe == TRUE){   # parse CoRe normalisation factor
+      message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
+      if("CoRe_media" %in% names(SettingsInfo)){
+        if(length(grep(SettingsInfo[["CoRe_media"]], SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])) < 1){     # Check for CoRe_media samples
+          stop("No CoRe_media samples were provided in the 'Conditions' in the SettingsFile_Sample. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
+           column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRe = FALSE for your analysis")
+        }
+      }
 
+      if ("CoRe_norm_factor" %in% names(SettingsInfo)==FALSE){
+        warning("No growth rate or growth factor provided for normalising the CoRe result, hence CoRe_norm_factor set to 1 for each sample")
+      }
+    }
+  }
 
+  #-------------General parameters
+  Feature_Filtering_options <- c("Standard","Modified")
+  if(FeatureFilt %in% Feature_Filtering_options == FALSE & is.null(FeatureFilt)==FALSE){
+    stop("Check input. The selected FeatureFilt option is not valid. Please set to NULL or select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
+  }
+  if(is.numeric(FeatureFilt_Value) == FALSE |FeatureFilt_Value > 1 | FeatureFilt_Value < 0){
+    stop("Check input. The selected FeatureFilt_Value should be numeric and between 0 and 1.")
+  }
+  if(is.logical(TIC) == FALSE){
+    stop("Check input. The TIC should be either `TRUE` if TIC normalization is to be performed or `FALSE` if no data normalization is to be applied.")
+  }
+  if(is.logical(MVI) == FALSE){
+    stop("Check input. MVI value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
+  }
+  if(is.numeric(MVI_Percentage)== FALSE |HotellinsConfidence > 100 | HotellinsConfidence < 0){
+    stop("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
+  }
+  if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
+    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
+  }
+
+}
 
 

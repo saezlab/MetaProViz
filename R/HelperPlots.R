@@ -181,7 +181,6 @@ set_size <- function(
     }
 
     invisible(gtbl)
-
 }
 
 
@@ -463,3 +462,368 @@ in_gtable <- function(name, gtbl) {
     {`if`(is.character(.), intersect(., gtbl$layout$name) %>% head(1L), .)}
 
 }
+
+
+##############################################################
+### ### ### Plot helper function: Processing ### ### ###
+##############################################################
+
+#' @param InputPlot This is the ggplot object generated within the in any of the processing functions function.
+#' @param PlotName Generated within the processing functions.
+#' @param PlotType Generated within the processing functions.
+#'
+#' @keywords Plot helper function
+#' @noRd
+#'
+
+plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
+
+  if(PlotType == "Scree"){
+    UNIT <- unit(12, "cm")
+  }else if(PlotType == "Hotellings"){
+    UNIT <- unit(12, "cm")#0.25*Sample
+  }else{#CV and Hist
+    UNIT <- unit(8, "cm")
+  }
+  # Make plot into nice format:
+  SUPER_PARAM <- list(widths = list(
+    list("axis-b", UNIT),
+    list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+    list("axis-l", "1cm"),
+    list("ylab-l", "1cm"),
+    list("guide-box-left", "0cm"),
+    list("axis-r", "0cm"),
+    list("ylab-r", "0cm"),
+    list("ylab-l", "1cm", offset = -1L),
+    list("guide-box-right", "1cm")
+  ),
+  heights = list(
+    list("axis-l", "8cm"),
+    list("axis-b", "0.5cm"),#This is adjusted for the x-axis ticks!
+    list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+    list("title", "0cm", offset = -2L, ifempty = FALSE),
+    list("title", "0cm", offset = -1L),
+    list("title", "0.25cm"),# how much space is between title and y-axis label
+    list("subtitle", "0cm"),
+    list("caption", "0.5cm"), #plots statistics information, space to bottom
+    list("guide-box-top", "0cm"),
+    list("xlab-t", "0cm", offset = -1L)
+  )
+  )
+
+  #Adjust the parameters:
+  suppressWarnings(suppressMessages(
+    Plot_Sized <- InputPlot %>%
+      ggplotGrob %>%
+      MetaProViz:::withCanvasSize(width = 12, height = 11) %>%
+      MetaProViz:::adjust_layout(SUPER_PARAM) %>%
+      MetaProViz:::adjust_title(c(PlotName))
+  ))
+
+  Plot_Sized %<>%
+    {ggplot2::ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
+
+  return(Plot_Sized)
+}
+
+##############################################################
+### ### ### Plot helper function: PCA ### ### ###
+##############################################################
+
+#' PCA helper function: Internal Function
+#'
+#' @param InputPlot This is the ggplot object generated within the VizPCA function.
+#' @param SettingsInfo Passed to VizPCA
+#' @param PlotName Passed to VizPCA
+#'
+#' @keywords PCA helper function
+#' @importFrom ggplot2 ggplotGrob
+#' @importFrom magrittr %>%
+#' @noRd
+PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
+
+  PCA_PARAM <- list(
+    widths = list(
+      list("axis-b", "8cm"),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", "1cm"),
+      list("xlab-b", ".5cm"),
+      list("xlab-b", "1cm", offset = 1L),
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),
+      list("title", "0.25cm"),# how much space is between title and y-axis label
+      list("subtitle", "0cm"),
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
+  )
+
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(PCA_PARAM) %>%
+    adjust_title(PlotName) %>%
+    adjust_legend(
+      InputPlot,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
+
+  log_trace(
+    'Sum of heights: %.02f, sum of widths: %.02f',
+    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+  )
+
+  #Return
+  Output <- Plot_Sized
+}
+
+
+##############################################################
+### ### ### Plot helper function: Heatmap ### ### ###
+##############################################################
+
+#' @param InputPlot This is the ggplot object generated within the VizHeatmap function.
+#' @param SettingsInfo Passed to VizHeatmap
+#' @param SettingsFile_Sample Passed to VizHeatmap
+#' @param SettingsFile_Metab Passed to VizHeatmap
+#' @param PlotName Passed to VizHeatmap
+#'
+#' @keywords Heatmap helper function
+#' @noRd
+
+PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample, SettingsFile_Metab, PlotName){
+
+  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+  HEAT_PARAM <- list(
+    widths = list(
+      list("legend", "2cm")
+    ),
+    heights = list(
+      list("main", "1cm")
+    )
+  )
+
+  #If we plot feature names on the x-axis, we need to adjust the height of the plot:
+  #if(as.logical(show_rownames)==TRUE){
+  #  Rows <- nrow(t(data))
+  #}
+
+  #Adjust the parameters:
+  Input <- InputPlot$gtable
+
+  Plot_Sized <- Input  %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(HEAT_PARAM) %>%
+    adjust_title(c(PlotName))
+
+  #Extract legend information and adjust:
+  color_entries <- grep("^color", names(SettingsInfo), value = TRUE)
+  if(length(color_entries)>0){#We need to adapt the plot Hights and widths
+    if(sum(grepl("color_Sample", names(SettingsInfo)))>0){
+      names <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
+      colour_names <- NULL
+      legend_names <- NULL
+      for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        legend_names[x] <- names_sel
+        colour_names[x] <- SettingsFile_Sample[names[[x]]]
+      }
+    }else{
+      colour_names <- NULL
+      legend_names <- NULL
+    }
+
+    if(sum(grepl("color_Metab", names(SettingsInfo)))>0){
+      names <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
+      colour_names_M <- NULL
+      legend_names_M <- NULL
+      for (x in 1:length(names)){
+        names_sel <- names[[x]]
+        legend_names_M[x] <- names_sel
+        colour_names_M[x] <- SettingsFile_Metab[names[[x]]]
+      }
+    }else{
+      colour_names_M <- NULL
+      legend_names_M <- NULL
+    }
+
+    legend_head <- c(legend_names, legend_names_M)
+    longest_name <- legend_head[which.max(nchar(legend_head[[1]]))]
+    character_count_head <- nchar(longest_name)+4#This is the length of the legend title name
+
+    legend_names <- c(unlist(colour_names), unlist(colour_names_M))
+    longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
+    character_count <- nchar(longest_name)#This is the length of the legend colour names
+
+    legendWidth <-  unit(((max(character_count_head, character_count))*0.3), "cm")#legend space
+
+    # Sum up total heights:
+    Plot_Sized$width %<>% add(legendWidth)
+
+    legendHeights <- unit((sum(length(unique(legend_names_M))+length(unique(colour_names_M))+length(unique(legend_names))+length(unique(colour_names)))), "cm")
+
+    Plot_Sized$width %<>% add(legendWidth)
+    if((grid::convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
+      Plot_Sized$height <- legendHeights
+    }
+
+  }
+
+  Output <- Plot_Sized
+
+}
+
+
+##############################################################
+### ### ### Plot helper function: Volcano   ### ### ###
+##############################################################
+
+#' @param InputPlot This is the ggplot object generated within the VizVolcano function.
+#' @param SettingsInfo Passed to VizVolcano
+#' @param PlotName Passed to VizVolcano
+#' @param Subtitle
+#'
+#' @keywords Volcano helper function
+#' @noRd
+#'
+
+plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
+  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+  VOL_PARAM <- list(
+    widths = list(
+      list("axis-b", "6cm"),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", "0.75cm"),#This is the distance to x-axis!
+      list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+      #list("xlab-b", "1cm", offset = 1L),
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),#Space above title
+      list("title", "0.25cm"),# how much space is between title and y-axis label
+      list("subtitle", "0cm"),
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
+  )
+
+  #Adjust the parameters:
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(VOL_PARAM) %>%
+    adjust_title(c(PlotName, Subtitle)) %>%#Fix this (if there is no Subtitle!)
+    adjust_legend(
+      InputPlot,
+      sections = c("color", "shape"),
+      SettingsInfo = SettingsInfo
+    )
+
+  log_trace(
+    'Sum of heights: %.02f, sum of widths: %.02f',
+    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+  )
+
+  #Return
+  Output <- Plot_Sized
+}
+
+
+#####################################################################
+### ### ### Plot helper function: Superplots  ### ### ###
+#####################################################################
+
+#' @param InputPlot This is the ggplot object generated within the VizSuperplots function.
+#' @param SettingsInfo Passed to VizSuperplots
+#' @param SettingsFile_Sample Passed to VizSuperplots
+#' @param Subtitle Passed to VizSuperplots
+#' @param PlotName Passed to VizSuperplots
+#' @param PlotType Passed to VizSuperplots
+#'
+#' @keywords PCA helper function
+#' @noRd
+
+plotGrob_Superplot <- function(InputPlot,
+                               SettingsInfo,
+                               SettingsFile_Sample,
+                               Subtitle,
+                               PlotName,
+                               PlotType){
+  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+  X_Con <- SettingsFile_Sample%>%
+    dplyr::distinct(Conditions)
+
+  X_Tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
+
+  if(PlotType == "Bar"){
+    UNIT <- unit(X_Con%>%nrow() * 0.5, "cm")
+  }else{
+    UNIT <- unit(X_Con%>%nrow() * 1, "cm")
+  }
+
+  SUPER_PARAM <- list(
+    widths = list(
+      list("axis-b", paste(UNIT)),
+      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+      list("axis-l", "1cm"),
+      list("ylab-l", "1cm"),
+      list("guide-box-left", "0cm"),
+      list("axis-r", "0cm"),
+      list("ylab-r", "0cm"),
+      list("ylab-l", "1cm", offset = -1L),
+      list("guide-box-right", "1cm")
+    ),
+    heights = list(
+      list("axis-l", "8cm"),
+      list("axis-b", X_Tick),#This is adjusted for the x-axis ticks!
+      list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+      list("title", "0cm", offset = -2L, ifempty = FALSE),
+      list("title", "0cm", offset = -1L),
+      list("title", "0.25cm"),# how much space is between title and y-axis label
+      list("subtitle", "0cm"),
+      list("caption", "0.5cm"), #plots statistics information, space to bottom
+      list("guide-box-top", "0cm"),
+      list("xlab-t", "0cm", offset = -1L)
+    )
+  )
+
+  #Adjust the parameters:
+  Plot_Sized <- InputPlot %>%
+    ggplotGrob %>%
+    withCanvasSize(width = 12, height = 11) %>%
+    adjust_layout(SUPER_PARAM) %>%
+    adjust_title(c(PlotName, Subtitle)) %>%
+    adjust_legend(
+      InputPlot,
+      sections = c("Superplot"),#here we do not have colour and shape, but other parameters
+      SettingsInfo = SettingsInfo
+    )
+
+  #Return
+  Output <- Plot_Sized
+}
+
+
+
