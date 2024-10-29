@@ -357,7 +357,10 @@ PoolEstimation <- function(InputData,
                            PrintPlot=TRUE,
                            FolderPath = NULL){
 
-  log_info('Starting pool estimation.')
+  ## ------------ Create log file ----------- ##
+  MetaProViz:::MetaProViz_Init()
+
+  logger::log_info('Starting pool estimation.')
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
   MetaProViz:::CheckInput(InputData=InputData,
@@ -393,9 +396,9 @@ PoolEstimation <- function(InputData,
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "PoolEstimation")
-    log_info('Selected output directory: `%s`.', SubFolder)
+    logger::log_info('Selected output directory: `%s`.', SubFolder)
     if (!dir.exists(SubFolder)) {
-      log_trace('Creating directory: `%s`.', SubFolder)
+      logger::log_trace('Creating directory: `%s`.', SubFolder)
       dir.create(SubFolder)
     }
   }
@@ -422,7 +425,7 @@ PoolEstimation <- function(InputData,
 
   # Create Output DF
   result_df_final <- result_df %>%
-    t()%>% as.data.frame() %>% rowwise() %>%
+    t()%>% as.data.frame() %>% dplyr::rowwise() %>%
     mutate(HighVar = CV > CutoffCV) %>% as.data.frame()
 
   result_df_final$MissingValuePercentage <- NAvector
@@ -542,79 +545,6 @@ PoolEstimation <- function(InputData,
 
 }
 
-################################################################################################
-### ### ### PreProcessing helper function: Internal Function to check function input ### ### ###
-################################################################################################
-
-#' Check input parameters
-#'
-#' @param InputData Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
-#' @param CoRe Passed to main function MetaProViz::PreProcessing()
-#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
-#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
-#' @param TIC Passed to main function MetaProViz::PreProcessing()
-#' @param MVI Passed to main function MetaProViz::PreProcessing()
-#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
-#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
-#'
-#' @keywords Input check
-#' @noRd
-#'
-#'
-
-CheckInput_PreProcessing <- function(InputData,
-                                     SettingsFile_Sample,
-                                     SettingsInfo,
-                                     CoRe,
-                                     FeatureFilt,
-                                     FeatureFilt_Value,
-                                     TIC,
-                                     MVI,
-                                     MVI_Percentage,
-                                     HotellinsConfidence){
-  if(is.vector(SettingsInfo)==TRUE){
-    #-------------SettingsInfo
-    #CoRe
-    if(CoRe == TRUE){   # parse CoRe normalisation factor
-      message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
-      if("CoRe_media" %in% names(SettingsInfo)){
-        if(length(grep(SettingsInfo[["CoRe_media"]], SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])) < 1){     # Check for CoRe_media samples
-          stop("No CoRe_media samples were provided in the 'Conditions' in the SettingsFile_Sample. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
-           column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRe = FALSE for your analysis")
-        }
-      }
-
-      if ("CoRe_norm_factor" %in% names(SettingsInfo)==FALSE){
-        warning("No growth rate or growth factor provided for normalising the CoRe result, hence CoRe_norm_factor set to 1 for each sample")
-      }
-    }
-  }
-
-  #-------------General parameters
-  Feature_Filtering_options <- c("Standard","Modified")
-  if(FeatureFilt %in% Feature_Filtering_options == FALSE & is.null(FeatureFilt)==FALSE){
-    stop("Check input. The selected FeatureFilt option is not valid. Please set to NULL or select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
-  }
-  if(is.numeric(FeatureFilt_Value) == FALSE |FeatureFilt_Value > 1 | FeatureFilt_Value < 0){
-    stop("Check input. The selected FeatureFilt_Value should be numeric and between 0 and 1.")
-  }
-  if(is.logical(TIC) == FALSE){
-    stop("Check input. The TIC should be either `TRUE` if TIC normalization is to be performed or `FALSE` if no data normalization is to be applied.")
-  }
-  if(is.logical(MVI) == FALSE){
-    stop("Check input. MVI value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
-  }
-  if(is.numeric(MVI_Percentage)== FALSE |HotellinsConfidence > 100 | HotellinsConfidence < 0){
-    stop("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
-  }
-  if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
-    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
-  }
-
-}
-
 
 ################################################################################################
 ### ### ### PreProcessing helper function: FeatureFiltering ### ### ###
@@ -716,7 +646,7 @@ FeatureFiltering <-function(InputData, FeatureFilt, FeatureFilt_Value, SettingsF
 ### ### ### PreProcessing helper function: Missing Value imputation ### ### ###
 ################################################################################################
 
-#' MVI
+#' Missing Value Imputation using half minimum value
 #'
 #' @param InputData Passed to main function MetaProViz::PreProcessing()
 #' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
@@ -808,7 +738,7 @@ MVImputation <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, MVI_
 ### ### ### PreProcessing helper function: Total ion Count Normalization ### ### ###
 ################################################################################################
 
-#' TIC
+#' Total ion count normalisazion
 #'
 #' @param InputData Passed to main function MetaProViz::PreProcessing()
 #' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
@@ -900,14 +830,11 @@ TICNorm <-function(InputData, SettingsFile_Sample, TIC){
   }
 }
 
-
-
-
 ################################################################################################
 ### ### ### PreProcessing helper function: CoRe nomalisation ### ### ###
 ################################################################################################
 
-#' CoReNorm
+#' Consumption Release Normalisation
 #'
 #' @param InputData Passed to main function MetaProViz::PreProcessing()
 #' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
@@ -959,7 +886,7 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
     rownames(result_df)[1] <- "CV"
 
     CutoffCV <- 30
-    result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+    result_df <- result_df %>% t()%>%as.data.frame() %>% dplyr::rowwise() %>%
       mutate(HighVar = CV > CutoffCV) %>% as.data.frame()
     rownames(result_df)<- colnames(CoRe_medias)
 
@@ -1038,7 +965,7 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
         result_df[1, is.na(result_df[1,])]<- 0
         rownames(result_df)[1] <- "CV"
 
-        result_df <- result_df %>% t()%>%as.data.frame() %>% rowwise() %>%
+        result_df <- result_df %>% t()%>%as.data.frame() %>% dplyr::rowwise() %>%
           mutate(HighVar = CV > CutoffCV) %>% as.data.frame()
         rownames(result_df)<- colnames(CoRe_medias)
 
@@ -1135,7 +1062,6 @@ CoReNorm <-function(InputData, SettingsFile_Sample, SettingsInfo){
   Output_list <- list("DF"= DF_list,"Plot"=PlotList)
   invisible(return(Output_list))
 }
-
 
 
 ################################################################################################
@@ -1410,69 +1336,4 @@ OutlierDetection <-function(InputData, SettingsFile_Sample, SettingsInfo, CoRe, 
   #Return
   Output_list <- list("DF"= DF_list,"Plot"=outlier_plot_list)
   invisible(return(Output_list))
-}
-
-
-
-##############################################################
-### ### ### Plot helper function: Internal Function ### ### ###
-##############################################################
-
-#' @param InputPlot This is the ggplot object generated within the in any of the processing functions function.
-#' @param PlotName Generated within the processing functions.
-#' @param PlotType Generated within the processing functions.
-#'
-#' @keywords Plot helper function
-#' @noRd
-#'
-
-plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
-
-  if(PlotType == "Scree"){
-    UNIT <- unit(12, "cm")
-  }else if(PlotType == "Hotellings"){
-    UNIT <- unit(12, "cm")#0.25*Sample
-  }else{#CV and Hist
-    UNIT <- unit(8, "cm")
-  }
-  # Make plot into nice format:
-  SUPER_PARAM <- list(widths = list(
-    list("axis-b", UNIT),
-    list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
-    list("axis-l", "1cm"),
-    list("ylab-l", "1cm"),
-    list("guide-box-left", "0cm"),
-    list("axis-r", "0cm"),
-    list("ylab-r", "0cm"),
-    list("ylab-l", "1cm", offset = -1L),
-    list("guide-box-right", "1cm")
-  ),
-  heights = list(
-    list("axis-l", "8cm"),
-    list("axis-b", "0.5cm"),#This is adjusted for the x-axis ticks!
-    list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
-    list("title", "0cm", offset = -2L, ifempty = FALSE),
-    list("title", "0cm", offset = -1L),
-    list("title", "0.25cm"),# how much space is between title and y-axis label
-    list("subtitle", "0cm"),
-    list("caption", "0.5cm"), #plots statistics information, space to bottom
-    list("guide-box-top", "0cm"),
-    list("xlab-t", "0cm", offset = -1L)
-  )
-  )
-
-  #Adjust the parameters:
-  suppressWarnings(suppressMessages(
-    Plot_Sized <- InputPlot %>%
-      ggplotGrob %>%
-      MetaProViz:::withCanvasSize(width = 12, height = 11) %>%
-      MetaProViz:::adjust_layout(SUPER_PARAM) %>%
-      MetaProViz:::adjust_title(c(PlotName))
-  ))
-
-  Plot_Sized %<>%
-    {ggplot2::ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = element_rect(fill = "transparent")))
-
-  return(Plot_Sized)
 }
