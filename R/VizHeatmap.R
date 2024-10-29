@@ -24,6 +24,8 @@
 ### ### ### Heatmap ### ### ###
 ###############################
 
+#' Heatmap visualization
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param SettingsInfo  \emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_SettingsFile_Metab",individual_Sample= "ColumnName_SettingsFile_Sample", color_Metab="ColumnName_SettingsFile_Metab", color_Sample= list("ColumnName_SettingsFile_Sample", "ColumnName_SettingsFile_Sample",...)).\strong{Default = NULL}
 #' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}
@@ -35,7 +37,19 @@
 #' @param Enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
-#' @keywords Volcano plot, pathways
+#' @return List with two elements: Plot and Plot_Sized
+#'
+#' @examples
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
+#'
+#' @keywords Heatmap
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @export
 #'
 #'
@@ -625,7 +639,7 @@ VizHeatmap <- function(InputData,
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = element_rect(fill = "transparent")))
 
-    PlotList_adaptedGrid[[PlotName]] <- Plot_Sized
+    PlotList_adaptedGrid[[paste("Heatmap_",PlotName, sep="")]] <- Plot_Sized
 
     #----- Save
     suppressMessages(suppressWarnings(

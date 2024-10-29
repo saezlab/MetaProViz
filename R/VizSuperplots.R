@@ -20,7 +20,8 @@
 #'
 #' This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
 
-
+#' Bar, Box or Violin plot in Superplot style visualization
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
 #' @param SettingsInfo Named vector including at least information on the conditions column: c(Conditions="ColumnName_SettingsFile_Sample"). Additionally Superplots can be made by adding Superplot ="ColumnName_SettingsFile_Sample", which are usually biological replicates or patient IDs. \strong{Default = c(Conditions="Conditions", Superplot = NULL)}
@@ -39,9 +40,22 @@
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
+#' @return List with two elements: Plot and Plot_Sized
+#'
+#' @examples
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")[,c(1:6)]
+#' Res <- MetaProViz::VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
+#'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom ggbeeswarm geom_beeswarm
+#'
 #' @export
-
+#'
 VizSuperplot <- function(InputData,
                          SettingsFile_Sample,
                          SettingsInfo = c(Conditions="Conditions", Superplot = NULL),
@@ -174,10 +188,10 @@ VizSuperplot <- function(InputData,
       dplyr::rename("Superplot"= paste(SettingsInfo[["Superplot"]]) )
 
     data <- merge(SettingsFile_Sample[c("Conditions","Superplot")] ,InputData, by=0)
-    data <- column_to_rownames(data, "Row.names")
+    data <- tibble::column_to_rownames(data, "Row.names")
   }else{
     data <- merge(SettingsFile_Sample[c("Conditions")] ,InputData, by=0)
-    data <- column_to_rownames(data, "Row.names")
+    data <- tibble::column_to_rownames(data, "Row.names")
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -195,7 +209,7 @@ VizSuperplot <- function(InputData,
 
   #Set the theme:
   if(is.null(Theme)==TRUE){
-    Theme <- theme_classic()
+    Theme <- ggplot2::theme_classic()
   }
 
   ## ------------ Create plots ----------- ##
@@ -206,21 +220,21 @@ VizSuperplot <- function(InputData,
   for (i in colnames(InputData)){
     #Prepare the dfs:
     suppressWarnings(dataMeans <- data %>%
-                       select(i, Conditions)
-                     %>% group_by(Conditions)
-                     %>% summarise_at(vars(i), list(mean = mean, sd = sd))
+                       dplyr::select(i, Conditions)
+                     %>% dplyr::group_by(Conditions)
+                     %>% dplyr::summarise_at(vars(i), list(mean = mean, sd = sd))
                      %>% as.data.frame())
     names(dataMeans)[2] <- "Intensity"
 
     if("Superplot" %in% names(SettingsInfo)){
       suppressWarnings(plotdata <- data %>%
-                       select(i,Conditions, Superplot)
-                     %>%  group_by(Conditions)
+                         dplyr::select(i,Conditions, Superplot)
+                     %>%  dplyr::group_by(Conditions)
                      %>% as.data.frame() )
     }else{
       suppressWarnings(plotdata <- data %>%
-                         select(i,Conditions)
-                       %>%  group_by(Conditions)
+                         dplyr::select(i,Conditions)
+                       %>%  dplyr::group_by(Conditions)
                        %>% as.data.frame() )
     }
     names(plotdata)[1] <- c("Intensity")
@@ -228,8 +242,8 @@ VizSuperplot <- function(InputData,
 
     # Take only selected conditions
     if(is.null(PlotConditions) == FALSE){
-      dataMeans <- dataMeans %>% filter(Conditions %in% PlotConditions)
-      plotdata <- plotdata %>% filter(Conditions %in% PlotConditions)
+      dataMeans <- dataMeans %>% dplyr::filter(Conditions %in% PlotConditions)
+      plotdata <- plotdata %>% dplyr::filter(Conditions %in% PlotConditions)
       plotdata$Conditions <- factor(plotdata$Conditions, levels = PlotConditions)
     }
 
@@ -305,8 +319,8 @@ VizSuperplot <- function(InputData,
 
         #Prepare df to add stats to plot
         df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE)%>%
-          separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
-          unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
+          tidyr::separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
+          tidyr::unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
         df$p.adj <- round(sapply(STAT_C1vC2, function(x) x$p.adj),5)
 
         # Add the 'res' column by repeating 'position' to match the number of rows
@@ -315,7 +329,7 @@ VizSuperplot <- function(InputData,
                       max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
 
         df <- df %>%
-          mutate(y.position = rep(position, length.out = n()))
+          dplyr::mutate(y.position = rep(position, length.out = dplyr::n()))
 
         # select stats based on comparison_table
         if(is.null(StatComparisons)== FALSE){
@@ -327,15 +341,15 @@ VizSuperplot <- function(InputData,
           }
 
           df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons", all.x=TRUE)%>%
-            column_to_rownames("entry")
+            tibble::column_to_rownames("entry")
 
           if(all(is.na(df_merge))==TRUE){#in case the reverse comparisons are needed
             df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons_rev", all.x=TRUE)%>%
-              column_to_rownames("entry")
+              tibble::column_to_rownames("entry")
           }
         }else{
           df_merge <- df[,-2]%>%
-            column_to_rownames("comparisons")
+            tibble::column_to_rownames("comparisons")
           }
 
 

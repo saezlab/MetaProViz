@@ -23,6 +23,9 @@
 #####################################
 ### ### ### Volcano Plots ### ### ###
 #####################################
+
+#' Volcano plot visualization
+#'
 #' @param Settings \emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}
 #' @param SettingsFile_Metab \emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}
@@ -47,7 +50,19 @@
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
+#' @return List with two elements: Plot and Plot_Sized
+#'
+#' @examples
+#' Intra <- MetaProViz::ToyData("IntraCells_DMA")
+#' Res <- MetaProViz::VizVolcano(InputData=Intra)
+#'
 #' @keywords Volcano plot, pathways
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @export
 
 # Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
