@@ -340,7 +340,7 @@ adjust_title <- function(gtbl, titles) {
 
         #------- Width: Check how much width is needed for the figure title/subtitle
         title_width <- titles %>% char2cm %>% max %>% cm
-        gtbl <<- gtbl
+
         gtbl %<>% set_width(
             c('guide-box-right', 'legend'),
             sprintf('%.02fcm', title_width - gtbl$width),
@@ -378,7 +378,6 @@ adjust_legend <- function(
         log_trace('Sections: %s', paste0(sections, collapse = ', '))
 
         Legend <- get_legend(InputPlot) # Extract legend to adjust separately
-        leg <<- Legend
 
         #------- Legend widths
         ## Legend titles:
