@@ -131,8 +131,8 @@ VizPCA <- function(InputData,
     #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
   }
 
-  logger::log_info("VizPCA: ", safe_colorblind_palette)
-  logger::log_info("VizPCA: ", safe_shape_palette)
+  logger::log_info(paste("VizPCA colour:", paste(safe_colorblind_palette, collapse = ", ")))
+  logger::log_info(paste("VizPCA shape:", paste(safe_shape_palette, collapse = ", ")))
 
   ##--- Prepare the color scheme:
   if("color" %in% names(SettingsInfo)==TRUE & "shape" %in% names(SettingsInfo)==TRUE){
