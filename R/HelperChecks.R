@@ -344,3 +344,154 @@ CheckInput_PreProcessing <- function(InputData,
 }
 
 
+################################################################################################
+### ### ### DMA helper function: Internal Function to check function input ### ### ###
+################################################################################################
+
+#' Check input parameters
+#'
+#' @param InputData Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
+#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param CoRe Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
+#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
+#' @param TIC Passed to main function MetaProViz::PreProcessing()
+#' @param MVI Passed to main function MetaProViz::PreProcessing()
+#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
+#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
+#'
+#' @keywords Input check
+#' @noRd
+#'
+#'
+
+CheckInput_DMA <- function(InputData,
+                           SettingsFile_Sample,
+                           SettingsInfo,
+                           StatPval,
+                           StatPadj,
+                           PerformShapiro,
+                           PerformBartlett,
+                           Transform){
+
+  #-------------SettingsInfo
+  if(is.null(SettingsInfo)==TRUE){
+    stop("You have to provide a SettingsInfo for Conditions.") # If Numerator and/or Denominator = NULL, they are not in SettingsInfo!
+  }
+
+  ## ------------ Denominator/numerator ----------- ##
+  # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
+  if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
+    # all-vs-all: Generate all pairwise combinations
+    conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+    denominator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
+    numerator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
+    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = TRUE
+  }else if("Denominator" %in% names(SettingsInfo)==TRUE  & "Numerator" %in% names(SettingsInfo)==FALSE){
+    #all-vs-one: Generate the pairwise combinations
+    conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+    denominator <- SettingsInfo[["Denominator"]]
+    numerator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
+    # Remove denom from num
+    numerator <- numerator[!numerator %in% denominator]
+    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
+    #Settings:
+    MultipleComparison = TRUE
+    all_vs_all = FALSE
+  }else if("Denominator" %in% names(SettingsInfo)==TRUE  & "Numerator" %in% names(SettingsInfo)==TRUE){
+    # one-vs-one: Generate the comparisons
+    denominator <- SettingsInfo[["Denominator"]]
+    numerator <- SettingsInfo[["Numerator"]]
+    comparisons <- matrix(c(SettingsInfo[["Denominator"]], SettingsInfo[["Numerator"]]))
+    #Settings:
+    MultipleComparison = FALSE
+    all_vs_all = FALSE
+  }
+
+  ## ------------ Test statistics ----------- ##
+  if(MultipleComparison==FALSE){
+    STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test", "lmFit")
+    if(StatPval %in% STAT_pval_options == FALSE){
+      stop("Check input. The selected StatPval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
+    }
+  }else{
+    STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
+    if(StatPval %in% STAT_pval_options == FALSE){
+      stop("Check input. The selected StatPval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
+    }
+  }
+
+  STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
+  if(StatPadj %in% STAT_padj_options == FALSE){
+    stop("Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
+  }
+
+  ## ------------ Sample Numbers ----------- ##
+  Num <- InputData %>%#Are sample numbers enough?
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
+    select_if(is.numeric)#only keep numeric columns with metabolite values
+  Denom <- InputData %>%
+    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+    select_if(is.numeric)
+
+  if(nrow(Num)==1){
+    stop("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
+  } else if(nrow(Denom)==1){
+    stop("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
+  }else if(nrow(Num)==0){
+    stop("There is no sample available for ", numerator, ".")
+  }else if(nrow(Denom)==0){
+    stop("There is no sample available for ", denominator, ".")
+  }
+
+  ## ------------ Check Missingness ------------- ##
+  Num_Miss <- replace(Num, Num==0, NA)
+  Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
+
+  Denom_Miss <- replace(Denom, Denom==0, NA)
+  Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
+
+  if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
+    Metabolites_Miss <- colnames(Num_Miss)
+    if(ncol(Num_Miss)<=10){
+      message("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    }else{
+      message("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " Those metabolite(s) mightl return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    }
+  } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
+    Metabolites_Miss <- colnames(Denom_Miss)
+    if(ncol(Num_Miss)<=10){
+      message("In `Denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    }else{
+      message("In `Denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s).", " Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")#
+    }
+  } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
+    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+    message("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s).",". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+  } else{
+    message("There are no NA/0 values")
+    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    Metabolites_Miss <- unique(Metabolites_Miss)
+  }
+
+  #-------------General parameters
+  if(is.logical(PerformShapiro) == FALSE){
+    stop("Check input. The Shapiro value should be either =TRUE or =FALSE.")
+  }
+  if(is.logical(PerformBartlett) == FALSE){
+    stop("Check input. The Bartlett value should be either =TRUE or =FALSE.")
+  }
+  if(is.logical(Transform) == FALSE){
+    stop("Check input. `Transform` should be either =TRUE or =FALSE.")
+  }
+
+  ## -------- Return settings ---------##
+  Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss, "denominator"=denominator, "numerator"=numerator)
+  return(invisible(Settings))
+}
+
