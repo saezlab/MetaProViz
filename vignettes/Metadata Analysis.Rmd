@@ -58,6 +58,7 @@ library(MetaProViz)
 library(magrittr)
 library(dplyr)
 library(rlang)
+library(tidyr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")

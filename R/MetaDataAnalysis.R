@@ -191,13 +191,13 @@ MetaAnalysis <- function(InputData,
    ## ---------- DF 2: Metabolites as row names ------------##
    Res_Top <- Stat_results%>%
      filter(tukeyHSD_p.adjusted< StatCutoff)%>%
-     separate_rows(paste("Features_", "(Top", Percentage, "%)", sep=""), sep = ", ")%>% # Separate 'Features (Top 0.1%)'
+     tidyr::separate_rows(paste("Features_", "(Top", Percentage, "%)", sep=""), sep = ", ")%>% # Separate 'Features (Top 0.1%)'
      dplyr::rename("FeatureID":= paste("Features_", "(Top", Percentage, "%)", sep=""))%>%
      select(- paste("Features_", "(Bottom", Percentage, "%)", sep=""))
 
    Res_Bottom <- Stat_results%>%
      filter(tukeyHSD_p.adjusted< StatCutoff)%>%
-     separate_rows(paste("Features_", "(Bottom", Percentage, "%)", sep=""), sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
+     tidyr::separate_rows(paste("Features_", "(Bottom", Percentage, "%)", sep=""), sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
      dplyr::rename("FeatureID":= paste("Features_", "(Bottom", Percentage, "%)", sep=""))%>%
      select(- paste("Features_", "(Top", Percentage, "%)", sep=""))
 
