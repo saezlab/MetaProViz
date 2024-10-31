@@ -159,6 +159,7 @@ PreProcessing <- function(InputData,
                                          SettingsFile_Sample=SettingsFile_Sample,
                                          SettingsInfo=SettingsInfo,
                                          TIC=TIC)
+    PlotList <- list()
     PlotList[["RLAPlot"]] <- RLAPlot_List[["Plot"]][["RLA_BeforeTICNorm"]]
   }
 
@@ -1201,7 +1202,7 @@ CoReNorm <-function(InputData,
 #'
 #' @importFrom dplyr relocate case_when mutate mutate_all select
 #' @importFrom inflection uik
-#' @importFrom factoextra::fviz_screeplot
+#' @importFrom factoextra fviz_screeplot
 #' @importFrom ggplot2 ggplot theme_classic theme geom_vline annotate geom_line geom_point geom_hline scale_y_continuous ggtitle scale_linetype_discrete
 #' @importFrom qcc mqcc
 #' @importFrom magrittr %>% %<>%
