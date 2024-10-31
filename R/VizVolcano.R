@@ -89,6 +89,8 @@ VizVolcano <- function(PlotSettings="Standard",
                        FolderPath = NULL,
                        Features="Metabolites",
                        PrintPlot=TRUE){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`

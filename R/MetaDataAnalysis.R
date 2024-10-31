@@ -51,11 +51,8 @@ MetaAnalysis <- function(InputData,
 
 ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
@@ -304,11 +301,9 @@ MetaPK <- function(InputData,
                    SaveAs_Table = "csv",
                    FolderPath = NULL){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##

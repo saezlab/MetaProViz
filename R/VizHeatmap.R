@@ -67,6 +67,8 @@ VizHeatmap <- function(InputData,
                        PrintPlot=TRUE,
                        FolderPath = NULL
 ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`

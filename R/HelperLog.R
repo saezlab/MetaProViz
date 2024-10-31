@@ -96,8 +96,7 @@ MPV_trace <- function() {#MPV=MetaProViz
 #'
 MetaProViz_Init <- function(){
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
-  if(!is.null(metaproviz.env$init)){
-    print("We want to see you!")
+  if(is.null(metaproviz.env$init)){
     #Initial log
     OmnipathR:::init_config(pkg = "MetaProViz")
     OmnipathR:::init_log(pkg = "MetaProViz")

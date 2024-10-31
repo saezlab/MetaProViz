@@ -347,10 +347,10 @@ InspectID <- function(Input_DataFrame,
 #'
 #'
 LoadKEGG <- function(){
-  #Get the package:
-  RequiredPackages <- c("rappdirs")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  logger::log_info("Load KEGG.")
 
   #------------------------------------------------------------------
   #Get the directory and filepath of cache results of R
@@ -444,6 +444,9 @@ LoadKEGG <- function(){
 #' @export
 #'
 LoadHallmarks <- function() {
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   # Read the .csv files
   Hallmark <- system.file("data", "Hallmarks.csv", package = "MetaProViz")
   Hallmark <- read.csv(Hallmark, check.names=FALSE)
@@ -474,11 +477,10 @@ Make_GeneMetabSet <- function(Input_GeneSet,
                               SaveAs_Table = "csv",
                               FolderPath = NULL){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse","cosmosR")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  logger::log_info("Make_GeneMetabSet.")
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
@@ -586,11 +588,11 @@ LoadMetalinks <- function(types = NULL,
                           uniprot_ids = NULL,
                           SaveAs_Table="csv",
                           FolderPath=NULL){
-  #------------------------------------------------------------------
-  #Get the package:
-  RequiredPackages <- c("rappdirs")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  logger::log_info("MetaLinksDB.")
+
 
   #------------------------------------------------------------------
   if((any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids)=="?"))==FALSE){

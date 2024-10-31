@@ -62,6 +62,11 @@ DMA <-function(InputData,
                FolderPath = NULL
 ){
 
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  logger::log_info("DMA: Differential metabolite analysis.")
+
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   CheckInput(InputData=InputData,
@@ -363,6 +368,9 @@ Log2FC_fun <-function(InputData,
                       CoRe,
                       Transform
 ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
     # all-vs-all: Generate all pairwise combinations
     conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -641,6 +649,8 @@ DMA_Stat_single <- function(InputData,
                             Log2FC_table,
                             StatPval,
                             StatPadj){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------ Check Missingness ------------- ##
   Num <- InputData %>%#Are sample numbers enough?
@@ -757,6 +767,9 @@ AOV <-function(InputData,
                SettingsFile_Sample,
                SettingsInfo,
                Log2FC_table){
+
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -888,6 +901,9 @@ Kruskal <-function(InputData,
                    StatPadj
 ){
 
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
   if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
@@ -1007,6 +1023,9 @@ Welch <-function(InputData,
                  SettingsInfo,
                  Log2FC_table
 ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
   if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
@@ -1125,6 +1144,9 @@ DMA_Stat_limma <- function(InputData,
                            StatPadj,
                            CoRe,
                            Transform){
+
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -1381,6 +1403,9 @@ Shapiro <-function(InputData,
                    QQplots=TRUE
 ){
 
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse", "gtools")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -1614,6 +1639,9 @@ Bartlett <-function(InputData,
                     SettingsFile_Sample,
                     SettingsInfo){
 
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   ## ------------ Setup and installs ----------- ##
   RequiredPackages <- c("tidyverse")
   new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
@@ -1668,6 +1696,9 @@ Bartlett <-function(InputData,
 #' @noRd
 
 vst <- function(InputData){
+
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   # model the mean and variance relationship on the data
   suppressMessages(melted <- reshape2::melt(InputData))

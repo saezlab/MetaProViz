@@ -438,13 +438,8 @@ MCA_CoRe <- function(InputData_Intra,
                      FolderPath=NULL
                      ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
@@ -1032,6 +1027,9 @@ MCA_CoRe <- function(InputData_Intra,
 #' @export
 #'
 MCA_rules<- function(Method){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   # Read the .csv files
   Cond <- system.file("data", "MCA_2Cond.csv", package = "MetaProViz")
   Cond<- read.csv( Cond, check.names=FALSE)
@@ -1089,6 +1087,9 @@ CheckInput_MCA <- function(InputData_C1,
                            FeatureID,
                            SaveAs_Table
                            ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   #------------- InputData
   if(is.null(InputData_C1)==FALSE){
     if(class(InputData_C1) != "data.frame"| class(InputData_C2) != "data.frame"){

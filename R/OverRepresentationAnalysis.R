@@ -50,6 +50,10 @@ ClusterORA <- function(InputData,
                        maxGSSize=1000 ,
                        SaveAs_Table= "csv",
                        FolderPath = NULL){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+
    ## ------------ Check Input files ----------- ##
   Pathways <- CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
@@ -185,6 +189,10 @@ StandardORA <- function(InputData,
                         FolderPath = NULL
 
 ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+
  ## ------------ Check Input files ----------- ##
   Pathways <- CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,

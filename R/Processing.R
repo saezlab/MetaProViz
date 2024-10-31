@@ -280,6 +280,8 @@ ReplicateSum <- function(InputData,
                          SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
                          SaveAs_Table = "csv",
                          FolderPath = NULL){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
@@ -623,6 +625,10 @@ FeatureFiltering <-function(InputData,
                             CoRe=FALSE,
                             FeatureFilt="Modified",
                             FeatureFilt_Value=0.8){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+
   ## ------------------ Prepare the data ------------------- ##
   feat_filt_data <- as.data.frame(replace(InputData, InputData==0, NA))
 

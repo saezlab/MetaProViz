@@ -51,6 +51,9 @@
 #' @export
 #'
 ToyData <- function(Dataset) {
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   #Available Datasets:
   datasets <- list(
     IntraCells_Raw = "MS55_RawPeakData.csv",
