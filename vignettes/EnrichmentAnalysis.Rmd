@@ -62,6 +62,7 @@ library(MetaProViz)
 
 #dependencies that need to be loaded:
 library(magrittr)
+library(dplyr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -183,7 +184,7 @@ Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Path
 # Check how our data looks like:
 Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
   filter(term=="HALLMARK_GLYCOLYSIS")%>%
-   slice(c(59,142,193, 201:203))%>%
+  dplyr::slice(c(59,142,193, 201:203))%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
