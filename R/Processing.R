@@ -44,8 +44,8 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
 #'                                  SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
 #'                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -74,7 +74,7 @@ PreProcessing <- function(InputData,
 ){
 ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
                           SettingsInfo= SettingsInfo,
@@ -84,7 +84,7 @@ PreProcessing <- function(InputData,
                           PrintPlot= PrintPlot)
 
   # HelperFunction `CheckInput` Specific
-  MetaProViz:::CheckInput_PreProcessing(InputData=InputData,
+  CheckInput_PreProcessing(InputData=InputData,
                                         SettingsFile_Sample=SettingsFile_Sample,
                                         SettingsInfo=SettingsInfo,
                                         CoRe=CoRe,
@@ -97,7 +97,7 @@ PreProcessing <- function(InputData,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "Processing",
+    Folder <- SavePath(FolderName= "Processing",
                                     FolderPath=FolderPath)
 
     SubFolder_P <- file.path(Folder, "PreProcessing")
@@ -114,7 +114,7 @@ PreProcessing <- function(InputData,
   ###################################################################################################################################
   ## ------------------ 1. Feature filtering ------------------- ##
   if(is.null(FeatureFilt)==FALSE){
-    InputData_Filtered <- MetaProViz:::FeatureFiltering(InputData=InputData,
+    InputData_Filtered <- FeatureFiltering(InputData=InputData,
                                                     FeatureFilt=FeatureFilt,
                                                     FeatureFilt_Value=FeatureFilt_Value,
                                                     SettingsFile_Sample=SettingsFile_Sample,
@@ -128,7 +128,7 @@ PreProcessing <- function(InputData,
 
   ## ------------------ 2. Missing value Imputation ------------------- ##
   if(MVI==TRUE){
-    MVIRes<- MetaProViz:::MVImputation(InputData=InputData_Filt,
+    MVIRes<- MVImputation(InputData=InputData_Filt,
                                        SettingsFile_Sample=SettingsFile_Sample,
                                        SettingsInfo=SettingsInfo,
                                        CoRe=CoRe,
@@ -140,7 +140,7 @@ PreProcessing <- function(InputData,
   ## ------------------  3. Total Ion Current Normalization ------------------- ##
   if(TIC==TRUE){
     #Perform TIC
-    TICRes_List <- MetaProViz:::TICNorm(InputData=MVIRes,
+    TICRes_List <- TICNorm(InputData=MVIRes,
                                         SettingsFile_Sample=SettingsFile_Sample,
                                         SettingsInfo=SettingsInfo,
                                         TIC=TIC)
@@ -155,7 +155,7 @@ PreProcessing <- function(InputData,
     TICRes <- MVIRes
 
     #Add plots to PlotList
-    RLAPlot_List <- MetaProViz:::TICNorm(InputData=MVIRes,
+    RLAPlot_List <- TICNorm(InputData=MVIRes,
                                          SettingsFile_Sample=SettingsFile_Sample,
                                          SettingsInfo=SettingsInfo,
                                          TIC=TIC)
@@ -165,7 +165,7 @@ PreProcessing <- function(InputData,
 
   ## ------------------ 4. CoRe media QC (blank) and normalization ------------------- ##
   if(CoRe ==TRUE){
-   data_CoReNorm <- MetaProViz:::CoReNorm(InputData= TICRes,
+   data_CoReNorm <- CoReNorm(InputData= TICRes,
                                           SettingsFile_Sample=SettingsFile_Sample,
                                           SettingsInfo=SettingsInfo)
 
@@ -177,7 +177,7 @@ PreProcessing <- function(InputData,
 
   ###################################################################################################################################
   ## ------------------ Sample outlier identification ------------------- ##
-  OutlierRes <-  MetaProViz:::OutlierDetection(InputData= data_norm,
+  OutlierRes <-  OutlierDetection(InputData= data_norm,
                                                SettingsFile_Sample=SettingsFile_Sample,
                                                SettingsInfo=SettingsInfo,
                                                CoRe=CoRe,
@@ -228,7 +228,7 @@ PreProcessing <- function(InputData,
   DFList[["Preprocessing_output"]] <- DFList[["Preprocessing_output"]]%>%tibble::rownames_to_column("Code")
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DFList,
+    SaveRes(InputList_DF=DFList,
                          InputList_Plot= PlotList,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,
@@ -260,8 +260,8 @@ PreProcessing <- function(InputData,
 #' @return DF with the merged analytical replicates
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::ReplicateSum(InputData=Intra[-c(49:58) ,-c(1:3)],
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- ReplicateSum(InputData=Intra[-c(49:58) ,-c(1:3)],
 #'                                 SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
 #'                                 SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
 #'
@@ -283,7 +283,7 @@ ReplicateSum <- function(InputData,
 
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
                           SettingsInfo = SettingsInfo,
@@ -311,7 +311,7 @@ ReplicateSum <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "Processing",
+    Folder <- SavePath(FolderName= "Processing",
                                     FolderPath=FolderPath)
     SubFolder <- file.path(Folder, "ReplicateSum")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
@@ -344,7 +344,7 @@ ReplicateSum <- function(InputData,
     tibble::column_to_rownames("UniqueID")# set UniqueID to rownames
 
   #--------------- return ------------------##
-  MetaProViz:::SaveRes(InputList_DF=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed%>%tibble::rownames_to_column("Code")),
+  SaveRes(InputList_DF=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed%>%tibble::rownames_to_column("Code")),
                        InputList_Plot = NULL,
                        SaveAs_Table=SaveAs_Table,
                        SaveAs_Plot=NULL,
@@ -378,8 +378,8 @@ ReplicateSum <- function(InputData,
 #' @return List with two elements: DF (including input and output table) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::PoolEstimation(InputData=Intra[ ,-c(1:3)],
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- PoolEstimation(InputData=Intra[ ,-c(1:3)],
 #'                                 SettingsFile_Sample=Intra[ , c(1:3)],
 #'                                 SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"))
 #'
@@ -402,12 +402,12 @@ PoolEstimation <- function(InputData,
                            FolderPath = NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz:::MetaProViz_Init()
+  MetaProViz_Init()
 
   logger::log_info('Starting pool estimation.')
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
                           SettingsInfo=SettingsInfo,
@@ -436,7 +436,7 @@ PoolEstimation <- function(InputData,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "Processing",
+    Folder <- SavePath(FolderName= "Processing",
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "PoolEstimation")
@@ -499,7 +499,7 @@ PoolEstimation <- function(InputData,
   dev.new()
   if(is.null(SettingsFile_Sample)==TRUE){
     pca_data <- PoolData
-    pca_QC_pool <-invisible(MetaProViz::VizPCA(InputData=pca_data,
+    pca_QC_pool <-invisible(VizPCA(InputData=pca_data,
                                                PlotName = "QC Pool samples",
                                                SaveAs_Plot =  NULL))
   }else{
@@ -508,7 +508,7 @@ PoolEstimation <- function(InputData,
       dplyr::mutate(Sample_type = dplyr::case_when(.data[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["PoolSamples"]] ~ "Pool",
                                      TRUE ~ "Sample"))
 
-    pca_QC_pool <-invisible(MetaProViz::VizPCA(InputData=pca_data %>%dplyr::select(-all_of(SettingsInfo[["Conditions"]]), -Sample_type),
+    pca_QC_pool <-invisible(VizPCA(InputData=pca_data %>%dplyr::select(-all_of(SettingsInfo[["Conditions"]]), -Sample_type),
                                                SettingsInfo= c(color="Sample_type"),
                                                SettingsFile_Sample= pca_data,
                                                PlotName = "QC Pool samples",
@@ -528,7 +528,7 @@ PoolEstimation <- function(InputData,
                         labs(title="CV for metabolites of Pool samples",x="Coefficient of variation (CV%)", y = "Frequency")+
                         theme_classic()))
 
-  HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Hist")
+  HistCV_Sized <- plotGrob_Processing(InputPlot =  HistCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Hist")
   PlotList [["Histogram_CV-PoolSamples"]] <- HistCV_Sized
 
   # 2. ViolinPlot of CVs
@@ -549,7 +549,7 @@ PoolEstimation <- function(InputData,
                           labs(title="CV for metabolites of Pool samples",x="Metabolites", y = "Coefficient of variation (CV%)")+
                           theme_classic())
 
-  ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Violin")
+  ViolinCV_Sized <- plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of Pool samples", PlotType= "Violin")
 
   PlotList [["ViolinPlot_CV-PoolSamples"]] <- ViolinCV_Sized
 
@@ -573,7 +573,7 @@ PoolEstimation <- function(InputData,
     SaveAs_Plot,
     SubFolder
   )
-  MetaProViz:::SaveRes(InputList_DF=DF_list,
+  SaveRes(InputList_DF=DF_list,
                       InputList_Plot = PlotList,
                       SaveAs_Table=SaveAs_Table,
                       SaveAs_Plot=SaveAs_Plot,
@@ -604,8 +604,8 @@ PoolEstimation <- function(InputData,
 #' @return List with two elements: filtered matrix  and features filtered
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz:::FeatureFiltering(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- FeatureFiltering(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                                      SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
 #'                                      SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -716,8 +716,8 @@ FeatureFiltering <-function(InputData,
 #' @return DF with imputed values
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz:::MVImputation(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- MVImputation(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                                  SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
 #'                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -823,8 +823,8 @@ MVImputation <-function(InputData,
 #' @return List with two elements: DF (including output table) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz:::TICNorm(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- TICNorm(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                             SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
 #'                             SettingsInfo = c(Conditions = "Conditions"))
 #'
@@ -873,7 +873,7 @@ TICNorm <-function(InputData,
     ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1))+
     ggplot2::theme(legend.position = "none")
 
-  #RLA_data_raw_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = RLA_data_raw, PlotName= "Before TIC Normalization", PlotType= "RLA")
+  #RLA_data_raw_Sized <- plotGrob_Processing(InputPlot = RLA_data_raw, PlotName= "Before TIC Normalization", PlotType= "RLA")
 
   if(TIC==TRUE){
     ## ------------------ Perform TIC ------------------- ##
@@ -904,7 +904,7 @@ TICNorm <-function(InputData,
       ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1))+
       ggplot2::theme(legend.position = "none")
 
-    #RLA_data_norm_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = RLA_data_norm, PlotName= "After TIC Normalization", PlotType= "RLA")
+    #RLA_data_norm_Sized <- plotGrob_Processing(InputPlot = RLA_data_norm, PlotName= "After TIC Normalization", PlotType= "RLA")
 
     #Combine Plots
     dev.new()
@@ -938,8 +938,8 @@ TICNorm <-function(InputData,
 #' @return List with two elements: DF (including output table) and Plot (including all plots generated)
 #'
 #' @examples
-#' Media <- MetaProViz::ToyData("CultureMedia_Raw")%>% subset(!Conditions=="Pool")%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
-#' Res <- MetaProViz:::CoReNorm(InputData= Media[, -c(1:3)],
+#' Media <- ToyData("CultureMedia_Raw")%>% subset(!Conditions=="Pool")%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+#' Res <- CoReNorm(InputData= Media[, -c(1:3)],
 #'                             SettingsFile_Sample= Media[, c(1:3)],
 #'                             SettingsInfo = c(Conditions = "Conditions", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"))
 #'
@@ -984,7 +984,7 @@ CoReNorm <-function(InputData,
     media_pca_data[is.na( media_pca_data)] <- 0
 
     dev.new()
-    pca_QC_media <-invisible(MetaProViz::VizPCA(InputData=media_pca_data %>%dplyr::select(-SettingsInfo[["Conditions"]], -Sample_type),
+    pca_QC_media <-invisible(VizPCA(InputData=media_pca_data %>%dplyr::select(-SettingsInfo[["Conditions"]], -Sample_type),
                                                 SettingsInfo= c(color="Sample_type"),
                                                 SettingsFile_Sample= media_pca_data,
                                                 PlotName = "QC Media_samples",
@@ -1024,7 +1024,7 @@ CoReNorm <-function(InputData,
                           ggplot2::labs(title="CV for metabolites of control media samples (no cells)",x="Coefficient of variation (CV)", y = "Frequency")+
                           ggplot2::theme_classic())
 
-    HistCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = HistCV, PlotName= "CV for metabolites of control media samples (no cells)", PlotType= "Hist")
+    HistCV_Sized <- plotGrob_Processing(InputPlot = HistCV, PlotName= "CV for metabolites of control media samples (no cells)", PlotType= "Hist")
 
     PlotList[["Histogram_CoReMediaCV"]] <- HistCV_Sized
 
@@ -1044,7 +1044,7 @@ CoReNorm <-function(InputData,
                             ggplot2::labs(title="CV for metabolites of control media samples (no cells)",x="Metabolites", y = "Coefficient of variation (CV)")+
                             ggplot2::theme_classic())
 
-    ViolinCV_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of control media samples (no cells)", PlotType= "Violin")
+    ViolinCV_Sized <- plotGrob_Processing(InputPlot = ViolinCV, PlotName= "CV for metabolites of control media samples (no cells)", PlotType= "Violin")
     PlotList[["CoRe_Media_CV_Violin"]] <- ViolinCV_Sized
 
     ######################################################################################
@@ -1193,8 +1193,8 @@ CoReNorm <-function(InputData,
 #' @return List with two elements: : DF (including output tables) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz:::OutlierDetection(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- OutlierDetection(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                                      SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
 #'                                      SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -1266,7 +1266,7 @@ OutlierDetection <-function(InputData,
     outlier_PCA_data$Conditions <- Conditions
 
     dev.new()
-    pca_outlier <-invisible(MetaProViz::VizPCA(InputData=data_norm,
+    pca_outlier <-invisible(VizPCA(InputData=data_norm,
                                                SettingsInfo= c(color=SettingsInfo[["Conditions"]]),
                                                SettingsFile_Sample= outlier_PCA_data,
                                                PlotName = paste("PCA outlier test filtering round ",loop),
@@ -1299,7 +1299,7 @@ OutlierDetection <-function(InputData,
       ggplot2::geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
       ggplot2::annotate("text", x = c(1:20),y = -0.8,label = screeplot_cumul,col = "black", size = 1.75)
 
-    #screeplot_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = screeplot, PlotName= paste("PCA Explained variance plot filtering round ",loop, sep = ""), PlotType= "Scree")
+    #screeplot_Sized <- plotGrob_Processing(InputPlot = screeplot, PlotName= paste("PCA Explained variance plot filtering round ",loop, sep = ""), PlotType= "Scree")
 
     if(loop==1){
       scree_outlierloop1 <-screeplot
@@ -1339,7 +1339,7 @@ OutlierDetection <-function(InputData,
       ggplot2::scale_linetype_discrete(name = LegendTitle,)+
       ggplot2::theme(plot.title = element_text(size = 13))+#, face = "bold")) +
       ggplot2::theme(axis.text = element_text(size = 7))
-    #HotellingT2plot_Sized <- MetaProViz:::plotGrob_Processing(InputPlot = HotellingT2plot, PlotName= paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"), PlotType= "Hotellings")
+    #HotellingT2plot_Sized <- plotGrob_Processing(InputPlot = HotellingT2plot, PlotName= paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"), PlotType= "Hotellings")
 
     if(loop==1){
       hotel_outlierloop1 <- HotellingT2plot
@@ -1445,7 +1445,7 @@ OutlierDetection <-function(InputData,
   # 1. Shape Outliers
   if(length(sample_outliers)>0){
     dev.new()
-    pca_QC <-invisible(MetaProViz::VizPCA(InputData=as.data.frame(InputData)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
+    pca_QC <-invisible(VizPCA(InputData=as.data.frame(InputData)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
                                           SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = "Outliers"),
                                           SettingsFile_Sample= MetaData_Sample ,
                                           PlotName = "Quality Control PCA Condition clustering and outlier check",
@@ -1457,7 +1457,7 @@ OutlierDetection <-function(InputData,
   # 2. Shape Biological replicates
   if("Biological_Replicates" %in% names(SettingsInfo)){
     dev.new()
-    pca_QC_repl <-invisible(MetaProViz::VizPCA(InputData=as.data.frame(InputData)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
+    pca_QC_repl <-invisible(VizPCA(InputData=as.data.frame(InputData)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
                                                SettingsInfo= c(color=SettingsInfo[["Conditions"]], shape = SettingsInfo[["Biological_Replicates"]]),
                                                SettingsFile_Sample= MetaData_Sample,
                                                PlotName =  "Quality Control PCA replicate spread check",

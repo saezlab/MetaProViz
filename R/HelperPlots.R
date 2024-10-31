@@ -514,9 +514,9 @@ plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
   suppressWarnings(suppressMessages(
     Plot_Sized <- InputPlot %>%
       ggplotGrob %>%
-      MetaProViz:::withCanvasSize(width = 12, height = 11) %>%
-      MetaProViz:::adjust_layout(SUPER_PARAM) %>%
-      MetaProViz:::adjust_title(c(PlotName))
+      withCanvasSize(width = 12, height = 11) %>%
+      adjust_layout(SUPER_PARAM) %>%
+      adjust_title(c(PlotName))
   ))
 
   Plot_Sized %<>%

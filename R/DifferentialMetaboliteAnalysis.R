@@ -64,7 +64,7 @@ DMA <-function(InputData,
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=SettingsFile_Metab,
                           SettingsInfo=SettingsInfo,
@@ -74,7 +74,7 @@ DMA <-function(InputData,
                           PrintPlot= PrintPlot)
 
   # HelperFunction `CheckInput` Specific
-  Settings <- MetaProViz:::CheckInput_DMA(InputData=InputData,
+  Settings <- CheckInput_DMA(InputData=InputData,
                                           SettingsFile_Sample=SettingsFile_Sample,
                                           SettingsInfo=SettingsInfo,
                                           StatPval=StatPval,
@@ -85,7 +85,7 @@ DMA <-function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "DMA",
+    Folder <- SavePath(FolderName= "DMA",
                                     FolderPath=FolderPath)
 
     if(PerformShapiro==TRUE){
@@ -113,14 +113,14 @@ DMA <-function(InputData,
       }
     tryCatch(
     {
-     Shapiro_output <-suppressWarnings(MetaProViz:::Shapiro(InputData=InputData,
+     Shapiro_output <-suppressWarnings(Shapiro(InputData=InputData,
                                                             SettingsFile_Sample=SettingsFile_Sample,
                                                             SettingsInfo=SettingsInfo,
                                                             StatPval=StatPval,
                                                             QQplots=FALSE))
     },
     error = function(e) {
-      message("Error occurred during MetaProViz:::Shapiro that performs the Shapiro-Wilk test. Message: ", conditionMessage(e))
+      message("Error occurred during Shapiro that performs the Shapiro-Wilk test. Message: ", conditionMessage(e))
     }
   )
   }
@@ -135,12 +135,12 @@ DMA <-function(InputData,
     if(length(UniqueConditions)>2){
       tryCatch(
         {
-          Bartlett_output<-suppressWarnings(MetaProViz:::Bartlett(InputData=InputData,
+          Bartlett_output<-suppressWarnings(Bartlett(InputData=InputData,
                                                                   SettingsFile_Sample=SettingsFile_Sample,
                                                                   SettingsInfo=SettingsInfo))
         },
         error = function(e) {
-          message("Error occurred during MetaProViz:::Bartlett that performs the Bartlett test. Message: ", conditionMessage(e))
+          message("Error occurred during Bartlett that performs the Bartlett test. Message: ", conditionMessage(e))
         }
       )
     }
@@ -156,7 +156,7 @@ DMA <-function(InputData,
 
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  Log2FC_table <- MetaProViz:::Log2FC_fun(InputData=InputData,
+  Log2FC_table <- Log2FC_fun(InputData=InputData,
                                           SettingsFile_Sample=SettingsFile_Sample,
                                           SettingsInfo=SettingsInfo,
                                           CoRe=CoRe,
@@ -166,7 +166,7 @@ DMA <-function(InputData,
   ############### Perform Hypothesis testing ###############
   if(Settings[["MultipleComparison"]] == FALSE){
     if(StatPval=="lmFit"){
-      STAT_C1vC2 <- MetaProViz:::DMA_Stat_limma(InputData=InputData,
+      STAT_C1vC2 <- DMA_Stat_limma(InputData=InputData,
                                                 SettingsFile_Sample=SettingsFile_Sample,
                                                 SettingsInfo=SettingsInfo,
                                                 StatPadj=StatPadj,
@@ -175,7 +175,7 @@ DMA <-function(InputData,
                                                 Transform=Transform)
 
     }else{
-      STAT_C1vC2 <-MetaProViz:::DMA_Stat_single(InputData=InputData,
+      STAT_C1vC2 <-DMA_Stat_single(InputData=InputData,
                                                 SettingsFile_Sample=SettingsFile_Sample,
                                                 SettingsInfo=SettingsInfo,
                                                 Log2FC_table=Log2FC_table,
@@ -185,7 +185,7 @@ DMA <-function(InputData,
   }else{ # MultipleComparison = TRUE
     #Correct data heteroscedasticity
     if(StatPval!="lmFit" & VST == TRUE){
-      VST_res <- MetaProViz:::vst(InputData)
+      VST_res <- vst(InputData)
       InputData <- VST_res[["DFs"]][["Corrected_data"]]
     }
 
@@ -196,23 +196,23 @@ DMA <-function(InputData,
     }
 
     if(StatPval=="aov"){
-      STAT_C1vC2 <- MetaProViz:::AOV(InputData=InputData,
+      STAT_C1vC2 <- AOV(InputData=InputData,
                                      SettingsFile_Sample=SettingsFile_Sample,
                                      SettingsInfo=SettingsInfo,
                                      Log2FC_table=Log2FC_table)
     }else if(StatPval=="kruskal.test"){
-      STAT_C1vC2 <-MetaProViz:::Kruskal(InputData=InputData,
+      STAT_C1vC2 <-Kruskal(InputData=InputData,
                                         SettingsFile_Sample=SettingsFile_Sample,
                                         SettingsInfo=SettingsInfo,
                                         Log2FC_table=Log2FC_table,
                                         StatPadj=StatPadj)
     }else if(StatPval=="welch"){
-      STAT_C1vC2 <-MetaProViz:::Welch(InputData=InputData,
+      STAT_C1vC2 <-Welch(InputData=InputData,
                                       SettingsFile_Sample=SettingsFile_Sample,
                                       SettingsInfo=SettingsInfo,
                                       Log2FC_table=Log2FC_table)
     }else if(StatPval=="lmFit"){
-      STAT_C1vC2 <- MetaProViz:::DMA_Stat_limma(InputData=InputData,
+      STAT_C1vC2 <- DMA_Stat_limma(InputData=InputData,
                                                 SettingsFile_Sample=SettingsFile_Sample,
                                                 SettingsInfo=SettingsInfo,
                                                 StatPadj=StatPadj,
@@ -262,7 +262,7 @@ DMA <-function(InputData,
     }
 
     dev.new()
-    VolcanoPlot <- invisible(MetaProViz::VizVolcano(PlotSettings="Standard",
+    VolcanoPlot <- invisible(VizVolcano(PlotSettings="Standard",
                                                     InputData=Volplotdata%>%column_to_rownames("Metabolite"),
                                                     SettingsInfo=VolPlot_SettingsInfo,
                                                     SettingsFile_Metab=VOlPlot_SettingsFile,
@@ -284,7 +284,7 @@ DMA <-function(InputData,
   #Here we make a list in which we will save the outputs:
   if(PerformShapiro==TRUE & exists("Shapiro_output")==TRUE){
     suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=Shapiro_output[["DF"]],
+      SaveRes(InputList_DF=Shapiro_output[["DF"]],
                            InputList_Plot= Shapiro_output[["Plot"]][["Distributions"]],
                            SaveAs_Table=SaveAs_Table,
                            SaveAs_Plot=SaveAs_Plot,
@@ -298,7 +298,7 @@ DMA <-function(InputData,
 
   if(PerformBartlett==TRUE & exists("Bartlett_output")==TRUE){
     suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=Bartlett_output[["DF"]],
+      SaveRes(InputList_DF=Bartlett_output[["DF"]],
                            InputList_Plot= Bartlett_output[["Plot"]],
                            SaveAs_Table=SaveAs_Table,
                            SaveAs_Plot=SaveAs_Plot,
@@ -312,7 +312,7 @@ DMA <-function(InputData,
 
   if(VST==TRUE & exists("VST_res")==TRUE){
     suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=VST_res[["DF"]],
+      SaveRes(InputList_DF=VST_res[["DF"]],
                            InputList_Plot= VST_res[["Plot"]],
                            SaveAs_Table=SaveAs_Table,
                            SaveAs_Plot=SaveAs_Plot,
@@ -325,7 +325,7 @@ DMA <-function(InputData,
   }
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DMA_Output,#This needs to be a list, also for single comparisons
+    SaveRes(InputList_DF=DMA_Output,#This needs to be a list, also for single comparisons
                          InputList_Plot= volplotList,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=SaveAs_Plot,

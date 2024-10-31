@@ -43,8 +43,8 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")[,c(1:6)]
-#' Res <- MetaProViz::VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
+#' Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
+#' Res <- VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
@@ -77,13 +77,13 @@ VizSuperplot <- function(InputData,
                          FolderPath = NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz:::MetaProViz_Init()
+  MetaProViz_Init()
 
   logger::log_info("VizSuperplot: Superplot visualization")
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
                           SettingsInfo=SettingsInfo,
@@ -177,7 +177,7 @@ VizSuperplot <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName=  paste(PlotType, "Plots", sep=""),
+    Folder <- SavePath(FolderName=  paste(PlotType, "Plots", sep=""),
                                     FolderPath=FolderPath)
   }
   logger::log_info("VizSuperplot results saved at ", Folder)
@@ -308,14 +308,14 @@ VizSuperplot <- function(InputData,
         numerator <-unique(SettingsFile_Sample$Conditions)
         comparisons <- combn(unique(conditions), 2) %>% as.matrix()
 
-        #Prepare Stat results using MetaProViz::DMA STAT helper functions
+        #Prepare Stat results using DMA STAT helper functions
         if(StatPval=="aov"){
-        STAT_C1vC2 <- MetaProViz:::AOV(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
+        STAT_C1vC2 <- AOV(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           SettingsInfo=c(Conditions="Conditions", Numerator = unique(SettingsFile_Sample$Conditions), Denominator  = unique(SettingsFile_Sample$Conditions)),
                           SettingsFile_Sample= SettingsFile_Sample,
                           Log2FC_table=NULL)
         }else if(StatPval=="kruskal.test"){
-          STAT_C1vC2 <-MetaProViz:::Kruskal(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
+          STAT_C1vC2 <-Kruskal(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
                                             SettingsInfo=c(Conditions="Conditions", Numerator = unique(SettingsFile_Sample$Conditions), Denominator  = unique(SettingsFile_Sample$Conditions)),
                                             SettingsFile_Sample= SettingsFile_Sample,
                                             Log2FC_table=NULL)
@@ -374,7 +374,7 @@ VizSuperplot <- function(InputData,
     PlotList[[i]] <- Plot
 
     # Make plot into nice format:
-    Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample,  PlotName = PlotName, Subtitle = i, PlotType=PlotType)
+    Plot_Sized <-  plotGrob_Superplot(InputPlot=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample,  PlotName = PlotName, Subtitle = i, PlotType=PlotType)
     PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
     PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
@@ -390,7 +390,7 @@ VizSuperplot <- function(InputData,
     SaveList[[cleaned_i]] <- Plot_Sized
     #----- Save
     suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                            InputList_Plot= SaveList,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,

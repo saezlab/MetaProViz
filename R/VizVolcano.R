@@ -53,8 +53,8 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_DMA")
-#' Res <- MetaProViz::VizVolcano(InputData=Intra)
+#' Intra <- ToyData("IntraCells_DMA")
+#' Res <- VizVolcano(InputData=Intra)
 #'
 #' @keywords Volcano plot, pathways
 #'
@@ -101,7 +101,7 @@ VizVolcano <- function(PlotSettings="Standard",
     Info <- SettingsInfo
   }
 
-  MetaProViz:::CheckInput(InputData=as.data.frame(t(InputData)),
+  CheckInput(InputData=as.data.frame(t(InputData)),
                           InputData_Num=FALSE,
                           SettingsFile_Sample=NULL,
                           SettingsFile_Metab=SettingsFile,#Set above
@@ -143,7 +143,7 @@ VizVolcano <- function(PlotSettings="Standard",
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "VolcanoPlots",
+    Folder <- SavePath(FolderName= "VolcanoPlots",
                                     FolderPath=FolderPath)
   }
 
@@ -244,7 +244,7 @@ VizVolcano <- function(PlotSettings="Standard",
   ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
   if(PlotSettings=="Standard"){#####--- 1. Standard
-    VolcanoRes <- MetaProViz:::VizVolcano_Standard(InputData= VolcanoData,
+    VolcanoRes <- VizVolcano_Standard(InputData= VolcanoData,
                                                    SettingsFile_Metab=SettingsFile_Metab,
                                                    SettingsInfo=SettingsInfo,
                                                    y= y,
@@ -266,7 +266,7 @@ VizVolcano <- function(PlotSettings="Standard",
                                                    Folder=Folder)
 
   }else if(PlotSettings=="Compare"){#####--- 2. Compare
-    VolcanoRes <- MetaProViz:::VizVolcano_Compare(InputData= VolcanoData,
+    VolcanoRes <- VizVolcano_Compare(InputData= VolcanoData,
                                                   InputData2=InputData2,
                                                   SettingsFile_Metab=SettingsFile_Metab,
                                                   SettingsInfo=SettingsInfo,
@@ -290,7 +290,7 @@ VizVolcano <- function(PlotSettings="Standard",
                                                   Folder=Folder)
 
   } else if(PlotSettings=="PEA"){#####--- 3. PEA
-    VolcanoRes <- MetaProViz:::VizVolcano_PEA(InputData= VolcanoData,
+    VolcanoRes <- VizVolcano_PEA(InputData= VolcanoData,
                                               InputData2=InputData2,
                                               SettingsFile_Metab=SettingsFile_Metab,#Problem: we need to know the column name of the features!
                                               SettingsInfo=SettingsInfo,
@@ -321,26 +321,26 @@ VizVolcano <- function(PlotSettings="Standard",
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsInfo Passed to main function MetaProViz::VizVolcano()
-#' @param y \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "Log2FC"}
-#' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
-#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param ColorPalette Created in MetaProViz::VizVolcano() based on ColorPalette passed to main function MetaProViz::VizVolcano()
-#' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
+#' @param InputData Passed to main function VizVolcano()
+#' @param SettingsFile_Metab Passed to main function VizVolcano()
+#' @param SettingsInfo Passed to main function VizVolcano()
+#' @param y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "Log2FC"}
+#' @param PlotName \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
+#' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
+#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param ycutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param ColorPalette Created in VizVolcano() based on ColorPalette passed to main function VizVolcano()
+#' @param ShapePalette Created in VizVolcano() based on ShapePalette passed to main function VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
-#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
-#' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
+#' @param SaveAs_Plot Passed to main function VizVolcano()
+#' @param PrintPlot Passed to main function VizVolcano()
+#' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
 
 #' @keywords Standard volcano plots
@@ -464,7 +464,7 @@ VizVolcano_Standard <- function(InputData,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+        Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
         PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
@@ -479,7 +479,7 @@ VizVolcano_Standard <- function(InputData,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
+          SaveRes(InputList_DF=NULL,
                                InputList_Plot= SaveList,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
@@ -576,7 +576,7 @@ VizVolcano_Standard <- function(InputData,
       PlotList[["Plot"]] <- Plot
 
       #Set the total heights and widths
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
+      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
       PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
       PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
@@ -587,7 +587,7 @@ VizVolcano_Standard <- function(InputData,
 
       #----- Save
       suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -612,28 +612,28 @@ VizVolcano_Standard <- function(InputData,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::VizVolcano()
-#' @param InputData2 Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsInfo Passed to main function MetaProViz::VizVolcano()
-#' @param y \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "Log2FC"}
-#' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
-#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param ColorPalette Created in MetaProViz::VizVolcano() based on ColorPalette passed to main function MetaProViz::VizVolcano()
-#' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
+#' @param InputData Passed to main function VizVolcano()
+#' @param InputData2 Passed to main function VizVolcano()
+#' @param SettingsFile_Metab Passed to main function VizVolcano()
+#' @param SettingsInfo Passed to main function VizVolcano()
+#' @param y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "Log2FC"}
+#' @param PlotName \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
+#' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
+#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param ycutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param ColorPalette Created in VizVolcano() based on ColorPalette passed to main function VizVolcano()
+#' @param ShapePalette Created in VizVolcano() based on ShapePalette passed to main function VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param ComparisonName Passed to main function MetaProViz::VizVolcano()
-#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
-#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
-#' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
+#' @param ComparisonName Passed to main function VizVolcano()
+#' @param SaveAs_Plot Passed to main function VizVolcano()
+#' @param PrintPlot Passed to main function VizVolcano()
+#' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
 #'
 #' @keywords Compare volcano plots
@@ -810,7 +810,7 @@ VizVolcano_Compare <- function(InputData,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+        Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
         PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
@@ -825,7 +825,7 @@ VizVolcano_Compare <- function(InputData,
 
         #----- Save
         suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
+        SaveRes(InputList_DF=NULL,
                            InputList_Plot= SaveList,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
@@ -940,7 +940,7 @@ VizVolcano_Compare <- function(InputData,
       ## Store the plot in the 'plots' list
       PlotList[["Plot"]] <- Plot
 
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
+      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
       PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
       PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
@@ -951,7 +951,7 @@ VizVolcano_Compare <- function(InputData,
 
        #----- Save
       suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -976,27 +976,27 @@ VizVolcano_Compare <- function(InputData,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::VizVolcano()
-#' @param InputData2 Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsInfo Passed to main function MetaProViz::VizVolcano()
-#' @param y \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "Log2FC"}
-#' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
-#' @param yCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param ColorPalette Created in MetaProViz::VizVolcano() based on ColorPalette passed to main function MetaProViz::VizVolcano()
-#' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
+#' @param InputData Passed to main function VizVolcano()
+#' @param InputData2 Passed to main function VizVolcano()
+#' @param SettingsFile_Metab Passed to main function VizVolcano()
+#' @param SettingsInfo Passed to main function VizVolcano()
+#' @param y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "Log2FC"}
+#' @param PlotName \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
+#' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
+#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param yCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param ColorPalette Created in VizVolcano() based on ColorPalette passed to main function VizVolcano()
+#' @param ShapePalette Created in VizVolcano() based on ShapePalette passed to main function VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
-#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
-#' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
+#' @param SaveAs_Plot Passed to main function VizVolcano()
+#' @param PrintPlot Passed to main function VizVolcano()
+#' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
 #' @keywords Volcano plots of pathway enrichment results
 #' @noRd
@@ -1156,7 +1156,7 @@ VizVolcano_PEA <- function(InputData,
 
       #Set the total heights and widths
       PlotTitle <- paste(PlotName, ": ", i, sep="")
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
       PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
       PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 
@@ -1172,7 +1172,7 @@ VizVolcano_PEA <- function(InputData,
 
       #----- Save
       suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
+        SaveRes(InputList_DF=NULL,
                              InputList_Plot= SaveList,
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,

@@ -500,7 +500,7 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
   ## ------------ Folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
   }
 
@@ -543,7 +543,7 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   DF_List <- list("GeneMetabSet"=GeneMetabSet,
                   "MetabSet"=MetabSet)
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
+    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -606,7 +606,7 @@ LoadMetalinks <- function(types = NULL,
 
   ## ------------ Folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
   }
 
@@ -824,7 +824,7 @@ LoadMetalinks <- function(types = NULL,
   DF_List <- list("MetalinksDB"=MetalinksDB,
                   "MetalinksDB_Type"=MetalinksDB_Type)
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
+    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,

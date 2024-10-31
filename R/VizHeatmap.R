@@ -40,8 +40,8 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- VizHeatmap(InputData=Intra[,-c(1:3)])
 #'
 #' @keywords Heatmap
 #'
@@ -70,7 +70,7 @@ VizHeatmap <- function(InputData,
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=SettingsFile_Metab,
                           SettingsInfo=SettingsInfo,
@@ -92,7 +92,7 @@ VizHeatmap <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "Heatmap",
+    Folder <- SavePath(FolderName= "Heatmap",
                                     FolderPath=FolderPath)
   }
 
@@ -227,7 +227,7 @@ VizHeatmap <- function(InputData,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
+          SaveRes(InputList_DF=NULL,
                                InputList_Plot= PlotList_adaptedGrid,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
@@ -366,7 +366,7 @@ VizHeatmap <- function(InputData,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
+          SaveRes(InputList_DF=NULL,
                                InputList_Plot= PlotList_adaptedGrid,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
@@ -529,7 +529,7 @@ VizHeatmap <- function(InputData,
 
             #----- Save
             suppressMessages(suppressWarnings(
-              MetaProViz:::SaveRes(InputList_DF=NULL,
+              SaveRes(InputList_DF=NULL,
                                    InputList_Plot= PlotList_adaptedGrid,
                                    SaveAs_Table=NULL,
                                    SaveAs_Plot=SaveAs_Plot,
@@ -643,7 +643,7 @@ VizHeatmap <- function(InputData,
 
     #----- Save
     suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                            InputList_Plot= PlotList_adaptedGrid,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,

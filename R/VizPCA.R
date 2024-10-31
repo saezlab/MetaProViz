@@ -44,8 +44,8 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")[,-c(1:3)]
-#' Res <- MetaProViz::VizPCA(Intra)
+#' Intra <- ToyData("IntraCells_Raw")[,-c(1:3)]
+#' Res <- VizPCA(Intra)
 #'
 #' @keywords PCA
 #'
@@ -74,12 +74,12 @@ VizPCA <- function(InputData,
 
   ###########################################################################
   ## ------------ Create log file ----------- ##
-  MetaProViz:::MetaProViz_Init()
+  MetaProViz_Init()
 
   logger::log_info("VizPCA: PCA plot visualization")
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
                           SettingsInfo=SettingsInfo,
@@ -104,7 +104,7 @@ VizPCA <- function(InputData,
   ## ------------ Create Results output folder ----------- ##
   Folder <- NULL
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "PCAPlots",
+    Folder <- SavePath(FolderName= "PCAPlots",
                                     FolderPath=FolderPath)
   }
   logger::log_info("VizPCA results saved at ", Folder)

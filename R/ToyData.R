@@ -42,7 +42,7 @@
 #' @description Import and process .csv file to create toy data.
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' Intra <- ToyData("IntraCells_Raw")
 #'
 #' @importFrom readr read_csv cols
 #' @importFrom magrittr %>% extract2

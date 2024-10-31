@@ -58,7 +58,7 @@ MCA_2Cond <- function(InputData_C1,
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  MetaProViz:::CheckInput_MCA(InputData_C1=InputData_C1,
+  CheckInput_MCA(InputData_C1=InputData_C1,
                               InputData_C2=InputData_C2,
                               InputData_CoRe=NULL,
                               InputData_Intra=NULL,
@@ -72,7 +72,7 @@ MCA_2Cond <- function(InputData_C1,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MCA2Cond",
+    Folder <- SavePath(FolderName= "MCA2Cond",
                                     FolderPath=FolderPath)
   }
 
@@ -392,7 +392,7 @@ MCA_2Cond <- function(InputData_C1,
   DF_List <- list("MCA_2Cond_Summary"=ClusterSummary, "MCA_2Cond_Results"=MergeDF_Rearrange)
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DF_List,
+    SaveRes(InputList_DF=DF_List,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -448,7 +448,7 @@ MCA_CoRe <- function(InputData_Intra,
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  MetaProViz:::CheckInput_MCA(InputData_C1=NULL,
+  CheckInput_MCA(InputData_C1=NULL,
                               InputData_C2=NULL,
                               InputData_CoRe= InputData_CoRe,
                               InputData_Intra=InputData_Intra,
@@ -463,7 +463,7 @@ MCA_CoRe <- function(InputData_Intra,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MCACoRe",
+    Folder <- SavePath(FolderName= "MCACoRe",
                                     FolderPath=FolderPath)
   }
 
@@ -1006,7 +1006,7 @@ MCA_CoRe <- function(InputData_Intra,
   DF_List <- list("MCA_CoRe_Summary"=ClusterSummary, "MCA_CoRe_Results"=MergeDF_Rearrange)
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DF_List,
+    SaveRes(InputList_DF=DF_List,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -1056,17 +1056,17 @@ MCA_rules<- function(Method){
 
 #' Check input parameters
 #'
-#' @param InputData_C1 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param InputData_C2 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param InputData_Intra Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param InputData_CoRe Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_C1 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_C2 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_Intra Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_CoRe Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param BackgroundMethod Passed to main function MetaProViz::MCA.
-#' @param FeatureID Passed to main function MetaProViz::MCA.
-#' @param SaveAs_Table Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
+#' @param InputData_C1 Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param InputData_C2 Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param InputData_Intra Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param InputData_CoRe Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_C1 Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_C2 Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_Intra Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param SettingsInfo_CoRe Passed to main function MCA. If not avaliable can be set to NULL.
+#' @param BackgroundMethod Passed to main function MCA.
+#' @param FeatureID Passed to main function MCA.
+#' @param SaveAs_Table Passed to main function PreProcessing(). If not avaliable can be set to NULL.
 #'
 #' @param Function Name of the MetaProViz Function that is checked.
 #' @param InputList

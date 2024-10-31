@@ -27,17 +27,17 @@
 #'
 # REFACT: Description of each argument should start with its type; e.g.
 # "@param x Character: name of the variable mapped to the x axis."
-#' @param InputData Passed to main function MetaProViz::Function().
+#' @param InputData Passed to main function Function().
 #' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
-#' @param SettingsFile_Sample \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param SettingsFile_Metab \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param SettingsInfo \emph{Optional: } Passed to main function MetaProViz::Function() \strong{Default = NULL}
-#' @param SaveAs_Plot \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.\strong{Default = NULL}
-#' @param SaveAs_Table \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL.\strong{Default = NULL}
-#' @param CoRe \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
-#' @param PrintPlot \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
-#' @param Theme \emph{Optional: } Passed to main function MetaProViz::Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param PlotSettings \emph{Optional: } Needs to be set for MetaProViz::VizX functions. Options are "Sample", "Feature", Both". This refers to SettingsInfo color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
+#' @param SettingsFile_Sample \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param SettingsFile_Metab \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param SettingsInfo \emph{Optional: } Passed to main function Function() \strong{Default = NULL}
+#' @param SaveAs_Plot \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL.\strong{Default = NULL}
+#' @param SaveAs_Table \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL.\strong{Default = NULL}
+#' @param CoRe \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param PrintPlot \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param Theme \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param PlotSettings \emph{Optional: } Needs to be set for VizX functions. Options are "Sample", "Feature", Both". This refers to SettingsInfo color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
 #'
 #'
 #' @keywords Input check
@@ -276,16 +276,16 @@ CheckInput <- function(InputData,
 
 #' Check specific input parameters for PreProcessing()
 #'
-#' @param InputData Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
-#' @param CoRe Passed to main function MetaProViz::PreProcessing()
-#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
-#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
-#' @param TIC Passed to main function MetaProViz::PreProcessing()
-#' @param MVI Passed to main function MetaProViz::PreProcessing()
-#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
-#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
+#' @param InputData Passed to main function PreProcessing()
+#' @param SettingsFile_Sample Passed to main function PreProcessing()
+#' @param SettingsInfo Passed to main function PreProcessing()
+#' @param CoRe Passed to main function PreProcessing()
+#' @param FeatureFilt Passed to main function PreProcessing()
+#' @param FeatureFilt_Value Passed to main function PreProcessing()
+#' @param TIC Passed to main function PreProcessing()
+#' @param MVI Passed to main function PreProcessing()
+#' @param MVI_Percentage Passed to main function PreProcessing()
+#' @param HotellinsConfidence Passed to main function PreProcessing()
 #'
 #' @keywords Input check
 #' @noRd
@@ -350,16 +350,16 @@ CheckInput_PreProcessing <- function(InputData,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsFile_Sample Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
-#' @param CoRe Passed to main function MetaProViz::PreProcessing()
-#' @param FeatureFilt Passed to main function MetaProViz::PreProcessing()
-#' @param FeatureFilt_Value Passed to main function MetaProViz::PreProcessing()
-#' @param TIC Passed to main function MetaProViz::PreProcessing()
-#' @param MVI Passed to main function MetaProViz::PreProcessing()
-#' @param MVI_Percentage Passed to main function MetaProViz::PreProcessing()
-#' @param HotellinsConfidence Passed to main function MetaProViz::PreProcessing()
+#' @param InputData Passed to main function PreProcessing()
+#' @param SettingsFile_Sample Passed to main function PreProcessing()
+#' @param SettingsInfo Passed to main function PreProcessing()
+#' @param CoRe Passed to main function PreProcessing()
+#' @param FeatureFilt Passed to main function PreProcessing()
+#' @param FeatureFilt_Value Passed to main function PreProcessing()
+#' @param TIC Passed to main function PreProcessing()
+#' @param MVI Passed to main function PreProcessing()
+#' @param MVI_Percentage Passed to main function PreProcessing()
+#' @param HotellinsConfidence Passed to main function PreProcessing()
 #'
 #' @keywords Input check
 #' @noRd

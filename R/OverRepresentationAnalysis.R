@@ -51,7 +51,7 @@ ClusterORA <- function(InputData,
                        SaveAs_Table= "csv",
                        FolderPath = NULL){
    ## ------------ Check Input files ----------- ##
-  Pathways <- MetaProViz:::CheckInput_ORA(InputData=InputData,
+  Pathways <- CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
                                           RemoveBackground=RemoveBackground,
                                           PathwayFile=PathwayFile,
@@ -64,7 +64,7 @@ ClusterORA <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "ClusterORA",
+    Folder <- SavePath(FolderName= "ClusterORA",
                                     FolderPath=FolderPath)
     }
 
@@ -134,7 +134,7 @@ ClusterORA <- function(InputData,
   }
   #Save files
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=df_list,
+    SaveRes(InputList_DF=df_list,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -186,7 +186,7 @@ StandardORA <- function(InputData,
 
 ){
  ## ------------ Check Input files ----------- ##
-  Pathways <- MetaProViz:::CheckInput_ORA(InputData=InputData,
+  Pathways <- CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
                                           RemoveBackground=FALSE,
                                           PathwayFile=PathwayFile,
@@ -199,7 +199,7 @@ StandardORA <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "ORA",
+    Folder <- SavePath(FolderName= "ORA",
                                     FolderPath=FolderPath)
   }
 
@@ -277,7 +277,7 @@ StandardORA <- function(InputData,
 
   #save:
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=ORA_output_list,
+    SaveRes(InputList_DF=ORA_output_list,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -299,8 +299,8 @@ StandardORA <- function(InputData,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
+#' @param InputData Passed to main function PreProcessing()
+#' @param SettingsInfo Passed to main function PreProcessing()
 #'
 #' @keywords Input check
 #' @noRd
