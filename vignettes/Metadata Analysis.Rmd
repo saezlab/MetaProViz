@@ -59,6 +59,7 @@ library(magrittr)
 library(dplyr)
 library(rlang)
 library(tidyr)
+library(tibble)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -263,16 +264,16 @@ Here we can also use the `MetaproViz::VizVolcano()` function to plot comparisons
 ```{r}
 #Early versus Late Stage
 MetaProViz::VizVolcano(PlotSettings="Compare",
-                       InputData=ResList[["EarlyStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
-                       InputData2= ResList[["LateStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData=ResList[["EarlyStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["LateStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        ComparisonName= c(InputData="EarlyStage", InputData2= "LateStage"),
                        PlotName= "EarlyStage-TUMOR_vs_NORMAL compared to LateStage-TUMOR_vs_NORMAL",
                        Subtitle= "Results of DMA" )
 
 # Young versus Old
 MetaProViz::VizVolcano(PlotSettings="Compare",
-                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
-                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        ComparisonName= c(InputData="Young", InputData2= "Old"),
                        PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
                        Subtitle= "Results of DMA" )
@@ -301,14 +302,14 @@ ggVennDiagram::ggVennDiagram(list(Top = top_entries,
 
 
 MetaData_Metab <- merge(x=Tissue_MetaData,
-                   y= MetaRes[["res_summary"]][, c(1,5:6) ]%>%column_to_rownames("FeatureID"),
+                   y= MetaRes[["res_summary"]][, c(1,5:6) ]%>%tibble::column_to_rownames("FeatureID"),
                    by=0,
                    all.y=TRUE)%>%
   column_to_rownames("Row.names")
 
 #Make a Volcano plot:
 MetaProViz::VizVolcano(PlotSettings="Standard",
-                       InputData=ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData=ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        SettingsFile_Metab =  MetaData_Metab,
                        SettingsInfo = c(color = "MainDriver_Term"),
                        PlotName= "TISSUE_TYPE-TUMOR_vs_NORMAL",
@@ -347,14 +348,14 @@ Now we can use this information to colour code our volcano plot:
 ```{r, eval=FALSE}
 #Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
-                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%column_to_rownames("Metabolite"),
+                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
                    by=0,
                    all.y=TRUE)%>%
-  column_to_rownames("Row.names")
+  tibble::column_to_rownames("Row.names")
 
 MetaProViz::VizVolcano(PlotSettings="Compare",
-                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
-                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        ComparisonName= c(InputData="Young", InputData2= "Old"),
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
@@ -367,14 +368,14 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 #Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
-                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%column_to_rownames("Metabolite"),
+                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
                    by=0,
                    all.y=TRUE)%>%
-  column_to_rownames("Row.names")
+  tibble::column_to_rownames("Row.names")
 
 MetaProViz::VizVolcano(PlotSettings="Compare",
-                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
-                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%column_to_rownames("Metabolite"),
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        ComparisonName= c(InputData="Young", InputData2= "Old"),
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
@@ -393,12 +394,12 @@ LoadKEGG()
 comparisons <- names(ResList)
 for(comparison in comparisons){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
-  DMA <- merge(Tissue_MetaData%>%rownames_to_column("Metabolite") ,ResList[[comparison]][["DMA"]][["TUMOR_vs_NORMAL"]], by="Metabolite", all.y=TRUE)
+  DMA <- merge(Tissue_MetaData%>%tibble::rownames_to_column("Metabolite") ,ResList[[comparison]][["DMA"]][["TUMOR_vs_NORMAL"]], by="Metabolite", all.y=TRUE)
   DMA <- DMA[,c(1,10,12:17)]
   DMA <- DMA[complete.cases(DMA),-1]#we remove metabolites that do not have a KEGG ID/KEGG pathway
  
   #remove dublons
-  DMA_Select <- DMA%>%distinct(KEGG, .keep_all = TRUE)%>%remove_rownames()%>%column_to_rownames("KEGG")
+  DMA_Select <- DMA%>%distinct(KEGG, .keep_all = TRUE)%>%remove_rownames()%>%tibble::column_to_rownames("KEGG")
   
   #Perform ORA
   DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA_Select, #Input data requirements: column `t.val` and column `Metabolite`

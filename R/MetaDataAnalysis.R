@@ -91,11 +91,11 @@ MetaAnalysis <- function(InputData,
 
   # Extract loadings for each PC
   PCA.res_Loadings <- as.data.frame(PCA.res$rotation)%>%
-    rownames_to_column("FeatureID")
+    tibble::rownames_to_column("FeatureID")
 
   #--- 2. Merge with demographics
   PCA.res_Info  <- merge(x=SettingsFile_Sample%>%rownames_to_column("UniqueID") , y=PCA.res_Info%>%rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
-      column_to_rownames("UniqueID")
+    tibble::column_to_rownames("UniqueID")
 
   #--- 3. convert columns that are not numeric to factor:
   ## Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
@@ -149,7 +149,7 @@ MetaAnalysis <- function(InputData,
 
   #Add explained variance into the table:
   prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
-    rownames_to_column("PC")%>%
+    tibble::rownames_to_column("PC")%>%
     mutate(PC = paste("PC", PC, sep=""))%>%
     dplyr::rename("Explained_Variance"=2)
 
@@ -243,7 +243,7 @@ MetaAnalysis <- function(InputData,
      select(term, PC, Explained_Variance)
 
    Data_Heat <- reshape2::dcast( Data_Heat, term ~ PC, value.var = "Explained_Variance")%>%
-     column_to_rownames("term")%>%
+     tibble::column_to_rownames("term")%>%
      mutate_all(~replace(., is.na(.), 0))
 
    #Plot
@@ -325,11 +325,11 @@ MetaPK <- function(InputData,
   if(is.null(SettingsInfo)==TRUE){
     MetaData <- names(SettingsFile_Sample)
     SettingsFile_Sample <- SettingsFile_Sample%>%
-      rownames_to_column("SampleID")
+      tibble::rownames_to_column("SampleID")
   }else{
     MetaData <- SettingsInfo
     SettingsFile_Sample_subset <- SettingsFile_Sample[, MetaData, drop = FALSE]%>%
-      rownames_to_column("SampleID")
+      tibble::rownames_to_column("SampleID")
   }
 
   # Convert into a pathway DF
