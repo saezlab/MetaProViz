@@ -210,7 +210,7 @@ PreProcessing <- function(InputData,
   }
 
   ## ---- Plots
-  if(is.null(TIC)==FALSE){
+  if(TIC==TRUE){
     PlotList <- c(TICRes_List[["Plot"]], OutlierRes[["Plot"]])
   }else{
     PlotList <- c(RLAPlot_List[["Plot"]])
