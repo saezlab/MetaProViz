@@ -39,6 +39,8 @@
 #'
 #' @importFrom dplyr mutate
 #' @importFrom rlang !!! !! := sym syms
+#' @importFrom tidyselect everything
+#' @importFrom dplyr across summarize first ungroup group_by
 #'
 #' @export
 #'
@@ -46,7 +48,6 @@ TranslateID <- function(InputData,
                         SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
                         From = c("kegg"),
                         To = c("pubchem","chebi","hmdb"),
-                        Method="GetAll",
                         SaveAs_Table= "csv",
                         FolderPath=NULL
 ){
@@ -67,13 +68,6 @@ TranslateID <- function(InputData,
     stop(m)
   }
 
-  Method_options <- c("GetAll", 'GetFirst')
-  if(!(Method %in% Method_options)){
-    m <- paste0("Check input. The selected Method option is not valid. Please select one of the folowing: ",paste(Method_options,collapse = ", "),".")
-    logger::log_error(m)
-    stop(m)
-  }
-
   ## ------------------  Create output folders and path ------------------- ##
   Folder <- MetaProViz:::SavePath(FolderName= "TranslateID",
                                   FolderPath=NULL)
@@ -84,13 +78,17 @@ TranslateID <- function(InputData,
   ## ------------------ Translate To-From for each pair ------------------- ##
   DF_List <- list()
   DF_List[["InputDF"]] <- InputData
-  Output_DataFrame <- InputData #Will add columns to the InputDF
+  DF_List[["TranslatedDF"]] <- InputData
 
   for (MetaboliteID in To) {# For each ID type in the ToFormat list, we will translate the IDs and then collapse them into a single row for each group (e.g. by path term and metaboliteID)
     #----- 1. Translate
-    df_translated <- InputData%>%
-      dplyr::rename(!!rlang::sym(From) := SettingsInfo[['InputID']])%>% #rename the column to the ID we want to from
-      OmnipathR::translate_ids(!!rlang::sym(From), !!rlang::sym(MetaboliteID), ramp = TRUE)# Use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings- note, the results will be in long format likely with double ups.
+    df_translated <-
+      DF_List[['TranslatedDF']] %>%
+      OmnipathR::translate_ids(
+        !!rlang::sym(SettingsInfo[['InputID']]) := !!rlang::sym(From),
+        !!rlang::sym(MetaboliteID),
+        ramp = TRUE
+      )  # Use OmnipathR to translate the ids. Note that the returned object (df_translated) will most likely have multiple mappings- note, the results will be in long format likely with double ups.
 
     #----- 2. Collapse
     # Now collapse the desired translated column rows into a single row for each group: "16680, 57856, 181457"
@@ -98,41 +96,13 @@ TranslateID <- function(InputData,
 
     df_translated <- df_translated %>%
       dplyr::group_by(!!!rlang::syms(grouping_vars)) %>%
-      dplyr::summarize(!!paste0(MetaboliteID, '_AllIDs') := paste(!!rlang::sym(MetaboliteID), collapse = ', ')) %>% # add prefix '_AllIDs' to the column name
+      dplyr::summarize(!!rlang::sym(MetaboliteID) := paste(!!rlang::sym(MetaboliteID), collapse = ', '), dplyr::across(tidyselect::everything(), dplyr::first)) %>%
       dplyr::ungroup()
 
-    #----- 3. For 'GetFirst' get the first translated ID for each unique ID from the original ID (CONTINUE)
-    message(paste('Converting from ', From, " to ", MetaboliteID))
-    if (Method == 'GetFirst') {
-      warning("Only the first translated ID from ", MetaboliteID, " will be returned for each unique ID from ", From, ".", sep="")
 
-      firstItem_cols <- df_translated %>%
-        dplyr::mutate(!!paste0(MetaboliteID, '_FirstID') := ifelse(
-          !is.na(!!rlang::sym(paste0(MetaboliteID, '_AllIDs'))),
-          sapply(strsplit(!!rlang::sym(paste0(MetaboliteID, '_AllIDs')), ", "), `[`, 1), # Split and get the first element
-          NA))
-      firstItem_cols <- firstItem_cols %>%
-        dplyr::select(-!!paste0(MetaboliteID, '_AllIDs')) #note this removes the 'collapsed' columns
-      df_translated <- firstItem_cols
-    }
+    logger::log_success(paste('Converting from ', From, " to ", MetaboliteID))
 
-    #----- 4. Add the new column to the InputData
-    # Now update the results from each type of ID translation into one main table, based off the users input table
-    if("GroupingVariable" %in% names(SettingsInfo)){
-    Output_DataFrame <- merge(x=Output_DataFrame,
-                              y=df_translated ,
-                              by.x=c(SettingsInfo[['InputID']], SettingsInfo[['GroupingVariable']]),
-                              by.y=c(From,SettingsInfo[['GroupingVariable']]),
-                              all.x=TRUE)
-    }else{
-      Output_DataFrame <- merge(x=Output_DataFrame,
-                                y=df_translated ,
-                                by.x=SettingsInfo[['InputID']],
-                                by.y=From,
-                                all.x=TRUE)
-    }
-
-    DF_List[["TranslatedDF"]] <- Output_DataFrame
+    DF_List[["TranslatedDF"]] <- df_translated
 
 
     #----- 5. Mapping Inspection: One-to-Many and Many-to-One relationshipts
