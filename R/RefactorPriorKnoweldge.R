@@ -92,7 +92,7 @@ TranslateID <- function(InputData,
 
     #----- 2. Collapse
     # Now collapse the desired translated column rows into a single row for each group: "16680, 57856, 181457"
-    grouping_vars <- c(SettingsInfo[['GroupingVariable']], From)
+    grouping_vars <- c(SettingsInfo[['GroupingVariable']], SettingsInfo[['InputID']])
 
     df_translated <- df_translated %>%
       dplyr::group_by(!!!rlang::syms(grouping_vars)) %>%
@@ -109,7 +109,7 @@ TranslateID <- function(InputData,
     # Now Inspect the IDs to identify potential problems with mapping - let's do this even if the user chose the GetFirst method, because it is very important to show the limitations...
     if("GroupingVariable" %in% names(SettingsInfo)){
       mapping_inspection = MetaProViz:::InspectID(InputData= df_translated,
-                                                  SettingsInfo = c(OriginalID= From, TranslatedID=paste0(MetaboliteID, '_AllIDs'), GroupingVariable="term"))
+                                                  SettingsInfo = c(OriginalID= From, TranslatedID=(MetaboliteID), GroupingVariable="term"))
     } else {
       mapping_inspection = MetaProViz:::InspectID(InputData= df_translated,
                                                 SettingsInfo = c(OriginalID= From, TranslatedID=paste0(MetaboliteID, '_AllIDs')))
