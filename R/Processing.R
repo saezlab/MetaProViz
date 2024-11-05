@@ -72,7 +72,10 @@ PreProcessing <- function(InputData,
                           PrintPlot = TRUE,
                           FolderPath = NULL
 ){
-## ------------------ Check Input ------------------- ##
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  ## ------------------ Check Input ------------------- ##
   # HelperFunction `CheckInput`
   CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,

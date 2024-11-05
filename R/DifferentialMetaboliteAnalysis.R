@@ -42,7 +42,22 @@
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
+#' @return Dependent on parameter settings, list of lists will be returned for DMA (DF of each comparison), Shapiro (Includes DF and Plot), Bartlett (Includes DF and Histogram), VST (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
+#'
+#' @examples
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' Res <- MetaProViz::DMA(InputData=Intra[-c(49:58) ,-c(1:3)],
+#'                        SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
+#'                        SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+#'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
+#'
+#' @importFrom dplyr select_if filter rename
+#' @importFrom tidyr separate unite
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom logger log_info
+#'
 #' @export
 #'
 DMA <-function(InputData,
@@ -241,7 +256,7 @@ DMA <-function(InputData,
   ###############  Add the metabolite Metadata if available ###############
   if(is.null(SettingsFile_Metab) == FALSE){
       DMA_Output <- lapply(DMA_Output, function(df){
-        merged_df <- merge(df,SettingsFile_Metab%>%rownames_to_column("Metabolite") , by = "Metabolite", all.x = TRUE)
+        merged_df <- merge(df,SettingsFile_Metab%>%tibble::rownames_to_column("Metabolite") , by = "Metabolite", all.x = TRUE)
         return(merged_df)
       })
     }
@@ -263,12 +278,12 @@ DMA <-function(InputData,
     Volplotdata<- DMA_Output[[DF]]
 
     if(CoRe==TRUE){
-      VOlPlot_SettingsFile <- DMA_Output[[DF]]%>%column_to_rownames("Metabolite")
+      VOlPlot_SettingsFile <- DMA_Output[[DF]]%>%tibble::column_to_rownames("Metabolite")
     }
 
     dev.new()
     VolcanoPlot <- invisible(VizVolcano(PlotSettings="Standard",
-                                                    InputData=Volplotdata%>%column_to_rownames("Metabolite"),
+                                                    InputData=Volplotdata%>%tibble::column_to_rownames("Metabolite"),
                                                     SettingsInfo=VolPlot_SettingsInfo,
                                                     SettingsFile_Metab=VOlPlot_SettingsFile,
                                                     y= "p.adj",
@@ -349,7 +364,7 @@ DMA <-function(InputData,
 ### ### ### Log2FC  ### ### ###
 ###############################
 
-#' This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+#' This helper function calculates the Log2(FoldChange) or in case of CoRe Log2(Distance).
 #'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -357,11 +372,20 @@ DMA <-function(InputData,
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{default = FALSE}
 #' @param Transform passed to main function. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma.
 #'
-#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
+#' @return
+#'
+#' @examples
+#' Intra <- ToyData("IntraCells_Raw")
+#'
+#'
+#' @keywords
+#'
+#' @importFrom dplyr
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @noRd
-
-
-
+#'
 Log2FC_fun <-function(InputData,
                       SettingsFile_Sample,
                       SettingsInfo,
@@ -371,6 +395,7 @@ Log2FC_fun <-function(InputData,
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
+  ## ------------ Assignments ----------- ##
   if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
     # all-vs-all: Generate all pairwise combinations
     conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -404,10 +429,10 @@ Log2FC_fun <-function(InputData,
   ## ------------ Check Missingness ------------- ##
   Num <- InputData %>%#Are sample numbers enough?
     filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
-    select_if(is.numeric)#only keep numeric columns with metabolite values
+    dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
   Denom <- InputData %>%
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-    select_if(is.numeric)
+    dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+    dplyr::select_if(is.numeric)
 
   Num_Miss <- replace(Num, Num==0, NA)
   Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
@@ -442,30 +467,30 @@ Log2FC_fun <-function(InputData,
   Log2FC_table <- list()# Create an empty list to store results data frames
   for(column in 1:dim(comparisons)[2]){
     C1 <- InputData %>% # Numerator
-      filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1,column]) %>%
-      select_if(is.numeric)#only keep numeric columns with metabolite values
+      dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1,column]) %>%
+      dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
     C2 <- InputData %>% # Deniminator
-      filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in%  comparisons[2,column]) %>%
-      select_if(is.numeric)
+      dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in%  comparisons[2,column]) %>%
+      dplyr::select_if(is.numeric)
 
     ## ------------  Calculate Log2FC ----------- ##
     # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if mean = 0 (If one value is NA, the mean will be NA even though all other values are available.)
     C1_Zero <- C1
     C1_Zero[is.na(C1_Zero)] <- 0
     Mean_C1 <- C1_Zero %>%
-      summarise_all("mean")
+      dplyr::summarise_all("mean")
 
     C2_Zero <- C2
     C2_Zero[is.na(C2_Zero)] <- 0
     Mean_C2 <- C2_Zero %>%
-      summarise_all("mean")
+      dplyr::summarise_all("mean")
 
     if(CoRe==TRUE){#Calculate absolute distance between the means. log2 transform and add sign (-/+):
       #CoRe values can be negative and positive, which can does not allow us to calculate a Log2FC.
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        rownames_to_column("Metabolite")
+        tibble::rownames_to_column("Metabolite")
       Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        rownames_to_column("Metabolite")
+        tibble::rownames_to_column("Metabolite")
       Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
         dplyr::rename("C1"=2,
                       "C2"=3)
@@ -475,18 +500,18 @@ Log2FC_fun <-function(InputData,
 
       if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
         Mean_Merge <- Mean_Merge%>%
-          mutate(C1 = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+          dplyr::mutate(C1 = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                 C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                 C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                 C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                 TRUE ~ paste(C1)))%>%
-          mutate(C2 = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+          dplyr::mutate(C2 = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                 C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                 C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                 C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                 TRUE ~ paste(C2)))%>%
-          mutate(C1 = as.numeric(C1))%>%
-          mutate(C2 = as.numeric(C2))
+          dplyr::mutate(C1 = as.numeric(C1))%>%
+          dplyr::mutate(C2 = as.numeric(C2))
 
         X <- Mean_Merge%>%
           subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
@@ -497,10 +522,10 @@ Log2FC_fun <-function(InputData,
       Mean_Merge$`Log2(Distance)` <-log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
 
       Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
-        mutate(`Log2(Distance)` = case_when(C1 > C2 ~ paste(`Log2(Distance)`*+1),#If C1>C2 the distance stays positive to reflect that C1 > C2
+        dplyr::mutate(`Log2(Distance)` = case_when(C1 > C2 ~ paste(`Log2(Distance)`*+1),#If C1>C2 the distance stays positive to reflect that C1 > C2
                                             C1 < C2 ~ paste(`Log2(Distance)`*-1),#If C1<C2 the distance gets a negative sign to reflect that C1 < C2
                                             TRUE ~ 'NA'))%>%
-        mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+        dplyr::mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
       #Add additional information:
       temp1 <- Mean_C1
@@ -528,21 +553,21 @@ Log2FC_fun <-function(InputData,
       names(CoRe_info)[4] <- "CoRe_specific"
 
       CoRe_info <-CoRe_info%>%
-        mutate(CoRe = case_when(CoRe_specific == "Released" ~ 'Released',
+        dplyr::mutate(CoRe = case_when(CoRe_specific == "Released" ~ 'Released',
                                 CoRe_specific == "Consumed" ~ 'Consumed',
                                 TRUE ~ 'Released/Consumed'))
 
       Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], CoRe_info[,c(1,4:5,2:3)], by="Metabolite", all.x=TRUE)
 
       #Add info on Input:
-      temp3 <- as.data.frame(t(C1))%>%rownames_to_column("Metabolite")
-      temp4 <- as.data.frame(t(C2))%>%rownames_to_column("Metabolite")
-      temp_3a4 <-merge(temp3, temp4, by="Metabolite", all=TRUE)
-      Log2FC_C1vC2 <-merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
+      temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
+      temp4 <- as.data.frame(t(C2))%>%tibble::rownames_to_column("Metabolite")
+      temp_3a4 <- merge(temp3, temp4, by="Metabolite", all=TRUE)
+      Log2FC_C1vC2 <- merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
 
       #Return DFs
       ##Make reverse DF
-      Log2FC_C2vC1 <-Log2FC_C1vC2
+      Log2FC_C2vC1 <- Log2FC_C1vC2
       Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` *-1
 
       ##Name them
@@ -559,27 +584,27 @@ Log2FC_fun <-function(InputData,
     }else if(CoRe==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        rownames_to_column("Metabolite")
+        tibble::rownames_to_column("Metabolite")
       Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        rownames_to_column("Metabolite")
-      Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        rename("C1"=2,
+        tibble::rownames_to_column("Metabolite")
+      Mean_Merge <- merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
+        dplyr::rename("C1"=2,
                "C2"=3)
       Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
 
       Mean_Merge <- Mean_Merge%>%
-        mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
+        dplyr::mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       TRUE ~ paste(C1)))%>%
-        mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
+        dplyr::mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
                                       C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
                                       TRUE ~ paste(C2)))%>%
-        mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
-        mutate(C2_Adapted = as.numeric(C2_Adapted))
+        dplyr::mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
+        dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
 
       if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
         X <- Mean_Merge%>%
@@ -599,8 +624,8 @@ Log2FC_fun <-function(InputData,
       }
 
       #Add info on Input:
-      temp3 <- as.data.frame(t(C1))%>%rownames_to_column("Metabolite")
-      temp4 <- as.data.frame(t(C2))%>%rownames_to_column("Metabolite")
+      temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
+      temp4 <- as.data.frame(t(C2))%>%tibble::rownames_to_column("Metabolite")
       temp_3a4 <-merge(temp3, temp4, by="Metabolite", all=TRUE)
       Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,8)], temp_3a4, by="Metabolite", all.x=TRUE)
 
@@ -654,11 +679,11 @@ DMA_Stat_single <- function(InputData,
 
   ## ------------ Check Missingness ------------- ##
   Num <- InputData %>%#Are sample numbers enough?
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Numerator"]]) %>%
-    select_if(is.numeric)#only keep numeric columns with metabolite values
+    dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Numerator"]]) %>%
+    dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
   Denom <- InputData %>%
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Denominator"]]) %>%
-    select_if(is.numeric)
+    dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Denominator"]]) %>%
+    dplyr::select_if(is.numeric)
 
   Num_Miss <- replace(Num, Num==0, NA)
   Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
@@ -684,11 +709,11 @@ DMA_Stat_single <- function(InputData,
   ## ------------ Perform Hypothesis testing ----------- ##
   for(column in 1:dim(comparisons)[2]){
     C1 <- InputData %>% # Numerator
-      filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1,column]) %>%
-      select_if(is.numeric)#only keep numeric columns with metabolite values
+      dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1,column]) %>%
+      dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
     C2 <- InputData %>% # Denominator
-      filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in%  comparisons[2,column]) %>%
-      select_if(is.numeric)
+      dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in%  comparisons[2,column]) %>%
+      dplyr::select_if(is.numeric)
   }
 
   # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
@@ -712,7 +737,7 @@ DMA_Stat_single <- function(InputData,
   #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
   PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
   PVal_C1vC2 <-PVal_C1vC2%>%
-    mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
+    dplyr::mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
                              TRUE ~ paste(VecPVAL_C1vC2)))
   PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
 
@@ -824,9 +849,9 @@ AOV <-function(InputData,
 
   #Make output DFs:
   Pval_table <- Tukey_res
-  Pval_table <- rownames_to_column(Pval_table,"Metabolite")
+  Pval_table <- tibble::rownames_to_column(Pval_table,"Metabolite")
 
-  Tval_table <- rownames_to_column(Tukey_res_diff,"Metabolite")
+  Tval_table <- tibble::rownames_to_column(Tukey_res_diff,"Metabolite")
 
   common_col_names <- setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
 
@@ -932,12 +957,12 @@ Kruskal <-function(InputData,
   # Kruskal test (p.val)
   aov.res= apply(InputData,2,function(x) kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
-  anova_res <- as.matrix(mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
+  anova_res <- as.matrix(dplyr::mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
   colnames(anova_res) = c("Kruskal_p.val")
 
   # Dunn test (p.adj)
   Dunndata <- InputData %>%
-    mutate(conditions = conditions) %>%
+    dplyr::mutate(conditions = conditions) %>%
     select(conditions, everything())%>% as.data.frame()
 
   # Applying a loop to obtain p.adj and t.val:
@@ -963,15 +988,15 @@ Kruskal <-function(InputData,
   }
 
   #Make output DFs:
-  Dunn_Pres <- column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
-  Pval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x))))
+  Dunn_Pres <- tibble::column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
+  Pval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x))))
   Pval_table <- Pval_table %>% as.data.frame()
-  Pval_table <- rownames_to_column(Pval_table, "Metabolite")
+  Pval_table <- tibble::rownames_to_column(Pval_table, "Metabolite")
 
-  Dunn_Tres <- column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
-  Tval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))
+  Dunn_Tres <- tibble::column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
+  Tval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))
   Tval_table <- Tval_table %>% as.data.frame()
-  Tval_table <- rownames_to_column(Tval_table, "Metabolite")
+  Tval_table <- tibble::rownames_to_column(Tval_table, "Metabolite")
 
   common_col_names <- setdiff(names(Dunn_Pres), "row.names")
 
@@ -1074,14 +1099,14 @@ Welch <-function(InputData,
   Games_Pres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'p.adj'])) %>% as.data.frame()
   colnames(Games_Pres) <- rownames(posthoc.res.list[[1]])
   comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
-  Games_Pres <- Games_Pres[,colnames(Games_Pres) %in% comps] %>% rownames_to_column("Metabolite")
+  Games_Pres <- Games_Pres[,colnames(Games_Pres) %in% comps] %>% tibble::rownames_to_column("Metabolite")
   # In case of p.adj =0 we change it to 10^-6
   Games_Pres[Games_Pres ==0] <- 0.000001
 
   ## 3. t.val
   Games_Tres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'t.val'])) %>% as.data.frame()
   colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
-  Games_Tres <- Games_Tres[,colnames(Games_Tres) %in% comps] %>% rownames_to_column("Metabolite")
+  Games_Tres <- Games_Tres[,colnames(Games_Tres) %in% comps] %>% tibble::rownames_to_column("Metabolite")
 
   results_list <- list()
   for(col_name in colnames(Games_Pres)){
@@ -1164,7 +1189,7 @@ DMA_Stat_limma <- function(InputData,
 
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
   targets <- SettingsFile_Sample%>%
-    rownames_to_column("sample")
+    tibble::rownames_to_column("sample")
   targets<- targets[,c("sample", SettingsInfo[["Conditions"]])]%>%
     dplyr::rename("condition"=2)%>%
     arrange(sample)#Order the column "sample" alphabetically
@@ -1176,12 +1201,12 @@ DMA_Stat_limma <- function(InputData,
       subset(condition==SettingsInfo[["Numerator"]] | condition==SettingsInfo[["Denominator"]])%>%
       arrange(sample)#Order the column "sample" alphabetically
 
-    Limma_input <- InputData%>%rownames_to_column("sample")
+    Limma_input <- InputData%>%tibble::rownames_to_column("sample")
     Limma_input <-merge(targets[,1:2],  Limma_input, by="sample", all.x=TRUE)
     Limma_input <- Limma_input[,-2]%>%
       arrange(sample)#Order the column "sample" alphabetically
   }else if(MultipleComparison==TRUE){
-    Limma_input <- InputData%>%rownames_to_column("sample")%>%
+    Limma_input <- InputData%>%tibble::rownames_to_column("sample")%>%
       arrange(sample)#Order the column "sample" alphabetically
   }
 
@@ -1194,7 +1219,7 @@ DMA_Stat_limma <- function(InputData,
     dplyr::rename("condition"="condition_limma_compatible")
 
   #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other
-  Limma_input <- as.data.frame(t(Limma_input%>%column_to_rownames("sample")))
+  Limma_input <- as.data.frame(t(Limma_input%>%tibble::column_to_rownames("sample")))
 
   if(Transform==TRUE){
     Limma_input <- log2(Limma_input) # communicate the log2 transformation --> how does limma deals with NA when calculating the change?
@@ -1307,7 +1332,7 @@ DMA_Stat_limma <- function(InputData,
                     "p.adj"=5)
 
     res.t <- res.t%>%
-      rownames_to_column("Metabolite")
+      tibble::rownames_to_column("Metabolite")
 
     # Store the data frame in the results list, named after the contrast
     results_list[[contrast_name]] <- res.t
@@ -1315,13 +1340,13 @@ DMA_Stat_limma <- function(InputData,
 
   #Make the name_match_df
   name_match_df <- as.data.frame(names(results_list))%>%
-    separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
+    tidyr::separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
 
   name_match_df <-merge(name_match_df, targets[,-c(1)] , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
     dplyr::rename("Condition1"=4)
   name_match_df <- merge(name_match_df, targets[,-c(1)] , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
     dplyr::rename("Condition2"=5)%>%
-    unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
+    tidyr::unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
 
   name_match_df<- name_match_df[,c(3,4)]%>%
     distinct(New, .keep_all = TRUE)
@@ -1355,7 +1380,7 @@ DMA_Stat_limma <- function(InputData,
 
   #Add input data
   Cond <- SettingsFile_Sample%>%
-    rownames_to_column("Code")
+    tibble::rownames_to_column("Code")
 
   InputReturn <- merge(Cond[,c("Code",SettingsInfo[["Conditions"]])], as.data.frame(t(Limma_input)),by.x="Code", by.y=0, all.y=TRUE)
 
@@ -1364,8 +1389,8 @@ DMA_Stat_limma <- function(InputData,
     C1 <- parts[1]
     C2 <- parts[2]
     InputReturn_Filt <- InputReturn%>%
-      filter(get(SettingsInfo[["Conditions"]])==C1 | get(SettingsInfo[["Conditions"]])==C2)%>%
-      column_to_rownames("Code")
+      dplyr::filter(get(SettingsInfo[["Conditions"]])==C1 | get(SettingsInfo[["Conditions"]])==C2)%>%
+      tibble::column_to_rownames("Code")
     InputReturn_Filt <-as.data.frame(t(InputReturn_Filt[,-c(1)]))
 
     if(Transform==TRUE){#Add prefix & suffix to each column since the data have been log2 transformed!
@@ -1405,13 +1430,6 @@ Shapiro <-function(InputData,
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
-
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "gtools")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
 
   ## ------------- Checks --------------##
   if(grepl("[[:space:]()-./\\\\]", SettingsInfo[["Conditions"]])==TRUE){
@@ -1461,8 +1479,8 @@ Shapiro <-function(InputData,
   ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
   #Prepare the input:
   Input_shaptest <- replace(InputData, is.na(InputData), 0)%>% #Shapiro test can not handle NAs!
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator)%>%
-    select_if(is.numeric)
+    dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator)%>%
+    dplyr::select_if(is.numeric)
   temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0#  we have to remove features with zero variance if there are any.
   temp <- temp[complete.cases(temp)]  # Remove NAs from temp
   columns_with_zero_variance <- names(temp[temp])# Extract column names where temp is TRUE
@@ -1489,7 +1507,7 @@ Shapiro <-function(InputData,
   for (i in UniqueConditions) {
     # Subset the data for the current condition
     subset_data <- Input_shaptest_Cond%>%
-      column_to_rownames("Row.names")%>%
+      tibble::column_to_rownames("Row.names")%>%
       subset(get(SettingsInfo[["Conditions"]]) == i, select = -c(1))
 
     #Check the sample size (shapiro.test(x) : sample size must be between 3 and 5000):
@@ -1543,7 +1561,7 @@ Shapiro <-function(InputData,
 
       #### Make Group wise data distribution plot and QQ plots
       subset_data <- Input_shaptest_Cond%>%
-        column_to_rownames("Row.names")%>%
+        tibble::column_to_rownames("Row.names")%>%
         subset(get(SettingsInfo[["Conditions"]]) ==  colnames(transpose), select = -c(1))
       all_data <- unlist(subset_data)
 
@@ -1610,9 +1628,9 @@ Shapiro <-function(InputData,
     ##-------- Return
     #Here we make a list
     if(QQplots==TRUE){
-      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
+      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%tibble::rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
     }else{
-      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots))
+      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%tibble::rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots))
     }
 
     suppressWarnings(invisible(return(Shapiro_output_list)))
@@ -1642,13 +1660,6 @@ Bartlett <-function(InputData,
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
-
   ################################################################################################################################################################################################
 
   conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1664,12 +1675,12 @@ Bartlett <-function(InputData,
   for(l in 1:length(bartlett_res)){
     DF_bartlett_results[l, 1] <-bartlett_res[[l]]$p.value
   }
-  DF_bartlett_results <- DF_bartlett_results %>% mutate(`Var homogeneity`= case_when(`Bartlett p.val`< 0.05~ FALSE,
+  DF_bartlett_results <- DF_bartlett_results %>% dplyr::mutate(`Var homogeneity`= case_when(`Bartlett p.val`< 0.05~ FALSE,
                                                                                      `Bartlett p.val`>=0.05 ~ TRUE))
   # if p<0.05 then unequal variances
   message("For ",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
 
-  DF_bartlett_results <- DF_bartlett_results %>% rownames_to_column("Metabolite") %>% relocate("Metabolite")
+  DF_bartlett_results <- DF_bartlett_results %>% tibble::rownames_to_column("Metabolite") %>% relocate("Metabolite")
   DF_Bartlett_results_out <- DF_bartlett_results
 
   #### Plots:
