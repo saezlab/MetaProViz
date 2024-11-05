@@ -301,3 +301,11 @@ StandardORA <- function(InputData,
   }
 
 
+#################################
+### ### ### Helper Fishers exact test ### ### ###
+#################################
+#'
+#'
+
+# perform test on n groups of features. DF with column feature and column group
+# output list of DFs named after groups
