@@ -44,8 +44,8 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- ToyData("IntraCells_Raw")
-#' Res <- PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' Res <- MetaProViz::PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
 #'                                  SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
 #'                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
