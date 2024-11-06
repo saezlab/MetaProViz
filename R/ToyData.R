@@ -39,7 +39,7 @@
 #'
 #' @return A data frame containing the toy data.
 #'
-#' @description Import and process .csv file to create toy data.
+#' @description Import and process .csv file to create toy data DF.
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
@@ -81,7 +81,7 @@ ToyData <- function(Dataset) {
   datasets %>%
   magrittr::extract2(Dataset) %>%
     system.file("data", ., package = "MetaProViz") %>%
-    readr::read_csv(col_types = cols()) %>%
+    readr::read_csv(col_types = readr::cols()) %>%
     {`if`(
     (rncol <- names(.) %>% intersect(rncols)) %>% length,
     tibble::column_to_rownames(., rncol),
