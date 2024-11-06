@@ -28,7 +28,7 @@
 #'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(Conditions="ColumnName_SettingsFile"). Can additionally pass information on numerator or denominator c(Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param StatPval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
 #' @param StatPadj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param SettingsFile_Metab \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. The row names must match the metabolite names in the columns of the InputData. \strong{Default = NULL}
@@ -36,11 +36,11 @@
 #' @param VST TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = FALSE}
 #' @param PerformShapiro TRUE or FALSE for whether to perform the shapiro.test and get informed about data distribution (normal versus not-normal distribution. \strong{Default = TRUE}
 #' @param PerformBartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
-#' @param Transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{default: NULL}
+#' @param Transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @return Dependent on parameter settings, list of lists will be returned for DMA (DF of each comparison), Shapiro (Includes DF and Plot), Bartlett (Includes DF and Histogram), VST (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
 #'
@@ -52,9 +52,8 @@
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #'
-#' @importFrom dplyr select_if filter rename
-#' @importFrom tidyr separate unite
-#' @importFrom magrittr %>% %<>%
+#' @importFrom dplyr rename
+#' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_info
 #'
@@ -368,34 +367,32 @@ DMA <-function(InputData,
 #'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param SettingsInfo \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{default = FALSE}
-#' @param Transform passed to main function. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma.
+#' @param Transform \emph{Optional: } If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma.\strong{default = TRUE}
 #'
-#' @return
+#' @return List of DFs named after comparison (e.g. Tumour versus Normal) with Log2FC or Log2(Distance) column and column with feature names
 #'
-#' @examples
-#' Intra <- ToyData("IntraCells_Raw")
+#' @keywords Log2FC, CoRe, Distance
 #'
-#'
-#' @keywords
-#'
-#' @importFrom dplyr
-#' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom tidyr summarise_all
+#' @importFrom dplyr select_if filter rename mutate
+#' @importFrom magrittr %>%
+#' @importFrom gtools foldchange2logratio
+#' @importFrom tibble rownames_to_column
 #'
 #' @noRd
 #'
 Log2FC_fun <-function(InputData,
                       SettingsFile_Sample,
-                      SettingsInfo,
-                      CoRe,
-                      Transform
+                      SettingsInfo=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+                      CoRe=FALSE,
+                      Transform=TRUE
 ){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
-  ## ------------ Assignments ----------- ##
+  # ------------ Assignments ----------- ##
   if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==FALSE){
     # all-vs-all: Generate all pairwise combinations
     conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -463,7 +460,7 @@ Log2FC_fun <-function(InputData,
   }
 
   ####################################################################################################################################
-  ##----------------- Log2FC ----------------------------
+  ## ----------------- Log2FC ----------------------------
   Log2FC_table <- list()# Create an empty list to store results data frames
   for(column in 1:dim(comparisons)[2]){
     C1 <- InputData %>% # Numerator
@@ -657,23 +654,33 @@ Log2FC_fun <-function(InputData,
 ### ### ### DMA helper function: Internal Function to perform single comparison ### ### ###
 ##########################################################################################
 
-#' @param InputData Passed to DMA
-#' @param SettingsFile_Sample Passed to DMA.
-#' @param SettingsInfo Passed to DMA.
-#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
-#' @param StatPval Passed to DMA
-#' @param StatPadj Passed to DMA
+#' This helper function to calculate One-vs-One comparison statistics
 #'
-#' @keywords DMA helper function
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo  Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (here one-vs-one).
+#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param StatPval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default = "t.test"}
+#' @param StatPadj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#'
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#'
+#' @keywords Statistical testing, p-value, t-value
+#'
+#' @importFrom stats p.adjust
+#' @importFrom tidyr summarise_all
+#' @importFrom dplyr select_if filter rename mutate
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#'
 #' @noRd
 #'
-
 DMA_Stat_single <- function(InputData,
                             SettingsFile_Sample,
                             SettingsInfo,
-                            Log2FC_table,
-                            StatPval,
-                            StatPadj){
+                            Log2FC_table=NULL,
+                            StatPval="t.test",
+                            StatPadj="fdr"){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -747,7 +754,7 @@ DMA_Stat_single <- function(InputData,
   PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
   #perform adjustment
-  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = StatPadj, n = length((PVal_C1vC2[,2]))) #p-adjusted
+  VecPADJ_C1vC2 <- stats::p.adjust((PVal_C1vC2[,2]),method = StatPadj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   Metabolite <- PVal_C1vC2[,1]
   PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
@@ -774,24 +781,33 @@ DMA_Stat_single <- function(InputData,
 }
 
 
-# all-vs-all:
 ################################################################
-### ### ### AOV: Internal Function to perform anova  ### ### ###
+### ### ### AOV: Internal Function to perform Anova  ### ### ###
 ################################################################
 
-#' @param InputData Passed to DMA
-#' @param SettingsFile_Sample Passed to DMA.
-#' @param SettingsInfo Passed to DMA.
-#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
+#' This helper function to calculate One-vs-All or All-vs-All comparison statistics
 #'
-#' @keywords Kruskal test,Hypothesis testing, p.value
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#'
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#'
+#' @keywords Statistical testing, p-value, t-value
+#'
+#' @importFrom stats aov TukeyHSD
+#' @importFromprob setdiff
+#' @importFrom dplyr rename
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#'
 #' @noRd
-
-
+#'
 AOV <-function(InputData,
                SettingsFile_Sample,
-               SettingsInfo,
-               Log2FC_table){
+               SettingsInfo=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+               Log2FC_table=NULL){
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -822,12 +838,11 @@ AOV <-function(InputData,
 
   #############################################################################################
   ## 1. Anova p.val
-  aov.res= apply(InputData,2,function(x) aov(x~conditions))
+  aov.res= apply(InputData,2,function(x) stats::aov(x~conditions))
 
   ## 2. Tukey test p.adj
-  posthoc.res = lapply(aov.res, TukeyHSD, conf.level=0.95)
-  Tukey_res <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'p adj']))
-  Tukey_res <- as.data.frame(Tukey_res)
+  posthoc.res = lapply(aov.res, stats::TukeyHSD, conf.level=0.95)
+  Tukey_res <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'p adj'])) %>% as.data.frame()
 
   comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
   opp_comps <-  paste(comparisons[2, ], comparisons[1, ], sep="-")
@@ -853,7 +868,7 @@ AOV <-function(InputData,
 
   Tval_table <- tibble::rownames_to_column(Tukey_res_diff,"Metabolite")
 
-  common_col_names <- setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
+  common_col_names <- prob::setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
 
   results_list <- list()
   for(col_name in common_col_names){
@@ -909,21 +924,32 @@ AOV <-function(InputData,
 ### ### ### Kruskal: Internal Function to perform Kruskal test  ### ### ###
 ###########################################################################
 
-#' @param InputData Passed to DMA
-#' @param SettingsFile_Sample Passed to DMA.
-#' @param SettingsInfo Passed to DMA.
-#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
-#' @param StatPadj Passed to DMA
+#' This helper function to calculate One-vs-All or All-vs-All comparison statistics
 #'
-#' @keywords Kruskal test,Hypothesis testing, p.value
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param StatPadj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#'
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#'
+#' @keywords Statistical testing, p-value, t-value
+#'
+#' @importFrom stats kruskal.test
+#' @importFrom prob setdiff
+#' @importFrom rstatix dunn_test
+#' @importFrom dplyr rename mutate_all mutate select
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @noRd
-
-
+#'
 Kruskal <-function(InputData,
                    SettingsFile_Sample,
-                   SettingsInfo,
-                   Log2FC_table,
-                   StatPadj
+                   SettingsInfo=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+                   Log2FC_table = NULL,
+                   StatPadj = "fdr"
 ){
 
   ## ------------ Create log file ----------- ##
@@ -955,7 +981,7 @@ Kruskal <-function(InputData,
 
   #############################################################################################
   # Kruskal test (p.val)
-  aov.res= apply(InputData,2,function(x) kruskal.test(x~conditions))
+  aov.res= apply(InputData,2,function(x) stats::kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
   anova_res <- as.matrix(dplyr::mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
   colnames(anova_res) = c("Kruskal_p.val")
@@ -963,7 +989,8 @@ Kruskal <-function(InputData,
   # Dunn test (p.adj)
   Dunndata <- InputData %>%
     dplyr::mutate(conditions = conditions) %>%
-    select(conditions, everything())%>% as.data.frame()
+    dplyr::select(conditions, everything())%>%
+    as.data.frame()
 
   # Applying a loop to obtain p.adj and t.val:
   Dunn_Pres<- data.frame(comparisons = paste(comparisons[1,],    comparisons[2,], sep = "_vs_" ))
@@ -989,16 +1016,16 @@ Kruskal <-function(InputData,
 
   #Make output DFs:
   Dunn_Pres <- tibble::column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
-  Pval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x))))
-  Pval_table <- Pval_table %>% as.data.frame()
-  Pval_table <- tibble::rownames_to_column(Pval_table, "Metabolite")
+  Pval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x)))) %>%
+    as.data.frame()%>%
+    tibble::rownames_to_column("Metabolite")
 
   Dunn_Tres <- tibble::column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
-  Tval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))
-  Tval_table <- Tval_table %>% as.data.frame()
-  Tval_table <- tibble::rownames_to_column(Tval_table, "Metabolite")
+  Tval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))%>%
+    as.data.frame()%>%
+    tibble::rownames_to_column("Metabolite")
 
-  common_col_names <- setdiff(names(Dunn_Pres), "row.names")
+  common_col_names <- prob::setdiff(names(Dunn_Pres), "row.names")
 
   results_list <- list()
   for(col_name in common_col_names){
@@ -1035,18 +1062,28 @@ Kruskal <-function(InputData,
 ### ### ### Welch: Internal Function to perform anova for unequal variance groups ### ### ###
 #############################################################################################
 
-#' @param InputData Passed to DMA
-#' @param SettingsFile_Sample Passed to DMA.
-#' @param SettingsInfo Passed to DMA.
-#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
+#' This helper function to calculate One-vs-All or All-vs-All comparison statistics
 #'
-#' @keywords Welch anova,Hypothesis testing, p.value, Games-Howell-test
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#'
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#'
+#' @keywords Statistical testing, p-value, t-value
+#'
+#' @importFrom rstatix games_howell_test
+#' @importFrom dplyr rename
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#'
 #' @noRd
-
+#'
 Welch <-function(InputData,
                  SettingsFile_Sample,
-                 SettingsInfo,
-                 Log2FC_table
+                 SettingsInfo=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+                 Log2FC_table=NULL
 ){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -1074,7 +1111,6 @@ Welch <-function(InputData,
     MultipleComparison = TRUE
     all_vs_all = FALSE
   }
-
 
   ###############################################################################################################
   ## 1. Welch's ANOVA using oneway.test is not used by the Games post.hoc function
@@ -1150,25 +1186,35 @@ Welch <-function(InputData,
 ### ### ### DMA helper function: Internal Function to perform limma ### ### ###
 ##########################################################################################
 
-#' @param InputData Passed to DMA
-#' @param SettingsFile_Sample Passed to DMA
-#' @param SettingsInfo Passed to DMA
-#' @param Log2FC_table this is the Log2FC DF generated within the DMA function.
-#' @param StatPadj Passed to DMA
-#' @param CoRe Passed to DMA
-#' @param Transform Passed to DMA. if TRUE log2 transformation will be performed.
+#' This helper function to calculate One-vs-One, One-vs-All or All-vs-All comparison statistics
 #'
-#' @keywords DMA helper function
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param StatPadj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param CoRe \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
+#' @param Transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
+#'
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#'
+#' @keywords Statistical testing, p-value, t-value
+#'
+#' @importFrom limma lmFit makeContrasts contrasts.fit eBayes topTable
+#' @importFrom dplyr rename arrange filter
+#' @importFrom tidyr separate unite
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @noRd
 #'
-
 DMA_Stat_limma <- function(InputData,
                            SettingsFile_Sample,
-                           SettingsInfo,
-                           Log2FC_table,
-                           StatPadj,
-                           CoRe,
-                           Transform){
+                           SettingsInfo=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+                           Log2FC_table = NULL,
+                           StatPadj ="fdr",
+                           CoRe=FALSE,
+                           Transform= TRUE){
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -1186,20 +1232,19 @@ DMA_Stat_limma <- function(InputData,
     all_vs_all = FALSE
   }
 
-
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_SettingsFile_Sample:
   targets <- SettingsFile_Sample%>%
     tibble::rownames_to_column("sample")
   targets<- targets[,c("sample", SettingsInfo[["Conditions"]])]%>%
     dplyr::rename("condition"=2)%>%
-    arrange(sample)#Order the column "sample" alphabetically
+    dplyr::arrange(sample)#Order the column "sample" alphabetically
   targets$condition_limma_compatible <-make.names(targets$condition)#make appropriate condition names accepted by limma
 
   if(MultipleComparison==FALSE){
     #subset the data:
     targets<-targets%>%
       subset(condition==SettingsInfo[["Numerator"]] | condition==SettingsInfo[["Denominator"]])%>%
-      arrange(sample)#Order the column "sample" alphabetically
+      dplyr::arrange(sample)#Order the column "sample" alphabetically
 
     Limma_input <- InputData%>%tibble::rownames_to_column("sample")
     Limma_input <-merge(targets[,1:2],  Limma_input, by="sample", all.x=TRUE)
@@ -1207,7 +1252,7 @@ DMA_Stat_limma <- function(InputData,
       arrange(sample)#Order the column "sample" alphabetically
   }else if(MultipleComparison==TRUE){
     Limma_input <- InputData%>%tibble::rownames_to_column("sample")%>%
-      arrange(sample)#Order the column "sample" alphabetically
+      dplyr::arrange(sample)#Order the column "sample" alphabetically
   }
 
   #Check if the order of the "sample" column is the same in both data frames
@@ -1411,20 +1456,31 @@ DMA_Stat_limma <- function(InputData,
 ### ### ### Shapiro function: Internal Function to perform Shapiro test and plots ### ### ###
 #############################################################################################
 
+#' This helper function to perform Shapiro test and plots
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param StatPval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
 #' @param QQplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be plotted  \strong{default = TRUE}
 #'
+#' @return List with tewo entries: DF (including the results DF) and Plots (including the Density and QQ plots)
+#'
 #' @keywords Shapiro test,Normality testing, Density plot, QQplot
+#'
+#' @importFrom stats shapiro.test
+#' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous theme_minimal labs ggplot_build geom_qq geom_qq_line
+#' @importFrom dplyr rename select_if filter
+#' @importFrom prob setdiff
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @noRd
 #'
-
 Shapiro <-function(InputData,
                    SettingsFile_Sample,
-                   SettingsInfo,
-                   StatPval,
+                   SettingsInfo=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+                   StatPval= "t-test",
                    QQplots=TRUE
 ){
 
@@ -1517,7 +1573,7 @@ Shapiro <-function(InputData,
       warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
     }else{
       # Apply Shapiro-Wilk test to each feature in the subset
-     shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+     shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) stats::shapiro.test(x)))
     }
   }
 
@@ -1556,7 +1612,7 @@ Shapiro <-function(InputData,
       #Reorder the DF:
       all_columns <- colnames(DF_shapiro_results)
       include_columns <- c("Metabolites with normal distribution [%]", "Metabolites with not-normal distribution [%]")
-      exclude_columns <- setdiff(all_columns, include_columns)
+      exclude_columns <- prob::setdiff(all_columns, include_columns)
       DF_shapiro_results <- DF_shapiro_results[, c(include_columns, exclude_columns)]
 
       #### Make Group wise data distribution plot and QQ plots
@@ -1565,27 +1621,25 @@ Shapiro <-function(InputData,
         subset(get(SettingsInfo[["Conditions"]]) ==  colnames(transpose), select = -c(1))
       all_data <- unlist(subset_data)
 
-      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white")  +
-        geom_density(alpha = 0.2, fill = "grey45")
+      plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
+        ggplot2::geom_histogram(ggplot2::aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white")  +
+        ggplot2::geom_density(alpha = 0.2, fill = "grey45")
 
-      density_values <- ggplot_build(plot)$data[[2]]
+      density_values <- ggplot2::ggplot_build(plot)$data[[2]]
 
-      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
-        geom_density(alpha=.2, fill="grey45") +
-        scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
+      plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
+        ggplot2::geom_histogram( ggplot2::aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
+        ggplot2::geom_density(alpha=.2, fill="grey45") +
+        ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
 
-      density_values2 <- ggplot_build(plot)$data[[2]]
+      density_values2 <- ggplot2::ggplot_build(plot)$data[[2]]
 
-      suppressWarnings(sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
-                        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
-                        geom_density(alpha=.2, fill="grey45") +
-                        scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
-                        theme_minimal()+
-                        # geom_vline(xintercept =median(all_data) , linetype = "dashed", color = "red")+
-                        labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")#+
-                      # geom_text(aes(x = density_values2$x[which.max(density_values2$y)], y = 0, label = "Median"),  vjust = 0, hjust = -0.5, color = "red", size = 3.5)  # Add label for
+      suppressWarnings(sampleDist <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
+                         ggplot2::geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
+                         ggplot2::geom_density(alpha=.2, fill="grey45") +
+                         ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
+                         ggplot2::theme_minimal()+
+                         ggplot2::labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")
       )
 
       Density_plots[[paste(colnames(transpose))]] <- sampleDist
@@ -1598,10 +1652,10 @@ Shapiro <-function(InputData,
         #QQ plots for each groups for each metabolite for normality visual check
         qq_plot_list <- list()
         for (col_name in colnames(subset_data)){
-          qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
-            geom_qq() +
-            geom_qq_line(color = "red") +
-            labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+          qq_plot <- ggplot2::ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
+            ggplot2::geom_qq() +
+            ggplot2::geom_qq_line(color = "red") +
+            ggplot2::labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
 
           plot.new()
           plot(qq_plot)
@@ -1643,16 +1697,24 @@ Shapiro <-function(InputData,
 ### ### ### Bartlett function: Internal Function to perform Bartlett test and plots ### ###
 ###########################################################################################
 
+#' This helper function perform the Bartlett test to check the homogeneity of variances across groups
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param SettingsInfo \emph{Optional: } Named vector including the information about the conditions column c(conditions="ColumnName_Plot_SettingsFile"). Can additionally pass information on numerator or denominator c(numerator = "ColumnName_Plot_SettingsFile", denumerator = "ColumnName_Plot_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param SettingsInfo  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#'
+#' @return List with two entries: DF (including the results DF) and Plots (including the  histogramm plot)
 #'
 #' @keywords Bartlett test,Normality testing, Density plot, QQplot
+#'
+#' @importFrom stats bartlett.test
+#' @importFrom ggplot2 ggplot geom_histogram geom_density ggtitle xlab geom_vline
+#' @importFrom dplyr mutate
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#'
 #' @noRd
 #'
-
-
-
 Bartlett <-function(InputData,
                     SettingsFile_Sample,
                     SettingsInfo){
@@ -1665,7 +1727,7 @@ Bartlett <-function(InputData,
   conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
 
   # Use Bartletts test
-  bartlett_res =  apply(InputData,2,function(x) bartlett.test(x~conditions))
+  bartlett_res =  apply(InputData,2,function(x) stats::bartlett.test(x~conditions))
 
   #Make the output DF
   DF_bartlett_results <- as.data.frame(matrix(NA, nrow = ncol(InputData)), ncol = 1)
@@ -1685,10 +1747,12 @@ Bartlett <-function(InputData,
 
   #### Plots:
   #Make density plots
-  Bartlettplot <- ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`Bartlett p.val`)) +
-    geom_histogram(aes(y=..density..), colour="black", fill="white")  +
-    geom_density(alpha = 0.2, fill = "grey45")+ ggtitle("Bartlett's test p.value distribution") +
-    xlab("p.value")+ geom_vline(aes(xintercept = 0.05, color="darkred"))
+  Bartlettplot <- ggplot2::ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`Bartlett p.val`)) +
+    ggplot2::geom_histogram(aes(y=..density..), colour="black", fill="white")  +
+    ggplot2::geom_density(alpha = 0.2, fill = "grey45")+
+    ggplot2::ggtitle("Bartlett's test p.value distribution") +
+    ggplot2::xlab("p.value")+
+    ggplot2::geom_vline(aes(xintercept = 0.05, color="darkred"))
 
   Bartlett_output_list<- list("DF"=list("Bartlett_result"=DF_Bartlett_results_out) , "Plot"=list("Histogram"=Bartlettplot))
 
@@ -1701,11 +1765,24 @@ Bartlett <-function(InputData,
 ### ### ### Variance stabilizing transformation function ### ###
 ################################################################
 
+#' This function performs a variance stabilizing transformation (VST) on the input data.
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #'
+#' @return List with two entries: DF (including the results DF) and Plots (including the scedasticity_plot)
+#'
 #' @keywords Heteroscedasticity, variance stabilizing transformation
+#'
+#' @importFrom reshape2 melt
+#' @importFrom stats lm
+#' @importFrom ggplot2 ggplot geom_point theme_bw scale_x_continuous scale_y_continuous xlab ylab geom_abline ggtitle geom_smooth aes
+#' @importFrom patchwork wrap_plots
+#' @importFrom dplyr summarise group_by
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#'
 #' @noRd
-
+#'
 vst <- function(InputData){
 
   ## ------------ Create log file ----------- ##
@@ -1713,15 +1790,22 @@ vst <- function(InputData){
 
   # model the mean and variance relationship on the data
   suppressMessages(melted <- reshape2::melt(InputData))
-  het.data <- melted %>% group_by(variable) %>% # make a dataframe to save the values
-    summarise(mean=mean(value), sd=sd(value))
+  het.data <- melted %>%
+    dplyr::group_by(variable) %>% # make a dataframe to save the values
+    dplyr::summarise(mean=mean(value), sd=sd(value))
   het.data$lm <- 1 # add a common group for the lm function to account for the whole data together
 
-  invisible(het_plot <-  ggplot(het.data, aes(x = mean, y = sd)) +
-               geom_point() + theme_bw() +
-               scale_x_continuous(trans='log2') +
-               scale_y_continuous(trans='log2') + xlab("log(mean)") + ylab("log(sd)") + geom_abline(intercept = 0, slope = 1)  +
-               ggtitle(" Data heteroscedasticity")  + geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
+  invisible(het_plot <-
+              ggplot2::ggplot(het.data, ggplot2::aes(x = mean, y = sd)) +
+              ggplot2::geom_point() +
+              ggplot2::theme_bw() +
+              ggplot2::scale_x_continuous(trans='log2') +
+              ggplot2::scale_y_continuous(trans='log2') +
+              ggplot2::xlab("log(mean)") +
+              ggplot2::ylab("log(sd)") +
+              ggplot2::geom_abline(intercept = 0, slope = 1)  +
+              ggplot2::ggtitle(" Data heteroscedasticity")  +
+              ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
 
   # select data
   prevst.data <- het.data
@@ -1729,7 +1813,7 @@ vst <- function(InputData){
   prevst.data$sd <- log(prevst.data$sd)
 
   # calculate the slope of the log data
-  data.fit <- lm(sd~mean, prevst.data)
+  data.fit <- stats::lm(sd~mean, prevst.data)
   coef(data.fit)
 
   # Make the vst transformation
@@ -1737,16 +1821,23 @@ vst <- function(InputData){
 
   # Heteroscedasticity visual check again
   suppressMessages(melted.vst <- reshape::melt(data.vst))
-  het.vst.data <- melted.vst %>% group_by(variable) %>% # make a dataframe to save the values
-    summarise(mean=mean(value), sd=sd(value))
+  het.vst.data <- melted.vst %>%
+    dplyr::group_by(variable) %>% # make a dataframe to save the values
+    dplyr::summarise(mean=mean(value), sd=sd(value))
   het.vst.data$lm <- 1 # add a common group for the lm function to account for the whole data together
 
   # plot variable stadard deviation as a function of the mean
-  invisible(hom_plot <- ggplot(het.vst.data, aes(x = mean, y = sd)) +
-              geom_point() + theme_bw() +
-              scale_x_continuous(trans='log2') +
-              scale_y_continuous(trans='log2') + xlab("log(mean)") + ylab("log(sd)") + geom_abline(intercept = 0)  +
-              ggtitle("Vst transformed data")  + geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
+  invisible(hom_plot <-
+              ggplot2::ggplot(het.vst.data,  ggplot2::aes(x = mean, y = sd)) +
+              ggplot2::geom_point() +
+              ggplot2::theme_bw() +
+              ggplot2::scale_x_continuous(trans='log2') +
+              ggplot2::scale_y_continuous(trans='log2') +
+              ggplot2::xlab("log(mean)") +
+              ggplot2::ylab("log(sd)") +
+              ggplot2::geom_abline(intercept = 0)  +
+              ggplot2::ggtitle("Vst transformed data")  +
+              ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
 
   invisible(scedasticity_plot <- patchwork::wrap_plots(het_plot,hom_plot))
 
