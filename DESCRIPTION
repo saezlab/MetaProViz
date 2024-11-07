@@ -1,4 +1,5 @@
 Package: MetaProViz
+Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
 Version: 2.1.1
 Authors@R: c(
