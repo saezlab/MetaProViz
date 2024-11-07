@@ -58,7 +58,7 @@ MCA_2Cond <- function(InputData_C1,
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  MetaProViz:::CheckInput_MCA(InputData_C1=InputData_C1,
+  CheckInput_MCA(InputData_C1=InputData_C1,
                               InputData_C2=InputData_C2,
                               InputData_CoRe=NULL,
                               InputData_Intra=NULL,
@@ -72,7 +72,7 @@ MCA_2Cond <- function(InputData_C1,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MCA2Cond",
+    Folder <- SavePath(FolderName= "MCA2Cond",
                                     FolderPath=FolderPath)
   }
 
@@ -392,7 +392,7 @@ MCA_2Cond <- function(InputData_C1,
   DF_List <- list("MCA_2Cond_Summary"=ClusterSummary, "MCA_2Cond_Results"=MergeDF_Rearrange)
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DF_List,
+    SaveRes(InputList_DF=DF_List,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -438,17 +438,12 @@ MCA_CoRe <- function(InputData_Intra,
                      FolderPath=NULL
                      ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  MetaProViz:::CheckInput_MCA(InputData_C1=NULL,
+  CheckInput_MCA(InputData_C1=NULL,
                               InputData_C2=NULL,
                               InputData_CoRe= InputData_CoRe,
                               InputData_Intra=InputData_Intra,
@@ -463,7 +458,7 @@ MCA_CoRe <- function(InputData_Intra,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MCACoRe",
+    Folder <- SavePath(FolderName= "MCACoRe",
                                     FolderPath=FolderPath)
   }
 
@@ -1006,7 +1001,7 @@ MCA_CoRe <- function(InputData_Intra,
   DF_List <- list("MCA_CoRe_Summary"=ClusterSummary, "MCA_CoRe_Results"=MergeDF_Rearrange)
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=DF_List,
+    SaveRes(InputList_DF=DF_List,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -1032,6 +1027,9 @@ MCA_CoRe <- function(InputData_Intra,
 #' @export
 #'
 MCA_rules<- function(Method){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
   # Read the .csv files
   Cond <- system.file("data", "MCA_2Cond.csv", package = "MetaProViz")
   Cond<- read.csv( Cond, check.names=FALSE)
@@ -1046,214 +1044,5 @@ MCA_rules<- function(Method){
     assign("MCA_CoRe", CoRe, envir=.GlobalEnv)
   } else{
     warning("Please choose the MCA regulatory rules you would like to load: 2Cond, CoRe")
-  }
-}
-
-
-################################################################################################
-### ### ### MCA Helper function: Internal Function to check function input ### ### ###
-################################################################################################
-
-#' Check input parameters
-#'
-#' @param InputData_C1 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param InputData_C2 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param InputData_Intra Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param InputData_CoRe Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_C1 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_C2 Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_Intra Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_CoRe Passed to main function MetaProViz::MCA. If not avaliable can be set to NULL.
-#' @param BackgroundMethod Passed to main function MetaProViz::MCA.
-#' @param FeatureID Passed to main function MetaProViz::MCA.
-#' @param SaveAs_Table Passed to main function MetaProViz::PreProcessing(). If not avaliable can be set to NULL.
-#'
-#' @param Function Name of the MetaProViz Function that is checked.
-#' @param InputList
-#'
-#'
-#' @keywords Input check
-#' @noRd
-#'
-#'
-
-CheckInput_MCA <- function(InputData_C1,
-                           InputData_C2,
-                           InputData_CoRe,
-                           InputData_Intra,
-                           SettingsInfo_C1,
-                           SettingsInfo_C2,
-                           SettingsInfo_CoRe,
-                           SettingsInfo_Intra,
-                           BackgroundMethod,
-                           FeatureID,
-                           SaveAs_Table
-                           ){
-  #------------- InputData
-  if(is.null(InputData_C1)==FALSE){
-    if(class(InputData_C1) != "data.frame"| class(InputData_C2) != "data.frame"){
-    stop("InputData_C1 and InputData_C2 should be a data.frame. It's currently a ", paste(class(InputData_C1)), paste(class(InputData_C2)), ".",sep = "")
-    }
-    if(length(InputData_C1[duplicated(InputData_C1[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_C1, whilst features must be unique")
-    }
-    if(length(InputData_C2[duplicated(InputData_C2[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_C2, whilst features must be unique")
-    }
-
-  }else{
-    if(class(InputData_Intra) != "data.frame"| class(InputData_CoRe) != "data.frame"){
-      stop("InputData_Intra and InputData_CoRe should be a data.frame. It's currently a ", paste(class(InputData_Intra)), paste(class(InputData_CoRe)), ".",sep = "")
-    }
-    if(length(InputData_Intra[duplicated(InputData_Intra[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_Intra, whilst features must be unique")
-    }
-    if(length(InputData_CoRe[duplicated(InputData_CoRe[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_CoRe, whilst features must be unique")
-    }
-  }
-
-
-  #------------- SettingsInfo
-  if(is.null(SettingsInfo_C1)==FALSE){
-    ## C1
-    #ValueCol
-    if("ValueCol" %in% names(SettingsInfo_C1)){
-      if(SettingsInfo_C1[["ValueCol"]] %in% colnames(InputData_C1)== FALSE){
-        stop("The ", SettingsInfo_C1[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
-      }
-    }
-    #StatCol
-    if("StatCol" %in% names(SettingsInfo_C1)){
-      if(SettingsInfo_C1[["StatCol"]] %in% colnames(InputData_C1)== FALSE){
-        stop("The ", SettingsInfo_C1[["StatCol"]], " column selected as StatCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
-      }
-    }
-
-    ## C2
-    #ValueCol
-    if("ValueCol" %in% names(SettingsInfo_C2)){
-      if(SettingsInfo_C2[["ValueCol"]] %in% colnames(InputData_C2)== FALSE){
-        stop("The ", SettingsInfo_C2[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
-      }
-    }
-    #StatCol
-    if("StatCol" %in% names(SettingsInfo_C2)){
-      if(SettingsInfo_C2[["StatCol"]] %in% colnames(InputData_C2)== FALSE){
-        stop("The ", SettingsInfo_C2[["StatCol"]], " column selected as StatCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
-      }
-    }
-  }else{
-    ## Intra
-    #ValueCol
-    if("ValueCol" %in% names(SettingsInfo_Intra)){
-      if(SettingsInfo_Intra[["ValueCol"]] %in% colnames(InputData_Intra)== FALSE){
-        stop("The ", SettingsInfo_Intra[["ValueCol"]], " column selected as ValueCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
-      }
-    }
-    #StatCol
-    if("StatCol" %in% names(SettingsInfo_Intra)){
-      if(SettingsInfo_Intra[["StatCol"]] %in% colnames(InputData_Intra)== FALSE){
-        stop("The ", SettingsInfo_Intra[["StatCol"]], " column selected as StatCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
-      }
-    }
-
-    ## CoRe
-    #ValueCol
-    if("ValueCol" %in% names(SettingsInfo_CoRe)){
-      if(SettingsInfo_CoRe[["ValueCol"]] %in% colnames(InputData_CoRe)== FALSE){
-        stop("The ", SettingsInfo_CoRe[["ValueCol"]], " column selected as ValueCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
-      }
-    }
-    #StatCol
-    if("StatCol" %in% names(SettingsInfo_CoRe)){
-      if(SettingsInfo_CoRe[["StatCol"]] %in% colnames(InputData_CoRe)== FALSE){
-        stop("The ", SettingsInfo_CoRe[["StatCol"]], " column selected as StatCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
-      }
-    }
-
-    #StatCol
-    if("DirectionCol" %in% names(SettingsInfo_CoRe)){
-      if(SettingsInfo_CoRe[["DirectionCol"]] %in% colnames(InputData_CoRe)== FALSE){
-        stop("The ", SettingsInfo_CoRe[["DirectionCol"]], " column selected as DirectionCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
-      }
-    }
-
-  }
-
-  #------------- SettingsInfo Cutoffs:
-  if(is.null(SettingsInfo_C1)==FALSE){
-    if(is.na(as.numeric(SettingsInfo_C1[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_C1[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_C1[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
-    }
-
-    if(is.na(as.numeric(SettingsInfo_C2[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_C2[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_C2[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
-    }
-
-    if(is.na(as.numeric(SettingsInfo_C1[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
-    }
-
-    if(is.na(as.numeric(SettingsInfo_C2[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
-    }
-
-  }else{
-    if(is.na(as.numeric(SettingsInfo_Intra[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_Intra[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_Intra[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
-    }
-
-    if(is.na(as.numeric(SettingsInfo_CoRe[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
-    }
-
-    if(is.na(as.numeric(SettingsInfo_Intra[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
-    }
-
-    if(is.na(as.numeric(SettingsInfo_CoRe[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
-    }
-  }
-
-  #------------ NAs in data
-  if(is.null(InputData_C1)==FALSE){
-    if(nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) < nrow(InputData_C1)){
-      warning("InputData_C1 includes NAs in ", SettingsInfo_C1[["ValueCol"]], " and/or in ", SettingsInfo_C1[["StatCol"]], ". ", nrow(InputData_C1)- nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
-    }
-
-    if(nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) < nrow(InputData_C2)){
-      warning("InputData_C2 includes NAs in ", SettingsInfo_C2[["ValueCol"]], " and/or in", SettingsInfo_C2[["StatCol"]], ". ", nrow(InputData_C2)- nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
-    }
-  }else{
-    if(nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) < nrow(InputData_Intra)){
-      warning("InputData_Intra includes NAs in ", SettingsInfo_Intra[["ValueCol"]], " and/or in ", SettingsInfo_Intra[["StatCol"]], ". ", nrow(InputData_Intra)- nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
-    }
-
-    if(nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) < nrow(InputData_CoRe)){
-      warning("InputData_CoRe includes NAs in ", SettingsInfo_CoRe[["ValueCol"]], " and/or in ", SettingsInfo_CoRe[["StatCol"]], ". ", nrow(InputData_CoRe)- nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
-    }
-  }
-
- #------------- BackgroundMethod
-  if(is.null(SettingsInfo_C1)==FALSE){
-    options <- c("C1|C2", "C1&C2", "C2", "C1" , "*")
-    if(any(options %in% BackgroundMethod) == FALSE){
-        stop("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
-    }
-  }else{
-    options <- c("Intra|CoRe", "Intra&CoRe", "CoRe", "Intra" , "*")
-    if(any(options %in% BackgroundMethod) == FALSE){
-      stop("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
-    }
-  }
-
-  #------------- SaveAs
-  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
-  if(is.null(SaveAs_Table)==FALSE){
-    if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
-      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
-    }
   }
 }

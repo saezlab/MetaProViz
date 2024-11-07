@@ -24,6 +24,8 @@
 ### ### ### Heatmap ### ### ###
 ###############################
 
+#' Heatmap visualization
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
 #' @param SettingsInfo  \emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_SettingsFile_Metab",individual_Sample= "ColumnName_SettingsFile_Sample", color_Metab="ColumnName_SettingsFile_Metab", color_Sample= list("ColumnName_SettingsFile_Sample", "ColumnName_SettingsFile_Sample",...)).\strong{Default = NULL}
 #' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}
@@ -35,7 +37,19 @@
 #' @param Enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
-#' @keywords Volcano plot, pathways
+#' @return List with two elements: Plot and Plot_Sized
+#'
+#' @examples
+#' Intra <- ToyData("IntraCells_Raw")
+#' Res <- VizHeatmap(InputData=Intra[,-c(1:3)])
+#'
+#' @keywords Heatmap
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames
+#'
 #' @export
 #'
 #'
@@ -53,10 +67,12 @@ VizHeatmap <- function(InputData,
                        PrintPlot=TRUE,
                        FolderPath = NULL
 ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=SettingsFile_Metab,
                           SettingsInfo=SettingsInfo,
@@ -78,7 +94,7 @@ VizHeatmap <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "Heatmap",
+    Folder <- SavePath(FolderName= "Heatmap",
                                     FolderPath=FolderPath)
   }
 
@@ -213,7 +229,7 @@ VizHeatmap <- function(InputData,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
+          SaveRes(InputList_DF=NULL,
                                InputList_Plot= PlotList_adaptedGrid,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
@@ -352,7 +368,7 @@ VizHeatmap <- function(InputData,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
+          SaveRes(InputList_DF=NULL,
                                InputList_Plot= PlotList_adaptedGrid,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
@@ -515,7 +531,7 @@ VizHeatmap <- function(InputData,
 
             #----- Save
             suppressMessages(suppressWarnings(
-              MetaProViz:::SaveRes(InputList_DF=NULL,
+              SaveRes(InputList_DF=NULL,
                                    InputList_Plot= PlotList_adaptedGrid,
                                    SaveAs_Table=NULL,
                                    SaveAs_Plot=SaveAs_Plot,
@@ -625,11 +641,11 @@ VizHeatmap <- function(InputData,
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = element_rect(fill = "transparent")))
 
-    PlotList_adaptedGrid[[PlotName]] <- Plot_Sized
+    PlotList_adaptedGrid[[paste("Heatmap_",PlotName, sep="")]] <- Plot_Sized
 
     #----- Save
     suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                            InputList_Plot= PlotList_adaptedGrid,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
@@ -649,102 +665,3 @@ VizHeatmap <- function(InputData,
     }
    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
-
-
-##############################################################
-### ### ### Heatmap helper function: Internal Function ### ### ###
-##############################################################
-
-#' @param InputPlot This is the ggplot object generated within the VizHeatmap function.
-#' @param SettingsInfo Passed to VizHeatmap
-#' @param SettingsFile_Sample Passed to VizHeatmap
-#' @param SettingsFile_Metab Passed to VizHeatmap
-#' @param PlotName Passed to VizHeatmap
-#'
-#' @keywords Heatmap helper function
-#' @noRd
-
-PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample, SettingsFile_Metab, PlotName){
-
-  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
-  HEAT_PARAM <- list(
-    widths = list(
-      list("legend", "2cm")
-    ),
-    heights = list(
-      list("main", "1cm")
-    )
-  )
-
-  #If we plot feature names on the x-axis, we need to adjust the height of the plot:
-  #if(as.logical(show_rownames)==TRUE){
-  #  Rows <- nrow(t(data))
-  #}
-
-  #Adjust the parameters:
-  Input <- InputPlot$gtable
-
-  Plot_Sized <- Input  %>%
-    withCanvasSize(width = 12, height = 11) %>%
-    adjust_layout(HEAT_PARAM) %>%
-    adjust_title(c(PlotName))
-
-  #Extract legend information and adjust:
-  color_entries <- grep("^color", names(SettingsInfo), value = TRUE)
-  if(length(color_entries)>0){#We need to adapt the plot Hights and widths
-    if(sum(grepl("color_Sample", names(SettingsInfo)))>0){
-      names <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
-      colour_names <- NULL
-      legend_names <- NULL
-      for (x in 1:length(names)){
-        names_sel <- names[[x]]
-        legend_names[x] <- names_sel
-        colour_names[x] <- SettingsFile_Sample[names[[x]]]
-      }
-    }else{
-      colour_names <- NULL
-      legend_names <- NULL
-    }
-
-    if(sum(grepl("color_Metab", names(SettingsInfo)))>0){
-      names <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
-      colour_names_M <- NULL
-      legend_names_M <- NULL
-      for (x in 1:length(names)){
-        names_sel <- names[[x]]
-        legend_names_M[x] <- names_sel
-        colour_names_M[x] <- SettingsFile_Metab[names[[x]]]
-      }
-    }else{
-      colour_names_M <- NULL
-      legend_names_M <- NULL
-    }
-
-    legend_head <- c(legend_names, legend_names_M)
-    longest_name <- legend_head[which.max(nchar(legend_head[[1]]))]
-    character_count_head <- nchar(longest_name)+4#This is the length of the legend title name
-
-    legend_names <- c(unlist(colour_names), unlist(colour_names_M))
-    longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
-    character_count <- nchar(longest_name)#This is the length of the legend colour names
-
-    legendWidth <-  unit(((max(character_count_head, character_count))*0.3), "cm")#legend space
-
-    # Sum up total heights:
-    Plot_Sized$width %<>% add(legendWidth)
-
-    legendHeights <- unit((sum(length(unique(legend_names_M))+length(unique(colour_names_M))+length(unique(legend_names))+length(unique(colour_names)))), "cm")
-
-    Plot_Sized$width %<>% add(legendWidth)
-    if((grid::convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
-      Plot_Sized$height <- legendHeights
-    }
-
-  }
-
-  Output <- Plot_Sized
-
-}
-
-
-

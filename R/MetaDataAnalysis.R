@@ -51,16 +51,13 @@ MetaAnalysis <- function(InputData,
 
 ){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           SettingsFile_Sample=SettingsFile_Sample,
                           SettingsFile_Metab=NULL,
                           SettingsInfo=NULL,
@@ -81,7 +78,7 @@ MetaAnalysis <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MetaAnalysis",
+    Folder <- SavePath(FolderName= "MetaAnalysis",
                                     FolderPath=FolderPath)
   }
 
@@ -250,7 +247,7 @@ MetaAnalysis <- function(InputData,
      mutate_all(~replace(., is.na(.), 0))
 
    #Plot
-   invisible(MetaProViz::VizHeatmap(InputData = Data_Heat,
+   invisible(VizHeatmap(InputData = Data_Heat,
                                     PlotName = "ExplainedVariance-bigger-0.1Percent_AND_p.adj-smaller0.05",
                                     Scale = "none",
                                     SaveAs_Plot = SaveAs_Plot,
@@ -264,7 +261,7 @@ MetaAnalysis <- function(InputData,
     ResList <- list(res_prcomp = PCA.res_Info, res_loadings = PCA.res_Loadings, res_TopBottomFeatures = TopBottom_Features, res_aov=Stat_results, res_summary=Res_summary)
 
     # Save the results
-    MetaProViz:::SaveRes(InputList_DF=ResList,
+    SaveRes(InputList_DF=ResList,
                          InputList_Plot = NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=FALSE,
@@ -304,11 +301,9 @@ MetaPK <- function(InputData,
                    SaveAs_Table = "csv",
                    FolderPath = NULL){
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  suppressMessages(library(tidyverse))
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
@@ -320,7 +315,7 @@ MetaPK <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "MetaAnalysis",
+    Folder <- SavePath(FolderName= "MetaAnalysis",
                                     FolderPath=FolderPath)
   }
 

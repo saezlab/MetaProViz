@@ -50,8 +50,12 @@ ClusterORA <- function(InputData,
                        maxGSSize=1000 ,
                        SaveAs_Table= "csv",
                        FolderPath = NULL){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+
    ## ------------ Check Input files ----------- ##
-  Pathways <- MetaProViz:::CheckInput_ORA(InputData=InputData,
+  Pathways <- CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
                                           RemoveBackground=RemoveBackground,
                                           PathwayFile=PathwayFile,
@@ -64,7 +68,7 @@ ClusterORA <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "ClusterORA",
+    Folder <- SavePath(FolderName= "ClusterORA",
                                     FolderPath=FolderPath)
     }
 
@@ -134,7 +138,7 @@ ClusterORA <- function(InputData,
   }
   #Save files
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=df_list,
+    SaveRes(InputList_DF=df_list,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -185,8 +189,12 @@ StandardORA <- function(InputData,
                         FolderPath = NULL
 
 ){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+
  ## ------------ Check Input files ----------- ##
-  Pathways <- MetaProViz:::CheckInput_ORA(InputData=InputData,
+  Pathways <- CheckInput_ORA(InputData=InputData,
                                           SettingsInfo=SettingsInfo,
                                           RemoveBackground=FALSE,
                                           PathwayFile=PathwayFile,
@@ -199,7 +207,7 @@ StandardORA <- function(InputData,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "ORA",
+    Folder <- SavePath(FolderName= "ORA",
                                     FolderPath=FolderPath)
   }
 
@@ -277,7 +285,7 @@ StandardORA <- function(InputData,
 
   #save:
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=ORA_output_list,
+    SaveRes(InputList_DF=ORA_output_list,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -293,140 +301,11 @@ StandardORA <- function(InputData,
   }
 
 
-################################################################################################
-### ### ### ORA helper function: Internal Function to check function input ### ### ###
-################################################################################################
-
-#' Check input parameters
-#'
-#' @param InputData Passed to main function MetaProViz::PreProcessing()
-#' @param SettingsInfo Passed to main function MetaProViz::PreProcessing()
-#'
-#' @keywords Input check
-#' @noRd
+#################################
+### ### ### Helper Fishers exact test ### ### ###
+#################################
 #'
 #'
 
-CheckInput_ORA <- function(InputData,
-                           SettingsInfo,
-                           RemoveBackground,
-                           PathwayFile,
-                           PathwayName,
-                           minGSSize,
-                           maxGSSize,
-                           SaveAs_Table,
-                           pCutoff,
-                           PercentageCutoff
-                           ){
-  # 1. The input data:
-  if(class(InputData) != "data.frame"){
-    stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
-  }
-  if(any(duplicated(row.names(InputData)))==TRUE){
-    stop("Duplicated row.names of InputData, whilst row.names must be unique")
-  }
-
-  # 2. Settings Columns:
-  if(is.vector(SettingsInfo)==FALSE & is.null(SettingsInfo)==FALSE){
-    stop("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
-  }
-
-  if(is.null(SettingsInfo)==FALSE){
-    #"ClusterColumn"
-    if("ClusterColumn" %in% names(SettingsInfo)){
-      if(SettingsInfo[["ClusterColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["ClusterColumn"]], " column selected as ClusterColumn in SettingsInfo was not found in InputData. Please check your input.")
-      }
-    }
-
-    #"BackgroundColumn"
-    if("BackgroundColumn" %in% names(SettingsInfo)){
-      if(SettingsInfo[["BackgroundColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["BackgroundColumn"]], " column selected as BackgroundColumn in SettingsInfo was not found in InputData. Please check your input.")
-      }
-    }
-
-    #"pvalColumn"
-    if("pvalColumn" %in% names(SettingsInfo)){
-      if(SettingsInfo[["pvalColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["pvalColumn"]], " column selected as pvalColumn in SettingsInfo was not found in InputData. Please check your input.")
-      }
-    }
-
-    #"PercentageColumn"
-    if("PercentageColumn" %in% names(SettingsInfo)){
-      if(SettingsInfo[["PercentageColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["PercentageColumn"]], " column selected as PercentageColumn in SettingsInfo was not found in InputData. Please check your input.")
-      }
-    }
-
-
-    #"PathwayTerm"
-    if("PathwayTerm" %in% names(SettingsInfo)){
-      if(SettingsInfo[["PathwayTerm"]] %in% colnames(PathwayFile)== FALSE){
-        stop("The ", SettingsInfo[["PathwayTerm"]], " column selected as PathwayTerm in SettingsInfo was not found in PathwayFile. Please check your input.")
-      }else{
-        PathwayFile <- PathwayFile%>%
-          dplyr::rename("term"=SettingsInfo[["PathwayTerm"]])
-        PathwayFile$Description <- PathwayFile$term
-      }
-    }else{
-      stop("SettingsInfo must provide the column name for PathwayTerm in PathwayFile")
-    }
-
-    # PathwayFeature
-    if("PathwayFeature" %in% names(SettingsInfo)){
-      if(SettingsInfo[["PathwayFeature"]] %in% colnames(PathwayFile)== FALSE){
-        stop("The ", SettingsInfo[["PathwayFeature"]], " column selected as PathwayFeature in SettingsInfo was not found in PathwayFile. Please check your input.")
-      }else{
-        PathwayFile <- PathwayFile%>%
-          dplyr::rename("gene"=SettingsInfo[["PathwayFeature"]])
-      }
-    }else{
-      stop("SettingsInfo must provide the column name for PathwayFeature in PathwayFile")
-    }
-
-  }else{
-    stop("you must provide SettingsInfo.")
-  }
-
-  # 3. General Settings
-  if(is.character(PathwayName)==FALSE){
-    stop("Check input. PathwayName must be a character of syntax 'example'.")
-  }
-
-  if(is.logical(RemoveBackground) == FALSE){
-    stop("Check input. RemoveBackground value should be either =TRUE or = FALSE.")
-  }
-
-  if(is.numeric(minGSSize)== FALSE){
-    stop("Check input. The selected minGSSize value should be numeric.")
-  }
-
-  if(is.numeric(maxGSSize)== FALSE){
-    stop("Check input. The selected maxGSSize value should be numeric.")
-  }
-
-  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
-  if(is.null(SaveAs_Table)==FALSE){
-    if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
-      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
-    }
-  }
-
-  if(is.null(pCutoff)== FALSE){
-    if(is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
-    stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
-  }
-  }
-
-  if(is.null(PercentageCutoff)== FALSE){
-    if( is.numeric(PercentageCutoff)== FALSE  | PercentageCutoff > 100 | PercentageCutoff < 0){
-    stop("Check input. The selected PercentageCutoff value should be numeric and between 0 and 100.")
-  }
-  }
-
-
-  ## -------- Return Pathways ---------##
-  return(invisible(PathwayFile))
-}
+# perform test on n groups of features. DF with column feature and column group
+# output list of DFs named after groups
