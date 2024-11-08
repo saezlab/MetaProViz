@@ -86,8 +86,8 @@ This script allows you to perform different data visualizations using the result
 Volcano plot visualization
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_DMA")
-Res <- MetaProViz::VizVolcano(InputData=Intra)
+Intra <- ToyData("IntraCells_DMA")
+Res <- VizVolcano(InputData=Intra)
 
 }
 \keyword{Volcano}

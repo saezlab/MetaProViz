@@ -56,8 +56,8 @@ This script allows you to perform PCA plot visualization using the results of th
 PCA plot visualization
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")[,-c(1:3)]
-Res <- MetaProViz::VizPCA(Intra)
+Intra <- ToyData("IntraCells_Raw")[,-c(1:3)]
+Res <- VizPCA(Intra)
 
 }
 \keyword{PCA}

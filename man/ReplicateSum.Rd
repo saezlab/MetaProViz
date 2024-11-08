@@ -23,8 +23,18 @@ ReplicateSum(
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
+\value{
+DF with the merged analytical replicates
+}
 \description{
 Merges the analytical replicates of an experiment
+}
+\examples{
+Intra <- ToyData("IntraCells_Raw")
+Res <- ReplicateSum(InputData=Intra[-c(49:58) ,-c(1:3)],
+                                SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
+                                SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+
 }
 \keyword{Analytical}
 \keyword{Merge}

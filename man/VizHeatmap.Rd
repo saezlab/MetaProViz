@@ -48,8 +48,8 @@ This script allows you to perform different data visualizations using the result
 Heatmap visualization
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")
-Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
+Intra <- ToyData("IntraCells_Raw")
+Res <- VizHeatmap(InputData=Intra[,-c(1:3)])
 
 }
 \keyword{Heatmap}
