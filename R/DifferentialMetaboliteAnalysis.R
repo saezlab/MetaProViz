@@ -375,8 +375,7 @@ DMA <-function(InputData,
 #'
 #' @keywords Log2FC, CoRe, Distance
 #'
-#' @importFrom tidyr summarise_all
-#' @importFrom dplyr select_if filter rename mutate
+#' @importFrom dplyr select_if filter rename mutate summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
@@ -668,8 +667,7 @@ Log2FC_fun <-function(InputData,
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom stats p.adjust
-#' @importFrom tidyr summarise_all
-#' @importFrom dplyr select_if filter rename mutate
+#' @importFrom dplyr select_if filter rename mutate summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #'
@@ -797,7 +795,6 @@ DMA_Stat_single <- function(InputData,
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom stats aov TukeyHSD
-#' @importFromprob setdiff
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
@@ -868,7 +865,7 @@ AOV <-function(InputData,
 
   Tval_table <- tibble::rownames_to_column(Tukey_res_diff,"Metabolite")
 
-  common_col_names <- prob::setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
+  common_col_names <- setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
 
   results_list <- list()
   for(col_name in common_col_names){
@@ -937,7 +934,6 @@ AOV <-function(InputData,
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom stats kruskal.test
-#' @importFrom prob setdiff
 #' @importFrom rstatix dunn_test
 #' @importFrom dplyr rename mutate_all mutate select
 #' @importFrom magrittr %>%
@@ -1025,7 +1021,7 @@ Kruskal <-function(InputData,
     as.data.frame()%>%
     tibble::rownames_to_column("Metabolite")
 
-  common_col_names <- prob::setdiff(names(Dunn_Pres), "row.names")
+  common_col_names <- setdiff(names(Dunn_Pres), "row.names")
 
   results_list <- list()
   for(col_name in common_col_names){
@@ -1471,7 +1467,6 @@ DMA_Stat_limma <- function(InputData,
 #' @importFrom stats shapiro.test
 #' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous theme_minimal labs ggplot_build geom_qq geom_qq_line
 #' @importFrom dplyr rename select_if filter
-#' @importFrom prob setdiff
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #'
@@ -1612,7 +1607,7 @@ Shapiro <-function(InputData,
       #Reorder the DF:
       all_columns <- colnames(DF_shapiro_results)
       include_columns <- c("Metabolites with normal distribution [%]", "Metabolites with not-normal distribution [%]")
-      exclude_columns <- prob::setdiff(all_columns, include_columns)
+      exclude_columns <- setdiff(all_columns, include_columns)
       DF_shapiro_results <- DF_shapiro_results[, c(include_columns, exclude_columns)]
 
       #### Make Group wise data distribution plot and QQ plots

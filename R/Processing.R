@@ -270,11 +270,11 @@ PreProcessing <- function(InputData,
 #'
 #' @keywords Analytical Replicate Merge
 #'
-#' @importFrom dplyr mutate_all summarise_all select rename
+#' @importFrom dplyr mutate_all summarise_all select rename ungroup group_by
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames ungroup
+#' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
-#' @importFrom tidyr unite group_by
+#' @importFrom tidyr unite
 #'
 #' @export
 #'
@@ -390,9 +390,9 @@ ReplicateSum <- function(InputData,
 #'
 #' @keywords Coefficient of Variation, high variance metabolites
 #'
-#' @importFrom dplyr case_when select rowwise mutate
+#' @importFrom dplyr case_when select rowwise mutate ungroup
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames ungroup
+#' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_info log_trace
 #'
 #' @export
