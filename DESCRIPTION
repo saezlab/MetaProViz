@@ -52,7 +52,7 @@ Imports:
     limma,
     logger,
     magrittr,
-    OmnipathR,
+    OmnipathR (>= 3.15.1),
     patchwork,
     pheatmap,
     purrr,
