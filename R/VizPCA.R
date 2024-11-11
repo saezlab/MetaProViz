@@ -120,15 +120,11 @@ VizPCA <- function(InputData,
     }
   } else{
     safe_colorblind_palette <-ColorPalette
-    #check that length is enough for what the user wants to colour
   }
   if(is.null(ShapePalette)){
     safe_shape_palette <- c(15,17,16,18,6,7,8,11,12)
-    #check that length is enough for what the user wants to shape
   } else{
     safe_shape_palette <-ShapePalette
-    #check that length is enough for what the user wants to shape
-    #stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
   }
 
   logger::log_info(paste("VizPCA colour:", paste(safe_colorblind_palette, collapse = ", ")))
