@@ -369,7 +369,7 @@ ReplicateSum <- function(InputData,
 ### ### ### Metabolite detection estimation using pool samples ### ### ###
 ##########################################################################
 
-#' Find metabolites with high variqability across total pool samples
+#' Find metabolites with high variability across total pool samples
 #'
 #' @param InputData DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.
 #' @param SettingsFile_Sample  \emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}
@@ -455,13 +455,12 @@ PoolEstimation <- function(InputData,
   ## ------------------ Prepare the data ------------------- ##
   #InputData files:
   if(is.null(SettingsFile_Sample)==TRUE){
-    PoolData <- InputData
-    PoolData[PoolData == 0] <- NA
+    PoolData <- InputData%>%
+      dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
   }else{
-    PoolData <- InputData[SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["PoolSamples"]],]
-    PoolData[PoolData == 0] <- NA
+    PoolData <- InputData[SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["PoolSamples"]],]%>%
+      dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
   }
-
 
   ###################################################################################################################################
   ## ------------------ Coefficient of Variation ------------------- ##
@@ -633,7 +632,8 @@ FeatureFiltering <-function(InputData,
 
 
   ## ------------------ Prepare the data ------------------- ##
-  feat_filt_data <- as.data.frame(replace(InputData, InputData==0, NA))
+  feat_filt_data <- as.data.frame(InputData)%>%
+    dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
 
   if(CoRe== TRUE){ # remove CoRe_media samples for feature filtering
     feat_filt_data <- feat_filt_data %>% dplyr::filter(!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] ==SettingsInfo[["CoRe_media"]])
@@ -745,8 +745,8 @@ MVImputation <-function(InputData,
                         CoRe=FALSE,
                         MVI_Percentage=50){
   ## ------------------ Prepare the data ------------------- ##
-  filtered_matrix <- InputData
-  filtered_matrix[filtered_matrix == 0] <- NA
+  filtered_matrix <- InputData%>%
+    dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
 
   ## ------------------ Perform MVI ------------------ ##
   # Do MVI for the samples
