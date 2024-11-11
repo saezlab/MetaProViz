@@ -93,14 +93,15 @@ DMA <-function(InputData,
                           PrintPlot= PrintPlot)
 
   # HelperFunction `CheckInput` Specific
-  Settings <- CheckInput_DMA(InputData=InputData,
-                                          SettingsFile_Sample=SettingsFile_Sample,
-                                          SettingsInfo=SettingsInfo,
-                                          StatPval=StatPval,
-                                          StatPadj=StatPadj,
-                                          PerformShapiro=PerformShapiro,
-                                          PerformBartlett=PerformBartlett,
-                                          Transform=Transform)
+  CheckInput_DMA(InputData=InputData,
+                 SettingsFile_Sample=SettingsFile_Sample,
+                 SettingsInfo=SettingsInfo,
+                 StatPval=StatPval,
+                 StatPadj=StatPadj,
+                 PerformShapiro=PerformShapiro,
+                 PerformBartlett=PerformBartlett,
+                 VST=VST,
+                 Transform=Transform)
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
