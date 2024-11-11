@@ -25,26 +25,26 @@
 
 #' Check input general parameters
 #'
-# REFACT: Description of each argument should start with its type; e.g.
-# "@param x Character: name of the variable mapped to the x axis."
-#' @param InputData Passed to main function Function().
+#' @param InputData Passed to MetaProViz functions. Usually DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. But can also be differential expression results or other InputData.
 #' @param InputData_Num  \emph{Optional: } If InputData must be numeric \strong{Default = TRUE}
-#' @param SettingsFile_Sample \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param SettingsFile_Metab \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param SettingsInfo \emph{Optional: } Passed to main function Function() \strong{Default = NULL}
-#' @param SaveAs_Plot \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL.\strong{Default = NULL}
-#' @param SaveAs_Table \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL.\strong{Default = NULL}
-#' @param CoRe \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
-#' @param PrintPlot \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = FALSE}
-#' @param Theme \emph{Optional: } Passed to main function Function(). If not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. If not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param SettingsFile_Metab \emph{Optional: } DF which contains information about the features. If not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param SettingsInfo \emph{Optional: } Passed to MetaProViz functions. Usually named vector containing the information about the names of the experimental parameters in SettingsFile_Sample, SettingsFile_Metab or InputData. \strong{Default = NULL}
+#' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. If set to NULL, plots are not saved.\strong{Default = NULL}
+#' @param SaveAs_Table \emph{Optional: } Select the file type of output table. Options are "csv", "xlsx", "txt". If set to NULL, plots are not saved. \strong{Default = NULL}
+#' @param CoRe \emph{Optional: } If TRUE, a consumption-release experiment has been performed. If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param PrintPlot \emph{Optional: } If TRUE prints an overview of resulting plots. If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param Theme \emph{Optional: } Can be set for VizX functions. If not avaliable can be set to NULL. \strong{Default = NULL}
 #' @param PlotSettings \emph{Optional: } Needs to be set for VizX functions. Options are "Sample", "Feature", Both". This refers to SettingsInfo color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
 #'
+#' @return returns warnings and errors if input is not correct
 #'
 #' @keywords Input check
+#'
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
 CheckInput <- function(InputData,
                        InputData_Num=TRUE,
                        SettingsFile_Sample=NULL,
@@ -59,34 +59,39 @@ CheckInput <- function(InputData,
   ############## Parameters valid for multiple MetaProViz functions
 
   #-------------InputData
-  # REFACT: this will fail with "condition has length > 1" error, and also
-  # gives wrong result. Use is.data.frame() instead.
-  if(class(InputData) != "data.frame"){
-    stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
+  if(is.data.frame(InputData)==FALSE){
+    message <- paste0("InputData should be a data.frame. It's currently a ", paste(class(InputData)), ".", sep = "")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(any(duplicated(row.names(InputData)))==TRUE){
-    stop("Duplicated row.names of InputData, whilst row.names must be unique")
+    message <- paste0("Duplicated row.names of InputData, whilst row.names must be unique")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(InputData_Num==TRUE){
      Test_num <- apply(InputData, 2, function(x) is.numeric(x))
      if((any(Test_num) ==  FALSE) ==  TRUE){
-       stop("InputData needs to be of class numeric")
+       message <- paste0("InputData needs to be of class numeric")
+       logger::log_trace(paste("Error ", message, sep=""))
+       stop(message)
        }
   }
 
-
   if(sum(duplicated(colnames(InputData))) > 0){
-    doublons <- as.character(colnames(InputData)[duplicated(colnames(InputData))])#number of duplications
-    #data <-data[!duplicated(colnames(InputData)),]#remove duplications
-    stop("InputData contained duplicates column names, whilst col.names must be unique.")
+    message <- paste0("InputData contained duplicates column names, whilst col.names must be unique.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   #-------------SettingsFile
   if(is.null(SettingsFile_Sample)==FALSE){
     Test_match <- merge(SettingsFile_Sample, InputData, by = "row.names", all =  FALSE)
     if(nrow(Test_match) ==  0){
-        stop("row.names InputData need to match row.names SettingsFile_Sample.")
+      message <- paste0("row.names InputData need to match row.names SettingsFile_Sample.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
       }
   }
 
@@ -99,47 +104,61 @@ CheckInput <- function(InputData,
 
   #-------------SettingsInfo
   if(is.vector(SettingsInfo)==FALSE & is.null(SettingsInfo)==FALSE){
-    stop("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
+    message <- paste0("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(SettingsInfo)==FALSE){
     #Conditions
     if("Conditions" %in% names(SettingsInfo)){
       if(SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ", SettingsInfo[["Conditions"]], " column selected as Conditions in SettingsInfo was not found in SettingsFile. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["Conditions"]], " column selected as Conditions in SettingsInfo was not found in SettingsFile. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #Biological replicates
     if("Biological_Replicates" %in% names(SettingsInfo)){
       if(SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["Biological_Replicates"]], " column selected as Biological_Replicates in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #Numerator
     if("Numerator" %in% names(SettingsInfo)==TRUE){
       if(SettingsInfo[["Numerator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
-        stop("The ",SettingsInfo[["Numerator"]], " column selected as numerator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        message <- paste0("The ",SettingsInfo[["Numerator"]], " column selected as numerator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
    #Denominator
     if("Denominator" %in% names(SettingsInfo)==TRUE){
       if(SettingsInfo[["Denominator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
-        stop("The ",SettingsInfo[["Denominator"]], " column selected as denominator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        message <- paste0("The ",SettingsInfo[["Denominator"]], " column selected as denominator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #Denominator & Numerator
     if("Denominator" %in% names(SettingsInfo)==FALSE  & "Numerator" %in% names(SettingsInfo) ==TRUE){
-      stop("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison." )
+      message <- paste0("Check input. The selected denominator option is empty while ",paste(SettingsInfo[["Numerator"]])," has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     #Superplot
     if("Superplot" %in% names(SettingsInfo)){
       if(SettingsInfo[["Superplot"]] %in% colnames(SettingsFile_Sample)== FALSE){
-        stop("The ",SettingsInfo[["Superplot"]], " column selected as Superplot column in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        message <- paste0("The ",SettingsInfo[["Superplot"]], " column selected as Superplot column in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
@@ -148,86 +167,112 @@ CheckInput <- function(InputData,
         #Plot colour
         if("color" %in% names(SettingsInfo)){
           if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Sample)== FALSE){
-            stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot shape
         if("shape" %in% names(SettingsInfo)){
           if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Sample)== FALSE){
-            stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot individual
         if("individual" %in% names(SettingsInfo)){
           if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Sample)== FALSE){
-            stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
       }else if(PlotSettings== "Feature"){
         if("color" %in% names(SettingsInfo)){
           if(SettingsInfo[["color"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["color"]], " column selected as color in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot shape
         if("shape" %in% names(SettingsInfo)){
           if(SettingsInfo[["shape"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["shape"]], " column selected as shape in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot individual
         if("individual" %in% names(SettingsInfo)){
           if(SettingsInfo[["individual"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
       }else if(PlotSettings== "Both"){
         #Plot colour sample
         if("color_Sample" %in% names(SettingsInfo)){
           if(SettingsInfo[["color_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
-            stop("The ",SettingsInfo[["color_Sample"]], " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["color_Sample"]], " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot colour Metab
         if("color_Metab" %in% names(SettingsInfo)){
           if(SettingsInfo[["color_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["color_Metab"]], " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["color_Metab"]], " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
           if(sum(colnames(InputData) %in% SettingsFile_Metab$Metabolite) < length(InputData)  ){
-            warning("The InputData contains metabolites not found in SettingsFile_Metab.")
+            message <- paste0("The InputData contains metabolites not found in SettingsFile_Metab.")
+            logger::log_trace(paste("Warning ", message, sep=""))
+            warning(message)
           }
         }
 
        # Plot shape_metab
         if("shape_Metab" %in% names(SettingsInfo)){
           if(SettingsInfo[["shape_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["shape_Metab"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["shape_Metab"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         # Plot shape_metab
         if("shape_Sample" %in% names(SettingsInfo)){
           if(SettingsInfo[["shape_Sample"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["shape_Sample"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["shape_Sample"]], " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot individual_Metab
         if("individual_Metab" %in% names(SettingsInfo)){
           if(SettingsInfo[["individual_Metab"]] %in% colnames(SettingsFile_Metab)== FALSE){
-            stop("The ",SettingsInfo[["individual_Metab"]], " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["individual_Metab"]], " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
         #Plot individual_Sample
         if("individual_Sample" %in% names(SettingsInfo)){
           if(SettingsInfo[["individual_Sample"]] %in% colnames(SettingsFile_Sample)== FALSE){
-            stop("The ",SettingsInfo[["individual_Sample"]], " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            message <- paste0("The ",SettingsInfo[["individual_Sample"]], " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
           }
         }
 
@@ -240,33 +285,42 @@ CheckInput <- function(InputData,
   Save_as_Plot_options <- c("svg","pdf", "png")
   if(is.null(SaveAs_Plot)==FALSE){
     if(SaveAs_Plot %in% Save_as_Plot_options == FALSE){
-    stop("Check input. The selected SaveAs_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", ")," or set to NULL if no plots should be saved." )
+      message <- paste0("Check input. The selected SaveAs_Plot option is not valid. Please select one of the folowwing: ",paste(Save_as_Plot_options,collapse = ", ")," or set to NULL if no plots should be saved.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
   }
   }
-
 
   SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
   if(is.null(SaveAs_Table)==FALSE){
     if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
-      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+      message <- paste0("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", ")," or set to NULL if no tables should be saved.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
   #-------------CoRe
   if(is.logical(CoRe) == FALSE){
-    stop("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
+    message <- paste0("Check input. The CoRe value should be either =TRUE for preprocessing of Consuption/Release experiment or =FALSE if not.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   #-------------Theme
   if(is.null(Theme)==FALSE){
     Theme_options <- c("theme_grey()", "theme_gray()", "theme_bw()", "theme_linedraw()", "theme_light()", "theme_dark()", "theme_minimal()", "theme_classic()", "theme_void()", "theme_test()")
     if (Theme %in% Theme_options == FALSE){
-      stop("Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
+      message <- paste0("Check input. Theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",paste(Theme_options, collapse = ", "),"." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
   #------------- general
   if(is.logical(PrintPlot) == FALSE){
-    stop("Check input. PrintPlot should be either =TRUE or =FALSE.")
+    message <- paste0("Check input. PrintPlot should be either =TRUE or =FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 }
 
@@ -276,46 +330,53 @@ CheckInput <- function(InputData,
 
 #' Check specific input parameters for PreProcessing()
 #'
-#' @param InputData Passed to main function PreProcessing()
-#' @param SettingsFile_Sample Passed to main function PreProcessing()
-#' @param SettingsInfo Passed to main function PreProcessing()
-#' @param CoRe Passed to main function PreProcessing()
-#' @param FeatureFilt Passed to main function PreProcessing()
-#' @param FeatureFilt_Value Passed to main function PreProcessing()
-#' @param TIC Passed to main function PreProcessing()
-#' @param MVI Passed to main function PreProcessing()
-#' @param MVI_Percentage Passed to main function PreProcessing()
-#' @param HotellinsConfidence Passed to main function PreProcessing()
+#' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). For CoRe = TRUE a CoRe_norm_factor = "Columnname_Input_SettingsFile" and CoRe_media = "Columnname_Input_SettingsFile", have to also be added.
+#' @param  \emph{Optional: }CoRe If TRUE, a consumption-release experiment has been performed and the CoRe value will be calculated.\strong{Default = FALSE}
+#' @param FeatureFilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
+#' @param FeatureFilt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
+#' @param TIC \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
+#' @param MVI \emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
+#' @param MVI_Percentage \emph{Optional: } Percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}
+#' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #'
-#' @keywords Input check
+#' @return returns warnings and errors if input is not correct
+#'
+#' @keywords Input check for MetaProViz::PreProcessing
+#'
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
-CheckInput_PreProcessing <- function(InputData,
-                                     SettingsFile_Sample,
+CheckInput_PreProcessing <- function(SettingsFile_Sample,
                                      SettingsInfo,
-                                     CoRe,
-                                     FeatureFilt,
-                                     FeatureFilt_Value,
-                                     TIC,
-                                     MVI,
-                                     MVI_Percentage,
-                                     HotellinsConfidence){
+                                     CoRe=FALSE,
+                                     FeatureFilt = "Modified",
+                                     FeatureFilt_Value = 0.8,
+                                     TIC = TRUE,
+                                     MVI= TRUE,
+                                     MVI_Percentage=50,
+                                     HotellinsConfidence = 0.99){
   if(is.vector(SettingsInfo)==TRUE){
     #-------------SettingsInfo
     #CoRe
     if(CoRe == TRUE){   # parse CoRe normalisation factor
-      message("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
+      message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
+      logger::log_trace(paste("Message ", message, sep=""))
+      message(message)
       if("CoRe_media" %in% names(SettingsInfo)){
         if(length(grep(SettingsInfo[["CoRe_media"]], SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])) < 1){     # Check for CoRe_media samples
-          stop("No CoRe_media samples were provided in the 'Conditions' in the SettingsFile_Sample. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
-           column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRe = FALSE for your analysis")
+          message <- paste0("No CoRe_media samples were provided in the 'Conditions' in the SettingsFile_Sample. For a CoRe experiment control media samples without cells have to be measured and be added in the 'Conditions'
+                            column labeled as 'CoRe_media' (see @param section). Please make sure that you used the correct labelling or whether you need CoRe = FALSE for your analysis")
+          logger::log_trace(paste("Error ", message, sep=""))
+          stop(message)
         }
       }
 
       if ("CoRe_norm_factor" %in% names(SettingsInfo)==FALSE){
-        warning("No growth rate or growth factor provided for normalising the CoRe result, hence CoRe_norm_factor set to 1 for each sample")
+        message <- paste0("No growth rate or growth factor provided for normalising the CoRe result, hence CoRe_norm_factor set to 1 for each sample")
+        logger::log_trace(paste("Warning ", message, sep=""))
+        warning(message)
       }
     }
   }
@@ -323,61 +384,79 @@ CheckInput_PreProcessing <- function(InputData,
   #-------------General parameters
   Feature_Filtering_options <- c("Standard","Modified")
   if(FeatureFilt %in% Feature_Filtering_options == FALSE & is.null(FeatureFilt)==FALSE){
-    stop("Check input. The selected FeatureFilt option is not valid. Please set to NULL or select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
+    message <- paste0("Check input. The selected FeatureFilt option is not valid. Please set to NULL or select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.numeric(FeatureFilt_Value) == FALSE |FeatureFilt_Value > 1 | FeatureFilt_Value < 0){
-    stop("Check input. The selected FeatureFilt_Value should be numeric and between 0 and 1.")
+    message <- paste0("Check input. The selected FeatureFilt_Value should be numeric and between 0 and 1.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.logical(TIC) == FALSE){
-    stop("Check input. The TIC should be either `TRUE` if TIC normalization is to be performed or `FALSE` if no data normalization is to be applied.")
+    message <- paste0("Check input. The TIC value should be either `TRUE` if TIC normalization is to be performed or `FALSE` if no data normalization is to be applied.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.logical(MVI) == FALSE){
-    stop("Check input. MVI value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
+    message <- paste0("Check input. The MVI value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.numeric(MVI_Percentage)== FALSE |HotellinsConfidence > 100 | HotellinsConfidence < 0){
-    stop("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
+    message <- paste0("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
-    stop("Check input. The selected Filtering value should be numeric and between 0 and 1.")
+    message <- paste0("Check input. The selected HotellinsConfidence value should be numeric and between 0 and 1.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
-
 }
-
 
 ################################################################################################
 ### ### ### DMA helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check input parameters
+#' Check input parameters of DMA
 #'
-#' @param InputData Passed to main function PreProcessing()
-#' @param SettingsFile_Sample Passed to main function PreProcessing()
-#' @param SettingsInfo Passed to main function PreProcessing()
-#' @param CoRe Passed to main function PreProcessing()
-#' @param FeatureFilt Passed to main function PreProcessing()
-#' @param FeatureFilt_Value Passed to main function PreProcessing()
-#' @param TIC Passed to main function PreProcessing()
-#' @param MVI Passed to main function PreProcessing()
-#' @param MVI_Percentage Passed to main function PreProcessing()
-#' @param HotellinsConfidence Passed to main function PreProcessing()
+#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names.
+#' @param SettingsFile_Sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
+#' @param SettingsInfo Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param StatPval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
+#' @param StatPadj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param VST TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = FALSE}
+#' @param PerformShapiro TRUE or FALSE for whether to perform the shapiro.test and get informed about data distribution (normal versus not-normal distribution. \strong{Default = TRUE}
+#' @param PerformBartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
+#' @param Transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
 #'
-#' @keywords Input check
+#' @return returns warnings and errors if input is not correct
+#'
+#' @keywords Input check for MetaProViz::DMA
+#'
+#' @importFrom logger log_trace
+#' @importFrom dplyr filter select_if
+#' @importFrom magrittr %>%
+#' @importFrom utils combn
+#'
 #' @noRd
 #'
-#'
-
 CheckInput_DMA <- function(InputData,
                            SettingsFile_Sample,
-                           SettingsInfo,
-                           StatPval,
-                           StatPadj,
-                           PerformShapiro,
-                           PerformBartlett,
-                           Transform){
+                           SettingsInfo= c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+                           StatPval ="lmFit",
+                           StatPadj="fdr",
+                           VST=FALSE,
+                           PerformShapiro =TRUE,
+                           PerformBartlett =TRUE,
+                           Transform=TRUE){
 
   #-------------SettingsInfo
   if(is.null(SettingsInfo)==TRUE){
-    stop("You have to provide a SettingsInfo for Conditions.") # If Numerator and/or Denominator = NULL, they are not in SettingsInfo!
+    message <- paste0("You have to provide SettingsInfo's for Conditions.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   ## ------------ Denominator/numerator ----------- ##
@@ -387,7 +466,7 @@ CheckInput_DMA <- function(InputData,
     conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
     denominator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
     numerator <-unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])
-    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+    comparisons <- utils::combn(unique(conditions), 2) %>% as.matrix()
     #Settings:
     MultipleComparison = TRUE
     all_vs_all = TRUE
@@ -416,36 +495,50 @@ CheckInput_DMA <- function(InputData,
   if(MultipleComparison==FALSE){
     STAT_pval_options <- c("t.test", "wilcox.test","chisq.test", "cor.test", "lmFit")
     if(StatPval %in% STAT_pval_options == FALSE){
-      stop("Check input. The selected StatPval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
+      message <- paste0("Check input. The selected StatPval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or specify numerator and denumerator." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }else{
     STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
     if(StatPval %in% STAT_pval_options == FALSE){
-      stop("Check input. The selected StatPval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
+      message <- paste0("Check input. The selected StatPval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",paste(STAT_pval_options,collapse = ", ")," or change numerator and denumerator." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
   STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
   if(StatPadj %in% STAT_padj_options == FALSE){
-    stop("Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
+    message <- paste0("Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   ## ------------ Sample Numbers ----------- ##
   Num <- InputData %>%#Are sample numbers enough?
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
-    select_if(is.numeric)#only keep numeric columns with metabolite values
+    dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
+    dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
   Denom <- InputData %>%
-    filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-    select_if(is.numeric)
+    dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+    dplyr::select_if(is.numeric)
 
   if(nrow(Num)==1){
-    stop("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
+    message <- paste0("There is only one sample available for ", numerator, ", so no statistical test can be performed.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   } else if(nrow(Denom)==1){
-    stop("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
+    message <- paste0("There is only one sample available for ", denominator, ", so no statistical test can be performed.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }else if(nrow(Num)==0){
-    stop("There is no sample available for ", numerator, ".")
+    message <- paste0("There is no sample available for ", numerator, ".")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }else if(nrow(Denom)==0){
-    stop("There is no sample available for ", denominator, ".")
+    message <- paste0("There is no sample available for ", denominator, ".")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   ## ------------ Check Missingness ------------- ##
@@ -458,49 +551,74 @@ CheckInput_DMA <- function(InputData,
   if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
     Metabolites_Miss <- colnames(Num_Miss)
     if(ncol(Num_Miss)<=10){
-      message("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      message <- paste0("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", paste0(colnames(Num_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      logger::log_info(message)
+      message(message)
     }else{
-      message("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " Those metabolite(s) mightl return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      message <- paste0("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      logger::log_info(message)
+      message(message)
     }
   } else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
     Metabolites_Miss <- colnames(Denom_Miss)
     if(ncol(Num_Miss)<=10){
-      message("In `Denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      message <- paste0("In `Denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", paste0(colnames(Denom_Miss), collapse = ", "), ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      logger::log_info(message)
+      message(message)
     }else{
-      message("In `Denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s).", " Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")#
+      message <- paste0("In `Denominator` ",paste0(toString(denominator)), ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s).", " Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+      logger::log_info(message)
+      message(message)#
     }
   } else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
-    message("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s).",". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+
+    message <- paste0("In `Numerator` ",paste0(toString(numerator)), ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", " and in `denominator`",paste0(toString(denominator)), " ",ncol(Denom_Miss), " Metabolite(s).",
+                      ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
+    logger::log_info(message)
+    message(message)
   } else{
-    message("There are no NA/0 values")
+    message <- paste0("There are no NA/0 values")
+    logger::log_info(message)
+    message(message)
+
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
   }
 
   #-------------General parameters
+  if(is.logical(VST) == FALSE){
+    message <- paste0("Check input. The VST value should be either =TRUE or =FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
+  }
+
   if(is.logical(PerformShapiro) == FALSE){
-    stop("Check input. The Shapiro value should be either =TRUE or =FALSE.")
+    message <- paste0("Check input. The Shapiro value should be either =TRUE or =FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.logical(PerformBartlett) == FALSE){
-    stop("Check input. The Bartlett value should be either =TRUE or =FALSE.")
+    message <- paste0("Check input. The Bartlett value should be either =TRUE or =FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.logical(Transform) == FALSE){
-    stop("Check input. `Transform` should be either =TRUE or =FALSE.")
+    message <- paste0("Check input. `Transform` should be either =TRUE or =FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
-  ## -------- Return settings ---------##
-  Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss, "denominator"=denominator, "numerator"=numerator)
-  return(invisible(Settings))
+  #Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss, "denominator"=denominator, "numerator"=numerator)
+  #return(invisible(Settings))
 }
-
 
 ################################################################################################
 ### ### ### ORA helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check input parameters
+#' Check input parameters of ORA
 #'
 #' @param InputData Passed to main function PreProcessing()
 #' @param SettingsInfo Passed to main function PreProcessing()
@@ -509,7 +627,6 @@ CheckInput_DMA <- function(InputData,
 #' @noRd
 #'
 #'
-
 CheckInput_ORA <- function(InputData,
                            SettingsInfo,
                            RemoveBackground,
