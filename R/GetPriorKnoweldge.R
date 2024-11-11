@@ -289,8 +289,8 @@ LoadMetalinks <- function(types = NULL,
     }
 
   #Python version enables the user to add their own link to the database dump (probably to obtain a specific version. Lets check how the link was generated and see if it would make sense for us to do the same.)
-  # --> At the moment abritrary!
-  # We could provide the user the ability to point to their own path were they already dumpled/stored qa version of metalinks they like to use!
+  # --> At the moment arbitrary!
+  # We could provide the user the ability to point to their own path were they already dumpled/stored QA version of metalinks they like to use!
 
   ## ------------ Folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
