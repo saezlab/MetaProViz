@@ -28,7 +28,7 @@
 #'
 #' @param InputData DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param SettingsInfo  or Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For CoRe = TRUE a CoRe_norm_factor = "Columnname_Input_SettingsFile" and CoRe_media = "Columnname_Input_SettingsFile", have to also be added. Column CoRe_norm_factor is used for normalization and CoRe_media is used to specify the name of the media controls in the Conditions.
+#' @param SettingsInfo  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For CoRe = TRUE a CoRe_norm_factor = "Columnname_Input_SettingsFile" and CoRe_media = "Columnname_Input_SettingsFile", have to also be added. Column CoRe_norm_factor is used for normalization and CoRe_media is used to specify the name of the media controls in the Conditions.
 #' @param FeatureFilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
 #' @param FeatureFilt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
 #' @param TIC \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
@@ -630,7 +630,6 @@ FeatureFiltering <-function(InputData,
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
-
   ## ------------------ Prepare the data ------------------- ##
   feat_filt_data <- as.data.frame(InputData)%>%
     dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
@@ -642,9 +641,9 @@ FeatureFiltering <-function(InputData,
 
   ## ------------------ Perform filtering ------------------ ##
   if(FeatureFilt ==  "Modified"){
-    message("Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)")
-    message(paste("filtering value selected:", FeatureFilt_Value))
-
+    message <- paste0("FeatureFiltering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). ", "Filtering value selected: ", FeatureFilt_Value, sep="")
+    logger::log_info(message)
+    message(message)
     if(CoRe== TRUE){
       feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]][!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]]]
     }else{
@@ -652,10 +651,14 @@ FeatureFiltering <-function(InputData,
     }
 
     if(is.null(unique(feat_filt_Conditions)) ==  TRUE){
-      stop("Conditions information is missing.")
+      message("Conditions information is missing.")
+      logger::log_trace(message)
+      stop(message)
     }
     if(length(unique(feat_filt_Conditions)) ==  1){
-      stop("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
+      message("To perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
+      logger::log_trace(message)
+      stop(message)
     }
 
     miss <- c()
@@ -678,8 +681,9 @@ FeatureFiltering <-function(InputData,
       filtered_matrix <- InputData[,-miss]
     }
   }else if(FeatureFilt ==  "Standard"){
-    message("Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples. REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y")
-    message(paste("filtering value selected:", FeatureFilt_Value))
+    message <- paste0 ("FeatureFiltering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y). ","Filtering value selected:", FeatureFilt_Value)
+    logger::log_info(message)
+    message(message)
 
     split_Input <- feat_filt_data
 
@@ -690,12 +694,17 @@ FeatureFiltering <-function(InputData,
     }
 
     if(length(miss) ==  0){ #remove metabolites if any are found
-      message("There where no metabolites exluded")
+      message <- paste0("FeatureFiltering: There where no metabolites exluded")
+      logger::log_info(message)
+      message(message)
+
       filtered_matrix <- InputData
       feat_file_res <- "There where no metabolites exluded"
     }else{
       names<-unique(colnames(InputData)[miss])
-      message(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
+      message <- paste0(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
+      logger::log_info(message)
+      message(message)
       filtered_matrix <- InputData[,-miss]
     }
   }
@@ -750,7 +759,9 @@ MVImputation <-function(InputData,
 
   ## ------------------ Perform MVI ------------------ ##
   # Do MVI for the samples
-  message("Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+  message <- paste0("Missing Value Imputation: Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0")
+  logger::log_info(message)
+  message(message)
 
   if(CoRe==TRUE){#remove blank samples
     NA_removed_matrix <- filtered_matrix%>% dplyr::filter(!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]])
@@ -767,7 +778,9 @@ MVImputation <-function(InputData,
       dplyr::group_by(Conditions) %>%
       dplyr::mutate(across(all_of(feature), ~{
         if(all(is.na(.))) {
-          message("For some conditions all measured samples are NA for " , feature, ". Hence we can not perform half-minimum value imputation per condition for this metabolite and will assume it is a true biological 0 in those cases.")
+          message <- paste0("For some conditions all measured samples are NA for " , feature, ". Hence we can not perform half-minimum value imputation per condition for this metabolite and will assume it is a true biological 0 in those cases.")
+          logger::log_info(message)
+          message(message)
           return(0)  # Return NA if all values are missing
         } else {
           return(replace(., is.na(.), min(., na.rm = TRUE)*(MVI_Percentage/100)))
@@ -787,12 +800,18 @@ MVImputation <-function(InputData,
 
     # report metabolites with NA
     if(sum(na_percentage)>0){
-      message("NA values were found in Control_media samples for metabolites. For metabolites including NAs MVI is performed unless all samples of a metabolite are NA.")
+      message <- paste0("NA values were found in Control_media samples for metabolites. For metabolites including NAs MVI is performed unless all samples of a metabolite are NA.")
+      logger::log_info(message)
+      message(message)
       if(sum(na_percentage>20 & na_percentage<100)>0){
-        message("Metabolites with high NA load (>20%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+        message <- paste0("Metabolites with high NA load (>20%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
+        logger::log_info(message)
+        message(message)
       }
       if(sum(na_percentage==100)>0){
-        message("Metabolites with only NAs (=100%) in Control_media samples are: ",paste(names(OnlyNA_metabs), collapse = ", "), ". Those NAs are set zero as we consider them true zeros")
+        message <- paste0("Metabolites with only NAs (=100%) in Control_media samples are: ",paste(names(OnlyNA_metabs), collapse = ", "), ". Those NAs are set zero as we consider them true zeros")
+        logger::log_info(message)
+        message(message)
       }
     }
 
@@ -861,7 +880,9 @@ TICNorm <-function(InputData,
   log_NA_removed_matrix <- suppressWarnings(log(NA_removed_matrix) %>% t() %>% as.data.frame()) # log tranforms the data
   nan_count <- sum(is.nan(as.matrix(log_NA_removed_matrix)))# Count NaN values (produced by log(0))
   if (nan_count > 0) {# Issue a custom warning if NaNs are present
-    warning(paste("For the RLA plot before/after TIC normalisation we have to perform log() transformation. This resulted in", nan_count, "NaN values due to 0s in the data."))
+    message <- paste("For the RLA plot before/after TIC normalisation we have to perform log() transformation. This resulted in", nan_count, "NaN values due to 0s in the data.")
+    logger::log_trace("Warning: ", message, sep="")
+    warning(message)
   }
 
   medians <- apply(log_NA_removed_matrix, 2, median) # get median
@@ -886,7 +907,10 @@ TICNorm <-function(InputData,
 
   if(TIC==TRUE){
     ## ------------------ Perform TIC ------------------- ##
-    message("Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    message <- paste0("Total Ion Count (TIC) normalization: Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
+    logger::log_info(message)
+    message(message)
+
     RowSums <- rowSums(NA_removed_matrix)
     Median_RowSums <- median(RowSums) #This will built the median
     Data_TIC_Pre <- apply(NA_removed_matrix, 2, function(i) i/RowSums) #This is dividing the ion intensity by the total ion count
@@ -977,7 +1001,10 @@ CoReNorm <-function(InputData,
   CoRe_medias <- Data_TIC[grep(SettingsInfo[["CoRe_media"]], Conditions),]
 
   if(dim(CoRe_medias)[1]==1){
-    warning("Only 1 CoRe_media sample was found. Thus, the consistency of the CoRe_media samples cannot be checked. It is assumed that the CoRe_media samples are already summed.")
+    message <- paste0("Only 1 CoRe_media sample was found. Thus, the consistency of the CoRe_media samples cannot be checked. It is assumed that the CoRe_media samples are already summed.")
+    logger::log_trace(paste("Warning: ", message, sep=""))
+    warning(message)
+
     CoRe_media_df <- CoRe_medias %>% t() %>% as.data.frame()
     colnames(CoRe_medias) <- "CoRe_mediaMeans"
   }else{
@@ -1021,7 +1048,9 @@ CoReNorm <-function(InputData,
 
     HighVar_metabs <- sum(result_df$HighVar == TRUE)
     if(HighVar_metabs>0){
-      message(paste0(HighVar_metabs, " of variables have high variability (CV > 30) in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."))
+      message <- paste0(HighVar_metabs, " of variables have high variability (CV > 30) in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not.")
+      logger::log_info(message)
+      message(message)
     }
 
     #Make histogram of CVs
@@ -1137,7 +1166,9 @@ CoReNorm <-function(InputData,
       }
 
       if(is.null(different_samples)==FALSE){
-        warning("The CoRe_media samples ", paste(different_samples, collapse = ", "), " were found to be different from the rest. They will not be included in the sum of the CoRe_media samples.")
+        message <- paste("The CoRe_media samples ", paste(different_samples, collapse = ", "), " were found to be different from the rest. They will not be included in the sum of the CoRe_media samples.")
+        logger::log_trace("Warning: " , message, sep="")
+        warning(message)
       }
       # Filter the CoRe_media samples
       CoRe_medias <- CoRe_medias %>% dplyr::filter(!rownames(CoRe_medias) %in% different_samples)
@@ -1149,12 +1180,17 @@ CoReNorm <-function(InputData,
 
   ######################################################################################
   ##------------------------ Substract mean (media control) from samples
-  message("CoRe data are normalised by substracting mean (blank) from each sample and multiplying with the CoRe_norm_factor")
+  message <- paste("CoRe data are normalised by substracting mean (blank) from each sample and multiplying with the CoRe_norm_factor")
+  logger::log_info(message)
+  message(message)
+
   ##-- Check CoRe_norm_factor
   if(("CoRe_norm_factor" %in% names(SettingsInfo))){
     CoRe_norm_factor <-   SettingsFile_Sample %>% dplyr::filter(!!as.name(SettingsInfo[["Conditions"]])!=SettingsInfo[["CoRe_media"]]) %>% dplyr::select(SettingsInfo[["CoRe_norm_factor"]]) %>%dplyr::pull()
     if(var(CoRe_norm_factor) ==  0){
-      warning("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
+      message <- paste("The growth rate or growth factor for normalising the CoRe result, is the same for all samples")
+      logger::log_trace("Warning: " , message, sep="")
+      warning(message)
     }
   }else{
     CoRe_norm_factor <- as.numeric(rep(1,dim(SettingsFile_Sample %>% dplyr::filter(!!as.name(SettingsInfo[["Conditions"]])!=SettingsInfo[["CoRe_media"]]))[1]))
@@ -1227,8 +1263,10 @@ OutlierDetection <-function(InputData,
                             CoRe=FALSE,
                             HotellinsConfidence=0.99){
   # Message:
-  message("Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.")
-  message(paste("HotellinsConfidence value selected:", HotellinsConfidence))
+  message <- paste("Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979). ",
+                   "HotellinsConfidence value selected: ", HotellinsConfidence, sep= "")
+  logger::log_info(message)
+  message(message)
 
   # Load the data:
   data_norm <- InputData%>%
@@ -1389,25 +1427,37 @@ OutlierDetection <-function(InputData,
   #################################################
   ##-- Print Outlier detection results about samples and metabolites
   if(length(sample_outliers) > 0){   # Print outlier samples
-    message("There are possible outlier samples in the data") #This was a warning
+    message <- paste("There are possible outlier samples in the data")
+    logger::log_info(message)
+    message(message) #This was a warning
     for (i in 1:length(sample_outliers)  ){
-      message("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
+      message <- paste("Filtering round ",i ," Outlier Samples: ", paste( head(sample_outliers[[i]]) ," "))
+      logger::log_info(message)
+      message(message)
     }
-  }else{message("No sample outliers were found")}
-
+  }else{
+    message <- paste("No sample outliers were found")
+    logger::log_info(message)
+    message(message)
+    }
 
   ##--  Print Zero variance metabolites
   zero_var_metab_export_df <- data.frame(1,2)
   names(zero_var_metab_export_df) <- c("Filtering round","Metabolite")
 
   if(zero_var_metab_warning==TRUE){
-    warning("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
+    message <- paste("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
+    logger::log_trace("Warning: " , message, sep="")
+    warning(message)
   }
 
   count = 1
   for (i in 1:length(metabolite_zero_var_total_list)){
     if (metabolite_zero_var_total_list[[i]] != 0){
-      message("Filtering round ",i ,". Zero variance metabolites identified: ", paste( metabolite_zero_var_total_list[[i]] ," "))
+      message <- paste("Filtering round ",i ,". Zero variance metabolites identified: ", paste( metabolite_zero_var_total_list[[i]] ," "))
+      logger::log_info(message)
+      message(message)
+
       zero_var_metab_export_df[count,"Filtering round"] <- paste(i)
       zero_var_metab_export_df[count,"Metabolite"] <- paste(metabolite_zero_var_total_list[[i]])
       count = count +1
