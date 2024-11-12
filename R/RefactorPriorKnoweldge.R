@@ -33,7 +33,8 @@
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::LoadKEGG()
-#' res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), Method="GetAll", SaveAs_Table= "csv", FolderPath=NULL)
+#' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
+
 #'
 #' @keywords Translate IDs
 #'
@@ -50,16 +51,16 @@
 TranslateID <- function(
     InputData,
     SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
-    From = c("kegg"),
+    From = "kegg",
     To = c("pubchem","chebi","hmdb"),
     SaveAs_Table= "csv",
     FolderPath=NULL
   ){
 
+  # Refactoring: make arguments similar to OmnipathR::translate_ids
+  # i.e. instead of From / To dynamic dots
+  # hence we dont need to rename the column that includes the "From"
   MetaProViz_Init()
-
-  From %<>% (stringr::str_to_lower)
-  To %<>% (stringr::str_to_lower)
 
   # Specific checks:
   unknown_types <-
@@ -91,8 +92,8 @@ TranslateID <- function(
     InputDF = InputData,
     TranslatedDF = OmnipathR::translate_ids(
       InputData,
-      !!rlang::sym(From),
-      !!!rlang::syms(To),
+      !!sym(SettingsInfo[['InputID']]) :=  !!sym(From),
+      !!!syms(To),#list of symbols, hence three !!!
       ramp = TRUE,
       expand = FALSE,
       inspect = TRUE,
@@ -104,7 +105,35 @@ TranslateID <- function(
 
 
 ##########################################################################################
-### ### ### Helper ### ### ###
+### ### ### NEW ### ### ###
+##########################################################################################
+
+#
+
+MappingAmbiguity <- function(
+    InputData,
+    SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
+    From = "kegg",
+    To = c("pubchem","chebi","hmdb"),
+    SaveAs_Table= "csv",
+    FolderPath=NULL
+){
+  #was inspectID
+  #Summary and translation one-to-many, many-to-one
+
+  #Step 1: +/-term --> One Group needed
+  #Step 2: Omnipath function to get numeric column summary of 1-to-9 map
+  #Step 3: Case_when --> column ( do things before and not within case_when)
+
+
+  #Step: create summary for the specific problem of metabolism
+
+
+}
+
+
+##########################################################################################
+### ### ### Helper ### ### ### --> Filtering should be done here!
 ##########################################################################################
 
 #' Clean translated ID in prior knowledge based on measured features
@@ -115,7 +144,7 @@ TranslateID <- function(
 #' @export
 #'
 DetectedID <- function(InputData,
-                        SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
+                       SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
 ){
 
   ## ------------------ Check Input ------------------- ##
@@ -123,6 +152,49 @@ DetectedID <- function(InputData,
 
   # Function that can use Prior knowledge that has multiple IDs "X1, X2, X3" and use the measured features to remove IDs based on measured data.
   # This is to enxure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
+
+
+
+
+}
+
+
+##########################################################################################
+### ### ### Check Measured ID's in prior knowledge ### ### ###
+##########################################################################################
+
+#' Check and summarize PriorKnowledge-to-MeasuredFeatures relationship
+#'
+#' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
+#' @param SettingsInfo
+#'
+#' @return
+#'
+#' @examples
+#'
+#' @keywords
+#'
+#' @importFrom dplyr mutate
+#' @importFrom rlang !!! !! := sym syms
+#'
+#' @export
+#'
+
+CheckMatchID <- function(InputData
+
+){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  ## ------------ Check Input files ----------- ##
+
+  ## ------------ Create Results output folder ----------- ##
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- SavePath(FolderName= "PriorKnowledgeChecks",
+                       FolderPath=FolderPath)
+  }
+  ################################################################################################################################################################################################
+  ## ------------ Prepare the Input -------- ##
 
 
 }
@@ -161,3 +233,6 @@ PossibleID <- function(InputData,
 ##########################################################################################
 
 #' Deal with pathway overlap in prior knowledge
+#'
+#'
+#'
