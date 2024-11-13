@@ -189,12 +189,12 @@ VizVolcano <- function(PlotSettings="Standard",
 
     if(PlotSettings=="PEA"){
       VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x=SettingsInfo[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
-        remove_rownames()%>%
+        tibble::remove_rownames()%>%
         mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])%>%
         filter(!is.na(x) | !is.na(x))
     }else{
      VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by=0, all.y=TRUE)%>%
-      remove_rownames()%>%
+       tibble::remove_rownames()%>%
       column_to_rownames("Row.names")%>%
       mutate(FeatureNames = rownames(InputData))%>%
       filter(!is.na(x) | !is.na(x))
