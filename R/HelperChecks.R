@@ -610,8 +610,8 @@ CheckInput_DMA <- function(InputData,
     stop(message)
   }
 
-  #Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss, "denominator"=denominator, "numerator"=numerator)
-  #return(invisible(Settings))
+  Settings <- list("comparisons"=comparisons, "MultipleComparison"=MultipleComparison, "all_vs_all"=all_vs_all, "Metabolites_Miss"=Metabolites_Miss, "denominator"=denominator, "numerator"=numerator)
+  return(invisible(Settings))
 }
 
 ################################################################################################
