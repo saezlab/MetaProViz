@@ -45,9 +45,15 @@
 #'
 #' @examples
 #' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
+#' ResI <- MetaProViz::PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
 #'                                  SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
 #'                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#'
+#' Media <- MetaProViz::ToyData("CultureMedia_Raw")
+#' ResM <- MetaProViz::PreProcessing(InputData = Media[-c(40:45) ,-c(1:3)],
+#'                                   SettingsFile_Sample = Media[-c(40:45) ,c(1:3)] ,
+#'                                   SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"),
+#'                                   CoRe=TRUE)
 #'
 #' @keywords 80  percent filtering rule, Missing Value Imputation, Total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts
 #'
@@ -87,16 +93,15 @@ PreProcessing <- function(InputData,
                           PrintPlot= PrintPlot)
 
   # HelperFunction `CheckInput` Specific
-  CheckInput_PreProcessing(InputData=InputData,
-                                        SettingsFile_Sample=SettingsFile_Sample,
-                                        SettingsInfo=SettingsInfo,
-                                        CoRe=CoRe,
-                                        FeatureFilt=FeatureFilt,
-                                        FeatureFilt_Value=FeatureFilt_Value,
-                                        TIC=TIC,
-                                        MVI=MVI,
-                                        MVI_Percentage=MVI_Percentage,
-                                        HotellinsConfidence=HotellinsConfidence)
+  CheckInput_PreProcessing(SettingsFile_Sample=SettingsFile_Sample,
+                           SettingsInfo=SettingsInfo,
+                           CoRe=CoRe,
+                           FeatureFilt=FeatureFilt,
+                           FeatureFilt_Value=FeatureFilt_Value,
+                           TIC=TIC,
+                           MVI=MVI,
+                           MVI_Percentage=MVI_Percentage,
+                           HotellinsConfidence=HotellinsConfidence)
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
