@@ -45,9 +45,9 @@
 #' @return Dependent on parameter settings, list of lists will be returned for DMA (DF of each comparison), Shapiro (Includes DF and Plot), Bartlett (Includes DF and Histogram), VST (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::DMA(InputData=Intra[-c(49:58) ,-c(1:3)],
-#'                        SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")[-c(49:58) ,]
+#' ResI <- MetaProViz::DMA(InputData=Intra[ ,-c(1:3)],
+#'                        SettingsFile_Sample=Intra[ , c(1:3)],
 #'                        SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
@@ -93,7 +93,7 @@ DMA <-function(InputData,
                           PrintPlot= PrintPlot)
 
   # HelperFunction `CheckInput` Specific
-  CheckInput_DMA(InputData=InputData,
+  Settings <- CheckInput_DMA(InputData=InputData,
                  SettingsFile_Sample=SettingsFile_Sample,
                  SettingsInfo=SettingsInfo,
                  StatPval=StatPval,
@@ -266,11 +266,11 @@ DMA <-function(InputData,
   if(CoRe==TRUE){
     x <- "Log2(Distance)"
     VolPlot_SettingsInfo= c(color="CoRe")
-    VOlPlot_SettingsFile = DMA_Output
+    VolPlot_SettingsFile = DMA_Output
   }else{
     x <- "Log2FC"
     VolPlot_SettingsInfo= NULL
-    VOlPlot_SettingsFile = NULL
+    VolPlot_SettingsFile = NULL
   }
 
   volplotList = list()
@@ -278,14 +278,14 @@ DMA <-function(InputData,
     Volplotdata<- DMA_Output[[DF]]
 
     if(CoRe==TRUE){
-      VOlPlot_SettingsFile <- DMA_Output[[DF]]%>%tibble::column_to_rownames("Metabolite")
+      VolPlot_SettingsFile <- DMA_Output[[DF]]%>%tibble::column_to_rownames("Metabolite")
     }
 
     dev.new()
     VolcanoPlot <- invisible(VizVolcano(PlotSettings="Standard",
                                                     InputData=Volplotdata%>%tibble::column_to_rownames("Metabolite"),
                                                     SettingsInfo=VolPlot_SettingsInfo,
-                                                    SettingsFile_Metab=VOlPlot_SettingsFile,
+                                                    SettingsFile_Metab=VolPlot_SettingsFile,
                                                     y= "p.adj",
                                                     x= x,
                                                     PlotName= DF,
@@ -1198,7 +1198,7 @@ Welch <-function(InputData,
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom limma lmFit makeContrasts contrasts.fit eBayes topTable
-#' @importFrom dplyr rename arrange filter
+#' @importFrom dplyr rename arrange filter distinct
 #' @importFrom tidyr separate unite
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -1391,7 +1391,7 @@ DMA_Stat_limma <- function(InputData,
     tidyr::unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
 
   name_match_df<- name_match_df[,c(3,4)]%>%
-    distinct(New, .keep_all = TRUE)
+    dplyr::distinct(New, .keep_all = TRUE)
 
   results_list_new <- list()
   #Match the lists using name_match_df
