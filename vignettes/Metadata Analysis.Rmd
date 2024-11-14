@@ -130,7 +130,7 @@ Here the metadata analysis is based on principal component analysis (PCA), which
 The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
 ```{r}
-MetaRes <- MetaProViz:::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
+MetaRes <- MetaProViz::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
                                      SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)],
                                      Scaling = TRUE,
                                      Percentage = 0.1,
