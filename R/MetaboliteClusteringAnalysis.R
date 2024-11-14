@@ -435,7 +435,11 @@ MCA_2Cond <- function(InputData_C1,
 #'                                   SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"),
 #'                                   CoRe=TRUE)
 #'
-#' MediaDMA <- MetaProViz::DMA(InputData=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)], SettingsFile_Sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)], SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"), CoRe=TRUE)
+#' MediaDMA <- MetaProViz::DMA(InputData=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
+#'                             SettingsFile_Sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)],
+#'                             SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"),
+#'                             StatPval ="aov",
+#'                             CoRe=TRUE)
 #'
 #' IntraDMA <- MetaProViz::ToyData(Data="IntraCells_DMA")
 #'
