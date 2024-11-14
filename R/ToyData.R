@@ -47,6 +47,7 @@
 #' @importFrom readr read_csv cols
 #' @importFrom magrittr %>% extract2
 #' @importFrom tibble column_to_rownames
+#' @importFrom logger log_trace
 #'
 #' @export
 #'
@@ -71,11 +72,9 @@ ToyData <- function(Dataset) {
 
   #Load dataset:
   if (!Dataset %in% names(datasets)) {
-    stop(sprintf(
-      "No such dataset: `%s`. Available datasets: %s",
-      Dataset,
-      paste(names(datasets), collapse = ", ")
-    ))
+    message <- sprintf("No such dataset: `%s`. Available datasets: %s", Dataset, paste(names(datasets), collapse = ", "))
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   datasets %>%
