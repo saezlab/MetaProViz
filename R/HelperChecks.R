@@ -431,7 +431,7 @@ CheckInput_PreProcessing <- function(SettingsFile_Sample,
 #' @param PerformBartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
 #' @param Transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
 #'
-#' @return returns warnings and errors if input is not correct
+#' @return Returns: 1. warnings and errors if input is not correct, 2. Settings
 #'
 #' @keywords Input check for MetaProViz::DMA
 #'
@@ -620,132 +620,181 @@ CheckInput_DMA <- function(InputData,
 
 #' Check input parameters of ORA
 #'
-#' @param InputData Passed to main function PreProcessing()
-#' @param SettingsInfo Passed to main function PreProcessing()
+#' @param InputData DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the PathwayFile.
+#' @param SettingsInfo \emph{Optional: } Pass ColumnName of the column including parameters to use for pCutoff and PercentageCutoff, ColumnName for PathwayFile. For MetaProViz::ClusterORA also BackgroundColumn. \strong{c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
+#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
+#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that should be considered for ORA. Selects Top/Bottom % of selected PercentageColumn, usually t.val or Log2FC \strong{default: 10}
+#' @param PathwayFile DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
+#' @param PathwayName \emph{Optional: } Name of the PathwayFile used \strong{default: ""}
+#' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
+#' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param RemoveBackground For MetaProViz::ClusterORA the Background Settings are passed, for MetaProViz::StandardORA set to FALSE.
 #'
-#' @keywords Input check
+#' @return Returns: 1. warnings and errors if input is not correct, 2. Pathway file
+#'
+#' @keywords Input check MetaProViz::StandardORA and MetaProViz::ClusterORA
+#'
+#' @importFrom logger log_trace
+#' @importFrom dplyr rename
+#'
 #' @noRd
 #'
-#'
 CheckInput_ORA <- function(InputData,
-                           SettingsInfo,
-                           RemoveBackground,
+                           SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+                           pCutoff=0.05,
+                           PercentageCutoff=10,
                            PathwayFile,
-                           PathwayName,
-                           minGSSize,
-                           maxGSSize,
-                           SaveAs_Table,
-                           pCutoff,
-                           PercentageCutoff
+                           PathwayName="",
+                           minGSSize=10,
+                           maxGSSize=1000 ,
+                           SaveAs_Table="csv",
+                           RemoveBackground
 ){
   # 1. The input data:
   if(class(InputData) != "data.frame"){
-    stop("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
+    message <- paste0("InputData should be a data.frame. It's currently a ", paste(class(InputData), ".",sep = ""))
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(any(duplicated(row.names(InputData)))==TRUE){
-    stop("Duplicated row.names of InputData, whilst row.names must be unique")
+    message <- paste0("Duplicated row.names of InputData, whilst row.names must be unique")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   # 2. Settings Columns:
   if(is.vector(SettingsInfo)==FALSE & is.null(SettingsInfo)==FALSE){
-    stop("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
+    message <- paste0("SettingsInfo should be NULL or a vector. It's currently a ", paste(class(SettingsInfo), ".", sep = ""))
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(SettingsInfo)==FALSE){
     #"ClusterColumn"
     if("ClusterColumn" %in% names(SettingsInfo)){
       if(SettingsInfo[["ClusterColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["ClusterColumn"]], " column selected as ClusterColumn in SettingsInfo was not found in InputData. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["ClusterColumn"]], " column selected as ClusterColumn in SettingsInfo was not found in InputData. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #"BackgroundColumn"
     if("BackgroundColumn" %in% names(SettingsInfo)){
       if(SettingsInfo[["BackgroundColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["BackgroundColumn"]], " column selected as BackgroundColumn in SettingsInfo was not found in InputData. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["BackgroundColumn"]], " column selected as BackgroundColumn in SettingsInfo was not found in InputData. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #"pvalColumn"
     if("pvalColumn" %in% names(SettingsInfo)){
       if(SettingsInfo[["pvalColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["pvalColumn"]], " column selected as pvalColumn in SettingsInfo was not found in InputData. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["pvalColumn"]], " column selected as pvalColumn in SettingsInfo was not found in InputData. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #"PercentageColumn"
     if("PercentageColumn" %in% names(SettingsInfo)){
       if(SettingsInfo[["PercentageColumn"]] %in% colnames(InputData)== FALSE){
-        stop("The ", SettingsInfo[["PercentageColumn"]], " column selected as PercentageColumn in SettingsInfo was not found in InputData. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["PercentageColumn"]], " column selected as PercentageColumn in SettingsInfo was not found in InputData. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
-
 
     #"PathwayTerm"
     if("PathwayTerm" %in% names(SettingsInfo)){
       if(SettingsInfo[["PathwayTerm"]] %in% colnames(PathwayFile)== FALSE){
-        stop("The ", SettingsInfo[["PathwayTerm"]], " column selected as PathwayTerm in SettingsInfo was not found in PathwayFile. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["PathwayTerm"]], " column selected as PathwayTerm in SettingsInfo was not found in PathwayFile. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }else{
         PathwayFile <- PathwayFile%>%
           dplyr::rename("term"=SettingsInfo[["PathwayTerm"]])
         PathwayFile$Description <- PathwayFile$term
       }
     }else{
-      stop("SettingsInfo must provide the column name for PathwayTerm in PathwayFile")
+      message <- paste0("SettingsInfo must provide the column name for PathwayTerm in PathwayFile")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     # PathwayFeature
     if("PathwayFeature" %in% names(SettingsInfo)){
       if(SettingsInfo[["PathwayFeature"]] %in% colnames(PathwayFile)== FALSE){
-        stop("The ", SettingsInfo[["PathwayFeature"]], " column selected as PathwayFeature in SettingsInfo was not found in PathwayFile. Please check your input.")
+        message <- paste0("The ", SettingsInfo[["PathwayFeature"]], " column selected as PathwayFeature in SettingsInfo was not found in PathwayFile. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }else{
         PathwayFile <- PathwayFile%>%
           dplyr::rename("gene"=SettingsInfo[["PathwayFeature"]])
       }
     }else{
-      stop("SettingsInfo must provide the column name for PathwayFeature in PathwayFile")
+      message <- paste0("SettingsInfo must provide the column name for PathwayFeature in PathwayFile")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
   }else{
-    stop("you must provide SettingsInfo.")
+    message <- paste0("You must provide SettingsInfo.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   # 3. General Settings
   if(is.character(PathwayName)==FALSE){
-    stop("Check input. PathwayName must be a character of syntax 'example'.")
+    message <- paste0("Check input. PathwayName must be a character of syntax 'example'.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.logical(RemoveBackground) == FALSE){
-    stop("Check input. RemoveBackground value should be either =TRUE or = FALSE.")
+    message <- paste0("Check input. RemoveBackground value should be either =TRUE or = FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.numeric(minGSSize)== FALSE){
-    stop("Check input. The selected minGSSize value should be numeric.")
+    message <- paste0("Check input. The selected minGSSize value should be numeric.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.numeric(maxGSSize)== FALSE){
-    stop("Check input. The selected maxGSSize value should be numeric.")
+    message <- paste0("Check input. The selected maxGSSize value should be numeric.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
-  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
+  SaveAs_Table_options <- c("txt","csv", "xlsx")
   if(is.null(SaveAs_Table)==FALSE){
     if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
-      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+      message <- paste0("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
   if(is.null(pCutoff)== FALSE){
     if(is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
-      stop("Check input. The selected Plot_pCutoff value should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
   if(is.null(PercentageCutoff)== FALSE){
     if( is.numeric(PercentageCutoff)== FALSE  | PercentageCutoff > 100 | PercentageCutoff < 0){
-      stop("Check input. The selected PercentageCutoff value should be numeric and between 0 and 100.")
+      message <- paste0("Check input. The selected PercentageCutoff value should be numeric and between 0 and 100.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
-
 
   ## -------- Return Pathways ---------##
   return(invisible(PathwayFile))
@@ -756,29 +805,28 @@ CheckInput_ORA <- function(InputData,
 ### ### ### MCA Helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check input parameters
+#' Check input parameters of MCA
 #'
-#' @param InputData_C1 Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param InputData_C2 Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param InputData_Intra Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param InputData_CoRe Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_C1 Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_C2 Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_Intra Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param SettingsInfo_CoRe Passed to main function MCA. If not avaliable can be set to NULL.
-#' @param BackgroundMethod Passed to main function MCA.
-#' @param FeatureID Passed to main function MCA.
-#' @param SaveAs_Table Passed to main function PreProcessing(). If not avaliable can be set to NULL.
+#' @param InputData_Intra For MetaProViz::MCA_CoRe, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param InputData_CoRe For MetaProViz::MCA_CoRe, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
+#' @param SettingsInfo_Intra For MetaProViz::MCA_CoRe, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_Intra,StatCol=ColumnName_InputData_Intra, StatCutoff= NumericValue, ValueCutoff=NumericValue)
+#' @param SettingsInfo_CoRe  For MetaProViz::MCA_CoRe, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_InputData_CoRe,ValueCol=ColumnName_InputData_CoRe,StatCol=ColumnName_InputData_CoRe, StatCutoff= NumericValue, ValueCutoff=NumericValue)
+#' @param InputData_C1 For MetaProViz::MCA_2Cond, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param InputData_C2 For MetaProViz::MCA_2Cond, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param SettingsInfo_C1  For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_C1,StatCol=ColumnName_InputData_C1, StatCutoff= NumericValue, ValueCutoff=NumericValue)
+#' @param SettingsInfo_C2 For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_InputData_C2,StatCol=ColumnName_InputData_C2, StatCutoff= NumericValue, ValueCutoff=NumericValue)
+#' @param FeatureID \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
+#' @param BackgroundMethod \emph{Optional: } Background method `Intra|CoRe, Intra&CoRe, CoRe, Intra or * \strong{Default="Intra&CoRe"}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #'
-#' @param Function Name of the MetaProViz Function that is checked.
-#' @param InputList
+#' @return Returns warnings and errors if input is not correct
 #'
+#' @keywords Input check MetaProViz::MCA_2Cond and MetaProViz::MCA_CoRe
 #'
-#' @keywords Input check
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
 CheckInput_MCA <- function(InputData_C1,
                            InputData_C2,
                            InputData_CoRe,
@@ -787,9 +835,9 @@ CheckInput_MCA <- function(InputData_C1,
                            SettingsInfo_C2,
                            SettingsInfo_CoRe,
                            SettingsInfo_Intra,
-                           BackgroundMethod,
-                           FeatureID,
-                           SaveAs_Table
+                           FeatureID= "Metabolite",
+                           BackgroundMethod="Intra&CoRe",
+                           SaveAs_Table = "csv"
 ){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -797,27 +845,38 @@ CheckInput_MCA <- function(InputData_C1,
   #------------- InputData
   if(is.null(InputData_C1)==FALSE){
     if(class(InputData_C1) != "data.frame"| class(InputData_C2) != "data.frame"){
-      stop("InputData_C1 and InputData_C2 should be a data.frame. It's currently a ", paste(class(InputData_C1)), paste(class(InputData_C2)), ".",sep = "")
+      message <- paste0("InputData_C1 and InputData_C2 should be a data.frame. It's currently a ", paste(class(InputData_C1)), paste(class(InputData_C2)), ".",sep = "")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
     if(length(InputData_C1[duplicated(InputData_C1[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_C1, whilst features must be unique")
+      message <- paste0("Duplicated FeatureIDs of InputData_C1, whilst features must be unique")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
     if(length(InputData_C2[duplicated(InputData_C2[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_C2, whilst features must be unique")
+      message <- paste0("Duplicated FeatureIDs of InputData_C2, whilst features must be unique")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
   }else{
     if(class(InputData_Intra) != "data.frame"| class(InputData_CoRe) != "data.frame"){
-      stop("InputData_Intra and InputData_CoRe should be a data.frame. It's currently a ", paste(class(InputData_Intra)), paste(class(InputData_CoRe)), ".",sep = "")
+      message <- paste0("InputData_Intra and InputData_CoRe should be a data.frame. It's currently a ", paste(class(InputData_Intra)), paste(class(InputData_CoRe)), ".",sep = "")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
     if(length(InputData_Intra[duplicated(InputData_Intra[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_Intra, whilst features must be unique")
+      message <- paste0("Duplicated FeatureIDs of InputData_Intra, whilst features must be unique")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
     if(length(InputData_CoRe[duplicated(InputData_CoRe[[FeatureID]]), FeatureID]) > 0){
-      stop("Duplicated FeatureIDs of InputData_CoRe, whilst features must be unique")
+      message <- paste0("Duplicated FeatureIDs of InputData_CoRe, whilst features must be unique")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
-
 
   #------------- SettingsInfo
   if(is.null(SettingsInfo_C1)==FALSE){
@@ -825,13 +884,17 @@ CheckInput_MCA <- function(InputData_C1,
     #ValueCol
     if("ValueCol" %in% names(SettingsInfo_C1)){
       if(SettingsInfo_C1[["ValueCol"]] %in% colnames(InputData_C1)== FALSE){
-        stop("The ", SettingsInfo_C1[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
+        message <- paste0("The ", SettingsInfo_C1[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
     #StatCol
     if("StatCol" %in% names(SettingsInfo_C1)){
       if(SettingsInfo_C1[["StatCol"]] %in% colnames(InputData_C1)== FALSE){
-        stop("The ", SettingsInfo_C1[["StatCol"]], " column selected as StatCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
+        message <- paste0("The ", SettingsInfo_C1[["StatCol"]], " column selected as StatCol in SettingsInfo_C1 was not found in InputData_C1. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
@@ -839,13 +902,17 @@ CheckInput_MCA <- function(InputData_C1,
     #ValueCol
     if("ValueCol" %in% names(SettingsInfo_C2)){
       if(SettingsInfo_C2[["ValueCol"]] %in% colnames(InputData_C2)== FALSE){
-        stop("The ", SettingsInfo_C2[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
+        message <- paste0("The ", SettingsInfo_C2[["ValueCol"]], " column selected as ValueCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
     #StatCol
     if("StatCol" %in% names(SettingsInfo_C2)){
       if(SettingsInfo_C2[["StatCol"]] %in% colnames(InputData_C2)== FALSE){
-        stop("The ", SettingsInfo_C2[["StatCol"]], " column selected as StatCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
+        message <- paste0("The ", SettingsInfo_C2[["StatCol"]], " column selected as StatCol in SettingsInfo_C2 was not found in InputData_C2. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
   }else{
@@ -853,13 +920,17 @@ CheckInput_MCA <- function(InputData_C1,
     #ValueCol
     if("ValueCol" %in% names(SettingsInfo_Intra)){
       if(SettingsInfo_Intra[["ValueCol"]] %in% colnames(InputData_Intra)== FALSE){
-        stop("The ", SettingsInfo_Intra[["ValueCol"]], " column selected as ValueCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
+        message <- paste0("The ", SettingsInfo_Intra[["ValueCol"]], " column selected as ValueCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
     #StatCol
     if("StatCol" %in% names(SettingsInfo_Intra)){
       if(SettingsInfo_Intra[["StatCol"]] %in% colnames(InputData_Intra)== FALSE){
-        stop("The ", SettingsInfo_Intra[["StatCol"]], " column selected as StatCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
+        message <- paste0("The ", SettingsInfo_Intra[["StatCol"]], " column selected as StatCol in SettingsInfo_Intra was not found in InputData_Intra. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
@@ -867,20 +938,26 @@ CheckInput_MCA <- function(InputData_C1,
     #ValueCol
     if("ValueCol" %in% names(SettingsInfo_CoRe)){
       if(SettingsInfo_CoRe[["ValueCol"]] %in% colnames(InputData_CoRe)== FALSE){
-        stop("The ", SettingsInfo_CoRe[["ValueCol"]], " column selected as ValueCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+        message <- paste0("The ", SettingsInfo_CoRe[["ValueCol"]], " column selected as ValueCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
     #StatCol
     if("StatCol" %in% names(SettingsInfo_CoRe)){
       if(SettingsInfo_CoRe[["StatCol"]] %in% colnames(InputData_CoRe)== FALSE){
-        stop("The ", SettingsInfo_CoRe[["StatCol"]], " column selected as StatCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+        message <- paste0("The ", SettingsInfo_CoRe[["StatCol"]], " column selected as StatCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
     #StatCol
     if("DirectionCol" %in% names(SettingsInfo_CoRe)){
       if(SettingsInfo_CoRe[["DirectionCol"]] %in% colnames(InputData_CoRe)== FALSE){
-        stop("The ", SettingsInfo_CoRe[["DirectionCol"]], " column selected as DirectionCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+        message <- paste0("The ", SettingsInfo_CoRe[["DirectionCol"]], " column selected as DirectionCol in SettingsInfo_CoRe was not found in InputData_CoRe. Please check your input.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
 
@@ -889,55 +966,79 @@ CheckInput_MCA <- function(InputData_C1,
   #------------- SettingsInfo Cutoffs:
   if(is.null(SettingsInfo_C1)==FALSE){
     if(is.na(as.numeric(SettingsInfo_C1[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_C1[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_C1[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected StatCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     if(is.na(as.numeric(SettingsInfo_C2[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_C2[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_C2[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected StatCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     if(is.na(as.numeric(SettingsInfo_C1[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected ValueCutoff in SettingsInfo_C1 should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     if(is.na(as.numeric(SettingsInfo_C2[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected ValueCutoff in SettingsInfo_C2 should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
   }else{
     if(is.na(as.numeric(SettingsInfo_Intra[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_Intra[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_Intra[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected StatCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     if(is.na(as.numeric(SettingsInfo_CoRe[["StatCutoff"]])) == TRUE |as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) > 1 | as.numeric(SettingsInfo_CoRe[["StatCutoff"]]) < 0){
-      stop("Check input. The selected StatCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected StatCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     if(is.na(as.numeric(SettingsInfo_Intra[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected ValueCutoff in SettingsInfo_Intra should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
 
     if(is.na(as.numeric(SettingsInfo_CoRe[["ValueCutoff"]])) == TRUE){
-      stop("Check input. The selected ValueCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
+      message <- paste0("Check input. The selected ValueCutoff in SettingsInfo_CoRe should be numeric and between 0 and 1.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
   #------------ NAs in data
   if(is.null(InputData_C1)==FALSE){
     if(nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) < nrow(InputData_C1)){
-      warning("InputData_C1 includes NAs in ", SettingsInfo_C1[["ValueCol"]], " and/or in ", SettingsInfo_C1[["StatCol"]], ". ", nrow(InputData_C1)- nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      message <- paste0("InputData_C1 includes NAs in ", SettingsInfo_C1[["ValueCol"]], " and/or in ", SettingsInfo_C1[["StatCol"]], ". ", nrow(InputData_C1)- nrow(InputData_C1[complete.cases(InputData_C1[[SettingsInfo_C1[["ValueCol"]]]], InputData_C1[[SettingsInfo_C1[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      logger::log_trace(paste("Warning ", message, sep=""))
+      warning(message)
     }
 
     if(nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) < nrow(InputData_C2)){
-      warning("InputData_C2 includes NAs in ", SettingsInfo_C2[["ValueCol"]], " and/or in", SettingsInfo_C2[["StatCol"]], ". ", nrow(InputData_C2)- nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      message <- paste0("InputData_C2 includes NAs in ", SettingsInfo_C2[["ValueCol"]], " and/or in", SettingsInfo_C2[["StatCol"]], ". ", nrow(InputData_C2)- nrow(InputData_C2[complete.cases(InputData_C2[[SettingsInfo_C2[["ValueCol"]]]], InputData_C2[[SettingsInfo_C2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      logger::log_trace(paste("Warning ", message, sep=""))
+      warning(message)
     }
   }else{
     if(nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) < nrow(InputData_Intra)){
-      warning("InputData_Intra includes NAs in ", SettingsInfo_Intra[["ValueCol"]], " and/or in ", SettingsInfo_Intra[["StatCol"]], ". ", nrow(InputData_Intra)- nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      message <- paste0("InputData_Intra includes NAs in ", SettingsInfo_Intra[["ValueCol"]], " and/or in ", SettingsInfo_Intra[["StatCol"]], ". ", nrow(InputData_Intra)- nrow(InputData_Intra[complete.cases(InputData_Intra[[SettingsInfo_Intra[["ValueCol"]]]], InputData_Intra[[SettingsInfo_Intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      logger::log_trace(paste("Warning ", message, sep=""))
+      warning(message)
     }
 
     if(nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) < nrow(InputData_CoRe)){
-      warning("InputData_CoRe includes NAs in ", SettingsInfo_CoRe[["ValueCol"]], " and/or in ", SettingsInfo_CoRe[["StatCol"]], ". ", nrow(InputData_CoRe)- nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      message <- paste0("InputData_CoRe includes NAs in ", SettingsInfo_CoRe[["ValueCol"]], " and/or in ", SettingsInfo_CoRe[["StatCol"]], ". ", nrow(InputData_CoRe)- nrow(InputData_CoRe[complete.cases(InputData_CoRe[[SettingsInfo_CoRe[["ValueCol"]]]], InputData_CoRe[[SettingsInfo_CoRe[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+      logger::log_trace(paste("Warning ", message, sep=""))
+      warning(message)
     }
   }
 
@@ -945,20 +1046,26 @@ CheckInput_MCA <- function(InputData_C1,
   if(is.null(SettingsInfo_C1)==FALSE){
     options <- c("C1|C2", "C1&C2", "C2", "C1" , "*")
     if(any(options %in% BackgroundMethod) == FALSE){
-      stop("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+      message <- paste0("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }else{
     options <- c("Intra|CoRe", "Intra&CoRe", "CoRe", "Intra" , "*")
     if(any(options %in% BackgroundMethod) == FALSE){
-      stop("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+      message <- paste0("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
   #------------- SaveAs
-  SaveAs_Table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
+  SaveAs_Table_options <- c("txt","csv", "xlsx")
   if(is.null(SaveAs_Table)==FALSE){
     if((SaveAs_Table %in% SaveAs_Table_options == FALSE)| (is.null(SaveAs_Table)==TRUE)){
-      stop("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+      message <- paste0("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ",paste(SaveAs_Table_options,collapse = ", "),"." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(  message)
     }
   }
 }
