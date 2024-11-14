@@ -551,10 +551,21 @@ Log2FC_fun <-function(InputData,
 
       CoRe_info <-CoRe_info%>%
         dplyr::mutate(CoRe = case_when(CoRe_specific == "Released" ~ 'Released',
-                                CoRe_specific == "Consumed" ~ 'Consumed',
-                                TRUE ~ 'Released/Consumed'))
+                                       CoRe_specific == "Consumed" ~ 'Consumed',
+                                       TRUE ~ 'Released/Consumed'))%>%
+        dplyr::mutate(!!paste("CoRe_", comparisons[1,column], sep="") := case_when(CoRe_specific == "Released" ~ 'Released',
+                                                                                   CoRe_specific == "Consumed" ~ 'Consumed',
+                                                                                   CoRe_specific == paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")~ 'Consumed',
+                                                                                   CoRe_specific == paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")~ 'Released',
+                                                                                   TRUE ~ 'NA'))%>%
+        dplyr::mutate(!!paste("CoRe_", comparisons[2,column], sep="") := case_when(CoRe_specific == "Released" ~ 'Released',
+                                                                                   CoRe_specific == "Consumed" ~ 'Consumed',
+                                                                                   CoRe_specific == paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")~ 'Released',
+                                                                                   CoRe_specific == paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")~ 'Consumed',
+                                                                                   TRUE ~ 'NA'))
 
-      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], CoRe_info[,c(1,4:5,2:3)], by="Metabolite", all.x=TRUE)
+
+      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], CoRe_info[,c(1,2,6,3,7,4:5)], by="Metabolite", all.x=TRUE)
 
       #Add info on Input:
       temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
