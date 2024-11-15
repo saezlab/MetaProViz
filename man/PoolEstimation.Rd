@@ -2,7 +2,7 @@
 % Please edit documentation in R/Processing.R
 \name{PoolEstimation}
 \alias{PoolEstimation}
-\title{Find metabolites with high variqability across total pool samples}
+\title{Find metabolites with high variability across total pool samples}
 \usage{
 PoolEstimation(
   InputData,
@@ -36,7 +36,7 @@ PoolEstimation(
 List with two elements: DF (including input and output table) and Plot (including all plots generated)
 }
 \description{
-Find metabolites with high variqability across total pool samples
+Find metabolites with high variability across total pool samples
 }
 \examples{
 Intra <- ToyData("IntraCells_Raw")

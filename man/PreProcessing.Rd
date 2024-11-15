@@ -26,7 +26,7 @@ PreProcessing(
 
 \item{SettingsFile_Sample}{DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.}
 
-\item{SettingsInfo}{or Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For CoRe = TRUE a CoRe_norm_factor = "Columnname_Input_SettingsFile" and CoRe_media = "Columnname_Input_SettingsFile", have to also be added. Column CoRe_norm_factor is used for normalization and CoRe_media is used to specify the name of the media controls in the Conditions.}
+\item{SettingsInfo}{Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For CoRe = TRUE a CoRe_norm_factor = "Columnname_Input_SettingsFile" and CoRe_media = "Columnname_Input_SettingsFile", have to also be added. Column CoRe_norm_factor is used for normalization and CoRe_media is used to specify the name of the media controls in the Conditions.}
 
 \item{FeatureFilt}{\emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80\%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}}
 
@@ -58,9 +58,15 @@ Modularised Normalization: 80\%-filtering rule, total-ion count normalization, m
 }
 \examples{
 Intra <- MetaProViz::ToyData("IntraCells_Raw")
-Res <- MetaProViz::PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
+ResI <- MetaProViz::PreProcessing(InputData=Intra[-c(49:58) ,-c(1:3)],
                                  SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+
+Media <- MetaProViz::ToyData("CultureMedia_Raw")
+ResM <- MetaProViz::PreProcessing(InputData = Media[-c(40:45) ,-c(1:3)],
+                                  SettingsFile_Sample = Media[-c(40:45) ,c(1:3)] ,
+                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"),
+                                  CoRe=TRUE)
 
 }
 \keyword{80}

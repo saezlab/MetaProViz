@@ -2,7 +2,7 @@
 % Please edit documentation in R/MetaboliteClusteringAnalysis.R
 \name{MCA_CoRe}
 \alias{MCA_CoRe}
-\title{MCA_CoRe}
+\title{This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (CoRe experiment).}
 \usage{
 MCA_CoRe(
   InputData_Intra,
@@ -35,8 +35,30 @@ MCA_CoRe(
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
-MCA an instance of the MetaProViz package
+List of two DFs: 1. Summary of the cluster count and 2. the detailed information of each metabolites in the clusters.
 }
 \description{
-This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (CoRe experiment).
+This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (CoRe experiment).
 }
+\examples{
+
+Media <- MetaProViz::ToyData("CultureMedia_Raw")
+ResM <- MetaProViz::PreProcessing(InputData = Media[-c(40:45) ,-c(1:3)],
+                                  SettingsFile_Sample = Media[-c(40:45) ,c(1:3)] ,
+                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"),
+                                  CoRe=TRUE)
+
+MediaDMA <- MetaProViz::DMA(InputData=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
+                            SettingsFile_Sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)],
+                            SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"),
+                            StatPval ="aov",
+                            CoRe=TRUE)
+
+IntraDMA <- MetaProViz::ToyData(Data="IntraCells_DMA")
+
+Res <- MetaProViz::MCA_CoRe(InputData_Intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
+                            InputData_CoRe = MediaDMA[["DMA"]][["786-M1A_vs_HK2"]])
+
+}
+\keyword{biological}
+\keyword{clustering}

@@ -168,16 +168,10 @@ DetectedID <- function(InputData,
 #' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
 #' @param SettingsInfo
 #'
-#' @return
-#'
-#' @examples
-#'
-#' @keywords
-#'
 #' @importFrom dplyr mutate
 #' @importFrom rlang !!! !! := sym syms
 #'
-#' @export
+#' @noRd
 #'
 
 CheckMatchID <- function(InputData

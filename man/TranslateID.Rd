@@ -7,7 +7,7 @@
 TranslateID(
   InputData,
   SettingsInfo = c(InputID = "MetaboliteID", GroupingVariable = "term"),
-  From = c("kegg"),
+  From = "kegg",
   To = c("pubchem", "chebi", "hmdb"),
   SaveAs_Table = "csv",
   FolderPath = NULL
@@ -30,7 +30,7 @@ Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
 KEGG_Pathways <- MetaProViz::LoadKEGG()
-res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), Method="GetAll", SaveAs_Table= "csv", FolderPath=NULL)
+Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
 
 }
 \keyword{IDs}
