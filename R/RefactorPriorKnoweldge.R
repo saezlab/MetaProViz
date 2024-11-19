@@ -88,19 +88,60 @@ TranslateID <- function(
   Folder <- MetaProViz:::SavePath(FolderName = "TranslateID", FolderPath = NULL)
 
   ## ------------------ Translate To-From for each pair ------------------- ##
-  list(
-    InputDF = InputData,
-    TranslatedDF = OmnipathR::translate_ids(
+  TranslatedDF <- OmnipathR::translate_ids(
       InputData,
       !!sym(SettingsInfo[['InputID']]) :=  !!sym(From),
       !!!syms(To),#list of symbols, hence three !!!
       ramp = TRUE,
       expand = FALSE,
-      inspect = TRUE,
-      inspect_grp = SettingsInfo[['GroupingVariable']]
+      quantify_ambiguity = TRUE,
+      qualify_ambiguity = TRUE,
+      ambiguity_groups =  SettingsInfo[['GroupingVariable']]
     )
-  )
 
+  ## ------------------ Add information to the results and Create Summary------------------- ##
+  ResList <- list()
+  for(item in  To){
+    #Extract and prepare table for each metabolite ID:
+    ExpandID <-  TranslatedDF %>%
+      dplyr::select(any_of(names(InputData)), dplyr::contains(item))  %>%
+      tidyr::unnest(cols = all_of(dplyr::contains(item)))
+
+    # Add information about instances across or within pathways!
+    if(SettingsInfo[["GroupingVariable"]] %in% colnames(ExpandID)){
+      ExpandID <- ExpandID %>% #many-to-many = within or across pathways? --> add column with this information
+        group_by(MetaboliteID, term) %>%
+        mutate(GroupingVariable = case_when(
+          n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==TRUE ~ "one-to-many_Within-and-AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+          n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==FALSE ~ "one-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+          n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity == "one-to-many" & n_distinct(term) <= 1 ~ "one-to-many_WithinGroups",  # Multiple KEGG IDs, same term
+          TRUE ~ NA_character_  #
+        )) %>%
+        ungroup()%>%
+        group_by(hmdb) %>%
+        mutate(GroupingVariable = case_when(
+          n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) == 1 ~ "many-to-many_WithinGroups",  # Multiple KEGG IDs, same term
+          n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) > 1 ~ "many-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+          TRUE ~  paste(GroupingVariable) #
+        )) %>%
+        ungroup()
+      }
+
+    #Create a summary file about the instances of one-to-many etc. also include a descriptive column that verbalizes issues
+    # --> e.g. pathway inflation/deflation
+
+
+    #return results
+    ResList[[item]] <- ExpandID
+  }
+
+  #many-to-many = within or across pathways? --> add column with this information
+
+
+  ## ------------------ Save the results ------------------- ##
+  res <- list(
+    InputDF = InputData,
+    TranslatedDF = TranslatedDF)
 }
 
 
@@ -197,6 +238,9 @@ CheckMatchID <- function(InputData
   ## ------------ Prepare the Input -------- ##
 
 
+
+
+
 }
 
 
@@ -234,5 +278,76 @@ PossibleID <- function(InputData,
 
 #' Deal with pathway overlap in prior knowledge
 #'
+#' @param InputData Dataframe with at least one column with the target (e.g. metabolite) and a column source (e.g. term).
+#' @param SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
+#' @examples
+#' KEGG_Pathways <- MetaProViz::LoadKEGG()
+#' InputData = KEGG_Pathways
 #'
 #'
+#'
+
+
+
+ClusterPK <- function(InputData,
+                      SettingsInfo= c(InputID="MetaboliteID", GroupingVariable="term")
+
+){
+
+  # Cluster PK before running enrichment analysis --> add another column that groups the data based on the pathway overlap:
+  # provide different options for clustering (e.g. % of overlap, semantics similarity) --> Ramp uses % of overlap, semnatics similarity: https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html
+
+
+  ## ------------------ Check Input ------------------- ##
+
+
+  ## ------------------ Create output folders and path ------------------- ##
+
+  ## ------------------ Cluster the data ------------------- ##
+  # 1. Create a list of unique MetaboliteIDs for each term
+  term_metabolites <- InputData %>%
+    dplyr::group_by(!!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    dplyr::summarize(MetaboliteIDs = list(unique(!!sym(SettingsInfo[["InputID"]])))) %>%
+    dplyr::ungroup()
+
+  # 2. Compute pairwise overlaps
+  term_overlap <- combn(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], 2, function(terms) {
+    term1_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[SettingsInfo[["GroupingVariable"]]]] == terms[1]][[1]]
+    term2_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[SettingsInfo[["GroupingVariable"]]]] == terms[2]][[1]]
+
+    overlap <- length(intersect(term1_ids, term2_ids)) / length(union(term1_ids, term2_ids))
+    data.frame(Term1 = terms[1], Term2 = terms[2], Overlap = overlap)
+    }, simplify = FALSE) %>%
+    dplyr::bind_rows()
+
+  # 3. Cluster terms based on overlap threshold
+  threshold <- 0.7 # Define similarity threshold
+  term_clusters <- term_overlap %>%
+    dplyr::filter(Overlap >= threshold) %>%
+    dplyr::select(Term1, Term2)
+
+  # 4. Merge cluster group information back to the original data
+  df <- InputData %>%
+    dplyr::left_join(term_metabolites %>% select(!!sym(SettingsInfo[["GroupingVariable"]]), Group), by = SettingsInfo[["GroupingVariable"]])
+
+
+
+
+  #Maybe use igraph?
+  #g <- igraph::graph_from_data_frame(term_clusters, directed = FALSE)
+  #clusters <- igraph::clusters(g)$membership
+  #term_metabolites$Group <- clusters[match(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], names(clusters))]
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
