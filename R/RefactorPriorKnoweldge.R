@@ -96,52 +96,76 @@ TranslateID <- function(
       expand = FALSE,
       quantify_ambiguity = TRUE,
       qualify_ambiguity = TRUE,
-      ambiguity_groups =  SettingsInfo[['GroupingVariable']]
+      ambiguity_groups =  SettingsInfo[['GroupingVariable']]#Checks within the groups, without it checks across groups
     )
 
+  ## ------------------
+  ambi <-
+  To %>%
+  rlang::set_names() %>%
+  purrr::map(
+    ~MappingAmbiguity(
+      TranslatedDF %>% select(all_of(c(names(InputData), .x))),
+      SettingsInfo[['InputID']],
+      .x,
+      SettingsInfo[['GroupingVariable']]
+    )
+  )
+
+
   ## ------------------ Add information to the results and Create Summary------------------- ##
-  ResList <- list()
-  for(item in  To){
-    #Extract and prepare table for each metabolite ID:
-    ExpandID <-  TranslatedDF %>%
-      dplyr::select(any_of(names(InputData)), dplyr::contains(item))  %>%
-      tidyr::unnest(cols = all_of(dplyr::contains(item)))
+
 
     # Add information about instances across or within pathways!
-    if(SettingsInfo[["GroupingVariable"]] %in% colnames(ExpandID)){
-      ExpandID <- ExpandID %>% #many-to-many = within or across pathways? --> add column with this information
-        group_by(MetaboliteID, term) %>%
-        mutate(GroupingVariable = case_when(
-          n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==TRUE ~ "one-to-many_Within-and-AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-          n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==FALSE ~ "one-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-          n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity == "one-to-many" & n_distinct(term) <= 1 ~ "one-to-many_WithinGroups",  # Multiple KEGG IDs, same term
-          TRUE ~ NA_character_  #
-        )) %>%
-        ungroup()%>%
-        group_by(hmdb) %>%
-        mutate(GroupingVariable = case_when(
-          n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) == 1 ~ "many-to-many_WithinGroups",  # Multiple KEGG IDs, same term
-          n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) > 1 ~ "many-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-          TRUE ~  paste(GroupingVariable) #
-        )) %>%
-        ungroup()
-      }
+    # if(SettingsInfo[["GroupingVariable"]] %in% colnames(ExpandID)){
+    #   ExpandID <- ExpandID %>% #many-to-many = within or across pathways? --> add column with this information
+    #      group_by(MetaboliteID, term) %>%
+    #     mutate(GroupingVariable = case_when(
+    #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==TRUE ~ "one-to-many_Within-and-AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+    #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==FALSE ~ "one-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+    #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity == "one-to-many" & n_distinct(term) <= 1 ~ "one-to-many_WithinGroups",  # Multiple KEGG IDs, same term
+    #       TRUE ~ NA_character_  #
+    #     )) %>%
+    #     ungroup()%>%
+    #     group_by(hmdb) %>%
+    #     mutate(GroupingVariable = case_when(
+    #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) == 1 ~ "many-to-many_WithinGroups",  # Multiple KEGG IDs, same term
+    #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) > 1 ~ "many-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+    #       TRUE ~  paste(GroupingVariable) #
+    #     )) %>%
+    #     ungroup()
+    # }
+
 
     #Create a summary file about the instances of one-to-many etc. also include a descriptive column that verbalizes issues
     # --> e.g. pathway inflation/deflation
 
 
     #return results
-    ResList[[item]] <- ExpandID
-  }
+   # ResList[[item]] <- ExpandID
+#
+  #}
 
-  #many-to-many = within or across pathways? --> add column with this information
+  # many-to-many = within or across pathways? --> add column with this information
 
 
-  ## ------------------ Save the results ------------------- ##
-  res <- list(
-    InputDF = InputData,
-    TranslatedDF = TranslatedDF)
+
+  # dplyr::select(any_of(names(InputData)), dplyr::contains(item))  %>%
+  #   tidyr::unnest(cols = all_of(dplyr::contains(item)))
+  #
+  #
+  #
+  # ## ------------------ Save the results ------------------- ##
+  # res <- list(
+  #   InputDF = InputData,
+  #   TranslatedDF = TranslatedDF)
+
+
+  #save function to folder
+
+  #return
+
+
 }
 
 
@@ -149,16 +173,41 @@ TranslateID <- function(
 ### ### ### NEW ### ### ###
 ##########################################################################################
 
-#
+# this is now part of OmnipathR --> denes said it will fit better there!
+# Problem: We need to be able to use this function here too. So we will need to extract it from Omnipath to also be present here! (either wrapper or copy!)
+# needs to be @export
 
 MappingAmbiguity <- function(
-    InputData,
-    SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
-    From = "kegg",
-    To = c("pubchem","chebi","hmdb"),
-    SaveAs_Table= "csv",
-    FolderPath=NULL
-){
+    InputData,  #  DF with at least two columns  with Orignial MetaboliteID and another MetaboliteID type (e.g. KEGG and HMDB). Can also include more metabolite IDs. OR translated DF from MetaProViz::TranslateID
+    From,
+    To,
+    Groups = NULL # if Null no groups column is used
+) {
+
+  #Extract and prepare table for each metabolite ID:
+  InputData %>%
+    {`if`(
+      is.null(Groups),
+      .,
+      OmnipathR::ambiguity(
+        .,
+        from_col = !!sym(From),
+        to_col = !!sym(To),
+        groups = Groups,
+        quantify = 'withingroup',
+        qualify = 'withingroup',
+        expand=TRUE
+      )
+    )} %>%
+    OmnipathR::ambiguity(
+      from_col = !!sym(From),
+      to_col = !!sym(To),
+      groups = NULL,
+      quantify = 'acrossgroup', # maybe name oneGroup or NoGrouping?
+      qualify = 'acrossgroup',
+      expand=TRUE
+    )
+
   #was inspectID
   #Summary and translation one-to-many, many-to-one
 
@@ -174,17 +223,17 @@ MappingAmbiguity <- function(
 
 
 ##########################################################################################
-### ### ### Helper ### ### ### --> Filtering should be done here!
+### ### ### Reduce mapping ambiguities by using detected IDs  ### ### ###
 ##########################################################################################
 
-#' Clean translated ID in prior knowledge based on measured features
+#' Reduce mapping ambiguities by using detected IDs
 #'
 #' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
 #' @param SettingsInfo
 #'
 #' @export
 #'
-DetectedID <- function(InputData,
+CleanMapping <- function(InputData,
                        SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
 ){
 
@@ -192,9 +241,9 @@ DetectedID <- function(InputData,
   # HelperFunction `CheckInput`
 
   # Function that can use Prior knowledge that has multiple IDs "X1, X2, X3" and use the measured features to remove IDs based on measured data.
-  # This is to enxure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
+  # This is to ensure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
 
-
+  # --> Cleans translated ID in prior knowledge based on measured features
 
 
 }
@@ -221,7 +270,7 @@ DetectedID <- function(InputData,
 #' @export
 #'
 
-CheckMatchID <- function(InputData
+CheckMatchID <- function(InputData #Maybe name DetectedID
 
 ){
   ## ------------ Create log file ----------- ##
@@ -248,14 +297,14 @@ CheckMatchID <- function(InputData
 ### ### ### Helper (?) ### ### ###
 ##########################################################################################
 
-#' Deal with detected input features.
+#' Deal with detected input features. If we only have one ID, could it also be another one?
 #'
 #' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
 #' @param SettingsInfo
 #'
 #' @export
 #'
-PossibleID <- function(InputData,
+AssignID <- function(InputData,
                        SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
 ){
 
@@ -268,6 +317,8 @@ PossibleID <- function(InputData,
 
   # Do this by using structural information via  accessing the structural DB in OmniPath!
   # Output is DF with the original ID column and a new column with additional possible IDs based on structure
+
+  #Is it possile to do this at the moment without structures, but by using other pior knowledge?
 
 }
 
@@ -289,8 +340,11 @@ PossibleID <- function(InputData,
 
 
 
-ClusterPK <- function(InputData,
-                      SettingsInfo= c(InputID="MetaboliteID", GroupingVariable="term")
+ClusterPK <- function(InputData, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
+                      SettingsInfo= c(InputID="MetaboliteID", GroupingVariable="term"),
+                      Clust = "Graph", # Options: "Graph", "Hierarchical",
+                      matrix ="percentage", # Choose "pearson", "spearman", "kendall", or "percentage"
+                      min= 2 # minimum pathways per cluster
 
 ){
 
@@ -303,6 +357,9 @@ ClusterPK <- function(InputData,
 
   ## ------------------ Create output folders and path ------------------- ##
 
+
+
+
   ## ------------------ Cluster the data ------------------- ##
   # 1. Create a list of unique MetaboliteIDs for each term
   term_metabolites <- InputData %>%
@@ -310,43 +367,181 @@ ClusterPK <- function(InputData,
     dplyr::summarize(MetaboliteIDs = list(unique(!!sym(SettingsInfo[["InputID"]])))) %>%
     dplyr::ungroup()
 
-  # 2. Compute pairwise overlaps
-  term_overlap <- combn(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], 2, function(terms) {
-    term1_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[SettingsInfo[["GroupingVariable"]]]] == terms[1]][[1]]
-    term2_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[SettingsInfo[["GroupingVariable"]]]] == terms[2]][[1]]
+  #2. Create the overlap matrix based on different methods:
+  if (matrix == "percentage") {# Compute pairwise overlaps
+    term_overlap <- combn(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], 2, function(terms) {
+      term1_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[SettingsInfo[["GroupingVariable"]]]] == terms[1]][[1]]
+      term2_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[SettingsInfo[["GroupingVariable"]]]] == terms[2]][[1]]
 
-    overlap <- length(intersect(term1_ids, term2_ids)) / length(union(term1_ids, term2_ids))
-    data.frame(Term1 = terms[1], Term2 = terms[2], Overlap = overlap)
+      overlap <- length(intersect(term1_ids, term2_ids)) / length(union(term1_ids, term2_ids))
+      data.frame(Term1 = terms[1], Term2 = terms[2], Overlap = overlap)
     }, simplify = FALSE) %>%
-    dplyr::bind_rows()
+      dplyr::bind_rows()
 
+    # Create overlap matrix: An overlap matrix is typically used to quantify the degree of overlap between two sets or groups.
+    # overlap coefficient (or Jaccard Index) Overlap(A,B)= ∣A∪B∣ / ∣A∩B
+    #The overlap matrix measures the similarity between sets or groups based on common elements.
+    terms <- unique(c(term_overlap$Term1, term_overlap$Term2))
+    overlap_matrix <- matrix(1, nrow = length(terms), ncol = length(terms), dimnames = list(terms, terms))
+    for (i in seq_len(nrow(term_overlap))) {
+      t1 <- term_overlap$Term1[i]
+      t2 <- term_overlap$Term2[i]
+      overlap_matrix[t1, t2] <- 1 - term_overlap$Overlap[i]
+      overlap_matrix[t2, t1] <- 1 - term_overlap$Overlap[i]
+    }
+  } else {
+    # Create a binary matrix for correlation methods
+    terms <- term_metabolites[[SettingsInfo[["GroupingVariable"]]]]
+    metabolites <- unique(unlist(term_metabolites$MetaboliteIDs)) #[[SettingsInfo[["InputID"]]]]
+
+    binary_matrix <- matrix(0, nrow = length(terms), ncol = length(metabolites), dimnames = list(terms, metabolites))
+    for (i in seq_along(terms)) {
+      metabolites_for_term <- term_metabolites$MetaboliteIDs[[i]] #[[SettingsInfo[["InputID"]]]]
+      binary_matrix[i, colnames(binary_matrix) %in% metabolites_for_term] <- 1
+    }
+
+    # Compute correlation matrix: square matrix used to represent the pairwise correlation coefficients between variables or terms
+    # correlation matrix 𝐶 C is an 𝑛 × 𝑛 n×n matrix where each element 𝐶 𝑖 𝑗 C ij  is the correlation coefficient between the variables 𝑋𝑖 Xi  and 𝑋 𝑗 X j
+    #The correlation matrix measures the strength and direction of linear relationships between variables.
+    correlation_matrix <- cor(t(binary_matrix), method = matrix)
+
+    # Convert to distance matrix
+    overlap_matrix <- 1 - correlation_matrix
+  }
   # 3. Cluster terms based on overlap threshold
   threshold <- 0.7 # Define similarity threshold
   term_clusters <- term_overlap %>%
     dplyr::filter(Overlap >= threshold) %>%
     dplyr::select(Term1, Term2)
 
-  # 4. Merge cluster group information back to the original data
+  # 4. Clustering
+  if (Clust == "Graph") { #Use Graph-based clustering
+  # Here we need the distance matrix:
+  overlap_matrix <- 1 - correlation_matrix
+
+  # An adjacency matrix represents a graph structure and encodes the relationships between nodes (vertices)
+  # Add weight (can also represent unweighted graphs)
+  adjacency_matrix <- exp(-overlap_matrix^2)  # Applying Gaussian kernel to convert distance into similarity
+
+  # Create a graph from the adjacency matrix
+  g <- igraph::graph_from_adjacency_matrix(adjacency_matrix, mode = "undirected", weighted = TRUE)
+  initial_clusters <- igraph::components(g)$membership
+  term_metabolites$Cluster <- initial_clusters[match(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], names(initial_clusters))]
+  } else if (Clust == "Hierarchical") { # Hierarchical clustering
+    hclust_result <- hclust(as.dist(distance_matrix), method = "average") # make methods into parameters!
+    num_clusters <- 4
+    term_clusters_hclust <- cutree(hclust_result, k = num_clusters)
+
+    term_metabolites$Cluster <- paste0("Cluster", term_clusters_hclust[match(terms, names(term_clusters_hclust))])
+    #term_metabolites$Cluster <- clusters[match(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], names(clusters))]
+  } else {
+    stop("Invalid clustering method specified in Clust parameter.")
+  }
+
+  # 5. Merge cluster group information back to the original data
   df <- InputData %>%
-    dplyr::left_join(term_metabolites %>% select(!!sym(SettingsInfo[["GroupingVariable"]]), Group), by = SettingsInfo[["GroupingVariable"]])
+    dplyr::left_join(term_metabolites %>% select(!!sym(SettingsInfo[["GroupingVariable"]]), Cluster), by = SettingsInfo[["GroupingVariable"]])%>%
+    dplyr::mutate(Cluster = ifelse(
+      is.na(Cluster),
+        "None", # Assign "None" to NAs
+        paste0("Cluster", Cluster) # Convert numeric IDs to descriptive labels
+      )
+    )
+
+  # 6. Summarize the clustering results
 
 
 
 
-  #Maybe use igraph?
-  #g <- igraph::graph_from_data_frame(term_clusters, directed = FALSE)
-  #clusters <- igraph::clusters(g)$membership
-  #term_metabolites$Group <- clusters[match(term_metabolites[[SettingsInfo[["GroupingVariable"]]]], names(clusters))]
+
+  ## ------------------ Save and return ------------------- ##
+
 
 }
 
 
 
 
+##########################################################################################
+### ### ### Helper function to add term information to Enrichment Results ### ### ###
+##########################################################################################
+
+#' Adds extra columns to enrichment output that inform about 1. The amount of genes associated with term in prior knowledge, 2. The amount of genes detected in input data associated with term in prior knowledge, and 3. The percentage of genes detected in input data associated with term in prior knowledge.
+#'
+#' @param mat Data matrix used as input for enrichment analysis
+#' @param net Prior Knowledge used as input for enrichment analysis
+#' @param res Results returned from the enrichment analysis
+#' @param .source used as input for enrichment analysis
+#' @param .target used as input for enrichment analysis
+#' @param complete TRUE or FALSE, weather only .source with results should be returned or all .source in net.
+#'
+#' @export
+
+# Better function Name and parameter names needed
+# Use in ORA functions and showcase in vignette with decoupleR output
+
+AddInfo <- function(mat,
+                    net,
+                    res,
+                    .source,
+                    .target,
+                    complete=FALSE){
+
+  ## ------------------ Check Input ------------------- ##
 
 
+  ## ------------------ Create output folders and path ------------------- ##
 
 
+  ## ------------------ Add information to enrichment results ------------------- ##
+
+  # add number of Genes_targeted_by_TF_num
+  net$Count <- 1
+  net_Mean <- aggregate(net$Count, by=list(source=net[[.source]]), FUN=sum)%>%
+    rename("targets_num" = 2)
+
+  if(complete==TRUE){
+    res_Add<- merge(x= res, y=net_Mean, by="source", all=TRUE)
+  }else{
+    res_Add<- merge(x= res, y=net_Mean, by="source", all.x =TRUE)
+  }
+
+  # add list of Genes_targeted_by_TF_chr
+  net_List <- aggregate(net[[.target]]~net[[.source]], FUN=toString)%>%
+    rename("source" = 1,
+           "targets_chr"=2)
+  res_Add<- merge(x= res_Add, y=net_List, by="source", all.x=TRUE)
+
+  # add number of Genes_targeted_by_TF_detected_num
+  mat <- as.data.frame(mat)%>% #Are these the normalised counts?
+    tibble::rownames_to_column("Symbol")
+
+  Detected <- merge(x= mat , y=net[,c(.source, .target)], by.x="Symbol", by.y=.target, all.x=TRUE)%>%
+    filter(!is.na(across(all_of(.source))))
+  Detected$Count <-1
+  Detected_Mean <- aggregate(Detected$Count, by=list(source=Detected[[.source]]), FUN=sum)%>%
+    rename("targets_detected_num" = 2)
+
+  res_Add<- merge(x= res_Add, y=Detected_Mean, by="source", all.x=TRUE)%>%
+    mutate(targets_detected_num = replace_na(targets_detected_num, 0))
+
+  # add list of Genes_targeted_by_TF_detected_chr
+  Detected_List <- aggregate(Detected$Symbol~Detected[[.source]], FUN=toString)%>%
+    rename("source"=1,
+           "targets_detected_chr" = 2)
+
+  res_Add<- merge(x= res_Add, y=Detected_List, by="source", all.x=TRUE)
+
+  #add percentage of Percentage_of_Genes_detected
+  res_Add$targets_detected_percentage <-round(((res_Add$targets_detected_num/res_Add$targets_num)*100),digits=2)
+
+  #sort by score
+  res_Add<-res_Add%>%
+    arrange(desc(as.numeric(as.character(score))))
+
+  ## ------------------ Save and return ------------------- ##
+  Output<-res_Add
+}
 
 
 
