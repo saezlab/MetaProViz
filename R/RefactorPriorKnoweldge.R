@@ -82,6 +82,13 @@ TranslateID <- function(
 
   }
 
+
+
+  #Task 1: Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
+
+
+
+
   ## ------------------  Create output folders and path ------------------- ##
   # Export to this location was not part of the original function, we should
   # set it up later - Denes
@@ -99,6 +106,51 @@ TranslateID <- function(
       ambiguity_groups =  SettingsInfo[['GroupingVariable']]#Checks within the groups, without it checks across groups
     )
 
+  #replace 0 with NA!
+
+  ## ------------------ Create Tables for each translation ------------------- ##
+
+  ResList <- list()
+  for(item in To){
+    DF <- TranslatedDF %>%
+      dplyr::select(any_of(names(InputData)), item)%>%
+      tidyr::unnest(cols = item)%>%
+
+
+
+  }
+
+
+
+
+
+
+
+    # Task 1: Check that SettingsInfo[['InputID']] has the same items in to across the different entries (would be in different Groupings, otherwise there should not be any duplications)
+
+
+    #Create Mapping column
+    item_columns <- TranslatedDF %>%
+      dplyr::select(item) %>%
+      apply(1, function(row) paste(row, collapse = " + "))
+
+    Mapping <- TranslatedDF %>%
+      dplyr::mutate(Mapping = paste(!!sym(SettingsInfo[['InputID']]), "=", item_columns))%>%
+      dplyr::select(any_of(names(InputData)), dplyr::contains(item), "Mapping")
+
+    ExpandID <- TranslatedDF %>%
+      dplyr::select(any_of(names(InputData)), dplyr::contains(item))  %>%
+      tidyr::unnest(cols = all_of(dplyr::contains(item)))
+
+    #return results
+    ResList[[item]] <- ExpandID
+  }
+
+
+
+
+
+
   ## ------------------
   ambi <-
   To %>%
@@ -113,40 +165,7 @@ TranslateID <- function(
   )
 
 
-  ## ------------------ Add information to the results and Create Summary------------------- ##
 
-
-    # Add information about instances across or within pathways!
-    # if(SettingsInfo[["GroupingVariable"]] %in% colnames(ExpandID)){
-    #   ExpandID <- ExpandID %>% #many-to-many = within or across pathways? --> add column with this information
-    #      group_by(MetaboliteID, term) %>%
-    #     mutate(GroupingVariable = case_when(
-    #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==TRUE ~ "one-to-many_Within-and-AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-    #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==FALSE ~ "one-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-    #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity == "one-to-many" & n_distinct(term) <= 1 ~ "one-to-many_WithinGroups",  # Multiple KEGG IDs, same term
-    #       TRUE ~ NA_character_  #
-    #     )) %>%
-    #     ungroup()%>%
-    #     group_by(hmdb) %>%
-    #     mutate(GroupingVariable = case_when(
-    #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) == 1 ~ "many-to-many_WithinGroups",  # Multiple KEGG IDs, same term
-    #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) > 1 ~ "many-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-    #       TRUE ~  paste(GroupingVariable) #
-    #     )) %>%
-    #     ungroup()
-    # }
-
-
-    #Create a summary file about the instances of one-to-many etc. also include a descriptive column that verbalizes issues
-    # --> e.g. pathway inflation/deflation
-
-
-    #return results
-   # ResList[[item]] <- ExpandID
-#
-  #}
-
-  # many-to-many = within or across pathways? --> add column with this information
 
 
 
@@ -173,40 +192,206 @@ TranslateID <- function(
 ### ### ### NEW ### ### ###
 ##########################################################################################
 
-# this is now part of OmnipathR --> denes said it will fit better there!
+#this is now part of OmnipathR --> denes said it will fit better there!
 # Problem: We need to be able to use this function here too. So we will need to extract it from Omnipath to also be present here! (either wrapper or copy!)
 # needs to be @export
 
-MappingAmbiguity <- function(
-    InputData,  #  DF with at least two columns  with Orignial MetaboliteID and another MetaboliteID type (e.g. KEGG and HMDB). Can also include more metabolite IDs. OR translated DF from MetaProViz::TranslateID
-    From,
-    To,
-    Groups = NULL # if Null no groups column is used
+#' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
+#'
+#' @param InputData Translated DF from MetaProViz::TranslateID reults or Dataframe with at least one column with the target ID (e.g. metabolite KEGG IDs) and another MetaboliteID type (e.g. KEGG and HMDB). Optional: add other columns such as source (e.g. term) or more metabolite IDs.
+#' @param To Column name of original metabolite identifier in InputData. Here should only be one ID per row
+#' @param From Column name of the secondary or translated metabolite identifier in InputData. Here can be multiple IDs per row.
+#' @param GroupingVariable \emph{Optional: } If NULL no groups are used. If TRUE provide column name in InputData containing the GroupingVariable; features are grouped. \strong{Default = NULL}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{Default = NULL}
+#'
+#' @return List with three DFs: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
+#'
+#' @examples
+#' KEGG_Pathways <- MetaProViz::LoadKEGG()
+#' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
+#'
+#'
+#' @keywords Mapping ambiguity
+#'
+#' @importFrom dplyr mutate
+#' @importFrom rlang !!! !! := sym syms
+#' @importFrom OmnipathR ambiguity
+#'
+#' @export
+#'
+
+MappingAmbiguity <- function( InputData=TranslatedDF,
+                              #SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
+                              From = "MetaboliteID",
+                              To = "hmdb",
+                              GroupingVariable = NULL,
+                              SaveAs_Table= "csv",
+                              FolderPath=NULL
 ) {
 
-  #Extract and prepare table for each metabolite ID:
-  InputData %>%
-    {`if`(
-      is.null(Groups),
-      .,
-      OmnipathR::ambiguity(
-        .,
-        from_col = !!sym(From),
-        to_col = !!sym(To),
-        groups = Groups,
-        quantify = 'withingroup',
-        qualify = 'withingroup',
-        expand=TRUE
-      )
-    )} %>%
-    OmnipathR::ambiguity(
-      from_col = !!sym(From),
-      to_col = !!sym(To),
-      groups = NULL,
-      quantify = 'acrossgroup', # maybe name oneGroup or NoGrouping?
-      qualify = 'acrossgroup',
-      expand=TRUE
+  ## ------------------  Check Input ------------------- ##
+
+
+  ## ------------------  Create output folders and path ------------------- ##
+
+
+
+
+  ## ------------------  General checks of wrong occurences ------------------- ##
+  # Task 1: Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
+  # Task 2: Check that SettingsInfo[['InputID']] has the same items in to across the different entries (would be in different Groupings, otherwise there should not be any duplications) --> List of Miss-Mappings across terms
+
+  # FYI: The above can not happen if our translateID function was used, but may be the case when the user has done something manually before
+
+
+
+  ## Create input
+
+
+  ids <- c(From, To)
+  ResList <- c(from_to_to = identity, to_to_from = rev) %>%
+    map(
+      function(direction) {
+        cols <- ids %>% direction
+
+        InputData %>%
+          dplyr::select(all_of(c(cols, GroupingVariable))) %>%
+          tidyr::unnest(cols) %>%# unlist the columns in case they are not expaned
+          OmnipathR::ambiguity(
+          from_col = !!sym(cols[1L]),
+          to_col = !!sym(cols[2L]),
+          groups = GroupingVariable,
+          quantify = 'Group',
+          qualify = 'Group',
+          #global = TRUE,#across groups will be done additionally --> suffix _AcrossGroup
+          #summary=TRUE, #summary of the mapping column
+          expand = TRUE
+        )
+      }
     )
+
+
+  #2. --> use different column names:  "MetaboliteID_hmdb_to_ambiguity" = "To_hmdb" , "MetaboliteID_hmdb_from_ambiguity" = "From_MetaboliteID"
+  #3. --> different order of columns: InputData columns, "hmdb", "From_MetaboliteID", "To_MetaboliteID"
+
+
+
+  #---- Summary
+
+  for(df in names(ResList)){
+    #Flank problematic cases by adding further columns to df
+
+
+    #Create Summary
+    Summary <- ResList[[df]] %>%
+      count(paste0())%>%#Column we will need to distinguish
+      pivot_wider(names_from = Relationship, values_from = n, values_fill = 0) #n=count --> column names are one-to-one, etc. and entries are the occurrences
+
+
+
+  }
+
+  ## ------------------  Perform ambiguity mapping ------------------- ##
+  #1. From-to-To: OriginalID-to-TranslatedID
+  #2. From-to-To: TranslatedID-to-OriginalID
+  Comp <- list(
+    list(From = From, To = To),
+    list(From = To, To = From)
+  )
+
+  ResList <- list()
+  for(comp in seq_along(Comp)){
+  # Change OmnipathR::ambiguity
+    #1. --> create a column "From-to-To" (= hmdb-to-kegg) only with one-to-one, one-to-none, one-to-many, create a column "From-to-To_Bidirectional" (= hmdb-to-kegg_Bidirectional) one-to-one, one-to-none, one-to-many AND many-to-many
+    #2. --> use different column names:  "MetaboliteID_hmdb_to_ambiguity" = "To_hmdb" , "MetaboliteID_hmdb_from_ambiguity" = "From_MetaboliteID"
+    #3. --> different order of columns: InputData columns, "hmdb", "From_MetaboliteID", "To_MetaboliteID"
+    if(is.null(GroupingVariable)){
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_OneGroup", sep="")]] <- InputData %>%
+        OmnipathR::ambiguity(
+        from_col = !!sym(Comp[[comp]]$From),
+        to_col = !!sym(Comp[[comp]]$To),
+        groups = NULL,
+        quantify = 'OneGroup', # maybe name NoGrouping?
+        qualify = 'OneGroup',
+        expand=TRUE)
+    }else{
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_WithinGroup", sep="")]] <- InputData %>%
+        OmnipathR::ambiguity(
+        from_col = !!sym(Comp[[comp]]$From),
+        to_col = !!sym(Comp[[comp]]$To),
+        groups = GroupingVariable,
+        quantify = 'WithinGroup',
+        qualify = 'WithinGroup',
+        expand=TRUE)
+
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To,"_AcrossGroup", sep="")]] <- InputData %>%
+        OmnipathR::ambiguity(
+        from_col = !!sym(Comp[[comp]]$From),
+        to_col = !!sym(Comp[[comp]]$To),
+        groups = NULL,
+        quantify = 'AcrossGroup',
+        qualify = 'AcrossGroup',
+        expand=TRUE)
+    }
+
+
+
+    }
+
+
+  ## ------------------  summaries the results and log messages ------------------- ##
+
+  for(df in names(ResList)){
+    #Flank problematic cases by adding further columns to df
+
+
+    #Create Summary
+    Summary <- ResList[[df]] %>%
+      count(Mapping)%>%#Column we will need to distinguish
+      pivot_wider(names_from = Relationship, values_from = n, values_fill = 0) #n=count --> column names are one-to-one, etc. and entries are the occurrences
+
+
+
+
+
+  }
+
+
+
+
+
+
+  # if(SettingsInfo[["GroupingVariable"]] %in% colnames(ExpandID)){
+  #   ExpandID <- ExpandID %>% #many-to-many = within or across pathways? --> add column with this information
+  #      group_by(MetaboliteID, term) %>%
+  #     mutate(GroupingVariable = case_when(
+  #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==TRUE ~ "one-to-many_Within-and-AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+  #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==FALSE ~ "one-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+  #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity == "one-to-many" & n_distinct(term) <= 1 ~ "one-to-many_WithinGroups",  # Multiple KEGG IDs, same term
+  #       TRUE ~ NA_character_  #
+  #     )) %>%
+  #     ungroup()%>%
+  #     group_by(hmdb) %>%
+  #     mutate(GroupingVariable = case_when(
+  #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) == 1 ~ "many-to-many_WithinGroups",  # Multiple KEGG IDs, same term
+  #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) > 1 ~ "many-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
+  #       TRUE ~  paste(GroupingVariable) #
+  #     )) %>%
+  #     ungroup()
+  # }
+
+
+  #Create a summary file about the instances of one-to-many etc. also include a descriptive column that verbalizes issues
+  # --> e.g. pathway inflation/deflation
+
+
+
+
+  ## ------------------  Save the results ------------------- ##
+
+
+
 
   #was inspectID
   #Summary and translation one-to-many, many-to-one
