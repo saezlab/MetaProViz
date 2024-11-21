@@ -4,7 +4,7 @@
 ##
 ## Purpose of script: Create gene-metabolite sets for pathway enrichment analysis.
 ##
-## Author: Christina Schmidt and Macabe Daley
+## Author: Christina Schmidt, Denes Turei and Macabe Daley
 ##
 ## Date Created: 2024-01-21
 ##
@@ -26,6 +26,8 @@
 #'
 #' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
 #' @param SettingsInfo \emph{Optional: } Column name of Target in Input_GeneSet. \strong{Default = list(InputID="MetaboliteID" , GroupingVariable="term")}
+#' @param From ID type your
+#' @param To One or multiple ID types
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{Default = NULL}
 #'
@@ -34,7 +36,7 @@
 #' @examples
 #' KEGG_Pathways <- MetaProViz::LoadKEGG()
 #' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
-
+#'
 #'
 #' @keywords Translate IDs
 #'
@@ -57,10 +59,9 @@ TranslateID <- function(
     FolderPath=NULL
   ){
 
-  # Refactoring: make arguments similar to OmnipathR::translate_ids
-  # i.e. instead of From / To dynamic dots
-  # hence we dont need to rename the column that includes the "From"
-  MetaProViz_Init()
+   MetaProViz_Init()
+
+  ## ------------------  Check Input ------------------- ##
 
   # Specific checks:
   unknown_types <-
@@ -82,16 +83,23 @@ TranslateID <- function(
 
   }
 
+  # Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
+  doublons <- InputData %>%
+    dplyr::group_by(!!sym(SettingsInfo[['InputID']]), !!sym(SettingsInfo[['GroupingVariable']]))%>%
+    dplyr::filter(n() > 1) %>%
+    dplyr::ungroup()
 
-
-  #Task 1: Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
-
-
+  if(nrow(doublons) > 0){
+    message <- sprintf(
+      'The following ID types are duplicated within one group: %s',
+      paste(doublons, collapse = ', ')
+    )
+    logger::log_warn(message)
+    warning(message)
+  }
 
 
   ## ------------------  Create output folders and path ------------------- ##
-  # Export to this location was not part of the original function, we should
-  # set it up later - Denes
   Folder <- MetaProViz:::SavePath(FolderName = "TranslateID", FolderPath = NULL)
 
   ## ------------------ Translate To-From for each pair ------------------- ##
@@ -114,7 +122,7 @@ TranslateID <- function(
   for(item in To){
     DF <- TranslatedDF %>%
       dplyr::select(any_of(names(InputData)), item)%>%
-      tidyr::unnest(cols = item)%>%
+      tidyr::unnest(cols = item)
 
 
 
@@ -144,7 +152,7 @@ TranslateID <- function(
 
     #return results
     ResList[[item]] <- ExpandID
-  }
+
 
 
 
