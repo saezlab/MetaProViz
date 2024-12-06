@@ -419,6 +419,8 @@ Alanine <- data.frame(
   TrivialName = c("D-Alanine", "L-Alanine", "Alanine", "Alanine zwitterion"),
   HMDB= c("HMDB0001310",  "HMDB0000161", NA, NA),
   ChEBI = c("15570", "16977", "16449", "66916" ),
+  KEGG = c("C00133", "C00041", "C01401", NA ),
+  PubChem = c("71080" , "5950", "602", "57383916"),
   stringsAsFactors = FALSE)
 
 # Print table:
@@ -427,22 +429,53 @@ Alanine%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
+Indeed, dependent on the database, the Alanine metabolite can have different IDs available:\
+```{r, echo=FALSE}
+#Print Plot:
+AlaninePlot <- Alanine%>%
+  tidyr::pivot_longer(cols = c("HMDB", "ChEBI", "KEGG", "PubChem"), 
+                               names_to = "Conditions",
+                               values_to = "ID")%>%
+  tidyr::drop_na()
+AlaninePlot$`IDs in Database` <- as.numeric(1)
+
+Plot <- ggplot2::ggplot(AlaninePlot, ggplot2::aes(fill=TrivialName, y=`IDs in Database`, x=Conditions)) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("D-Alanine" = "#9F0162"  , "L-Alanine" = "#006384", "Alanine" = "grey", "Alanine zwitterion" = "#00735C"))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("Alanine IDs in in different databases")+
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(x = "Database", y = "Number of IDs")
+
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=AlaninePlot,  PlotName = "Alanine IDs in in different databases", Subtitle = NULL, PlotType="Bar")
+ 
+PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+Plot_Sized %<>%
+      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+      add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+
+#ggplot2::ggsave(filename = "AlaninePlot.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+ 
+Plot_Sized
+```
+\
 For instance, if we want to assign a HMDB ID, we have to assign both "HMDB0001310",  "HMDB0000161" to the metabolite Alanine, for ChEBI we could assign only one, "16449", but this may lead to other problems as the ChEBI ID is not specific and may not be part of certain metabolic pathways. The reason for this is that substrate chirality is critical to enzymatic processes and stereoselectivity of enzymes to be homochiral with predominance of one particular enantiomer (e.g. D-sugars, L-amino acids, etc.).\
 To showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases. To do so we serached for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 ```{r, echo=FALSE}
 # devtools::install_github("ncats/RAMP-DB")
 #rampDB <- RaMP::RaMP(version = "2.5.4")
 
-Pathways <- RaMP::getPathwayFromAnalyte(db = rampDB, c("hmdb:HMDB0001310", "hmdb:HMDB0000161", "chebi:16449", "chebi:66916", "chebi:16977", "chebi:15570"))%>%
- tidyr::unite(Pathway, c("pathwaySource", "pathwayName"), sep = ": ")
+Pathways <- RaMP::getPathwayFromAnalyte(db = rampDB, c("hmdb:HMDB0001310", "hmdb:HMDB0000161", "chebi:16449", "chebi:66916", "chebi:16977", "chebi:15570", "kegg:C00041", "kegg:C00133", "kegg:C01401", "pubchem:71080","pubchem:5950","pubchem:602","pubchem:57383916" ))
 
 Count <- Pathways %>%
+  tidyr::unite(Pathway, c("pathwaySource", "pathwayName"), sep = ": ")%>%
   dplyr::group_by(inputId) %>%
   dplyr::summarise(PathwayCount = dplyr::n_distinct(Pathway), .groups = 'drop')%>%
   tidyr::separate(inputId, into = c("Database", "ID"), sep = ":", remove = TRUE)
 
 Alanine <- merge(x = Alanine%>%
-                      tidyr::pivot_longer(cols = c("HMDB", "ChEBI"), 
+                      tidyr::pivot_longer(cols = c("HMDB", "ChEBI", "KEGG", "PubChem"), 
                                           names_to = "Database",
                                           values_to = "ID")%>%
                       dplyr::filter(!is.na(ID))  , 
@@ -457,8 +490,51 @@ Alanine <- merge(x = Alanine%>%
 Alanine%>%
   kableExtra::kbl(caption = "Alanine IDs in HMDB and ChEBI mapped to pathways from wiki, KEGG and Reactome using RamP.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+```{r, echo=FALSE}
+#BarGraph
+Plot <- ggplot2::ggplot(Alanine, ggplot2::aes(fill=TrivialName, y=`PathwayCount`, x=Database)) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("D-Alanine" = "#9F0162"  , "L-Alanine" = "#006384", "Alanine" = "grey", "Alanine zwitterion" = "#00735C"))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("Alanine IDs in in different pathway")+
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(x = "Database", y = "Number of Pathways")
 
-#BarGraph?
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=AlaninePlot,  PlotName = "Alanine IDs in in different databases", Subtitle = NULL, PlotType="Bar")
+ 
+PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+Plot_Sized %<>%
+      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+      add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+
+#ggplot2::ggsave(filename = "AlaninePlot_Pathways.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+ 
+Plot_Sized
+```
+
+```{r, eval=FALSE, include=FALSE}
+# Make BarGraph per pathway and ID type
+Alanine_Path <- Pathways%>%
+  tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",A", remove = FALSE)%>%
+  tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",D", remove = FALSE)%>%
+  dplyr::group_by(pathwaySource, commonName) %>%
+  dplyr::summarise(PathwayCount = dplyr::n_distinct(pathwayName),
+                   commonNames = paste(unique(commonName), collapse = ", "),
+                   .groups = 'drop')
+
+
+#BarGraph
+Plot <- ggplot2::ggplot(Alanine_Path, ggplot2::aes(fill=commonNames, y=PathwayCount , x=pathwaySource)) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("D-Alanine" = "#9F0162"  , "L-Alanine" = "#006384", "Alanine" = "grey", "Alanine zwitterion" = "#00735C"))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("Alanine IDs in in different databases")+
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(x = "Pathway Source", y = "Number of Pathways")
+
 
 #* https://www.sciencedirect.com/science/article/pii/S0731708521005410
 #* This problem is even excarbated in lipidomics, where different levels of residues....
