@@ -92,6 +92,15 @@ Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
 
+## Example Data
+
+clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al
+including 138 matched tumour and normal tissue pairs \[@Hakimi2016\].
+Cell-lines data from intra- and extracellular metabolomics data from
+cell culture media from [metabolomics workbench project
+PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
+<img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;" />
+
 ## Installation
 
 **MetaProViz** is an R package and to install the package, start R and
