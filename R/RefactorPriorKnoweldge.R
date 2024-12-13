@@ -254,15 +254,17 @@ TranslateID <- function(
 #' @export
 #'
 
-MappingAmbiguity <- function( InputData=DF_subset, #InputData=DF_subset
-                              From = "MetaboliteID",
-                              To = "hmdb",
-                              GroupingVariable = NULL,
-                              SaveAs_Table= "csv",
-                              FolderPath=NULL
+MappingAmbiguity <- function(InputData=DF_subset, #InputData=DF_subset
+                             From = "MetaboliteID",
+                             To = "hmdb",
+                             GroupingVariable = NULL,
+                             Summary=FALSE,
+                             SaveAs_Table= "csv",
+                             FolderPath=NULL
 ) {
 
   ## ------------------  Check Input ------------------- ##
+
 
 
   ## ------------------  Create output folders and path ------------------- ##
@@ -365,29 +367,29 @@ MappingAmbiguity <- function( InputData=DF_subset, #InputData=DF_subset
     }
 }
 
-
   ## ------------------ Create SummaryTable ------------------- ##
-  #Only if Summary =TRUE
+  if(Summary==TRUE){
+    # Combine the two tables
+    Summary <- merge(x= ResList[["MetaboliteID-to-hmdb_Long"]][,c("UniqueID", paste0(From, "_to_", To), paste0("Count(", From, "_to_", To, ")"), paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep=""))],
+                     y= ResList[["hmdb-to-MetaboliteID_Long"]][,c("UniqueID", paste0(To, "_to_", From), paste0("Count(", To, "_to_", From, ")"), paste0("AcrossGroupMappingIssue(", To, "_to_", From, ")", sep=""))],
+                     by = "UniqueID",
+                     all = TRUE)%>%
+      separate(UniqueID, into = c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
+      distinct()
 
-  # Combine the two tables
-  Summary <- merge(x= ResList[["MetaboliteID-to-hmdb_Long"]][,c("UniqueID", paste0(From, "_to_", To), paste0("Count(", From, "_to_", To, ")"), paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep=""))],
-                   y= ResList[["hmdb-to-MetaboliteID_Long"]][,c("UniqueID", paste0(To, "_to_", From), paste0("Count(", To, "_to_", From, ")"), paste0("AcrossGroupMappingIssue(", To, "_to_", From, ")", sep=""))],
-                   by = "UniqueID",
-                   all = TRUE)%>%
-    separate(UniqueID, into = c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
-    distinct()
+    # Add relevant mapping information
+    Summary <- Summary %>%
+      mutate(Mapping = case_when(
+        !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == 1  ~ "one-to-one",
+        !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == 1  ~ "one-to-many",
+        !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-many",
+        !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-one",
+        !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == NA  ~ "one-to-none",
+        TRUE ~ NA ))
 
-  # Add relevant mapping information
-  Summary <- Summary %>%
-    mutate(Mapping = case_when(
-      !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == 1  ~ "one-to-one",
-      !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == 1  ~ "one-to-many",
-      !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-many",
-      !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-one",
-      !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == NA  ~ "one-to-none",
-      TRUE ~ NA ))
+    ResList[["Summary"]] <- Summary
 
-  ResList[["Summary"]] <- Summary
+  }
 
   ## ------------------  Save the results and log messages ------------------- ##
 
@@ -410,10 +412,21 @@ MappingAmbiguity <- function( InputData=DF_subset, #InputData=DF_subset
 #' @param PriorKnowledge Dataframe with at least one column with the "original target metabolite ID", "source" (e.g. term) and the "translated target metabolite ID".
 #' @param SettingsInfo
 #'
+#' @examples
+#' InputData <-  MetaProViz::ToyData(Data="Cells_MetaData")
+#'
+#' @return Prior Knowledge usable for enrichment analysis
+#'
 #' @export
 #'
 CleanMapping <- function(InputData,
-                         SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
+                         PriorKnowledge,
+                         DetectedID="HMDB",
+                         GroupingVariable="term",
+                         From="MetaboliteID",
+                         To="hmdb",
+                         SaveAs_Table= "csv",
+                         FolderPath=NULL
 ){
 
   ## ------------------ Check Input ------------------- ##
@@ -424,12 +437,45 @@ CleanMapping <- function(InputData,
 
   # --> Cleans translated ID in prior knowledge based on measured features
 
+  ## ------------------ Prepare InputData -------------------##
+  DetectedDF <- InputData%>%
+    select(!!sym(DetectedID))%>%
+    as.data.frame()%>%
+    distinct()%>%
+    filter(!is.na(!!sym(DetectedID)))
+
 
   ## ------------------ Use the ambiguity function to create the "Summary File" ------------------- ##
+  Summary <- MetaProViz::MappingAmbiguity()[["Summary"]]#%>%
+    #remove To=0 or NA
+
+
+  ## ------------------ Clean Prior Knowledge based on detected IDs ----------------------##
+  # Add detected IDs to the PriorKnowledge
+  CombinedDF <- merge(x= Summary,
+                y= DetectedDF,
+                by.x= To,
+                by.y=DetectedID,
+                all.y=TRUE)%>%
+    .[complete.cases(.), ]#Make sure that NAs are TRUE NAs (not because of missmatching)
+
+
+  CombinedDF <- CombinedDF %>%
+    group_by(!!sym(From), !!sym(GroupingVariable))%>%
+    mutate(Collapsed_To = paste(unique(!!sym(To)), collapse = ", "))%>%
+    mutate(Collapsed_To_Number = n())%>%
+    mutate(Action = case_when(
+      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "one-to-one" & if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number == 1 ~ "None",# Detected ID is a one-to-one mapping within and across groups.
+      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "one-to-many" & if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number == 1 ~ "None",
+      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "one-to-many" & if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number > 1 ~ "one-to-many_detected",
+      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "many-to-many" & if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number == 1 ~ "many-to-many_1detected",#Check that the detected ID is not the one mapping to many!
+      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "many-to-many" & if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number > 1 ~ "many-to-many_Ndetected",#Check that the detected ID is not the one mapping to many!
+      #if_any(starts_with("AcrossGroupMappingIssue("), ~ . == TRUE, na.rm = TRUE)~ "TRUE",
+      TRUE ~ "FALSE" ))
 
 
 
-
+  ## ------------------ Save Results ----------------------##
 
 }
 
