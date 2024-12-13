@@ -39,6 +39,7 @@
 #'
 #' devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/OmnipathR")
 #'
+#'
 #' @keywords Translate IDs
 #'
 #' @importFrom dplyr mutate
@@ -63,6 +64,9 @@ TranslateID <- function(
    MetaProViz_Init()
 
   ## ------------------  Check Input ------------------- ##
+
+  #One row must be one feature!!
+
 
   # Specific checks:
   unknown_types <-
@@ -123,7 +127,8 @@ TranslateID <- function(
     group_by( !!sym(SettingsInfo[['InputID']]) ,  !!sym(SettingsInfo[['GroupingVariable']]))%>%
     mutate(!!sym(To) := paste(unique(!!sym(To)), collapse = ", ")) %>%
     ungroup() %>%
-    distinct()
+    distinct()%>%
+    mutate(!!sym(To) := ifelse(!!sym(To) == 0, NA, !!sym(To)))
 
 
 
@@ -134,7 +139,7 @@ TranslateID <- function(
   #
   InspectHMDB <- TranslatedDF%>% attr('ambiguity_MetaboliteID_hmdb')
 
-  #replace 0 with NA!
+
 
   ## ------------------ Create Tables for each translation ------------------- ##
 
@@ -238,7 +243,7 @@ TranslateID <- function(
 #' @examples
 #' KEGG_Pathways <- MetaProViz::LoadKEGG()
 #' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
-#'
+#' InputData=DF_subset
 #'
 #' @keywords Mapping ambiguity
 #'
@@ -249,8 +254,7 @@ TranslateID <- function(
 #' @export
 #'
 
-MappingAmbiguity <- function( InputData=TranslatedDF,
-                              #SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
+MappingAmbiguity <- function( InputData=DF_subset, #InputData=DF_subset
                               From = "MetaboliteID",
                               To = "hmdb",
                               GroupingVariable = NULL,
@@ -273,6 +277,16 @@ MappingAmbiguity <- function( InputData=TranslatedDF,
   # FYI: The above can not happen if our translateID function was used, but may be the case when the user has done something manually before
 
 
+
+
+  ## ------------------  Prepare Input data ------------------- ##
+  #If the user provides a DF where the To column is a list of IDs, then we can use it right away
+  #If the To column is not a list of IDs, but a character column, we need to convert it into a list of IDs
+  if(is.character(InputData[[To]])==TRUE){
+    InputData[[To]] <- InputData[[To]]%>%
+      strsplit(", ")%>%
+      lapply(as.character)
+  }
 
   ## ------------------  Perform ambiguity mapping ------------------- ##
   #1. From-to-To: OriginalID-to-TranslatedID
@@ -302,69 +316,58 @@ MappingAmbiguity <- function( InputData=TranslatedDF,
         ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
         attr(paste0("ambiguity_", Comp[[comp]]$From , "_",Comp[[comp]]$To, sep=""))
 
-    # Add further information we need to summarise the table and combine Original-to-Translated and Translated-to-Original
-    # If we have a GroupingVariable we need to combine it with the MetaboliteID before merging
-    ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
-      unnest(cols = all_of(Comp[[comp]]$From))%>%
-      mutate(!!sym(paste0("AcrossGroupMappingIssue(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")", sep="")) := case_when(
-        !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity_bygroup", sep="")) != !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity", sep=""))  ~ "TRUE",
-        TRUE ~ "FALSE" ))%>%
-      group_by(!!sym(Comp[[comp]]$From), !!sym(GroupingVariable))%>%
-      mutate(!!sym(Comp[[comp]]$To) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
-                                   paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
-      )) %>%
-      mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n()))%>%
-      ungroup()%>%
-      distinct() %>%
-      unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To)), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)%>%
-      separate_rows(!!sym(Comp[[comp]]$To), sep = ", ") %>%
-      unite(UniqueID, c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
-      distinct()%>%
-      group_by(!!sym(Comp[[comp]]$From))%>%
-      mutate(!!sym(paste0(Comp[[comp]]$To, "_AcrossGroup")) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
-                                              paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
-      )) %>%
-      mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, "_AcrossGroup)")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n()))%>%
-      ungroup()%>%
-      distinct()%>%
-      unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To, "_AcrossGroup")), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)
+    ############################################################################################################
+    # Only works if we have GroupingVariable!
+    if(is.null(GroupingVariable)==FALSE){
+      # Add further information we need to summarise the table and combine Original-to-Translated and Translated-to-Original
+      # If we have a GroupingVariable we need to combine it with the MetaboliteID before merging
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
+        unnest(cols = all_of(Comp[[comp]]$From))%>%
+        mutate(!!sym(paste0("AcrossGroupMappingIssue(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")", sep="")) := case_when(
+          !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity_bygroup", sep="")) != !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity", sep=""))  ~ "TRUE",
+          TRUE ~ "FALSE" ))%>%
+        group_by(!!sym(Comp[[comp]]$From), !!sym(GroupingVariable))%>%
+        mutate(!!sym(Comp[[comp]]$To) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
+                                                paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
+        )) %>%
+        mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n()))%>%
+        ungroup()%>%
+        distinct() %>%
+        unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To)), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)%>%
+        separate_rows(!!sym(Comp[[comp]]$To), sep = ", ") %>%
+        unite(UniqueID, c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
+        distinct()#%>%
+      #group_by(!!sym(Comp[[comp]]$From))%>%
+      # mutate(!!sym(paste0(Comp[[comp]]$To, "_AcrossGroup")) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
+      #                                        paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
+      #)) %>%
+      #mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, "_AcrossGroup)")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n_distinct(!!sym(Comp[[comp]]$To))))%>%
+      #ungroup()%>%
+      #distinct()%>%
+      #unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To, "_AcrossGroup")), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)
 
-    # Question: How do I now add the information about this across pathway mapping issue? --> we do have TRUE, but not what is the problem --> maybe we can be more specific?
-
+      # Question: How do I now add the information about this across pathway mapping issue? --> we do have TRUE, but not what is the problem --> maybe we can be more specific?
+    }else{
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
+        unnest(cols = all_of(Comp[[comp]]$From))%>%
+        group_by(!!sym(Comp[[comp]]$From))%>%
+        mutate(!!sym(Comp[[comp]]$To) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
+                                                paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
+        )) %>%
+        mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n()))%>%
+        ungroup()%>%
+        distinct() %>%
+        unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To)), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)%>%
+        separate_rows(!!sym(Comp[[comp]]$To), sep = ", ") %>%
+        unite(UniqueID, c(From, To), sep="_", remove=FALSE)%>%
+        distinct()%>%
+        mutate(!!sym(paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep="")) := NA)
+    }
 }
 
 
-  # To add further information we need to summarise the table and combine Original-to-Translated and Translated-to-Original
-  # If we have a GroupingVariable we need to combine it with the MetaboliteID before merging
-  Original_to_Translated <- ResList[[paste0(From, "-to-", To , sep="")]]%>%
-    unnest(cols = all_of(From))%>%
-    mutate(!!sym(paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep="")) := case_when(
-      !!sym(paste0(From, "_", To, "_ambiguity_bygroup", sep="")) != !!sym(paste0(From, "_", To, "_ambiguity", sep=""))  ~ "TRUE",
-      TRUE ~ "FALSE" ))%>%
-    group_by(!!sym(From), !!sym(GroupingVariable))%>%
-    mutate(!!sym(To) := paste(unique(!!sym(To)), collapse = ", ")) %>%
-    mutate( !!sym(paste0("Count(", From, "_to_", To, ")")) := ifelse(all(!!sym(To) == 0), 0, n()))%>%
-    ungroup()%>%
-    distinct() %>%
-    unite(!!sym(paste0(From, "_to_", To)), c(From, To), sep=" --> ", remove=FALSE)%>%
-    separate_rows(!!sym(To), sep = ", ") %>%
-    unite(UniqueID, c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
-    distinct()
-
-  Translated_to_Original <- ResList[[paste0(To, "-to-", From , sep="")]]%>%
-    unnest(cols = all_of(To))%>%
-    group_by(!!sym(To), !!sym(GroupingVariable))%>%
-    mutate(!!sym(From) := ifelse(!!sym(To) == 0, NA,  # Or another placeholder
-      paste(unique(!!sym(From)), collapse = ", ")
-    )) %>%
-    mutate( !!sym(paste0("Count(", To, "_to_", From, ")")) := ifelse(all(!!sym(From) == 0), 0, n()))%>%
-    ungroup()%>%
-    distinct() %>%
-    unite(!!sym(paste0(To, "_to_", From)), c(To, From), sep=" --> ", remove=FALSE)%>%
-    separate_rows(!!sym(From), sep = ", ")  %>%
-    unite(UniqueID, c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
-    distinct()
-
+  ## ------------------ Create SummaryTable ------------------- ##
+  #Only if Summary =TRUE
 
   # Combine the two tables
   Summary <- merge(x= ResList[["MetaboliteID-to-hmdb_Long"]][,c("UniqueID", paste0(From, "_to_", To), paste0("Count(", From, "_to_", To, ")"), paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep=""))],
@@ -384,105 +387,14 @@ MappingAmbiguity <- function( InputData=TranslatedDF,
       !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == NA  ~ "one-to-none",
       TRUE ~ NA ))
 
+  ResList[["Summary"]] <- Summary
+
+  ## ------------------  Save the results and log messages ------------------- ##
 
 
 
 
 
-
-
-
-
-
-
-  #ids <- c(From, To)
-  #ResList <- c(from_to_to = identity, to_to_from = rev) %>%
-  #  map(
-  #    function(direction) {
-  #      cols <- ids %>% direction
-
-   #     InputData %>%
-   #       dplyr::select(all_of(c(cols, GroupingVariable))) %>%
-   #       tidyr::unnest(cols) %>%# unlist the columns in case they are not expaned
-   #       OmnipathR::ambiguity(
-    #      from_col = !!sym(cols[1L]),
-    #      to_col = !!sym(cols[2L]),
-   #       groups = GroupingVariable,
-   #       quantify = 'Group',
-   #       qualify = 'Group',
-   #       global = TRUE,#across groups will be done additionally --> suffix _AcrossGroup
-   #       summary=TRUE, #summary of the mapping column
-    #      expand = TRUE
-   #     )
-    #  }
-    #)
-
-
-
-
-
-  ## ------------------  summaries the results and log messages ------------------- ##
-
-  for(df in names(ResList)){
-    #Flank problematic cases by adding further columns to df
-
-
-    #Create Summary
-    Summary <- ResList[[df]] %>%
-      count(Mapping)%>%#Column we will need to distinguish
-      pivot_wider(names_from = Relationship, values_from = n, values_fill = 0) #n=count --> column names are one-to-one, etc. and entries are the occurrences
-
-
-
-
-
-  }
-
-
-
-
-
-
-  # if(SettingsInfo[["GroupingVariable"]] %in% colnames(ExpandID)){
-  #   ExpandID <- ExpandID %>% #many-to-many = within or across pathways? --> add column with this information
-  #      group_by(MetaboliteID, term) %>%
-  #     mutate(GroupingVariable = case_when(
-  #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==TRUE ~ "one-to-many_Within-and-AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-  #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "one-to-many" & n_distinct(term) >=2 & duplicated(term)==FALSE ~ "one-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-  #       n_distinct(hmdb) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity == "one-to-many" & n_distinct(term) <= 1 ~ "one-to-many_WithinGroups",  # Multiple KEGG IDs, same term
-  #       TRUE ~ NA_character_  #
-  #     )) %>%
-  #     ungroup()%>%
-  #     group_by(hmdb) %>%
-  #     mutate(GroupingVariable = case_when(
-  #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) == 1 ~ "many-to-many_WithinGroups",  # Multiple KEGG IDs, same term
-  #       n_distinct(MetaboliteID) > 1 & MetaboliteID_hmdb_to_ambiguity > 1 & MetaboliteID_hmdb_ambiguity== "many-to-many" & n_distinct(term) > 1 ~ "many-to-many_AcrossGroups",  # Multiple KEGG IDs, multiple terms --> should not happen!
-  #       TRUE ~  paste(GroupingVariable) #
-  #     )) %>%
-  #     ungroup()
-  # }
-
-
-  #Create a summary file about the instances of one-to-many etc. also include a descriptive column that verbalizes issues
-  # --> e.g. pathway inflation/deflation
-
-
-
-
-  ## ------------------  Save the results ------------------- ##
-
-
-
-
-  #was inspectID
-  #Summary and translation one-to-many, many-to-one
-
-  #Step 1: +/-term --> One Group needed
-  #Step 2: Omnipath function to get numeric column summary of 1-to-9 map
-  #Step 3: Case_when --> column ( do things before and not within case_when)
-
-
-  #Step: create summary for the specific problem of metabolism
 
 
 }
@@ -494,13 +406,14 @@ MappingAmbiguity <- function( InputData=TranslatedDF,
 
 #' Reduce mapping ambiguities by using detected IDs
 #'
-#' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
+#' @param InputData Dataframe with at least one column with the target (e.g. metabolite)
+#' @param PriorKnowledge Dataframe with at least one column with the "original target metabolite ID", "source" (e.g. term) and the "translated target metabolite ID".
 #' @param SettingsInfo
 #'
 #' @export
 #'
 CleanMapping <- function(InputData,
-                       SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
+                         SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term")
 ){
 
   ## ------------------ Check Input ------------------- ##
@@ -510,6 +423,12 @@ CleanMapping <- function(InputData,
   # This is to ensure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
 
   # --> Cleans translated ID in prior knowledge based on measured features
+
+
+  ## ------------------ Use the ambiguity function to create the "Summary File" ------------------- ##
+
+
+
 
 
 }
