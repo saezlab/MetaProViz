@@ -129,11 +129,21 @@ SaveRes<- function(InputList_DF= NULL,
           FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
         }
 
+        #unlist DF columns if needed
+        InputList_DF[[DF]] <- InputList_DF[[DF]]%>%
+          mutate(
+            across(
+              where(is.list),
+              ~map_chr(.x, ~ paste(sort(unique(.x)), collapse = "; "))
+            )
+          )
         #Save table
         if (SaveAs_Table == "csv"){
-          write.csv(InputList_DF[[DF]], paste0(FileName_Save,".csv", sep = ""), row.names = FALSE)
+          InputList_DF[[DF]]%>%
+            readr::write_csv(paste0(FileName_Save,".csv", sep = ""))
         }else if (SaveAs_Table == "txt"){
-          write.table(InputList_DF[[DF]], paste0(FileName_Save,".txt", sep = "") , col.names = TRUE, row.names = FALSE)
+          InputList_DF[[DF]]%>%
+            readr::write_delim(paste0(FileName_Save,".csv", sep = ""))
         }
       }
     }
