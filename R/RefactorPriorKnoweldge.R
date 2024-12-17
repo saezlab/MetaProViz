@@ -24,89 +24,99 @@
 
 #' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 #'
-#' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
+#' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.
 #' @param SettingsInfo \emph{Optional: } Column name of Target in Input_GeneSet. \strong{Default = list(InputID="MetaboliteID" , GroupingVariable="term")}
-#' @param From ID type your
-#' @param To One or multiple ID types
+#' @param From ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
+#' @param To One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{Default = NULL}
 #'
-#' @return List with three DFs: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
+#' @return List with at least three DFs: 1) Original data and the new column of translated ids spearated by comma. 2) Mapping information between Original ID to Translated ID. 3) Mapping summary between Original ID to Translated ID.
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::LoadKEGG()
-#' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
+#' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))
 #'
-#' devtools::load_all("C:/Users/chris/OneDrive/Documents/GitHub/OmnipathR")
+#' @keywords Translate metabolite IDs
 #'
-#'
-#' @keywords Translate IDs
-#'
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate select group_by ungroup distinct filter across n
+#' @importFrom tidyselect all_of
+#' @importFrom prob setdiff union
 #' @importFrom rlang !!! !! := sym syms
-#' @importFrom tidyselect everything starts_with
-#' @importFrom dplyr across summarize first ungroup group_by select
 #' @importFrom OmnipathR id_types translate_ids
 #' @importFrom logger log_warn
 #' @importFrom stringr str_to_lower
 #'
 #' @export
 #'
-TranslateID <- function(
-    InputData,
-    SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
-    From = "kegg",
-    To = c("pubchem","chebi","hmdb"),
-    SaveAs_Table= "csv",
-    FolderPath=NULL
+TranslateID <- function(InputData,
+                        SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"),
+                        From = "kegg",
+                        To = c("pubchem","chebi","hmdb"),
+                        SaveAs_Table= "csv",
+                        FolderPath=NULL
   ){
 
-   MetaProViz_Init()
+  MetaProViz_Init()
 
   ## ------------------  Check Input ------------------- ##
-
-  #One row must be one feature!!
-
+  # HelperFunction `CheckInput`
+  MetaProViz:::CheckInput(InputData=InputData,
+                          InputData_Num=FALSE,
+                          SaveAs_Table=SaveAs_Table)
 
   # Specific checks:
-  unknown_types <-
-    OmnipathR::id_types() %>%
+  if("InputID" %in% names(SettingsInfo)){
+    if(SettingsInfo[["InputID"]] %in% colnames(InputData)== FALSE){
+      message <- paste0("The ", SettingsInfo[["InputID"]], " column selected as InputID in SettingsInfo was not found in InputData. Please check your input.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
+    }
+  }
+
+  if("GroupingVariable" %in% names(SettingsInfo)){
+    if(SettingsInfo[["GroupingVariable"]] %in% colnames(InputData)== FALSE){
+      message <- paste0("The ", SettingsInfo[["GroupingVariable"]], " column selected as GroupingVariable in SettingsInfo was not found in InputData. Please check your input.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
+    }
+  }
+
+  unknown_types <- OmnipathR::id_types() %>%
     dplyr::select(tidyselect::starts_with('in_')) %>%
     unlist %>%
     unique %>%
-    str_to_lower %>%
-    setdiff(union(From, To), .)
+    stringr::str_to_lower %>%
+    prob::setdiff(prob::union(From, To), .)
 
   if (length(unknown_types) > 0L) {
-
-    msg <- sprintf(
-      'The following ID types are not recognized: %s',
-      paste(unknown_types, collapse = ', ')
-    )
+    msg <- sprintf('The following ID types are not recognized: %s', paste(unknown_types, collapse = ', '))
     logger::log_warn(msg)
     warning(msg)
-
   }
 
   # Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
   doublons <- InputData %>%
     dplyr::group_by(!!sym(SettingsInfo[['InputID']]), !!sym(SettingsInfo[['GroupingVariable']]))%>%
-    dplyr::filter(n() > 1) %>%
+    dplyr::filter(dplyr::n() > 1) %>%
     dplyr::ungroup()
 
   if(nrow(doublons) > 0){
-    message <- sprintf(
-      'The following ID types are duplicated within one group: %s',
-      paste(doublons, collapse = ', ')
-    )
+    message <- sprintf('The following ID types are duplicated within one group: %s',paste(doublons, collapse = ', '))
     logger::log_warn(message)
     warning(message)
   }
 
-
   ## ------------------  Create output folders and path ------------------- ##
-  Folder <- MetaProViz:::SavePath(FolderName = "TranslateID", FolderPath = NULL)
+  if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
+    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+                                    FolderPath=FolderPath)
 
+    SubFolder <- file.path(Folder, "ID_Translation")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+  }
+
+  ########################################################################################################################################################
   ## ------------------ Translate To-From for each pair ------------------- ##
   TranslatedDF <- OmnipathR::translate_ids(
       InputData,
@@ -119,117 +129,54 @@ TranslateID <- function(
       ambiguity_groups =  SettingsInfo[['GroupingVariable']],#Checks within the groups, without it checks across groups
       ambiguity_summary = TRUE
     )
+  #TranslatedDF %>% attributes %>% names
+  #TranslatedDF%>% attr('ambiguity_MetaboliteID_hmdb')
 
-  ## Create DF for TranslatedIDs
-  DF_subset <- TranslatedDF %>%
-    select(all_of(intersect(names(.), names(InputData))), all_of(To)) %>%
-    unnest(cols = all_of(To))%>%
-    group_by( !!sym(SettingsInfo[['InputID']]) ,  !!sym(SettingsInfo[['GroupingVariable']]))%>%
-    mutate(!!sym(To) := paste(unique(!!sym(To)), collapse = ", ")) %>%
-    ungroup() %>%
-    distinct()%>%
-    mutate(!!sym(To) := ifelse(!!sym(To) == 0, NA, !!sym(To)))
-
-
-
-
-  #Check names of attributes
-  TranslatedDF %>% attributes %>% names
-
-  #
-  InspectHMDB <- TranslatedDF%>% attr('ambiguity_MetaboliteID_hmdb')
-
-
-
-  ## ------------------ Create Tables for each translation ------------------- ##
-
+  ## --------------- Create output DF -------------------- ##
   ResList <- list()
+
+  ## Create DF for TranslatedIDs only with the original data and the translatedID columns
+  DF_subset <- TranslatedDF %>%
+    dplyr::select(tidyselect::all_of(intersect(names(.), names(InputData))), tidyselect::all_of(To)) %>%
+    dplyr::mutate(across(all_of(To), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
+    dplyr::group_by(!!sym(SettingsInfo[['InputID']]), !!sym(SettingsInfo[['GroupingVariable']])) %>%
+    dplyr::mutate(across(tidyselect::all_of(To), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
+    dplyr::ungroup() %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(dplyr::across(tidyselect::all_of(To), ~ ifelse(. == "0", NA, .)))
+
+  ResList[["TranslatedDF"]] <- DF_subset
+
+  ## Add DF with mapping information
+  ResList[["TranslatedDF_MappingInfo"]] <- TranslatedDF
+
+  ## Also save the different mapping summaries!
   for(item in To){
-    DF <- TranslatedDF %>%
-      dplyr::select(any_of(names(InputData)), item)%>%
-      tidyr::unnest(cols = item)
-
-
-
+    SummaryDF <- TranslatedDF%>% attr(paste0("ambiguity_", SettingsInfo[['InputID']], "_", item, sep=""))
+    ResList[[paste0("MappingSummary_", item, sep="")]] <-  SummaryDF
   }
 
+  ## ------------------ Save the results ------------------- ##
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF=ResList,
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= SubFolder,
+                         FileName= "TranslateID",
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
 
-
-
-
-
-
-    # Task 1: Check that SettingsInfo[['InputID']] has the same items in to across the different entries (would be in different Groupings, otherwise there should not be any duplications)
-
-
-    #Create Mapping column
-    item_columns <- TranslatedDF %>%
-      dplyr::select(item) %>%
-      apply(1, function(row) paste(row, collapse = " + "))
-
-    Mapping <- TranslatedDF %>%
-      dplyr::mutate(Mapping = paste(!!sym(SettingsInfo[['InputID']]), "=", item_columns))%>%
-      dplyr::select(any_of(names(InputData)), dplyr::contains(item), "Mapping")
-
-    ExpandID <- TranslatedDF %>%
-      dplyr::select(any_of(names(InputData)), dplyr::contains(item))  %>%
-      tidyr::unnest(cols = all_of(dplyr::contains(item)))
-
-    #return results
-    ResList[[item]] <- ExpandID
-
-
-
-
-
-
-
-  ## ------------------
-  ambi <-
-  To %>%
-  rlang::set_names() %>%
-  purrr::map(
-    ~MappingAmbiguity(
-      TranslatedDF %>% select(all_of(c(names(InputData), .x))),
-      SettingsInfo[['InputID']],
-      .x,
-      SettingsInfo[['GroupingVariable']]
-    )
-  )
-
-
-
-
-
-
-  # dplyr::select(any_of(names(InputData)), dplyr::contains(item))  %>%
-  #   tidyr::unnest(cols = all_of(dplyr::contains(item)))
-  #
-  #
-  #
-  # ## ------------------ Save the results ------------------- ##
-  # res <- list(
-  #   InputDF = InputData,
-  #   TranslatedDF = TranslatedDF)
-
-
-  #save function to folder
-
-  #return
-
-
+  #Return
+  invisible(return(ResList))
 }
 
 
 ##########################################################################################
-### ### ### NEW ### ### ###
+### ### ### Mapping Ambiguity ### ### ###
 ##########################################################################################
 
-#this is now part of OmnipathR --> denes said it will fit better there!
-# Problem: We need to be able to use this function here too. So we will need to extract it from Omnipath to also be present here! (either wrapper or copy!)
-# needs to be @export
-
-#' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
+#' Create Mapping Ambiguities between two ID types
 #'
 #' @param InputData Translated DF from MetaProViz::TranslateID reults or Dataframe with at least one column with the target ID (e.g. metabolite KEGG IDs) and another MetaboliteID type (e.g. KEGG and HMDB). Optional: add other columns such as source (e.g. term) or more metabolite IDs.
 #' @param To Column name of original metabolite identifier in InputData. Here should only be one ID per row
@@ -238,12 +185,12 @@ TranslateID <- function(
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{Default = NULL}
 #'
-#' @return List with three DFs: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
+#' @return List with at least three DFs: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::LoadKEGG()
-#' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
-#' InputData=DF_subset
+#' Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))
+#'
 #'
 #' @keywords Mapping ambiguity
 #'
@@ -253,24 +200,17 @@ TranslateID <- function(
 #'
 #' @export
 #'
-
-MappingAmbiguity <- function(InputData=DF_subset, #InputData=DF_subset
-                             From = "MetaboliteID",
-                             To = "hmdb",
+MappingAmbiguity <- function(InputData,
+                             From,
+                             To,
                              GroupingVariable = NULL,
                              Summary=FALSE,
                              SaveAs_Table= "csv",
                              FolderPath=NULL
 ) {
 
+  MetaProViz_Init()
   ## ------------------  Check Input ------------------- ##
-
-
-
-  ## ------------------  Create output folders and path ------------------- ##
-
-
-
 
   ## ------------------  General checks of wrong occurences ------------------- ##
   # Task 1: Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
@@ -279,8 +219,17 @@ MappingAmbiguity <- function(InputData=DF_subset, #InputData=DF_subset
   # FYI: The above can not happen if our translateID function was used, but may be the case when the user has done something manually before
 
 
+  ## ------------------  Create output folders and path ------------------- ##
+  if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE ){
+    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+                                    FolderPath=FolderPath)
+
+    SubFolder <- file.path(Folder, "MappingAmbiguities")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+  }
 
 
+  #####################################################################################################################################################################################
   ## ------------------  Prepare Input data ------------------- ##
   #If the user provides a DF where the To column is a list of IDs, then we can use it right away
   #If the To column is not a list of IDs, but a character column, we need to convert it into a list of IDs
@@ -388,7 +337,6 @@ MappingAmbiguity <- function(InputData=DF_subset, #InputData=DF_subset
         TRUE ~ NA ))
 
     ResList[["Summary"]] <- Summary
-
   }
 
   ## ------------------  Save the results and log messages ------------------- ##
