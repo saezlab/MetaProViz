@@ -6,7 +6,7 @@ author:
       - Heidelberg University
   - name: Macabe Daley
     affiliation:
-      - Heidelberg University, DKFZ
+      - Heidelberg University
 output: 
   html_document:
     self_contained: true
@@ -237,121 +237,40 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 \
 
 ::: {style="border: 1px solid red; padding: 10px; background-color: #ffe6e6;"}
-<strong>Warning:</strong> Translating IDs between formats e.g.
-KEGG to HMDB is a non-trivial task, and it is possible for one original ID to link to many translated IDs, and vice versa.
-We discuss this below and in the InspectID subsection (which the TranslateID function will run by default).
-We currently leave it to user discretion to select the most appropriate ID based on their research question and data.
+<strong>Important Information:</strong> Translating IDs between formats e.g. KEGG to HMDB is a non-trivial task, and it is expected for one original ID to link to many translated IDs, and vice versa. We discuss the implications throughout this vignette and leave it to user discretion to select the most appropriate ID based on their research question and data.
 :::
 
 <br>
 
-As visible from the prior knowledge tables above, it becomes clear that we require a specific metabolite ID depending on the prior knowledge resource.
-Indeed, the KEGG pathways include KEGG IDs, whilst the Hallmarks metabolite sets include HMDB IDs.
-
-\
+Across the different prior knowledge resources (see also tables above) specific metabolite IDs are used and hence depending on the prior knowledge resource a specific metabolite ID is required.\
 If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::TranslateID()` function.
-This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and  RaMP DB [@Braisted2023] on the backend of our function and currently supports ID translation of metabolites to and from the following formats:
-
--   KEGG
-
--   HMDB
-
--   ChEBI
-
--   PubChem
-
-In the simplest case, we can use the function like so:
-
+This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and  RaMP-DB [@Braisted2023] on the backend of our function and currently supports ID translation of metabolites to and from the following formats:\
+-   KEGG\
+-   HMDB\
+-   ChEBI\
+-   PubChem\
+\
+As an example we are translating the KEGG pathways we loaded with `metaproViz::LoadKEGG` into HMDB ids:\
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
-translated_ids_example <- TranslateID(KEGG_Pathways[39,])$Translated_DataFrame
+KEGG_Pathways_Translated <- MetaProViz::TranslateID(InputData= KEGG_Pathways, 
+                                                     SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), 
+                                                     From = c("kegg"), 
+                                                     To = c("hmdb", "pubchem"))
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
-translated_ids_example %>%
-  kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (besides HMDB)") %>%
+KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
+  kableExtra::kbl(caption = "Translation of KEGG IDs in KEGG pathways to HMDB & pubchem IDs") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
-
 \
-Using the default translation settings for a single ID, we can see that we receive back a single PubChem ID and ChEBI ID. However the HMDB column has two HMDBs associated with it (HMDB0001022, HMDB01022).
-In this case this difference is trivial and due to HMDB formatting conventions: the longer version appears to be from the original HMDB ID format versus the shorter more concise version.
-To avoid this we could change the settings to remove HMDB completely, like so:
+Here it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping. In fact it is very common that an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs) or even a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).\
+This comes with many implications for the analysis that will be discussed in the next section.
 
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
-translated_ids_example <- TranslateID(KEGG_Pathways[39,], 
-            SettingsInfo = list(IdColumn="MetaboliteID", 
-                                FromFormat=c("kegg"), 
-                                ToFormat=c("pubchem","chebi"), 
-                                Method="GetAll", 
-                                GroupingVariable="term"))$Translated_DataFrame
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-translated_ids_example %>%
-  kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (excluding HMDB)") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-<br>
-
-Or we could keep just the first item of every translation by changing the \`Method='GetFirst'\` parameter like so:
-
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
-translated_ids_example <- TranslateID(KEGG_Pathways[39,], 
-            SettingsInfo = list(IdColumn="MetaboliteID", 
-                                FromFormat=c("kegg"), 
-                                ToFormat=c("pubchem","chebi", "hmdb"), 
-                                Method="GetFirst", 
-                                GroupingVariable="term"))$Translated_DataFrame
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-translated_ids_example %>%
-  kableExtra::kbl(caption = "Example of 1-to-one translation of `KEGG_Pathways` (using GetFirst method)") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-<br>
-
-Ideally we would want a smarter and more consistent way to filter these out.
-However, it is important to note that this translation process is rarely as straightforward as the one-to-one translation above (at least for PubChem and ChEBI IDs in the example).
-
-Very commonly, an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs).
-Occasionally, it could also be a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).
-We can inspect instances of where this is the case in our data:
-
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
-translated_ids_example <- KEGG_Pathways %>% filter(MetaboliteID == 'C00009') %>% 
-  first() %>%
-  TranslateID()
-translated_ids_example_df <- translated_ids_example$Translated_DataFrame
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-translated_ids_example_df %>%
-  kableExtra::kbl(caption = "Example of 1-to-many translation of `KEGG_Pathways` (besides HMDB)") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-<br>
-
-The above example of the Orthophosphate metabolite (`KEGG ID C00009`) shows the complexity of this one-to-many multi-mapping issue: for the single KEGG ID, it returns:
-
--   4 different PubChem IDs
-
--   4 different ChEBI IDs
-
--   10 different HMDB IDs
-
-For pathway analysis we would want to keep only one metabolite for each pathway.
-But we would probably want to keep our metabolite choice across pathways, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our input data.
-
-This brings us to more formally discuss some of the important caveats with the standard TranslateID function, which we will discuss now in the InspectID subsection.
-
-## Inspect IDs
-
-Some of the complexities of Translating IDs which we have discussed in the examples so far, can be demonstrated here (Fig.2).
-The InspectID function (which is included by default when running TranslateID) provides users with a summary of the relationships between the Original and Translated IDs.
+## 3.1 Mapping problems
+The complexities of translating metabolite IDs are demonstrated here (Fig.2). The relationships between Original IDs (e.g. KEGG) and Translated IDs (e.g. HMDB), can be quite complex and in fact we encounter `one-to-one` (no matches were found for the ID), `one-to-none` ( direct #relationship was established), `one-to-many` (multiple matches were found for the ID. i.e. it is ambiguously mapped) and `many-to-many` ( considers the relationships between the Translated IDs to Original IDs , where a translated ID ambiguously maps back to multiple different Original IDs) mappings.\
+For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the pathways size, i.e. how many metabolites are in the pathway "Glycolysis / Gluconeogenesis - Homo sapiens (human)", which would in turn inflate/deflate the enrichment results and hence it would be desired to keep the number of metabolites in a pathway consistent.
+\
 
 <center>
 
@@ -361,56 +280,46 @@ The InspectID function (which is included by default when running TranslateID) p
 
 <br>
 
-As indicated by Figure 2, relationships between Original IDs (e.g. KEGG) and Translated IDs (e.g. HMDB), can be quite complex, resulting in One-to-None/One/Many mappings.
-Furthermore, the relationships between the Translated IDs (e.g. HMDB) and Original IDs (e.g. KEGG) must also be considered, because the Translated IDs could also ambiguously map back to multiple different Original IDs.
-
-Because of these complexities we leave it to the user to decide which IDs exactly they wish to keep, which could also be influenced by which identifiers they have in their experimental results.
-However we automatically provide summary information to the user, with the following two tables per Translated ID type:
-
-1.  **Mapping_Orig2Trans_XXX_to_YYY** (e.g. Mapping_Orig2Trans_kegg_to_pubchem)
-
-2.  **Mapping_Trans2Orig_YYY_to_XXX** (e.g. Mapping_Trans2Orig_pubchem_to_kegg)
-
-Each table provides the summary of either the Original ID to Translated IDs or vice versa, with counts of the number of Pathways the ID was present in, and most importantly the number of Original/Translated IDs that were mapped to the left-hand-side ID.
-This is then summarised in the `Relationship` column, which is specified as either:
-
-1.  `One-to-None` : no matches were found for the ID.
-
-2.  `One-to-One` : a direct one-to-one relationship was established between either Original ID to Translated ID, or Translated ID to Original ID. Note however that this does not imply that the reverse relationship is true.
-    See Figure 2.
-
-3.  `One-to-Many` : multiple matches were found for the ID. i.e. it is ambiguously mapped.
-
-<br>
-
-These tables are automatically returned as a DataFrame List when running TranslateID, and can be accessed accordingly.
-Note that for the full translation between all 4 ID types, it should take about 1 minute to execute.
-
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
-translated_ids_example_full <- KEGG_Pathways %>% TranslateID()
-print(names(translated_ids_example_full))
+Because of this complexity the output of `MetaProViz::TranslateID()` includes not only the Translation table showcased above, but additionally information about the mapping ambiguity as well as a summary of the relationships between the Original and Translated IDs.\
+Indeed, the translation of e.g. KEGG to hmdb and pubchem includes multiple data frames including a summary of the mapping occurrences:\
+```{r}
+names(KEGG_Pathways_Translated)
 ```
 
-<br>
-
-Finally, this information is summarised in the TranslationSummary table.
-
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
-translated_ids_example_full$TranslationSummary
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-translated_ids_example_full$TranslationSummary %>%
-  kableExtra::kbl(caption = "TranslationSummary table from `KEGG_Pathways`") %>%
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+KEGG_Pathways_Translated[["MappingSummary_hmdb"]][c(1:3, 7:9),] %>%
+  kableExtra::kbl(caption = "MappingSummary_hmdb") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
+\
+We also have the ability to extract a long version of the DF:
 
-Note that ordinarily, we should expect that the Trans2Orig tables do not have any One-to-None relationships, because those IDs that have been already translated naturally have an Original ID that was their source.
 
-<br>\
 
+* To write about: The column definition as per Omnipath vignette. 
+
+*Transition to next headline: Enrichment analysis and detection (maybe show figure here).
+
+To use the prior knowledge for enrichment analysis, we would want to keep the metabolite IDs across pathways consistent, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our measured input data.
+
+
+
+
+
+
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
 
 # 4. Metabolite IDs in measured data
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
 The difficulty with assigning metabolite IDs to measured data is the uncertainty in the detection of metabolites. Indeed, differentiation of structural isomers (both constitutional isomers and stereoisomers) as for example the distinction between enantiomers. This leads to loss of information and hence uncertainty is assigning metabolite IDs.\
 One example is the metabolite Alanine, which can occur in its L- or D- form. If in an experiment those enantiomers have not been distinguished, the correct way would be to either assign two metabolite IDs (L- and D-Alanine) or a more general Alanine ID without chiral information. Yet, in reality this is not as trivial:\
 ```{r, echo=FALSE}
