@@ -69,6 +69,6 @@ Suggests:
     pkgdown,
     svglite,
     testthat (>= 3.0.0)
-Remotes: saezlab/OmnipathR, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git, git::https://git.bioconductor.org/packages/clusterProfiler
+Remotes: saezlab/OmnipathR@dev, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git, git::https://git.bioconductor.org/packages/clusterProfiler
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
