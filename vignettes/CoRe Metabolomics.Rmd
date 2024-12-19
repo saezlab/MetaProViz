@@ -753,7 +753,7 @@ As explained above, when analyzing CoRe data it is important to take into accoun
 For this we need to add this information into the Metadata_Metabolite file:
 ```{r}
 # colour for consumption and release: For this we need to add this information into the Metadata_Metabolite file
-MetaData_Metab <- merge(MappingInfo%>%rownames_to_column("Metabolite"), DMA_786M1A_vs_HK2[,c(1,5:6)], by="Metabolite", all.y=TRUE)%>%
+MetaData_Metab <- merge(MappingInfo%>%rownames_to_column("Metabolite"), DMA_786M1A_vs_HK2[,c(1,6,8:10)], by="Metabolite", all.y=TRUE)%>%
   column_to_rownames("Metabolite")
 
 ```
