@@ -56,7 +56,7 @@ TranslateID <- function(InputData,
                         Summary=FALSE,
                         SaveAs_Table= "csv",
                         FolderPath=NULL
-  ){
+  ){# Add ability to also get metabolite names that are human readable from an ID type!
 
   MetaProViz_Init()
 
@@ -302,7 +302,7 @@ MappingAmbiguity <- function(InputData,
   for(comp in seq_along(Comp)){
     #Run Omnipath ambiguity
     ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- InputData %>%
-      unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
+      tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
       OmnipathR::ambiguity(
           from_col = !!sym(Comp[[comp]]$From),
           to_col = !!sym(Comp[[comp]]$To),
@@ -324,7 +324,7 @@ MappingAmbiguity <- function(InputData,
         # Add further information we need to summarise the table and combine Original-to-Translated and Translated-to-Original
         # If we have a GroupingVariable we need to combine it with the MetaboliteID before merging
         ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
-          unnest(cols = all_of(Comp[[comp]]$From))%>%
+          tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>%
           mutate(!!sym(paste0("AcrossGroupMappingIssue(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")", sep="")) := case_when(
             !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity_bygroup", sep="")) != !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity", sep=""))  ~ "TRUE",
             TRUE ~ "FALSE" ))%>%
@@ -351,7 +351,7 @@ MappingAmbiguity <- function(InputData,
         # Question: How do I now add the information about this across pathway mapping issue? --> we do have TRUE, but not what is the problem --> maybe we can be more specific?
         }else{
           ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
-            unnest(cols = all_of(Comp[[comp]]$From))%>%
+            tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>%
             group_by(!!sym(Comp[[comp]]$From))%>%
             mutate(!!sym(Comp[[comp]]$To) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
                                                     paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
@@ -428,7 +428,7 @@ MappingAmbiguity <- function(InputData,
 #'
 CleanMapping <- function(InputData,
                          PriorKnowledge,
-                         DetectedID="HMDB",
+                         DetectedID="HMDB", #enable that lists can be passed if multuiple IDs are assigned to one measurement!
                          GroupingVariable="term",
                          From="MetaboliteID",
                          To="hmdb",
@@ -510,6 +510,8 @@ CleanMapping <- function(InputData,
       TRUE ~ "FALSE" ))
 
   #Clean Prior knowledge:
+
+
 
 
 

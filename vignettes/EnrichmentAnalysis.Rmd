@@ -58,8 +58,8 @@ First if you have not done yet, install the required dependencies and load the l
 # 2. Install the latest development version from GitHub using devtools
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
-#library(MetaProViz)
-devtools::load_all()
+library(MetaProViz)
+
 #dependencies that need to be loaded:
 library(magrittr)
 library(dplyr)
@@ -349,12 +349,7 @@ In fact, to perform enrichment analysis we need a column source (=e.g. term) and
 
 ## 4.1 Use measured Metabolite IDs to guide the selection of PK IDs
 The measured metabolite IDs can be used to guide the selection of PK IDs. This is crucial to circumvent inflation or deflation of metabolite-sets, which in turn will affect the enrichment analysis results.\
-
-
-
-
-
-
+This is something we are currently working on and hope to provide within the next release, so stay tuned.
 
 ## 4.2. Assigning Metabolite IDs to measured data
 The difficulty with assigning metabolite IDs to measured data is the uncertainty in the detection of metabolites. Indeed, differentiation of structural isomers (both constitutional isomers and stereoisomers) as for example the distinction between enantiomers. This leads to loss of information and hence uncertainty is assigning metabolite IDs.\
