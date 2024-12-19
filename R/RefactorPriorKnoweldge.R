@@ -424,7 +424,7 @@ MappingAmbiguity <- function(InputData,
 #'
 #' @return Prior Knowledge usable for enrichment analysis
 #'
-#' @export
+#' @noRd
 #'
 CleanMapping <- function(InputData,
                          PriorKnowledge,
@@ -563,7 +563,7 @@ CleanMapping <- function(InputData,
 #' InputData = KEGG_Pathways
 #'
 #'
-#'
+#' @noRd
 
 
 
@@ -699,7 +699,7 @@ ClusterPK <- function(InputData, # This can be either the original PK (e.g. KEGG
 #' @param .target used as input for enrichment analysis
 #' @param complete TRUE or FALSE, weather only .source with results should be returned or all .source in net.
 #'
-#' @export
+#' @noRd
 
 # Better function Name and parameter names needed
 # Use in ORA functions and showcase in vignette with decoupleR output
