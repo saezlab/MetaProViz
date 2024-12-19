@@ -17,8 +17,6 @@
 ##
 ##
 ## ---------------------------
-#'
-#' This script allows you to perform different data visualizations using the results of the MetaProViz analysis
 
 ###############################
 ### ### ### Heatmap ### ### ###
@@ -41,20 +39,18 @@
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- VizHeatmap(InputData=Intra[,-c(1:3)])
+#' Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
 #'
 #' @keywords Heatmap
 #'
 #' @importFrom ggplot2 ggplot theme
-#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom dplyr rename select
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom logger log_trace
 #'
 #' @export
 #'
-#'
-
-
 VizHeatmap <- function(InputData,
                        SettingsInfo= NULL,
                        SettingsFile_Sample=NULL,
@@ -83,12 +79,16 @@ VizHeatmap <- function(InputData,
 
   # CheckInput` Specific
   if(is.logical(Enforce_FeatureNames) == FALSE | is.logical(Enforce_SampleNames) == FALSE){
-    stop("Check input. The Enforce_FeatureNames and Enforce_SampleNames value should be either =TRUE or = FALSE.")
+    message <- paste0("Check input. The Enforce_FeatureNames and Enforce_SampleNames value should be either =TRUE or = FALSE.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   Scale_options <- c("row","column", "none")
   if(Scale %in% Scale_options == FALSE){
-      stop("Check input. The selected Scale option is not valid. Please select one of the folowwing: ",paste(Scale_options,collapse = ", "),"." )
+    message <- paste0("Check input. The selected Scale option is not valid. Please select one of the folowwing: ",paste(Scale_options,collapse = ", "),"." )
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
     }
 
 
@@ -104,13 +104,13 @@ VizHeatmap <- function(InputData,
 
   if(is.null(SettingsFile_Metab)==FALSE){#removes information about metabolites that are not included in the InputData
     SettingsFile_Metab <- merge(x=SettingsFile_Metab, y=as.data.frame(t(InputData)), by=0, all.y=TRUE)%>%
-      column_to_rownames("Row.names")
+      tibble::column_to_rownames("Row.names")
     SettingsFile_Metab <- SettingsFile_Metab[,-c((ncol(SettingsFile_Metab)-nrow(InputData)+1):ncol(SettingsFile_Metab))]
   }
 
     if(is.null(SettingsFile_Sample)==FALSE){#removes information about samples that are not included in the InputData
       SettingsFile_Sample <- merge(x=SettingsFile_Sample, y=InputData, by=0, all.y=TRUE)%>%
-        column_to_rownames("Row.names")
+        tibble::column_to_rownames("Row.names")
       SettingsFile_Sample <- SettingsFile_Sample[,-c((ncol(SettingsFile_Sample)-ncol(InputData)+1):ncol(SettingsFile_Sample))]
     }
 
@@ -125,7 +125,9 @@ VizHeatmap <- function(InputData,
       selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
       if(length(selected_path_metabs)==1 ){
-        warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+        message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+        logger::log_trace(paste("Warning ", message, sep=""))
+        warning(message)
         unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
       }
     }
@@ -138,7 +140,7 @@ VizHeatmap <- function(InputData,
     for (i in IndividualPlots){
       selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-      data_path <- data %>% select(all_of(selected_path_metabs))
+      data_path <- data %>% dplyr::select(all_of(selected_path_metabs))
 
       # Column annotation
       col_annot_vars <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
@@ -242,7 +244,9 @@ VizHeatmap <- function(InputData,
                                PlotUnit="cm")))
 
       }else{
-          message(i , " includes <= 2 objects and is hence not plotted.")
+        message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
+        logger::log_trace(paste("Message ", message, sep=""))
+        message(message)
         }
     }
     #Return if assigned:
@@ -258,7 +262,9 @@ VizHeatmap <- function(InputData,
         selected_path <- SettingsFile_Sample %>% filter(get(SettingsInfo[["individual_Sample"]]) == i)
         selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
         if(length(selected_path_metabs)==1 ){
-          warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+          message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+          logger::log_trace(paste("Warning ", message, sep=""))
+          warning(message)
           unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
         }
       }
@@ -270,15 +276,15 @@ VizHeatmap <- function(InputData,
       for (i in IndividualPlots){
         #Select the data:
         selected_path <- SettingsFile_Sample %>% filter(get(SettingsInfo[["individual_Sample"]]) == i)%>%
-          rownames_to_column("UniqueID")
+          tibble::rownames_to_column("UniqueID")
         selected_path <- as.data.frame(selected_path[,1])%>%
           dplyr::rename("UniqueID"=1)
-        data_path <- merge(selected_path, data%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+        data_path <- merge(selected_path, data%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
         data_path <- data_path%>%
-          column_to_rownames("UniqueID")
+          tibble::column_to_rownames("UniqueID")
 
         # Column annotation
-        selected_SettingsFile_Sample <- merge(selected_path, SettingsFile_Sample%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+        selected_SettingsFile_Sample <- merge(selected_path, SettingsFile_Sample%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
 
         col_annot_vars <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
         col_annot<- NULL
@@ -380,7 +386,9 @@ VizHeatmap <- function(InputData,
                                PlotWidth=PlotWidth,
                                PlotUnit="cm")))
         }else{
-          message(i , " includes <= 2 objects and is hence not plotted.")
+          message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
+          logger::log_trace(paste("Message ", message, sep=""))
+          message(message)
         }
         }
       #Return if assigned:
@@ -396,7 +404,9 @@ VizHeatmap <- function(InputData,
           selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
           selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           if(length(selected_path_metabs)==1 ){
-            warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+            message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+            logger::log_trace(paste("Warning ", message, sep=""))
+            warning(message)
             unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
           }
         }
@@ -410,7 +420,9 @@ VizHeatmap <- function(InputData,
           selected_path <- SettingsFile_Sample %>% filter(get(SettingsInfo[["individual_Sample"]]) == i)
           selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           if(length(selected_path_metabs)==1 ){
-            warning("The metadata group ", paste(i), " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+            message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+            logger::log_trace(paste("Warning ", message, sep=""))
+            warning(message)
             unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
           }
         }
@@ -424,7 +436,7 @@ VizHeatmap <- function(InputData,
         for (i in IndividualPlots_Metab){
           selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
           selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-          data_path_metab <- data %>% select(all_of(selected_path_metabs))
+          data_path_metab <- data %>% dplyr::select(all_of(selected_path_metabs))
 
           # Row annotation
           row_annot_vars <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
@@ -444,15 +456,15 @@ VizHeatmap <- function(InputData,
           for (s in IndividualPlots_Sample){
             #Select the data:
             selected_path <- SettingsFile_Sample %>% filter(get(SettingsInfo[["individual_Sample"]]) == s)%>%
-              rownames_to_column("UniqueID")
+              tibble::rownames_to_column("UniqueID")
             selected_path <- as.data.frame(selected_path[,1])%>%
               dplyr::rename("UniqueID"=1)
-            data_path <- merge(selected_path, data_path_metab%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+            data_path <- merge(selected_path, data_path_metab%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
             data_path <- data_path%>%
-              column_to_rownames("UniqueID")
+              tibble::column_to_rownames("UniqueID")
 
             # Column annotation
-            selected_SettingsFile_Sample <- merge(selected_path, SettingsFile_Sample%>%rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+            selected_SettingsFile_Sample <- merge(selected_path, SettingsFile_Sample%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
 
             col_annot_vars <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
             col_annot<- NULL
@@ -660,7 +672,9 @@ VizHeatmap <- function(InputData,
 
 
     }else{
-      message(i , " includes <= 2 objects and is hence not plotted.")
+      message <- paste0(PlotName , " includes <= 2 objects and is hence not plotted.")
+      logger::log_trace(paste("Message ", message, sep=""))
+      message(message)
     }
     }
    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))

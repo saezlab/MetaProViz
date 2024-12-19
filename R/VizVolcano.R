@@ -59,13 +59,13 @@
 #' @keywords Volcano plot, pathways
 #'
 #' @importFrom ggplot2 ggplot theme
-#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom dplyr rename filter mutate
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom logger log_trace
 #'
 #' @export
-
-# Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
+#'
 VizVolcano <- function(PlotSettings="Standard",
                        InputData,
                        SettingsInfo= NULL,
@@ -116,32 +116,45 @@ VizVolcano <- function(PlotSettings="Standard",
 
   # CheckInput` Specific:
   if(is.numeric(yCutoff)== FALSE |yCutoff > 1 | yCutoff < 0){
-      stop("Check input. The selected yCutoff value should be numeric and between 0 and 1.")
+    message<- paste0("Check input. The selected yCutoff value should be numeric and between 0 and 1.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
     }
   if(is.numeric(xCutoff)== FALSE  | xCutoff < 0){
-      stop("Check input. The selected xCutoff value should be numeric and between 0 and +oo.")
+    message<- paste0("Check input. The selected xCutoff value should be numeric and between 0 and +oo.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
     }
   if(paste(x) %in% colnames(InputData)==FALSE | paste(y) %in% colnames(InputData)==FALSE){
-    stop("Check your input. The column name of x and/ore y does not exist in Input_data.")
+    message<- paste0("Check your input. The column name of x and/ore y does not exist in Input_data.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(SelectLab)==FALSE & is.vector(SelectLab)==FALSE){
-    stop("Check input. SelectedLab must be either NULL or a vector.")
+    message<- paste0("Check input. SelectLab must be either NULL or a vector.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.logical(Connectors) == FALSE){
-    stop("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
+    message<- paste0("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(PlotName)==FALSE & is.vector(PlotName)==FALSE){
-    stop("Check input. PlotName must be either NULL or a vector.")
+    message<- paste0("Check input. PlotName must be either NULL or a vector.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   Plot_options <- c("Standard", "Compare", "PEA")
   if (PlotSettings %in% Plot_options == FALSE){
-    stop("PlotSettings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+    message<- paste0("PlotSettings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
-
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
@@ -190,20 +203,20 @@ VizVolcano <- function(PlotSettings="Standard",
     if(PlotSettings=="PEA"){
       VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x=SettingsInfo[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
         tibble::remove_rownames()%>%
-        mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])%>%
-        filter(!is.na(x) | !is.na(x))
+        dplyr::mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])%>%
+        dplyr::filter(!is.na(x) | !is.na(x))
     }else{
      VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by=0, all.y=TRUE)%>%
        tibble::remove_rownames()%>%
-      column_to_rownames("Row.names")%>%
-      mutate(FeatureNames = rownames(InputData))%>%
-      filter(!is.na(x) | !is.na(x))
+       tibble::column_to_rownames("Row.names")%>%
+       dplyr::mutate(FeatureNames = rownames(InputData))%>%
+       dplyr::filter(!is.na(x) | !is.na(x))
     }
 
    }else{
      VolcanoData <- InputData[, c(x, y)]%>%
-       mutate(FeatureNames = rownames(InputData))%>%
-       filter(!is.na(x) | !is.na(x))
+       dplyr::mutate(FeatureNames = rownames(InputData))%>%
+       dplyr::filter(!is.na(x) | !is.na(x))
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -321,7 +334,7 @@ VizVolcano <- function(PlotSettings="Standard",
 ### ### ### VizVolcano helper function: Internal Function for PlotSettings Standard ### ### ###
 ################################################################################################
 
-#' Check input parameters
+#' VizVolcano_Standard
 #'
 #' @param InputData Passed to main function VizVolcano()
 #' @param SettingsFile_Metab Passed to main function VizVolcano()
@@ -344,12 +357,17 @@ VizVolcano <- function(PlotSettings="Standard",
 #' @param PrintPlot Passed to main function VizVolcano()
 #' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
-
+#' @return List with two elements: Plot and Plot_Sized
+#'
 #' @keywords Standard volcano plots
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#'
 #' @noRd
 #'
-#'
-
 VizVolcano_Standard <- function(InputData,
                                 SettingsFile_Metab,
                                 SettingsInfo,
@@ -637,12 +655,18 @@ VizVolcano_Standard <- function(InputData,
 #' @param PrintPlot Passed to main function VizVolcano()
 #' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
+#' @return List with two elements: Plot and Plot_Sized
 #'
 #' @keywords Compare volcano plots
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
 VizVolcano_Compare <- function(InputData,
                                InputData2,
                                SettingsFile_Metab,
@@ -670,12 +694,16 @@ VizVolcano_Compare <- function(InputData,
   ##--- Check InputData
   if(is.data.frame(InputData2)==FALSE){
     if(paste(x) %in% colnames(InputData2)==FALSE | paste(y) %in% colnames(InputData2)==FALSE){
-      stop("Check your InputData2. The column name of x and/or y does not exist in InputData2.")
+      message <- paste("Check your InputData2. The column name of ", x, " and/or ", y, " does not exist in InputData2.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
     }
 
   if(any(duplicated(row.names(InputData2)))==TRUE){
-    stop("Duplicated row.names of InputData2, whilst row.names must be unique")
+    message <- paste("Duplicated row.names of InputData2, whilst row.names must be unique")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   #Pass colours/shapes
@@ -684,7 +712,7 @@ VizVolcano_Compare <- function(InputData,
 
   ##--- Prepare Input Data
   if(is.null(SettingsFile_Metab)==FALSE){
-  InputData2 <- merge(x=SettingsFile_Metab%>%rownames_to_column("FeatureNames") , y=InputData2[, c(x, y)]%>%rownames_to_column("FeatureNames") , by="FeatureNames", all.y=TRUE)%>%
+  InputData2 <- merge(x=SettingsFile_Metab%>%tibble::rownames_to_column("FeatureNames") , y=InputData2[, c(x, y)]%>%tibble::rownames_to_column("FeatureNames") , by="FeatureNames", all.y=TRUE)%>%
     filter(!is.na(x) | !is.na(x))
   InputData[,"comparison"]  <- as.character(paste(ComparisonName[["InputData"]]))
   InputData2[,"comparison"]  <- as.character(paste(ComparisonName[["InputData2"]]))
@@ -1000,11 +1028,18 @@ VizVolcano_Compare <- function(InputData,
 #' @param PrintPlot Passed to main function VizVolcano()
 #' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
+#' @return List with two elements: Plot and Plot_Sized
+#'
 #' @keywords Volcano plots of pathway enrichment results
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
 VizVolcano_PEA <- function(InputData,
                            InputData2,
                            SettingsFile_Metab,
@@ -1029,14 +1064,20 @@ VizVolcano_PEA <- function(InputData,
   #####################
   ##--- Check PEA settings
   if(is.vector(SettingsInfo)==FALSE){
-    stop("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo.")
+    message <- paste0("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.null(SettingsFile_Metab)==TRUE){
-    stop("You have chosen Settings=`PEA` that requires you to provide a DF SettingsFile_Metab including the pathways used for the enrichment analysis.")
+    message <- pasteo("You have chosen Settings=`PEA` that requires you to provide a DF SettingsFile_Metab including the pathways used for the enrichment analysis.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.null(SettingsFile_Metab)==FALSE & is.null(SettingsFile_Metab)==FALSE){
     if("PEA_Feature" %in% names(SettingsInfo)==FALSE | "PEA_score" %in% names(SettingsInfo)==FALSE | "PEA_stat" %in% names(SettingsInfo)==FALSE | "PEA_Pathway" %in% names(SettingsInfo)==FALSE){
-      stop("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
+      message <- paste0("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
