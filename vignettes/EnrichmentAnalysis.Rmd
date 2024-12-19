@@ -292,20 +292,45 @@ KEGG_Pathways_Translated[["MappingSummary_hmdb"]][c(1:3, 7:9),] %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-We also have the ability to extract a long version of the DF:
-
-
 
 * To write about: The column definition as per Omnipath vignette. 
 
-*Transition to next headline: Enrichment analysis and detection (maybe show figure here).
+\
+We also have the ability to extract a long version of the DF that includes a row for each mapping occurrence, which can be useful for downstream analysis. Yet, this can become very large dependent on the amount of many-to-many mappings, hence by default we do not generate this summary. Within the `MetaProViz::TranslateID()` you can set the parameter `Summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `MetaProViz::MappingAmbiguity()` to generate this long summary as well as the mapping summary in general.\
+```{r, eval=FALSE, include=TRUE}
+# Option 1:
+KEGG_Pathways_TranslatedSum <- MetaProViz::TranslateID(InputData= KEGG_Pathways, 
+                                                    SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), 
+                                                    From = c("kegg"), 
+                                                    To = c("hmdb", "pubchem"),
+                                                    Summary =TRUE)
+```
+```{r}
+# Option 2:
+MappingProblems <- MetaProViz::MappingAmbiguity(InputData= KEGG_Pathways_Translated[["TranslatedDF"]]%>% dplyr::rename("KEGG"="MetaboliteID"), 
+                                                From = "KEGG", 
+                                                To = "hmdb", 
+                                                GroupingVariable = "term", 
+                                                Summary=TRUE)
 
-To use the prior knowledge for enrichment analysis, we would want to keep the metabolite IDs across pathways consistent, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our measured input data.
+```
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+MappingProblems[["Summary"]][c(1:2, 503, 505),c(2:6, 8:9,11)] %>%
+  kableExtra::kbl(caption = "Long summary of mapping problems taking into account both directions, From-to-To and To-to-From.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+in the table it is shown that the KEGG ID C00002 maps to 3 different HMDB IDs, and it is shown that one of those HMDB IDs HMDB0000538 maps to one KEGG ID, hence this Mapping is one-to-many. The other two HMDB Ids are also in the table and it is checked to how many KEGG IDs they map. Additionally, we have passed `GroupingVariable = "term"` as we have pathways, which also means each of those mappings is checked within a pathway and across pathways (e.g. C00002 is shown twice, for two different terms). \
+In fact, to perform enrichment analysis we need a column source (=e.g. term) and we would want to keep the metabolite IDs across pathways consistent, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our measured input data (Fig. 3). This is crucial to circumvent inflation or deflation of metabolite-sets, which in turn will affect the enrichment analysis results. In the next section 4., we will elaborate on this. 
+\
 
+<center>
 
+![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites). ](Fig.3.png){width="50%"}
 
+</center>
 
-
+<br>
 
 
 ::: {.progress .progress-striped .active}
