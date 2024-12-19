@@ -44,4 +44,4 @@ jobs:
         run: Rscript -e 'install.packages("pak")'
 
       - name: Install MetaProViz from git by pak
-        run: Rscript -e ''pak::pkg_install("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
+        run: Rscript -e 'pak::pkg_install("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
