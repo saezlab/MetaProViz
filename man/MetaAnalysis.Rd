@@ -2,7 +2,7 @@
 % Please edit documentation in R/MetaDataAnalysis.R
 \name{MetaAnalysis}
 \alias{MetaAnalysis}
-\title{This script allows you to perform}
+\title{This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.}
 \usage{
 MetaAnalysis(
   InputData,
@@ -35,7 +35,18 @@ MetaAnalysis(
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
-\description{
-This script allows you to perform
+\value{
+List of DFs: prcomp results, loadings, Top-Bottom features, annova results, results summary
 }
-\keyword{PCA}
+\description{
+This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
+}
+\examples{
+Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
+Res <- MetaProViz::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
+                                SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+
+}
+\keyword{PCA,}
+\keyword{annova,}
+\keyword{metadata}

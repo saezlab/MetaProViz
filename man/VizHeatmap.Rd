@@ -2,8 +2,7 @@
 % Please edit documentation in R/VizHeatmap.R
 \name{VizHeatmap}
 \alias{VizHeatmap}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis
-Heatmap visualization}
+\title{Heatmap visualization}
 \usage{
 VizHeatmap(
   InputData,
@@ -44,12 +43,11 @@ VizHeatmap(
 List with two elements: Plot and Plot_Sized
 }
 \description{
-This script allows you to perform different data visualizations using the results of the MetaProViz analysis
 Heatmap visualization
 }
 \examples{
 Intra <- ToyData("IntraCells_Raw")
-Res <- VizHeatmap(InputData=Intra[,-c(1:3)])
+Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
 
 }
 \keyword{Heatmap}
