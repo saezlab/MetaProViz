@@ -294,9 +294,6 @@ KEGG_Pathways_Translated[["MappingSummary_hmdb"]][c(1:3, 7:9),] %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-
-* To write about: The column definition as per Omnipath vignette. 
-
 \
 We also have the ability to extract a long version of the DF that includes a row for each mapping occurrence, which can be useful for downstream analysis. Yet, this can become very large dependent on the amount of many-to-many mappings, hence by default we do not generate this summary. Within the `MetaProViz::TranslateID()` you can set the parameter `Summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `MetaProViz::MappingAmbiguity()` to generate this long summary as well as the mapping summary in general.\
 ```{r, eval=FALSE, include=TRUE}
