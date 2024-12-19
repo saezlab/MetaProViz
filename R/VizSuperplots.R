@@ -55,6 +55,7 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom ggbeeswarm geom_beeswarm
+#' @importFrom logger log_trace log_info
 #'
 #' @export
 #'
@@ -94,17 +95,23 @@ VizSuperplot <- function(InputData,
 
   # CheckInput` Specific
   if(is.null(SettingsInfo)==TRUE){
-    stop("You must provide the column name for Conditions via SettingsInfo=c(Conditions=ColumnName) in order to plot the x-axis conditions.")
+    message <- paste0("You must provide the column name for Conditions via SettingsInfo=c(Conditions=ColumnName) in order to plot the x-axis conditions.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(PlotType %in% c("Box", "Bar", "Violin") == FALSE){
-    stop("PlotType must be either Box, Bar or Violin.")
+    message <- paste0("PlotType must be either Box, Bar or Violin.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(PlotConditions) == FALSE){
     for (Condition in PlotConditions){
       if(Condition %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
-        stop(paste0("Check Input. The PlotConditions ",Condition," were not found in the Conditions Column."))
+        message <- paste0("Check Input. The PlotConditions ",Condition," were not found in the Conditions Column.")
+        logger::log_trace(paste("Error ", message, sep=""))
+        stop(message)
       }
     }
   }
@@ -113,10 +120,14 @@ VizSuperplot <- function(InputData,
     for (Comp in StatComparisons){
       if(is.null(PlotConditions)==FALSE){
         if(PlotConditions[Comp[1]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] ==FALSE){
-          stop("Check Input. The StatComparisons condition ",paste(Comp[1]), " is not found in the Conditions Column of the SettingsFile_Sample.")
+          message <- paste0("Check Input. The StatComparisons condition ",Comp[1], " is not found in the Conditions Column of the SettingsFile_Sample.")
+          logger::log_trace(paste("Error ", message, sep=""))
+          stop(message)
         }
         if(PlotConditions[Comp[2]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] ==FALSE){
-          stop("Check Input. The StatComparisons condition ",paste(Comp[2]), " is not found in the Conditions Column of the SettingsFile_Sample.")
+          message <- paste0("Check Input. The StatComparisons condition ",Comp[2], " is not found in the Conditions Column of the SettingsFile_Sample.")
+          logger::log_trace(paste("Error ", message, sep=""))
+          stop(message)
         }
       }
     }
@@ -148,10 +159,14 @@ VizSuperplot <- function(InputData,
 
   if(is.null(StatPval)==FALSE){
     if(MultipleComparison == TRUE & (StatPval=="t.test" | StatPval=="wilcox.test")){
-      warning("The selected StatPval option for Hypothesis testing,", StatPval, " is for one-versus-one comparison, but you have more than 2 conditions. Hence aov is performed.")
+      message <- paste0("Check input. The selected StatPval option for Hypothesis testing,", StatPval, " is for multiple comparison, but you have only 2 conditions. Hence aov is performed.")
+      logger::log_trace(paste("Warning ", message, sep=""))
+      warning(message)
       StatPval <- "aov"
     }else if(MultipleComparison == FALSE & (StatPval=="aov" | StatPval=="kruskal.test")){
-      warning("The selected StatPval option for Hypothesis testing,", StatPval, " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
+      message <- paste0("Check input. The selected StatPval option for Hypothesis testing,", StatPval, " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
+      logger::log_trace(paste("Warning ", message, sep=""))
+      warning(message)
       StatPval <- "t.test"
       }
     }
@@ -167,7 +182,9 @@ VizSuperplot <- function(InputData,
   STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
   if(is.null(StatPadj)==FALSE){
     if(StatPadj %in% STAT_padj_options == FALSE){
-      stop("Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
+      message <- paste0("Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
   }
   }
 

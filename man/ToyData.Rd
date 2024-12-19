@@ -24,9 +24,9 @@ ToyData(Dataset)
 A data frame containing the toy data.
 }
 \description{
-Import and process .csv file to create toy data.
+Import and process .csv file to create toy data DF.
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")
+Intra <- ToyData("IntraCells_Raw")
 
 }

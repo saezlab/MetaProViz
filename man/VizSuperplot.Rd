@@ -68,8 +68,8 @@ This script allows you to perform different visualizations (bar, box, violin plo
 Bar, Box or Violin plot in Superplot style visualization
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")[,c(1:6)]
-Res <- MetaProViz::VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
+Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
+Res <- VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
 
 }
 \keyword{Barplot,}

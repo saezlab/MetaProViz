@@ -2,13 +2,13 @@
 % Please edit documentation in R/Processing.R
 \name{PoolEstimation}
 \alias{PoolEstimation}
-\title{Description}
+\title{Find metabolites with high variability across total pool samples}
 \usage{
 PoolEstimation(
   InputData,
   SettingsFile_Sample = NULL,
   SettingsInfo = NULL,
-  CutoffCV = 100,
+  CutoffCV = 30,
   SaveAs_Plot = "svg",
   SaveAs_Table = "csv",
   PrintPlot = TRUE,
@@ -22,7 +22,7 @@ PoolEstimation(
 
 \item{SettingsInfo}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
 
-\item{CutoffCV}{\emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 1}}
+\item{CutoffCV}{\emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 30}}
 
 \item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
 
@@ -32,8 +32,18 @@ PoolEstimation(
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
+\value{
+List with two elements: DF (including input and output table) and Plot (including all plots generated)
+}
 \description{
-Description
+Find metabolites with high variability across total pool samples
+}
+\examples{
+Intra <- ToyData("IntraCells_Raw")
+Res <- PoolEstimation(InputData=Intra[ ,-c(1:3)],
+                                SettingsFile_Sample=Intra[ , c(1:3)],
+                                SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"))
+
 }
 \keyword{Coefficient}
 \keyword{Variation,}

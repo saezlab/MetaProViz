@@ -39,7 +39,7 @@
 #'
 #' @return A data frame containing the toy data.
 #'
-#' @description Import and process .csv file to create toy data.
+#' @description Import and process .csv file to create toy data DF.
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
@@ -47,6 +47,7 @@
 #' @importFrom readr read_csv cols
 #' @importFrom magrittr %>% extract2
 #' @importFrom tibble column_to_rownames
+#' @importFrom logger log_trace
 #'
 #' @export
 #'
@@ -71,17 +72,15 @@ ToyData <- function(Dataset) {
 
   #Load dataset:
   if (!Dataset %in% names(datasets)) {
-    stop(sprintf(
-      "No such dataset: `%s`. Available datasets: %s",
-      Dataset,
-      paste(names(datasets), collapse = ", ")
-    ))
+    message <- sprintf("No such dataset: `%s`. Available datasets: %s", Dataset, paste(names(datasets), collapse = ", "))
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   datasets %>%
   magrittr::extract2(Dataset) %>%
     system.file("data", ., package = "MetaProViz") %>%
-    readr::read_csv(col_types = cols()) %>%
+    readr::read_csv(col_types = readr::cols()) %>%
     {`if`(
     (rncol <- names(.) %>% intersect(rncols)) %>% length,
     tibble::column_to_rownames(., rncol),

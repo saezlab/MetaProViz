@@ -18,13 +18,13 @@
 ##
 ## ---------------------------
 #'
-#' This script allows you to perform
-
 
 ###############################################
 ### ### ### MetaAnalysis ### ### ###
 ###############################################
 
+#' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
+#'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
@@ -35,9 +35,25 @@
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
-#' @keywords PCA
+#' @return List of DFs: prcomp results, loadings, Top-Bottom features, annova results, results summary
+#'
+#' @examples
+#' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
+#' Res <- MetaProViz::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
+#'                                 SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+#'
+#' @keywords PCA, annova, metadata
+#'
+#' @importFrom dplyr filter bind_rows rename mutate ungroup group_by summarise select arrange rowwise mutate_all distinct
+#' @importFrom magrittr %>%
+#' @importFrom stats as.formula aov TukeyHSD
+#' @importFrom broom tidy
+#' @importFrom tidyr separate_rows
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom logger log_info
+#'
 #' @export
-
+#'
 MetaAnalysis <- function(InputData,
                          SettingsFile_Sample,
                          Scaling = TRUE,
@@ -50,7 +66,6 @@ MetaAnalysis <- function(InputData,
                          #SettingInfo= c(MainSeparator = "TISSUE_TYPE), # enable this parameter in the function --> main separator: Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `SettingsInfo` and provide the column name of our main separator.
 
 ){
-
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -71,10 +86,12 @@ MetaAnalysis <- function(InputData,
     if(any(grepl('[^[:alnum:]]', colnames(SettingsFile_Sample)))==TRUE){
       #Remove special characters in colnames
       colnames(SettingsFile_Sample) <- make.names(colnames(SettingsFile_Sample))
-      message("The column names of the 'SettingsFile_Sample'contain special character that where removed.")
+      #Message:
+      message <- paste("The column names of the 'SettingsFile_Sample' contain special character that where removed.")
+      logger::log_info(message)
+      message(message)
     }
   }
-
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
@@ -94,7 +111,10 @@ MetaAnalysis <- function(InputData,
     tibble::rownames_to_column("FeatureID")
 
   #--- 2. Merge with demographics
-  PCA.res_Info  <- merge(x=SettingsFile_Sample%>%rownames_to_column("UniqueID") , y=PCA.res_Info%>%rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
+  PCA.res_Info  <- merge(x=SettingsFile_Sample%>% tibble::rownames_to_column("UniqueID"),
+                         y=PCA.res_Info%>% tibble::rownames_to_column("UniqueID"),
+                         by="UniqueID",
+                         all.y=TRUE)%>%
     tibble::column_to_rownames("UniqueID")
 
   #--- 3. convert columns that are not numeric to factor:
@@ -112,14 +132,14 @@ MetaAnalysis <- function(InputData,
 
   for (meta_col in MetaData) {
     for (pc_col in colnames(PCA.res_Info)[grepl("^PC", colnames(PCA.res_Info))]) {
-      Formula <- as.formula(paste(pc_col, "~", meta_col, sep=""))# Create a formula for ANOVA --> When constructing the ANOVA formula, it's important to ensure that the response variable (dependent variable) is numeric.
+      Formula <- stats::as.formula(paste(pc_col, "~", meta_col, sep=""))# Create a formula for ANOVA --> When constructing the ANOVA formula, it's important to ensure that the response variable (dependent variable) is numeric.
       #pairwiseFormula <- as.formula(paste("pairwise ~" , meta_col, sep=""))
 
-      anova_result <- aov(Formula, data = PCA.res_Info)# Perform ANOVA
+      anova_result <- stats::aov(Formula, data = PCA.res_Info)# Perform ANOVA
       anova_result_tidy <- broom::tidy(anova_result)#broom::tidy --> convert statistics into table
-      anova_row <- filter(anova_result_tidy, term != "Residuals")  # Exclude Residuals row
+      anova_row <- dplyr::filter(anova_result_tidy, term != "Residuals")  # Exclude Residuals row
 
-      tukey_result <- TukeyHSD(anova_result)# Perform Tukey test
+      tukey_result <- stats::TukeyHSD(anova_result)# Perform Tukey test
       tukey_result_tidy <- broom::tidy( tukey_result)#broom::tidy --> convert statistics into table
 
       #lm_result_p.val <- lsmeans::lsmeans((lm(Formula, data = PCA.res_Info)),  pairwiseFormula , adjust=NULL)# adjust=NULL leads to the p-value!
@@ -150,7 +170,7 @@ MetaAnalysis <- function(InputData,
   #Add explained variance into the table:
   prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
     tibble::rownames_to_column("PC")%>%
-    mutate(PC = paste("PC", PC, sep=""))%>%
+    dplyr::mutate(PC = paste("PC", PC, sep=""))%>%
     dplyr::rename("Explained_Variance"=2)
 
   Stat_results <- merge(Stat_results, prop_var_ex,  by="PC",all.x=TRUE)
@@ -174,77 +194,74 @@ MetaAnalysis <- function(InputData,
      #Return
      res <- cbind(data.frame(PC=paste("PC", i, sep = "")), top_features, bottom_features)
      }) %>%
-     bind_rows(.id = "PC")%>%
-     mutate(PC = paste("PC", PC, sep=""))
+     dplyr::bind_rows(.id = "PC")%>%
+     dplyr::mutate(PC = paste("PC", PC, sep=""))
 
 
    ## ---------- Final DF 1------------##
    ## Add to results DF
    Stat_results <- merge(Stat_results,
                          TopBottom_Features%>%
-                           group_by(PC) %>%
-                           summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
-                           ungroup(),
+                           dplyr::group_by(PC) %>%
+                           dplyr::summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
+                           dplyr::ungroup(),
                          by="PC",
                          all.x=TRUE)
 
    ## ---------- DF 2: Metabolites as row names ------------##
    Res_Top <- Stat_results%>%
-     filter(tukeyHSD_p.adjusted< StatCutoff)%>%
+     dplyr::filter(tukeyHSD_p.adjusted< StatCutoff)%>%
      tidyr::separate_rows(paste("Features_", "(Top", Percentage, "%)", sep=""), sep = ", ")%>% # Separate 'Features (Top 0.1%)'
      dplyr::rename("FeatureID":= paste("Features_", "(Top", Percentage, "%)", sep=""))%>%
-     select(- paste("Features_", "(Bottom", Percentage, "%)", sep=""))
+     dplyr::select(- paste("Features_", "(Bottom", Percentage, "%)", sep=""))
 
    Res_Bottom <- Stat_results%>%
-     filter(tukeyHSD_p.adjusted< StatCutoff)%>%
+     dplyr::filter(tukeyHSD_p.adjusted< StatCutoff)%>%
      tidyr::separate_rows(paste("Features_", "(Bottom", Percentage, "%)", sep=""), sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
      dplyr::rename("FeatureID":= paste("Features_", "(Bottom", Percentage, "%)", sep=""))%>%
-     select(- paste("Features_", "(Top", Percentage, "%)", sep=""))
+     dplyr::select(- paste("Features_", "(Top", Percentage, "%)", sep=""))
 
    Res <- rbind(Res_Top, Res_Bottom)%>%
-     group_by(FeatureID, term) %>%            # Group by FeatureID and term
-     summarise(
+     dplyr::group_by(FeatureID, term) %>%            # Group by FeatureID and term
+     dplyr::summarise(
        PC = paste(unique(PC), collapse = ", "), # Concatenate unique PC entries with commas
-       `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE) # Sum Explained_Variance
-     ) %>%
-     ungroup()%>%  # Remove previous grouping
-     group_by(FeatureID) %>%  # Group by FeatureID for MainDriver calculation
-     mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>% # Mark TRUE for the highest value
-     ungroup()  # Remove grouping
+       `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE)) %>% # Sum Explained_Variance
+     dplyr::ungroup()%>%  # Remove previous grouping
+     dplyr::group_by(FeatureID) %>%  # Group by FeatureID for MainDriver calculation
+     dplyr::mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>% # Mark TRUE for the highest value
+     dplyr::ungroup()  # Remove grouping
 
    Res_summary <- Res%>%
-     group_by(FeatureID) %>%
-     summarise(
+     dplyr::group_by(FeatureID) %>%
+     dplyr::summarise(
        term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
        `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
-       MainDriver = paste(MainDriver, collapse = ", ")  # Extract the term where MainDriver is TRUE
-     ) %>%
-     ungroup()%>%
-     rowwise() %>%
-     mutate(  # Extract the term where MainDriver is TRUE
+       MainDriver = paste(MainDriver, collapse = ", ")) %>%  # Extract the term where MainDriver is TRUE
+     dplyr::ungroup()%>%
+     dplyr::rowwise() %>%
+     dplyr::mutate(  # Extract the term where MainDriver is TRUE
        MainDriver_Term = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
                                 strsplit(term, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]],
                                 NA),
        # Extract the Sum(Explained_Variance) where MainDriver is TRUE
        `MainDriver_Sum(VarianceExplained)` = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
                                                     as.numeric(strsplit(`Sum(Explained_Variance)`, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]]),
-                                                    NA)
-     ) %>%
-     ungroup()%>%
-     arrange(desc(`MainDriver_Sum(VarianceExplained)`))
+                                                    NA)) %>%
+     dplyr::ungroup()%>%
+     dplyr::arrange(desc(`MainDriver_Sum(VarianceExplained)`))
 
    ###############################################################################################################################################################################################################
    ## ---------- Plot ------------##
    # Plot DF
    Data_Heat <- Stat_results %>%
-     filter(tukeyHSD_p.adjusted < 0.05)%>%#Filter for significant results
-     filter(Explained_Variance > 0.1)%>%#Exclude Residuals row
-     distinct(term, PC, .keep_all = TRUE)%>%#only keep unique term~PC combinations AND STATS
-     select(term, PC, Explained_Variance)
+     dplyr::filter(tukeyHSD_p.adjusted < 0.05)%>%#Filter for significant results
+     dplyr::filter(Explained_Variance > 0.1)%>%#Exclude Residuals row
+     dplyr::distinct(term, PC, .keep_all = TRUE)%>%#only keep unique term~PC combinations AND STATS
+     dplyr::select(term, PC, Explained_Variance)
 
    Data_Heat <- reshape2::dcast( Data_Heat, term ~ PC, value.var = "Explained_Variance")%>%
      tibble::column_to_rownames("term")%>%
-     mutate_all(~replace(., is.na(.), 0))
+     dplyr::mutate_all(~replace(., is.na(.), 0))
 
    #Plot
    invisible(VizHeatmap(InputData = Data_Heat,
@@ -279,31 +296,43 @@ MetaAnalysis <- function(InputData,
 ### ### ### MetaPriorKnowlegde ### ### ###
 ###############################################
 
-### Enrichment analysis-based
-
-#*we can make pathway file from metadata and use this to run enrichment analysis.
-#*At the moment we can just make the pathways and we need to include a standard fishers exact test.
-#*Merge with function above?
-# *Advantage/disadvantage: Not specific - with annova PC we get granularity e.g. smoker-ExSmoker-PC5, whilst here we only get smoking in generall as parameter
-
 #' Meta prior-knowledge
 #'
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
-#' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param SettingsInfo \emph{Optional: } NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
-#' @keywords prior knowledge
+#' @return DF with prior knowledge based on patient metadata
+#'
+#' @examples
+#' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
+#' Res <- MetaProViz::MetaPK(InputData=Tissue_Norm[,-c(1:13)],
+#'                           SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+#'
+#' @keywords prior knowledge, metadata
+#'
+#' @importFrom magrittr %>%
+#' @importFrom tidyr pivot_longer unite
+#' @importFrom tibble rownames_to_column
+#'
 #' @export
+#'
 MetaPK <- function(InputData,
                    SettingsFile_Sample,
+                   SettingsInfo=NULL,
                    SaveAs_Table = "csv",
                    FolderPath = NULL){
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
+  ### Enrichment analysis-based
+  #*we can make pathway file from metadata and use this to run enrichment analysis.
+  #*At the moment we can just make the pathways and we need to include a standard fishers exact test.
+  #*Merge with function above?
+  # *Advantage/disadvantage: Not specific - with annova PC we get granularity e.g. smoker-ExSmoker-PC5, whilst here we only get smoking in generall as parameter
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
@@ -314,7 +343,7 @@ MetaPK <- function(InputData,
 
 
   ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
+  if(is.null(SaveAs_Table)==FALSE){
     Folder <- SavePath(FolderName= "MetaAnalysis",
                                     FolderPath=FolderPath)
   }
@@ -324,7 +353,7 @@ MetaPK <- function(InputData,
   # Use the Sample metadata for this:
   if(is.null(SettingsInfo)==TRUE){
     MetaData <- names(SettingsFile_Sample)
-    SettingsFile_Sample <- SettingsFile_Sample%>%
+    SettingsFile_Sample_subset <- SettingsFile_Sample%>%
       tibble::rownames_to_column("SampleID")
   }else{
     MetaData <- SettingsInfo
@@ -334,8 +363,8 @@ MetaPK <- function(InputData,
 
   # Convert into a pathway DF
   Metadata_df <- SettingsFile_Sample_subset %>%
-    pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry")%>%
-    unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
+    tidyr::pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry")%>%
+    tidyr::unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
   Metadata_df$mor <- 1
 
   #Run ULM using decoupleR (input=PCs from prcomp and pkn=Metadata_df)
@@ -353,7 +382,6 @@ MetaPK <- function(InputData,
    # dplyr::rename("Explained_Variance"=2)
 
   #ULM_res <- merge(ULM_res, prop_var_ex,  by.x="condition",by.y="PC",all.x=TRUE)
-
 
   ###############################################################################################################################################################################################################
   ## ---------- Save ------------##
