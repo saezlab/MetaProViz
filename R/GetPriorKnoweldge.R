@@ -29,8 +29,11 @@
 #' @description Import and process KEGG.
 #' @importFrom utils read.csv
 #' @return A data frame containing the KEGG pathways for ORA.
-#' @export
 #'
+#' @examples
+#' KEGG_Pathways <- MetaProViz::LoadKEGG()
+#'
+#' @export
 #'
 LoadKEGG <- function(){
   ## ------------ Create log file ----------- ##
@@ -191,7 +194,7 @@ Make_GeneMetabSet <- function(Input_GeneSet,
     Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
 
-    SubFolder <- file.path(Folder, "MetabSet")
+    SubFolder <- file.path(Folder, "MetaboliteSet")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
@@ -301,7 +304,7 @@ LoadMetalinks <- function(types = NULL,
     Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
 
-    SubFolder <- file.path(Folder, "MetabSet")
+    SubFolder <- file.path(Folder, "MetaboliteSet")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
