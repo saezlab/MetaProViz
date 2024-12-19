@@ -32,9 +32,11 @@ Depends:
     R (>= 4.4.1),
     ggplot2 (>= 3.3.5)
 Imports:
+    clusterProfiler
     cosmosR,
     dplyr,
     EnhancedVolcano,
+    fgsea,
     factoextra,
     ggbeeswarm,
     ggfortify,
@@ -69,6 +71,6 @@ Suggests:
     pkgdown,
     svglite,
     testthat (>= 3.0.0)
-Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git, git::https://git.bioconductor.org/packages/clusterProfiler
+Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
