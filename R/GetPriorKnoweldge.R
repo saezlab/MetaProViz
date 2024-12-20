@@ -29,8 +29,11 @@
 #' @description Import and process KEGG.
 #' @importFrom utils read.csv
 #' @return A data frame containing the KEGG pathways for ORA.
-#' @export
 #'
+#' @examples
+#' KEGG_Pathways <- MetaProViz::LoadKEGG()
+#'
+#' @export
 #'
 LoadKEGG <- function(){
   ## ------------ Create log file ----------- ##
@@ -190,7 +193,11 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   if(is.null(SaveAs_Table)==FALSE){
     Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
+
+    SubFolder <- file.path(Folder, "MetaboliteSet")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
+
 
   ######################################################
   ##-------------- Cosmos PKN
@@ -235,7 +242,7 @@ Make_GeneMetabSet <- function(Input_GeneSet,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
-                         FolderPath= Folder,
+                         FolderPath= SubFolder,
                          FileName= PKName,
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
@@ -296,6 +303,9 @@ LoadMetalinks <- function(types = NULL,
   if(is.null(SaveAs_Table)==FALSE){
     Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
+
+    SubFolder <- file.path(Folder, "MetaboliteSet")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
   #------------------------------------------------------------------
@@ -516,7 +526,7 @@ LoadMetalinks <- function(types = NULL,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
-                         FolderPath= Folder,
+                         FolderPath= SubFolder,
                          FileName= "MetaLinksDB",
                          CoRe=FALSE,
                          PrintPlot=FALSE)))

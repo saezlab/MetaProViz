@@ -9,21 +9,28 @@ TranslateID(
   SettingsInfo = c(InputID = "MetaboliteID", GroupingVariable = "term"),
   From = "kegg",
   To = c("pubchem", "chebi", "hmdb"),
+  Summary = FALSE,
   SaveAs_Table = "csv",
   FolderPath = NULL
 )
 }
 \arguments{
-\item{InputData}{Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)}
+\item{InputData}{Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.}
 
 \item{SettingsInfo}{\emph{Optional: } Column name of Target in Input_GeneSet. \strong{Default = list(InputID="MetaboliteID" , GroupingVariable="term")}}
 
+\item{From}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}}
+
+\item{To}{One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}}
+
+\item{Summary}{\emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}}
+
 \item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{FolderPath}{{Optional:} String which is added to the resulting folder name \strong{Default = NULL}}
+\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \value{
-List with three DFs: 1) Original data and the new column of translated ids. 2) Mapping summary from Original ID to Translated. 3) Mapping summary from Translated to Original.
+List with at least three DFs: 1) Original data and the new column of translated ids spearated by comma. 2) Mapping information between Original ID to Translated ID. 3) Mapping summary between Original ID to Translated ID.
 }
 \description{
 Translate IDs to/from KEGG, PubChem, Chebi, HMDB
@@ -31,7 +38,9 @@ Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 \examples{
 KEGG_Pathways <- MetaProViz::LoadKEGG()
 Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
+Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem", "hmdb"))
 
 }
 \keyword{IDs}
 \keyword{Translate}
+\keyword{metabolite}

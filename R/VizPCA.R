@@ -49,11 +49,12 @@
 #'
 #' @keywords PCA
 #'
-#' @importFrom ggplot2 ggplot theme element_rect autoplot
+#' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
+#' @importFrom logger log_info log_trace
 #'
 #' @export
 #'
@@ -90,15 +91,21 @@ VizPCA <- function(InputData,
 
   # CheckInput` Specific
   if(is.logical(ShowLoadings) == FALSE){
-    stop("Check input. The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
+    message <- paste("The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.logical(Scaling) == FALSE){
-    stop("Check input. The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
+    message <- paste("The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(any(is.na(InputData))==TRUE){
      InputData[is.na(InputData)] <- 0#replace NA with 0
-     message("NA values are included in InputData that were set to 0 prior to performing PCA.")
+     message <- paste("NA values are included in InputData that were set to 0 prior to performing PCA.")
+     logger::log_info(message)
+     message(message)
   }
 
   ## ------------ Create Results output folder ----------- ##
@@ -177,7 +184,7 @@ VizPCA <- function(InputData,
         color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
         #Overwrite color_scale
         ColorScale <- "discrete"
-        logger::log_info("warning: ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
+        logger::log_info("Warning: ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
         warning("ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
       }
     }
@@ -234,13 +241,13 @@ VizPCA <- function(InputData,
                   loadings.label.size=2.5,
                   loadings.colour="grey10",
                   loadings.label.colour="grey10" ) +
-    scale_shape_manual(values=shape_select)+
-    ggtitle(paste(PlotName)) +
-    geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-    geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    ggplot2::scale_shape_manual(values=shape_select)+
+    ggplot2::ggtitle(paste(PlotName)) +
+    ggplot2::geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+    ggplot2::geom_vline(xintercept=0,  color = "black", linewidth=0.1)
 
     if(ColorScale=="discrete"){
-      PCA <-PCA + scale_color_manual(values=color_select)
+      PCA <-PCA + ggplot2::scale_color_manual(values=color_select)
     }else if(ColorScale=="continuous" & is.null(ColorPalette)){
       PCA <-PCA + color_select
     }

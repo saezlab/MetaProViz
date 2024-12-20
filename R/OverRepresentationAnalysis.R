@@ -154,13 +154,10 @@ ClusterORA <- function(InputData,
 }
 
 
-
-
-#################################
+###################################
 ### ### ### StandardORA ### ### ###
-#################################
-#' StandardORA
-#'
+###################################
+
 #' Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
 #'
 #' @param InputData DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the PathwayFile.
@@ -175,8 +172,9 @@ ClusterORA <- function(InputData,
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return Saves results as individual .csv files.
+#'
 #' @export
-
+#'
 StandardORA <- function(InputData,
                         SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                         pCutoff=0.05,
@@ -191,7 +189,6 @@ StandardORA <- function(InputData,
 ){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
-
 
  ## ------------ Check Input files ----------- ##
   Pathways <- CheckInput_ORA(InputData=InputData,
