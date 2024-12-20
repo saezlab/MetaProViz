@@ -23,6 +23,9 @@
 #####################################
 ### ### ### Volcano Plots ### ### ###
 #####################################
+
+#' Volcano plot visualization
+#'
 #' @param Settings \emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}
 #' @param SettingsFile_Metab \emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}
@@ -47,10 +50,22 @@
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #'
+#' @return List with two elements: Plot and Plot_Sized
+#'
+#' @examples
+#' Intra <- ToyData("IntraCells_DMA")
+#' Res <- VizVolcano(InputData=Intra)
+#'
 #' @keywords Volcano plot, pathways
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom logger log_trace
+#'
 #' @export
-
-# Helper function needed for adding column to pathway file defining if this metabolite is unique/multiple pathways
+#'
 VizVolcano <- function(PlotSettings="Standard",
                        InputData,
                        SettingsInfo= NULL,
@@ -74,23 +89,9 @@ VizVolcano <- function(PlotSettings="Standard",
                        FolderPath = NULL,
                        Features="Metabolites",
                        PrintPlot=TRUE){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
-  ## ------------ Setup and installs ----------- ##
-  RequiredPackages <- c("tidyverse", "EnhancedVolcano")
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    install.packages(new.packages)
-  }
-  new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)>0){
-    if (!require("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-
-    BiocManager::install(new.packages)
-  }
-  suppressMessages(library(tidyverse))
-
-  ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
   if(PlotSettings=="PEA"){
@@ -102,7 +103,7 @@ VizVolcano <- function(PlotSettings="Standard",
     Info <- SettingsInfo
   }
 
-  MetaProViz:::CheckInput(InputData=as.data.frame(t(InputData)),
+  CheckInput(InputData=as.data.frame(t(InputData)),
                           InputData_Num=FALSE,
                           SettingsFile_Sample=NULL,
                           SettingsFile_Metab=SettingsFile,#Set above
@@ -115,36 +116,49 @@ VizVolcano <- function(PlotSettings="Standard",
 
   # CheckInput` Specific:
   if(is.numeric(yCutoff)== FALSE |yCutoff > 1 | yCutoff < 0){
-      stop("Check input. The selected yCutoff value should be numeric and between 0 and 1.")
+    message<- paste0("Check input. The selected yCutoff value should be numeric and between 0 and 1.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
     }
   if(is.numeric(xCutoff)== FALSE  | xCutoff < 0){
-      stop("Check input. The selected xCutoff value should be numeric and between 0 and +oo.")
+    message<- paste0("Check input. The selected xCutoff value should be numeric and between 0 and +oo.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
     }
   if(paste(x) %in% colnames(InputData)==FALSE | paste(y) %in% colnames(InputData)==FALSE){
-    stop("Check your input. The column name of x and/ore y does not exist in Input_data.")
+    message<- paste0("Check your input. The column name of x and/ore y does not exist in Input_data.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(SelectLab)==FALSE & is.vector(SelectLab)==FALSE){
-    stop("Check input. SelectedLab must be either NULL or a vector.")
+    message<- paste0("Check input. SelectLab must be either NULL or a vector.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.logical(Connectors) == FALSE){
-    stop("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
+    message<- paste0("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   if(is.null(PlotName)==FALSE & is.vector(PlotName)==FALSE){
-    stop("Check input. PlotName must be either NULL or a vector.")
+    message<- paste0("Check input. PlotName must be either NULL or a vector.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   Plot_options <- c("Standard", "Compare", "PEA")
   if (PlotSettings %in% Plot_options == FALSE){
-    stop("PlotSettings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+    message<- paste0("PlotSettings option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
-
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- MetaProViz:::SavePath(FolderName= "VolcanoPlots",
+    Folder <- SavePath(FolderName= "VolcanoPlots",
                                     FolderPath=FolderPath)
   }
 
@@ -188,21 +202,21 @@ VizVolcano <- function(PlotSettings="Standard",
 
     if(PlotSettings=="PEA"){
       VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x=SettingsInfo[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
-        remove_rownames()%>%
-        mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])%>%
-        filter(!is.na(x) | !is.na(x))
+        tibble::remove_rownames()%>%
+        dplyr::mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])%>%
+        dplyr::filter(!is.na(x) | !is.na(x))
     }else{
      VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by=0, all.y=TRUE)%>%
-      remove_rownames()%>%
-      column_to_rownames("Row.names")%>%
-      mutate(FeatureNames = rownames(InputData))%>%
-      filter(!is.na(x) | !is.na(x))
+       tibble::remove_rownames()%>%
+       tibble::column_to_rownames("Row.names")%>%
+       dplyr::mutate(FeatureNames = rownames(InputData))%>%
+       dplyr::filter(!is.na(x) | !is.na(x))
     }
 
    }else{
      VolcanoData <- InputData[, c(x, y)]%>%
-       mutate(FeatureNames = rownames(InputData))%>%
-       filter(!is.na(x) | !is.na(x))
+       dplyr::mutate(FeatureNames = rownames(InputData))%>%
+       dplyr::filter(!is.na(x) | !is.na(x))
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -222,7 +236,7 @@ VizVolcano <- function(PlotSettings="Standard",
   ##--- Prepare colour and shape palette
   if(is.null(ColorPalette)){
     if("color" %in% names(SettingsInfo)==TRUE){
-      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange")
+      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
     }else{
       safe_colorblind_palette <- c("#888888", "#44AA99", "#44AA99","#CC6677")
     }
@@ -245,7 +259,7 @@ VizVolcano <- function(PlotSettings="Standard",
   ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
   if(PlotSettings=="Standard"){#####--- 1. Standard
-    VolcanoRes <- MetaProViz:::VizVolcano_Standard(InputData= VolcanoData,
+    VolcanoRes <- VizVolcano_Standard(InputData= VolcanoData,
                                                    SettingsFile_Metab=SettingsFile_Metab,
                                                    SettingsInfo=SettingsInfo,
                                                    y= y,
@@ -267,7 +281,7 @@ VizVolcano <- function(PlotSettings="Standard",
                                                    Folder=Folder)
 
   }else if(PlotSettings=="Compare"){#####--- 2. Compare
-    VolcanoRes <- MetaProViz:::VizVolcano_Compare(InputData= VolcanoData,
+    VolcanoRes <- VizVolcano_Compare(InputData= VolcanoData,
                                                   InputData2=InputData2,
                                                   SettingsFile_Metab=SettingsFile_Metab,
                                                   SettingsInfo=SettingsInfo,
@@ -291,7 +305,7 @@ VizVolcano <- function(PlotSettings="Standard",
                                                   Folder=Folder)
 
   } else if(PlotSettings=="PEA"){#####--- 3. PEA
-    VolcanoRes <- MetaProViz:::VizVolcano_PEA(InputData= VolcanoData,
+    VolcanoRes <- VizVolcano_PEA(InputData= VolcanoData,
                                               InputData2=InputData2,
                                               SettingsFile_Metab=SettingsFile_Metab,#Problem: we need to know the column name of the features!
                                               SettingsInfo=SettingsInfo,
@@ -320,35 +334,40 @@ VizVolcano <- function(PlotSettings="Standard",
 ### ### ### VizVolcano helper function: Internal Function for PlotSettings Standard ### ### ###
 ################################################################################################
 
-#' Check input parameters
+#' VizVolcano_Standard
 #'
-#' @param InputData Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsInfo Passed to main function MetaProViz::VizVolcano()
-#' @param y \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "Log2FC"}
-#' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
-#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param ColorPalette Created in MetaProViz::VizVolcano() based on ColorPalette passed to main function MetaProViz::VizVolcano()
-#' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
+#' @param InputData Passed to main function VizVolcano()
+#' @param SettingsFile_Metab Passed to main function VizVolcano()
+#' @param SettingsInfo Passed to main function VizVolcano()
+#' @param y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "Log2FC"}
+#' @param PlotName \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
+#' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
+#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param ycutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param ColorPalette Created in VizVolcano() based on ColorPalette passed to main function VizVolcano()
+#' @param ShapePalette Created in VizVolcano() based on ShapePalette passed to main function VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
-#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
-#' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
+#' @param SaveAs_Plot Passed to main function VizVolcano()
+#' @param PrintPlot Passed to main function VizVolcano()
+#' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
-
+#' @return List with two elements: Plot and Plot_Sized
+#'
 #' @keywords Standard volcano plots
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#'
 #' @noRd
 #'
-#'
-
 VizVolcano_Standard <- function(InputData,
                                 SettingsFile_Metab,
                                 SettingsInfo,
@@ -465,20 +484,22 @@ VizVolcano_Standard <- function(InputData,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotTitle, Subtitle = Subtitle)
-        Plot <-Plot_Sized[[3]]
-        Plot <- ggplot2::ggplot() +
-          annotation_custom(Plot)
-        Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+        Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized %<>%
+          {ggplot2::ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        PlotList_adaptedGrid[[cleaned_i]] <- Plot
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
-        SaveList[[cleaned_i]] <- Plot
+        SaveList[[cleaned_i]] <- Plot_Sized
+
         #----- Save
         suppressMessages(suppressWarnings(
-          MetaProViz:::SaveRes(InputList_DF=NULL,
+          SaveRes(InputList_DF=NULL,
                                InputList_Plot= SaveList,
                                SaveAs_Table=NULL,
                                SaveAs_Plot=SaveAs_Plot,
@@ -486,8 +507,8 @@ VizVolcano_Standard <- function(InputData,
                                FileName= paste("Volcano_",PlotName, sep=""),
                                CoRe=FALSE,
                                PrintPlot=PrintPlot,
-                               PlotHeight=Plot_Sized[[1]],
-                               PlotWidth=Plot_Sized[[2]],
+                               PlotHeight= PlotHeight,
+                               PlotWidth=PlotWidth,
                                PlotUnit="cm")))
       }
     }
@@ -575,16 +596,18 @@ VizVolcano_Standard <- function(InputData,
       PlotList[["Plot"]] <- Plot
 
       #Set the total heights and widths
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotName, Subtitle = Subtitle)
-      Plot <-Plot_Sized[[3]]
-      Plot <- ggplot2::ggplot() +
-        annotation_custom(Plot)
-      Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
-      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot
+      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
+      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      Plot_Sized %<>%
+        {ggplot2::ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
+
+      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
       #----- Save
       suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -592,8 +615,8 @@ VizVolcano_Standard <- function(InputData,
                              FileName= paste("Volcano_", PlotName, sep=""),
                              CoRe=FALSE,
                              PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
+                             PlotHeight=PlotHeight,
+                             PlotWidth=PlotWidth,
                              PlotUnit="cm")))
     }
   }
@@ -609,35 +632,41 @@ VizVolcano_Standard <- function(InputData,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::VizVolcano()
-#' @param InputData2 Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsInfo Passed to main function MetaProViz::VizVolcano()
-#' @param y \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "Log2FC"}
-#' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
-#' @param ycutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param ColorPalette Created in MetaProViz::VizVolcano() based on ColorPalette passed to main function MetaProViz::VizVolcano()
-#' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
+#' @param InputData Passed to main function VizVolcano()
+#' @param InputData2 Passed to main function VizVolcano()
+#' @param SettingsFile_Metab Passed to main function VizVolcano()
+#' @param SettingsInfo Passed to main function VizVolcano()
+#' @param y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "Log2FC"}
+#' @param PlotName \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
+#' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
+#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param ycutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param ColorPalette Created in VizVolcano() based on ColorPalette passed to main function VizVolcano()
+#' @param ShapePalette Created in VizVolcano() based on ShapePalette passed to main function VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param ComparisonName Passed to main function MetaProViz::VizVolcano()
-#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
-#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
-#' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
+#' @param ComparisonName Passed to main function VizVolcano()
+#' @param SaveAs_Plot Passed to main function VizVolcano()
+#' @param PrintPlot Passed to main function VizVolcano()
+#' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
 #'
+#' @return List with two elements: Plot and Plot_Sized
 #'
 #' @keywords Compare volcano plots
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
 VizVolcano_Compare <- function(InputData,
                                InputData2,
                                SettingsFile_Metab,
@@ -665,12 +694,16 @@ VizVolcano_Compare <- function(InputData,
   ##--- Check InputData
   if(is.data.frame(InputData2)==FALSE){
     if(paste(x) %in% colnames(InputData2)==FALSE | paste(y) %in% colnames(InputData2)==FALSE){
-      stop("Check your InputData2. The column name of x and/or y does not exist in InputData2.")
+      message <- paste("Check your InputData2. The column name of ", x, " and/or ", y, " does not exist in InputData2.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
     }
 
   if(any(duplicated(row.names(InputData2)))==TRUE){
-    stop("Duplicated row.names of InputData2, whilst row.names must be unique")
+    message <- paste("Duplicated row.names of InputData2, whilst row.names must be unique")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
   #Pass colours/shapes
@@ -679,8 +712,8 @@ VizVolcano_Compare <- function(InputData,
 
   ##--- Prepare Input Data
   if(is.null(SettingsFile_Metab)==FALSE){
-  InputData2 <- merge(x=SettingsFile_Metab%>%rownames_to_column("FeatureNames") , y=InputData2[, c(x, y)]%>%rownames_to_column("FeatureNames") , by="FeatureNames", all.y=TRUE)%>%
-    na.omit()
+  InputData2 <- merge(x=SettingsFile_Metab%>%tibble::rownames_to_column("FeatureNames") , y=InputData2[, c(x, y)]%>%tibble::rownames_to_column("FeatureNames") , by="FeatureNames", all.y=TRUE)%>%
+    filter(!is.na(x) | !is.na(x))
   InputData[,"comparison"]  <- as.character(paste(ComparisonName[["InputData"]]))
   InputData2[,"comparison"]  <- as.character(paste(ComparisonName[["InputData2"]]))
   InputCompare  <- rbind(InputData,InputData2)
@@ -807,21 +840,22 @@ VizVolcano_Compare <- function(InputData,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotTitle, Subtitle = Subtitle)
-        Plot <-Plot_Sized[[3]]
-        Plot <- ggplot2::ggplot() +
-          annotation_custom(Plot)
-        Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+        Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized %<>%
+          {ggplot2::ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
-        #save plot and get rid of extra signs before saving
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-        PlotList_adaptedGrid[[cleaned_i]] <- Plot
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
-        SaveList[[cleaned_i]] <- Plot
+        SaveList[[cleaned_i]] <- Plot_Sized
+
         #----- Save
         suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
+        SaveRes(InputList_DF=NULL,
                            InputList_Plot= SaveList,
                            SaveAs_Table=NULL,
                            SaveAs_Plot=SaveAs_Plot,
@@ -829,8 +863,8 @@ VizVolcano_Compare <- function(InputData,
                            FileName= paste("Volcano_",PlotName, sep=""),
                            CoRe=FALSE,
                            PrintPlot=PrintPlot,
-                           PlotHeight=Plot_Sized[[1]],
-                           PlotWidth=Plot_Sized[[2]],
+                           PlotHeight=PlotHeight,
+                           PlotWidth=PlotWidth,
                            PlotUnit="cm")))
       }
     }
@@ -936,17 +970,18 @@ VizVolcano_Compare <- function(InputData,
       ## Store the plot in the 'plots' list
       PlotList[["Plot"]] <- Plot
 
-      #Set the total heights and widths
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotName, Subtitle = Subtitle)
-      Plot <-Plot_Sized[[3]]
-      Plot <- ggplot2::ggplot() +
-        annotation_custom(Plot)
-      Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
-      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot
+      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotName, Subtitle = Subtitle)
+      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      Plot_Sized %<>%
+        {ggplot2::ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
-      #----- Save
+      PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
+
+       #----- Save
       suppressMessages(suppressWarnings(
-      MetaProViz:::SaveRes(InputList_DF=NULL,
+      SaveRes(InputList_DF=NULL,
                              InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -954,8 +989,8 @@ VizVolcano_Compare <- function(InputData,
                              FileName= paste("Volcano_", PlotName, sep=""),
                              CoRe=FALSE,
                              PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
+                             PlotHeight=PlotHeight,
+                             PlotWidth=PlotWidth,
                              PlotUnit="cm")))
 
     }
@@ -971,33 +1006,40 @@ VizVolcano_Compare <- function(InputData,
 
 #' Check input parameters
 #'
-#' @param InputData Passed to main function MetaProViz::VizVolcano()
-#' @param InputData2 Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsFile_Metab Passed to main function MetaProViz::VizVolcano()
-#' @param SettingsInfo Passed to main function MetaProViz::VizVolcano()
-#' @param y \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = "Log2FC"}
-#' @param PlotName \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function MetaProViz::VizVolcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.5}
-#' @param yCutoff \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function MetaProViz::VizVolcano() \strong{Default = ""}
-#' @param ColorPalette Created in MetaProViz::VizVolcano() based on ColorPalette passed to main function MetaProViz::VizVolcano()
-#' @param ShapePalette Created in MetaProViz::VizVolcano() based on ShapePalette passed to main function MetaProViz::VizVolcano()
+#' @param InputData Passed to main function VizVolcano()
+#' @param InputData2 Passed to main function VizVolcano()
+#' @param SettingsFile_Metab Passed to main function VizVolcano()
+#' @param SettingsInfo Passed to main function VizVolcano()
+#' @param y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = "Log2FC"}
+#' @param PlotName \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
+#' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
+#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param yCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param ColorPalette Created in VizVolcano() based on ColorPalette passed to main function VizVolcano()
+#' @param ShapePalette Created in VizVolcano() based on ShapePalette passed to main function VizVolcano()
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param SaveAs_Plot Passed to main function MetaProViz::VizVolcano()
-#' @param PrintPlot Passed to main function MetaProViz::VizVolcano()
-#' @param Folder Created in MetaProViz::VizVolcano(). Path to the folder where files are saved.
+#' @param SaveAs_Plot Passed to main function VizVolcano()
+#' @param PrintPlot Passed to main function VizVolcano()
+#' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
+#'
+#' @return List with two elements: Plot and Plot_Sized
 #'
 #' @keywords Volcano plots of pathway enrichment results
+#'
+#' @importFrom ggplot2 ggplot theme
+#' @importFrom dplyr rename filter mutate
+#' @importFrom magrittr %>% %<>%
+#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom logger log_trace
+#'
 #' @noRd
 #'
-#'
-
 VizVolcano_PEA <- function(InputData,
                            InputData2,
                            SettingsFile_Metab,
@@ -1022,14 +1064,20 @@ VizVolcano_PEA <- function(InputData,
   #####################
   ##--- Check PEA settings
   if(is.vector(SettingsInfo)==FALSE){
-    stop("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo.")
+    message <- paste0("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.null(SettingsFile_Metab)==TRUE){
-    stop("You have chosen Settings=`PEA` that requires you to provide a DF SettingsFile_Metab including the pathways used for the enrichment analysis.")
+    message <- pasteo("You have chosen Settings=`PEA` that requires you to provide a DF SettingsFile_Metab including the pathways used for the enrichment analysis.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if(is.null(SettingsFile_Metab)==FALSE & is.null(SettingsFile_Metab)==FALSE){
     if("PEA_Feature" %in% names(SettingsInfo)==FALSE | "PEA_score" %in% names(SettingsInfo)==FALSE | "PEA_stat" %in% names(SettingsInfo)==FALSE | "PEA_Pathway" %in% names(SettingsInfo)==FALSE){
-      stop("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
+      message <- paste0("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
     }
   }
 
@@ -1151,23 +1199,23 @@ VizVolcano_PEA <- function(InputData,
 
       #Set the total heights and widths
       PlotTitle <- paste(PlotName, ": ", i, sep="")
-      Plot_Sized <-  MetaProViz:::plotGrob_Volcano(Input=Plot, keyvals = keyvals, keyvalsshape = keyvalsshape, PlotName = PlotTitle, Subtitle = Subtitle)
-      Plot <-Plot_Sized[[3]]
+      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, SettingsInfo=SettingsInfo,  PlotName = PlotTitle, Subtitle = Subtitle)
+      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 
-      # First we want to convert the plot back into a ggplot object:
-      Plot <- ggplot2::ggplot() +
-        annotation_custom(Plot)
-      Plot <-Plot + theme(panel.background = element_rect(fill = "transparent"))
+      Plot_Sized %<>%
+        {ggplot2::ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
-      #save plot and get rid of extra signs before saving
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
-      PlotList_adaptedGrid[[cleaned_i]] <- Plot
+      PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
+
       SaveList <- list()
-      SaveList[[cleaned_i]] <- Plot
+      SaveList[[cleaned_i]] <- Plot_Sized
 
       #----- Save
       suppressMessages(suppressWarnings(
-        MetaProViz:::SaveRes(InputList_DF=NULL,
+        SaveRes(InputList_DF=NULL,
                              InputList_Plot= SaveList,
                              SaveAs_Table=NULL,
                              SaveAs_Plot=SaveAs_Plot,
@@ -1175,192 +1223,12 @@ VizVolcano_PEA <- function(InputData,
                              FileName= paste("Volcano_",PlotName, sep=""),
                              CoRe=FALSE,
                              PrintPlot=PrintPlot,
-                             PlotHeight=Plot_Sized[[1]],
-                             PlotWidth=Plot_Sized[[2]],
+                             PlotHeight=PlotHeight,
+                             PlotWidth=PlotWidth,
                              PlotUnit="cm")))
 
     }
   }
 
  return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
-}
-
-
-##############################################################
-### ### ### Volcano helper function: Internal Function ### ### ###
-##############################################################
-
-#' @param Input This is the ggplot object generated within the VizVolcano function.
-#' @param keyvals Generated in VizVolcano
-#' @param keyvalsshape Generated in VizVolcano
-#' @param PlotName Passed to VizVolcano
-#' @param Subtitle
-#'
-#' @keywords Volcano helper function
-#' @noRd
-#'
-
-plotGrob_Volcano <- function(Input, keyvals, keyvalsshape, PlotName, Subtitle){
-  #------- Set the total heights and widths
-  #we need ggplot_grob to edit the gtable of the ggplot object. Using this we can manipulate the gtable arguments directly.
-  plottable<- ggplot2::ggplotGrob(Input) # Convert the plot to a gtable:  gtable::gtable_show_layout(plottable)
-  if(is.null(keyvals)==TRUE & is.null(keyvalsshape)==TRUE){
-    #-----widths
-    plottable$widths[5] <- unit(6, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(10)] <- unit(5,"cm")#controls margins --> Figure legend
-    plottable$widths[c(7,8,9,11)] <- unit(0,"cm")#controls margins --> not needed
-    plot_widths <- 14
-
-    if((PlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      Titles <- c(PlotName, Subtitle)
-      longest_title <- Titles[which.max(nchar(Titles))]
-      character_count <- nchar(longest_title)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11,12)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName=="" & Subtitle==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(1,2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <- 11
-    } else{
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      plot_heights <-11.5
-    }
-  }else if(is.null(keyvals)==FALSE & is.null(keyvalsshape)==FALSE){
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))+(round(as.numeric(Legend$heights[5]),1))
-
-    #-----Plot widths
-    plottable$widths[5] <- unit(6, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 9+Value
-
-    if((PlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      Titles <- c(PlotName, Subtitle)
-      longest_title <- Titles[which.max(nchar(Titles))]
-      character_count <- nchar(longest_title)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName=="" & Subtitle==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    } else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11.5){#If the legend requires more heights than the Plot (excluding title space)
-          Add <- (Legend_heights-11.5)/2
-          plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-          plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-          plot_heights <- Legend_heights
-        }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11.5
-      }
-    }
-  }else if(is.null(keyvals)==FALSE | is.null(keyvalsshape)==FALSE){
-    #------- Legend heights
-    Legend <- ggpubr::get_legend(Input) # Extract legend to adjust separately
-    Legend_heights <- (round(as.numeric(Legend$heights[3]),1))
-
-    #----- Plot widths
-    plottable$widths[5] <- unit(6, "cm")#controls x-axis
-    plottable$widths[c(3)] <- unit(2,"cm")#controls margins --> y-axis label is there
-    plottable$widths[c(1,2,4)] <- unit(0,"cm")#controls margins --> not needed
-    plottable$widths[c(6)] <- unit(1,"cm")#controls margins --> start Figure legend
-    plottable$widths[c(7,8,10,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    Value <- round(as.numeric(plottable$widths[9]),1) #plottable$widths[9] is a <unit/unit_v2> object and we can extract the extract the numeric part
-    plot_widths <- 9+Value
-
-    if((PlotName=="" | Subtitle=="")==FALSE){#Check how much width is needed for the figure title/subtitle
-      Titles <- c(PlotName, Subtitle)
-      longest_title <- Titles[which.max(nchar(Titles))]
-      character_count <- nchar(longest_title)
-      Titles_width <- (character_count*0.25)+0.8
-      if(Titles_width>plot_widths){#If the title needs more space than the plot offers:
-        plottable$widths[11] <- unit(Titles_width-plot_widths,"cm")#controls margins --> start Figure legend
-        plot_widths <- Titles_width
-      }
-    }
-
-    #-----Plot heigths
-    plottable$heights[7] <- unit(8, "cm")#controls x-axis
-    plottable$heights[c(8)] <- unit(1,"cm")#controls margins --> x-axis label
-    plottable$heights[c(10)] <- unit(1.5,"cm")#controls margins --> Figure caption
-    plottable$heights[c(9,11)] <- unit(0,"cm")#controls margins --> not needed
-
-    if(PlotName=="" & Subtitle==""){
-      plottable$heights[c(6)] <- unit(0.5,"cm")#controls margins --> Some space above the plot
-      plottable$heights[c(2,3,4,5)] <- unit(0,"cm")#controls margins --> not needed
-
-      if(Legend_heights>11){#If the legend requires more heights than the Plot
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }else{#If we do have Title and or subtitle
-      plottable$heights[c(3)] <- unit(1,"cm")#controls margins --> PlotName and subtitle
-      plottable$heights[c(2,4,5,6)] <- unit(0,"cm")#controls margins --> not needed
-      if(Legend_heights>11){#If the legend requires more heights than the Plot (excluding title space)
-        Add <- (Legend_heights-11)/2
-        plottable$heights[1] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(Add,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- Legend_heights
-      }else{
-        plottable$heights[1] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the top
-        plottable$heights[12] <- unit(0,"cm")#controls margins --> Can be increased if Figure legend needs more space on the bottom
-        plot_heights <- 11
-      }
-    }
-  }
-  #plot_param <-c(plot_heights=plot_heights, plot_widths=plot_widths)
-  Output<- list(plot_heights, plot_widths, plottable)
 }

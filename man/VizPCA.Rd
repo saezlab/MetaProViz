@@ -2,7 +2,8 @@
 % Please edit documentation in R/VizPCA.R
 \name{VizPCA}
 \alias{VizPCA}
-\title{This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis}
+\title{This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis
+PCA plot visualization}
 \usage{
 VizPCA(
   InputData,
@@ -47,7 +48,16 @@ VizPCA(
 
 \item{Input_data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
 }
+\value{
+List with two elements: Plot and Plot_Sized
+}
 \description{
 This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis
+PCA plot visualization
+}
+\examples{
+Intra <- ToyData("IntraCells_Raw")[,-c(1:3)]
+Res <- VizPCA(Intra)
+
 }
 \keyword{PCA}

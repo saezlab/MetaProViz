@@ -1,0 +1,445 @@
+---
+title: "Metadata Analysis"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+output: 
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+\
+Tissue metabolomics experiment is a standard metabolomics experiment using tissue samples (e.g. from animals or patients).\
+\
+<span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
+
+* To perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+* To do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors based on patients demographics like age, gender and tumour stage.\
+* Find the main metabolite drivers that separate patients based on their demographics like age, gender and tumour stage.\
+\
+First if you have not done yet, install the required dependencies and load the libraries:
+```{r message=FALSE, warning=FALSE}
+# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). 
+# 2. Install the latest development version from GitHub using devtools
+#devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+library(MetaProViz)
+
+#dependencies that need to be loaded:
+library(magrittr)
+library(dplyr)
+library(rlang)
+library(tidyr)
+library(tibble)
+
+#Please install the Biocmanager Dependencies:
+#BiocManager::install("clusterProfiler")
+#BiocManager::install("EnhancedVolcano")
+```
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+# 1. Loading the example data
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+\
+Here we choose an example datasets, which is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs [@Hakimi2016]. Metabolomics was done using The company Metabolon, so this is untargeted metabolomics. Here we use the median normalised data from the supplementary table 2 of the paper. We have combined the metainformation about the patients with the metabolite measurements and removed not identified metabolites. Lastly, we have added a column "Stage" where Stage1 and Stage2 patients are summarised to "EARLY-STAGE" and Stage3 and Stage4 patients to "LATE-STAGE". Moreover, we have added a column "Age", where patients with "AGE AT SURGERY" <42 are defined as "Young" and patients with AGE AT SURGERY >58 as "Old" and the remaining patients as "Middle".\
+
+#<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
+`1.` Tissue experiment **(Intra)** \
+We can load the `ToyData`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
+```{r}
+# Load the example data:
+Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
+
+```
+```{r, echo=FALSE}
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+# Check how our data looks like:
+Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Tissue_Norm` including columns with sample information and metabolite ids with their measured values.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+
+`2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
+```{r}
+Tissue_MetaData <- MetaProViz::ToyData("Tissue_MetaData")
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+Tissue_MetaData[1:5,c(1:2, 7:10)]%>%
+  kableExtra::kbl(caption = "Preview of the DF `Tissue_MetaData` including the trivial metabolite identifiers used in the experiment as well as IDs and pathway information.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  #kableExtra::scroll_box(width = "100%", height = "200px")
+```
+
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+# 2. Run MetaProViz Analysis
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+</div>
+
+
+## Pre-processing
+This has been done by the authors of the paper and we will use the median normalized data. If you want to know how you can use the **MetaProViz** pre-processing module, please check out the vignette:\
+- [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
+- [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
+
+## Metadata analysis
+We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
+\
+Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
+The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
+\
+```{r}
+MetaRes <- MetaProViz::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
+                                     SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)],
+                                     Scaling = TRUE,
+                                     Percentage = 0.1,
+                                     StatCutoff= 0.05,
+                                     SaveAs_Table = "csv",
+                                     SaveAs_Plot = "svg",
+                                     PrintPlot= TRUE,
+                                     FolderPath = NULL)
+
+```
+\
+Ultimately, this is leading to clusters of metabolites that are driving the separation of the different demographics.\
+\
+We generated the general anova output DF:\
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetaRes[["res_aov"]][c(1:2, 1777:1778, 3191:3192), -c(10:11)]%>%
+  kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_aov`]] including the main metabolite drivers that separate patients based on their demographics.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+We generated the summarised results output DF, where each feature (=metabolite) was assigned a main demographics parameter this feature is separating:\
+```{r, echo=FALSE}
+# Check how our data looks like:
+MetaRes[["res_summary"]][c(1:6), ]%>%
+  kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_summary`]] including the metabolite drivers in rows and list the patients demographics they can separate.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+```{r}
+##1. Tissue_Type
+TissueTypeList <- MetaRes[["res_summary"]]%>%
+  filter(MainDriver_Term == "TISSUE_TYPE")%>%
+  filter(`MainDriver_Sum(VarianceExplained)`>30)%>%
+  select(FeatureID)%>%
+  pull()
+
+#select columns Tissue_norm that are in TissueTypeList if they exist
+Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
+
+#Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
+MetaProViz:::VizHeatmap(InputData = Input_Heatmap,
+                       SettingsFile_Sample = Tissue_Norm[,c(1:13)],
+                       SettingsInfo = c(color_Sample = list("TISSUE_TYPE")),
+                       Scale ="column",
+                       PlotName = "MainDrivers")
+```
+
+## DMA
+Here we use Differential Metabolite Analysis (`DMA`) to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value.\
+For more information please see the vignette:\
+- [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
+- [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
+\
+We will perform multiple comparisons based on the different patient demographics available:
+1. Tumour versus Normal: All patients
+2. Tumour versus Normal: Subset of `Early Stage` patients 
+3. Tumour versus Normal: Subset of `Late Stage` patients
+4. Tumour versus Normal: Subset of `Young` patients
+5. Tumour versus Normal: Subset of `Old` patients
+\
+```{r Display_Not_Run, eval=FALSE}
+#Prepare the different selections
+EarlyStage <- Tissue_Norm%>%
+  filter(STAGE== "EARLY-STAGE")
+LateStage <- Tissue_Norm%>%
+  filter(STAGE=="LATE-STAGE")
+Old <- Tissue_Norm%>%
+  filter(AGE=="Old")
+Young <- Tissue_Norm%>%
+  filter(AGE=="Young")
+
+DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+
+#Run DMA
+ResList <- list()
+for(item in names(DFs)){
+  #Get the right DF:
+  InputData <- DFs[[item]]
+  #Perform DMA
+  message(paste("Running DMA for", item))
+  TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
+                   SettingsFile_Sample =  InputData[,c(1:13)],
+                   SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
+                   PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+  #Add Results to list
+  ResList[[item]] <- TvN
+}
+```
+\
+<div class="vscroll-plot">
+```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+#Prepare the different selections
+EarlyStage <- Tissue_Norm%>%
+  filter(STAGE== "EARLY-STAGE")
+LateStage <- Tissue_Norm%>%
+  filter(STAGE=="LATE-STAGE")
+Old <- Tissue_Norm%>%
+  filter(AGE=="Old")
+Young <- Tissue_Norm%>%
+  filter(AGE=="Young")
+
+DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+
+#Run DMA
+ResList <- list()
+for(item in names(DFs)){
+  #Get the right DF:
+  InputData <- DFs[[item]]
+  #Perform DMA
+  message(paste("Running DMA for", item))
+  TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
+                         SettingsFile_Sample =  InputData[,c(1:13)],
+                         SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
+                         SettingsFile_Metab = Tissue_MetaData,
+                         PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+  #Add Results to list
+  ResList[[item]] <- TvN
+}
+```
+</div>
+\
+\
+\
+
+
+We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
+Here we can also use the `MetaproViz::VizVolcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
+```{r}
+#Early versus Late Stage
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["EarlyStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["LateStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="EarlyStage", InputData2= "LateStage"),
+                       PlotName= "EarlyStage-TUMOR_vs_NORMAL compared to LateStage-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA" )
+
+# Young versus Old
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="Young", InputData2= "Old"),
+                       PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA" )
+```
+\
+Here we can observe that Tumour versus Normal has lower significance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
+Lastly, we can also check if the top changed metabolites comparing Tumour versus Normal correlate with the main metabolite drivers that separate patients based on their `TISSUE_TYPE`, which are Tumour or Normal.\
+```{r}
+#Get the top changed metabolites
+top_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>% 
+  arrange(desc(t.val)) %>% 
+  slice(1:25)%>%
+  select(Metabolite)%>%
+  pull()
+bottom_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>% 
+  arrange(desc(t.val)) %>%
+  slice((n()-24):n())%>%
+  select(Metabolite)  %>%
+  pull()
+
+#Check if those overlap with the top demographics drivers
+ggVennDiagram::ggVennDiagram(list(Top = top_entries,
+                                  Bottom = bottom_entries,
+                                  TissueTypeList = TissueTypeList))+
+  scale_fill_gradient(low = "blue", high = "red") 
+
+
+MetaData_Metab <- merge(x=Tissue_MetaData,
+                   y= MetaRes[["res_summary"]][, c(1,5:6) ]%>%tibble::column_to_rownames("FeatureID"),
+                   by=0,
+                   all.y=TRUE)%>%
+  column_to_rownames("Row.names")
+
+#Make a Volcano plot:
+MetaProViz::VizVolcano(PlotSettings="Standard",
+                       InputData=ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       SettingsFile_Metab =  MetaData_Metab,
+                       SettingsInfo = c(color = "MainDriver_Term"),
+                       PlotName= "TISSUE_TYPE-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA" )
+
+```
+
+
+## Biological regulated clustering
+To understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age, 
+we can use the `MetaProViz::MCA_2Cond()` function.\
+Metabolite Clustering Analysis (`MCA`) enables clustering of metabolites into groups based on logical regulatory rules. Here we set two different thresholds, one for the differential metabolite abundance (Log2FC) and one for the significance (e.g. p.adj). This will define if a feature (= metabolite) is assigned into:\
+1. “UP”, which means a metabolite is significantly up-regulated in the underlying comparison.\
+2. “DOWN”, which means a metabolite is significantly down-regulated in the underlying comparison.\
+3. “No Change”, which means a metabolite does not change significantly in the underlying comparison and/or is not defined as up-regulated/down-regulated based on the Log2FC threshold chosen.\
+\
+Thereby “No Change” is further subdivided into four states:\
+1. “Not Detected”, which means a metabolite is not detected in the underlying comparison.\
+2. “Not Significant”, which means a metabolite is not significant in the underlying comparison.\
+3. “Significant positive”, which means a metabolite is significant in the underlying comparison and the differential metabolite abundance is positive, yet does not meet the threshold set for “UP” (e.g. Log2FC >1 = “UP” and we have a significant Log2FC=0.8).\
+4. “Significant negative”, which means a metabolite is significant in the underlying comparison and the differential metabolite abundance is negative, yet does not meet the threshold set for “DOWN”.\
+\
+For more information you can also check out the other vignettes.
+```{r}
+MCAres <-  MetaProViz::MCA_2Cond(InputData_C1=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]],
+                                 InputData_C2=ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]],
+                                 SettingsInfo_C1=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                                 SettingsInfo_C2=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                                 FeatureID = "Metabolite",
+                                 SaveAs_Table = "csv",
+                                 BackgroundMethod="C1&C2"#Most stringend background setting, only includes metabolites detected in both comparisons
+                                 )
+```
+\
+Now we can use this information to colour code our volcano plot:
+```{r, eval=FALSE}
+#Add metabolite information such as KEGG ID or pathway to results
+MetaData_Metab <- merge(x=Tissue_MetaData,
+                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
+                   by=0,
+                   all.y=TRUE)%>%
+  tibble::column_to_rownames("Row.names")
+
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="Young", InputData2= "Old"),
+                       SettingsFile_Metab =  MetaData_Metab,
+                       PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA",
+                       SettingsInfo = c(individual = "SUPER_PATHWAY",
+                                        color = "RG2_Significant"))
+```
+\
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+#Add metabolite information such as KEGG ID or pathway to results
+MetaData_Metab <- merge(x=Tissue_MetaData,
+                   y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
+                   by=0,
+                   all.y=TRUE)%>%
+  tibble::column_to_rownames("Row.names")
+
+MetaProViz::VizVolcano(PlotSettings="Compare",
+                       InputData=ResList[["Young"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= ResList[["Old"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
+                       ComparisonName= c(InputData="Young", InputData2= "Old"),
+                       SettingsFile_Metab =  MetaData_Metab,
+                       PlotName= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       Subtitle= "Results of DMA",
+                       SettingsInfo = c(individual = "SUPER_PATHWAY",
+                                        color = "RG2_Significant"))
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+DM_ORA_res<- list()
+
+LoadKEGG()
+
+comparisons <- names(ResList)
+for(comparison in comparisons){
+  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. 
+  DMA <- merge(Tissue_MetaData%>%tibble::rownames_to_column("Metabolite") ,ResList[[comparison]][["DMA"]][["TUMOR_vs_NORMAL"]], by="Metabolite", all.y=TRUE)
+  DMA <- DMA[,c(1,10,12:17)]
+  DMA <- DMA[complete.cases(DMA),-1]#we remove metabolites that do not have a KEGG ID/KEGG pathway
+ 
+  #remove dublons
+  DMA_Select <- DMA%>%distinct(KEGG, .keep_all = TRUE)%>%remove_rownames()%>%tibble::column_to_rownames("KEGG")
+  
+  #Perform ORA
+  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA_Select, #Input data requirements: column `t.val` and column `Metabolite`
+                                                       SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
+                                                       PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                                       PathwayName="Class",
+                                                       minGSSize=3,
+                                                       maxGSSize=1000,
+                                                       pCutoff=0.01,
+                                                       PercentageCutoff=10)
+  
+  MetaProViz::VizVolcano(PlotSettings="PEA",
+                       InputData= DMA_Select, #Must be the data you have used as an input for the pathway analysis
+                       InputData2=as.data.frame(DM_ORA_res[[comparison]][["ClusterGo"]])%>%dplyr::rename("term"="ID"),
+                       SettingsInfo= c(PEA_Pathway="term",# Needs to be the same in both, SettingsFile_Metab and InputData2.
+                                       PEA_stat="p.adjust",#Column InputData2
+                                       PEA_score="GeneRatio",#Column InputData2
+                                       PEA_Feature="MetaboliteID"),# Column SettingsFile_Metab (needs to be the same as row names in InputData)
+                       SettingsFile_Metab= KEGG_Pathways,#Must be the pathways used for pathway analysis
+                       PlotName= paste("KEGG_", comparison, sep=""),
+                       Subtitle= "PEA" )
+  
+                                                
+                                                 
+}
+```
+
+</div>
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessioninfo::session_info()
+```
+
+# Bibliography

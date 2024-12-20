@@ -2,7 +2,7 @@
 % Please edit documentation in R/DifferentialMetaboliteAnalysis.R
 \name{DMA}
 \alias{DMA}
-\title{This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.}
+\title{This function allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.}
 \usage{
 DMA(
   InputData,
@@ -27,7 +27,7 @@ DMA(
 
 \item{SettingsFile_Sample}{DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.}
 
-\item{SettingsInfo}{\emph{Optional: } Named vector including the information about the conditions column c(Conditions="ColumnName_SettingsFile"). Can additionally pass information on numerator or denominator c(Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile") for specifying which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all). Using =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator and are presented in the right side on the Volcano plot (For CoRe the Log2Distance). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}}
+\item{SettingsInfo}{\emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}}
 
 \item{StatPval}{\emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}}
 
@@ -43,7 +43,7 @@ DMA(
 
 \item{PerformBartlett}{TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}}
 
-\item{Transform}{TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{default: NULL}}
+\item{Transform}{TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}}
 
 \item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
 
@@ -51,10 +51,20 @@ DMA(
 
 \item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+}
+\value{
+Dependent on parameter settings, list of lists will be returned for DMA (DF of each comparison), Shapiro (Includes DF and Plot), Bartlett (Includes DF and Histogram), VST (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
 }
 \description{
-This script allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+This function allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+}
+\examples{
+Intra <- MetaProViz::ToyData("IntraCells_Raw")[-c(49:58) ,]
+ResI <- MetaProViz::DMA(InputData=Intra[ ,-c(1:3)],
+                       SettingsFile_Sample=Intra[ , c(1:3)],
+                       SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+
 }
 \keyword{Analysis,}
 \keyword{Differential}

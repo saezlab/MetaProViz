@@ -4,7 +4,7 @@
 \alias{MCA_2Cond}
 \title{\subsection{---------------------------}{
 
-MCA_2Cond
+This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between conditions.
 }}
 \usage{
 MCA_2Cond(
@@ -31,15 +31,28 @@ MCA_2Cond(
 
 \item{FeatureID}{\emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
+\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{Default = "csv"}}
 
 \item{BackgroundMethod}{\emph{Optional: } Background method C1|C2, C1&C2, C2, C1 or * \strong{Default="C1&C2"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \value{
-MCA an instance of the MetaProViz package
+List of two DFs: 1. Summary of the cluster count and 2. the detailed information of each metabolites in the clusters.
 }
 \description{
-This script allows you to perform metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between two conditions (e.g. KO versus WT in Hypoxia = Cond1 and KO versus WT in Normoxia = Cond2).
+\subsection{---------------------------}{
+
+This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between conditions.
 }
+}
+\examples{
+Intra <- MetaProViz::ToyData("IntraCells_Raw")
+Input <- MetaProViz::DMA(InputData=Intra[-c(49:58) ,-c(1:3)], SettingsFile_Sample=Intra[-c(49:58) , c(1:3)], SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+
+Res <- MetaProViz::MCA_2Cond(InputData_C1 = Input[["DMA"]][["786-O_vs_HK2"]],
+                             InputData_C2 = Input[["DMA"]][["786-M1A_vs_HK2"]])
+
+}
+\keyword{biological}
+\keyword{clustering}

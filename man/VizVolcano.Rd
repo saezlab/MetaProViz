@@ -2,7 +2,8 @@
 % Please edit documentation in R/VizVolcano.R
 \name{VizVolcano}
 \alias{VizVolcano}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis}
+\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+Volcano plot visualization}
 \usage{
 VizVolcano(
   PlotSettings = "Standard",
@@ -77,8 +78,17 @@ VizVolcano(
 
 \item{FeatureID}{{Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}}
 }
+\value{
+List with two elements: Plot and Plot_Sized
+}
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+Volcano plot visualization
+}
+\examples{
+Intra <- ToyData("IntraCells_DMA")
+Res <- VizVolcano(InputData=Intra)
+
 }
 \keyword{Volcano}
 \keyword{pathways}

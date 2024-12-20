@@ -3,10 +3,10 @@ title: "Standard Metabolomics"
 author:
   - name: Christina Schmidt
     affiliation:
-    - Heidelberg Universiy
+    - Heidelberg University
   - name: Dimitrios Prymidis
     affiliation:
-    - Cologne Universiy
+    - Cologne University
 output: 
   html_document:
     self_contained: true
@@ -25,7 +25,7 @@ editor_options:
 
 <style>
 .vscroll-plot {
-    width: 1000px;
+    width: 850px;
     height: 500px;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -59,7 +59,11 @@ First if you have not done yet, install the required dependencies and load the l
 library(MetaProViz)
 
 #dependencies that need to be loaded:
-library(tidyverse)
+library(magrittr)
+library(dplyr)
+library(rlang)
+library(ggfortify)
+library(tibble)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -84,7 +88,7 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 We can load the `ToyData`, which includes columns with Sample information and columns with the measured metabolite integrated peaks.\
 ```{r}
-MetaProViz::ToyData(data="Standard")
+Intra <- MetaProViz::ToyData(Data="IntraCells_Raw")
 ```
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
@@ -97,7 +101,7 @@ Intra[1:5, c(1:4,21,44)]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MetaProViz::ToyData(data="MappingInfo")
+MappingInfo <- MetaProViz::ToyData(Data="Cells_MetaData")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -145,28 +149,28 @@ It is worth mentioning that the Coefficient of variation (CV) is calculated by d
 ```{r, eval=FALSE}
 #### Select Pool samples:
 #Get the Pool data
-PoolData <- MetaProViz::ToyData(data="Standard") %>%
+PoolData <- MetaProViz::ToyData(Data="IntraCells_Raw") %>%
   subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
  
 # Check the metabolite variability
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
                                                      SettingsFile_Sample = NULL,
                                                      SettingsInfo = NULL,
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 ```
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
 #### Select Pool samples:
 #Get the Pool data
-PoolData <- MetaProViz::ToyData(data="Standard") %>%
+PoolData <- MetaProViz::ToyData(Data="IntraCells_Raw") %>%
   subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
 
 # Check the metabolite variability
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
                                                      SettingsFile_Sample = NULL,
                                                      SettingsInfo = NULL,
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 ```
 </div>
 \
@@ -177,7 +181,7 @@ Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = PoolData,
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = Intra[,-c(1:3)],
                                                      SettingsFile_Sample = Intra[,1:3],
                                                      SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 ```
@@ -189,7 +193,7 @@ Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 Pool_Estimation_result<- MetaProViz::PoolEstimation(InputData = Intra[,-c(1:3)],
                                                      SettingsFile_Sample = Intra[,1:3],
                                                      SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"),
-                                                     CutoffCV = 100)
+                                                     CutoffCV = 30)
 
 Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 ```
@@ -360,7 +364,7 @@ for(comparison in comparisons){
   dplyr::rename("Metabolite"="KEGGCompound")#We use the KEGG trivial names to match with the KEGG pathways
   
   #Perform ORA
-  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA%>%remove_rownames()%>%column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
+  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(InputData= DMA%>%remove_rownames()%>%tibble::column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
                                                        SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                                                        PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
                                                        PathwayName="KEGG",
@@ -458,7 +462,7 @@ MappingInfo[1:6,]%>%
 ```
 
 ```{r, include=FALSE, warning=FALSE}
-MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%column_to_rownames("Metabolite"),
+MC_ORA_result <- MetaProViz::ClusterORA(InputData=MCAres[["MCA_2Cond_Results"]]%>%tibble::column_to_rownames("Metabolite"),
                                          SettingsInfo=c(ClusterColumn="RG2_Significant", 
                                                         BackgroundColumn="BG_Method", 
                                                         PathwayTerm= "Pathway", #This is the column name including the pathways names
@@ -495,8 +499,8 @@ MetaData_Sample%>%
 \
 Moreover, we can use MetaData for our features (=Metabolites), which we loaded with the `MappingInfo` and we can also add the information on which cluster a metabolite was assigned to in the `MetaProViz::MCA()` analysis above:\
 ```{r}
-MetaData_Metab <-merge(MappingInfo%>%rownames_to_column("Metabolite"), MCAres[["MCA_2Cond_Results"]][,c(1, 14,15)], by="Metabolite", all.y=TRUE)%>%
-  column_to_rownames("Metabolite")
+MetaData_Metab <-merge(MappingInfo%>%tibble::rownames_to_column("Metabolite"), MCAres[["MCA_2Cond_Results"]][,c(1, 14,15)], by="Metabolite", all.y=TRUE)%>%
+  tibble::column_to_rownames("Metabolite")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -614,6 +618,10 @@ MetaProViz::VizHeatmap(InputData = Input_Heatmap,
                        SettingsFile_Metab =  MetaData_Metab,
                        PlotName = "Pathway")
 ```
+</div>
+\
+\
+\
 
 ### Superplots
 Sometimes one might be interested to create individual plots for each metabolite to understand the differences between specific conditions. For this common plot types are bargraphs, boxplots or violin plots. 
@@ -727,20 +735,20 @@ DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGoSummary"]][1:4,-c(1,7)]%>%
 Here we will first look into the results from the differential analysis (see section `DMA` above) for the comparison of `786-M1A_vs_HK2`:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"))
+MetaProViz::VizVolcano(InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"))
 ```
 \
 If you seek to plot the metabolite names you can change the paramter `SelectLab` from its default (`SelectLab=""`) to NULL and the metabolite names will be plotted randomly. 
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+MetaProViz::VizVolcano(InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        SelectLab = NULL)
 ```
 \
 With the parameter `SelectLab` you can also pass a vector with Metabolite names that should be labeled:
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+MetaProViz::VizVolcano(InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        SelectLab = c("N-acetylaspartylglutamate", "cystathionine", "orotidine"))
 ```
 \
@@ -751,7 +759,7 @@ Next we may be interested to understand which metabolite clusters based on our M
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant"),
                        SettingsFile_Metab= MetaData_Metab,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour coded for metabolic clusters" )
 
@@ -759,7 +767,7 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(shape="RG2_Significant"),
                        SettingsFile= MetaData_Metab,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Shape for metabolic clusters, color for significance." )
 
@@ -767,7 +775,7 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(shape="RG2_Significant", color="RG2_Significant"),
                        SettingsFile= MetaData_Metab,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Shape and color for metabolic clusters." )
 ```
@@ -778,7 +786,7 @@ Given that we also know, which metabolic pathway the metabolites correspond to, 
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="Pathway"),
                        SettingsFile_Metab= MappingInfo,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2 Results of DMA. Colour for metabolic pathways.",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )
 ```
@@ -788,8 +796,8 @@ We immediately see that there are many pathways displayed on the plot, which can
 #Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant", individual="Pathway"),
-                       SettingsFile= MetaData_Metab,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+                       SettingsFile_Metab= MetaData_Metab,
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )
 ```
@@ -799,8 +807,8 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 #Now we can generate a plot for each pathway and color for the metabolite clusters:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        SettingsInfo= c(color="RG2_Significant", individual="Pathway"),
-                       SettingsFile= MetaData_Metab,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+                       SettingsFile_Metab= MetaData_Metab,
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A versus HK2",
                        Subtitle= "Results of DMA. Colour for metabolic pathways." )
 
@@ -813,8 +821,8 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 #### **Comparison**
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Comparison."}
 MetaProViz::VizVolcano(PlotSettings="Compare",
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
-                       InputData2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
                        ComparisonName= c(InputData="786M1A_vs_HK", InputData2= "786-O_vs_HK2"),
                        PlotName= "786M1A vs HK2 compared to 7860 vs HK2",
                        Subtitle= "Results of DMA" )
@@ -825,8 +833,8 @@ Now we do individual plots again:
 MetaProViz::VizVolcano(PlotSettings="Compare",
                        SettingsInfo= c(individual="Pathway"),
                        SettingsFile_Metab= MappingInfo,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
-                       InputData2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A vs HK2 compared to 7860 vs HK2",
                        Subtitle= "Results of DMA" )
 ```
@@ -836,8 +844,8 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
 MetaProViz::VizVolcano(PlotSettings="Compare",
                        SettingsInfo= c(individual="Pathway"),
                        SettingsFile_Metab= MappingInfo,
-                       InputData=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
-                       InputData2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
+                       InputData=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
+                       InputData2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
                        PlotName= "786M1A vs HK2 compared to 7860 vs HK2",
                        Subtitle= "Results of DMA" )
 
@@ -854,7 +862,7 @@ For this we need to prepare the correct input data including the pathways used t
 #1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab. 
 InputPEA <- DMA_786M1A_vs_HK2 %>%
   filter(!is.na(KEGGCompound)) %>%
-  column_to_rownames("KEGGCompound")
+  tibble::column_to_rownames("KEGGCompound")
 
 #2. InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name
 InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
@@ -897,6 +905,7 @@ MetaProViz::VizVolcano(PlotSettings="PEA",
 </div>
 \
 \
+
 <div class="progress progress-striped active">
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>

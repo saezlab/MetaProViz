@@ -2,7 +2,7 @@
 % Please edit documentation in R/OverRepresentationAnalysis.R
 \name{StandardORA}
 \alias{StandardORA}
-\title{StandardORA}
+\title{Uses enricher to run ORA on the differential metabolites (DM) using a pathway list}
 \usage{
 StandardORA(
   InputData,
