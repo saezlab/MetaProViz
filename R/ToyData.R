@@ -65,7 +65,8 @@ ToyData <- function(Dataset) {
     Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv",
     Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv",
     Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv",
-    Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv"
+    Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv",
+    AlaninePathways = "AlaninePathways.csv"
   )
 
   rncols <- c("Code", "Metabolite")
