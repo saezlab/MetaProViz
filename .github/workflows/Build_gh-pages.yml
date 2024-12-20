@@ -24,11 +24,10 @@ jobs:
         run: |
           Rscript -e 'install.packages("remotes")'
           Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
+          Rscript -e 'install.packages("pkgdown")'
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
+      - name: Install MetaProViz from git by remotes
+        run: Rscript -e 'remotes::install_github("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
