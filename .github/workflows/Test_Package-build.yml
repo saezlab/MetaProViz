@@ -41,7 +41,9 @@ jobs:
           use-public-rspm: true
 
       - name: Install remotes
-        run: Rscript -e 'install.packages("remotes")'
+        run: |
+          Rscript -e 'install.packages("remotes")'
+          Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
       - name: Install MetaProViz from git by pak
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
