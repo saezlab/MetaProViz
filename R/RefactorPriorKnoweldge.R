@@ -449,7 +449,7 @@ CleanMapping <- function(InputData,
   if(is.null(SaveAs_Table)==FALSE ){
     Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
-
+  }
 
 }
 
