@@ -1,0 +1,283 @@
+term,many_to_many,one_to_many,one_to_none,one_to_one,total,to_many,to_none,to_one,to_total,from_many,from_one,from_total,many_to_one,scope
+Glycolysis / Gluconeogenesis - Homo sapiens (human),6,48,4,7,65,20,4,7,31,3,56,59,0,group
+Citrate cycle (TCA cycle) - Homo sapiens (human),0,37,1,5,43,14,1,5,20,0,43,43,0,group
+Pentose phosphate pathway - Homo sapiens (human),26,52,8,3,89,26,8,3,37,13,56,69,0,group
+Pentose and glucuronate interconversions - Homo sapiens (human),0,57,23,14,94,22,23,14,59,0,72,72,0,group
+Fructose and mannose metabolism - Homo sapiens (human),4,38,27,10,79,18,27,10,55,2,49,51,0,group
+Galactose metabolism - Homo sapiens (human),10,36,16,13,75,17,16,13,46,5,50,55,0,group
+Ascorbate and aldarate metabolism - Homo sapiens (human),6,44,25,10,85,22,25,10,57,3,55,58,0,group
+Starch and sucrose metabolism - Homo sapiens (human),0,33,18,7,58,12,18,7,37,0,41,41,0,group
+Amino sugar and nucleotide sugar metabolism - Homo sapiens (human),34,46,70,17,167,32,70,17,119,17,64,81,0,group
+Pyruvate metabolism - Homo sapiens (human),8,42,2,10,62,20,2,10,32,4,53,57,0,group
+Glyoxylate and dicarboxylate metabolism - Homo sapiens (human),10,75,13,10,108,37,13,10,60,5,86,91,0,group
+Propanoate metabolism - Homo sapiens (human),6,43,6,16,71,20,6,16,42,3,60,63,0,group
+Butanoate metabolism - Homo sapiens (human),6,38,13,15,72,19,13,15,47,3,54,57,0,group
+Inositol phosphate metabolism - Homo sapiens (human),4,30,20,12,66,15,20,12,47,2,43,45,0,group
+Oxidative phosphorylation - Homo sapiens (human),0,14,1,2,17,5,1,2,8,0,17,17,0,group
+Nitrogen metabolism - Homo sapiens (human),0,12,2,5,19,6,2,5,13,0,18,18,0,group
+Sulfur metabolism - Homo sapiens (human),0,38,10,7,55,17,10,7,34,0,46,46,0,group
+Fatty acid biosynthesis - Homo sapiens (human),0,19,24,25,68,9,24,25,58,0,45,45,0,group
+Fatty acid elongation - Homo sapiens (human),4,4,10,25,43,4,10,25,39,2,30,32,0,group
+Fatty acid degradation - Homo sapiens (human),10,10,9,31,60,9,9,31,49,5,42,47,0,group
+Steroid biosynthesis - Homo sapiens (human),0,30,14,35,79,8,14,35,57,0,66,66,0,group
+Primary bile acid biosynthesis - Homo sapiens (human),12,31,4,25,72,18,4,25,47,6,57,63,0,group
+Steroid hormone biosynthesis - Homo sapiens (human),0,50,6,71,127,24,6,71,101,0,122,122,0,group
+Glycerolipid metabolism - Homo sapiens (human),0,104,19,8,131,10,19,8,37,0,113,113,0,group
+Glycerophospholipid metabolism - Homo sapiens (human),0,172,24,14,210,18,24,14,56,0,187,187,0,group
+Ether lipid metabolism - Homo sapiens (human),0,2,17,7,26,1,17,7,25,0,10,10,0,group
+Sphingolipid metabolism - Homo sapiens (human),38,62,13,2,115,20,13,2,35,19,65,84,0,group
+Arachidonic acid metabolism - Homo sapiens (human),14,218,0,15,247,64,0,15,79,7,233,240,0,group
+Linoleic acid metabolism - Homo sapiens (human),0,124,5,5,134,19,5,5,29,0,130,130,0,group
+alpha-Linolenic acid metabolism - Homo sapiens (human),0,109,16,12,137,16,16,12,44,0,122,122,0,group
+Biosynthesis of unsaturated fatty acids - Homo sapiens (human),0,42,38,15,95,21,38,15,74,0,58,58,0,group
+Purine metabolism - Homo sapiens (human),0,98,20,33,151,45,20,33,98,0,132,132,0,group
+Pyrimidine metabolism - Homo sapiens (human),0,71,13,18,102,35,13,18,66,0,90,90,0,group
+"Alanine, aspartate and glutamate metabolism - Homo sapiens (human)",0,56,2,0,58,25,2,0,27,0,57,57,0,group
+"Glycine, serine and threonine metabolism - Homo sapiens (human)",0,87,6,3,96,37,6,3,46,0,91,91,0,group
+Cysteine and methionine metabolism - Homo sapiens (human),6,98,16,5,125,47,16,5,68,3,104,107,0,group
+"Valine, leucine and isoleucine degradation - Homo sapiens (human)",6,38,6,16,66,20,6,16,42,3,55,58,0,group
+"Valine, leucine and isoleucine biosynthesis - Homo sapiens (human)",0,41,2,1,44,20,2,1,23,0,43,43,0,group
+Lysine degradation - Homo sapiens (human),0,75,12,10,97,34,12,10,56,0,86,86,0,group
+Arginine biosynthesis - Homo sapiens (human),0,36,4,1,41,16,4,1,21,0,38,38,0,group
+Arginine and proline metabolism - Homo sapiens (human),0,103,17,4,124,49,17,4,70,0,108,108,0,group
+Histidine metabolism - Homo sapiens (human),0,50,10,13,73,24,10,13,47,0,64,64,0,group
+Tyrosine metabolism - Homo sapiens (human),8,76,19,21,124,38,19,21,78,4,98,102,0,group
+Phenylalanine metabolism - Homo sapiens (human),0,44,15,13,72,21,15,13,49,0,58,58,0,group
+Tryptophan metabolism - Homo sapiens (human),0,58,23,32,113,28,23,32,83,0,91,91,0,group
+"Phenylalanine, tyrosine and tryptophan biosynthesis - Homo sapiens (human)",0,47,11,1,59,23,11,1,35,0,49,49,0,group
+beta-Alanine metabolism - Homo sapiens (human),0,47,1,9,57,22,1,9,32,0,57,57,0,group
+Taurine and hypotaurine metabolism - Homo sapiens (human),0,39,3,3,45,18,3,3,24,0,43,43,0,group
+Phosphonate and phosphinate metabolism - Homo sapiens (human),0,33,40,5,78,12,40,5,57,0,39,39,0,group
+Selenocompound metabolism - Homo sapiens (human),0,18,10,8,36,9,10,8,27,0,27,27,0,group
+D-Amino acid metabolism - Homo sapiens (human),0,97,21,3,121,45,21,3,69,0,101,101,0,group
+Glutathione metabolism - Homo sapiens (human),0,34,11,10,55,16,11,10,37,0,45,45,0,group
+N-Glycan biosynthesis - Homo sapiens (human),0,4,31,5,40,2,31,5,38,0,10,10,0,group
+Various types of N-glycan biosynthesis - Homo sapiens (human),0,0,31,0,31,0,31,0,31,0,1,1,0,group
+Mucin type O-glycan biosynthesis - Homo sapiens (human),0,0,17,0,17,0,17,0,17,0,1,1,0,group
+Mannose type O-glycan biosynthesis - Homo sapiens (human),0,2,26,0,28,1,26,0,27,0,3,3,0,group
+Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate - Homo sapiens (human),0,4,9,1,14,2,9,1,12,0,6,6,0,group
+Glycosaminoglycan biosynthesis - heparan sulfate / heparin - Homo sapiens (human),0,6,8,0,14,3,8,0,11,0,7,7,0,group
+Glycosaminoglycan degradation - Homo sapiens (human),0,2,24,2,28,1,24,2,27,0,5,5,0,group
+Glycosylphosphatidylinositol (GPI)-anchor biosynthesis - Homo sapiens (human),0,26,40,2,68,3,40,2,45,0,29,29,0,group
+Glycosphingolipid biosynthesis - lacto and neolacto series - Homo sapiens (human),0,0,57,0,57,0,57,0,57,0,1,1,0,group
+Glycosphingolipid biosynthesis - globo and isoglobo series - Homo sapiens (human),0,0,25,0,25,0,25,0,25,0,1,1,0,group
+Glycosphingolipid biosynthesis - ganglio series - Homo sapiens (human),0,0,31,0,31,0,31,0,31,0,1,1,0,group
+Thiamine metabolism - Homo sapiens (human),0,30,14,4,48,13,14,4,31,0,35,35,0,group
+Riboflavin metabolism - Homo sapiens (human),0,25,4,12,41,8,4,12,24,0,38,38,0,group
+Vitamin B6 metabolism - Homo sapiens (human),0,38,9,6,53,14,9,6,29,0,45,45,0,group
+Nicotinate and nicotinamide metabolism - Homo sapiens (human),0,54,21,9,84,25,21,9,55,0,64,64,0,group
+Pantothenate and CoA biosynthesis - Homo sapiens (human),0,41,5,6,52,19,5,6,30,0,48,48,0,group
+Biotin metabolism - Homo sapiens (human),0,12,18,5,35,6,18,5,29,0,18,18,0,group
+Lipoic acid metabolism - Homo sapiens (human),0,35,11,16,62,15,11,16,42,0,52,52,0,group
+Folate biosynthesis - Homo sapiens (human),0,38,26,14,78,18,26,14,58,0,53,53,0,group
+One carbon pool by folate - Homo sapiens (human),8,45,0,5,58,21,0,5,26,4,50,54,0,group
+Retinol metabolism - Homo sapiens (human),4,22,6,7,39,12,6,7,25,2,30,32,0,group
+Porphyrin metabolism - Homo sapiens (human),0,28,108,26,162,12,108,26,146,0,55,55,0,group
+Ubiquinone and other terpenoid-quinone biosynthesis - Homo sapiens (human),10,33,40,11,94,20,40,11,71,5,45,50,0,group
+Terpenoid backbone biosynthesis - Homo sapiens (human),0,46,14,10,72,20,14,12,46,1,57,58,2,group
+Caffeine metabolism - Homo sapiens (human),0,4,3,17,24,2,3,17,22,0,22,22,0,group
+"Neomycin, kanamycin and gentamicin biosynthesis - Homo sapiens (human)",0,21,72,2,95,7,72,2,81,0,24,24,0,group
+Metabolism of xenobiotics by cytochrome P450 - Homo sapiens (human),0,10,30,86,126,5,30,86,121,0,97,97,0,group
+Drug metabolism - cytochrome P450 - Homo sapiens (human),0,10,28,67,105,5,28,67,100,0,78,78,0,group
+Drug metabolism - other enzymes - Homo sapiens (human),0,9,28,31,68,4,28,31,63,0,41,41,0,group
+Aminoacyl-tRNA biosynthesis - Homo sapiens (human),0,51,29,0,80,23,29,0,52,0,52,52,0,group
+Protein processing in endoplasmic reticulum - Homo sapiens (human),0,0,5,0,5,0,5,0,5,0,1,1,0,group
+Sulfur relay system - Homo sapiens (human),0,9,4,3,16,4,4,3,11,0,13,13,0,group
+Virion - Human immunodeficiency virus - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Virion - Flavivirus and Alphavirus - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Virion - Hepatitis viruses - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+ABC transporters - Homo sapiens (human),0,99,46,40,185,44,46,40,130,0,140,140,0,group
+MAPK signaling pathway - Homo sapiens (human),0,25,0,0,25,4,0,0,4,0,25,25,0,group
+ErbB signaling pathway - Homo sapiens (human),0,21,0,1,22,2,0,1,3,0,22,22,0,group
+Ras signaling pathway - Homo sapiens (human),0,25,0,2,27,4,0,2,6,0,27,27,0,group
+Rap1 signaling pathway - Homo sapiens (human),0,23,0,1,24,3,0,1,4,0,24,24,0,group
+Notch signaling pathway - Homo sapiens (human),0,0,1,0,1,0,1,0,1,0,1,1,0,group
+Hedgehog signaling pathway - Homo sapiens (human),0,2,0,0,2,1,0,0,1,0,2,2,0,group
+VEGF signaling pathway - Homo sapiens (human),0,23,0,1,24,3,0,1,4,0,24,24,0,group
+Apelin signaling pathway - Homo sapiens (human),0,25,0,1,26,4,0,1,5,0,26,26,0,group
+NF-kappa B signaling pathway - Homo sapiens (human),0,21,0,0,21,2,0,0,2,0,21,21,0,group
+HIF-1 signaling pathway - Homo sapiens (human),0,32,1,2,35,7,1,2,10,0,35,35,0,group
+FoxO signaling pathway - Homo sapiens (human),0,9,0,1,10,4,0,1,5,0,10,10,0,group
+Calcium signaling pathway - Homo sapiens (human),0,25,3,2,30,4,3,2,9,0,28,28,0,group
+Phosphatidylinositol signaling system - Homo sapiens (human),4,32,8,7,51,13,8,7,28,2,40,42,0,group
+Phospholipase D signaling pathway - Homo sapiens (human),0,41,0,3,44,7,0,3,10,0,44,44,0,group
+Sphingolipid signaling pathway - Homo sapiens (human),0,64,0,4,68,10,0,4,14,0,68,68,0,group
+cAMP signaling pathway - Homo sapiens (human),0,61,2,2,65,15,2,2,19,0,64,64,0,group
+cGMP-PKG signaling pathway - Homo sapiens (human),0,10,0,1,11,5,0,1,6,0,11,11,0,group
+PI3K-Akt signaling pathway - Homo sapiens (human),0,2,0,2,4,1,0,2,3,0,4,4,0,group
+AMPK signaling pathway - Homo sapiens (human),0,26,2,7,35,11,2,7,20,0,34,34,0,group
+mTOR signaling pathway - Homo sapiens (human),0,6,0,1,7,3,0,1,4,0,7,7,0,group
+Neuroactive ligand-receptor interaction - Homo sapiens (human),0,74,5,14,93,34,5,14,53,0,89,89,0,group
+ECM-receptor interaction - Homo sapiens (human),0,0,1,0,1,0,1,0,1,0,1,1,0,group
+Endocytosis - Homo sapiens (human),0,2,2,3,7,1,2,3,6,0,6,6,0,group
+Phagosome - Homo sapiens (human),0,0,1,0,1,0,1,0,1,0,1,1,0,group
+Lysosome - Homo sapiens (human),0,5,1,1,7,2,1,1,4,0,7,7,0,group
+Autophagy - animal - Homo sapiens (human),0,24,2,2,28,2,2,2,6,0,27,27,0,group
+Autophagy - other - Homo sapiens (human),0,22,2,0,24,1,2,0,3,0,23,23,0,group
+Mitophagy - animal - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Efferocytosis - Homo sapiens (human),0,80,0,2,82,18,0,2,20,0,82,82,0,group
+Oocyte meiosis - Homo sapiens (human),0,4,0,1,5,2,0,1,3,0,5,5,0,group
+Apoptosis - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Ferroptosis - Homo sapiens (human),0,28,10,5,43,12,10,5,27,0,34,34,0,group
+Necroptosis - Homo sapiens (human),0,34,0,2,36,4,0,2,6,0,36,36,0,group
+Cellular senescence - Homo sapiens (human),0,0,0,2,2,0,0,2,2,0,2,2,0,group
+Focal adhesion - Homo sapiens (human),0,0,0,2,2,0,0,2,2,0,2,2,0,group
+Gap junction - Homo sapiens (human),0,34,0,1,35,8,0,1,9,0,35,35,0,group
+Regulation of actin cytoskeleton - Homo sapiens (human),0,0,1,4,5,0,1,4,5,0,5,5,0,group
+Complement and coagulation cascades - Homo sapiens (human),0,0,29,2,31,0,29,2,31,0,3,3,0,group
+Platelet activation - Homo sapiens (human),0,37,0,2,39,10,0,2,12,0,39,39,0,group
+Neutrophil extracellular trap formation - Homo sapiens (human),0,27,2,3,32,5,2,3,10,0,31,31,0,group
+NOD-like receptor signaling pathway - Homo sapiens (human),0,6,0,1,7,2,0,1,3,0,7,7,0,group
+RIG-I-like receptor signaling pathway - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Cytosolic DNA-sensing pathway - Homo sapiens (human),0,0,1,1,2,0,1,1,2,0,2,2,0,group
+C-type lectin receptor signaling pathway - Homo sapiens (human),0,25,5,0,30,4,5,0,9,0,26,26,0,group
+Natural killer cell mediated cytotoxicity - Homo sapiens (human),0,21,0,1,22,2,0,1,3,0,22,22,0,group
+T cell receptor signaling pathway - Homo sapiens (human),0,21,0,1,22,2,0,1,3,0,22,22,0,group
+Th1 and Th2 cell differentiation - Homo sapiens (human),0,21,0,0,21,2,0,0,2,0,21,21,0,group
+Th17 cell differentiation - Homo sapiens (human),0,24,0,0,24,3,0,0,3,0,24,24,0,group
+B cell receptor signaling pathway - Homo sapiens (human),0,21,0,1,22,2,0,1,3,0,22,22,0,group
+Fc epsilon RI signaling pathway - Homo sapiens (human),0,34,0,2,36,8,0,2,10,0,36,36,0,group
+Fc gamma R-mediated phagocytosis - Homo sapiens (human),0,37,0,2,39,5,0,2,7,0,39,39,0,group
+Leukocyte transendothelial migration - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Intestinal immune network for IgA production - Homo sapiens (human),0,5,0,0,5,2,0,0,2,0,5,5,0,group
+Chemokine signaling pathway - Homo sapiens (human),0,23,0,1,24,3,0,1,4,0,24,24,0,group
+Insulin secretion - Homo sapiens (human),0,32,0,2,34,6,0,2,8,0,34,34,0,group
+Insulin signaling pathway - Homo sapiens (human),0,5,0,2,7,2,0,2,4,0,7,7,0,group
+Glucagon signaling pathway - Homo sapiens (human),0,53,1,4,58,20,1,4,25,0,58,58,0,group
+Regulation of lipolysis in adipocytes - Homo sapiens (human),0,105,0,3,108,10,0,3,13,0,108,108,0,group
+Adipocytokine signaling pathway - Homo sapiens (human),0,32,1,2,35,3,1,2,6,0,35,35,0,group
+PPAR signaling pathway - Homo sapiens (human),0,21,0,0,21,5,0,0,5,0,21,21,0,group
+GnRH secretion - Homo sapiens (human),0,26,0,2,28,4,0,2,6,0,28,28,0,group
+GnRH signaling pathway - Homo sapiens (human),0,37,0,0,37,5,0,0,5,0,37,37,0,group
+Ovarian steroidogenesis - Homo sapiens (human),0,43,0,13,56,11,0,13,24,0,56,56,0,group
+Estrogen signaling pathway - Homo sapiens (human),0,26,0,1,27,4,0,1,5,0,27,27,0,group
+Progesterone-mediated oocyte maturation - Homo sapiens (human),0,2,1,2,5,1,1,2,4,0,5,5,0,group
+Prolactin signaling pathway - Homo sapiens (human),0,14,0,6,20,5,0,6,11,0,20,20,0,group
+Oxytocin signaling pathway - Homo sapiens (human),0,33,1,0,34,8,1,0,9,0,34,34,0,group
+Relaxin signaling pathway - Homo sapiens (human),0,23,0,1,24,3,0,1,4,0,24,24,0,group
+"Growth hormone synthesis, secretion and action - Homo sapiens (human)",0,23,0,0,23,3,0,0,3,0,23,23,0,group
+Thyroid hormone synthesis - Homo sapiens (human),0,54,0,2,56,13,0,2,15,0,56,56,0,group
+Thyroid hormone signaling pathway - Homo sapiens (human),0,25,1,2,28,4,1,2,7,0,28,28,0,group
+"Parathyroid hormone synthesis, secretion and action - Homo sapiens (human)",0,29,1,2,32,5,1,2,8,0,32,32,0,group
+Melanogenesis - Homo sapiens (human),0,25,0,1,26,4,0,1,5,0,26,26,0,group
+Renin secretion - Homo sapiens (human),0,16,0,4,20,8,0,4,12,0,20,20,0,group
+Renin-angiotensin system - Homo sapiens (human),0,2,5,5,12,1,5,5,11,0,8,8,0,group
+Aldosterone synthesis and secretion - Homo sapiens (human),0,42,0,9,51,10,0,9,19,0,51,51,0,group
+Cortisol synthesis and secretion - Homo sapiens (human),0,8,0,6,14,4,0,6,10,0,14,14,0,group
+Adrenergic signaling in cardiomyocytes - Homo sapiens (human),0,27,0,1,28,5,0,1,6,0,28,28,0,group
+Vascular smooth muscle contraction - Homo sapiens (human),0,46,0,1,47,12,0,1,13,0,47,47,0,group
+Salivary secretion - Homo sapiens (human),0,30,1,1,32,6,1,1,8,0,32,32,0,group
+Gastric acid secretion - Homo sapiens (human),0,28,0,1,29,5,0,1,6,0,29,29,0,group
+Pancreatic secretion - Homo sapiens (human),0,26,2,1,29,4,2,1,7,0,28,28,0,group
+Bile secretion - Homo sapiens (human),0,119,89,31,239,47,89,31,167,0,151,151,0,group
+Carbohydrate digestion and absorption - Homo sapiens (human),0,34,9,6,49,7,9,6,22,0,41,41,0,group
+Protein digestion and absorption - Homo sapiens (human),0,71,3,3,77,34,3,3,40,0,75,75,0,group
+Fat digestion and absorption - Homo sapiens (human),0,120,2,4,126,6,2,4,12,0,125,125,0,group
+Cholesterol metabolism - Homo sapiens (human),0,98,0,1,99,8,0,1,9,0,99,99,0,group
+Vitamin digestion and absorption - Homo sapiens (human),0,119,7,15,141,17,7,15,39,0,135,135,0,group
+Folate transport and metabolism - Homo sapiens (human),8,109,0,3,120,16,0,3,19,4,112,116,0,group
+Cobalamin transport and metabolism - Homo sapiens (human),0,14,5,4,23,5,5,4,14,0,19,19,0,group
+Mineral absorption - Homo sapiens (human),0,38,1,1,40,16,1,1,18,0,40,40,0,group
+Vasopressin-regulated water reabsorption - Homo sapiens (human),0,2,0,0,2,1,0,0,1,0,2,2,0,group
+Aldosterone-regulated sodium reabsorption - Homo sapiens (human),0,4,0,3,7,2,0,3,5,0,7,7,0,group
+Endocrine and other factor-regulated calcium reabsorption - Homo sapiens (human),0,23,0,2,25,3,0,2,5,0,25,25,0,group
+Proximal tubule bicarbonate reclamation - Homo sapiens (human),0,20,1,1,22,7,1,1,9,0,22,22,0,group
+Collecting duct acid secretion - Homo sapiens (human),0,3,0,0,3,1,0,0,1,0,3,3,0,group
+Glutamatergic synapse - Homo sapiens (human),0,27,0,0,27,5,0,0,5,0,27,27,0,group
+GABAergic synapse - Homo sapiens (human),0,13,0,0,13,6,0,0,6,0,13,13,0,group
+Cholinergic synapse - Homo sapiens (human),0,25,0,5,30,4,0,5,9,0,30,30,0,group
+Dopaminergic synapse - Homo sapiens (human),0,35,0,1,36,8,0,1,9,0,36,36,0,group
+Serotonergic synapse - Homo sapiens (human),6,96,0,2,104,37,0,2,39,3,98,101,0,group
+Long-term potentiation - Homo sapiens (human),0,25,0,0,25,4,0,0,4,0,25,25,0,group
+Long-term depression - Homo sapiens (human),0,27,0,1,28,5,0,1,6,0,28,28,0,group
+Retrograde endocannabinoid signaling - Homo sapiens (human),0,136,2,3,141,11,2,3,16,0,140,140,0,group
+Synaptic vesicle cycle - Homo sapiens (human),0,16,1,2,19,7,1,2,10,0,19,19,0,group
+Neurotrophin signaling pathway - Homo sapiens (human),0,32,0,1,33,3,0,1,4,0,33,33,0,group
+Phototransduction - Homo sapiens (human),0,7,0,1,8,3,0,1,4,0,8,8,0,group
+Olfactory transduction - Homo sapiens (human),0,8,0,0,8,4,0,0,4,0,8,8,0,group
+Taste transduction - Homo sapiens (human),0,39,5,7,51,17,5,7,29,0,47,47,0,group
+Inflammatory mediator regulation of TRP channels - Homo sapiens (human),0,52,5,12,69,15,5,12,32,0,65,65,0,group
+Osteoclast differentiation - Homo sapiens (human),0,2,0,0,2,1,0,0,1,0,2,2,0,group
+Longevity regulating pathway - Homo sapiens (human),0,7,0,4,11,3,0,4,7,0,11,11,0,group
+Longevity regulating pathway - multiple species - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Circadian rhythm - Homo sapiens (human),0,2,0,0,2,1,0,0,1,0,2,2,0,group
+Circadian entrainment - Homo sapiens (human),0,25,0,1,26,4,0,1,5,0,26,26,0,group
+Thermogenesis - Homo sapiens (human),0,104,1,11,116,9,1,11,21,0,116,116,0,group
+Pathways in cancer - Homo sapiens (human),0,53,2,13,68,11,2,13,26,0,67,67,0,group
+Proteoglycans in cancer - Homo sapiens (human),0,2,4,2,8,1,4,2,7,0,5,5,0,group
+Chemical carcinogenesis - DNA adducts - Homo sapiens (human),0,4,31,43,78,2,31,43,76,0,48,48,0,group
+Chemical carcinogenesis - receptor activation - Homo sapiens (human),0,10,4,19,33,5,4,19,28,0,30,30,0,group
+Chemical carcinogenesis - reactive oxygen species - Homo sapiens (human),0,25,13,26,64,10,13,26,49,0,52,52,0,group
+Central carbon metabolism in cancer - Homo sapiens (human),0,84,1,1,86,34,1,1,36,0,86,86,0,group
+Choline metabolism in cancer - Homo sapiens (human),0,142,0,3,145,7,0,3,10,0,145,145,0,group
+PD-L1 expression and PD-1 checkpoint pathway in cancer - Homo sapiens (human),0,21,0,1,22,2,0,1,3,0,22,22,0,group
+Colorectal cancer - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Pancreatic cancer - Homo sapiens (human),0,12,0,1,13,1,0,1,2,0,13,13,0,group
+Hepatocellular carcinoma - Homo sapiens (human),0,23,3,3,29,3,3,3,9,0,27,27,0,group
+Gastric cancer - Homo sapiens (human),0,5,0,2,7,2,0,2,4,0,7,7,0,group
+Glioma - Homo sapiens (human),0,21,0,1,22,2,0,1,3,0,22,22,0,group
+Acute myeloid leukemia - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Chronic myeloid leukemia - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Basal cell carcinoma - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Melanoma - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Renal cell carcinoma - Homo sapiens (human),0,7,0,0,7,2,0,0,2,0,7,7,0,group
+Prostate cancer - Homo sapiens (human),0,4,0,9,13,2,0,9,11,0,13,13,0,group
+Endometrial cancer - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Breast cancer - Homo sapiens (human),0,0,0,3,3,0,0,3,3,0,3,3,0,group
+Small cell lung cancer - Homo sapiens (human),0,5,0,1,6,2,0,1,3,0,6,6,0,group
+Non-small cell lung cancer - Homo sapiens (human),0,26,0,1,27,4,0,1,5,0,27,27,0,group
+Human T-cell leukemia virus 1 infection - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Human immunodeficiency virus 1 infection - Homo sapiens (human),0,21,1,1,23,2,1,1,4,0,23,23,0,group
+Hepatitis C - Homo sapiens (human),0,0,1,1,2,0,1,1,2,0,2,2,0,group
+Coronavirus disease - COVID-19 - Homo sapiens (human),0,19,2,4,25,1,2,4,7,0,24,24,0,group
+Influenza A - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Measles - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Herpes simplex virus 1 infection - Homo sapiens (human),0,0,2,1,3,0,2,1,3,0,2,2,0,group
+Human cytomegalovirus infection - Homo sapiens (human),0,23,1,1,25,3,1,1,5,0,25,25,0,group
+Kaposi sarcoma-associated herpesvirus infection - Homo sapiens (human),0,43,0,1,44,3,0,1,4,0,44,44,0,group
+Epstein-Barr virus infection - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Human papillomavirus infection - Homo sapiens (human),0,4,0,1,5,2,0,1,3,0,5,5,0,group
+Vibrio cholerae infection - Homo sapiens (human),0,25,0,0,25,4,0,0,4,0,25,25,0,group
+Epithelial cell signaling in Helicobacter pylori infection - Homo sapiens (human),0,0,2,1,3,0,2,1,3,0,2,2,0,group
+Pathogenic Escherichia coli infection - Homo sapiens (human),0,24,0,1,25,2,0,1,3,0,25,25,0,group
+Salmonella infection - Homo sapiens (human),0,2,3,1,6,1,3,1,5,0,4,4,0,group
+Shigellosis - Homo sapiens (human),0,27,5,2,34,5,5,2,12,0,30,30,0,group
+Yersinia infection - Homo sapiens (human),0,4,0,2,6,2,0,2,4,0,6,6,0,group
+Pertussis - Homo sapiens (human),0,6,2,3,11,3,2,3,8,0,10,10,0,group
+Legionellosis - Homo sapiens (human),0,2,1,0,3,1,1,0,2,0,3,3,0,group
+Staphylococcus aureus infection - Homo sapiens (human),0,0,2,0,2,0,2,0,2,0,1,1,0,group
+Tuberculosis - Homo sapiens (human),0,4,13,2,19,2,13,2,17,0,7,7,0,group
+Amoebiasis - Homo sapiens (human),0,35,2,1,38,7,2,1,10,0,37,37,0,group
+Malaria - Homo sapiens (human),0,2,3,0,5,1,3,0,4,0,3,3,0,group
+Toxoplasmosis - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Leishmaniasis - Homo sapiens (human),0,21,0,0,21,4,0,0,4,0,21,21,0,group
+Chagas disease - Homo sapiens (human),0,6,0,1,7,3,0,1,4,0,7,7,0,group
+African trypanosomiasis - Homo sapiens (human),0,29,0,0,29,6,0,0,6,0,29,29,0,group
+Asthma - Homo sapiens (human),0,11,0,0,11,5,0,0,5,0,11,11,0,group
+Systemic lupus erythematosus - Homo sapiens (human),0,6,1,0,7,1,1,0,2,0,7,7,0,group
+Rheumatoid arthritis - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Autoimmune thyroid disease - Homo sapiens (human),0,4,1,1,6,2,1,1,4,0,6,6,0,group
+Graft-versus-host disease - Homo sapiens (human),0,2,0,0,2,1,0,0,1,0,2,2,0,group
+Alzheimer disease - Homo sapiens (human),0,4,7,2,13,2,7,2,11,0,7,7,0,group
+Parkinson disease - Homo sapiens (human),0,40,4,5,49,10,4,5,19,0,46,46,0,group
+Amyotrophic lateral sclerosis - Homo sapiens (human),0,8,1,2,11,4,1,2,7,0,11,11,0,group
+Huntington disease - Homo sapiens (human),0,4,1,0,5,2,1,0,3,0,5,5,0,group
+Spinocerebellar ataxia - Homo sapiens (human),0,23,1,0,24,3,1,0,4,0,24,24,0,group
+Prion disease - Homo sapiens (human),0,2,0,1,3,1,0,1,2,0,3,3,0,group
+Pathways of neurodegeneration - multiple diseases - Homo sapiens (human),0,35,11,4,50,8,11,4,23,0,40,40,0,group
+Cocaine addiction - Homo sapiens (human),0,13,1,0,14,6,1,0,7,0,14,14,0,group
+Amphetamine addiction - Homo sapiens (human),0,13,1,0,14,6,1,0,7,0,14,14,0,group
+Morphine addiction - Homo sapiens (human),0,10,4,1,15,4,4,1,9,0,12,12,0,group
+Nicotine addiction - Homo sapiens (human),0,7,0,1,8,3,0,1,4,0,8,8,0,group
+Alcoholism - Homo sapiens (human),0,13,0,2,15,6,0,2,8,0,15,15,0,group
+Lipid and atherosclerosis - Homo sapiens (human),0,91,4,2,97,5,4,2,11,0,94,94,0,group
+Fluid shear stress and atherosclerosis - Homo sapiens (human),0,6,0,2,8,3,0,2,5,0,8,8,0,group
+Hypertrophic cardiomyopathy - Homo sapiens (human),0,0,0,1,1,0,0,1,1,0,1,1,0,group
+Dilated cardiomyopathy - Homo sapiens (human),0,2,0,0,2,1,0,0,1,0,2,2,0,group
+Diabetic cardiomyopathy - Homo sapiens (human),0,65,9,9,83,14,9,9,32,0,75,75,0,group
+Type II diabetes mellitus - Homo sapiens (human),0,5,0,1,6,2,0,1,3,0,6,6,0,group
+Alcoholic liver disease - Homo sapiens (human),0,7,0,6,13,3,0,6,9,0,13,13,0,group
+Non-alcoholic fatty liver disease - Homo sapiens (human),0,3,0,0,3,1,0,0,1,0,3,3,0,group
+Insulin resistance - Homo sapiens (human),0,121,4,4,129,10,4,4,18,0,126,126,0,group
+AGE-RAGE signaling pathway in diabetic complications - Homo sapiens (human),0,35,4,0,39,4,4,0,8,0,36,36,0,group
+Cushing syndrome - Homo sapiens (human),0,8,0,7,15,4,0,7,11,0,15,15,0,group

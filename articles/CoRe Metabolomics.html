@@ -8,8 +8,8 @@
 <title>CoRe Metabolomics • MetaProViz</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="CoRe Metabolomics">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,15 +111,18 @@ First if you have not done yet, install the required dependencies and
 load the libraries:</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS). </span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
 <span><span class="co"># 2. Install the latest development version from GitHub using devtools</span></span>
 <span><span class="co">#devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
+<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span>
 <span></span>
 <span><span class="co">#dependencies that need to be loaded:</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rlang.r-lib.org" class="external-link">rlang</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sinhrks/ggfortify" class="external-link">ggfortify</a></span><span class="op">)</span></span>
 <span></span>
@@ -515,9 +518,7 @@ analysis. <strong>(KEGG_Pathways)</strong><br></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#This will use KEGGREST to query the KEGG API to load the pathways:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/LoadKEGG.html">LoadKEGG</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Installing package into '/home/runner/work/_temp/Library'</span></span>
-<span><span class="co">#&gt; (as 'lib' is unspecified)</span></span>
-<span><span class="co">#&gt; also installing the dependencies 'gargle', 'uuid', 'ids', 'conflicted', 'dbplyr', 'dtplyr', 'googledrive', 'googlesheets4', 'haven', 'reprex'</span></span></code></pre></div>
+<span><span class="co">#&gt; Cached file loaded from: ~/.cache/KEGG_Metabolite.rds</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Preview of the DF <code>KEGG_Pathways</code>.
@@ -691,7 +692,7 @@ data.<br></p>
 <code class="sourceCode R"><span><span class="va">Pool_Estimation_result</span><span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/PoolEstimation.html">PoolEstimation</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Media</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>                                                    SettingsFile_Sample <span class="op">=</span> <span class="va">Media</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>,</span>
 <span>                                                    SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>PoolSamples <span class="op">=</span> <span class="st">"Pool"</span>, Conditions<span class="op">=</span><span class="st">"Conditions"</span><span class="op">)</span>,</span>
-<span>                                                    CutoffCV <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span>                                                    CutoffCV <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Pool_Estimation_result_DF_CV</span> <span class="op">&lt;-</span><span class="va">Pool_Estimation_result</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"CV"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <div class="vscroll-plot">
@@ -843,31 +844,29 @@ the condition name for the <code>CoRe_media</code> in the
 <span>                                                MVI<span class="op">=</span><span class="cn">TRUE</span>, <span class="co">#We assume the values are not missing at random and perform half minimum MVI</span></span>
 <span>                                                MVI_Percentage<span class="op">=</span><span class="fl">50</span>,</span>
 <span>                                                HotellinsConfidence <span class="op">=</span> <span class="fl">0.99</span>,<span class="co"># We perform outlier testing using 0.99 confidence interval</span></span>
-<span>                                                CoRe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<span>                                                CoRe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Now we can have a look at the results table:</span></span>
 <span><span class="va">Media_Preprocessed</span> <span class="op">&lt;-</span>  <span class="va">PreProcessing_res</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"Preprocessing_output"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <div class="vscroll-plot">
 <pre><code><span><span class="co">#&gt; For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.</span></span>
-<span><span class="co">#&gt; Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values. REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004)</span></span>
-<span><span class="co">#&gt; filtering value selected: 0.8</span></span>
+<span><span class="co">#&gt; FeatureFiltering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). Filtering value selected: 0.8</span></span>
 <span><span class="co">#&gt; 3 metabolites where removed: N-acetylaspartylglutamate, hypotaurine, S-(2-succinyl)cysteine</span></span>
-<span><span class="co">#&gt; Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0</span></span>
+<span><span class="co">#&gt; Missing Value Imputation: Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0</span></span>
 <span><span class="co">#&gt; NA values were found in Control_media samples for metabolites. For metabolites including NAs MVI is performed unless all samples of a metabolite are NA.</span></span>
 <span><span class="co">#&gt; Metabolites with high NA load (&gt;20%) in Control_media samples are: dihydroorotate.</span></span>
 <span><span class="co">#&gt; Metabolites with only NAs (=100%) in Control_media samples are: hydroxyphenylpyruvate. Those NAs are set zero as we consider them true zeros</span></span>
-<span><span class="co">#&gt; Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022</span></span>
+<span><span class="co">#&gt; Total Ion Count (TIC) normalization: Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022</span></span>
 <span><span class="co">#&gt; 8 of variables have high variability (CV &gt; 30) in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not.</span></span>
 <span><span class="co">#&gt; Warning in CoReNorm(InputData = TICRes, SettingsFile_Sample =</span></span>
 <span><span class="co">#&gt; SettingsFile_Sample, : The CoRe_media samples MS51-06 were found to be</span></span>
 <span><span class="co">#&gt; different from the rest. They will not be included in the sum of the CoRe_media</span></span>
 <span><span class="co">#&gt; samples.</span></span>
 <span><span class="co">#&gt; CoRe data are normalised by substracting mean (blank) from each sample and multiplying with the CoRe_norm_factor</span></span>
-<span><span class="co">#&gt; Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979.</span></span>
-<span><span class="co">#&gt; HotellinsConfidence value selected: 0.99</span></span>
+<span><span class="co">#&gt; Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979). HotellinsConfidence value selected: 0.99</span></span>
 <span><span class="co">#&gt; There are possible outlier samples in the data</span></span>
-<span><span class="co">#&gt; Filtering round 1 Outlier Samples: MS51-06</span></span>
-<span><span class="co">#&gt; Filtering round 2 Outlier Samples: MS51-09</span></span></code></pre>
+<span><span class="co">#&gt; Filtering round  1  Outlier Samples:  MS51-06</span></span>
+<span><span class="co">#&gt; Filtering round  2  Outlier Samples:  MS51-09</span></span></code></pre>
 <p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-2.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-3.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-4.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-5.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-6.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-7.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-8.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-9.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-10.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-11.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-12.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-13.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-14.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-15.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-12-16.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <br><br><br><table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -1153,7 +1152,7 @@ plot is generated and saved.<br></p>
 <span>                               SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Numerator<span class="op">=</span><span class="cn">NULL</span>, Denominator <span class="op">=</span> <span class="st">"HK2"</span><span class="op">)</span>,</span>
 <span>                               StatPval <span class="op">=</span><span class="st">"aov"</span>,</span>
 <span>                               StatPadj<span class="op">=</span><span class="st">"fdr"</span>,</span>
-<span>                               SettingsFile_Metab <span class="op">=</span> <span class="va">MappingInfo</span>, </span>
+<span>                               SettingsFile_Metab <span class="op">=</span> <span class="va">MappingInfo</span>,</span>
 <span>                               CoRe<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Inspect the DMA results tables:</span></span>
@@ -1342,16 +1341,22 @@ p.adj
 t.val
 </th>
 <th style="text-align:left;">
+Mean_786-M1A
+</th>
+<th style="text-align:left;">
+CoRe_786-M1A
+</th>
+<th style="text-align:left;">
+Mean_HK2
+</th>
+<th style="text-align:left;">
+CoRe_HK2
+</th>
+<th style="text-align:left;">
 CoRe_specific
 </th>
 <th style="text-align:left;">
 CoRe
-</th>
-<th style="text-align:left;">
-Mean_786-M1A
-</th>
-<th style="text-align:left;">
-Mean_HK2
 </th>
 <th style="text-align:right;">
 MS51-16
@@ -1408,16 +1413,22 @@ aconitate
 6426780519
 </td>
 <td style="text-align:left;">
-Consumed
-</td>
-<td style="text-align:left;">
-Consumed
-</td>
-<td style="text-align:left;">
 -6426780518.51619
 </td>
 <td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
 -9.31322574615479e-07
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Consumed
 </td>
 <td style="text-align:right;">
 -5865088200
@@ -1473,16 +1484,22 @@ arginine
 -106493120308
 </td>
 <td style="text-align:left;">
-Released
-</td>
-<td style="text-align:left;">
-Released
-</td>
-<td style="text-align:left;">
 106493120307.837
 </td>
 <td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
 5.7220458984375e-05
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Released
 </td>
 <td style="text-align:right;">
 216146922501
@@ -1538,16 +1555,22 @@ aspartate
 21960976607
 </td>
 <td style="text-align:left;">
-Consumed
-</td>
-<td style="text-align:left;">
-Consumed
-</td>
-<td style="text-align:left;">
 -21960976606.516
 </td>
 <td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
 -1.72853469848633e-06
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Consumed
 </td>
 <td style="text-align:right;">
 -20078854995
@@ -1603,16 +1626,22 @@ betaine
 -586606639559
 </td>
 <td style="text-align:left;">
-Released
-</td>
-<td style="text-align:left;">
-Released
-</td>
-<td style="text-align:left;">
 586606639558.529
 </td>
 <td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
 1.9073486328125e-06
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Released
 </td>
 <td style="text-align:right;">
 688358341457
@@ -1668,16 +1697,22 @@ carbamoyl phosphate
 -833502731
 </td>
 <td style="text-align:left;">
-Released
-</td>
-<td style="text-align:left;">
-Released
-</td>
-<td style="text-align:left;">
 833502730.89944
 </td>
 <td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
 9.23871994018555e-07
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Released
 </td>
 <td style="text-align:right;">
 544741981
@@ -1758,13 +1793,13 @@ column “term”, “Metabolite” and “Description”, and the
 <span></span>
 <span><span class="va">comparisons</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">comparison</span> <span class="kw">in</span> <span class="va">comparisons</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="co">#Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names. </span></span>
+<span>  <span class="co">#Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.</span></span>
 <span>  <span class="va">DMA</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="va">comparison</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="va">DMA</span> <span class="op">&lt;-</span> <span class="va">DMA</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span><span class="va">DMA</span><span class="op">)</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="co">#we remove metabolites that do not have a KEGG ID/KEGG pathway</span></span>
-<span>    <span class="fu">remove_rownames</span><span class="op">(</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span><span class="co">#We use the KEGG trivial names to match with the KEGG pathways</span></span>
-<span>  </span>
-<span>  <span class="co">#Perform ORA: Here we use </span></span>
+<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">remove_rownames</a></span><span class="op">(</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span><span class="co">#We use the KEGG trivial names to match with the KEGG pathways</span></span>
+<span></span>
+<span>  <span class="co">#Perform ORA: Here we use</span></span>
 <span>  <span class="va">DM_ORA_res</span><span class="op">[[</span><span class="va">comparison</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ClusterORA.html">ClusterORA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA</span>,</span>
 <span>                                                     SettingsInfo<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ClusterColumn<span class="op">=</span><span class="st">"CoRe_specific"</span>, PathwayTerm<span class="op">=</span> <span class="st">"term"</span>, PathwayFeature<span class="op">=</span> <span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                                                     RemoveBackground<span class="op">=</span><span class="cn">FALSE</span>,<span class="co">#we do not have any background</span></span>
@@ -1821,15 +1856,6 @@ GeneRatio
 BgRatio
 </th>
 <th style="text-align:right;">
-RichFactor
-</th>
-<th style="text-align:right;">
-FoldEnrichment
-</th>
-<th style="text-align:right;">
-zScore
-</th>
-<th style="text-align:right;">
 pvalue
 </th>
 <th style="text-align:right;">
@@ -1858,15 +1884,6 @@ Percentage_of_Pathway_detected
 </td>
 <td style="text-align:left;">
 3/52
-</td>
-<td style="text-align:right;">
-1.00
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-3.060612
 </td>
 <td style="text-align:right;">
 0.0129412
@@ -1898,15 +1915,6 @@ L-Aspartate/L-Histidine/Pantothenate
 3/52
 </td>
 <td style="text-align:right;">
-1.00
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-3.060612
-</td>
-<td style="text-align:right;">
 0.0129412
 </td>
 <td style="text-align:right;">
@@ -1934,15 +1942,6 @@ L-Aspartate/L-Histidine/Pantothenate
 </td>
 <td style="text-align:left;">
 4/52
-</td>
-<td style="text-align:right;">
-0.75
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-2.380476
 </td>
 <td style="text-align:right;">
 0.0438415
@@ -1974,15 +1973,6 @@ L-Aspartate/L-Histidine/Pantothenate
 4/52
 </td>
 <td style="text-align:right;">
-0.50
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-1.190238
-</td>
-<td style="text-align:right;">
 0.2573349
 </td>
 <td style="text-align:right;">
@@ -2010,15 +2000,6 @@ Glycine/5-Oxoproline
 </td>
 <td style="text-align:left;">
 4/52
-</td>
-<td style="text-align:right;">
-0.50
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-1.190238
 </td>
 <td style="text-align:right;">
 0.2573349
@@ -4328,7 +4309,7 @@ pre-processing please see the vignette “Standard Metabolomics”).</p>
 <span><span class="va">Intra_DMA_786M1A_vs_HK2</span><span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ToyData.html">ToyData</a></span><span class="op">(</span>Data<span class="op">=</span><span class="st">"IntraCells_DMA"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Perform metabolite clustering:</span></span>
-<span><span class="va">MCA_CoRe_res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_CoRe.html">MCA_CoRe</a></span><span class="op">(</span>InputData_Intra <span class="op">=</span><span class="va">Intra_DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">rownames_to_column</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span> ,</span>
+<span><span class="va">MCA_CoRe_res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_CoRe.html">MCA_CoRe</a></span><span class="op">(</span>InputData_Intra <span class="op">=</span><span class="va">Intra_DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span> ,</span>
 <span>                                     InputData_CoRe <span class="op">=</span> <span class="va">DMA_786M1A_vs_HK2</span>,</span>
 <span>                                     SettingsInfo_Intra<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ValueCol<span class="op">=</span><span class="st">"Log2FC"</span>,StatCol<span class="op">=</span><span class="st">"p.adj"</span>, StatCutoff<span class="op">=</span> <span class="fl">0.05</span>, ValueCutoff<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,</span>
 <span>                                     SettingsInfo_CoRe<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>DirectionCol<span class="op">=</span><span class="st">"CoRe"</span>, ValueCol<span class="op">=</span><span class="st">"Log2(Distance)"</span>,StatCol<span class="op">=</span><span class="st">"p.adj"</span>, StatCutoff<span class="op">=</span> <span class="fl">0.05</span>, ValueCutoff<span class="op">=</span><span class="fl">28</span><span class="op">)</span>,</span>
@@ -4860,13 +4841,13 @@ Amino acid metabolism
 </tbody>
 </table>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">MC_ORA_result</span><span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ClusterORA.html">ClusterORA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">MCA_CoRe_res</span><span class="op">[[</span><span class="st">"MCA_CoRe_Results"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
-<span>                                       SettingsInfo<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ClusterColumn<span class="op">=</span><span class="st">"RG2_Significant"</span>, </span>
-<span>                                                        BackgroundColumn<span class="op">=</span><span class="st">"BG_Method"</span>, </span>
+<code class="sourceCode R"><span><span class="va">MC_ORA_result</span><span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ClusterORA.html">ClusterORA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">MCA_CoRe_res</span><span class="op">[[</span><span class="st">"MCA_CoRe_Results"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                                       SettingsInfo<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ClusterColumn<span class="op">=</span><span class="st">"RG2_Significant"</span>,</span>
+<span>                                                        BackgroundColumn<span class="op">=</span><span class="st">"BG_Method"</span>,</span>
 <span>                                                        PathwayTerm<span class="op">=</span> <span class="st">"Pathway"</span>, <span class="co">#This is the column name including the pathways names</span></span>
 <span>                                                        PathwayFeature<span class="op">=</span> <span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                                       RemoveBackground<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>                                       PathwayFile<span class="op">=</span><span class="va">MappingInfo</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">rownames_to_column</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                                       PathwayFile<span class="op">=</span><span class="va">MappingInfo</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                                       PathwayName<span class="op">=</span><span class="st">"KEGG"</span>,</span>
 <span>                                       minGSSize<span class="op">=</span><span class="fl">3</span>,</span>
 <span>                                       maxGSSize<span class="op">=</span><span class="fl">1000</span> ,</span>
@@ -5744,7 +5725,7 @@ Now lets check out the standard plot:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizPCA.html">VizPCA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">Input_PCA</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-33-1.png" alt="Figure: Standard Settings." width="576"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-34-1.png" alt="Figure: Standard Settings." width="576"><p class="caption">
 Figure: Standard Settings.
 </p>
 </div>
@@ -5761,7 +5742,7 @@ together.<br></p>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
 <span>                   PlotName <span class="op">=</span> <span class="st">"Batch Effect"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-34-1.png" alt="Figure: Do we have a batch effect?" width="576"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-35-1.png" alt="Figure: Do we have a batch effect?" width="576"><p class="caption">
 Figure: Do we have a batch effect?
 </p>
 </div>
@@ -5774,7 +5755,7 @@ Figure: Do we have a batch effect?
 <span>                   ColorScale <span class="op">=</span> <span class="st">"continuous"</span>,</span>
 <span>                   PlotName <span class="op">=</span> <span class="st">"Batch Effect (continuous color scale)"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-35-1.png" alt="Figure: Do we have a batch effect?" width="576"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-36-1.png" alt="Figure: Do we have a batch effect?" width="576"><p class="caption">
 Figure: Do we have a batch effect?
 </p>
 </div>
@@ -5786,7 +5767,7 @@ replicates in the shape parameter:<br></p>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
 <span>                   PlotName <span class="op">=</span> <span class="st">"Sample Conditions"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-36-1.png" alt="Figure: Do the samples cluster for the conditions?" width="576"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-37-1.png" alt="Figure: Do the samples cluster for the conditions?" width="576"><p class="caption">
 Figure: Do the samples cluster for the conditions?
 </p>
 </div>
@@ -5798,7 +5779,7 @@ we can display this too.<br></p>
 <span>                   InputData<span class="op">=</span><span class="va">Input_PCA</span>,</span>
 <span>                   PlotName <span class="op">=</span> <span class="st">"Sample Status"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-37-1.png" alt="Figure: Do the samples cluster for the Cell status?" width="576"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-38-1.png" alt="Figure: Do the samples cluster for the Cell status?" width="576"><p class="caption">
 Figure: Do the samples cluster for the Cell status?
 </p>
 </div>
@@ -5811,8 +5792,7 @@ data, which will be showcased on different examples.<br>
 As input, we need a DF that contains the samples as rownames and the
 features (=metabolites) as column names:<br></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Input_Heatmap</span> <span class="op">&lt;-</span>   <span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span> <span class="co">#remove columns that include Metadata such as cell type,...</span></span>
-<span>  </span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">Input_Heatmap</span> <span class="op">&lt;-</span>   <span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span> <span class="co">#remove columns that include Metadata such as cell type,...</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Input for <code><a href="../reference/VizHeatmap.html">MetaProViz::VizHeatmap()</a></code>, with samples as
@@ -5966,10 +5946,10 @@ the metabolite names are not plotted since this would get too crowded
 (You can enforce this by changing the parameter
 <code>enforce_FeatureNames = TRUE</code>).</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>, </span>
+<code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>                       PlotName <span class="op">=</span> <span class="st">"Overview"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-40-1.png" alt="Overview heatmap." width="960"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-41-1.png" alt="Overview heatmap." width="960"><p class="caption">
 Overview heatmap.
 </p>
 </div>
@@ -5982,7 +5962,7 @@ same time:<br></p>
 <span>                       SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color_Sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Conditions"</span>,<span class="st">"Biological_Replicates"</span>, <span class="st">"Status"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                       PlotName <span class="op">=</span> <span class="st">"Colour Samples"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-41-1.png" alt="Colour for sample metadata." width="960"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-42-1.png" alt="Colour for sample metadata." width="960"><p class="caption">
 Colour for sample metadata.
 </p>
 </div>
@@ -5992,10 +5972,10 @@ Moreover, we can also add metabolite metadata information:<br></p>
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>                       SettingsFile_Sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>                       SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color_Metab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Pathway"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                       SettingsFile_Metab <span class="op">=</span>  <span class="va">MappingInfo</span>, </span>
+<span>                       SettingsFile_Metab <span class="op">=</span>  <span class="va">MappingInfo</span>,</span>
 <span>                       PlotName <span class="op">=</span> <span class="st">"Colour Metabolites"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-42-1.png" alt="Colour for metabolite metadata." width="1152"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-43-1.png" alt="Colour for metabolite metadata." width="1152"><p class="caption">
 Colour for metabolite metadata.
 </p>
 </div>
@@ -6011,7 +5991,7 @@ fall into the MCA-Cluster <code>Core_DOWN</code>, meaning in comparison
 to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># individual: One individual plot for each pathway, col annotation: Colour for samples</span></span>
-<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>, </span>
+<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizHeatmap.html">VizHeatmap</a></span><span class="op">(</span>InputData <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>                       SettingsFile_Sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>                       SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual_Metab <span class="op">=</span> <span class="st">"Pathway"</span>,</span>
 <span>                                        color_Sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Conditions"</span>,<span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
@@ -6019,7 +5999,7 @@ to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.</p>
 <span>                       SettingsFile_Metab <span class="op">=</span>  <span class="va">MetaData_Metab</span>,</span>
 <span>                       PlotName <span class="op">=</span> <span class="st">"Pathway"</span><span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-1.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-2.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-3.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-4.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-5.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-6.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-7.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-8.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-9.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-10.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-11.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-12.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-13.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-14.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-15.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-16.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-17.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-18.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-19.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-20.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-21.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-22.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-23.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-24.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-25.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-26.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-27.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-28.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-29.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-30.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-31.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-32.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-33.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-34.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-35.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-36.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-37.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-38.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-39.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-40.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-41.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-42.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-43.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-44.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-45.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-46.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-47.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-48.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-49.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-50.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-51.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-52.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-53.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-54.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-55.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-56.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-57.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-58.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-59.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-60.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-61.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-62.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-63.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-64.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-65.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-44-66.png" width="864" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-1.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-2.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-3.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-4.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-5.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-6.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-7.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-8.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-9.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-10.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-11.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-12.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-13.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-14.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-15.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-16.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-17.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-18.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-19.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-20.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-21.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-22.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-23.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-24.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-25.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-26.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-27.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-28.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-29.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-30.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-31.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-32.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-33.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-34.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-35.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-36.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-37.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-38.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-39.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-40.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-41.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-42.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-43.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-44.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-45.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-46.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-47.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-48.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-49.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-50.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-51.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-52.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-53.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-54.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-55.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-56.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-57.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-58.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-59.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-60.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-61.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-62.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-63.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-64.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-65.png" width="864" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-45-66.png" width="864" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br>
 You can also choose to make individual plots for any Sample Metadata
@@ -6940,7 +6920,7 @@ condition as in the superplots style as described in by Lord et al <span class="
 <span>                                           PlotConditions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HK2"</span>, <span class="st">"786-O"</span>, <span class="st">"786-M1A"</span>, <span class="st">"786-M2A"</span>, <span class="st">"OSRC2"</span>, <span class="st">"OSLM1B"</span>, <span class="st">"RFX631"</span><span class="op">)</span>,<span class="co">#sets the order in which the samples should be plotted</span></span>
 <span>                                           StatComparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#Stat comparisons to be included on the plot</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-48-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-48-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-48-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-48-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-48-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-48-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-49-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-49-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-49-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-49-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-49-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-49-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br>
 Now, if we for instance prefer boxplots over bargraphs we can simply
@@ -6953,7 +6933,7 @@ change the parameter <code>PlotType</code>:</p>
 <span>                                           PlotConditions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HK2"</span>, <span class="st">"786-O"</span>, <span class="st">"786-M1A"</span>, <span class="st">"786-M2A"</span>, <span class="st">"OSRC2"</span>, <span class="st">"OSLM1B"</span>, <span class="st">"RFX631"</span><span class="op">)</span>,<span class="co">#sets the order in which the samples should be plotted</span></span>
 <span>                                           StatComparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#Stat comparisons to be included on the plot</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-50-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-50-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-50-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-50-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-50-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-51-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-51-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-51-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-51-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-51-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-51-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br>
 We can also change it to violin plots:</p>
@@ -6965,7 +6945,7 @@ We can also change it to violin plots:</p>
 <span>                                           PlotConditions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HK2"</span>, <span class="st">"786-O"</span>, <span class="st">"786-M1A"</span>, <span class="st">"786-M2A"</span>, <span class="st">"OSRC2"</span>, <span class="st">"OSLM1B"</span>, <span class="st">"RFX631"</span><span class="op">)</span>,<span class="co">#sets the order in which the samples should be plotted</span></span>
 <span>                                           StatComparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#Stat comparisons to be included on the plot</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-52-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-52-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-52-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-52-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-52-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-53-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-53-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-53-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-53-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-53-6.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br></p>
 </div>
@@ -7006,10 +6986,10 @@ p.adj
 t.val
 </th>
 <th style="text-align:left;">
-CoRe_specific
+Mean_786-M1A
 </th>
 <th style="text-align:left;">
-CoRe
+CoRe_786-M1A
 </th>
 </tr></thead>
 <tbody>
@@ -7027,10 +7007,10 @@ CoRe
 -3092107029
 </td>
 <td style="text-align:left;">
-Released in 786-M1A and Consumed HK2
+3092107028.86536
 </td>
 <td style="text-align:left;">
-Released/Consumed
+Released
 </td>
 </tr>
 <tr>
@@ -7047,10 +7027,10 @@ Released/Consumed
 -22633671598
 </td>
 <td style="text-align:left;">
-Released in 786-M1A and Consumed HK2
+22633671597.7763
 </td>
 <td style="text-align:left;">
-Released/Consumed
+Released
 </td>
 </tr>
 <tr>
@@ -7067,7 +7047,7 @@ Released/Consumed
 1274819834
 </td>
 <td style="text-align:left;">
-Consumed
+-1274819834.18323
 </td>
 <td style="text-align:left;">
 Consumed
@@ -7087,10 +7067,10 @@ acetylcarnitine
 359462986907
 </td>
 <td style="text-align:left;">
-Consumed in 786-M1A and Released HK2
+-359462986906.515
 </td>
 <td style="text-align:left;">
-Released/Consumed
+Consumed
 </td>
 </tr>
 <tr>
@@ -7107,10 +7087,10 @@ acetylcholine
 1140284111
 </td>
 <td style="text-align:left;">
-Consumed in 786-M1A and Released HK2
+-1140284111.31361
 </td>
 <td style="text-align:left;">
-Released/Consumed
+Consumed
 </td>
 </tr>
 <tr>
@@ -7127,10 +7107,10 @@ acetylornithine
 -6752323351
 </td>
 <td style="text-align:left;">
-Released in 786-M1A and Consumed HK2
+6752323351.13854
 </td>
 <td style="text-align:left;">
-Released/Consumed
+Released
 </td>
 </tr>
 <tr>
@@ -7147,7 +7127,7 @@ aconitate
 6426780519
 </td>
 <td style="text-align:left;">
-Consumed
+-6426780518.51619
 </td>
 <td style="text-align:left;">
 Consumed
@@ -7164,10 +7144,10 @@ analysis (see section <code>DMA</code> above) for the comparison of
 <code>786-M1A_vs_HK2</code>:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
-<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-54-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-55-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7177,11 +7157,11 @@ If you seek to plot the metabolite names you can change the paramter
 NULL and the metabolite names will be plotted randomly.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
-<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       SelectLab <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-55-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-56-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7190,11 +7170,11 @@ With the parameter <code>SelectLab</code> you can also pass a vector
 with Metabolite names that should be labeled:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
-<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       SelectLab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"histidine"</span>, <span class="st">"phenylalanine"</span>, <span class="st">"lactate"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-56-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-57-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7207,8 +7187,8 @@ For this we need to add this information into the Metadata_Metabolite
 file:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># colour for consumption and release: For this we need to add this information into the Metadata_Metabolite file</span></span>
-<span><span class="va">MetaData_Metab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">MappingInfo</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">rownames_to_column</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>, <span class="va">DMA_786M1A_vs_HK2</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>, by<span class="op">=</span><span class="st">"Metabolite"</span>, all.y<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">MetaData_Metab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">MappingInfo</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>, <span class="va">DMA_786M1A_vs_HK2</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">6</span>,<span class="fl">8</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">]</span>, by<span class="op">=</span><span class="st">"Metabolite"</span>, all.y<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Metadata table including additional information about the Metabolites.
@@ -7227,6 +7207,12 @@ KEGGCompound
 </th>
 <th style="text-align:left;">
 Pathway
+</th>
+<th style="text-align:left;">
+CoRe_786-M1A
+</th>
+<th style="text-align:left;">
+CoRe_HK2
 </th>
 <th style="text-align:left;">
 CoRe_specific
@@ -7251,6 +7237,12 @@ NA
 </td>
 <td style="text-align:left;">
 Amino acid metabolism
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Consumed
 </td>
 <td style="text-align:left;">
 Consumed
@@ -7276,6 +7268,12 @@ O-Acetylcarnitine
 Fatty acyl carnitines
 </td>
 <td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
 Consumed in 786-M1A and Released HK2
 </td>
 <td style="text-align:left;">
@@ -7297,6 +7295,12 @@ N-Acetylornithine
 </td>
 <td style="text-align:left;">
 Arginine and proline metabolism
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Consumed
 </td>
 <td style="text-align:left;">
 Released in 786-M1A and Consumed HK2
@@ -7322,6 +7326,12 @@ L-Glutamate
 Amino acid metabolism
 </td>
 <td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
 Released in 786-M1A and Consumed HK2
 </td>
 <td style="text-align:left;">
@@ -7343,6 +7353,12 @@ L-Glutamine
 </td>
 <td style="text-align:left;">
 Amino acid metabolism
+</td>
+<td style="text-align:left;">
+Released
+</td>
+<td style="text-align:left;">
+Consumed
 </td>
 <td style="text-align:left;">
 Released in 786-M1A and Consumed HK2
@@ -7373,6 +7389,12 @@ Consumed
 <td style="text-align:left;">
 Consumed
 </td>
+<td style="text-align:left;">
+Consumed
+</td>
+<td style="text-align:left;">
+Consumed
+</td>
 </tr>
 </tbody>
 </table>
@@ -7383,12 +7405,12 @@ Now we can make the different plots:</p>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Colour coded for consumption/release"</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-59-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-60-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7398,12 +7420,12 @@ Figure: Standard figure displaying DMA results.
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shape<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Shape for consumption/release, color for significance."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-59-2.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-60-2.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7413,12 +7435,12 @@ Figure: Standard figure displaying DMA results.
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shape<span class="op">=</span><span class="st">"CoRe_specific"</span>, color<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA. Shape and color for consumption/release."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-59-3.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-60-3.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7430,12 +7452,12 @@ consumption/release metabolites.</p>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"CoRe"</span>, shape<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-60-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-61-1.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7444,7 +7466,7 @@ Figure: Standard figure displaying DMA results.
 <span><span class="co">#&gt; Removed 2 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_vline()`).</span></span></code></pre>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-60-2.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-61-2.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7453,7 +7475,7 @@ Figure: Standard figure displaying DMA results.
 <span><span class="co">#&gt; Removed 2 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_vline()`).</span></span></code></pre>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-60-3.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-61-3.png" alt="Figure: Standard figure displaying DMA results." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results.
 </p>
 </div>
@@ -7473,12 +7495,12 @@ will be used from Input_data.<br></p>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"CoRe"</span>, shape<span class="op">=</span><span class="st">"CoRe_specific"</span>, color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A versus HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA."</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-61-1.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-62-1.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded for
 metabolic pathways and shaped for metabolic clusters.
 </p>
@@ -7488,7 +7510,7 @@ metabolic pathways and shaped for metabolic clusters.
 <span><span class="co">#&gt; Removed 2 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_vline()`).</span></span></code></pre>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-61-2.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-62-2.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded for
 metabolic pathways and shaped for metabolic clusters.
 </p>
@@ -7498,7 +7520,7 @@ metabolic pathways and shaped for metabolic clusters.
 <span><span class="co">#&gt; Removed 2 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_vline()`).</span></span></code></pre>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-61-3.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-62-3.png" alt="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters." width="672"><p class="caption">
 Figure: Standard figure displaying DMA results colour coded for
 metabolic pathways and shaped for metabolic clusters.
 </p>
@@ -7514,14 +7536,14 @@ one plot:<br></p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Make the plot</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
-<span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       ComparisonName<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="st">"786M1A_vs_HK"</span>, InputData2<span class="op">=</span> <span class="st">"786-O_vs_HK2"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A vs HK2 compared to 7860 vs HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA"</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-62-1.png" alt="Figure: Comparison." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-63-1.png" alt="Figure: Comparison." width="672"><p class="caption">
 Figure: Comparison.
 </p>
 </div>
@@ -7533,14 +7555,14 @@ your graph as well as make individual plots:<br></p>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
-<span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       ComparisonName<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="st">"786M1A_vs_HK"</span>, InputData2<span class="op">=</span> <span class="st">"786-O_vs_HK2"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A vs HK2 compared to 7860 vs HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA"</span> <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
-<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-63-1.png" alt="Figure: Comparison." width="672"><p class="caption">
+<img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-64-1.png" alt="Figure: Comparison." width="672"><p class="caption">
 Figure: Comparison.
 </p>
 </div>
@@ -7549,14 +7571,14 @@ Figure: Comparison.
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
-<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
-<span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
+<span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       ComparisonName<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="st">"786M1A_vs_HK"</span>, InputData2<span class="op">=</span> <span class="st">"786-O_vs_HK2"</span><span class="op">)</span>,</span>
 <span>                       x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
 <span>                       PlotName<span class="op">=</span> <span class="st">"786M1A vs HK2 compared to 7860 vs HK2"</span>,</span>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"Results of DMA"</span> <span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-65-16.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-66-16.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br></p>
 </div>
@@ -7574,10 +7596,10 @@ consumed/released). Here, I will plot the ORA results of the metabolites
 that are released in both conditions, HK2 and 786-M1A.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Prepare the Input:</span></span>
-<span><span class="co">#1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab. </span></span>
+<span><span class="co">#1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab.</span></span>
 <span><span class="va">InputPEA</span> <span class="op">&lt;-</span> <span class="va">DMA_786M1A_vs_HK2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">KEGGCompound</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">column_to_rownames</span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#2. InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name</span></span>
 <span><span class="va">InputPEA2</span> <span class="op">&lt;-</span> <span class="va">MC_ORA_786M1A_vs_HK2_Consumed</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -7599,7 +7621,7 @@ that are released in both conditions, HK2 and 786-M1A.</p>
 <span>                       Subtitle<span class="op">=</span> <span class="st">"PEA"</span> ,</span>
 <span>                       SelectLab <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <div class="vscroll-plot">
-<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-16.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-17.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-18.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-19.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-20.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-21.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-22.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-23.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-24.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-25.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-26.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-27.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-28.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-29.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-30.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-31.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-32.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-33.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-34.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-35.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-36.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-37.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-38.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-39.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-40.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-41.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-42.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-43.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-44.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-45.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-46.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-47.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-48.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-49.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-50.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-51.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-52.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-53.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-54.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-55.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-56.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-57.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-58.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-59.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-60.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-61.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-62.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-63.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-64.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-65.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-66.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-67.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-68.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-69.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-70.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-71.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-72.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-73.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-74.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-75.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-76.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-77.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-78.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-79.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-80.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-81.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-82.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-83.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-84.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-85.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-86.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-87.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-88.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-89.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-90.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-91.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-92.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-93.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-94.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-95.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-96.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-97.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-98.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-99.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-100.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-101.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-102.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-103.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-104.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-105.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-106.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-107.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-108.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-109.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-110.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-111.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-112.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-113.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-114.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-115.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-116.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-68-117.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-1.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-2.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-3.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-4.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-5.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-6.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-7.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-8.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-9.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-10.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-11.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-12.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-13.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-14.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-15.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-16.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-17.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-18.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-19.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-20.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-21.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-22.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-23.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-24.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-25.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-26.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-27.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-28.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-29.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-30.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-31.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-32.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-33.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-34.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-35.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-36.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-37.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-38.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-39.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-40.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-41.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-42.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-43.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-44.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-45.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-46.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-47.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-48.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-49.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-50.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-51.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-52.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-53.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-54.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-55.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-56.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-57.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-58.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-59.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-60.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-61.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-62.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-63.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-64.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-65.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-66.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-67.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-68.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-69.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-70.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-71.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-72.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-73.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-74.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-75.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-76.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-77.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-78.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-79.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-80.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-81.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-82.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-83.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-84.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-85.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-86.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-87.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-88.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-89.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-90.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-91.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-92.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-93.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-94.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-95.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-96.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-97.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-98.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-99.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-100.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-101.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-102.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-103.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-104.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-105.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-106.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-107.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-108.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-109.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-110.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-111.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-112.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-113.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-114.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-115.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-116.png" width="672" style="display: block; margin: auto auto auto 0;"><img src="CoRe%20Metabolomics_files/figure-html/unnamed-chunk-69-117.png" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <br><br><div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 100%">
@@ -7612,182 +7634,71 @@ that are released in both conditions, HK2 and 786-M1A.</p>
 <div class="section level2">
 <h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<pre><code><span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
-<span><span class="co">#&gt;  version  R version 4.4.2 (2024-10-31)</span></span>
-<span><span class="co">#&gt;  os       Ubuntu 22.04.5 LTS</span></span>
-<span><span class="co">#&gt;  system   x86_64, linux-gnu</span></span>
-<span><span class="co">#&gt;  ui       X11</span></span>
-<span><span class="co">#&gt;  language en</span></span>
-<span><span class="co">#&gt;  collate  C.UTF-8</span></span>
-<span><span class="co">#&gt;  ctype    C.UTF-8</span></span>
-<span><span class="co">#&gt;  tz       UTC</span></span>
-<span><span class="co">#&gt;  date     2024-11-04</span></span>
-<span><span class="co">#&gt;  pandoc   3.1.11 @ /opt/hostedtoolcache/pandoc/3.1.11/x64/ (via rmarkdown)</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.4.2 (2024-10-31)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.1 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">package         </span> <span style="color: #555555; font-style: italic;">*</span> <span style="color: #555555; font-style: italic;">version  </span> <span style="color: #555555; font-style: italic;">date (UTC)</span> <span style="color: #555555; font-style: italic;">lib</span> <span style="color: #555555; font-style: italic;">source</span></span></span>
-<span><span class="co">#&gt;  abind              1.4-8     <span style="color: #555555;">2024-09-12</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  AnnotationDbi      1.68.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  ape                5.8       <span style="color: #555555;">2024-04-11</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  aplot              0.2.3     <span style="color: #555555;">2024-06-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  backports          1.5.0     <span style="color: #555555;">2024-05-23</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  beeswarm           0.4.0     <span style="color: #555555;">2021-06-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  Biobase            2.66.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  BiocGenerics       0.52.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  BiocParallel       1.40.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  Biostrings         2.74.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  bit                4.5.0     <span style="color: #555555;">2024-09-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  bit64              4.5.2     <span style="color: #555555;">2024-09-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  blob               1.2.4     <span style="color: #555555;">2023-03-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  broom              1.0.7     <span style="color: #555555;">2024-09-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  bslib              0.8.0     <span style="color: #555555;">2024-07-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  cachem             1.1.0     <span style="color: #555555;">2024-05-16</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  car                3.1-3     <span style="color: #555555;">2024-09-27</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  carData            3.0-5     <span style="color: #555555;">2022-01-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  cellranger         1.1.0     <span style="color: #555555;">2016-07-27</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  checkmate          2.3.2     <span style="color: #555555;">2024-07-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  cli                3.6.3     <span style="color: #555555;">2024-06-21</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  clusterProfiler    4.14.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  codetools          0.2-20    <span style="color: #555555;">2024-03-31</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.4.2)</span></span></span>
-<span><span class="co">#&gt;  colorspace         2.1-1     <span style="color: #555555;">2024-07-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  cowplot            1.1.3     <span style="color: #555555;">2024-01-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  crayon             1.5.3     <span style="color: #555555;">2024-06-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  curl               5.2.3     <span style="color: #555555;">2024-09-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  data.table         1.16.2    <span style="color: #555555;">2024-10-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  DBI                1.2.3     <span style="color: #555555;">2024-06-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  desc               1.4.3     <span style="color: #555555;">2023-12-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  digest             0.6.37    <span style="color: #555555;">2024-08-19</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  DOSE               4.0.0     <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  dplyr            * 1.1.4     <span style="color: #555555;">2023-11-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  EnhancedVolcano    1.24.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  enrichplot         1.26.1    <span style="color: #555555;">2024-10-30</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  evaluate           1.0.1     <span style="color: #555555;">2024-10-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  factoextra         1.0.7     <span style="color: #555555;">2020-04-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  fansi              1.0.6     <span style="color: #555555;">2023-12-08</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  farver             2.1.2     <span style="color: #555555;">2024-05-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  fastmap            1.2.0     <span style="color: #555555;">2024-05-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  fastmatch          1.1-4     <span style="color: #555555;">2023-08-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  fgsea              1.32.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  forcats          * 1.0.0     <span style="color: #555555;">2023-01-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  Formula            1.2-5     <span style="color: #555555;">2023-02-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  fs                 1.6.5     <span style="color: #555555;">2024-10-30</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  generics           0.1.3     <span style="color: #555555;">2022-07-05</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  GenomeInfoDb       1.42.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  GenomeInfoDbData   1.2.13    <span style="color: #555555;">2024-11-04</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
-<span><span class="co">#&gt;  ggbeeswarm         0.7.2     <span style="color: #555555;">2023-04-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggfortify        * 0.4.17    <span style="color: #555555;">2024-04-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggfun              0.1.7     <span style="color: #555555;">2024-10-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggplot2          * 3.5.1     <span style="color: #555555;">2024-04-23</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggplotify          0.1.2     <span style="color: #555555;">2023-08-09</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggpubr             0.6.0     <span style="color: #555555;">2023-02-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggrepel            0.9.6     <span style="color: #555555;">2024-09-07</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggsignif           0.6.4     <span style="color: #555555;">2022-10-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggtangle           0.0.4     <span style="color: #555555;">2024-10-30</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ggtree             3.14.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  glue               1.8.0     <span style="color: #555555;">2024-09-30</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  GO.db              3.20.0    <span style="color: #555555;">2024-11-04</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
-<span><span class="co">#&gt;  GOSemSim           2.32.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  gridExtra          2.3       <span style="color: #555555;">2017-09-09</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  gridGraphics       0.5-1     <span style="color: #555555;">2020-12-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  gson               0.1.0     <span style="color: #555555;">2023-03-07</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  gtable             0.3.6     <span style="color: #555555;">2024-10-25</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  hash               2.2.6.3   <span style="color: #555555;">2023-08-19</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  highr              0.11      <span style="color: #555555;">2024-05-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  hms                1.1.3     <span style="color: #555555;">2023-03-21</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  htmltools          0.5.8.1   <span style="color: #555555;">2024-04-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  htmlwidgets        1.6.4     <span style="color: #555555;">2023-12-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  httr               1.4.7     <span style="color: #555555;">2023-08-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  igraph             2.1.1     <span style="color: #555555;">2024-10-19</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  inflection         1.3.6     <span style="color: #555555;">2022-06-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  IRanges            2.40.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  jquerylib          0.1.4     <span style="color: #555555;">2021-04-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  jsonlite           1.8.9     <span style="color: #555555;">2024-09-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  kableExtra         1.4.0     <span style="color: #555555;">2024-01-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  KEGGREST         * 1.46.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  knitr              1.48      <span style="color: #555555;">2024-07-07</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  labeling           0.4.3     <span style="color: #555555;">2023-08-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  later              1.3.2     <span style="color: #555555;">2023-12-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  lattice            0.22-6    <span style="color: #555555;">2024-03-20</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.4.2)</span></span></span>
-<span><span class="co">#&gt;  lazyeval           0.2.2     <span style="color: #555555;">2019-03-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  lifecycle          1.0.4     <span style="color: #555555;">2023-11-07</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  logger             0.4.0     <span style="color: #555555;">2024-10-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  lubridate        * 1.9.3     <span style="color: #555555;">2023-09-27</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  magrittr         * 2.0.3     <span style="color: #555555;">2022-03-30</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  MASS               7.3-61    <span style="color: #555555;">2024-06-13</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.4.2)</span></span></span>
-<span><span class="co">#&gt;  Matrix             1.7-1     <span style="color: #555555;">2024-10-18</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.4.2)</span></span></span>
-<span><span class="co">#&gt;  memoise            2.0.1     <span style="color: #555555;">2021-11-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  MetaProViz       * 2.1.2     <span style="color: #555555;">2024-11-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
-<span><span class="co">#&gt;  munsell            0.5.1     <span style="color: #555555;">2024-04-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  nlme               3.1-166   <span style="color: #555555;">2024-08-14</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.4.2)</span></span></span>
-<span><span class="co">#&gt;  OmnipathR          3.13.28   <span style="color: #555555;">2024-11-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Github (saezlab/OmnipathR@4007299)</span></span></span>
-<span><span class="co">#&gt;  patchwork          1.3.0     <span style="color: #555555;">2024-09-16</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  pheatmap           1.0.12    <span style="color: #555555;">2019-01-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  pillar             1.9.0     <span style="color: #555555;">2023-03-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  pkgconfig          2.0.3     <span style="color: #555555;">2019-09-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  pkgdown            2.1.1     <span style="color: #555555;">2024-09-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  plyr               1.8.9     <span style="color: #555555;">2023-10-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  png                0.1-8     <span style="color: #555555;">2022-11-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  prettyunits        1.2.0     <span style="color: #555555;">2023-09-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  progress           1.2.3     <span style="color: #555555;">2023-12-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  purrr            * 1.0.2     <span style="color: #555555;">2023-08-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  qcc                2.7       <span style="color: #555555;">2017-07-11</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  qvalue             2.38.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  R.methodsS3        1.8.2     <span style="color: #555555;">2022-06-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  R.oo               1.27.0    <span style="color: #555555;">2024-11-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  R.utils            2.12.3    <span style="color: #555555;">2023-11-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  R6                 2.5.1     <span style="color: #555555;">2021-08-19</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  ragg               1.3.3     <span style="color: #555555;">2024-09-11</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  rappdirs           0.3.3     <span style="color: #555555;">2021-01-31</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  RColorBrewer       1.1-3     <span style="color: #555555;">2022-04-03</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  Rcpp               1.0.13-1  <span style="color: #555555;">2024-11-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  readr            * 2.1.5     <span style="color: #555555;">2024-01-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  readxl             1.4.3     <span style="color: #555555;">2023-07-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  reshape2           1.4.4     <span style="color: #555555;">2020-04-09</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  rlang            * 1.1.4     <span style="color: #555555;">2024-06-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  rmarkdown          2.28      <span style="color: #555555;">2024-08-17</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  RSQLite            2.3.7     <span style="color: #555555;">2024-05-27</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  rstatix            0.7.2     <span style="color: #555555;">2023-02-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  rstudioapi         0.17.1    <span style="color: #555555;">2024-10-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  rvest              1.0.4     <span style="color: #555555;">2024-02-12</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  S4Vectors          0.44.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  sass               0.4.9     <span style="color: #555555;">2024-03-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  scales             1.3.0     <span style="color: #555555;">2023-11-28</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  sessioninfo        1.2.2     <span style="color: #555555;">2021-12-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">any (@1.2.2)</span></span></span>
-<span><span class="co">#&gt;  stringi            1.8.4     <span style="color: #555555;">2024-05-06</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  stringr          * 1.5.1     <span style="color: #555555;">2023-11-14</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  svglite            2.1.3     <span style="color: #555555;">2023-12-08</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  systemfonts        1.1.0     <span style="color: #555555;">2024-05-15</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  textshaping        0.4.0     <span style="color: #555555;">2024-05-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  tibble           * 3.2.1     <span style="color: #555555;">2023-03-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  tidyr            * 1.3.1     <span style="color: #555555;">2024-01-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  tidyselect         1.2.1     <span style="color: #555555;">2024-03-11</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  tidytree           0.4.6     <span style="color: #555555;">2023-12-12</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  tidyverse        * 2.0.0     <span style="color: #555555;">2023-02-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.4.0)</span></span></span>
-<span><span class="co">#&gt;  timechange         0.3.0     <span style="color: #555555;">2024-01-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  treeio             1.30.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  tzdb               0.4.0     <span style="color: #555555;">2023-05-12</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  UCSC.utils         1.2.0     <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  utf8               1.2.4     <span style="color: #555555;">2023-10-22</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  vctrs              0.6.5     <span style="color: #555555;">2023-12-01</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  vipor              0.4.7     <span style="color: #555555;">2023-12-18</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  viridisLite        0.4.2     <span style="color: #555555;">2023-05-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  vroom              1.6.5     <span style="color: #555555;">2023-12-05</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  withr              3.0.2     <span style="color: #555555;">2024-10-28</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  xfun               0.49      <span style="color: #555555;">2024-10-31</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  XML                3.99-0.17 <span style="color: #555555;">2024-06-25</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  xml2               1.3.6     <span style="color: #555555;">2023-12-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  XVector            0.46.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
-<span><span class="co">#&gt;  yaml               2.3.10    <span style="color: #555555;">2024-07-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  yulab.utils        0.1.7     <span style="color: #555555;">2024-08-26</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  zip                2.3.1     <span style="color: #555555;">2024-01-27</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  zlibbioc           1.52.0    <span style="color: #555555;">2024-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #555555;"> [1] /home/runner/work/_temp/Library</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;"> [2] /opt/R/4.4.2/lib/R/site-library</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;"> [3] /opt/R/4.4.2/lib/R/library</span></span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8        LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [6] LC_MESSAGES=C.UTF-8    LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C           LC_TELEPHONE=C        </span></span>
+<span><span class="co">#&gt; [11] LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span></code></pre>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] ggfortify_0.4.17 rlang_1.1.4      tibble_3.2.1     dplyr_1.1.4      magrittr_2.0.3   MetaProViz_2.1.3</span></span>
+<span><span class="co">#&gt; [7] ggplot2_3.5.1   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] splines_4.4.2           later_1.4.1             ggplotify_0.1.2         bitops_1.0-9           </span></span>
+<span><span class="co">#&gt;   [5] R.oo_1.27.0             cellranger_1.1.0        polyclip_1.10-7         XML_3.99-0.17          </span></span>
+<span><span class="co">#&gt;   [9] factoextra_1.0.7        lifecycle_1.0.4         rstatix_0.7.2           lattice_0.22-6         </span></span>
+<span><span class="co">#&gt;  [13] vroom_1.6.5             MASS_7.3-61             backports_1.5.0         limma_3.58.1           </span></span>
+<span><span class="co">#&gt;  [17] sass_0.4.9              rmarkdown_2.29          jquerylib_0.1.4         yaml_2.3.10            </span></span>
+<span><span class="co">#&gt;  [21] zip_2.3.1               EnhancedVolcano_1.20.0  qcc_2.7                 RColorBrewer_1.1-3     </span></span>
+<span><span class="co">#&gt;  [25] cowplot_1.1.3           DBI_1.2.3               lubridate_1.9.4         abind_1.4-8            </span></span>
+<span><span class="co">#&gt;  [29] zlibbioc_1.48.2         rvest_1.0.4             purrr_1.0.2             R.utils_2.12.3         </span></span>
+<span><span class="co">#&gt;  [33] ggraph_2.2.1            BiocGenerics_0.48.1     RCurl_1.98-1.16         hash_2.2.6.3           </span></span>
+<span><span class="co">#&gt;  [37] yulab.utils_0.1.8       tweenr_2.0.3            rappdirs_0.3.3          GenomeInfoDbData_1.2.11</span></span>
+<span><span class="co">#&gt;  [41] IRanges_2.36.0          S4Vectors_0.40.2        enrichplot_1.22.0       ggrepel_0.9.6          </span></span>
+<span><span class="co">#&gt;  [45] tidytree_0.4.6          pheatmap_1.0.12         pkgdown_2.1.1           svglite_2.1.3          </span></span>
+<span><span class="co">#&gt;  [49] codetools_0.2-20        DOSE_3.28.2             xml2_1.3.6              ggforce_0.4.2          </span></span>
+<span><span class="co">#&gt;  [53] tidyselect_1.2.1        aplot_0.2.4             farver_2.1.2            viridis_0.6.5          </span></span>
+<span><span class="co">#&gt;  [57] stats4_4.4.2            jsonlite_1.8.9          tidygraph_1.3.1         Formula_1.2-5          </span></span>
+<span><span class="co">#&gt;  [61] systemfonts_1.1.0       tools_4.4.2             progress_1.2.3          treeio_1.26.0          </span></span>
+<span><span class="co">#&gt;  [65] ragg_1.3.3              Rcpp_1.0.13-1           glue_1.8.0              gridExtra_2.3          </span></span>
+<span><span class="co">#&gt;  [69] xfun_0.49               qvalue_2.34.0           GenomeInfoDb_1.38.8     withr_3.0.2            </span></span>
+<span><span class="co">#&gt;  [73] fastmap_1.2.0           digest_0.6.37           gridGraphics_0.5-1      timechange_0.3.0       </span></span>
+<span><span class="co">#&gt;  [77] R6_2.5.1                textshaping_0.4.1       colorspace_2.1-1        GO.db_3.18.0           </span></span>
+<span><span class="co">#&gt;  [81] gtools_3.9.5            RSQLite_2.3.9           R.methodsS3_1.8.2       tidyr_1.3.1            </span></span>
+<span><span class="co">#&gt;  [85] generics_0.1.3          data.table_1.16.4       graphlayouts_1.2.1      prettyunits_1.2.0      </span></span>
+<span><span class="co">#&gt;  [89] httr_1.4.7              htmlwidgets_1.6.4       scatterpie_0.2.4        inflection_1.3.6       </span></span>
+<span><span class="co">#&gt;  [93] pkgconfig_2.0.3         gtable_0.3.6            blob_1.2.4              XVector_0.42.0         </span></span>
+<span><span class="co">#&gt;  [97] shadowtext_0.1.4        clusterProfiler_4.10.1  OmnipathR_3.15.2        htmltools_0.5.8.1      </span></span>
+<span><span class="co">#&gt; [101] carData_3.0-5           fgsea_1.33.1            scales_1.3.0            kableExtra_1.4.0       </span></span>
+<span><span class="co">#&gt; [105] Biobase_2.62.0          png_0.1-8               ggfun_0.1.8             knitr_1.49             </span></span>
+<span><span class="co">#&gt; [109] rstudioapi_0.17.1       tzdb_0.4.0              reshape2_1.4.4          nlme_3.1-166           </span></span>
+<span><span class="co">#&gt; [113] checkmate_2.3.2         curl_6.0.1              cachem_1.1.0            stringr_1.5.1          </span></span>
+<span><span class="co">#&gt; [117] parallel_4.4.2          vipor_0.4.7             HDO.db_0.99.1           AnnotationDbi_1.64.1   </span></span>
+<span><span class="co">#&gt; [121] desc_1.4.3              pillar_1.10.0           grid_4.4.2              logger_0.4.0           </span></span>
+<span><span class="co">#&gt; [125] vctrs_0.6.5             ggpubr_0.6.0            car_3.1-3               beeswarm_0.4.0         </span></span>
+<span><span class="co">#&gt; [129] evaluate_1.0.1          readr_2.1.5             cli_3.6.3               compiler_4.4.2         </span></span>
+<span><span class="co">#&gt; [133] crayon_1.5.3            ggsignif_0.6.4          labeling_0.4.3          plyr_1.8.9             </span></span>
+<span><span class="co">#&gt; [137] fs_1.6.5                ggbeeswarm_0.7.2        stringi_1.8.4           viridisLite_0.4.2      </span></span>
+<span><span class="co">#&gt; [141] BiocParallel_1.36.0     munsell_0.5.1           Biostrings_2.70.3       lazyeval_0.2.2         </span></span>
+<span><span class="co">#&gt; [145] GOSemSim_2.28.1         Matrix_1.7-1            hms_1.1.3               patchwork_1.3.0        </span></span>
+<span><span class="co">#&gt; [149] bit64_4.5.2             KEGGREST_1.42.0         statmod_1.5.0           igraph_2.1.2           </span></span>
+<span><span class="co">#&gt; [153] broom_1.0.7             memoise_2.0.1           bslib_0.8.0             ggtree_3.10.1          </span></span>
+<span><span class="co">#&gt; [157] fastmatch_1.1-4         bit_4.5.0.1             readxl_1.4.3            gson_0.1.0             </span></span>
+<span><span class="co">#&gt; [161] ape_5.8-1</span></span></code></pre>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Badia-I-Mompel2022" class="csl-entry">
 Badia-I-Mompel, Pau, Jesús Vélez Santiago, Jana Braunger, Celina Geiss,

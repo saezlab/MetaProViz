@@ -8,8 +8,8 @@
 <title>METabolomics pre-PRocessing, functiOnal analysis and VIZualisation • MetaProViz</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="METabolomics pre-PRocessing, functiOnal analysis and VIZualisation">
 <meta name="description" content="MetaProViz can analyse standard metabolomics and exometabolomics data (CoRe).It performs pre-processing including feature filtering, missimg value imputation, normalisation and outlier detection. It perform functional analysis including differential metabolite analysis (DMA), clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs and saves them in a publication ready format.">
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,6 +87,11 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 <p>Here you will find a brief overview and information about the installation of the package and its dependencies.</p>
 </div>
 <div class="section level2">
+<h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+</h2>
+<p>clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs [@Hakimi2016]. Cell-lines data from intra- and extracellular metabolomics data from cell culture media from <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418" class="external-link">metabolomics workbench project PR001418</a>. <img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;"></p>
+</div>
+<div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p><strong>MetaProViz</strong> is an R package and to install the package, start R and enter:</p>
@@ -135,7 +140,7 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  title <span class="ot">=</span> {MetaProViz<span class="sc">:</span> METabolomics pre<span class="sc">-</span>PRocessing, functiOnal analysis and VIZualisation},</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  author <span class="ot">=</span> {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez<span class="sc">-</span>Rodriguez and Christian Frezza},</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2023</span>},</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">2</span>.<span class="fl">1.2</span>},</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">2</span>.<span class="fl">1.3</span>},</span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 </div>

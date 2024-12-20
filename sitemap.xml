@@ -8,9 +8,12 @@
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/AddInfo.html</loc></url>
+<url><loc>/reference/CleanMapping.html</loc></url>
 <url><loc>/reference/ClusterORA.html</loc></url>
+<url><loc>/reference/ClusterPK.html</loc></url>
 <url><loc>/reference/DMA.html</loc></url>
-<url><loc>/reference/InspectID.html</loc></url>
+<url><loc>/reference/DetectedID.html</loc></url>
 <url><loc>/reference/LoadHallmarks.html</loc></url>
 <url><loc>/reference/LoadKEGG.html</loc></url>
 <url><loc>/reference/LoadMetalinks.html</loc></url>
@@ -18,9 +21,14 @@
 <url><loc>/reference/MCA_CoRe.html</loc></url>
 <url><loc>/reference/MCA_rules.html</loc></url>
 <url><loc>/reference/Make_GeneMetabSet.html</loc></url>
+<url><loc>/reference/MappingAmbiguity.html</loc></url>
 <url><loc>/reference/MetaAnalysis.html</loc></url>
 <url><loc>/reference/MetaPK.html</loc></url>
+<url><loc>/reference/MetaProViz_log.html</loc></url>
+<url><loc>/reference/MetaProViz_logfile.html</loc></url>
+<url><loc>/reference/MetaProViz_set_loglevel.html</loc></url>
 <url><loc>/reference/PoolEstimation.html</loc></url>
+<url><loc>/reference/PossibleID.html</loc></url>
 <url><loc>/reference/PreProcessing.html</loc></url>
 <url><loc>/reference/ReplicateSum.html</loc></url>
 <url><loc>/reference/StandardORA.html</loc></url>
@@ -33,10 +41,7 @@
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/metaproviz_config_path.html</loc></url>
 <url><loc>/reference/metaproviz_load_config.html</loc></url>
-<url><loc>/reference/metaproviz_log.html</loc></url>
-<url><loc>/reference/metaproviz_logfile.html</loc></url>
 <url><loc>/reference/metaproviz_reset_config.html</loc></url>
 <url><loc>/reference/metaproviz_save_config.html</loc></url>
-<url><loc>/reference/metaproviz_set_loglevel.html</loc></url>
 </urlset>
 
