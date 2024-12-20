@@ -402,6 +402,7 @@ Plot_Sized
 For instance, if we want to assign a HMDB ID, we have to assign both "HMDB0001310",  "HMDB0000161" to the metabolite Alanine, for ChEBI we could assign only one, "16449", but this may lead to other problems as the ChEBI ID is not specific and may not be part of certain metabolic pathways. The reason for this is that substrate chirality is critical to enzymatic processes and stereo selectivity of enzymes to be homochiral with predominance of one particular enantiomer (e.g. D-sugars, L-amino acids, etc.).\
 To showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases. To do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 ```{r, echo=FALSE}
+suppressMessages(suppressWarnings(install.packages("devtools")))
 suppressMessages(suppressWarnings(devtools::install_github("ncats/RAMP-DB")))
 rampDB <-  suppressMessages(suppressWarnings(RaMP::RaMP(version = "2.5.4")))
 
