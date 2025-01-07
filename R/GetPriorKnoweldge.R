@@ -145,6 +145,27 @@ LoadHallmarks <- function() {
 }
 
 
+##########################################################################################
+### ### ### Load Gaude Metabolic Signature prior knowledge ### ### ###
+##########################################################################################
+#'
+#' @title Toy Data Import
+#' @description Import and process .csv file to create toy data.
+#' @importFrom utils read.csv
+#' @return A data frame containing the toy data.
+#' @export
+#'
+LoadGaude <- function() {
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  # Read the .csv files
+  MetabolicSig <- system.file("data", "Compilled_MetabolicSig_2025-01-07.csv", package = "MetaProViz")
+  MetabolicSig <- read.csv(MetabolicSig, check.names=FALSE)
+
+  # Return into environment
+  assign("Gaude_Pathways", MetabolicSig, envir=.GlobalEnv)
+}
 
 ##########################################################################################
 ### ### ### Get Metabolite Pathways using Cosmos prior knowledge ### ### ###
