@@ -50,14 +50,6 @@ LoadKEGG <- function(){
     KEGG_Metabolite <- readRDS(File_path)
     message("Cached file loaded from: ", File_path)
   }else{# load from KEGG
-    RequiredPackages <- c("KEGGREST", "tidyverse")
-    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-    if(length(new.packages)) install.packages(new.packages)
-
-    suppressMessages(library(KEGGREST))
-    suppressMessages(library(tidyverse))
-
-    #--------------------------------------------------------------------------------------------
     # 1. Make a list of all available human pathways in KEGG
     Pathways_H <- as.data.frame(keggList("pathway", "hsa"))  # hsa = human
 
@@ -126,10 +118,10 @@ LoadKEGG <- function(){
 ### ### ### Load Hallmark prior knowledge ### ### ###
 ##########################################################################################
 #'
-#' @title Toy Data Import
-#' @description Import and process .csv file to create toy data.
+#' @title Prior Knowledge Import
+#' @description Import and process .csv file to create Prior Knowledge.
 #' @importFrom utils read.csv
-#' @return A data frame containing the toy data.
+#' @return A data frame containing the Prior Knowledge.
 #' @export
 #'
 LoadHallmarks <- function() {
@@ -144,15 +136,14 @@ LoadHallmarks <- function() {
   assign("Hallmark_Pathways", Hallmark, envir=.GlobalEnv)
 }
 
-
 ##########################################################################################
 ### ### ### Load Gaude Metabolic Signature prior knowledge ### ### ###
 ##########################################################################################
 #'
-#' @title Toy Data Import
-#' @description Import and process .csv file to create toy data.
+#' @title Prior Knowledge Import
+#' @description Import and process .csv file to create Prior Knowledge.
 #' @importFrom utils read.csv
-#' @return A data frame containing the toy data.
+#' @return A data frame containing the Prior Knowledge.
 #' @export
 #'
 LoadGaude <- function() {
@@ -166,6 +157,98 @@ LoadGaude <- function() {
   # Return into environment
   assign("Gaude_Pathways", MetabolicSig, envir=.GlobalEnv)
 }
+
+##########################################################################################
+### ### ### Load RaMP prior knowledge ### ### ###
+##########################################################################################
+#'
+#' @title Prior Knowledge Import
+#' @param version \emph{Optional: } Version of the RaMP database loaded from OmniPathR. \strong{default: "2.5.4"}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+
+#' @description Import and process file to create Prior Knowledge.
+#'
+#' @importFrom  OmnipathR ramp_table
+#' @importFrom rappdirs user_cache_dir
+#' @importFrom dplyr filter select group_by summarise mutate
+#' @importFrom stringr str_remove
+#'
+#' @return A data frame containing the Prior Knowledge.
+#'
+#' @examples
+#' ChemicalClass <- MetaProViz::LoadRAMP()
+#'
+#' @export
+#'
+LoadRAMP <- function(version = "2.5.4",
+                     SaveAs_Table="csv",
+                     FolderPath=NULL){
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  ## ------------ Folder ----------- ##
+  if(is.null(SaveAs_Table)==FALSE){
+    Folder <- SavePath(FolderName= "PriorKnowledge",
+                       FolderPath=FolderPath)
+
+    SubFolder <- file.path(Folder, "MetaboliteSet")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+  }
+
+
+  ######################################################
+  #Get the directory and filepath of cache results of R
+  directory <- rappdirs::user_cache_dir()#get chache directory
+  File_path <-paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep="")
+
+  if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
+    HMDB_ChemicalClass <- readRDS(File_path)
+    message("Cached file loaded from: ", File_path)
+  }else{# load from OmniPath
+  # Get RaMP via OmnipathR and extract ClassyFire classes
+  Structure <- OmnipathR::ramp_table( "metabolite_class" , version = version)
+  Class <- OmnipathR::ramp_table( "chem_props" , version = version)
+
+  HMDB_ChemicalClass <- merge(Structure, Class[,c(1:3,10)], by="ramp_id", all.x=TRUE)%>%
+    dplyr::filter(stringr::str_starts(class_source_id, "hmdb:"))%>% # Select HMDB only!
+    dplyr::filter(stringr::str_starts(chem_source_id, "hmdb:"))%>% # Select HMDB only!
+    dplyr::select(-c("chem_data_source", "chem_source_id"))%>%
+    tidyr::pivot_wider(
+      names_from = class_level_name, # Use class_level_name as the new column names
+      values_from = class_name,      # Use class_name as the values for the new columns
+      values_fn = list(class_name = ~paste(unique(.), collapse = ", ")) # Combine duplicate values
+    )%>%
+    dplyr::group_by(across(-common_name))%>%
+    dplyr::summarise(
+      common_name = paste(unique(common_name), collapse = "; "), # Combine all common names into one
+      .groups = "drop"  # Ungroup after summarising
+    )%>%
+    dplyr::mutate(class_source_id = stringr::str_remove(class_source_id, "^hmdb:"))%>% # Remove 'hmdb:' prefix
+    dplyr::select(class_source_id, common_name, ClassyFire_class, ClassyFire_super_class, ClassyFire_sub_class) # Reorder columns
+
+  #Save the results as an RDS file in the Cache directory of R
+  if(!dir.exists(directory)) {dir.create(directory)}
+  saveRDS(HMDB_ChemicalClass, file = paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep=""))
+
+  }
+
+  ##-------------- Save and return
+  DF_List <- list("ChemicalClass_MetabSet"=HMDB_ChemicalClass)
+  suppressMessages(suppressWarnings(
+    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
+            InputList_Plot= NULL,
+            SaveAs_Table=SaveAs_Table,
+            SaveAs_Plot=NULL,
+            FolderPath= SubFolder,
+            FileName= "ChemicalClass",
+            CoRe=FALSE,
+            PrintPlot=FALSE)))
+
+  # Return into environment
+  assign("ChemicalClass_MetabSet", HMDB_ChemicalClass, envir=.GlobalEnv)
+}
+
 
 ##########################################################################################
 ### ### ### Get Metabolite Pathways using Cosmos prior knowledge ### ### ###
