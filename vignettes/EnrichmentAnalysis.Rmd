@@ -135,7 +135,6 @@ This is known as the many-to-many mapping problem.\
 Moreover, metabolic pathways that are the basis of the PK databases also includes co-factors such as ions or other small molecules that are not only part of most reactions, but can also not be detected in experimentallly acquired data (e.g. H2O, CO2, etc).
 
 ## KEGG pathway-metabolite sets
-
 KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000].
 **(KEGG_Pathways)**\
 
@@ -143,7 +142,6 @@ KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can 
 #This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::LoadKEGG()
 ```
-
 \
 
 ```{r, echo=FALSE}
@@ -153,25 +151,47 @@ KEGG_Pathways[c(1:3,52:54),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-## Create pathway-metabolite sets
+## Chemical class-metabolite sets
+The chemical class-metabolite sets are based on the classification of metabolites into chemical classes, which can be used to perform compound class enrichment analysis.\
+The chemical class-metabolite sets were curated by RaMP-DB, which used ClassyFire [@Braisted2023]. Here we access them via OmnipathR.\
+```{r}
+MetaProViz::LoadRAMP()
+```
+\
+```{r, echo=FALSE}
+# Check how our data looks like:
+ChemicalClass_MetabSet[c(1:5,80:83, 500:503),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `ChemicalClass_MetabSet`.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
 
+
+## Create pathway-metabolite sets
 The function `Make_GeneMetabSet` can be used to translate gene names to metabolite names by using a PK network of metabolic reactions calls CosmosR [@Dugourd2021].
 This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB [@Castanza2022].
 Moreover, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
-The Hallmarks gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()`.\
+The Hallmarks [@Liberzon2015] gene-set and Gaude [@Gaude2016] gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()` and `LoadGaude` respectively.\
 
 ```{r}
-#Load the example data:
+#Load the example gene-sets:
 MetaProViz::LoadHallmarks()
+
+MetaProViz::LoadGaude()
 ```
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
+ChemicalClass_MetabSet[c(997:998,2916:2917, 2916:2918),]%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
-
+\
+```{r, echo=FALSE}
+# Check how our data looks like:
+Gaude_Pathways[c(486:490, 1504, 1507, 1531, 49:50, 779),]%>%
+  kableExtra::kbl(caption = "Preview of the DF `gaude_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
 \
 Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.
 
@@ -180,6 +200,10 @@ Now we can use the function `Make_GeneMetabSet` to translate the gene names to m
 Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
                                                      SettingsInfo=c(Target="gene"),
                                                      PKName="Hallmarks")
+
+Gaude_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Gaude_Pathways,
+                                                     SettingsInfo=c(Target="gene"),
+                                                     PKName="Gaude")
 ```
 
 ```{r, echo=FALSE}

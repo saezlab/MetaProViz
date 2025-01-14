@@ -37,7 +37,6 @@ Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
 KEGG_Pathways <- MetaProViz::LoadKEGG()
-Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem","chebi","hmdb"), SaveAs_Table= "csv", FolderPath=NULL)
 Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem", "hmdb"))
 
 }

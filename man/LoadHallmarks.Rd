@@ -2,13 +2,13 @@
 % Please edit documentation in R/GetPriorKnoweldge.R
 \name{LoadHallmarks}
 \alias{LoadHallmarks}
-\title{Toy Data Import}
+\title{Prior Knowledge Import}
 \usage{
 LoadHallmarks()
 }
 \value{
-A data frame containing the toy data.
+A data frame containing the Prior Knowledge.
 }
 \description{
-Import and process .csv file to create toy data.
+Import and process .csv file to create Prior Knowledge.
 }

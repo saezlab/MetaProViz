@@ -1,0 +1,1933 @@
+gene,term
+GPT,Alanine and Aspartate Metabolism
+GPT2,Alanine and Aspartate Metabolism
+ACY3,Alanine and Aspartate Metabolism
+AGXT,Alanine and Aspartate Metabolism
+AGXT2,Alanine and Aspartate Metabolism
+AGXT2L1,Alanine and Aspartate Metabolism
+ASNS,Alanine and Aspartate Metabolism
+ASPA,Alanine and Aspartate Metabolism
+ASRGL1,Alanine and Aspartate Metabolism
+DDO,Alanine and Aspartate Metabolism
+GOT1,Alanine and Aspartate Metabolism
+GOT2,Alanine and Aspartate Metabolism
+SLC1A1,Alanine and Aspartate Metabolism
+SLC1A2,Alanine and Aspartate Metabolism
+SLC1A3,Alanine and Aspartate Metabolism
+SLC1A4,Alanine and Aspartate Metabolism
+SLC1A5,Alanine and Aspartate Metabolism
+SLC1A6,Alanine and Aspartate Metabolism
+SLC1A7,Alanine and Aspartate Metabolism
+SLC36A1,Alanine and Aspartate Metabolism
+SLC38A1,Alanine and Aspartate Metabolism
+SLC38A2,Alanine and Aspartate Metabolism
+SLC38A3,Alanine and Aspartate Metabolism
+SLC38A4,Alanine and Aspartate Metabolism
+SLC38A5,Alanine and Aspartate Metabolism
+SLC6A14,Alanine and Aspartate Metabolism
+SLC7A10,Alanine and Aspartate Metabolism
+SLC7A2,Alanine and Aspartate Metabolism
+SLC7A3,Alanine and Aspartate Metabolism
+SLC7A8,Alanine and Aspartate Metabolism
+SLC25A12,Alanine and Aspartate Metabolism
+SLC25A13,Alanine and Aspartate Metabolism
+AMDHD2,Amino and Nucleotide Sugar Metabolism
+CHIA,Amino and Nucleotide Sugar Metabolism
+CHIT1,Amino and Nucleotide Sugar Metabolism
+CMAS,Amino and Nucleotide Sugar Metabolism
+GALE,Amino and Nucleotide Sugar Metabolism
+GFPT1,Amino and Nucleotide Sugar Metabolism
+GFPT2,Amino and Nucleotide Sugar Metabolism
+GNE,Amino and Nucleotide Sugar Metabolism
+GNPDA1,Amino and Nucleotide Sugar Metabolism
+GNPDA2,Amino and Nucleotide Sugar Metabolism
+GNPNAT1,Amino and Nucleotide Sugar Metabolism
+MANSC1,Amino and Nucleotide Sugar Metabolism
+NAGK,Amino and Nucleotide Sugar Metabolism
+NANS,Amino and Nucleotide Sugar Metabolism
+PGM3,Amino and Nucleotide Sugar Metabolism
+RENBP,Amino and Nucleotide Sugar Metabolism
+TGDS,Amino and Nucleotide Sugar Metabolism
+UAP1,Amino and Nucleotide Sugar Metabolism
+UAP1L1,Amino and Nucleotide Sugar Metabolism
+UXS1,Amino and Nucleotide Sugar Metabolism
+PROSC,Arginine and Proline Metabolism
+ABP1,Arginine and Proline Metabolism
+ALDH18A1,Arginine and Proline Metabolism
+ALDH4A1,Arginine and Proline Metabolism
+AOC2,Arginine and Proline Metabolism
+AOC3,Arginine and Proline Metabolism
+DAO,Arginine and Proline Metabolism
+GOT1,Arginine and Proline Metabolism
+GOT2,Arginine and Proline Metabolism
+NAGS,Arginine and Proline Metabolism
+OAT,Arginine and Proline Metabolism
+PRODH,Arginine and Proline Metabolism
+PRODH2,Arginine and Proline Metabolism
+PYCR1,Arginine and Proline Metabolism
+PYCR2,Arginine and Proline Metabolism
+PYCRL,Arginine and Proline Metabolism
+SLC22A1,Arginine and Proline Metabolism
+SLC22A2,Arginine and Proline Metabolism
+SLC22A3,Arginine and Proline Metabolism
+SLC25A15,Arginine and Proline Metabolism
+SLC25A2,Arginine and Proline Metabolism
+SLC36A1,Arginine and Proline Metabolism
+SLC38A1,Arginine and Proline Metabolism
+SLC38A2,Arginine and Proline Metabolism
+SLC38A4,Arginine and Proline Metabolism
+SLC5A1,Arginine and Proline Metabolism
+SLC6A14,Arginine and Proline Metabolism
+SLC6A7,Arginine and Proline Metabolism
+SLC6A8,Arginine and Proline Metabolism
+SLC7A1,Arginine and Proline Metabolism
+SLC7A2,Arginine and Proline Metabolism
+SLC7A3,Arginine and Proline Metabolism
+SLC7A5,Arginine and Proline Metabolism
+SLC7A6,Arginine and Proline Metabolism
+SLC7A7,Arginine and Proline Metabolism
+SLC2A10,Ascorbate uptake
+SLC23A1,Ascorbate uptake
+SLC23A2,Ascorbate uptake
+UPB1,beta-Alanine metabolism
+ABP1,beta-Alanine metabolism
+AOC2,beta-Alanine metabolism
+AOC3,beta-Alanine metabolism
+CNDP1,beta-Alanine metabolism
+HIBCH,beta-Alanine metabolism
+SLC6A6,beta-Alanine metabolism
+ABCB11,Bile Acid Biosynthesis
+ABCC3,Bile Acid Biosynthesis
+ACOX2,Bile Acid Biosynthesis
+AKR1D1,Bile Acid Biosynthesis
+AMACR,Bile Acid Biosynthesis
+BAAT,Bile Acid Biosynthesis
+CH25H,Bile Acid Biosynthesis
+CYP27A1,Bile Acid Biosynthesis
+CYP39A1,Bile Acid Biosynthesis
+CYP46A1,Bile Acid Biosynthesis
+CYP7A1,Bile Acid Biosynthesis
+HSD17B4,Bile Acid Biosynthesis
+HSD3B7,Bile Acid Biosynthesis
+SCP2,Bile Acid Biosynthesis
+SLC10A1,Bile Acid Biosynthesis
+SLC10A2,Bile Acid Biosynthesis
+SLC27A2,Bile Acid Biosynthesis
+SLCO1A2,Bile Acid Biosynthesis
+SLCO1B1,Bile Acid Biosynthesis
+SLCO1B3,Bile Acid Biosynthesis
+SLCO2B1,Bile Acid Biosynthesis
+SLCO4A1,Bile Acid Biosynthesis
+BTD,Biotin Metabolism
+HLCS,Biotin Metabolism
+SLC16A1,Biotin Metabolism
+SLC19A3,Biotin Metabolism
+SLC5A6,Biotin Metabolism
+ABO,Blood Group Biosynthesis
+B3GNT2,Blood Group Biosynthesis
+B3GNT3,Blood Group Biosynthesis
+B3GNT5,Blood Group Biosynthesis
+FUT1,Blood Group Biosynthesis
+FUT3,Blood Group Biosynthesis
+FUT9,Blood Group Biosynthesis
+GCNT2,Blood Group Biosynthesis
+ST3GAL3,Blood Group Biosynthesis
+ST3GAL6,Blood Group Biosynthesis
+ST8SIA5,Blood Group Biosynthesis
+CA1,Carbonic Acid Metabolism
+CA12,Carbonic Acid Metabolism
+CA13,Carbonic Acid Metabolism
+CA14,Carbonic Acid Metabolism
+CA2,Carbonic Acid Metabolism
+CA3,Carbonic Acid Metabolism
+CA4,Carbonic Acid Metabolism
+CA5A,Carbonic Acid Metabolism
+CA5B,Carbonic Acid Metabolism
+CA6,Carbonic Acid Metabolism
+CA7,Carbonic Acid Metabolism
+CA8,Carbonic Acid Metabolism
+CA9,Carbonic Acid Metabolism
+CPT1A,Carnitine shuttle
+CPT1B,Carnitine shuttle
+CPT1C,Carnitine shuttle
+CPT2,Carnitine shuttle
+CRAT,Carnitine shuttle
+SLC22A4,Carnitine shuttle
+SLC22A5,Carnitine shuttle
+SLC25A20,Carnitine shuttle
+ABCA1,Cholesterol Metabolism
+CYP51A1,Cholesterol Metabolism
+DHCR7,Cholesterol Metabolism
+HMGCR,Cholesterol Metabolism
+IDI1,Cholesterol Metabolism
+IDI2,Cholesterol Metabolism
+LCAT,Cholesterol Metabolism
+B3GALT6,Chondroitin and Heparan sulfate biosynthesis
+B3GAT1,Chondroitin and Heparan sulfate biosynthesis
+B3GAT2,Chondroitin and Heparan sulfate biosynthesis
+B3GAT3,Chondroitin and Heparan sulfate biosynthesis
+B4GALT7,Chondroitin and Heparan sulfate biosynthesis
+CHPF,Chondroitin and Heparan sulfate biosynthesis
+CHPF2,Chondroitin and Heparan sulfate biosynthesis
+CHST11,Chondroitin and Heparan sulfate biosynthesis
+CHST12,Chondroitin and Heparan sulfate biosynthesis
+CHST13,Chondroitin and Heparan sulfate biosynthesis
+CHST3,Chondroitin and Heparan sulfate biosynthesis
+CHST7,Chondroitin and Heparan sulfate biosynthesis
+CHSY1,Chondroitin and Heparan sulfate biosynthesis
+CHSY3,Chondroitin and Heparan sulfate biosynthesis
+CSGALNACT1,Chondroitin and Heparan sulfate biosynthesis
+CSGALNACT2,Chondroitin and Heparan sulfate biosynthesis
+EXT1,Chondroitin and Heparan sulfate biosynthesis
+EXT2,Chondroitin and Heparan sulfate biosynthesis
+EXTL1,Chondroitin and Heparan sulfate biosynthesis
+EXTL2,Chondroitin and Heparan sulfate biosynthesis
+EXTL3,Chondroitin and Heparan sulfate biosynthesis
+GLCE,Chondroitin and Heparan sulfate biosynthesis
+HS2ST1,Chondroitin and Heparan sulfate biosynthesis
+HS3ST1,Chondroitin and Heparan sulfate biosynthesis
+HS3ST2,Chondroitin and Heparan sulfate biosynthesis
+HS3ST3A1,Chondroitin and Heparan sulfate biosynthesis
+HS3ST3B1,Chondroitin and Heparan sulfate biosynthesis
+HS3ST4,Chondroitin and Heparan sulfate biosynthesis
+HS3ST5,Chondroitin and Heparan sulfate biosynthesis
+HS3ST6,Chondroitin and Heparan sulfate biosynthesis
+HS6ST1,Chondroitin and Heparan sulfate biosynthesis
+HS6ST2,Chondroitin and Heparan sulfate biosynthesis
+HS6ST3,Chondroitin and Heparan sulfate biosynthesis
+NDST1,Chondroitin and Heparan sulfate biosynthesis
+NDST2,Chondroitin and Heparan sulfate biosynthesis
+NDST3,Chondroitin and Heparan sulfate biosynthesis
+NDST4,Chondroitin and Heparan sulfate biosynthesis
+UST,Chondroitin and Heparan sulfate biosynthesis
+XYLT1,Chondroitin and Heparan sulfate biosynthesis
+XYLT2,Chondroitin and Heparan sulfate biosynthesis
+ARSB,Chondroitin sulfate degradation
+GALNS,Chondroitin sulfate degradation
+GLB1,Chondroitin sulfate degradation
+GUSB,Chondroitin sulfate degradation
+HEXA,Chondroitin sulfate degradation
+HEXB,Chondroitin sulfate degradation
+IDS,Chondroitin sulfate degradation
+IDUA,Chondroitin sulfate degradation
+NEU1,Chondroitin sulfate degradation
+ALDH1B1,Citric Acid Cycle
+GOT1,Citric Acid Cycle
+GOT2,Citric Acid Cycle
+ACLY,Citric Acid Cycle
+ACO1,Citric Acid Cycle
+ACO2,Citric Acid Cycle
+ALDH4A1,Citric Acid Cycle
+ALDH5A1,Citric Acid Cycle
+CLYBL,Citric Acid Cycle
+CS,Citric Acid Cycle
+DLD,Citric Acid Cycle
+DLST,Citric Acid Cycle
+FAHD1,Citric Acid Cycle
+FAH,Citric Acid Cycle
+FH,Citric Acid Cycle
+HICDH,Citric Acid Cycle
+IDH1,Citric Acid Cycle
+IDH2,Citric Acid Cycle
+IDH3A,Citric Acid Cycle
+IDH3B,Citric Acid Cycle
+IDH3G,Citric Acid Cycle
+IREB2,Citric Acid Cycle
+MDH1,Citric Acid Cycle
+MDH1B,Citric Acid Cycle
+MDH2,Citric Acid Cycle
+OGDH,Citric Acid Cycle
+PCK1,Citric Acid Cycle
+PCK2,Citric Acid Cycle
+PDHX,Citric Acid Cycle
+SDHA,Citric Acid Cycle
+SDHB,Citric Acid Cycle
+SDHC,Citric Acid Cycle
+SDHD,Citric Acid Cycle
+SLC13A2,Citric Acid Cycle
+SLC13A3,Citric Acid Cycle
+SLC13A5,Citric Acid Cycle
+SLC16A1,Citric Acid Cycle
+SLC16A7,Citric Acid Cycle
+SLC16A8,Citric Acid Cycle
+SLC25A1,Citric Acid Cycle
+SLC25A10,Citric Acid Cycle
+SLC25A11,Citric Acid Cycle
+SLC33A1,Citric Acid Cycle
+SUCLA2,Citric Acid Cycle
+SUCLG1,Citric Acid Cycle
+SUCLG2,Citric Acid Cycle
+SLC5A6,Citric Acid Cycle
+ADSL,Citric Acid Cycle
+ACSS1,Citric Acid Cycle
+ACSS2,Citric Acid Cycle
+DLAT,Citric Acid Cycle
+ME1,Citric Acid Cycle
+ME2,Citric Acid Cycle
+ME3,Citric Acid Cycle
+PC,Citric Acid Cycle
+PDHA1,Citric Acid Cycle
+PDHA2,Citric Acid Cycle
+PDHB,Citric Acid Cycle
+COASY,CoA Biosynthesis
+PANK1,CoA Biosynthesis
+PANK2,CoA Biosynthesis
+PANK3,CoA Biosynthesis
+PANK4,CoA Biosynthesis
+PPCDC,CoA Biosynthesis
+PPCS,CoA Biosynthesis
+SLC25A16,CoA Biosynthesis
+SLC5A6,CoA Biosynthesis
+VNN1,CoA Biosynthesis
+VNN2,CoA Biosynthesis
+VNN3,CoA Biosynthesis
+CKB,Creatine Metabolism
+CKM,Creatine Metabolism
+CKMT1B,Creatine Metabolism
+CKMT2,Creatine Metabolism
+GAMT,Creatine Metabolism
+GATM,Creatine Metabolism
+ADCY1,Cyclic Nucleotides Metabolism
+ADCY10,Cyclic Nucleotides Metabolism
+ADCY2,Cyclic Nucleotides Metabolism
+ADCY3,Cyclic Nucleotides Metabolism
+ADCY4,Cyclic Nucleotides Metabolism
+ADCY5,Cyclic Nucleotides Metabolism
+ADCY6,Cyclic Nucleotides Metabolism
+ADCY7,Cyclic Nucleotides Metabolism
+ADCY8,Cyclic Nucleotides Metabolism
+ADCY9,Cyclic Nucleotides Metabolism
+GUCY1A2,Cyclic Nucleotides Metabolism
+GUCY1A3,Cyclic Nucleotides Metabolism
+GUCY1B2,Cyclic Nucleotides Metabolism
+GUCY1B3,Cyclic Nucleotides Metabolism
+GUCY2C,Cyclic Nucleotides Metabolism
+GUCY2D,Cyclic Nucleotides Metabolism
+GUCY2F,Cyclic Nucleotides Metabolism
+NPR1,Cyclic Nucleotides Metabolism
+NPR2,Cyclic Nucleotides Metabolism
+PDE10A,Cyclic Nucleotides Metabolism
+PDE11A,Cyclic Nucleotides Metabolism
+PDE1A,Cyclic Nucleotides Metabolism
+PDE1B,Cyclic Nucleotides Metabolism
+PDE1C,Cyclic Nucleotides Metabolism
+PDE2A,Cyclic Nucleotides Metabolism
+PDE3A,Cyclic Nucleotides Metabolism
+PDE3B,Cyclic Nucleotides Metabolism
+PDE4A,Cyclic Nucleotides Metabolism
+PDE4B,Cyclic Nucleotides Metabolism
+PDE4C,Cyclic Nucleotides Metabolism
+PDE4D,Cyclic Nucleotides Metabolism
+PDE5A,Cyclic Nucleotides Metabolism
+PDE6A,Cyclic Nucleotides Metabolism
+PDE6B,Cyclic Nucleotides Metabolism
+PDE6C,Cyclic Nucleotides Metabolism
+PDE6D,Cyclic Nucleotides Metabolism
+PDE6G,Cyclic Nucleotides Metabolism
+PDE6H,Cyclic Nucleotides Metabolism
+PDE7A,Cyclic Nucleotides Metabolism
+PDE7B,Cyclic Nucleotides Metabolism
+PDE8A,Cyclic Nucleotides Metabolism
+PDE8B,Cyclic Nucleotides Metabolism
+PDE9A,Cyclic Nucleotides Metabolism
+CYP2A13,CYP Metabolism
+CYP2A6,CYP Metabolism
+CYP2C18,CYP Metabolism
+CYP2C19,CYP Metabolism
+CYP2C8,CYP Metabolism
+CYP2C9,CYP Metabolism
+CYP2D6,CYP Metabolism
+CYP2E1,CYP Metabolism
+CYP2F1,CYP Metabolism
+CYP3A4,CYP Metabolism
+CYP3A5,CYP Metabolism
+CYP4A11,CYP Metabolism
+CYB5D1,CYP Metabolism
+CYP1A1,CYP Metabolism
+CYP1A2,CYP Metabolism
+CYP1B1,CYP Metabolism
+AHCY,Cysteine Metabolism
+AHCYL1,Cysteine Metabolism
+AHCYL2,Cysteine Metabolism
+CBS,Cysteine Metabolism
+CTH,Cysteine Metabolism
+GOT1,Cysteine Metabolism
+GOT2,Cysteine Metabolism
+LDHAL6A,Cysteine Metabolism
+LDHAL6B,Cysteine Metabolism
+MPST,Cysteine Metabolism
+SLC1A4,Cysteine Metabolism
+SLC1A5,Cysteine Metabolism
+SLC3A1,Cysteine Metabolism
+SLC6A14,Cysteine Metabolism
+SLC7A10,Cysteine Metabolism
+SLC7A11,Cysteine Metabolism
+SLC7A8,Cysteine Metabolism
+SLC7A9,Cysteine Metabolism
+SUOX,Cysteine Metabolism
+TST,Cysteine Metabolism
+ADH5,DNA Demethylation
+ADH6,DNA Demethylation
+TET1,DNA Demethylation
+TET2,DNA Demethylation
+TET3,DNA Demethylation
+TDG,DNA Demethylation
+DNMT1,DNA Methylation
+DNMT3A,DNA Methylation
+DNMT3B,DNA Methylation
+DNMT3L,DNA Methylation
+TRDMT1,DNA Methylation
+DTYMK,DNA Synthesis
+NT5M,DNA Synthesis
+RRM1,DNA Synthesis
+RRM2,DNA Synthesis
+TYMS,DNA Synthesis
+SLC25A19,DNA Synthesis
+AKR1B1,Eicosanoid Metabolism
+AKR1A1,Eicosanoid Metabolism
+AKR1C4,Eicosanoid Metabolism
+CYP4F8,Eicosanoid Metabolism
+ABCC4,Eicosanoid Metabolism
+ALOX12,Eicosanoid Metabolism
+ALOX12B,Eicosanoid Metabolism
+ALOX15,Eicosanoid Metabolism
+ALOX15B,Eicosanoid Metabolism
+ALOX5,Eicosanoid Metabolism
+CBR1,Eicosanoid Metabolism
+CYP4F12,Eicosanoid Metabolism
+CYP4F2,Eicosanoid Metabolism
+CYP4F3,Eicosanoid Metabolism
+FADS1,Eicosanoid Metabolism
+HPGDS,Eicosanoid Metabolism
+LTA4H,Eicosanoid Metabolism
+LTC4S,Eicosanoid Metabolism
+MGST2,Eicosanoid Metabolism
+MGST3,Eicosanoid Metabolism
+PTGDS,Eicosanoid Metabolism
+PTGES,Eicosanoid Metabolism
+PTGES2,Eicosanoid Metabolism
+PTGIS,Eicosanoid Metabolism
+PTGS1,Eicosanoid Metabolism
+PTGS2,Eicosanoid Metabolism
+SLC22A1,Eicosanoid Metabolism
+SLC22A2,Eicosanoid Metabolism
+SLC22A3,Eicosanoid Metabolism
+SLCO1A2,Eicosanoid Metabolism
+SLCO1B1,Eicosanoid Metabolism
+SLCO1B3,Eicosanoid Metabolism
+SLCO2A1,Eicosanoid Metabolism
+SLCO2B1,Eicosanoid Metabolism
+SLCO3A1,Eicosanoid Metabolism
+SLCO4A1,Eicosanoid Metabolism
+TBXAS1,Eicosanoid Metabolism
+ADH1A,Ethanol Metabolism
+ADH1B,Ethanol Metabolism
+ADH1C,Ethanol Metabolism
+ADH4,Ethanol Metabolism
+ADH7,Ethanol Metabolism
+ALDH1A1,Ethanol Metabolism
+ALDH1B1,Ethanol Metabolism
+ALDH3A1,Ethanol Metabolism
+ALDH3B1,Ethanol Metabolism
+ALDH3B2,Ethanol Metabolism
+AOX1,Ethanol Metabolism
+ZADH2,Ethanol Metabolism
+ELOVL1,Fatty Acid Biosynthesis
+ELOVL2,Fatty Acid Biosynthesis
+ELOVL3,Fatty Acid Biosynthesis
+ELOVL4,Fatty Acid Biosynthesis
+ELOVL5,Fatty Acid Biosynthesis
+ELOVL6,Fatty Acid Biosynthesis
+ELOVL7,Fatty Acid Biosynthesis
+FADS1,Fatty Acid Biosynthesis
+FADS2,Fatty Acid Biosynthesis
+FADS3,Fatty Acid Biosynthesis
+FADS6,Fatty Acid Biosynthesis
+FASN,Fatty Acid Biosynthesis
+HSD17B12,Fatty Acid Biosynthesis
+PTPLA,Fatty Acid Biosynthesis
+PTPLAD1,Fatty Acid Biosynthesis
+PTPLAD2,Fatty Acid Biosynthesis
+PTPLB,Fatty Acid Biosynthesis
+SCD,Fatty Acid Biosynthesis
+SCD5,Fatty Acid Biosynthesis
+SLC25A1,Fatty Acid Biosynthesis
+TECR,Fatty Acid Biosynthesis
+TECRL,Fatty Acid Biosynthesis
+ACACA,Fatty Acid Biosynthesis
+ACACB,Fatty Acid Biosynthesis
+MCAT,Fatty Acid Biosynthesis
+AACS,Fatty Acid Biosynthesis
+ALDH3A2,Fatty Acid Metabolism
+CYP4F12,Fatty Acid Metabolism
+AADAC,Fatty Acid Metabolism
+CROT,Fatty Acid Metabolism
+LIPC,Fatty Acid Metabolism
+MLYCD,Fatty Acid Metabolism
+SLC22A4,Fatty Acid Metabolism
+SLC22A5,Fatty Acid Metabolism
+SLC25A20,Fatty Acid Metabolism
+SLC27A1,Fatty Acid Metabolism
+SLC27A2,Fatty Acid Metabolism
+SLC27A3,Fatty Acid Metabolism
+SLC27A4,Fatty Acid Metabolism
+SLC27A5,Fatty Acid Metabolism
+ACSL1,Fatty Acid Metabolism
+ACSL3,Fatty Acid Metabolism
+ACSL4,Fatty Acid Metabolism
+ACSL5,Fatty Acid Metabolism
+ECH1,Fatty Acid Metabolism
+PCCA,Fatty Acid Metabolism
+PCCB,Fatty Acid Metabolism
+ADH1A,"Fatty Acids Oxidation, mitochondrial"
+ADH1B,"Fatty Acids Oxidation, mitochondrial"
+ADH1C,"Fatty Acids Oxidation, mitochondrial"
+ADH5,"Fatty Acids Oxidation, mitochondrial"
+ADH6,"Fatty Acids Oxidation, mitochondrial"
+ADH7,"Fatty Acids Oxidation, mitochondrial"
+ALDH2,"Fatty Acids Oxidation, mitochondrial"
+ACAD10,"Fatty Acids Oxidation, mitochondrial"
+ACAD11,"Fatty Acids Oxidation, mitochondrial"
+ACAD9,"Fatty Acids Oxidation, mitochondrial"
+ACADM,"Fatty Acids Oxidation, mitochondrial"
+ACADS,"Fatty Acids Oxidation, mitochondrial"
+ACADSB,"Fatty Acids Oxidation, mitochondrial"
+ECHDC2,"Fatty Acids Oxidation, mitochondrial"
+ECHS1,"Fatty Acids Oxidation, mitochondrial"
+HADHA,"Fatty Acids Oxidation, mitochondrial"
+HADHB,"Fatty Acids Oxidation, mitochondrial"
+ACOT2,"Fatty Acids Oxidation, mitochondrial"
+ACSM1,"Fatty Acids Oxidation, mitochondrial"
+DCI,"Fatty Acids Oxidation, mitochondrial"
+ETFA,"Fatty Acids Oxidation, mitochondrial"
+ETFB,"Fatty Acids Oxidation, mitochondrial"
+ETFDH,"Fatty Acids Oxidation, mitochondrial"
+ADH1A,"Fatty Acids Oxidation, peroxisomal"
+ADH1B,"Fatty Acids Oxidation, peroxisomal"
+ADH1C,"Fatty Acids Oxidation, peroxisomal"
+ADH5,"Fatty Acids Oxidation, peroxisomal"
+ADH6,"Fatty Acids Oxidation, peroxisomal"
+ADH7,"Fatty Acids Oxidation, peroxisomal"
+ALDH1A1,"Fatty Acids Oxidation, peroxisomal"
+ZADH2,"Fatty Acids Oxidation, peroxisomal"
+HSD17B4,"Fatty Acids Oxidation, peroxisomal"
+ACOT8,"Fatty Acids Oxidation, peroxisomal"
+ACAA1,"Fatty Acids Oxidation, peroxisomal"
+ACOX1,"Fatty Acids Oxidation, peroxisomal"
+ACOX3,"Fatty Acids Oxidation, peroxisomal"
+EHHADH,"Fatty Acids Oxidation, peroxisomal"
+PHYH,"Fatty Acids Oxidation, peroxisomal"
+HAO1,Folate Metabolism
+HAO2,Folate Metabolism
+MTR,Folate Metabolism
+ALDH1L1,Folate Metabolism
+DHFR,Folate Metabolism
+FOLR1,Folate Metabolism
+FOLR3,Folate Metabolism
+FPGS,Folate Metabolism
+FTCD,Folate Metabolism
+GGH,Folate Metabolism
+MTHFD1,Folate Metabolism
+MTHFD2,Folate Metabolism
+MTHFR,Folate Metabolism
+MTHFS,Folate Metabolism
+SLC19A1,Folate Metabolism
+SLC46A1,Folate Metabolism
+AMT,Folate Metabolism
+MGAM,Fructose and Mannose Metabolism
+FPGT,Fructose and Mannose Metabolism
+FUK,Fructose and Mannose Metabolism
+GMDS,Fructose and Mannose Metabolism
+GMPPA,Fructose and Mannose Metabolism
+GMPPB,Fructose and Mannose Metabolism
+KHK,Fructose and Mannose Metabolism
+MPI,Fructose and Mannose Metabolism
+PMM1,Fructose and Mannose Metabolism
+PMM2,Fructose and Mannose Metabolism
+SLC2A5,Fructose and Mannose Metabolism
+SLC2A7,Fructose and Mannose Metabolism
+SLC5A10,Fructose and Mannose Metabolism
+SLC5A9,Fructose and Mannose Metabolism
+SORD,Fructose and Mannose Metabolism
+TSTA3,Fructose and Mannose Metabolism
+ALDH9A1,GABA shunt
+ABAT,GABA shunt
+ADHFE1,GABA shunt
+AKR7A2,GABA shunt
+ALDH4A1,GABA shunt
+ALDH5A1,GABA shunt
+GAD1,GABA shunt
+GAD2,GABA shunt
+SLC36A1,GABA shunt
+CNDP1,GABA shunt
+B4GALT1,Galactose metabolism
+B4GALT2,Galactose metabolism
+GALE,Galactose metabolism
+GALK1,Galactose metabolism
+GALK2,Galactose metabolism
+GALT,Galactose metabolism
+GLB1,Galactose metabolism
+LALBA,Galactose metabolism
+LCT,Galactose metabolism
+NEU1,Galactose metabolism
+SI,Galactose metabolism
+SLC2A10,Galactose metabolism
+SLC2A2,Galactose metabolism
+SLC2A3,Galactose metabolism
+SLC2A4,Galactose metabolism
+SLC2A8,Galactose metabolism
+SLC5A1,Galactose metabolism
+SLC5A11,Galactose metabolism
+SLC5A9,Galactose metabolism
+UGP2,Galactose metabolism
+ACY1,Glutamate metabolism
+ALDH18A1,Glutamate metabolism
+ALDH4A1,Glutamate metabolism
+GLS,Glutamate metabolism
+GLS2,Glutamate metabolism
+GLUD1,Glutamate metabolism
+GLUD2,Glutamate metabolism
+GLUL,Glutamate metabolism
+GOT1,Glutamate metabolism
+GOT2,Glutamate metabolism
+GPT,Glutamate metabolism
+GPT2,Glutamate metabolism
+NAGS,Glutamate metabolism
+SLC17A6,Glutamate metabolism
+SLC17A7,Glutamate metabolism
+SLC17A8,Glutamate metabolism
+SLC1A1,Glutamate metabolism
+SLC1A2,Glutamate metabolism
+SLC1A3,Glutamate metabolism
+SLC1A5,Glutamate metabolism
+SLC1A6,Glutamate metabolism
+SLC1A7,Glutamate metabolism
+SLC25A12,Glutamate metabolism
+SLC25A13,Glutamate metabolism
+SLC25A18,Glutamate metabolism
+SLC25A22,Glutamate metabolism
+SLC32A1,Glutamate metabolism
+SLC38A1,Glutamate metabolism
+SLC38A2,Glutamate metabolism
+SLC38A3,Glutamate metabolism
+SLC38A4,Glutamate metabolism
+SLC38A5,Glutamate metabolism
+SLC3A2,Glutamate metabolism
+SLC6A1,Glutamate metabolism
+SLC6A11,Glutamate metabolism
+SLC6A12,Glutamate metabolism
+SLC6A13,Glutamate metabolism
+SLC7A11,Glutamate metabolism
+SLC7A6,Glutamate metabolism
+SLC7A7,Glutamate metabolism
+OPLAH,Glutamate metabolism
+GLRX,Glutathione Metabolism
+GLRX2,Glutathione Metabolism
+CBS,Glutathione Metabolism
+CTH,Glutathione Metabolism
+GSR,Glutathione Metabolism
+ADH5,Glutathione Metabolism
+ESD,Glutathione Metabolism
+GCLC,Glutathione Metabolism
+GCLM,Glutathione Metabolism
+GGT1,Glutathione Metabolism
+GPX1,Glutathione Metabolism
+GPX2,Glutathione Metabolism
+GPX3,Glutathione Metabolism
+GPX4,Glutathione Metabolism
+GPX5,Glutathione Metabolism
+GPX6,Glutathione Metabolism
+GPX7,Glutathione Metabolism
+GPX8,Glutathione Metabolism
+GSS,Glutathione Metabolism
+PRDX1,Glutathione Metabolism
+PRDX2,Glutathione Metabolism
+PRDX3,Glutathione Metabolism
+HAGH,Glutathione Metabolism
+GSTM1,Glutathione Metabolism
+LCAT,Glycerophospholipid Metabolism
+ABCB4,Glycerophospholipid Metabolism
+ACHE,Glycerophospholipid Metabolism
+AGPS,Glycerophospholipid Metabolism
+ALPI,Glycerophospholipid Metabolism
+ALPL,Glycerophospholipid Metabolism
+ALPP,Glycerophospholipid Metabolism
+ALPPL2,Glycerophospholipid Metabolism
+ATP10A,Glycerophospholipid Metabolism
+ATP8A1,Glycerophospholipid Metabolism
+CDIPT,Glycerophospholipid Metabolism
+CDS1,Glycerophospholipid Metabolism
+CDS2,Glycerophospholipid Metabolism
+CEPT1,Glycerophospholipid Metabolism
+CHAT,Glycerophospholipid Metabolism
+CHKA,Glycerophospholipid Metabolism
+CHKB,Glycerophospholipid Metabolism
+CHPT1,Glycerophospholipid Metabolism
+CLC,Glycerophospholipid Metabolism
+CRLS1,Glycerophospholipid Metabolism
+DGKA,Glycerophospholipid Metabolism
+DGKB,Glycerophospholipid Metabolism
+DGKD,Glycerophospholipid Metabolism
+DGKE,Glycerophospholipid Metabolism
+DGKG,Glycerophospholipid Metabolism
+DGKH,Glycerophospholipid Metabolism
+DGKI,Glycerophospholipid Metabolism
+DGKQ,Glycerophospholipid Metabolism
+DGKZ,Glycerophospholipid Metabolism
+ETNK1,Glycerophospholipid Metabolism
+ETNK2,Glycerophospholipid Metabolism
+GK,Glycerophospholipid Metabolism
+GK2,Glycerophospholipid Metabolism
+GK3P,Glycerophospholipid Metabolism
+GPD1,Glycerophospholipid Metabolism
+LGALS13,Glycerophospholipid Metabolism
+PAFAH1B1,Glycerophospholipid Metabolism
+PAFAH1B2,Glycerophospholipid Metabolism
+PAFAH1B3,Glycerophospholipid Metabolism
+PAFAH2,Glycerophospholipid Metabolism
+PCYT1A,Glycerophospholipid Metabolism
+PCYT1B,Glycerophospholipid Metabolism
+PCYT2,Glycerophospholipid Metabolism
+PEMT,Glycerophospholipid Metabolism
+PGS1,Glycerophospholipid Metabolism
+PHOSPHO1,Glycerophospholipid Metabolism
+PI4K2A,Glycerophospholipid Metabolism
+PIP5K1A,Glycerophospholipid Metabolism
+PIP5K1B,Glycerophospholipid Metabolism
+PIP5K1C,Glycerophospholipid Metabolism
+PISD,Glycerophospholipid Metabolism
+PLA2G10,Glycerophospholipid Metabolism
+PLA2G12A,Glycerophospholipid Metabolism
+PLA2G1B,Glycerophospholipid Metabolism
+PLA2G2A,Glycerophospholipid Metabolism
+PLA2G2D,Glycerophospholipid Metabolism
+PLA2G2E,Glycerophospholipid Metabolism
+PLA2G2F,Glycerophospholipid Metabolism
+PLA2G4A,Glycerophospholipid Metabolism
+PLA2G5,Glycerophospholipid Metabolism
+PLA2G6,Glycerophospholipid Metabolism
+PLA2G7,Glycerophospholipid Metabolism
+PLD1,Glycerophospholipid Metabolism
+PLD2,Glycerophospholipid Metabolism
+PTDSS1,Glycerophospholipid Metabolism
+PTDSS2,Glycerophospholipid Metabolism
+SLC18A3,Glycerophospholipid Metabolism
+SLC22A1,Glycerophospholipid Metabolism
+SLC22A2,Glycerophospholipid Metabolism
+SLC22A3,Glycerophospholipid Metabolism
+SLC5A7,Glycerophospholipid Metabolism
+CBS,"Glycine, Serine and Threonine Metabolism"
+AGXT,"Glycine, Serine and Threonine Metabolism"
+AGXT2,"Glycine, Serine and Threonine Metabolism"
+AGXT2L1,"Glycine, Serine and Threonine Metabolism"
+AOC3,"Glycine, Serine and Threonine Metabolism"
+BHMT,"Glycine, Serine and Threonine Metabolism"
+BHMT2,"Glycine, Serine and Threonine Metabolism"
+CHDH,"Glycine, Serine and Threonine Metabolism"
+DAO,"Glycine, Serine and Threonine Metabolism"
+DLD,"Glycine, Serine and Threonine Metabolism"
+DMGDH,"Glycine, Serine and Threonine Metabolism"
+GATM,"Glycine, Serine and Threonine Metabolism"
+GCAT,"Glycine, Serine and Threonine Metabolism"
+GCSH,"Glycine, Serine and Threonine Metabolism"
+GLDC,"Glycine, Serine and Threonine Metabolism"
+GNMT,"Glycine, Serine and Threonine Metabolism"
+MAOA,"Glycine, Serine and Threonine Metabolism"
+MAOB,"Glycine, Serine and Threonine Metabolism"
+PHGDH,"Glycine, Serine and Threonine Metabolism"
+PIPOX,"Glycine, Serine and Threonine Metabolism"
+PSAT1,"Glycine, Serine and Threonine Metabolism"
+PSPH,"Glycine, Serine and Threonine Metabolism"
+SARDH,"Glycine, Serine and Threonine Metabolism"
+SDS,"Glycine, Serine and Threonine Metabolism"
+SHMT1,"Glycine, Serine and Threonine Metabolism"
+SHMT2,"Glycine, Serine and Threonine Metabolism"
+SLC1A4,"Glycine, Serine and Threonine Metabolism"
+SLC1A5,"Glycine, Serine and Threonine Metabolism"
+SLC32A1,"Glycine, Serine and Threonine Metabolism"
+SLC36A1,"Glycine, Serine and Threonine Metabolism"
+SLC38A1,"Glycine, Serine and Threonine Metabolism"
+SLC38A2,"Glycine, Serine and Threonine Metabolism"
+SLC38A4,"Glycine, Serine and Threonine Metabolism"
+SLC38A5,"Glycine, Serine and Threonine Metabolism"
+SLC3A1,"Glycine, Serine and Threonine Metabolism"
+SLC6A12,"Glycine, Serine and Threonine Metabolism"
+SLC6A14,"Glycine, Serine and Threonine Metabolism"
+SLC6A5,"Glycine, Serine and Threonine Metabolism"
+SLC6A9,"Glycine, Serine and Threonine Metabolism"
+SLC7A10,"Glycine, Serine and Threonine Metabolism"
+SLC7A8,"Glycine, Serine and Threonine Metabolism"
+SLC7A9,"Glycine, Serine and Threonine Metabolism"
+THNSL1,"Glycine, Serine and Threonine Metabolism"
+AGL,Glycogen Degradation
+GAA,Glycogen Degradation
+GANC,Glycogen Degradation
+PYGB,Glycogen Degradation
+PYGL,Glycogen Degradation
+PYGM,Glycogen Degradation
+GBE1,Glycogen Synthesis
+GYG1,Glycogen Synthesis
+GYG2,Glycogen Synthesis
+GYS1,Glycogen Synthesis
+GYS2,Glycogen Synthesis
+PFKFB1,Glycolysis and Gluconeogenesis
+PFKFB2,Glycolysis and Gluconeogenesis
+PFKFB3,Glycolysis and Gluconeogenesis
+PFKFB4,Glycolysis and Gluconeogenesis
+ACYP1,Glycolysis and Gluconeogenesis
+ACYP2,Glycolysis and Gluconeogenesis
+ALDOA,Glycolysis and Gluconeogenesis
+ALDOB,Glycolysis and Gluconeogenesis
+ALDOC,Glycolysis and Gluconeogenesis
+BPGM,Glycolysis and Gluconeogenesis
+ENO1,Glycolysis and Gluconeogenesis
+ENO2,Glycolysis and Gluconeogenesis
+ENO3,Glycolysis and Gluconeogenesis
+FBP1,Glycolysis and Gluconeogenesis
+FBP2,Glycolysis and Gluconeogenesis
+G6PC,Glycolysis and Gluconeogenesis
+G6PC2,Glycolysis and Gluconeogenesis
+G6PC3,Glycolysis and Gluconeogenesis
+GAPDH,Glycolysis and Gluconeogenesis
+GAPDHS,Glycolysis and Gluconeogenesis
+GCK,Glycolysis and Gluconeogenesis
+GPD2,Glycolysis and Gluconeogenesis
+GPI,Glycolysis and Gluconeogenesis
+HK1,Glycolysis and Gluconeogenesis
+HK2,Glycolysis and Gluconeogenesis
+HK3,Glycolysis and Gluconeogenesis
+HKDC1,Glycolysis and Gluconeogenesis
+LDHA,Glycolysis and Gluconeogenesis
+LDHAL6A,Glycolysis and Gluconeogenesis
+LDHAL6B,Glycolysis and Gluconeogenesis
+LDHB,Glycolysis and Gluconeogenesis
+LDHC,Glycolysis and Gluconeogenesis
+LDHD,Glycolysis and Gluconeogenesis
+PCK1,Glycolysis and Gluconeogenesis
+PCK2,Glycolysis and Gluconeogenesis
+PFKL,Glycolysis and Gluconeogenesis
+PFKM,Glycolysis and Gluconeogenesis
+PFKP,Glycolysis and Gluconeogenesis
+PGAM1,Glycolysis and Gluconeogenesis
+PGAM2,Glycolysis and Gluconeogenesis
+PGK1,Glycolysis and Gluconeogenesis
+PGK2,Glycolysis and Gluconeogenesis
+PGM1,Glycolysis and Gluconeogenesis
+PGM2,Glycolysis and Gluconeogenesis
+PKLR,Glycolysis and Gluconeogenesis
+PKM2,Glycolysis and Gluconeogenesis
+SLC16A1,Glycolysis and Gluconeogenesis
+SLC16A3,Glycolysis and Gluconeogenesis
+SLC16A7,Glycolysis and Gluconeogenesis
+SLC16A8,Glycolysis and Gluconeogenesis
+SLC25A11,Glycolysis and Gluconeogenesis
+SLC2A1,Glycolysis and Gluconeogenesis
+SLC2A10,Glycolysis and Gluconeogenesis
+SLC2A11,Glycolysis and Gluconeogenesis
+SLC2A12,Glycolysis and Gluconeogenesis
+SLC2A14,Glycolysis and Gluconeogenesis
+SLC2A2,Glycolysis and Gluconeogenesis
+SLC2A3,Glycolysis and Gluconeogenesis
+SLC2A4,Glycolysis and Gluconeogenesis
+SLC2A6,Glycolysis and Gluconeogenesis
+SLC2A7,Glycolysis and Gluconeogenesis
+SLC2A8,Glycolysis and Gluconeogenesis
+SLC2A9,Glycolysis and Gluconeogenesis
+SLC5A1,Glycolysis and Gluconeogenesis
+SLC5A11,Glycolysis and Gluconeogenesis
+SLC5A12,Glycolysis and Gluconeogenesis
+SLC5A2,Glycolysis and Gluconeogenesis
+SLC5A3,Glycolysis and Gluconeogenesis
+SLC5A8,Glycolysis and Gluconeogenesis
+SLC5A9,Glycolysis and Gluconeogenesis
+TPI1,Glycolysis and Gluconeogenesis
+UEVLD,Glycolysis and Gluconeogenesis
+DPM2,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+GPAA1,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PGAP1,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGA,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGB,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGC,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGF,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGG,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGH,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGK,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGL,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGM,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGN,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGO,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGP,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGQ,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGS,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGT,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGV,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGW,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGX,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+PIGZ,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis
+GRHPR,Glyoxylate and Dicarboxylate Metabolism
+HAO1,Glyoxylate and Dicarboxylate Metabolism
+HAO2,Glyoxylate and Dicarboxylate Metabolism
+GLO1,Glyoxylate and Dicarboxylate Metabolism
+HAGHL,Glyoxylate and Dicarboxylate Metabolism
+GNS,Heparan sulfate degradation
+GUSB,Heparan sulfate degradation
+IDS,Heparan sulfate degradation
+IDUA,Heparan sulfate degradation
+NAGLU,Heparan sulfate degradation
+SGSH,Heparan sulfate degradation
+ALDH2,Histidine Metabolism
+ALDH3A1,Histidine Metabolism
+ALDH3B1,Histidine Metabolism
+ALDH3B2,Histidine Metabolism
+ABP1,Histidine Metabolism
+AOC2,Histidine Metabolism
+AOC3,Histidine Metabolism
+CNDP1,Histidine Metabolism
+DDC,Histidine Metabolism
+FTCD,Histidine Metabolism
+HAL,Histidine Metabolism
+HDC,Histidine Metabolism
+HNMT,Histidine Metabolism
+MAOA,Histidine Metabolism
+MAOB,Histidine Metabolism
+SLC22A1,Histidine Metabolism
+SLC22A2,Histidine Metabolism
+SLC22A3,Histidine Metabolism
+SLC38A3,Histidine Metabolism
+SLC38A4,Histidine Metabolism
+SLC3A1,Histidine Metabolism
+SLC6A14,Histidine Metabolism
+UROC1,Histidine Metabolism
+DOT1L,Histone Methylation
+MLL3,Histone Methylation
+MLL4,Histone Methylation
+SETD7,Histone Methylation
+SETDB1,Histone Methylation
+SETDB2,Histone Methylation
+SUV39H1,Histone Methylation
+SUV39H2,Histone Methylation
+GUSB,Hyaluronan Metabolism
+HAS1,Hyaluronan Metabolism
+HAS2,Hyaluronan Metabolism
+HAS3,Hyaluronan Metabolism
+HEXA,Hyaluronan Metabolism
+HEXB,Hyaluronan Metabolism
+IMPA1,Inositol Phosphate Metabolism
+IMPA2,Inositol Phosphate Metabolism
+IPMK,Inositol Phosphate Metabolism
+ISYNA1,Inositol Phosphate Metabolism
+MIOX,Inositol Phosphate Metabolism
+PI4K2A,Inositol Phosphate Metabolism
+SLC2A13,Inositol Phosphate Metabolism
+SLC5A11,Inositol Phosphate Metabolism
+SLC5A3,Inositol Phosphate Metabolism
+B3GNT2,Keratan sulfate biosynthesis
+B3GNT3,Keratan sulfate biosynthesis
+B3GNT4,Keratan sulfate biosynthesis
+B3GNT6,Keratan sulfate biosynthesis
+B3GNT7,Keratan sulfate biosynthesis
+B3GNT8,Keratan sulfate biosynthesis
+B3GNTL1,Keratan sulfate biosynthesis
+B4GALT1,Keratan sulfate biosynthesis
+B4GALT2,Keratan sulfate biosynthesis
+B4GALT3,Keratan sulfate biosynthesis
+B4GALT5,Keratan sulfate biosynthesis
+CHST1,Keratan sulfate biosynthesis
+CHST2,Keratan sulfate biosynthesis
+CHST3,Keratan sulfate biosynthesis
+CHST4,Keratan sulfate biosynthesis
+CHST5,Keratan sulfate biosynthesis
+CHST6,Keratan sulfate biosynthesis
+ST3GAL1,Keratan sulfate biosynthesis
+ST3GAL2,Keratan sulfate biosynthesis
+ST3GAL3,Keratan sulfate biosynthesis
+ST3GAL4,Keratan sulfate biosynthesis
+AGA,Keratan sulfate degradation
+FUCA1,Keratan sulfate degradation
+FUCA2,Keratan sulfate degradation
+GALNS,Keratan sulfate degradation
+GLB1,Keratan sulfate degradation
+GNS,Keratan sulfate degradation
+HEXA,Keratan sulfate degradation
+HEXB,Keratan sulfate degradation
+NAGA,Keratan sulfate degradation
+NEU1,Keratan sulfate degradation
+ACAT1,Ketone Bodies Metabolism
+ACAT2,Ketone Bodies Metabolism
+BDH1,Ketone Bodies Metabolism
+SLC16A1,Ketone Bodies Metabolism
+SLC16A3,Ketone Bodies Metabolism
+SLC16A8,Ketone Bodies Metabolism
+SLC5A12,Ketone Bodies Metabolism
+SLC5A8,Ketone Bodies Metabolism
+HMGCL,Ketone Bodies Metabolism
+HMGCLL1,Ketone Bodies Metabolism
+AACS,Ketone Bodies Metabolism
+ACSS1,Ketone Bodies Metabolism
+ACSS2,Ketone Bodies Metabolism
+ACOT12,Ketone Bodies Metabolism
+OXCT1,Ketone Bodies Metabolism
+OXCT2,Ketone Bodies Metabolism
+ALDH2,Lysine Metabolism
+ALDH7A1,Lysine Metabolism
+AADAT,Lysine Metabolism
+AASS,Lysine Metabolism
+BBOX1,Lysine Metabolism
+PIPOX,Lysine Metabolism
+SLC25A21,Lysine Metabolism
+SLC38A4,Lysine Metabolism
+SLC3A1,Lysine Metabolism
+SLC6A14,Lysine Metabolism
+SLC7A1,Lysine Metabolism
+SLC7A2,Lysine Metabolism
+SLC7A3,Lysine Metabolism
+SPCS1,Lysine Metabolism
+SPCS2,Lysine Metabolism
+SPCS3,Lysine Metabolism
+TMLHE,Lysine Metabolism
+GCDH,Lysine Metabolism
+AHCY,Methionine Metabolism
+AHCYL1,Methionine Metabolism
+AHCYL2,Methionine Metabolism
+ACY1,Methionine Metabolism
+AMD1,Methionine Metabolism
+GNMT,Methionine Metabolism
+DNMT1,Methionine Metabolism
+DNMT3A,Methionine Metabolism
+DNMT3B,Methionine Metabolism
+DNMT3L,Methionine Metabolism
+BHMT,Methionine Metabolism
+BHMT2,Methionine Metabolism
+MAT1A,Methionine Metabolism
+MAT2A,Methionine Metabolism
+MAT2B,Methionine Metabolism
+MTAP,Methionine Metabolism
+MTR,Methionine Metabolism
+SLC25A26,Methionine Metabolism
+SLC3A1,Methionine Metabolism
+SLC43A2,Methionine Metabolism
+SLC6A14,Methionine Metabolism
+SLC7A8,Methionine Metabolism
+SUOX,Methionine Metabolism
+ABCB4,Multidrug resistance
+ABCC1,Multidrug resistance
+ABCC3,Multidrug resistance
+ABCC4,Multidrug resistance
+ALG1,N-Glycan Biosynthesis
+ALG10,N-Glycan Biosynthesis
+ALG12,N-Glycan Biosynthesis
+ALG2,N-Glycan Biosynthesis
+ALG3,N-Glycan Biosynthesis
+ALG5,N-Glycan Biosynthesis
+ALG6,N-Glycan Biosynthesis
+ALG8,N-Glycan Biosynthesis
+B4GALT1,N-Glycan Biosynthesis
+B4GALT2,N-Glycan Biosynthesis
+B4GALT3,N-Glycan Biosynthesis
+B4GALT5,N-Glycan Biosynthesis
+DAD1,N-Glycan Biosynthesis
+DDOST,N-Glycan Biosynthesis
+DOLPP1,N-Glycan Biosynthesis
+DPAGT1,N-Glycan Biosynthesis
+DPM1,N-Glycan Biosynthesis
+DPM2,N-Glycan Biosynthesis
+DPM3,N-Glycan Biosynthesis
+FUT8,N-Glycan Biosynthesis
+MAN1A1,N-Glycan Biosynthesis
+MAN1A2,N-Glycan Biosynthesis
+MAN1B1,N-Glycan Biosynthesis
+MAN1C1,N-Glycan Biosynthesis
+MAN2A1,N-Glycan Biosynthesis
+MAN2A2,N-Glycan Biosynthesis
+MGAT1,N-Glycan Biosynthesis
+MGAT2,N-Glycan Biosynthesis
+MGAT3,N-Glycan Biosynthesis
+MGAT4A,N-Glycan Biosynthesis
+MGAT4B,N-Glycan Biosynthesis
+MGAT5,N-Glycan Biosynthesis
+MOGS,N-Glycan Biosynthesis
+RPN1,N-Glycan Biosynthesis
+RPN2,N-Glycan Biosynthesis
+ST6GAL1,N-Glycan Biosynthesis
+TUSC3,N-Glycan Biosynthesis
+UGDH,N-Glycan Biosynthesis
+AGA,N-Glycan Degradation
+ENGASE,N-Glycan Degradation
+FUCA1,N-Glycan Degradation
+FUCA2,N-Glycan Degradation
+GALNS,N-Glycan Degradation
+GLB1,N-Glycan Degradation
+HEXA,N-Glycan Degradation
+HEXB,N-Glycan Degradation
+MAN2B1,N-Glycan Degradation
+MAN2C1,N-Glycan Degradation
+MANBA,N-Glycan Degradation
+NEU1,N-Glycan Degradation
+NEU2,N-Glycan Degradation
+NEU4,N-Glycan Degradation
+CD38,NAD Metabolism
+NADK,NAD Metabolism
+NADSYN1,NAD Metabolism
+NMNAT1,NAD Metabolism
+NMNAT2,NAD Metabolism
+NMNAT3,NAD Metabolism
+NNMT,NAD Metabolism
+NNT,NAD Metabolism
+QPRT,NAD Metabolism
+ABCC4,Nucleotide Metabolism
+BPNT1,Nucleotide Metabolism
+CANT1,Nucleotide Metabolism
+DCK,Nucleotide Metabolism
+DGUOK,Nucleotide Metabolism
+ENTPD1,Nucleotide Metabolism
+ENTPD2,Nucleotide Metabolism
+ENTPD3,Nucleotide Metabolism
+ENTPD4,Nucleotide Metabolism
+ENTPD5,Nucleotide Metabolism
+ENTPD6,Nucleotide Metabolism
+NME1,Nucleotide Metabolism
+NME2,Nucleotide Metabolism
+NME3,Nucleotide Metabolism
+NME4,Nucleotide Metabolism
+NME6,Nucleotide Metabolism
+NME7,Nucleotide Metabolism
+NUDT2,Nucleotide Metabolism
+NUDT5,Nucleotide Metabolism
+NUDT9,Nucleotide Metabolism
+PAPSS1,Nucleotide Metabolism
+PAPSS2,Nucleotide Metabolism
+SLC29A1,Nucleotide Metabolism
+ENPP1,Nucleotide Metabolism
+ENPP2,Nucleotide Metabolism
+ENPP3,Nucleotide Metabolism
+A4GNT,O-Glycan Biosynthesis
+B3GNT6,O-Glycan Biosynthesis
+C1GALT1,O-Glycan Biosynthesis
+GALNT1,O-Glycan Biosynthesis
+GALNT10,O-Glycan Biosynthesis
+GALNT11,O-Glycan Biosynthesis
+GALNT12,O-Glycan Biosynthesis
+GALNT13,O-Glycan Biosynthesis
+GALNT14,O-Glycan Biosynthesis
+GALNT2,O-Glycan Biosynthesis
+GALNT3,O-Glycan Biosynthesis
+GALNT4,O-Glycan Biosynthesis
+GALNT5,O-Glycan Biosynthesis
+GALNT6,O-Glycan Biosynthesis
+GALNT7,O-Glycan Biosynthesis
+GALNT8,O-Glycan Biosynthesis
+GALNT9,O-Glycan Biosynthesis
+GALNTL2,O-Glycan Biosynthesis
+GCNT1,O-Glycan Biosynthesis
+GCNT3,O-Glycan Biosynthesis
+GCNT4,O-Glycan Biosynthesis
+ST3GAL1,O-Glycan Biosynthesis
+ST6GALNAC1,O-Glycan Biosynthesis
+UGDH,O-Glycan Biosynthesis
+ATP5A1,Oxidative Phosphorylation
+ATP5B,Oxidative Phosphorylation
+ATP5C1,Oxidative Phosphorylation
+ATP5D,Oxidative Phosphorylation
+ATP5E,Oxidative Phosphorylation
+ATP5F1,Oxidative Phosphorylation
+ATP5G1,Oxidative Phosphorylation
+ATP5G2,Oxidative Phosphorylation
+ATP5G3,Oxidative Phosphorylation
+ATP5H,Oxidative Phosphorylation
+ATP5I,Oxidative Phosphorylation
+ATP5J,Oxidative Phosphorylation
+ATP5J2,Oxidative Phosphorylation
+ATP5L,Oxidative Phosphorylation
+COX4I1,Oxidative Phosphorylation
+COX4I2,Oxidative Phosphorylation
+COX5A,Oxidative Phosphorylation
+COX5B,Oxidative Phosphorylation
+COX6A1,Oxidative Phosphorylation
+COX6A2,Oxidative Phosphorylation
+COX6B1,Oxidative Phosphorylation
+COX6B2,Oxidative Phosphorylation
+COX6C,Oxidative Phosphorylation
+COX7A1,Oxidative Phosphorylation
+COX7A2,Oxidative Phosphorylation
+COX7A2L,Oxidative Phosphorylation
+COX7B,Oxidative Phosphorylation
+COX7B2,Oxidative Phosphorylation
+COX7C,Oxidative Phosphorylation
+COX8A,Oxidative Phosphorylation
+COX8C,Oxidative Phosphorylation
+CYC1,Oxidative Phosphorylation
+NDUFA1,Oxidative Phosphorylation
+NDUFA10,Oxidative Phosphorylation
+NDUFA11,Oxidative Phosphorylation
+NDUFA12,Oxidative Phosphorylation
+NDUFA13,Oxidative Phosphorylation
+NDUFA2,Oxidative Phosphorylation
+NDUFA3,Oxidative Phosphorylation
+NDUFA4,Oxidative Phosphorylation
+NDUFA5,Oxidative Phosphorylation
+NDUFA6,Oxidative Phosphorylation
+NDUFA7,Oxidative Phosphorylation
+NDUFA8,Oxidative Phosphorylation
+NDUFA9,Oxidative Phosphorylation
+NDUFAB1,Oxidative Phosphorylation
+NDUFB1,Oxidative Phosphorylation
+NDUFB10,Oxidative Phosphorylation
+NDUFB2,Oxidative Phosphorylation
+NDUFB3,Oxidative Phosphorylation
+NDUFB4,Oxidative Phosphorylation
+NDUFB5,Oxidative Phosphorylation
+NDUFB6,Oxidative Phosphorylation
+NDUFB7,Oxidative Phosphorylation
+NDUFB8,Oxidative Phosphorylation
+NDUFB9,Oxidative Phosphorylation
+NDUFC1,Oxidative Phosphorylation
+NDUFC2,Oxidative Phosphorylation
+NDUFS1,Oxidative Phosphorylation
+NDUFS2,Oxidative Phosphorylation
+NDUFS3,Oxidative Phosphorylation
+NDUFS4,Oxidative Phosphorylation
+NDUFS5,Oxidative Phosphorylation
+NDUFS6,Oxidative Phosphorylation
+NDUFS7,Oxidative Phosphorylation
+NDUFS8,Oxidative Phosphorylation
+NDUFV1,Oxidative Phosphorylation
+NDUFV2,Oxidative Phosphorylation
+NDUFV3,Oxidative Phosphorylation
+SLC25A4,Oxidative Phosphorylation
+SLC25A5,Oxidative Phosphorylation
+SLC25A6,Oxidative Phosphorylation
+UCP1,Oxidative Phosphorylation
+UCP2,Oxidative Phosphorylation
+UCP3,Oxidative Phosphorylation
+UQCR10,Oxidative Phosphorylation
+UQCRB,Oxidative Phosphorylation
+UQCRC1,Oxidative Phosphorylation
+UQCRC2,Oxidative Phosphorylation
+UQCRFS1,Oxidative Phosphorylation
+UQCRH,Oxidative Phosphorylation
+UQCRQ,Oxidative Phosphorylation
+FBP1,Pentose Phosphate Pathway
+FBP2,Pentose Phosphate Pathway
+PGM2,Pentose Phosphate Pathway
+DCXR,Pentose Phosphate Pathway
+XYLB,Pentose Phosphate Pathway
+G6PD,Pentose Phosphate Pathway
+H6PD,Pentose Phosphate Pathway
+PGD,Pentose Phosphate Pathway
+PGLS,Pentose Phosphate Pathway
+PRPS1,Pentose Phosphate Pathway
+PRPS1L1,Pentose Phosphate Pathway
+PRPS2,Pentose Phosphate Pathway
+RBKS,Pentose Phosphate Pathway
+RPE,Pentose Phosphate Pathway
+RPIA,Pentose Phosphate Pathway
+TALDO1,Pentose Phosphate Pathway
+TKT,Pentose Phosphate Pathway
+TKTL1,Pentose Phosphate Pathway
+TKTL2,Pentose Phosphate Pathway
+ALDH3A1,Phenylalanine metabolism
+ALDH3B1,Phenylalanine metabolism
+ALDH3B2,Phenylalanine metabolism
+ABP1,Phenylalanine metabolism
+AOC2,Phenylalanine metabolism
+DDC,Phenylalanine metabolism
+GOT1,Phenylalanine metabolism
+GOT2,Phenylalanine metabolism
+HPD,Phenylalanine metabolism
+MAOA,Phenylalanine metabolism
+MAOB,Phenylalanine metabolism
+PAH,Phenylalanine metabolism
+SLC16A10,Phenylalanine metabolism
+SLC38A1,Phenylalanine metabolism
+SLC38A2,Phenylalanine metabolism
+SLC38A4,Phenylalanine metabolism
+SLC43A1,Phenylalanine metabolism
+SLC43A2,Phenylalanine metabolism
+SLC6A14,Phenylalanine metabolism
+SLC7A2,Phenylalanine metabolism
+SLC7A3,Phenylalanine metabolism
+SLC7A5,Phenylalanine metabolism
+SLC7A8,Phenylalanine metabolism
+TAT,Phenylalanine metabolism
+PPA1,Phosphate Metabolism
+PPA2,Phosphate Metabolism
+HCST,Phosphoinositide Signalling
+INPP1,Phosphoinositide Signalling
+INPP4A,Phosphoinositide Signalling
+INPP4B,Phosphoinositide Signalling
+INPP5A,Phosphoinositide Signalling
+INPP5B,Phosphoinositide Signalling
+INPP5D,Phosphoinositide Signalling
+INPP5E,Phosphoinositide Signalling
+INPPL1,Phosphoinositide Signalling
+ITPKA,Phosphoinositide Signalling
+ITPKB,Phosphoinositide Signalling
+ITPKC,Phosphoinositide Signalling
+MTMR3,Phosphoinositide Signalling
+OCRL,Phosphoinositide Signalling
+PIK3C2A,Phosphoinositide Signalling
+PIK3C2B,Phosphoinositide Signalling
+PIK3C2G,Phosphoinositide Signalling
+PIK3C3,Phosphoinositide Signalling
+PIK3CA,Phosphoinositide Signalling
+PIK3CB,Phosphoinositide Signalling
+PIK3CD,Phosphoinositide Signalling
+PIK3CG,Phosphoinositide Signalling
+PIK3R1,Phosphoinositide Signalling
+PIK3R2,Phosphoinositide Signalling
+PIK3R3,Phosphoinositide Signalling
+PIK3R5,Phosphoinositide Signalling
+PIP5K1A,Phosphoinositide Signalling
+PIP5K1B,Phosphoinositide Signalling
+PIP5K1C,Phosphoinositide Signalling
+PLCB1,Phosphoinositide Signalling
+PLCB2,Phosphoinositide Signalling
+PLCB3,Phosphoinositide Signalling
+PLCB4,Phosphoinositide Signalling
+PLCD1,Phosphoinositide Signalling
+PLCD3,Phosphoinositide Signalling
+PLCD4,Phosphoinositide Signalling
+PLCE1,Phosphoinositide Signalling
+PLCG1,Phosphoinositide Signalling
+PLCG2,Phosphoinositide Signalling
+PLCH1,Phosphoinositide Signalling
+PLCH2,Phosphoinositide Signalling
+PLCL1,Phosphoinositide Signalling
+PLCXD2,Phosphoinositide Signalling
+PLCZ1,Phosphoinositide Signalling
+PTEN,Phosphoinositide Signalling
+SYNJ1,Phosphoinositide Signalling
+SYNJ2,Phosphoinositide Signalling
+ADC,Polyamines Metabolism
+AGMAT,Polyamines Metabolism
+AMD1,Polyamines Metabolism
+MAOA,Polyamines Metabolism
+MAOB,Polyamines Metabolism
+ODC1,Polyamines Metabolism
+SAT2,Polyamines Metabolism
+SMS,Polyamines Metabolism
+SMOX,Polyamines Metabolism
+SRM,Polyamines Metabolism
+SSAT2,Polyamines Metabolism
+ALAD,Porphyrin and Heme Metabolism
+ALAS1,Porphyrin and Heme Metabolism
+ALAS2,Porphyrin and Heme Metabolism
+BLVRA,Porphyrin and Heme Metabolism
+BLVRB,Porphyrin and Heme Metabolism
+CPOX,Porphyrin and Heme Metabolism
+CYBRD1,Porphyrin and Heme Metabolism
+FECH,Porphyrin and Heme Metabolism
+FTH1,Porphyrin and Heme Metabolism
+FTMT,Porphyrin and Heme Metabolism
+HCCS,Porphyrin and Heme Metabolism
+HMBS,Porphyrin and Heme Metabolism
+HMOX1,Porphyrin and Heme Metabolism
+HMOX2,Porphyrin and Heme Metabolism
+PPOX,Porphyrin and Heme Metabolism
+SLC46A1,Porphyrin and Heme Metabolism
+SLCO1B1,Porphyrin and Heme Metabolism
+SLCO1B3,Porphyrin and Heme Metabolism
+UROD,Porphyrin and Heme Metabolism
+UROS,Porphyrin and Heme Metabolism
+HIBCH,Propanoate Metabolism
+SLC16A1,Propanoate Metabolism
+SLC16A3,Propanoate Metabolism
+SLC16A7,Propanoate Metabolism
+SLC16A8,Propanoate Metabolism
+SLC5A12,Propanoate Metabolism
+SLC5A8,Propanoate Metabolism
+P4HA1,Protein Modification
+P4HA2,Protein Modification
+P4HB,Protein Modification
+GGPS1,Protein Modification
+HMGCR,Protein Modification
+SLC25A1,Protein Modification
+SLC33A1,Protein Modification
+MTMR3,Protein Modification
+PLOD1,Protein Modification
+PLOD2,Protein Modification
+PLOD3,Protein Modification
+GCH1,Pterin Biosynthesis
+PCBD1,Pterin Biosynthesis
+PTS,Pterin Biosynthesis
+QDPR,Pterin Biosynthesis
+SPR,Pterin Biosynthesis
+ADSL,Purine Biosynthesis
+ATIC,Purine Biosynthesis
+GART,Purine Biosynthesis
+PAICS,Purine Biosynthesis
+PFAS,Purine Biosynthesis
+PPAT,Purine Biosynthesis
+GMPS,Purine Biosynthesis
+IMPDH1,Purine Biosynthesis
+IMPDH2,Purine Biosynthesis
+PRPS1,Purine Biosynthesis
+PRPS1L1,Purine Biosynthesis
+PRPS2,Purine Biosynthesis
+ADK,Purine Metabolism
+ADSS,Purine Metabolism
+ADSSL1,Purine Metabolism
+AK1,Purine Metabolism
+AK2,Purine Metabolism
+AK3,Purine Metabolism
+AK3L1,Purine Metabolism
+AK5,Purine Metabolism
+AK7,Purine Metabolism
+AMPD1,Purine Metabolism
+AMPD2,Purine Metabolism
+AMPD3,Purine Metabolism
+GMPR,Purine Metabolism
+GMPR2,Purine Metabolism
+GUK1,Purine Metabolism
+ITPA,Purine Metabolism
+NT5C1B,Purine Metabolism
+NT5C2,Purine Metabolism
+NT5E,Purine Metabolism
+SLC2A9,Purine Metabolism
+ADA,Purine Metabolism
+APRT,Purine Metabolism
+GDA,Purine Metabolism
+HPRT1,Purine Metabolism
+SLC28A2,Purine Metabolism
+SLC28A3,Purine Metabolism
+SLC29A2,Purine Metabolism
+XDH,Purine Metabolism
+CPS1,Pyrimidine Biosynthesis
+PRPS1,Pyrimidine Biosynthesis
+PRPS1L1,Pyrimidine Biosynthesis
+PRPS2,Pyrimidine Biosynthesis
+CAD,Pyrimidine Biosynthesis
+DHODH,Pyrimidine Biosynthesis
+UMPS,Pyrimidine Biosynthesis
+ALDH6A1,Pyrimidine Metabolism
+DUT,Pyrimidine Metabolism
+NT5C,Pyrimidine Metabolism
+TK1,Pyrimidine Metabolism
+TK2,Pyrimidine Metabolism
+UCK1,Pyrimidine Metabolism
+UCK2,Pyrimidine Metabolism
+UPP2,Pyrimidine Metabolism
+AICDA,Pyrimidine Metabolism
+CDA,Pyrimidine Metabolism
+CTPS,Pyrimidine Metabolism
+CTPS2,Pyrimidine Metabolism
+DCTD,Pyrimidine Metabolism
+DPYD,Pyrimidine Metabolism
+DPYS,Pyrimidine Metabolism
+DPYSL2,Pyrimidine Metabolism
+DPYSL3,Pyrimidine Metabolism
+SLC28A1,Pyrimidine Metabolism
+SLC28A3,Pyrimidine Metabolism
+SLC29A1,Pyrimidine Metabolism
+UPB1,Pyrimidine Metabolism
+UPP1,Pyrimidine Metabolism
+SDS,Pyruvate Metabolism
+GPT,Pyruvate Metabolism
+GPT2,Pyruvate Metabolism
+HAO1,Pyruvate Metabolism
+HAO2,Pyruvate Metabolism
+GRHPR,Pyruvate Metabolism
+AGXT,Pyruvate Metabolism
+AGXT2,Pyruvate Metabolism
+AGXT2L1,Pyruvate Metabolism
+ADH1A,Retinol Metabolism
+ADH1B,Retinol Metabolism
+ADH1C,Retinol Metabolism
+ADH7,Retinol Metabolism
+AOX1,Retinol Metabolism
+ZADH2,Retinol Metabolism
+ALDH1A2,Retinol Metabolism
+ALDH1A3,Retinol Metabolism
+BCMO1,Retinol Metabolism
+LRAT,Retinol Metabolism
+PNPLA4,Retinol Metabolism
+RDH10,Retinol Metabolism
+RDH11,Retinol Metabolism
+RDH12,Retinol Metabolism
+RDH13,Retinol Metabolism
+RDH14,Retinol Metabolism
+RDH16,Retinol Metabolism
+RDH5,Retinol Metabolism
+RDH8,Retinol Metabolism
+SDR16C5,Retinol Metabolism
+UGT1A10,Retinol Metabolism
+UGT1A8,Retinol Metabolism
+ACP1,Riboflavin Metabolism
+ACP2,Riboflavin Metabolism
+ENPP1,Riboflavin Metabolism
+FLAD1,Riboflavin Metabolism
+RFK,Riboflavin Metabolism
+TYR,Riboflavin Metabolism
+ADH1A,ROS Detoxification
+ADH1B,ROS Detoxification
+ADH1C,ROS Detoxification
+ADH7,ROS Detoxification
+AKR1B1,ROS Detoxification
+AKR1A1,ROS Detoxification
+AKR1C4,ROS Detoxification
+ALDH1A1,ROS Detoxification
+ALDH2,ROS Detoxification
+ALDH3A1,ROS Detoxification
+ALDH3B1,ROS Detoxification
+ALDH3B2,ROS Detoxification
+AOX1,ROS Detoxification
+ZADH2,ROS Detoxification
+TXNRD1,ROS Detoxification
+TXNRD2,ROS Detoxification
+CAT,ROS Detoxification
+EPX,ROS Detoxification
+LPO,ROS Detoxification
+MPO,ROS Detoxification
+PRDX1,ROS Detoxification
+PRDX2,ROS Detoxification
+PRDX3,ROS Detoxification
+PRDX5,ROS Detoxification
+PRDX6,ROS Detoxification
+PXDN,ROS Detoxification
+PXDNL,ROS Detoxification
+SOD1,ROS Detoxification
+SOD2,ROS Detoxification
+SOD3,ROS Detoxification
+SLC2A10,ROS Detoxification
+TPO,ROS Detoxification
+AHCY,Selenoamino acid metabolism
+AHCYL1,Selenoamino acid metabolism
+AHCYL2,Selenoamino acid metabolism
+CBS,Selenoamino acid metabolism
+CTH,Selenoamino acid metabolism
+MAT1A,Selenoamino acid metabolism
+MAT2A,Selenoamino acid metabolism
+MAT2B,Selenoamino acid metabolism
+PAPSS1,Selenoamino acid metabolism
+PAPSS2,Selenoamino acid metabolism
+SCLY,Selenoamino acid metabolism
+SEPHS1,Selenoamino acid metabolism
+SEPHS2,Selenoamino acid metabolism
+A4GALT,Sphingolipid Metabolism
+ARSA,Sphingolipid Metabolism
+ASAH1,Sphingolipid Metabolism
+B3GALNT1,Sphingolipid Metabolism
+B3GALT4,Sphingolipid Metabolism
+B3GALT5,Sphingolipid Metabolism
+B3GNT3,Sphingolipid Metabolism
+B4GALNT1,Sphingolipid Metabolism
+CERK,Sphingolipid Metabolism
+COL4A3BP,Sphingolipid Metabolism
+FUT1,Sphingolipid Metabolism
+GAL3ST1,Sphingolipid Metabolism
+GALC,Sphingolipid Metabolism
+GALNS,Sphingolipid Metabolism
+GBA,Sphingolipid Metabolism
+GBGT1,Sphingolipid Metabolism
+GLA,Sphingolipid Metabolism
+GLB1,Sphingolipid Metabolism
+NAGA,Sphingolipid Metabolism
+NEU1,Sphingolipid Metabolism
+SGPL1,Sphingolipid Metabolism
+SGPP1,Sphingolipid Metabolism
+SLC33A1,Sphingolipid Metabolism
+SMPD3,Sphingolipid Metabolism
+SPHK2,Sphingolipid Metabolism
+SPTLC1,Sphingolipid Metabolism
+SPTLC2,Sphingolipid Metabolism
+ST3GAL2,Sphingolipid Metabolism
+ST3GAL5,Sphingolipid Metabolism
+ST6GALNAC2,Sphingolipid Metabolism
+ST6GALNAC3,Sphingolipid Metabolism
+ST6GALNAC5,Sphingolipid Metabolism
+ST6GALNAC6,Sphingolipid Metabolism
+ST8SIA1,Sphingolipid Metabolism
+ST8SIA5,Sphingolipid Metabolism
+UGCG,Sphingolipid Metabolism
+FDPS,Steroid Metabolism
+GGPS1,Steroid Metabolism
+HMGCS1,Steroid Metabolism
+HMGCS2,Steroid Metabolism
+LSS,Steroid Metabolism
+MVD,Steroid Metabolism
+MVK,Steroid Metabolism
+NSDHL,Steroid Metabolism
+PMVK,Steroid Metabolism
+SC4MOL,Steroid Metabolism
+SC5DL,Steroid Metabolism
+SOAT1,Steroid Metabolism
+SQLE,Steroid Metabolism
+TM7SF2,Steroid Metabolism
+HSD17B12,Steroid Metabolism
+ABCC1,Steroid Metabolism
+ABCC4,Steroid Metabolism
+AKR1C1,Steroid Metabolism
+AKR1C4,Steroid Metabolism
+AKR1D1,Steroid Metabolism
+DHCR24,Steroid Metabolism
+CYP11A1,Steroid Metabolism
+CYP11B1,Steroid Metabolism
+CYP11B2,Steroid Metabolism
+CYP17A1,Steroid Metabolism
+CYP19A1,Steroid Metabolism
+CYP1B1,Steroid Metabolism
+CYP21A2,Steroid Metabolism
+CYP3A43,Steroid Metabolism
+CYP3A7,Steroid Metabolism
+EBP,Steroid Metabolism
+FDFT1,Steroid Metabolism
+HSD11B1,Steroid Metabolism
+HSD11B2,Steroid Metabolism
+HSD17B1,Steroid Metabolism
+HSD17B2,Steroid Metabolism
+HSD17B3,Steroid Metabolism
+HSD17B7,Steroid Metabolism
+HSD17B8,Steroid Metabolism
+HSD3B1,Steroid Metabolism
+HSD3B2,Steroid Metabolism
+SCP2,Steroid Metabolism
+SLC25A1,Steroid Metabolism
+SLCO1A2,Steroid Metabolism
+SLCO1B1,Steroid Metabolism
+SLCO1B3,Steroid Metabolism
+SLCO1C1,Steroid Metabolism
+SLCO3A1,Steroid Metabolism
+SLCO4A1,Steroid Metabolism
+SRD5A1,Steroid Metabolism
+SRD5A2,Steroid Metabolism
+STARD3,Steroid Metabolism
+STS,Steroid Metabolism
+SULT1A1,Steroid Metabolism
+SULT1E1,Steroid Metabolism
+SULT2A1,Steroid Metabolism
+SULT2B1,Steroid Metabolism
+UGT1A10,Steroid Metabolism
+UGT1A8,Steroid Metabolism
+UGT2B28,Steroid Metabolism
+UGT2B4,Steroid Metabolism
+UGT2B7,Steroid Metabolism
+AKR1A1,Sugar Degradation
+AKR1C4,Sugar Degradation
+AKR1B1,Sugar Degradation
+AMY1A,Sugar Degradation
+AMY2A,Sugar Degradation
+AMY2B,Sugar Degradation
+ATHL1,Sugar Degradation
+GBA3,Sugar Degradation
+MGAM,Sugar Degradation
+SI,Sugar Degradation
+TREH,Sugar Degradation
+GGT1,Taurine and hypotaurine metabolism
+CDO1,Taurine and hypotaurine metabolism
+CSAD,Taurine and hypotaurine metabolism
+SLC6A6,Taurine and hypotaurine metabolism
+SLC19A1,Thiamine Metabolism
+SLC19A2,Thiamine Metabolism
+SLC19A3,Thiamine Metabolism
+THTPA,Thiamine Metabolism
+TPK1,Thiamine Metabolism
+SLC33A1,"Transport, Endoplasmic Reticular"
+SLC35D1,"Transport, Endoplasmic Reticular"
+SLC37A4,"Transport, Endoplasmic Reticular"
+SLC3A2,"Transport, Extracellular"
+ATP1A1,"Transport, Extracellular"
+ATP1A2,"Transport, Extracellular"
+ATP1A3,"Transport, Extracellular"
+ATP1A4,"Transport, Extracellular"
+ATP1B1,"Transport, Extracellular"
+ATP1B2,"Transport, Extracellular"
+ATP1B3,"Transport, Extracellular"
+ATP1B4,"Transport, Extracellular"
+ATP2B1,"Transport, Extracellular"
+ATP2B2,"Transport, Extracellular"
+ATP2B3,"Transport, Extracellular"
+ATP2B4,"Transport, Extracellular"
+ATP4A,"Transport, Extracellular"
+ATP4B,"Transport, Extracellular"
+RHAG,"Transport, Extracellular"
+RHBG,"Transport, Extracellular"
+SLC12A1,"Transport, Extracellular"
+SLC12A2,"Transport, Extracellular"
+SLC12A3,"Transport, Extracellular"
+SLC12A4,"Transport, Extracellular"
+SLC12A5,"Transport, Extracellular"
+SLC12A6,"Transport, Extracellular"
+SLC12A7,"Transport, Extracellular"
+SLC13A1,"Transport, Extracellular"
+SLC13A4,"Transport, Extracellular"
+SLC15A2,"Transport, Extracellular"
+SLC17A1,"Transport, Extracellular"
+SLC17A2,"Transport, Extracellular"
+SLC17A3,"Transport, Extracellular"
+SLC17A4,"Transport, Extracellular"
+SLC20A1,"Transport, Extracellular"
+SLC20A2,"Transport, Extracellular"
+SLC24A1,"Transport, Extracellular"
+SLC24A2,"Transport, Extracellular"
+SLC24A3,"Transport, Extracellular"
+SLC24A4,"Transport, Extracellular"
+SLC26A1,"Transport, Extracellular"
+SLC26A11,"Transport, Extracellular"
+SLC26A2,"Transport, Extracellular"
+SLC26A3,"Transport, Extracellular"
+SLC26A4,"Transport, Extracellular"
+SLC26A6,"Transport, Extracellular"
+SLC26A7,"Transport, Extracellular"
+SLC26A8,"Transport, Extracellular"
+SLC26A9,"Transport, Extracellular"
+SLC34A1,"Transport, Extracellular"
+SLC34A2,"Transport, Extracellular"
+SLC34A3,"Transport, Extracellular"
+SLC4A1,"Transport, Extracellular"
+SLC4A10,"Transport, Extracellular"
+SLC4A2,"Transport, Extracellular"
+SLC4A3,"Transport, Extracellular"
+SLC4A4,"Transport, Extracellular"
+SLC4A5,"Transport, Extracellular"
+SLC4A7,"Transport, Extracellular"
+SLC4A8,"Transport, Extracellular"
+SLC4A9,"Transport, Extracellular"
+SLC5A5,"Transport, Extracellular"
+SLC8A1,"Transport, Extracellular"
+SLC8A2,"Transport, Extracellular"
+SLC8A3,"Transport, Extracellular"
+SLC9A1,"Transport, Extracellular"
+SLC9A2,"Transport, Extracellular"
+SLC9A3,"Transport, Extracellular"
+SLC9A4,"Transport, Extracellular"
+SLC9A5,"Transport, Extracellular"
+SLC2A1,"Transport, Golgi Apparatus"
+SLC35A1,"Transport, Golgi Apparatus"
+SLC35A2,"Transport, Golgi Apparatus"
+SLC35A3,"Transport, Golgi Apparatus"
+SLC35B2,"Transport, Golgi Apparatus"
+SLC35B4,"Transport, Golgi Apparatus"
+SLC35C1,"Transport, Golgi Apparatus"
+SLC35D2,"Transport, Golgi Apparatus"
+SLC9A7,"Transport, Golgi Apparatus"
+SLC9A8,"Transport, Golgi Apparatus"
+ATP6V0A1,"Transport, Lysosomal"
+ATP6V0A2,"Transport, Lysosomal"
+ATP6V0A4,"Transport, Lysosomal"
+ATP6V0B,"Transport, Lysosomal"
+ATP6V0C,"Transport, Lysosomal"
+ATP6V0D1,"Transport, Lysosomal"
+ATP6V0D2,"Transport, Lysosomal"
+ATP6V1A,"Transport, Lysosomal"
+ATP6V1B1,"Transport, Lysosomal"
+ATP6V1B2,"Transport, Lysosomal"
+ATP6V1C1,"Transport, Lysosomal"
+ATP6V1C2,"Transport, Lysosomal"
+ATP6V1D,"Transport, Lysosomal"
+ATP6V1E1,"Transport, Lysosomal"
+ATP6V1E2,"Transport, Lysosomal"
+ATP6V1F,"Transport, Lysosomal"
+ATP6V1G1,"Transport, Lysosomal"
+ATP6V1G2,"Transport, Lysosomal"
+ATP6V1G3,"Transport, Lysosomal"
+ATP6V1H,"Transport, Lysosomal"
+SLC17A5,"Transport, Lysosomal"
+SLC29A3,"Transport, Lysosomal"
+SLC36A1,"Transport, Lysosomal"
+TCIRG1,"Transport, Lysosomal"
+AQP8,"Transport, Mitochondrial"
+AQP9,"Transport, Mitochondrial"
+MMAA,"Transport, Mitochondrial"
+SLC25A14,"Transport, Mitochondrial"
+SLC25A27,"Transport, Mitochondrial"
+SLC25A3,"Transport, Mitochondrial"
+AGPAT1,Triacylglycerol Synthesis
+AGPAT2,Triacylglycerol Synthesis
+AGPAT3,Triacylglycerol Synthesis
+AGPAT4,Triacylglycerol Synthesis
+AGPAT5,Triacylglycerol Synthesis
+AGPAT6,Triacylglycerol Synthesis
+DGAT1,Triacylglycerol Synthesis
+DGAT2,Triacylglycerol Synthesis
+GNPAT,Triacylglycerol Synthesis
+GPAM,Triacylglycerol Synthesis
+LIPC,Triacylglycerol Synthesis
+LIPF,Triacylglycerol Synthesis
+LIPG,Triacylglycerol Synthesis
+LPL,Triacylglycerol Synthesis
+MGLL,Triacylglycerol Synthesis
+MOGAT1,Triacylglycerol Synthesis
+MOGAT2,Triacylglycerol Synthesis
+PLA2G3,Triacylglycerol Synthesis
+PNLIP,Triacylglycerol Synthesis
+PNLIPRP1,Triacylglycerol Synthesis
+PNLIPRP2,Triacylglycerol Synthesis
+PPAP2A,Triacylglycerol Synthesis
+PPAP2B,Triacylglycerol Synthesis
+PPAP2C,Triacylglycerol Synthesis
+ALDH2,Tryptophan metabolism
+AADAT,Tryptophan metabolism
+ABP1,Tryptophan metabolism
+ACMSD,Tryptophan metabolism
+AOC2,Tryptophan metabolism
+ASMT,Tryptophan metabolism
+CCBL1,Tryptophan metabolism
+DDC,Tryptophan metabolism
+GCDH,Tryptophan metabolism
+HAAO,Tryptophan metabolism
+INMT,Tryptophan metabolism
+KMO,Tryptophan metabolism
+KYNU,Tryptophan metabolism
+MAOA,Tryptophan metabolism
+MAOB,Tryptophan metabolism
+SLC16A10,Tryptophan metabolism
+SLC18A1,Tryptophan metabolism
+SLC18A2,Tryptophan metabolism
+SLC22A1,Tryptophan metabolism
+SLC22A2,Tryptophan metabolism
+SLC22A3,Tryptophan metabolism
+SLC25A21,Tryptophan metabolism
+SLC6A14,Tryptophan metabolism
+SLC7A5,Tryptophan metabolism
+SLC7A8,Tryptophan metabolism
+TDO2,Tryptophan metabolism
+TPH1,Tryptophan metabolism
+TPH2,Tryptophan metabolism
+GOT2,Tryptophan metabolism
+ADH4,Tyrosine metabolism
+ALDH3A1,Tyrosine metabolism
+ALDH3B1,Tyrosine metabolism
+ALDH3B2,Tyrosine metabolism
+ABP1,Tyrosine metabolism
+AOC2,Tyrosine metabolism
+AOC3,Tyrosine metabolism
+COMT,Tyrosine metabolism
+COMTD1,Tyrosine metabolism
+DBH,Tyrosine metabolism
+DCT,Tyrosine metabolism
+DDC,Tyrosine metabolism
+DUOX1,Tyrosine metabolism
+DUOX2,Tyrosine metabolism
+FAHD1,Tyrosine metabolism
+FAH,Tyrosine metabolism
+GOT1,Tyrosine metabolism
+GOT2,Tyrosine metabolism
+GSTZ1,Tyrosine metabolism
+HGD,Tyrosine metabolism
+HPD,Tyrosine metabolism
+MAOA,Tyrosine metabolism
+MAOB,Tyrosine metabolism
+MOXD1,Tyrosine metabolism
+PAH,Tyrosine metabolism
+PNMT,Tyrosine metabolism
+SLC16A10,Tyrosine metabolism
+SLC16A2,Tyrosine metabolism
+SLC18A1,Tyrosine metabolism
+SLC18A2,Tyrosine metabolism
+SLC22A1,Tyrosine metabolism
+SLC22A2,Tyrosine metabolism
+SLC22A3,Tyrosine metabolism
+SLC6A14,Tyrosine metabolism
+SLC6A2,Tyrosine metabolism
+SLC6A3,Tyrosine metabolism
+SLC6A4,Tyrosine metabolism
+SLC7A5,Tyrosine metabolism
+SLC7A8,Tyrosine metabolism
+SLCO1A2,Tyrosine metabolism
+SLCO1B1,Tyrosine metabolism
+SLCO1B3,Tyrosine metabolism
+SLCO1C1,Tyrosine metabolism
+SLCO4A1,Tyrosine metabolism
+SULT1A1,Tyrosine metabolism
+SULT1A2,Tyrosine metabolism
+SULT1A3,Tyrosine metabolism
+TAT,Tyrosine metabolism
+TH,Tyrosine metabolism
+TPO,Tyrosine metabolism
+TYR,Tyrosine metabolism
+TYRP1,Tyrosine metabolism
+HMGCR,Ubiquinone Biosynthesis
+FDPS,Ubiquinone Biosynthesis
+COQ2,Ubiquinone Biosynthesis
+COQ3,Ubiquinone Biosynthesis
+COQ6,Ubiquinone Biosynthesis
+COQ7,Ubiquinone Biosynthesis
+GATM,Urea Cycle
+ABP1,Urea Cycle
+ACY1,Urea Cycle
+AQP9,Urea Cycle
+CPS1,Urea Cycle
+SLC14A1,Urea Cycle
+SLC14A2,Urea Cycle
+ARG1,Urea Cycle
+ARG2,Urea Cycle
+ASL,Urea Cycle
+ASS1,Urea Cycle
+NOS1,Urea Cycle
+NOS3,Urea Cycle
+OTC,Urea Cycle
+HMGCL,"Valine, Leucine and Isoleucine Metabolism"
+ALDH6A1,"Valine, Leucine and Isoleucine Metabolism"
+ACAD8,"Valine, Leucine and Isoleucine Metabolism"
+ACADM,"Valine, Leucine and Isoleucine Metabolism"
+ACADSB,"Valine, Leucine and Isoleucine Metabolism"
+ACAT1,"Valine, Leucine and Isoleucine Metabolism"
+AUH,"Valine, Leucine and Isoleucine Metabolism"
+BCAT1,"Valine, Leucine and Isoleucine Metabolism"
+BCAT2,"Valine, Leucine and Isoleucine Metabolism"
+BCKDHA,"Valine, Leucine and Isoleucine Metabolism"
+BCKDHB,"Valine, Leucine and Isoleucine Metabolism"
+DBT,"Valine, Leucine and Isoleucine Metabolism"
+DLD,"Valine, Leucine and Isoleucine Metabolism"
+HIBADH,"Valine, Leucine and Isoleucine Metabolism"
+IVD,"Valine, Leucine and Isoleucine Metabolism"
+MCCC1,"Valine, Leucine and Isoleucine Metabolism"
+MCCC2,"Valine, Leucine and Isoleucine Metabolism"
+MCEE,"Valine, Leucine and Isoleucine Metabolism"
+MUT,"Valine, Leucine and Isoleucine Metabolism"
+PCCA,"Valine, Leucine and Isoleucine Metabolism"
+PCCB,"Valine, Leucine and Isoleucine Metabolism"
+SLC16A1,"Valine, Leucine and Isoleucine Metabolism"
+SLC16A7,"Valine, Leucine and Isoleucine Metabolism"
+SLC16A8,"Valine, Leucine and Isoleucine Metabolism"
+SLC1A5,"Valine, Leucine and Isoleucine Metabolism"
+SLC5A8,"Valine, Leucine and Isoleucine Metabolism"
+SLC38A1,"Valine, Leucine and Isoleucine Metabolism"
+SLC38A2,"Valine, Leucine and Isoleucine Metabolism"
+SLC38A4,"Valine, Leucine and Isoleucine Metabolism"
+SLC43A1,"Valine, Leucine and Isoleucine Metabolism"
+SLC43A2,"Valine, Leucine and Isoleucine Metabolism"
+SLC6A14,"Valine, Leucine and Isoleucine Metabolism"
+SLC7A2,"Valine, Leucine and Isoleucine Metabolism"
+SLC7A3,"Valine, Leucine and Isoleucine Metabolism"
+SLC7A5,"Valine, Leucine and Isoleucine Metabolism"
+SLC7A6,"Valine, Leucine and Isoleucine Metabolism"
+SLC7A7,"Valine, Leucine and Isoleucine Metabolism"
+SLC7A8,"Valine, Leucine and Isoleucine Metabolism"
+ALDH2,"Valine, Leucine and Isoleucine Metabolism"
+MMAA,Vitamin B12 Metabolism
+PDXK,Vitamin B6 Metabolism
+PDXP,Vitamin B6 Metabolism
+PNPO,Vitamin B6 Metabolism
+CYP24A1,Vitamin D
+CYP27A1,Vitamin D
+ADH1A,Xenobiotics Metabolism
+ADH1B,Xenobiotics Metabolism
+ADH1C,Xenobiotics Metabolism
+ADH7,Xenobiotics Metabolism
+AKR1B1,Xenobiotics Metabolism
+AKR1A1,Xenobiotics Metabolism
+AKR1C4,Xenobiotics Metabolism
+ALDH1A1,Xenobiotics Metabolism
+ALDH1B1,Xenobiotics Metabolism
+ALDH2,Xenobiotics Metabolism
+ALDH3A1,Xenobiotics Metabolism
+ALDH3B1,Xenobiotics Metabolism
+ALDH3B2,Xenobiotics Metabolism
+AOX1,Xenobiotics Metabolism
+ZADH2,Xenobiotics Metabolism
+SULT1A1,Xenobiotics Metabolism
+SULT1A2,Xenobiotics Metabolism
+SULT1A3,Xenobiotics Metabolism
+AADAC,Xenobiotics Metabolism
+AKR7A2,Xenobiotics Metabolism
+CES2,Xenobiotics Metabolism
+CYP2E1,Xenobiotics Metabolism
+MAOA,Xenobiotics Metabolism
+MAOB,Xenobiotics Metabolism
+CYP51A1,Xenobiotics Metabolism
+CBR1,Xenobiotics Metabolism
+PAPSS1,Xenobiotics Metabolism
+PAPSS2,Xenobiotics Metabolism
+UGT1A10,Xenobiotics Metabolism
+UGT1A8,Xenobiotics Metabolism

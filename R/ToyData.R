@@ -35,6 +35,8 @@
 #'         \item{\code{"Tissue_DMA"}: }
 #'         \item{\code{"Tissue_DMA_Old"}: }
 #'         \item{\code{"Tissue_DMA_Young"}: }
+#'         \item{\code{"Tissue_TvN_Proteomics"}: }
+#'         \item{\code{"Tissue_TvN_RNAseq"}: }
 #'     }
 #'
 #' @return A data frame containing the toy data.
@@ -42,7 +44,7 @@
 #' @description Import and process .csv file to create toy data DF.
 #'
 #' @examples
-#' Intra <- ToyData("IntraCells_Raw")
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
 #'
 #' @importFrom readr read_csv cols
 #' @importFrom magrittr %>% extract2
@@ -66,6 +68,8 @@ ToyData <- function(Dataset) {
     Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv",
     Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv",
     Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv",
+    Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv",
+    Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv",
     AlaninePathways = "AlaninePathways.csv"
   )
 
