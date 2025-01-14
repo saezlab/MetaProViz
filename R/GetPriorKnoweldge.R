@@ -28,6 +28,7 @@
 #' @title KEGG
 #' @description Import and process KEGG.
 #' @importFrom utils read.csv
+#' @importFrom KEGGREST keggGet keggList
 #' @return A data frame containing the KEGG pathways for ORA.
 #'
 #' @examples
@@ -51,7 +52,7 @@ LoadKEGG <- function(){
     message("Cached file loaded from: ", File_path)
   }else{# load from KEGG
     # 1. Make a list of all available human pathways in KEGG
-    Pathways_H <- as.data.frame(keggList("pathway", "hsa"))  # hsa = human
+    Pathways_H <- as.data.frame(KEGGREST::keggList("pathway", "hsa"))  # hsa = human
 
     # 2. Initialize the result data frame
     KEGG_H <- data.frame(KEGGPathway = character(nrow(Pathways_H)),
@@ -66,7 +67,7 @@ LoadKEGG <- function(){
 
       tryCatch({#try-catch block is used to catch any errors that occur during the query process
         # Query the pathway information
-        query <- keggGet(path)
+        query <- KEGGREST::keggGet(path)
 
         # Extract the necessary information and store it in the result data frame
         KEGG_H[k, "KEGGPathway"] <- Pathways_H[k,]
