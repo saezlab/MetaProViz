@@ -51,6 +51,12 @@ LoadKEGG <- function(){
     KEGG_Metabolite <- readRDS(File_path)
     message("Cached file loaded from: ", File_path)
   }else{# load from KEGG
+    RequiredPackages <- c("KEGGREST")
+    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
+    if(length(new.packages)) install.packages(new.packages)
+
+    suppressMessages(library(KEGGREST))
+   
     # 1. Make a list of all available human pathways in KEGG
     Pathways_H <- as.data.frame(KEGGREST::keggList("pathway", "hsa"))  # hsa = human
 
