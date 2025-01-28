@@ -95,11 +95,15 @@ installation of the package and its dependencies.
 ## Example Data
 
 clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al
-including 138 matched tumour and normal tissue pairs \[@Hakimi2016\].
-Cell-lines data from intra- and extracellular metabolomics data from
-cell culture media from [metabolomics workbench project
+including 138 matched tumour and normal tissue pairs (Hakimi et al.
+2016). Cell-lines data from intra- and extracellular metabolomics data
+from cell culture media from [metabolomics workbench project
 PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
-<img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;" />
+<img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;" />  
+Additionally we also added transcriptomics and proteomics data of ccRCC
+patients processed with SiRCle (Mora et al. 2024), originally from
+[PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127)
+(Clark et al. 2019).
 
 ## Installation
 
@@ -115,32 +119,6 @@ Now **MetaProViz** can be imported as:
 ``` r
 library(MetaProViz)
 ```
-
-### Dependencies
-
-If you are using **MetaProViz** the following packages are required:  
-
-    "tidyverse"
-    "ggplot2"
-    "factoextra"
-    "qcc"
-    "hash"
-    "reshape"
-    "gridExtra"
-    "inflection"
-    "patchwork"
-    "clusterProfiler"
-    "ggupset"
-    "gtools"
-    "EnhancedVolcano"
-    "writexl"
-    "pheatmap"
-    "ggfortify"
-
-  
-While we have done our best to ensure all the dependencies are
-documented, if they aren’t please let us know and we will try to resolve
-them.
 
 ### Windows specifications
 
@@ -162,3 +140,39 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
       year = {2023},
       note = {R package version 2.1.4},
     }
+
+## References
+
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
+
+<div id="ref-Clark2019" class="csl-entry">
+
+Clark, David J, Saravana M Dhanasekaran, Francesca Petralia, Jianbo Pan,
+Xiaoyu Song, Yingwei Hu, Felipe da Veiga Leprevost, et al. 2019.
+“Integrated Proteogenomic Characterization of Clear Cell Renal Cell
+Carcinoma.” *Cell* 179 (4): 964–983.e31.
+<https://doi.org/10.1016/j.cell.2019.10.007>.
+
+</div>
+
+<div id="ref-Hakimi2016" class="csl-entry">
+
+Hakimi, A Ari, Ed Reznik, Chung-Han Lee, Chad J Creighton, A Rose
+Brannon, Augustin Luna, B Arman Aksoy, et al. 2016. “An Integrated
+Metabolic Atlas of Clear Cell Renal Cell Carcinoma.” *Cancer Cell* 29
+(1): 104–16. <https://doi.org/10.1016/j.ccell.2015.12.004>.
+
+</div>
+
+<div id="ref-Mora_Schmidt2024" class="csl-entry">
+
+Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and
+Mikael Bodén. 2024. “SiRCle (Signature Regulatory Clustering) Model
+Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
+*Genome Medicine* 16 (1): 144.
+<https://doi.org/10.1186/s13073-024-01415-3>.
+
+</div>
+
+</div>
