@@ -390,7 +390,7 @@ DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
 Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
 ### MCA-2Cond
-This metabolite clustering method is based on the Regulatory Clustering Method (RCM) that was developed as part of the Signature Regulatory Clustering (SiRCle) model (@Mora_Schmidt2022). As part of the [SiRCleR package](https://github.com/ArianeMora/SiRCleR/tree/main), also variation of the initial RCM method are proposed as  clustering based on two comparisons (e.g. KO versus WT in hypoxia and in normoxia).\
+This metabolite clustering method is based on the Regulatory Clustering Method (RCM) that was developed as part of the Signature Regulatory Clustering (SiRCle) model (@Mora_Schmidt2024). As part of the [SiRCleR package](https://github.com/ArianeMora/SiRCleR/tree/main), also variation of the initial RCM method are proposed as  clustering based on two comparisons (e.g. KO versus WT in hypoxia and in normoxia).\
 Here we set two different thresholds, one for the differential metabolite abundance (`Log2FC`) and one for the `significance` (e.g. p.adj). This will define if a feature (= metabolite) is assigned into:\
 1. ***"UP"***, which means a metabolite is significantly up-regulated in the underlying comparison.\
 2. ***"DOWN"***,  which means a metabolite is significantly down-regulated in the underlying comparison.\
