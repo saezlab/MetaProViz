@@ -303,6 +303,7 @@ MappingAmbiguity <- function(InputData,
     #Run Omnipath ambiguity
     ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- InputData %>%
       tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
+      filter(!is.na(!!sym(Comp[[comp]]$From)))%>%#Remove NA values, otherwise they are counted as column is character
       OmnipathR::ambiguity(
           from_col = !!sym(Comp[[comp]]$From),
           to_col = !!sym(Comp[[comp]]$To),
@@ -338,17 +339,7 @@ MappingAmbiguity <- function(InputData,
           unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To)), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)%>%
           separate_rows(!!sym(Comp[[comp]]$To), sep = ", ") %>%
           unite(UniqueID, c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
-          distinct()#%>%
-        #group_by(!!sym(Comp[[comp]]$From))%>%
-        # mutate(!!sym(paste0(Comp[[comp]]$To, "_AcrossGroup")) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
-        #                                        paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
-        #)) %>%
-        #mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, "_AcrossGroup)")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n_distinct(!!sym(Comp[[comp]]$To))))%>%
-        #ungroup()%>%
-        #distinct()%>%
-        #unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To, "_AcrossGroup")), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)
-
-        # Question: How do I now add the information about this across pathway mapping issue? --> we do have TRUE, but not what is the problem --> maybe we can be more specific?
+          distinct()
         }else{
           ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
             tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>%
@@ -365,6 +356,18 @@ MappingAmbiguity <- function(InputData,
             distinct()%>%
             mutate(!!sym(paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep="")) := NA)
         }
+    }
+
+    # Add NA metabolite maps back if they do exist:
+    Removed <- InputData %>%
+      tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
+      filter(is.na(!!sym(Comp[[comp]]$From)))
+    if(nrow(Removed)>0){
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- bind_rows(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]],
+                                                                                         test<- Removed%>%
+                                                                                            bind_cols(setNames(as.list(rep(NA, length(setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))),
+                                                                                                               setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))
+      )
     }
   }
 
@@ -386,7 +389,12 @@ MappingAmbiguity <- function(InputData,
         !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-many",
         !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-one",
         !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == NA  ~ "one-to-none",
-        TRUE ~ NA ))
+        !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & is.na(!!sym(paste0("Count(", To, "_to_", From, ")")))  ~ "one-to-none",
+        !!sym(paste0("Count(", From, "_to_", To, ")")) == NA & !!sym(paste0("Count(", To, "_to_", From, ")")) >= 1  ~ "none-to-one",
+        is.na(!!sym(paste0("Count(", From, "_to_", To, ")"))) & !!sym(paste0("Count(", To, "_to_", From, ")")) >= 1  ~ "none-to-one",
+        TRUE ~ NA )) %>%
+      mutate( !!sym(paste0("Count(", From, "_to_", To, ")")) := replace_na( !!sym(paste0("Count(", From, "_to_", To, ")")), 0)) %>%
+      mutate( !!sym(paste0("Count(", To, "_to_", From, ")")) := replace_na( !!sym(paste0("Count(", To, "_to_", From, ")")), 0))
 
     ResList[["Summary"]] <- Summary
   }
