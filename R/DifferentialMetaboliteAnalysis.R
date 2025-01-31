@@ -55,6 +55,7 @@
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom purrr map reduce
 #' @importFrom logger log_info
 #'
 #' @export
@@ -262,6 +263,38 @@ DMA <-function(InputData,
     }
 
   ################################################################################################################################################################################################
+  ###############  For CoRe=TRUE create summary of Feature_metadata ###############
+  if(CoRe==TRUE){
+    df_list_selected <- purrr::map(names(DMA_Output), function(df_name) {
+    df <- DMA_Output[[df_name]]  # Extract the dataframe
+
+    # Extract the dynamic column name
+    core_col <- grep("^CoRe_", names(df), value = TRUE)  # Find the column that starts with "CoRe_"
+    # Filter only columns where the part after "CoRe_" is in valid_conditions
+    core_col <- core_col[str_remove(core_col, "^CoRe_") %in% unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])]
+
+
+    # Select only the relevant columns
+    df_selected <- df %>%
+      select(Metabolite, all_of(core_col))
+
+    return(df_selected)
+  })
+
+  # Merge all dataframes by "Metabolite"
+  merged_df <- purrr::reduce(df_list_selected, full_join, by = "Metabolite")
+  names(merged_df) <- gsub("\\.x$", "", names(merged_df))#It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to be added to the column names. We only keep one column (.x)
+
+  Feature_Metadata <- merged_df %>%
+    select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))#Now we remove all other columns with .x.x, .y.y, etc.
+
+  if(is.null(SettingsFile_Metab) == FALSE){ #Add to Metadata file:
+    Feature_Metadata <- merge(SettingsFile_Metab%>%tibble::rownames_to_column("Metabolite"), Feature_Metadata , by = "Metabolite", all.x = TRUE)
+  }
+  }
+
+
+  ################################################################################################################################################################################################
   ###############  Plots ###############
   if(CoRe==TRUE){
     x <- "Log2(Distance)"
@@ -353,6 +386,20 @@ DMA <-function(InputData,
                          FileName= "DMA",
                          CoRe=CoRe,
                          PrintPlot=PrintPlot)))
+
+
+  suppressMessages(suppressWarnings(
+    SaveRes(InputList_DF=list("Feature_Metadata"=Feature_Metadata),#This needs to be a list, also for single comparisons
+            InputList_Plot= NULL,
+            SaveAs_Table=SaveAs_Table,
+            SaveAs_Plot=NULL,
+            FolderPath= Folder,
+            FileName= "DMA",
+            CoRe=CoRe,
+            PrintPlot=PrintPlot)))
+
+  DMA_Output_List <- c(DMA_Output_List, list("Feature_Metadata"=Feature_Metadata))
+
 
   DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
 
