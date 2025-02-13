@@ -59,8 +59,9 @@ First if you have not done yet, install the required dependencies and load the l
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
-
-
+library(magrittr)
+library(rlang)
+library(purrr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
