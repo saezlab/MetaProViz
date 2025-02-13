@@ -192,6 +192,179 @@ TranslateID <- function(InputData,
 }
 
 
+
+##########################################################################################
+### ### ### Find additional potential IDs  ### ### ###
+##########################################################################################
+
+#' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
+#'
+#' @param InputData Dataframe with at least one column with the detected metabolite IDs (one ID per row).
+#' @param SettingsInfo \emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}
+#' @param From ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#'
+#' @return Input DF with additional column including potential additional IDs.
+#'
+#' @examples
+#' DetectedIDs <- MetaProViz::ToyData(Data="Cells_MetaData")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
+#' Res <- MetaProViz::EquivalentIDs(InputData= DetectedIDs, SettingsInfo = c(InputID="KEGG.ID"), From = "kegg")
+#'
+#' @keywords Find potential additional IDs for one metabolite identifier
+#'
+#' @importFrom dplyr mutate select group_by ungroup distinct filter across rowwise
+#' @importFrom tidyr separate_rows
+#' @importFrom purrr map_chr
+#' @importFrom tidyselect all_of
+#' @importFrom rlang !!! !! := sym syms
+#' @importFrom OmnipathR id_types translate_ids
+#' @importFrom logger log_warn log_trace
+#' @importFrom stringr str_to_lower
+#'
+#' @export
+#'
+EquivalentIDs <- function(InputData,
+                          SettingsInfo = c(InputID="MetaboliteID"),
+                          From = "kegg",
+                          SaveAs_Table= "csv",
+                          FolderPath=NULL){
+
+  MetaProViz_Init()
+
+  ## ------------------  Check Input ------------------- ##
+  # HelperFunction `CheckInput`
+  MetaProViz:::CheckInput(InputData=InputData,
+                          InputData_Num=FALSE,
+                          SaveAs_Table=SaveAs_Table)
+
+  # Specific checks:
+  if("InputID" %in% names(SettingsInfo)){
+    if(SettingsInfo[["InputID"]] %in% colnames(InputData)== FALSE){
+      message <- paste0("The ", SettingsInfo[["InputID"]], " column selected as InputID in SettingsInfo was not found in InputData. Please check your input.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
+    }
+  }
+
+  unknown_types <- OmnipathR::id_types() %>%
+    dplyr::select(tidyselect::starts_with('in_')) %>%
+    unlist %>%
+    unique %>%
+    str_to_lower %>%
+    setdiff(From, .)
+
+  if (length(unknown_types) > 0L) {
+    msg <- sprintf('The following ID types are not recognized: %s', paste(unknown_types, collapse = ', '))
+    logger::log_warn(msg)
+    warning(msg)
+  }
+
+  # Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
+  doublons <- InputData[duplicated(InputData[[SettingsInfo[['InputID']]]]), ]
+
+  if(nrow(doublons) > 0){
+    InputData <- InputData %>%
+      dplyr::distinct(!!sym(SettingsInfo[['InputID']]), .keep_all = TRUE)
+
+    message <- sprintf('The following IDs are duplicated and removed: %s',paste(doublons[[SettingsInfo[['InputID']]]], collapse = ', '))
+    logger::log_warn(message)
+    warning(message)
+  }
+
+  ## ------------------  Create output folders and path ------------------- ##
+  if(is.null(SaveAs_Table)==FALSE ){
+    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+                                    FolderPath=FolderPath)
+
+    SubFolder <- file.path(Folder, "EquivalentIDs")
+    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+  }
+
+  ## ------------------ Set the ID type for To ----------------- ##
+  To <- case_when(
+    From == "pubchem" ~ "chebi",  # If To is "pubchem", choose "chebi"
+    TRUE ~ "pubchem"              # For other cases, don't use a secondary column
+  )
+
+  message <- paste0(To, " is used to find additional potential IDs for ", From, ".", sep="")
+  logger::log_trace(message)
+  message(message)
+
+  ## ------------------ Translate From-to-To ------------------- ##
+  TranslatedDF <- OmnipathR::translate_ids(
+    InputData,
+    !!sym(SettingsInfo[['InputID']]) :=  !!sym(From),
+    !!!syms(To),#list of symbols, hence three !!!
+    ramp = TRUE,
+    expand = FALSE,
+    quantify_ambiguity =FALSE,
+    qualify_ambiguity =  TRUE, # Can not be set to FALSE!
+    ambiguity_groups =  NULL,#Checks within the groups, without it checks across groups
+    ambiguity_summary =  FALSE
+  )%>%
+    dplyr::select(tidyselect::all_of(intersect(names(.), names(InputData))), tidyselect::all_of(To)) %>%
+    dplyr::mutate(across(all_of(To), ~ purrr::map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
+    dplyr::group_by(!!sym(SettingsInfo[['InputID']])) %>%
+    dplyr::mutate(across(tidyselect::all_of(To), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
+    dplyr::ungroup() %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(dplyr::across(tidyselect::all_of(To), ~ ifelse(. == "0", NA, .)))
+
+
+  ## ------------------ Translate To-to-From ------------------- ##
+  TranslatedDF_Long <- TranslatedDF%>%
+    dplyr::select(!!sym(SettingsInfo[['InputID']]), !!sym(To))%>%
+    dplyr::rename("InputID" = !!sym(SettingsInfo[['InputID']]))%>%
+    tidyr::separate_rows(!!sym(To), sep = ", ") %>%
+    dplyr::mutate(across(all_of(To), ~trimws(.))) %>%  # Remove extra spaces
+    dplyr::filter(!!sym(To) != "")  # Remove empty entries
+
+  OtherIDs <- OmnipathR::translate_ids(
+    TranslatedDF_Long ,
+    !!sym(To),
+    !!sym(From),#list of symbols, hence three !!!
+    ramp = TRUE,
+    expand = FALSE,
+    quantify_ambiguity =FALSE,
+    qualify_ambiguity =  TRUE, # Can not be set to FALSE!
+    ambiguity_groups =  NULL,#Checks within the groups, without it checks across groups
+    ambiguity_summary =  FALSE
+  )%>%
+    dplyr::select("InputID", !!sym(To), !!sym(From))%>%
+    dplyr::distinct(InputID, !!sym(From), .keep_all = TRUE) %>%  # Remove duplicates based on InputID and From
+    dplyr::mutate(AdditionalID = dplyr::if_else(InputID == !!sym(From), FALSE, TRUE)) %>%
+    dplyr::select("InputID",!!sym(From), "AdditionalID")%>%
+    dplyr::filter(AdditionalID == TRUE) %>%
+    dplyr::mutate(across(all_of(From), ~ purrr::map_chr(., ~ paste(unique(.), collapse = ", "))))%>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(
+      FromList = list(stringr::str_split(!!sym(From), ",\\s*")[[1]]),  # Wrap in list
+      SameAsInput = ifelse(any(FromList == InputID), InputID, NA_character_),  # Match InputID
+      PotentialAdditionalIDs = paste(FromList[FromList != InputID], collapse = ", ")  # Combine other IDs
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(InputID, PotentialAdditionalIDs)  # Final selection
+
+  ## ------------------ Create Output ------------------- ##
+  OutputDF <- merge(InputData, OtherIDs, by.x= SettingsInfo[['InputID']] , by.y= "InputID", all.x=TRUE)
+
+  ## ------------------ Save the results ------------------- ##
+  ResList <- list("EquivalentIDs" = OutputDF)
+
+  suppressMessages(suppressWarnings(
+    MetaProViz:::SaveRes(InputList_DF=ResList,
+                         InputList_Plot= NULL,
+                         SaveAs_Table=SaveAs_Table,
+                         SaveAs_Plot=NULL,
+                         FolderPath= SubFolder,
+                         FileName= "EquivalentIDs",
+                         CoRe=FALSE,
+                         PrintPlot=FALSE)))
+
+  return(invisible(OutputDF))
+}
+
 ##########################################################################################
 ### ### ### Mapping Ambiguity ### ### ###
 ##########################################################################################
