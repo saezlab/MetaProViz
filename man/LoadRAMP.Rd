@@ -17,5 +17,9 @@ LoadRAMP(version = "2.5.4", SaveAs_Table = "csv", FolderPath = NULL)
 A data frame containing the Prior Knowledge.
 }
 \description{
-Import and process .csv file to create Prior Knowledge.
+Import and process file to create Prior Knowledge.
+}
+\examples{
+ChemicalClass <- MetaProViz::LoadRAMP()
+
 }
