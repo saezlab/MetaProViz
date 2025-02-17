@@ -201,7 +201,7 @@ TranslateID <- function(InputData,
 #'
 #' @param InputData Dataframe with at least one column with the detected metabolite IDs (one ID per row).
 #' @param SettingsInfo \emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}
-#' @param From ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
+#' @param From ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
@@ -209,7 +209,7 @@ TranslateID <- function(InputData,
 #'
 #' @examples
 #' DetectedIDs <- MetaProViz::ToyData(Data="Cells_MetaData")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
-#' Res <- MetaProViz::EquivalentIDs(InputData= DetectedIDs, SettingsInfo = c(InputID="KEGG.ID"), From = "kegg")
+#' Res <- MetaProViz::EquivalentIDs(InputData= DetectedIDs, SettingsInfo = c(InputID="HMDB"), From = "hmdb")
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
@@ -226,7 +226,7 @@ TranslateID <- function(InputData,
 #'
 EquivalentIDs <- function(InputData,
                           SettingsInfo = c(InputID="MetaboliteID"),
-                          From = "kegg",
+                          From = "hmdb",
                           SaveAs_Table= "csv",
                           FolderPath=NULL){
 
@@ -283,13 +283,19 @@ EquivalentIDs <- function(InputData,
 
   ## ------------------ Set the ID type for To ----------------- ##
   To <- case_when(
-    From == "pubchem" ~ "chebi",  # If To is "pubchem", choose "chebi"
-    TRUE ~ "pubchem"              # For other cases, don't use a secondary column
+    From == "chebi" ~ "pubchem",  # If To is "pubchem", choose "chebi"
+    TRUE ~ "chebi"              # For other cases, don't use a secondary column
   )
 
   message <- paste0(To, " is used to find additional potential IDs for ", From, ".", sep="")
   logger::log_trace(message)
   message(message)
+
+  ## ------------------ Load manual table ----------------- ##
+  if((From == "kegg") == FALSE){
+    EquivalentFeatures <- MetaProViz:: ToyData("EquivalentFeatures")%>%
+      dplyr::select(From)
+  }
 
   ## ------------------ Translate From-to-To ------------------- ##
   TranslatedDF <- OmnipathR::translate_ids(
@@ -344,10 +350,39 @@ EquivalentIDs <- function(InputData,
       PotentialAdditionalIDs = paste(FromList[FromList != InputID], collapse = ", ")  # Combine other IDs
     ) %>%
     dplyr::ungroup() %>%
-    dplyr::select(InputID, PotentialAdditionalIDs)  # Final selection
+    dplyr::select(InputID, PotentialAdditionalIDs, hmdb)%>%  # Final selection
+    dplyr::rename("AllIDs"= "hmdb")
+
+  ## ------------------ Merge to Input ------------------- ##
+  OtherIDs <- merge(InputData, OtherIDs, by.x= SettingsInfo[['InputID']] , by.y= "InputID", all.x=TRUE)
+
+  ##------------------- Add additional IDs -------------- ##
+
+  if (exists("EquivalentFeatures")) {
+   EquivalentFeatures$AllIDs <- EquivalentFeatures[[From]]
+    EquivalentFeatures_Long <- EquivalentFeatures  %>%
+      separate_rows(!!sym(From), sep = ",")
+
+    OtherIDs <- merge(OtherIDs, EquivalentFeatures_Long, by.x= SettingsInfo[['InputID']] , by.y= "hmdb", all.x=TRUE)%>%
+      rowwise() %>%
+      mutate(AllIDs = paste(unique(na.omit(unlist(str_split(paste(na.omit(c(AllIDs.x, AllIDs.y)), collapse = ","), ",\\s*")))), collapse = ",")) %>%
+      ungroup()%>%
+      rowwise() %>%
+      mutate(
+        PotentialAdditionalIDs = paste(
+          setdiff(
+            unlist(str_split(AllIDs, ",\\s*")),  # Split merged_column into individual IDs
+            as.character(!!sym(SettingsInfo[['InputID']]))  # Split hmdb into individual IDs
+          ),
+          collapse = ", "  # Combine the remaining IDs back into a comma-separated string
+        )
+      ) %>%
+      ungroup()%>%
+      select(-AllIDs.x, -AllIDs.y)
+  }
 
   ## ------------------ Create Output ------------------- ##
-  OutputDF <- merge(InputData, OtherIDs, by.x= SettingsInfo[['InputID']] , by.y= "InputID", all.x=TRUE)
+  OutputDF <- OtherIDs
 
   ## ------------------ Save the results ------------------- ##
   ResList <- list("EquivalentIDs" = OutputDF)
@@ -587,72 +622,41 @@ MappingAmbiguity <- function(InputData,
   invisible(return(ResList))
 }
 
-
-##########################################################################################
-### ### ### Reduce mapping ambiguities by using detected IDs  ### ### ###
-##########################################################################################
-
-#' Reduce mapping ambiguities by using detected IDs
-#'
-#' @param InputData Dataframe with at least one column with the target (e.g. metabolite)
-#' @param PriorKnowledge Dataframe with at least one column with the "original target metabolite ID", "source" (e.g. term) and the "translated target metabolite ID".
-#' @param SettingsInfo
-#'
-#' @examples
-#' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%select("Metabolite", "HMDB")
-#' PathwayFile <- MetaProViz::TranslateID(InputData= MetaProViz::LoadKEGG(), SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]
-#' Res <- MetaProViz::CleanMapping(InputData= DetectedIDs, PriorKnowledge= PathwayFile, DetectedID="HMDB", GroupingVariable="term", From="MetaboliteID", To="hmdb")
-#'
-#' @return Prior Knowledge usable for enrichment analysis
-#'
-#' @noRd
-#'
-CleanMapping <- function(InputData,
-                         PriorKnowledge,
-                         DetectedID="HMDB", #enable that lists can be passed if multuiple IDs are assigned to one measurement!
-                         GroupingVariable="term",
-                         From="MetaboliteID",
-                         To="hmdb",
-                         SaveAs_Table= "csv",
-                         FolderPath=NULL
-){
-
-  MetaProViz_Init()
-  ## ------------------ Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-
-  # Function that can use Prior knowledge that has multiple IDs "X1, X2, X3" and use the measured features to remove IDs based on measured data.
-  # This is to ensure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
-
-  # --> Cleans translated ID in prior knowledge based on measured features
-
-  ## ------------------  Create output folders and path ------------------- ##
-  if(is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
-                                    FolderPath=FolderPath)
-  }
-
-}
-
-
 ##########################################################################################
 ### ### ### Check Measured ID's in prior knowledge ### ### ###
 ##########################################################################################
 
 #' Check and summarize PriorKnowledge-to-MeasuredFeatures relationship
 #'
-#' @param InputData Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term)
+#' @param InputData Dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma. If there is a main ID and additional IDs, please provide them in separate columns.
+#' @param PriorKnowledge Dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match InputData metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma.
+
 #' @param SettingsInfo
 #'
 #' @importFrom dplyr mutate
 #' @importFrom rlang !!! !! := sym syms
 #'
+#' @examples
+#' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%select("Metabolite", "HMDB")
+#' PathwayFile <- MetaProViz::TranslateID(InputData= MetaProViz::LoadKEGG(), SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]
+#' Res <- MetaProViz::CleanMapping(InputData= DetectedIDs, PriorKnowledge= PathwayFile, DetectedID="HMDB", GroupingVariable="term", From="MetaboliteID", To="hmdb")
+
+#'
 #' @noRd
 #'
 
-CheckMatchID <- function(InputData
+CheckMatchID <- function(InputData,
+                         DetectedID
 
 ){
+
+  # Function that can use Prior knowledge that has multiple IDs "X1, X2, X3" and use the measured features to remove IDs based on measured data.
+  # This is to ensure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
+
+  # --> Cleans translated ID in prior knowledge based on measured features
+
+
+
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -673,7 +677,6 @@ CheckMatchID <- function(InputData
     as.data.frame()%>%
     distinct()%>%
     filter(!is.na(!!sym(DetectedID)))
-
 
   ## ------------------ Use the ambiguity function to create the "Summary File" ------------------- ##
   Summary <- MetaProViz::MappingAmbiguity(InputData= PriorKnowledge,
