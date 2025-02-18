@@ -20,6 +20,7 @@ ToyData(Dataset)
 \item{\code{"Tissue_DMA_Young"}: }
 \item{\code{"Tissue_TvN_Proteomics"}: }
 \item{\code{"Tissue_TvN_RNAseq"}: }
+\item{\code{"EquivalentFeatures"}: }
 }}
 }
 \value{

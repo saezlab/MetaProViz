@@ -7,7 +7,7 @@
 EquivalentIDs(
   InputData,
   SettingsInfo = c(InputID = "MetaboliteID"),
-  From = "kegg",
+  From = "hmdb",
   SaveAs_Table = "csv",
   FolderPath = NULL
 )
@@ -17,7 +17,7 @@ EquivalentIDs(
 
 \item{SettingsInfo}{\emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}}
 
-\item{From}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}}
+\item{From}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}}
 
 \item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
@@ -31,7 +31,7 @@ Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 }
 \examples{
 DetectedIDs <- MetaProViz::ToyData(Data="Cells_MetaData")\%>\% tibble::rownames_to_column("TrivialName")\%>\%tidyr::drop_na()
-Res <- MetaProViz::EquivalentIDs(InputData= DetectedIDs, SettingsInfo = c(InputID="KEGG.ID"), From = "kegg")
+Res <- MetaProViz::EquivalentIDs(InputData= DetectedIDs, SettingsInfo = c(InputID="HMDB"), From = "hmdb")
 
 }
 \keyword{Find}
