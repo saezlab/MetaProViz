@@ -28,8 +28,9 @@
 #' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param Percentage \emph{Optional: } Percentage of top and bottom features to be displayed in the results. \strong{Default = 0.1}
-#' @param StatCutoff \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test. \strong{Default = 0.05}
+#' @param Percentage \emph{Optional: } Percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}
+#' @param StatCutoff \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for the results summary and on the heatmap. \strong{Default = 0.05}
+#' @param VarianceCutoff \emph{Optional: } Cutoff for the PCs variance that should be displayed on the heatmap. \strong{Default = 1}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
@@ -59,6 +60,7 @@ MetaAnalysis <- function(InputData,
                          Scaling = TRUE,
                          Percentage = 0.1,
                          StatCutoff= 0.05,
+                         VarianceCutoff=1,
                          SaveAs_Table = "csv",
                          SaveAs_Plot = "svg",
                          PrintPlot= TRUE,
@@ -210,7 +212,7 @@ MetaAnalysis <- function(InputData,
 
    ## ---------- DF 2: Metabolites as row names ------------##
    Res_Top <- Stat_results%>%
-     dplyr::filter(tukeyHSD_p.adjusted< StatCutoff)%>%
+     dplyr::filter(tukeyHSD_p.adjusted < StatCutoff)%>%
      tidyr::separate_rows(paste("Features_", "(Top", Percentage, "%)", sep=""), sep = ", ")%>% # Separate 'Features (Top 0.1%)'
      dplyr::rename("FeatureID":= paste("Features_", "(Top", Percentage, "%)", sep=""))%>%
      dplyr::select(- paste("Features_", "(Bottom", Percentage, "%)", sep=""))
@@ -254,22 +256,31 @@ MetaAnalysis <- function(InputData,
    ## ---------- Plot ------------##
    # Plot DF
    Data_Heat <- Stat_results %>%
-     dplyr::filter(tukeyHSD_p.adjusted < 0.05)%>%#Filter for significant results
-     dplyr::filter(Explained_Variance > 0.1)%>%#Exclude Residuals row
+     dplyr::filter(tukeyHSD_p.adjusted < StatCutoff)%>%#Filter for significant results
+     dplyr::filter(Explained_Variance > VarianceCutoff)%>%#Exclude Residuals row
      dplyr::distinct(term, PC, .keep_all = TRUE)%>%#only keep unique term~PC combinations AND STATS
      dplyr::select(term, PC, Explained_Variance)
 
-   Data_Heat <- reshape2::dcast( Data_Heat, term ~ PC, value.var = "Explained_Variance")%>%
-     tibble::column_to_rownames("term")%>%
-     dplyr::mutate_all(~replace(., is.na(.), 0))
+  Data_Heat <- reshape2::dcast( Data_Heat, term ~ PC, value.var = "Explained_Variance")%>%
+       tibble::column_to_rownames("term")%>%
+       dplyr::mutate_all(~replace(., is.na(.), 0))
 
-   #Plot
-   invisible(VizHeatmap(InputData = Data_Heat,
-                                    PlotName = "ExplainedVariance-bigger-0.1Percent_AND_p.adj-smaller0.05",
-                                    Scale = "none",
-                                    SaveAs_Plot = SaveAs_Plot,
-                                    PrintPlot = PrintPlot,
-                                    FolderPath = Folder))
+   if(nrow(Data_Heat) > 2){
+
+     #Plot
+     invisible(VizHeatmap(InputData = Data_Heat,
+                          PlotName = paste0("ExplainedVariance-bigger-", VarianceCutoff , "Percent_AND_p.adj-smaller", StatCutoff, sep=""),
+                          Scale = "none",
+                          SaveAs_Plot = SaveAs_Plot,
+                          PrintPlot = PrintPlot,
+                          FolderPath = Folder))
+
+   }else{
+     message <- paste0("StatCutoff of ", StatCutoff, " and VarianceCutoff of ", VarianceCutoff, " do only return <= 2 cases, hence no heatmap is plotted.")
+     logger::log_info("warning: ", message)
+     warning(message)
+   }
+
 
 
    ###############################################################################################################################################################################################################
