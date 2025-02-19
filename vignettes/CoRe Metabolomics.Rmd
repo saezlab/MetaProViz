@@ -195,9 +195,9 @@ Media_Metadata <- Media%>%
 PreProcessing_res <-  MetaProViz::PreProcessing(InputData=Media_input,
                                                 SettingsFile_Sample =Media_Metadata,
                                                 SettingsInfo = c(Conditions = "Conditions",
-                                                                       Biological_Replicates = "Biological_Replicates",
-                                                                       CoRe_norm_factor = "GrowthFactor",
-                                                                       CoRe_media = "blank"),
+                                                                 Biological_Replicates = "Biological_Replicates",
+                                                                 CoRe_norm_factor = "GrowthFactor",
+                                                                 CoRe_media = "blank"),
                                                 FeatureFilt = "Modified",
                                                 FeatureFilt_Value = 0.8,
                                                 TIC = TRUE,# As we have raw data we will perform total ion count norm
