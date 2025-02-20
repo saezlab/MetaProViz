@@ -628,17 +628,16 @@ MappingAmbiguity <- function(InputData,
 
 #' Check and summarize PriorKnowledge-to-MeasuredFeatures relationship
 #'
-#' @param InputData Dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma. If there is a main ID and additional IDs, please provide them in separate columns.
-#' @param PriorKnowledge Dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match InputData metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma.
-
+#' @param InputData Dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
+#' @param PriorKnowledge Dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match InputData metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
 #' @param SettingsInfo
 #'
 #' @importFrom dplyr mutate
 #' @importFrom rlang !!! !! := sym syms
 #'
 #' @examples
-#' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%select("Metabolite", "HMDB")
-#' PathwayFile <- MetaProViz::TranslateID(InputData= MetaProViz::LoadKEGG(), SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]
+#' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
+#' PathwayFile <- MetaProViz::TranslateID(InputData= MetaProViz::LoadKEGG(), SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
 #' Res <- MetaProViz::CleanMapping(InputData= DetectedIDs, PriorKnowledge= PathwayFile, DetectedID="HMDB", GroupingVariable="term", From="MetaboliteID", To="hmdb")
 
 #'
@@ -646,7 +645,9 @@ MappingAmbiguity <- function(InputData,
 #'
 
 CheckMatchID <- function(InputData,
-                         DetectedID
+                         PriorKnowledge,
+                         SettingsInfo = c(InputID="HMDB", PriorID="hmdb", GroupingVariable="term")
+
 
 ){
 
@@ -662,73 +663,211 @@ CheckMatchID <- function(InputData,
 
   ## ------------ Check Input files ----------- ##
 
+  #Remove NA in ID cols
+  #check if columns exist in DFs
+  #remove duplications --> GroupingVariable and for data without GroupingVariable.
+
+  #if this is not a file without GroupingVariable, just add one to the DF! also add column GroupingVariable (enrties None) and add to SettingsInfo[["GroupingVariable"]]
+
+
+  # Check if multiple IDs are present:
+  #1. InputData
+  InputData_MultipleIDs <- any(
+    grepl(",\\s*", InputData[[SettingsInfo[["InputID"]]]]) |  # Comma-separated
+      sapply(InputData[[SettingsInfo[["InputID"]]]] , function(x) {
+        if (grepl("^c\\(|^list\\(", x)) {
+          parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
+          return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+        }
+        FALSE
+      })
+  )
+
+  #1. InputData
+  PK_MultipleIDs <- any(
+    grepl(",\\s*", PriorKnowledge[[SettingsInfo[["PriorID"]]]]) |  # Comma-separated
+      sapply(PriorKnowledge[[SettingsInfo[["PriorID"]]]] , function(x) {
+        if (grepl("^c\\(|^list\\(", x)) {
+          parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
+          return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+        }
+        FALSE
+      })
+  )
+
   ## ------------ Create Results output folder ----------- ##
   if(is.null(SaveAs_Table)==FALSE){
     Folder <- SavePath(FolderName= "PriorKnowledgeChecks",
                        FolderPath=FolderPath)
-    SubFolder <- file.path(Folder, "MetaboliteSet")
+    SubFolder <- file.path(Folder, "CheckMatchID_Detected-to-PK")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
   ######################################################################################################################################
-  ## ------------------ Prepare InputData -------------------##
-  DetectedDF <- InputData%>%
-    select(!!sym(DetectedID))%>%
-    as.data.frame()%>%
-    distinct()%>%
-    filter(!is.na(!!sym(DetectedID)))
+  ## ------------ Check  how IDs match and if needed remove unmatched IDs ----------- ##
 
-  ## ------------------ Use the ambiguity function to create the "Summary File" ------------------- ##
-  Summary <- MetaProViz::MappingAmbiguity(InputData= PriorKnowledge,
-                                          From = From,
-                                          To = To,
-                                          GroupingVariable = GroupingVariable,
-                                          Summary=TRUE)[["Summary"]]
-    #remove To=0 or NA
+  # 1.  Create long DF
+  create_long_df <- function(df, id_col, df_name) {
+    df %>%
+      mutate(row_id = row_number()) %>%
+      mutate(!!paste0("OriginalEntry_", df_name, sep="") := !!sym(id_col)) %>%  # Store original values
+      separate_rows(!!sym(id_col), sep = ",\\s*") %>%
+      group_by(row_id) %>%
+      mutate(!!(paste0("OriginalGroup_", df_name, sep="")) := paste0(df_name, "_", cur_group_id())) %>%
+      ungroup()
+  }
 
+  if(InputData_MultipleIDs){
+    InputData_long <- create_long_df(InputData, SettingsInfo[["InputID"]], "InputData")%>%
+      select(SettingsInfo[["InputID"]],"OriginalEntry_InputData", OriginalGroup_InputData)
+  }else{
+    InputData_long <- InputData %>%
+      mutate(OriginalGroup_InputData := paste0("InputData_", row_number()))%>%
+      select(SettingsInfo[["InputID"]], OriginalGroup_InputData)
+  }
 
-  ## ------------------ Extract IDs that "are not" versus "are" present in prior knowledge and return ----------------------##
-  # Add detected IDs to the PriorKnowledge
-  CombinedDF_Detected <- merge(x= Summary,
-                y= DetectedDF,
-                by.x= To,
-                by.y=DetectedID,
-                all.y=TRUE)
+  if(PK_MultipleIDs){
+    PK_long <- create_long_df(PriorKnowledge, SettingsInfo[["PriorID"]], "PK")%>%
+      select(SettingsInfo[["PriorID"]], "OriginalEntry_PK", OriginalGroup_PK, SettingsInfo[["GroupingVariable"]])
+  }else{
+    PK_long <- PriorKnowledge %>%
+      mutate(OriginalGroup_PK := paste0("PK_", row_number()))%>%
+      select(SettingsInfo[["PriorID"]],OriginalGroup_PK, SettingsInfo[["GroupingVariable"]])
+  }
 
-  DetectedIDs_NoPathway <- CombinedDF_Detected%>%
-    filter(is.na(!!sym(From)))%>%
-    select(!!sym(To))%>%
-    distinct()
+  # 2. Merge DF
+  merged_df <- merge(PK_long, InputData_long, by.x= SettingsInfo[["PriorID"]],  by.y= SettingsInfo[["InputID"]], all=TRUE)%>%
+    distinct(!!sym(SettingsInfo[["PriorID"]]), !!sym(SettingsInfo[["GroupingVariable"]]), OriginalGroup_InputData, .keep_all = TRUE)
 
-  DetectedIDs_InPathway <- CombinedDF_Detected%>%
-    filter(!is.na(!!sym(From)))%>%
-    select(!!sym(To))%>%
-    distinct()
-
-  message <- paste0("Of ", nrow(DetectedDF), " metabolite IDs that were detected in the measured data, ", nrow(DetectedIDs_InPathway), " were found in the prior knowledge and ", nrow(DetectedIDs_NoPathway), " were not found in the prior knowledge.")
-  logger::log_info(message)
-  message(message)
-
-  ## ------------------ Clean Prior Knowledge based on detected IDs ----------------------##
-  CombinedDF_Detected <- CombinedDF_Detected %>%
-    filter(!is.na(!!sym(From)))%>%
-    group_by(!!sym(From), !!sym(GroupingVariable))%>%
-    mutate(Collapsed_To = paste(unique(!!sym(To)), collapse = ", "))%>%
-    mutate(Collapsed_To_Number = n())%>%
-    mutate(Action = case_when(
-      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "one-to-one" & dplyr::if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number == 1 ~ "None",# Detected ID is a one-to-one mapping within and across groups.
-      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "one-to-many" & dplyr::if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number == 1 ~ "None",
-      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "one-to-many" & dplyr::if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number > 1 ~ "one-to-many_detected",
-      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "many-to-many" & dplyr::if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number == 1 ~ "many-to-many_1detected",#Check that the detected ID is not the one mapping to many!
-      (!!sym(To) != 0 | !is.na(!!sym(To))) & Mapping == "many-to-many" & dplyr::if_all(starts_with("AcrossGroupMappingIssue("), ~ . != TRUE, na.rm = TRUE) & Collapsed_To_Number > 1 ~ "many-to-many_Ndetected",#Check that the detected ID is not the one mapping to many!
-      #if_any(starts_with("AcrossGroupMappingIssue("), ~ . == TRUE, na.rm = TRUE)~ "TRUE",
-      TRUE ~ "FALSE" ))
-
-  #Clean Prior knowledge:
+  #3. Add information to summarize and describe problems
+  merged_df <- merged_df %>%
+    # num_PK_entries
+    group_by(OriginalGroup_PK, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    mutate(
+      num_PK_entries = sum(!is.na(OriginalGroup_PK))) %>%# count the times we have the same PK_entry match with multiple InputData entries --> extend below!
 
 
 
 
+
+
+
+
+
+    ungroup()%>%
+    # num_Input_entries
+    group_by(OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    mutate(
+      num_Input_entries = sum(!is.na(OriginalGroup_InputData)))%>%
+    ungroup()%>%
+    #  Handle "Detected-to-PK" (When PK has multiple IDs)
+    group_by(OriginalGroup_PK, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    mutate(
+      `Detected-to-PK` = case_when(
+        num_Input_entries == 0 & num_PK_entries == 1 ~ "none-to-one", # No match & OriginalGroup_PK appears once
+        num_Input_entries == 0 & num_PK_entries > 1 ~ "none-to-many", # No match & OriginalGroup_PK appears multiple times
+        num_Input_entries == 1 & num_PK_entries == 1 ~ "one-to-one", # One unique match in InputData, one PK
+        num_Input_entries == 1 & num_PK_entries > 1 ~ "one-to-many", # One unique match in InputData, multiple PKs
+        num_Input_entries > 1 & num_PK_entries == 1 ~ "many-to-one", # Multiple matches in InputData, one PK
+        num_Input_entries > 1 & num_PK_entries > 1 ~ "many-to-many", # Multiple matches in InputData, multiple PKs
+        num_Input_entries == 1 & num_PK_entries == 0 ~ "one-to-none",
+        num_Input_entries > 1 & num_PK_entries == 0 ~ "many-to-none",
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    ungroup() %>%
+    # Handle "PK-to-Detected" (When InputData has multiple IDs)
+    group_by(OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    mutate(
+      `PK-to-Detected` = case_when(
+        num_PK_entries == 0 & num_Input_entries == 1 ~ "none-from-one",
+        num_PK_entries == 0 & num_Input_entries > 1 ~ "none-from-many",
+        num_PK_entries  == 1 & num_Input_entries == 1 ~ "one-from-one",
+        num_PK_entries  == 1 & num_Input_entries > 1 ~ "one-from-many",
+        num_PK_entries  > 1 & num_Input_entries == 1 ~ "many-from-one",
+        num_PK_entries  > 1 & num_Input_entries > 1 ~ "many-from-many",
+        num_PK_entries > 1 & num_Input_entries == 0 ~ "many-from-none",
+        num_PK_entries == 1 & num_Input_entries == 0 ~ "one-from-none",
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    ungroup() %>%
+    # Assign ActionRequired (If many-to-many in either case)
+    mutate(
+      ActionRequired = case_when(
+        `Detected-to-PK` == "many-to-many" | `PK-to-Detected` == "many-from-many" ~ "Check",
+        TRUE ~ "None"
+      )
+    )
+
+  # 4. Create summary table
+  Values_InputData <- unique(InputData[[SettingsInfo[["InputID"]]]])
+  Values_PK <- unique(PK_long[[SettingsInfo[["PriorID"]]]])
+
+  summary_df <- tibble(
+    !!sym(SettingsInfo[["InputID"]]) := Values_InputData,
+    found_match_in_PK = NA,
+    matches = NA_character_,
+    match_overlap_percentage = NA_real_,
+    original_count = NA_integer_,
+    matches_count = NA_integer_
+  )
+
+  # Populate the summary data frame
+  for(i in seq_along(Values_InputData)) {
+    # Handle NA case explicitly
+    if (is.na(Values_InputData[i])) {
+      summary_df$original_count[i] <- 0
+      summary_df$matches_count[i] <- 0
+      summary_df$match_overlap_percentage[i] <- NA
+      summary_df$found_match_in_PK[i] <- NA # could also set it to FALSE but making NA for now for plotting
+      summary_df$matches[i] <- NA
+    } else {
+      # Split each cell into individual entries and trim whitespace
+      entries <- trimws(unlist(strsplit(as.character(Values_InputData[i]), ",\\s*"))) # delimiter = "," or ", "
+
+      # Identify which entries are in the lookup set
+      matched <- entries[entries %in% Values_PK]
+
+      # Determine if any match was found
+      summary_df$found_match_in_PK[i] <- length(matched) > 0
+
+      # Concatenate matched entries into a single string
+      summary_df$matches[i] <- paste(matched, collapse = ", ")
+
+      # Calculate and store counts
+      summary_df$original_count[i] <- length(entries)
+      summary_df$matches_count[i] <- length(matched)
+
+      # Calculate fraction: matched entries / total entries
+      if(length(entries) > 0) {
+        summary_df$match_overlap_percentage[i] <- (length(matched) / length(entries))*100
+      } else {
+        summary_df$match_overlap_percentage[i] <- NA
+      }
+    }
+  }
+
+  summary_df <- merge(x= summary_df,
+                      y= merged_df%>%
+                        dplyr::select(-c(OriginalGroup_PK, OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])))%>%
+                        distinct(!!sym(SettingsInfo[["PriorID"]]), .keep_all = TRUE),
+                      by.x= SettingsInfo[["InputID"]] ,
+                      by.y= SettingsInfo[["PriorID"]],
+                      all.x=TRUE)
+
+  summary_df <- merge(x= summary_df, y= InputData, by=SettingsInfo[["InputID"]], all.x=TRUE)%>%
+    distinct(!!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
+
+  # 5. Messages and summarise
+  message <- paste0("InputData has multiple IDs per measurement = ", InputData_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
+  message1 <- paste0("InputData has ", dplyr::n_distinct(unique(InputData[[SettingsInfo[["InputID"]]]])), " unique entries with " ,dplyr::n_distinct(unique(InputData_long[[SettingsInfo[["InputID"]]]])) ," unique ", SettingsInfo[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " match, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(unique(InputData_long[[SettingsInfo[["InputID"]]]])))*100, "%." , sep="")
+  message2 <- paste0("PriorKnowledge has ", dplyr::n_distinct(PriorKnowledge[[SettingsInfo[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[SettingsInfo[["PriorID"]]]]) ," unique ", SettingsInfo[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " are detected in the data, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(PK_long[[SettingsInfo[["PriorID"]]]]))*100, "%.")
+
+  if(nrow(summary_df%>% dplyr::filter(ActionRequired == "Check"))>=1){
+    #warning <- paste0("There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category") # "Check"
+
+  }
 
 
   ## ------------------ Save Results ----------------------##
