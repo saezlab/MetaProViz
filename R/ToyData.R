@@ -72,7 +72,8 @@ ToyData <- function(Dataset) {
     Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv",
     Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv",
     AlaninePathways = "AlaninePathways.csv",
-    EquivalentFeatures = "EquivalentFeatureTable.csv"
+    EquivalentFeatures = "EquivalentFeatureTable.csv",
+    BiocratesFeatureTable = "BiocratesFeatureTable.csv"
   )
 
   rncols <- c("Code", "Metabolite")
