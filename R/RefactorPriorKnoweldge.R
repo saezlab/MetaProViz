@@ -229,6 +229,21 @@ EquivalentIDs <- function(InputData,
                           From = "hmdb",
                           SaveAs_Table= "csv",
                           FolderPath=NULL){
+  # FUTURE: Once we have the structural similarity tool available in OmniPath, we can start creating this function!
+
+  ### 1)
+  #Check Measured ID's in prior knowledge
+
+
+  ### 2)
+  # A user has one HMDB IDs for their measured metabolites (one ID per measured peak) --> this is often the case as the user either gets a trivial name and they have searched for the ID themselves or because the facility only provides one ID at random
+  # We have mapped the HMDB IDs with the pathways and 20 do not map
+  # We want to check if it is because the pathways don't include them, or because the user just gave the wrong ID by chance (i.e. They picked D-Alanine, but the prior knowledge includes L-Alanine)
+
+  # Do this by using structural information via  accessing the structural DB in OmniPath!
+  # Output is DF with the original ID column and a new column with additional possible IDs based on structure
+
+  #Is it possible to do this at the moment without structures, but by using other pior knowledge?
 
   MetaProViz_Init()
 
@@ -630,7 +645,7 @@ MappingAmbiguity <- function(InputData,
 #'
 #' @param InputData Dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
 #' @param PriorKnowledge Dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match InputData metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
-#' @param SettingsInfo
+#' @param SettingsInfo Colum name of Metabolite IDs in InputData and PriorKnowledge as well as column name of GroupingVariable in PriorKnowledge. \strong{Default = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term")}
 #'
 #' @importFrom dplyr mutate
 #' @importFrom rlang !!! !! := sym syms
@@ -638,7 +653,7 @@ MappingAmbiguity <- function(InputData,
 #' @examples
 #' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' PathwayFile <- MetaProViz::TranslateID(InputData= MetaProViz::LoadKEGG(), SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz::CleanMapping(InputData= DetectedIDs, PriorKnowledge= PathwayFile, DetectedID="HMDB", GroupingVariable="term", From="MetaboliteID", To="hmdb")
+#' Res <- MetaProViz::CleanMapping(InputData= DetectedIDs, PriorKnowledge= PathwayFile, SettingsInfo = c(InputID="HMDB", PriorID="hmdb", GroupingVariable="term"))
 
 #'
 #' @noRd
@@ -646,45 +661,112 @@ MappingAmbiguity <- function(InputData,
 
 CheckMatchID <- function(InputData,
                          PriorKnowledge,
-                         SettingsInfo = c(InputID="HMDB", PriorID="hmdb", GroupingVariable="term")
-
-
+                         SettingsInfo = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term")
 ){
-
-  # Function that can use Prior knowledge that has multiple IDs "X1, X2, X3" and use the measured features to remove IDs based on measured data.
-  # This is to ensure that not two detected metabolites map to the same entry and if the original PK was translated to  ensure the one-to-many, many-to-one issues are taken care of (within and across DBs)
-
-  # --> Cleans translated ID in prior knowledge based on measured features
-
-
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
   ## ------------ Check Input files ----------- ##
 
-  #Remove NA in ID cols
-  #check if columns exist in DFs
-  #remove duplications --> GroupingVariable and for data without GroupingVariable.
+  ## InputData:
+  if("InputID" %in% names(SettingsInfo)){
+    if(SettingsInfo[["InputID"]] %in% colnames(InputData)== FALSE){
+      message <- paste0("The ", SettingsInfo[["InputID"]], " column selected as InpuID in SettingsInfo was not found in InputData. Please check your input.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
+    }
+  }else{
+    message <- paste0("No ", SettingsInfo[["InputID"]], " provided. Please check your input.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
+  }
 
-  #if this is not a file without GroupingVariable, just add one to the DF! also add column GroupingVariable (enrties None) and add to SettingsInfo[["GroupingVariable"]]
+  if(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])) >=1){#remove NAs:
+     message <- paste0(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])), " NA values were removed from column", SettingsInfo[["InputID"]])
+     logger::log_trace(paste("Warning: ", message, sep=""))
 
+     InputData <- InputData %>%
+      filter(!is.na(.data[[SettingsInfo[["InputID"]]]]))
 
-  # Check if multiple IDs are present:
-  #1. InputData
+    warning(message)
+  }
+
+  if(nrow(InputData) - nrow(distinct(InputData, .data[[SettingsInfo[["InputID"]]]])) >= 1){# Remove duplicate IDs
+    message <- paste0(nrow(InputData) - nrow(distinct(InputData, .data[[SettingsInfo[["InputID"]]]])), " duplicated IDs were removed from column", SettingsInfo[["InputID"]])
+    logger::log_trace(paste("Warning: ", message, sep=""))
+
+    InputData <- InputData %>%
+      distinct(.data[[SettingsInfo[["InputID"]]]], .keep_all = TRUE)
+
+    warning(message)
+  }
+
   InputData_MultipleIDs <- any(
-    grepl(",\\s*", InputData[[SettingsInfo[["InputID"]]]]) |  # Comma-separated
-      sapply(InputData[[SettingsInfo[["InputID"]]]] , function(x) {
-        if (grepl("^c\\(|^list\\(", x)) {
-          parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
-          return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
-        }
-        FALSE
-      })
-  )
+     grepl(",\\s*", InputData[[SettingsInfo[["InputID"]]]]) |  # Comma-separated
+       sapply(InputData[[SettingsInfo[["InputID"]]]] , function(x) {
+         if (grepl("^c\\(|^list\\(", x)) {
+           parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
+           return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+         }
+         FALSE
+       })
+   )
 
-  #1. InputData
-  PK_MultipleIDs <- any(
+  ## PriorKnowledge:
+  if("PriorID" %in% names(SettingsInfo)){
+    if(SettingsInfo[["PriorID"]] %in% colnames(PriorKnowledge)== FALSE){
+      message <- paste0("The ", SettingsInfo[["PriorID"]], " column selected as InpuID in SettingsInfo was not found in PriorKnowledge. Please check your input.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
+    }
+  }else{
+    message <- paste0("No ", SettingsInfo[["PriorID"]], " provided. Please check your input.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
+  }
+
+  if(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])) >=1){#remove NAs:
+    message <- paste0(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])), " NA values were removed from column", SettingsInfo[["PriorID"]])
+    logger::log_trace(paste("Warning: ", message, sep=""))
+
+    PriorKnowledge <- PriorKnowledge %>%
+      filter(!is.na(.data[[SettingsInfo[["PriorID"]]]]))
+
+    warning(message)
+  }
+
+   if("GroupingVariable" %in% names(SettingsInfo)){#Add GroupingVariable
+    if(SettingsInfo[["GroupingVariable"]] %in% colnames(PriorKnowledge)== FALSE){
+      message <- paste0("The ", SettingsInfo[["GroupingVariable"]], " column selected as InpuID in SettingsInfo was not found in PriorKnowledge. Please check your input.")
+      logger::log_trace(paste("Error ", message, sep=""))
+      stop(message)
+    }
+  }else{
+    #Add GroupingVariable
+    SettingsInfo["GroupingVariable"] <- "GroupingVariable"
+    PriorKnowledge["GroupingVariable"] <- "None"
+
+    message <- paste0("No ", SettingsInfo[["PriorID"]], " provided. If this was not intentional, please check your input.")
+    logger::log_trace(message)
+    message(message)
+  }
+
+  if(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[SettingsInfo[["PriorID"]]]], .data[[SettingsInfo[["GroupingVariable"]]]])) >= 1){# Remove duplicate IDs
+    message <- paste0(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[SettingsInfo[["PriorID"]]]], .data[[SettingsInfo[["GroupingVariable"]]]])) , " duplicated IDs were removed from column", SettingsInfo[["PriorID"]])
+    logger::log_trace(paste("Warning: ", message, sep=""))
+
+    PriorKnowledge <- PriorKnowledge %>%
+      distinct(.data[[SettingsInfo[["PriorID"]]]], !!sym(SettingsInfo[["GroupingVariable"]]), .keep_all = TRUE)%>%
+      group_by(!!sym(SettingsInfo[["PriorID"]])) %>%
+      mutate(across(everything(), ~ if (is.character(.)) paste(unique(.), collapse = ", ")))%>%
+      ungroup()%>%
+      distinct(.data[[SettingsInfo[["PriorID"]]]], .keep_all = TRUE)
+
+    warning(message)
+  }
+
+  PK_MultipleIDs <- any(# Check if multiple IDs are present:
     grepl(",\\s*", PriorKnowledge[[SettingsInfo[["PriorID"]]]]) |  # Comma-separated
       sapply(PriorKnowledge[[SettingsInfo[["PriorID"]]]] , function(x) {
         if (grepl("^c\\(|^list\\(", x)) {
@@ -704,16 +786,16 @@ CheckMatchID <- function(InputData,
   }
 
   ######################################################################################################################################
-  ## ------------ Check  how IDs match and if needed remove unmatched IDs ----------- ##
+  ## ------------ Check how IDs match and if needed remove unmatched IDs ----------- ##
 
   # 1.  Create long DF
   create_long_df <- function(df, id_col, df_name) {
     df %>%
-      mutate(row_id = row_number()) %>%
+      mutate(row_id = dplyr::row_number()) %>%
       mutate(!!paste0("OriginalEntry_", df_name, sep="") := !!sym(id_col)) %>%  # Store original values
       separate_rows(!!sym(id_col), sep = ",\\s*") %>%
       group_by(row_id) %>%
-      mutate(!!(paste0("OriginalGroup_", df_name, sep="")) := paste0(df_name, "_", cur_group_id())) %>%
+      mutate(!!(paste0("OriginalGroup_", df_name, sep="")) := paste0(df_name, "_", dplyr::cur_group_id())) %>%
       ungroup()
   }
 
@@ -722,7 +804,7 @@ CheckMatchID <- function(InputData,
       select(SettingsInfo[["InputID"]],"OriginalEntry_InputData", OriginalGroup_InputData)
   }else{
     InputData_long <- InputData %>%
-      mutate(OriginalGroup_InputData := paste0("InputData_", row_number()))%>%
+      mutate(OriginalGroup_InputData := paste0("InputData_", dplyr::row_number()))%>%
       select(SettingsInfo[["InputID"]], OriginalGroup_InputData)
   }
 
@@ -731,80 +813,95 @@ CheckMatchID <- function(InputData,
       select(SettingsInfo[["PriorID"]], "OriginalEntry_PK", OriginalGroup_PK, SettingsInfo[["GroupingVariable"]])
   }else{
     PK_long <- PriorKnowledge %>%
-      mutate(OriginalGroup_PK := paste0("PK_", row_number()))%>%
+      mutate(OriginalGroup_PK := paste0("PK_", dplyr::row_number()))%>%
       select(SettingsInfo[["PriorID"]],OriginalGroup_PK, SettingsInfo[["GroupingVariable"]])
   }
 
   # 2. Merge DF
   merged_df <- merge(PK_long, InputData_long, by.x= SettingsInfo[["PriorID"]],  by.y= SettingsInfo[["InputID"]], all=TRUE)%>%
-    distinct(!!sym(SettingsInfo[["PriorID"]]), !!sym(SettingsInfo[["GroupingVariable"]]), OriginalGroup_InputData, .keep_all = TRUE)
+    distinct(!!sym(SettingsInfo[["PriorID"]]), OriginalGroup_InputData, .keep_all = TRUE)
 
   #3. Add information to summarize and describe problems
   merged_df <- merged_df %>%
     # num_PK_entries
     group_by(OriginalGroup_PK, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
     mutate(
-      num_PK_entries = sum(!is.na(OriginalGroup_PK))) %>%# count the times we have the same PK_entry match with multiple InputData entries --> extend below!
-
-
-
-
-
-
-
-
-
+      num_PK_entries = sum(!is.na(OriginalGroup_PK)),
+      num_PK_entries_groups = dplyr::n_distinct(OriginalGroup_PK, na.rm = TRUE)) %>% # count the times we have the same PK_entry match with multiple InputData entries --> extend below!
     ungroup()%>%
     # num_Input_entries
     group_by(OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
     mutate(
-      num_Input_entries = sum(!is.na(OriginalGroup_InputData)))%>%
+      num_Input_entries = sum(!is.na(OriginalGroup_InputData)),
+      num_Input_entries_groups = dplyr::n_distinct(OriginalGroup_InputData,, na.rm = TRUE))%>%
     ungroup()%>%
-    #  Handle "Detected-to-PK" (When PK has multiple IDs)
-    group_by(OriginalGroup_PK, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
-    mutate(
-      `Detected-to-PK` = case_when(
-        num_Input_entries == 0 & num_PK_entries == 1 ~ "none-to-one", # No match & OriginalGroup_PK appears once
-        num_Input_entries == 0 & num_PK_entries > 1 ~ "none-to-many", # No match & OriginalGroup_PK appears multiple times
-        num_Input_entries == 1 & num_PK_entries == 1 ~ "one-to-one", # One unique match in InputData, one PK
-        num_Input_entries == 1 & num_PK_entries > 1 ~ "one-to-many", # One unique match in InputData, multiple PKs
-        num_Input_entries > 1 & num_PK_entries == 1 ~ "many-to-one", # Multiple matches in InputData, one PK
-        num_Input_entries > 1 & num_PK_entries > 1 ~ "many-to-many", # Multiple matches in InputData, multiple PKs
-        num_Input_entries == 1 & num_PK_entries == 0 ~ "one-to-none",
-        num_Input_entries > 1 & num_PK_entries == 0 ~ "many-to-none",
-        TRUE ~ NA_character_
-      )
-    ) %>%
-    ungroup() %>%
-    # Handle "PK-to-Detected" (When InputData has multiple IDs)
-    group_by(OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
-    mutate(
-      `PK-to-Detected` = case_when(
-        num_PK_entries == 0 & num_Input_entries == 1 ~ "none-from-one",
-        num_PK_entries == 0 & num_Input_entries > 1 ~ "none-from-many",
-        num_PK_entries  == 1 & num_Input_entries == 1 ~ "one-from-one",
-        num_PK_entries  == 1 & num_Input_entries > 1 ~ "one-from-many",
-        num_PK_entries  > 1 & num_Input_entries == 1 ~ "many-from-one",
-        num_PK_entries  > 1 & num_Input_entries > 1 ~ "many-from-many",
-        num_PK_entries > 1 & num_Input_entries == 0 ~ "many-from-none",
-        num_PK_entries == 1 & num_Input_entries == 0 ~ "one-from-none",
-        TRUE ~ NA_character_
-      )
-    ) %>%
-    ungroup() %>%
-    # Assign ActionRequired (If many-to-many in either case)
     mutate(
       ActionRequired = case_when(
-        `Detected-to-PK` == "many-to-many" | `PK-to-Detected` == "many-from-many" ~ "Check",
-        TRUE ~ "None"
+        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups == 1 ~ "None",
+        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2  ~ "Check",
+        num_Input_entries ==1 & num_Input_entries_groups >= 2 & num_PK_entries_groups == 1  ~ "Check",
+        num_Input_entries > 1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2 ~ "Check",
+        num_Input_entries > 1 & num_Input_entries_groups >= 2 & num_PK_entries_groups >= 2 ~ "Check",
+        num_Input_entries == 0 ~ "None", # ID(s) of PK not measured
+        TRUE ~ NA_character_
+      )
+    )%>%
+    mutate(
+      Detection = case_when(
+        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups == 1 ~ "One input ID of the same group maps to at least ONE PK ID of ONE group",
+        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2  ~ "One input ID of the same group maps to at least ONE PK ID of MANY groups",
+        num_Input_entries ==1 & num_Input_entries_groups >= 2 & num_PK_entries_groups == 1  ~ "One input ID of MANY groups maps to at least ONE PK ID of ONE groups",
+        num_Input_entries > 1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2 ~ "MANY input IDs of the same group map to at least ONE PK ID of MANY PK groups",
+        num_Input_entries > 1 & num_Input_entries_groups >= 2 & num_PK_entries_groups >= 2 ~ "MANY input IDs of the MANY groups map to at least ONE PK ID of MANY PK groups",
+        num_Input_entries == 0 ~ "Not Detected", # ID(s) of PK not measured
+        TRUE ~ NA_character_
       )
     )
+    #  Handle "Detected-to-PK" (When PK has multiple IDs)
+    #group_by(OriginalGroup_PK, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    #mutate(
+    #  `Detected-to-PK` = case_when(
+    #    num_Input_entries == 0 & num_PK_entries == 1 ~ "none-to-one", # No match & OriginalGroup_PK appears once
+    #    num_Input_entries == 0 & num_PK_entries > 1 ~ "none-to-many", # No match & OriginalGroup_PK appears multiple times
+    #    num_Input_entries == 1 & num_PK_entries == 1 ~ "one-to-one", # One unique match in InputData, one PK
+    #    num_Input_entries == 1 & num_PK_entries > 1 ~ "one-to-many", # One unique match in InputData, multiple PKs
+    #    num_Input_entries > 1 & num_PK_entries == 1 ~ "many-to-one", # Multiple matches in InputData, one PK
+    #    num_Input_entries > 1 & num_PK_entries > 1 ~ "many-to-many", # Multiple matches in InputData, multiple PKs
+    #    num_Input_entries == 1 & num_PK_entries == 0 ~ "one-to-none",
+    #    num_Input_entries > 1 & num_PK_entries == 0 ~ "many-to-none",
+    #    TRUE ~ NA_character_
+    #  )
+    #) %>%
+    #ungroup() %>%
+    # Handle "PK-to-Detected" (When InputData has multiple IDs)
+    #group_by(OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])) %>%
+    #mutate(
+    #  `PK-to-Detected` = case_when(
+    #    num_PK_entries == 0 & num_Input_entries == 1 ~ "none-from-one",
+    #    num_PK_entries == 0 & num_Input_entries > 1 ~ "none-from-many",
+    #    num_PK_entries  == 1 & num_Input_entries == 1 ~ "one-from-one",
+    #    num_PK_entries  == 1 & num_Input_entries > 1 ~ "one-from-many",
+    #    num_PK_entries  > 1 & num_Input_entries == 1 ~ "many-from-one",
+    #    num_PK_entries  > 1 & num_Input_entries > 1 ~ "many-from-many",
+    #    num_PK_entries > 1 & num_Input_entries == 0 ~ "many-from-none",
+    #    num_PK_entries == 1 & num_Input_entries == 0 ~ "one-from-none",
+    #    TRUE ~ NA_character_
+    #  )
+    #) %>%
+    #ungroup() %>%
+    # Assign ActionRequired (If many-to-many in either case)
+    #mutate(
+    #  ActionRequired = case_when(
+    #    `Detected-to-PK` == "many-to-many" | `PK-to-Detected` == "many-from-many" ~ "Check",
+    #    TRUE ~ "None"
+     # )
+    #)
 
   # 4. Create summary table
   Values_InputData <- unique(InputData[[SettingsInfo[["InputID"]]]])
   Values_PK <- unique(PK_long[[SettingsInfo[["PriorID"]]]])
 
-  summary_df <- tibble(
+  summary_df <- tibble::tibble(
     !!sym(SettingsInfo[["InputID"]]) := Values_InputData,
     found_match_in_PK = NA,
     matches = NA_character_,
@@ -850,14 +947,14 @@ CheckMatchID <- function(InputData,
 
   summary_df <- merge(x= summary_df,
                       y= merged_df%>%
-                        dplyr::select(-c(OriginalGroup_PK, OriginalGroup_InputData, !!sym(SettingsInfo[["GroupingVariable"]])))%>%
+                        dplyr::select(-c(OriginalGroup_PK, OriginalGroup_InputData))%>%
                         distinct(!!sym(SettingsInfo[["PriorID"]]), .keep_all = TRUE),
                       by.x= SettingsInfo[["InputID"]] ,
                       by.y= SettingsInfo[["PriorID"]],
                       all.x=TRUE)
 
   summary_df <- merge(x= summary_df, y= InputData, by=SettingsInfo[["InputID"]], all.x=TRUE)%>%
-    distinct(!!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
+    distinct(!!sym(SettingsInfo[["InputID"]]), OriginalEntry_PK, .keep_all = TRUE)
 
   # 5. Messages and summarise
   message <- paste0("InputData has multiple IDs per measurement = ", InputData_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
@@ -869,38 +966,27 @@ CheckMatchID <- function(InputData,
 
   }
 
+  ## ------------------ Plot Summary ----------------------##
+  # x = "Class" and y = Frequency. Match Status can be colour of if no class provided class = Match status.
+  # Check Biocrates code.
+
 
   ## ------------------ Save Results ----------------------##
+  ResList <- list("InputData_Matched" = summary_df)
 
+  suppressMessages(suppressWarnings(
+  MetaProViz:::SaveRes(InputList_DF=ResList,
+                       InputList_Plot= NULL,
+                       SaveAs_Table=SaveAs_Table,
+                       SaveAs_Plot=NULL,
+                       FolderPath= SubFolder,
+                       FileName= "CheckMatchID_Detected-to-PK",
+                       CoRe=FALSE,
+                       PrintPlot=FALSE)))
+
+   #Return
+   invisible(return(ResList[["InputData_Matched"]]))
 }
-
-
-##########################################################################################
-### ### ###  ### ### ###
-##########################################################################################
-
-#' Deal with detected input features. If we only have one ID, could it also be another one?
-#'
-#'
-#AssignID <- function(){
-
-  # FUTURE: Once we have the structural similarity tool available in OmniPath, we can start creating this function!
-
-  ### 1)
-  #Check Measured ID's in prior knowledge
-
-
-  ### 2)
-  # A user has one HMDB IDs for their measured metabolites (one ID per measured peak) --> this is often the case as the user either gets a trivial name and they have searched for the ID themselves or because the facility only provides one ID at random
-  # We have mapped the HMDB IDs with the pathways and 20 do not map
-  # We want to check if it is because the pathways don't include them, or because the user just gave the wrong ID by chance (i.e. They picked D-Alanine, but the prior knowledge includes L-Alanine)
-
-  # Do this by using structural information via  accessing the structural DB in OmniPath!
-  # Output is DF with the original ID column and a new column with additional possible IDs based on structure
-
-  #Is it possible to do this at the moment without structures, but by using other pior knowledge?
-
-#}
 
 
 ##########################################################################################
@@ -1036,9 +1122,6 @@ ClusterPK <- function(InputData, # This can be either the original PK (e.g. KEGG
 
 
 }
-
-
-
 
 ##########################################################################################
 ### ### ### Helper function to add term information to Enrichment Results ### ### ###
