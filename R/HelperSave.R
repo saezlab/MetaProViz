@@ -170,7 +170,7 @@ SaveRes<- function(InputList_DF= NULL,
         PlotUnit <- "cm"
       }
 
-      ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+      ggplot2::ggsave(filename = paste0(FileName_Save, ".",SaveAs_Plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
 
       if(PrintPlot==TRUE){
         suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
