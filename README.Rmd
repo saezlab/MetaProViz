@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: vignettes/bibliography.bib
 editor_options: 
   chunk_output_type: console
 ---
@@ -164,7 +165,15 @@ Plot_Sized_Media <- Plot_Sized
 
 gridExtra::grid.arrange(Plot_Sized_Tissue, Plot_Sized_Intra, Plot_Sized_Media, ncol=3)
 ```
-
+\
+Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle [@Mora_Schmidt2024], originally from [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127) [@Clark2019].
+```{r, eval=FALSE, include=FALSE}
+#This is based on Supplemetary File 2: 13073_2024_1415_MOESM2_ESM.xlsx sheet protein and sheet RNA
+patients <- data.frame(
+  Patient = c("Tumour", "Normal")
+  Protein = c("", ""),
+  RNA= c("",  ""))
+```
 
 ## Installation
 **MetaProViz** is an R package and to install the package, start R and enter:
@@ -176,29 +185,6 @@ Now **MetaProViz** can be imported as:
 ```{r load_library, eval=FALSE}
 library(MetaProViz)
 ```
-
-### Dependencies
-If you are using **MetaProViz** the following packages are required:\
-```
-"tidyverse"
-"ggplot2"
-"factoextra"
-"qcc"
-"hash"
-"reshape"
-"gridExtra"
-"inflection"
-"patchwork"
-"clusterProfiler"
-"ggupset"
-"gtools"
-"EnhancedVolcano"
-"writexl"
-"pheatmap"
-"ggfortify"
-```
-\
-While we have done our best to ensure all the dependencies are documented, if they aren't please let us know and we will try to resolve them.
 
 ### Windows specifications
 Note if you are running Windows you might have an issue with long paths, which you can resolve in the registry on Windows 10:
@@ -214,9 +200,9 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
   title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
   author = {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez-Rodriguez and Christian Frezza},
   year = {2023},
-  note = {R package version 2.1.4},
+  note = {R package version 2.1.5},
 }
 ```
 
-
+## References
 

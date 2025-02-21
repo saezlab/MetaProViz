@@ -37,6 +37,7 @@
 #'         \item{\code{"Tissue_DMA_Young"}: }
 #'         \item{\code{"Tissue_TvN_Proteomics"}: }
 #'         \item{\code{"Tissue_TvN_RNAseq"}: }
+#'         \item{\code{"EquivalentFeatures"}: }
 #'     }
 #'
 #' @return A data frame containing the toy data.
@@ -70,7 +71,9 @@ ToyData <- function(Dataset) {
     Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv",
     Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv",
     Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv",
-    AlaninePathways = "AlaninePathways.csv"
+    AlaninePathways = "AlaninePathways.csv",
+    EquivalentFeatures = "EquivalentFeatureTable.csv",
+    BiocratesFeatureTable = "BiocratesFeatureTable.csv"
   )
 
   rncols <- c("Code", "Metabolite")

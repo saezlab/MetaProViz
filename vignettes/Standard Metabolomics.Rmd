@@ -390,7 +390,7 @@ DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
 Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
 ### MCA-2Cond
-This metabolite clustering method is based on the Regulatory Clustering Method (RCM) that was developed as part of the Signature Regulatory Clustering (SiRCle) model (@Mora_Schmidt2022). As part of the [SiRCleR package](https://github.com/ArianeMora/SiRCleR/tree/main), also variation of the initial RCM method are proposed as  clustering based on two comparisons (e.g. KO versus WT in hypoxia and in normoxia).\
+This metabolite clustering method is based on the Regulatory Clustering Method (RCM) that was developed as part of the Signature Regulatory Clustering (SiRCle) model (@Mora_Schmidt2024). As part of the [SiRCleR package](https://github.com/ArianeMora/SiRCleR/tree/main), also variation of the initial RCM method are proposed as  clustering based on two comparisons (e.g. KO versus WT in hypoxia and in normoxia).\
 Here we set two different thresholds, one for the differential metabolite abundance (`Log2FC`) and one for the `significance` (e.g. p.adj). This will define if a feature (= metabolite) is assigned into:\
 1. ***"UP"***, which means a metabolite is significantly up-regulated in the underlying comparison.\
 2. ***"DOWN"***,  which means a metabolite is significantly down-regulated in the underlying comparison.\
@@ -528,7 +528,8 @@ Input_PCA[,1:7]%>%
 \
 Now lets check out the standard plot:
 ```{r, warning=FALSE, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Standard Settings."}
-MetaProViz::VizPCA(InputData=Input_PCA)
+MetaProViz::VizPCA(InputData=Input_PCA,
+                   )
 ```
 Next, we can interactively choose shape and color using the additional information of interest from our Metadata. Especially for complex data, such as patient data, it can be valuable to use different demographics (e.g. age, gender, medication,...) for this. First lets check if we have any batch effect by colour coding for the biological replicates, which would be the case if the replicates cluster together.\
 ```{r, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Do we have a batch effect?"}

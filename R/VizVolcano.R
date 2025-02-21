@@ -53,8 +53,8 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- ToyData("IntraCells_DMA")
-#' Res <- VizVolcano(InputData=Intra)
+#' Intra <- MetaProViz::ToyData("IntraCells_DMA")
+#' Res <- MetaProViz::VizVolcano(InputData=Intra)
 #'
 #' @keywords Volcano plot, pathways
 #'
@@ -560,8 +560,8 @@ VizVolcano_Standard <- function(InputData,
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              pCutoff = xCutoff,
-                                              FCcutoff = yCutoff,#Cut off Log2FC, automatically 2
+                                              pCutoff = yCutoff,
+                                              FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
                                               axisLabSize = 10,
@@ -580,7 +580,7 @@ VizVolcano_Standard <- function(InputData,
                                               cutoffLineType = "dashed",
                                               cutoffLineCol = "black",
                                               cutoffLineWidth = 0.5,
-                                              legendLabels=c(paste(x," < |", yCutoff, "|"), paste(x," > |", yCutoff, "|"), paste(y, ' < ', xCutoff) , paste(y, ' < ', xCutoff,' & ',x," < |", yCutoff, "|")),
+                                              legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
                                               legendPosition = LegendPos,
                                               legendLabSize = 9,
                                               legendIconSize =4,
@@ -935,8 +935,8 @@ VizVolcano_Compare <- function(InputData,
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              pCutoff = xCutoff,
-                                              FCcutoff = yCutoff,#Cut off Log2FC, automatically 2
+                                              pCutoff = yCutoff,
+                                              FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
                                               axisLabSize = 10,
@@ -955,7 +955,7 @@ VizVolcano_Compare <- function(InputData,
                                               cutoffLineType = "dashed",
                                               cutoffLineCol = "black",
                                               cutoffLineWidth = 0.5,
-                                              legendLabels=c(paste(x," < |", yCutoff, "|"), paste(x," > |", yCutoff, "|"), paste(y, ' < ', xCutoff) , paste(y, ' < ', xCutoff,' & ',x," < |", yCutoff, "|")),
+                                              legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
                                               legendPosition = 'right',
                                               legendLabSize = 7,
                                               legendIconSize =4,

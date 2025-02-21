@@ -31,11 +31,13 @@
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param ColorPalette \emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}
+#' @param ColorScale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
 #' @param ShapePalette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param ShowLoadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
+#' @param PCx \emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}
+#' @param PCy \emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}
 #' @param Theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}
-#' @param ColorScale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
 #' @param PlotName \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
 #' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
@@ -66,6 +68,8 @@ VizPCA <- function(InputData,
                    ShapePalette=NULL,
                    ShowLoadings = FALSE,
                    Scaling = TRUE,
+                   PCx=1,
+                   PCy=2,
                    Theme=NULL,#theme_classic()
                    PlotName= '',
                    SaveAs_Plot = "svg",
@@ -227,6 +231,8 @@ VizPCA <- function(InputData,
   #Make the plot:
   PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),
                   data= InputPCA,
+                  x= PCx ,
+                  y= PCy,
                   colour = Param_Col,
                   fill =  Param_Col,
                   shape = Param_Sha,

@@ -59,12 +59,9 @@ First if you have not done yet, install the required dependencies and load the l
 #devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
-
-#dependencies that need to be loaded:
 library(magrittr)
-library(dplyr)
-
-library(tidyr)
+library(rlang)
+library(purrr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -331,7 +328,7 @@ KEGG_Pathways_TranslatedSum <- MetaProViz::TranslateID(InputData= KEGG_Pathways,
 ```
 ```{r}
 # Option 2:
-MappingProblems <- MetaProViz::MappingAmbiguity(InputData= KEGG_Pathways_Translated[["TranslatedDF"]]%>% dplyr::rename("KEGG"="MetaboliteID"),
+MappingProblems <- MetaProViz::MappingAmbiguity(InputData= KEGG_Pathways_Translated[["TranslatedDF"]][,1:5]%>% dplyr::rename("KEGG"="MetaboliteID"),
                                                 From = "KEGG",
                                                 To = "hmdb",
                                                 GroupingVariable = "term",
@@ -344,7 +341,57 @@ MappingProblems[["Summary"]][c(1:2, 503, 505),c(2:6, 8:9,11)] %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-in the table it is shown that the KEGG ID C00002 maps to 3 different HMDB IDs, and it is shown that one of those HMDB IDs HMDB0000538 maps to one KEGG ID, hence this Mapping is one-to-many. The other two HMDB Ids are also in the table and it is checked to how many KEGG IDs they map. Additionally, we have passed `GroupingVariable = "term"` as we have pathways, which also means each of those mappings is checked within a pathway and across pathways (e.g. C00002 is shown twice, for two different terms). \
+In the table it is shown that the KEGG ID C00002 maps to 3 different HMDB IDs, and it is shown that one of those HMDB IDs HMDB0000538 maps to one KEGG ID, hence this Mapping is one-to-many. The other two HMDB Ids are also in the table and it is checked to how many KEGG IDs they map. Additionally, we have passed `GroupingVariable = "term"` as we have pathways, which also means each of those mappings is checked within a pathway and across pathways (e.g. C00002 is shown twice, for two different terms). \
+```{r,echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+Plot <- MappingProblems[["Summary"]]%>%
+  filter(term == "Glycolysis / Gluconeogenesis - Homo sapiens (human)")%>%
+  filter(!KEGG=="NA")%>%
+  distinct(KEGG, .keep_all = TRUE) %>%
+  select(term, KEGG,  KEGG_to_hmdb, `Count(KEGG_to_hmdb)`, `AcrossGroupMappingIssue(KEGG_to_hmdb)`, hmdb_to_KEGG, `Count(hmdb_to_KEGG)`, `AcrossGroupMappingIssue(hmdb_to_KEGG)`, Mapping)
+Plot$Count <- 1
+
+PlotA <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.character(`Count(KEGG_to_hmdb)`))) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("many-to-many" = "#006384"  , "one-to-many" = "#d03293", "one-to-one"= "#630026", "one-to-none" = "#00735C"))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("KEGG_Glycolysis/Gluconeogenesis")+
+        #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(x = "One KEGG ID to n HMDB IDs", y = "Number of KEGG IDs",  fill ="Mapping")
+
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=PlotA, SettingsInfo=c(Conditions="Conditions", Superplot="Mapping"), SettingsFile_Sample=Plot%>%dplyr::rename("Conditions"="Count(KEGG_to_hmdb)"),  PlotName = "KEGG_Glycolysis-Gluconeogenesis", Subtitle = NULL, PlotType="Bar")
+ 
+PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+Plot_Sized %<>%
+      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+       magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+Plot_Sized_A <- Plot_Sized
+#ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_KEGG-to-HMDB.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+
+PlotB <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.character(`Count(hmdb_to_KEGG)`))) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("many-to-many" = "#006384"  , "one-to-many" = "#d03293", "one-to-one"= "#630026", "one-to-none" = "#00735C"))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("KEGG_Glycolysis/Gluconeogenesis")+
+        #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(x = "HMDB ID to n KEGG IDs", y = "Number of KEGG IDs",  fill ="Mapping")
+
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=PlotB, SettingsInfo=c(Conditions="Conditions", Superplot="Mapping"), SettingsFile_Sample=Plot%>%dplyr::rename("Conditions"="Count(hmdb_to_KEGG)"),  PlotName = "KEGG_Glycolysis-Gluconeogenesis", Subtitle = NULL, PlotType="Bar")
+ 
+PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+Plot_Sized %<>%
+      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+       magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+
+#ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_HMDB-to-KEGG.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+
+Plot_Sized_B <- Plot_Sized
+
+gridExtra::grid.arrange(Plot_Sized_A, Plot_Sized_B, ncol=2)
+
+```
+
 In fact, to perform enrichment analysis we need a column source (=e.g. term) and we would want to keep the metabolite IDs across pathways consistent, avoid ambiguous mapping as much as possible (many-to-many mapping), and have this metabolite ID selection guided by any IDs we might have available to us in our measured input data (Fig. 3). This is crucial to circumvent inflation or deflation of metabolite-sets, which in turn will affect the enrichment analysis results. In the next section 4., we will elaborate on this.
 \
 

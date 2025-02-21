@@ -18,6 +18,9 @@ ToyData(Dataset)
 \item{\code{"Tissue_DMA"}: }
 \item{\code{"Tissue_DMA_Old"}: }
 \item{\code{"Tissue_DMA_Young"}: }
+\item{\code{"Tissue_TvN_Proteomics"}: }
+\item{\code{"Tissue_TvN_RNAseq"}: }
+\item{\code{"EquivalentFeatures"}: }
 }}
 }
 \value{
@@ -27,6 +30,6 @@ A data frame containing the toy data.
 Import and process .csv file to create toy data DF.
 }
 \examples{
-Intra <- ToyData("IntraCells_Raw")
+Intra <- MetaProViz::ToyData("IntraCells_Raw")
 
 }

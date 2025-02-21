@@ -14,6 +14,8 @@ VizPCA(
   ShapePalette = NULL,
   ShowLoadings = FALSE,
   Scaling = TRUE,
+  PCx = 1,
+  PCy = 2,
   Theme = NULL,
   PlotName = "",
   SaveAs_Plot = "svg",
@@ -35,6 +37,10 @@ VizPCA(
 \item{ShowLoadings}{\emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}}
 
 \item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
+
+\item{PCx}{\emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}}
+
+\item{PCy}{\emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}}
 
 \item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}}
 

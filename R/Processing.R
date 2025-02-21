@@ -213,7 +213,11 @@ PreProcessing <- function(InputData,
   }
 
   if(CoRe ==TRUE){
-     DFList_CoRe <- list( "CV_CoRe_blank"= data_CoReNorm[["DF"]][["CV_CoRe_blank"]],"Variation_ContigencyTable_CoRe_blank"=data_CoReNorm[["DF"]][["Contigency_table_CoRe_blank"]])
+    if(is.null(data_CoReNorm[["DF"]][["Contigency_table_CoRe_blank"]])){
+      DFList_CoRe <- list( "CV_CoRe_blank"= data_CoReNorm[["DF"]][["CV_CoRe_blank"]])
+    }else{
+      DFList_CoRe <- list( "CV_CoRe_blank"= data_CoReNorm[["DF"]][["CV_CoRe_blank"]],"Variation_ContigencyTable_CoRe_blank"=data_CoReNorm[["DF"]][["Contigency_table_CoRe_blank"]])
+    }
      DFList <- c(DFList, DFList_CoRe)
   }
 
@@ -1177,6 +1181,11 @@ CoReNorm <-function(InputData,
       }
       # Filter the CoRe_media samples
       CoRe_medias <- CoRe_medias %>% dplyr::filter(!rownames(CoRe_medias) %in% different_samples)
+    }else{
+      message <- paste0("Only >=2 blank samples available. Thus,we can not perform outlier testing for the blank samples.")
+      logger::log_trace(message)
+      message(message)
+
     }
     CoRe_media_df <- as.data.frame(data.frame("CoRe_mediaMeans"=  colMeans(CoRe_medias, na.rm = TRUE)))
   }
