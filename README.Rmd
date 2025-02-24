@@ -46,7 +46,7 @@ We have generated several tutorials showcasing the different functionalities Met
 - [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
 - [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
 - [Enrichment Analysis](https://saezlab.github.io/MetaProViz/articles/EnrichmentAnalysis.html)\
-- [Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)\
+- [Sample Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Sample%20Metadata%20Analysis.html)\
 \
 Here you will find a brief overview and information about the installation of the package and its dependencies.
 

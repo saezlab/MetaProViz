@@ -31,7 +31,7 @@ navbar:
       - text: Enrichment Analysis
         href: articles/EnrichmentAnalysis.html
       - text: Metadata Analysis
-        href: articles/Metadata Analysis.html
+        href: articles/Sample Metadata Analysis.html
     #customize intro:
     reference:
       text: Reference

@@ -1,5 +1,5 @@
 ---
-title: "Metadata Analysis"
+title: "Sample Metadata Analysis"
 author:
   - name: Christina Schmidt
     affiliation:
