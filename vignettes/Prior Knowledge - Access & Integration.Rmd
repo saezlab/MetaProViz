@@ -35,6 +35,7 @@ editor_options:
 }
 </style>
 ```
+
 ```{r chunk_setup, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
@@ -46,14 +47,6 @@ knitr::opts_chunk$set(
 
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
-- 1. To understand detected metabolite IDs in measured data.\
-- 2. To access metabolite prior knowledge and metabolite-gene prior knowledge networks.\
-- 3. To link experimental data to prior knowledge - the Do's and Don'ts.\
-- 4. To deal with many-to-many mapping in your metabolite identifiers.\
-- 5. To perform pathway enrichment analysis.\
-
---> Revamp: Christina/Macabe Add links to jump to parts and box around
-\
 - 1.
 To understand detected metabolite IDs in measured data.\
 - 2.
@@ -89,19 +82,15 @@ library(stringr)
 \
 \
 
-::: {.progress .progress-striped .active}
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
 :::
 ::::
 
 # Loading the example data
 
-::: {.progress .progress-striped .active}
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
 :::
 ::::
 
@@ -139,25 +128,19 @@ FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="BiocratesFeatureTable")
 \
 \
 
-::: {.progress .progress-striped .active}
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
 :::
 ::::
 
 # 1. Metabolite IDs in measured data
 
-::: {.progress .progress-striped .active}
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
-:::
 :::
 ::::
 
 ***Assigning Metabolite IDs to measured data***\
-The difficulty with assigning metabolite IDs to measured data is the uncertainty in the detection of metabolites. Indeed, differentiation of structural isomers (both constitutional isomers and stereoisomers) as for example the distinction between enantiomers. This leads to loss of information and hence uncertainty is assigning metabolite IDs.\
-One example is the metabolite Alanine, which can occur in its L- or D- form. If in an experiment those enantiomers have not been distinguished, the correct way would be to either assign two metabolite IDs (L- and D-Alanine) or a more general Alanine ID without chiral information. Yet, in reality this is not as trivial:\
 The difficulty with assigning metabolite IDs to measured data is the uncertainty in the detection of metabolites.
 Indeed, differentiation of structural isomers (both constitutional isomers and stereoisomers) as for example the distinction between enantiomers.
 This leads to loss of information and hence uncertainty is assigning metabolite IDs.\
@@ -215,8 +198,6 @@ Plot_Sized
 ```
 
 \
-For instance, if we want to assign a HMDB ID, we have to assign both "HMDB0001310",  "HMDB0000161" to the metabolite Alanine, for ChEBI we could assign only one, "16449", but this may lead to other problems as the ChEBI ID is not specific and may not be part of certain metabolic pathways. The reason for this is that substrate chirality is critical to enzymatic processes and stereo selectivity of enzymes to be homochiral with predominance of one particular enantiomer (e.g. D-sugars, L-amino acids, etc.).\
-To showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases. To do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 For instance, if we want to assign a HMDB ID, we have to assign both "HMDB0001310", "HMDB0000161" to the metabolite Alanine, for ChEBI we could assign only one, "16449", but this may lead to other problems as the ChEBI ID is not specific and may not be part of certain metabolic pathways.
 The reason for this is that substrate chirality is critical to enzymatic processes and stereo selectivity of enzymes to be homochiral with predominance of one particular enantiomer (e.g. D-sugars, L-amino acids, etc.).\
 To showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases.
@@ -300,12 +281,10 @@ Plot <- ggplot2::ggplot(Alanine_Path, ggplot2::aes(fill=commonNames, y=PathwayCo
 ```
 
 \
-This showcases if we choose the ChEBI ID for Alanine (ChEBI ID 16449), if experimentally the distinction was not possible, we will not map to any pathway even though the metabolite is part of many pathways. Hence, we recommend to assign multiple IDs to a measured ID, where specificity in detection is not given.\
 This showcases if we choose the ChEBI ID for Alanine (ChEBI ID 16449), if experimentally the distinction was not possible, we will not map to any pathway even though the metabolite is part of many pathways.
 Hence, we recommend to assign multiple IDs to a measured ID, where specificity in detection is not given.\
 
 \
-Yet, many metabolomics studies do not report multiple IDs, but rather one ID per measured peak. In some cases the chosen ID is correct in representing the degree of ambiguity in the detection, e.g. "Alanine-Zwitterion", whilst in other cases a specific ID, which has not been detected in this specificity, e.g. "L-Alanine". In both cases this can lead to missed maps to prior knowledge and hence a loss of information as discussed above.\
 Yet, many metabolomics studies do not report multiple IDs, but rather one ID per measured peak.
 In some cases the chosen ID is correct in representing the degree of ambiguity in the detection, e.g. "Alanine-Zwitterion", whilst in other cases a specific ID, which has not been detected in this specificity, e.g. "L-Alanine".
 In both cases this can lead to missed maps to prior knowledge and hence a loss of information as discussed above.\
