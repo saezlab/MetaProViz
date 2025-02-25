@@ -46,9 +46,11 @@ knitr::opts_chunk$set(
 
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
-- To access metabolite prior knowledge and metabolite-gene prior knowledge networks.\
-- To deal with many-to-many mapping in your metabolite identifiers.\
-- To perform pathway enrichment analysis.\
+- 1. To understand detected metabolite IDs in measured data.\
+- 2. To access metabolite prior knowledge and metabolite-gene prior knowledge networks.\
+- 3. To link experimental data to prior knowledge - the Do's and Don'ts.\
+- 4. To deal with many-to-many mapping in your metabolite identifiers.\
+- 5. To perform pathway enrichment analysis.\
 
 --> Revamp: Christina/Macabe Add links to jump to parts and box around
 \
@@ -64,6 +66,7 @@ library(magrittr)
 library(rlang)
 library(purrr)
 library(dplyr)
+library(stringr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -79,7 +82,7 @@ library(dplyr)
 :::
 :::
 
-# 1. Loading the example data
+# Loading the example data
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -110,17 +113,16 @@ Example \
 
 ```{r}
 # Load the example data:
-FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="")
+FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="BiocratesFeatureTable")
 ```
 \
 \
-
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
 :::
 :::
-# 2. Metabolite IDs in measured data
+# 1. Metabolite IDs in measured data
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -255,21 +257,39 @@ Plot <- ggplot2::ggplot(Alanine_Path, ggplot2::aes(fill=commonNames, y=PathwayCo
 ```
 \
 This showcases if we choose the ChEBI ID for Alanine (ChEBI ID 16449), if experimentally the distinction was not possible, we will not map to any pathway even though the metabolite is part of many pathways. Hence, we recommend to assign multiple IDs to a measured ID, where specificity in detection is not given.\
+\
+Yet, many metabolomics studies do not report multiple IDs, but rather one ID per measured peak. In some cases the chosen ID is correct in representing the degree of ambiguity in the detection, e.g. "Alanine-Zwitterion", whilst in other cases a specific ID, which has not been detected in this specificity, e.g. "L-Alanine". In both cases this can lead to missed maps to prior knowledge and hence a loss of information as discussed above.\
+Hence, we assign multiple IDs to a measured peak, where specificity in detection may not be given (i.e. amino acids).\
+```{r}
+# Example Cell-line data:
+Input_HMDB <- FeatureMetadata_Cells%>%
+  dplyr::filter(!HMDB == "NA")%>% # ID in the measured data we want to use, hence we remove NA's
+  dplyr::select("HMDB", "Pathway") # only keep relevant columns
 
---> Christina: Add/showcase new function!
+# Add equivalent IDs:
+FeatureMetadata_Cells_AddIDs <- MetaProViz::EquivalentIDs(InputData= Input_HMDB,
+                                                          SettingsInfo = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
+                                                          From = "hmdb")
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+FeatureMetadata_Cells_AddIDs [2:8, ]%>%
+  kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using MetaProViz::EquivalentIDs() function.") %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
 :::
 :::
 
-# 3. Accessing Prior Knowledge
+# 2. Accessing Prior Knowledge
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
 :::
 :::
-
+--> Christina: Implement terminology of MetSigDB!
 \
 Metabolite prior knowledge (PK) is essential for the interpretation of metabolomics data.
 It can be used to perform pathway enrichment analysis, compound class enrichment analysis, and by using specific PK databases, it can be used to study the connection of metabolites and receptors or transporters.Since the quality and content of the PK will dictate the success of the downstream analysis and biological interpretation, it is important to ensure the PK is used correctly.\
@@ -397,7 +417,7 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 :::
 :::
 
-# 4. Linking experimental data to prior knowledge
+# 3. Linking experimental data to prior knowledge
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -408,8 +428,8 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 
 --> Macabe your vignette: here we can also just make a note to the next chapter Translate IDs
 --> We could consider to show two PK examples, once the biocrates kit linked to e.g. MetaLinksDB and classyfire chemical class
---> For MEtaLinksDB, we could show all feature metadata examples (cells, tissues, Biocrates)
-
+--> For MetaLinksDB, we could show all feature metadata examples (cells --> increased space before/after adding multiple IDs, Biocrates)
+--> Also show the coverage of the different ID types (some peaks do not have one ID type, but another one! --> True also in other example fetaure metadata, not only biocrates.) --> helper (not exported into RefactorPriorKnowledge.R, and call this plot in TranslateID --> check if the plotting works in 4. )
 
 \
 \
@@ -420,7 +440,7 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 :::
 :::
 
-# 5. Translate IDs
+# 4. Translate IDs
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -460,7 +480,7 @@ KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
 Here it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping. In fact it is very common that an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs) or even a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).\
 This comes with many implications for the analysis that will be discussed in the next section.
 
-## 5.1 Mapping problems
+## 4.1 Mapping problems
 The complexities of translating metabolite IDs are demonstrated here (Fig.2). The relationships between Original IDs (e.g. KEGG) and Translated IDs (e.g. HMDB), can be quite complex and in fact we encounter `one-to-one` (no matches were found for the ID), `one-to-none` ( direct #relationship was established), `one-to-many` (multiple matches were found for the ID. i.e. it is ambiguously mapped) and `many-to-many` ( considers the relationships between the Translated IDs to Original IDs , where a translated ID ambiguously maps back to multiple different Original IDs) mappings.\
 For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the pathways size, i.e. how many metabolites are in the pathway "Glycolysis / Gluconeogenesis - Homo sapiens (human)", which would in turn inflate/deflate the enrichment results and hence it would be desired to keep the number of metabolites in a pathway consistent.
 \
@@ -584,7 +604,7 @@ This is something we are currently working on and hope to provide within the nex
 :::
 :::
 
-# 6. Run enrichment analysis
+# 5. Run enrichment analysis
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -654,7 +674,6 @@ We have performed differential analysis (details can be found in the vignette [M
 Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
 Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
 Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
-
 ```
 
 \
