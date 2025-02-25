@@ -87,33 +87,31 @@ library(dplyr)
 :::
 
 \
---> Macabe: Load Biocrates data 
 
---> Also Load Metadata from the other Christina
-
-[As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`]{style="text-decoration:underline"}:\
-`1.`Cell line experiment **(CellLine)**\
-Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
-The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
-We have performed pre-processing and differential analysis (details can be found in the vignette vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)) and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
-
+[As part of the **MetaProViz** package you can load the example feature metadata using the function `toy_data()`]{style="text-decoration:underline"}:\
+`1.` Metadata of cell line experiment **(CellLine)**\
+Example datasets is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].\
 ```{r}
 #Load the Pre-processed intracellular data:
-Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
+FeatureMetadata_Cells <- MetaProViz::ToyData(Data="Cells_MetaData")
 ```
+\
+`2.` Metadata of patients tissue experiment **(Tissue)**\
+Example datasets is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
+```{r}
+# Load the example data:
+FeatureMetadata_Tissue <- MetaProViz::ToyData(Data="Tissue_MetaData")
 
-`2.` Tissue experiment **(Tissue)**\
-Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
-We have performed differential analysis (details can be found in the vignette [Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)) and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
+```
+\
+`3.` Metadata of Biocrates kit **(Biocrates)**\
+Example \
+--> Macabe: Load Biocrates data 
 
 ```{r}
 # Load the example data:
-Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
-Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
-Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
-
+FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="")
 ```
-
 \
 \
 
@@ -631,7 +629,31 @@ The full scope of different methods is beyond the scope of MetaProViz, but are a
 ```
 \
 \
+[As part of the **MetaProViz** package you can load the example data using the function `toy_data()`]{style="text-decoration:underline"} to test the enrichment analysis:\
+`1.`Cell line experiment **(CellLine)**\
+Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
+The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
+We have performed pre-processing and differential analysis (details can be found in the vignette vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)) and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
 
+```{r}
+#Load the Pre-processed intracellular data:
+Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
+```
+
+`2.` Tissue experiment **(Tissue)**\
+Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
+We have performed differential analysis (details can be found in the vignette [Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)) and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
+
+```{r}
+# Load the example data:
+Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
+Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
+Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
+
+```
+
+\
+\
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
