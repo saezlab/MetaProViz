@@ -957,7 +957,7 @@ CheckMatchID <- function(InputData,
                       all.x=TRUE)
 
   summary_df <- merge(x= summary_df, y= InputData, by=SettingsInfo[["InputID"]], all.x=TRUE)%>%
-    distinct(!!sym(SettingsInfo[["InputID"]]), OriginalEntry_PK, .keep_all = TRUE)
+    distinct(!!sym(SettingsInfo[["InputID"]]), !!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
 
   # 5. Messages and summarise
   message <- paste0("InputData has multiple IDs per measurement = ", InputData_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
