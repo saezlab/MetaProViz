@@ -1,5 +1,5 @@
 ---
-title: "Enrichment Analysis"
+title: "Prior Knowledge - Access & Integration"
 author:
   - name: Christina Schmidt
     affiliation:
@@ -45,11 +45,12 @@ knitr::opts_chunk$set(
 # <img src="Hexagon_MetaProViz.png" align="right" width="200"/>
 
 \
-[In this tutorial we showcase how to use **MetaProViz**]{style="text-decoration:underline"}:\
-- To access metabolite prior knowledge.\
+[In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
+- To access metabolite prior knowledge and metabolite-gene prior knowledge networks.\
 - To deal with many-to-many mapping in your metabolite identifiers.\
 - To perform pathway enrichment analysis.\
 
+--> Revamp: Christina/Macabe Add links to jump to parts and box around
 \
 First if you have not done yet, install the required dependencies and load the libraries:
 
@@ -62,6 +63,7 @@ library(MetaProViz)
 library(magrittr)
 library(rlang)
 library(purrr)
+library(dplyr)
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -85,6 +87,10 @@ library(purrr)
 :::
 
 \
+--> Macabe: Load Biocrates data 
+
+--> Also Load Metadata from the other Christina
+
 [As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`]{style="text-decoration:underline"}:\
 `1.`Cell line experiment **(CellLine)**\
 Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
@@ -241,6 +247,27 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
   kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB_Type` including metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
+\
+\
+
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+# 3. Linking experimental data to prior knowledge
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+\
+
+--> Macabe your vignette
+
+
 
 \
 \
@@ -251,7 +278,7 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 :::
 :::
 
-# 3. Translate IDs
+# 4. Translate IDs
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -291,7 +318,7 @@ KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
 Here it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping. In fact it is very common that an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs) or even a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).\
 This comes with many implications for the analysis that will be discussed in the next section.
 
-## 3.1 Mapping problems
+## 4.1 Mapping problems
 The complexities of translating metabolite IDs are demonstrated here (Fig.2). The relationships between Original IDs (e.g. KEGG) and Translated IDs (e.g. HMDB), can be quite complex and in fact we encounter `one-to-one` (no matches were found for the ID), `one-to-none` ( direct #relationship was established), `one-to-many` (multiple matches were found for the ID. i.e. it is ambiguously mapped) and `many-to-many` ( considers the relationships between the Translated IDs to Original IDs , where a translated ID ambiguously maps back to multiple different Original IDs) mappings.\
 For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the pathways size, i.e. how many metabolites are in the pathway "Glycolysis / Gluconeogenesis - Homo sapiens (human)", which would in turn inflate/deflate the enrichment results and hence it would be desired to keep the number of metabolites in a pathway consistent.
 \
@@ -347,7 +374,7 @@ Plot <- MappingProblems[["Summary"]]%>%
   filter(term == "Glycolysis / Gluconeogenesis - Homo sapiens (human)")%>%
   filter(!KEGG=="NA")%>%
   distinct(KEGG, .keep_all = TRUE) %>%
-  select(term, KEGG,  KEGG_to_hmdb, `Count(KEGG_to_hmdb)`, `AcrossGroupMappingIssue(KEGG_to_hmdb)`, hmdb_to_KEGG, `Count(hmdb_to_KEGG)`, `AcrossGroupMappingIssue(hmdb_to_KEGG)`, Mapping)
+  dplyr::select(term, KEGG,  KEGG_to_hmdb, `Count(KEGG_to_hmdb)`, `AcrossGroupMappingIssue(KEGG_to_hmdb)`, hmdb_to_KEGG, `Count(hmdb_to_KEGG)`, `AcrossGroupMappingIssue(hmdb_to_KEGG)`, Mapping)
 Plot$Count <- 1
 
 PlotA <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.character(`Count(KEGG_to_hmdb)`))) + 
@@ -409,18 +436,18 @@ In fact, to perform enrichment analysis we need a column source (=e.g. term) and
 :::
 :::
 
-# 4. Metabolite IDs in measured data
+# 5. Metabolite IDs in measured data
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
 :::
 :::
 
-## 4.1 Use measured Metabolite IDs to guide the selection of PK IDs
+## 5.1 Use measured Metabolite IDs to guide the selection of PK IDs
 The measured metabolite IDs can be used to guide the selection of PK IDs. This is crucial to circumvent inflation or deflation of metabolite-sets, which in turn will affect the enrichment analysis results.\
 This is something we are currently working on and hope to provide within the next release, so stay tuned.
 
-## 4.2. Assigning Metabolite IDs to measured data
+## 5.2. Assigning Metabolite IDs to measured data
 The difficulty with assigning metabolite IDs to measured data is the uncertainty in the detection of metabolites. Indeed, differentiation of structural isomers (both constitutional isomers and stereoisomers) as for example the distinction between enantiomers. This leads to loss of information and hence uncertainty is assigning metabolite IDs.\
 One example is the metabolite Alanine, which can occur in its L- or D- form. If in an experiment those enantiomers have not been distinguished, the correct way would be to either assign two metabolite IDs (L- and D-Alanine) or a more general Alanine ID without chiral information. Yet, in reality this is not as trivial:\
 ```{r, echo=FALSE}
@@ -554,7 +581,7 @@ This showcases if we choose the ChEBI ID for Alanine (ChEBI ID 16449), if experi
 :::
 :::
 
-# 5. Run enrichment analysis
+# 6. Run enrichment analysis
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
