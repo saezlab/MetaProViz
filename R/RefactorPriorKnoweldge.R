@@ -646,6 +646,8 @@ MappingAmbiguity <- function(InputData,
 #' @param InputData Dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
 #' @param PriorKnowledge Dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match InputData metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
 #' @param SettingsInfo Colum name of Metabolite IDs in InputData and PriorKnowledge as well as column name of GroupingVariable in PriorKnowledge. \strong{Default = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term")}
+#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param FolderPath {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @importFrom dplyr mutate
 #' @importFrom rlang !!! !! := sym syms
@@ -660,7 +662,9 @@ MappingAmbiguity <- function(InputData,
 
 CheckMatchID <- function(InputData,
                          PriorKnowledge,
-                         SettingsInfo = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term")
+                         SettingsInfo = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term"),
+                         SaveAs_Table= "csv",
+                         FolderPath=NULL
 ){
 
   ## ------------ Create log file ----------- ##
