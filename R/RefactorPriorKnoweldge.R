@@ -653,8 +653,7 @@ MappingAmbiguity <- function(InputData,
 #' @examples
 #' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' PathwayFile <- MetaProViz::TranslateID(InputData= MetaProViz::LoadKEGG(), SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz::CleanMapping(InputData= DetectedIDs, PriorKnowledge= PathwayFile, SettingsInfo = c(InputID="HMDB", PriorID="hmdb", GroupingVariable="term"))
-
+#' Res <- MetaProViz::CheckMatchID(InputData= DetectedIDs, PriorKnowledge= PathwayFile, SettingsInfo = c(InputID="HMDB", PriorID="hmdb", GroupingVariable="term"))
 #'
 #' @noRd
 #'
