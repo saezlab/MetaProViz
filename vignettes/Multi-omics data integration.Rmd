@@ -91,6 +91,28 @@ Here we chose publicly available data from the [paper](https://www.cell.com/canc
 Metab_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
 ```
 \
+We have three metabolite ID types provided in the data, HMDB, KEGG and PubChem. First we will translate KEGG and PubChem to HMDB and see if we can increase our feature space:
+```{r}
+# Translate KEGG IDs to HMDB IDs
+Metab_TvsN_TranslatedKEGG <- MetaProViz::TranslateID(InputData= Metab_TvsN,
+                                                     SettingsInfo = c(InputID="KEGG", GroupingVariable="SUPER_PATHWAY"),
+                                                     From = c("kegg"),
+                                                     To = c("hmdb"))
+
+#Count cases where KEGG is present, HMDB was not present and now has been added. 
+#Count cases where originally we only had one HMDB ID, but now have multiple.
+#Count cases where KEGG and HMDB is present and the translation does not include present HMDB
+
+#Translate PuChem IDs to HMDB IDs
+Metab_TvsN_TranslatedPubChem <- MetaProViz::TranslateID(InputData= Metab_TvsN,
+                                                     SettingsInfo = c(InputID="PUBCHEM", GroupingVariable="SUPER_PATHWAY"),
+                                                     From = c("pubchem"),
+                                                     To = c("hmdb"))
+
+
+#Create a new column with all HMDB IDs present
+
+```
 
 ```{r}
 # Add additional potential IDs:
@@ -179,7 +201,7 @@ MetaLinksDB_Select$Mean_tval <- (ifelse(is.na(MetaLinksDB_Select$t.val_Metab), 0
 
 ## 2.4. Visualisation
 --> Macabe: we can plot everything or the selection based on enrichment analysis scores. Or label top scored pairs as you did with MOFA results (at least if thats easy in R networkplots). 
-
+--> Here: three different shapes (if easily doable): Metabolites, Prot-Transporter, Prot-Receptor
 
 ::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
