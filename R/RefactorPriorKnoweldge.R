@@ -1206,3 +1206,95 @@ AddInfo <- function(mat,
 
 
 
+
+
+##########################################################################################
+### ### ### Helper function to create complex upset plots to visualise PK coverage ### ### ###
+##########################################################################################
+
+#' Docstring TODO
+#'
+#' @param df TODO
+#' @param class_col TODO... etc
+#'
+#' @noRd
+
+# Functions to create the complex upset plots
+
+# Define the function
+GenerateUpset <- function(df,
+                          class_col = "Class",
+                          intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
+                          plot_title = "Metabolite IDs",
+                          palette_type = c("viridis", "polychrome"),
+                          output_file = NULL,
+                          width = 14,
+                          height = 8,
+                          dpi = 300) {
+  # Load required libraries
+  library(ComplexUpset)
+  library(ggplot2)
+  library(viridis)  # For viridis palette
+
+  # Match palette_type argument
+  palette_type <- match.arg(palette_type)
+
+  # Ensure the class column is a factor
+  df[[class_col]] <- as.factor(df[[class_col]])
+
+  # Choose the appropriate scale based on palette_type
+  if(palette_type == "viridis"){
+    fill_scale <- scale_fill_viridis_d(option = "viridis")
+  } else if(palette_type == "polychrome"){
+    if (!requireNamespace("Polychrome", quietly = TRUE)) {
+      stop("Package 'Polychrome' is required for the polychrome palette. Please install it.")
+    }
+    # Get the levels of the class column
+    class_levels <- levels(df[[class_col]])
+    # Get 36 colors from Polychrome (you can adjust if needed)
+    my_palette <- Polychrome::palette36.colors(n = 36)
+    if(length(my_palette) < length(class_levels)) {
+      stop("Not enough colors in the Polychrome palette for the number of classes!")
+    }
+    # Create a named palette that maps each level to a color
+    my_palette_named <- setNames(my_palette[1:length(class_levels)], class_levels)
+    fill_scale <- scale_fill_manual(values = my_palette_named)
+  }
+
+  # Create the upset plot
+  p <- ComplexUpset::upset(
+    data = df,
+    intersect = intersect_cols,
+    name = plot_title,
+    base_annotations = list(
+      "Intersection size" = intersection_size(
+        # Use aes_string to allow a dynamic fill mapping
+        mapping = aes_string(fill = class_col),
+        counts = TRUE
+      ) +
+        fill_scale +
+        theme(
+          legend.position = "right",
+          axis.text.x = element_text(angle = 90, hjust = 1)
+        )
+    ),
+    set_sizes = (
+      upset_set_size() +
+        theme(axis.text.y = element_text(size = 10))
+    )
+  ) +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.margin = margin(1, 1, 1, 1, "cm")
+    )
+
+  # If an output file is provided, save the plot
+  if(!is.null(output_file)){
+    ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
+  }
+
+  # Return the plot object so it can be printed in the notebook
+  return(p)
+}
+
+
