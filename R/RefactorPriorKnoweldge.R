@@ -685,6 +685,9 @@ CheckMatchID <- function(InputData,
     stop(message)
   }
 
+  ### This is after the main input checks, so could save original df here for later merging to get Null and duplicates back.
+  # Assignment here... e.g. InputData_Original
+
   if(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])) >=1){#remove NAs:
      message <- paste0(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])), " NA values were removed from column", SettingsInfo[["InputID"]])
      logger::log_trace(paste("Warning: ", message, sep=""))
@@ -728,6 +731,7 @@ CheckMatchID <- function(InputData,
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
+
 
   if(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])) >=1){#remove NAs:
     message <- paste0(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])), " NA values were removed from column", SettingsInfo[["PriorID"]])
@@ -956,10 +960,17 @@ CheckMatchID <- function(InputData,
                       by.y= SettingsInfo[["PriorID"]],
                       all.x=TRUE)
 
-  summary_df <- merge(x= summary_df, y= InputData, by=SettingsInfo[["InputID"]], all.x=TRUE)%>%
-    distinct(!!sym(SettingsInfo[["InputID"]]), !!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
+  if(PK_MultipleIDs){
+    summary_df <- merge(x= summary_df, y= InputData, by=SettingsInfo[["InputID"]], all.x=TRUE)%>%
+      distinct(!!sym(SettingsInfo[["InputID"]]), OriginalEntry_PK, .keep_all = TRUE)
+  }else{
+    summary_df <- merge(x= summary_df, y= InputData, by=SettingsInfo[["InputID"]], all.x=TRUE)%>%
+      distinct(!!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
+  }
 
-  # 5. Messages and summarise
+  # 5. Merge back on input data to retain Nulls: TODO (and duplications might be added back in? would need to change start of function)
+
+  # 6. Messages and summarise
   message <- paste0("InputData has multiple IDs per measurement = ", InputData_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
   message1 <- paste0("InputData has ", dplyr::n_distinct(unique(InputData[[SettingsInfo[["InputID"]]]])), " unique entries with " ,dplyr::n_distinct(unique(InputData_long[[SettingsInfo[["InputID"]]]])) ," unique ", SettingsInfo[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " match, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(unique(InputData_long[[SettingsInfo[["InputID"]]]])))*100, "%." , sep="")
   message2 <- paste0("PriorKnowledge has ", dplyr::n_distinct(PriorKnowledge[[SettingsInfo[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[SettingsInfo[["PriorID"]]]]) ," unique ", SettingsInfo[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " are detected in the data, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(PK_long[[SettingsInfo[["PriorID"]]]]))*100, "%.")
