@@ -56,7 +56,7 @@ LoadKEGG <- function(){
     if(length(new.packages)) install.packages(new.packages)
 
     suppressMessages(library(KEGGREST))
-   
+
     # 1. Make a list of all available human pathways in KEGG
     Pathways_H <- as.data.frame(KEGGREST::keggList("pathway", "hsa"))  # hsa = human
 
@@ -429,11 +429,6 @@ LoadMetalinks <- function(types = NULL,
     con <- DBI::dbConnect(RSQLite::SQLite(), File_path, synchronous = NULL)
     message("Cached file loaded from: ", File_path)
   }else{# load from API
-    RequiredPackages <- c("tidyverse", "RSQLite", "DBI")
-    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-    if(length(new.packages)) install.packages(new.packages)
-
-    suppressMessages(library(tidyverse))
 
     #--------------------------------------------------------------------------------------------
     #Python availability via Liana: https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
