@@ -1495,3 +1495,86 @@ GenerateStackedBar <- function(data,
                    plot.title = ggplot2::element_text(hjust = 0.4))
 }
 
+
+
+##########################################################################################
+### ### ### Helper function to count number of entries for an ID column value and plot ### ### ###
+##########################################################################################
+
+#' Count Entries and Generate a Histogram Plot for a Specified Column
+#'
+#' This function processes a data frame column by counting the number of entries within each cell.
+#' It considers both \code{NA} values and empty strings as zero entries, and categorizes each cell as
+#' "No ID", "Single ID", or "Multiple IDs" based on the count. A histogram is then generated to visualize
+#' the distribution of entry counts.
+#'
+#' @param data A data frame containing the data to be analyzed.
+#' @param column A string specifying the name of the column in \code{data} to analyze.
+#' @param delimiter A string specifying the delimiter used to split cell values. Defaults to \code{","}.
+#' @param fill_colors A named character vector providing colors for each category. Defaults to
+#'   \code{c("No ID" = "#FB8072", "Single ID" = "#B3DE69", "Multiple IDs" = "#80B1D3")}.
+#' @param binwidth Numeric value specifying the bin width for the histogram. Defaults to \code{1}.
+#' @param title_prefix A string to use as the title of the plot. If \code{NULL} (default), the title
+#'   will be generated as "Number of <column> IDs per Biocrates Cell".
+#'
+#' @return A list with two elements:
+#'   \item{result}{A data frame that includes three additional columns: \code{was_na} (logical indicator
+#'                  of missing or empty cells), \code{entry_count} (number of entries in each cell), and
+#'                  \code{id_label} (a categorical label based on the entry count).}
+#'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
+#'
+#' @noRd
+CountEntries <- function(data,
+                                   column,
+                                   delimiter = ",",
+                                   fill_colors = c("No ID" = "#FB8072",
+                                                   "Single ID" = "#B3DE69",
+                                                   "Multiple IDs" = "#80B1D3"),
+                                   binwidth = 1,
+                                   title_prefix = NULL) {
+  # Process the data: count entries and label each cell based on the number of entries.
+  processed_data <- dplyr::mutate(
+    data,
+    was_na = is.na(.data[[column]]) | .data[[column]] == "",
+    entry_count = sapply(.data[[column]], function(cell) {
+      if (is.na(cell) || cell == "") {
+        0  # Treat NA or empty as 0 entries for counting
+      } else {
+        length(unlist(strsplit(as.character(cell), delimiter)))
+      }
+    }),
+    id_label = dplyr::case_when(
+      entry_count == 0 ~ "No ID",
+      entry_count == 1 ~ "Single ID",
+      entry_count >= 2 ~ "Multiple IDs"
+    )
+  )
+
+  # Generate the plot title if not provided
+  if (is.null(title_prefix)) {
+    plot_title <- paste("Number of", column, "IDs per Biocrates Cell")
+  } else {
+    plot_title <- title_prefix
+  }
+
+  # Create the histogram plot using ggplot2
+  plot_obj <- ggplot2::ggplot(processed_data, ggplot2::aes(x = entry_count, fill = id_label)) +
+    ggplot2::geom_histogram(binwidth = binwidth, boundary = -0.5, color = "black") +
+    ggplot2::scale_fill_manual(values = fill_colors) +
+    ggplot2::labs(title = plot_title,
+                  x = "Number of Entries",
+                  y = "Frequency",
+                  fill = "Cell Type") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 22),
+      legend.position = c(0.95, 0.95),
+      legend.justification = c("right", "top"),
+      legend.title = ggplot2::element_text(size = 20),
+      legend.text = ggplot2::element_text(size = 18)
+    )
+
+  # Return the processed data and the plot object as a list
+  return(list(result = processed_data, plot = plot_obj))
+}
+
