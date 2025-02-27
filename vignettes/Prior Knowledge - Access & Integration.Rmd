@@ -117,8 +117,8 @@ FeatureMetadata_Tissue <- MetaProViz::ToyData(Data="Tissue_MetaData")
 
 \
 `3.` Metadata of Biocrates kit **(Biocrates)**\
-Example\
---\> Macabe: Load Biocrates data (explain briefly why multiple IDs are present and why this is good practice)
+This data base is from the MetalinksDB paper [@Farr_Dimitrov2024].
+It includes associations between protein and metabolite entities, collated from a variety of different sources.
 
 ```{r}
 # Load the example data:
@@ -528,10 +528,6 @@ So ideally it is best to use a PK with inherent coverage of metabolites if possi
 ::::
 
 \
-
---\> Macabe your vignette: here we can also just make a note to the next chapter Translate IDs --\> We could consider to show two PK examples, once the biocrates kit linked to e.g.
-MetaLinksDB and classyfire chemical class --\> For MetaLinksDB, we could show all feature metadata examples (cells --\> increased space before/after adding multiple IDs, Biocrates) --\> Also show the coverage of the different ID types (some peaks do not have one ID type, but another one! --\> True also in other example fetaure metadata, not only biocrates.) --\> helper (not exported into RefactorPriorKnowledge.R, and call this plot in TranslateID --\> check if the plotting works in 4. )
-
 Now that we have inspected the overlap of genes and metabolites between the different PK resources, let's turn our attention to linking our experimental data to the PK.
 
 The experimental data in this example will be the data loaded from section 1 (Loading the example data).
@@ -701,7 +697,12 @@ p <- MetaProViz:::GenerateStackedBar(
 p
 ```
 
-\
+From the above plot we see that a few of the metabolite classes from the biocrates kit have every metabolite with a HMDB ID and a corresponding entry in MetalinksDB.
+These are represented by bars that are completely green, such as the Amino Acids and Fatty Acids classes.
+
+However for a number of other classes of metabolites, we see that they will not be represented in the MetalinksDB PK at all, either because we do not have a HMDB ID associated with the Biocrates metabolite (represented by grey bars), or because MetalinksDB does not include a HMDB ID for that metabolite (represented by red bars).
+This poor coverage of course could be a concern for our analysis if we are interested in analysing many of these classes, since it will mean in this case that our experimental results for Phosphatidylglycerols for instance will not be linked to PK.
+In any case we will certainly need to keep this in mind for downstream analysis and the interpretation of results, so that we don't overinterpret results that for instance have a large number of Amino Acids, or falsely assume that the absence of Phosphatidylinositols in our PK integration results means that they are not present or important in our data.\
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
