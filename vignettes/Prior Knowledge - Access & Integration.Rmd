@@ -543,17 +543,9 @@ Whichever resource our experimental data resembles, we want to follow this overa
 
 We could select any combination of experimental data to integrate with the PK.
 This will be based on your data and research question.
-For this vignette, we will focus on:
-
--   CellLine experimental data to Hallmarks PK
+For this vignette, for now we will focus on:
 
 -   Biocrates experimental data to MetalinksDB PK
-
-## CellLine data to Hallmarks, or Biocrates to Classyfyre?
-
-```{r}
-#TODO
-```
 
 ## Biocrates data to MetalinksDB
 
@@ -608,9 +600,11 @@ These results tell us that:
 
     -   LIMID: then you would miss at least 89 metabolites with CHEBI+HMDB
 
-\^ Note that these numbers are minimums, the real values are a little higher once you add for instance metabolites with just CHEBI or just LIMID, etc.
+-   There are two things to note about these observations above:
 
-\^ Note also that this isn't considering what the values of these IDs are exactly; maybe some of the HMDB ids are shared for instance for a single metabolite.
+    -   these numbers are minimums, the real values are a little higher once you add for instance metabolites with just CHEBI or just LIMID, etc.
+
+    -   this process isn't considering what the values of these IDs are exactly; maybe some of the HMDB ids are shared for instance for a single metabolite.
 
 ### 2. Select identifiers to link to PK of interest
 
@@ -620,72 +614,93 @@ In this case, MetalinksDB uses HMDBs as metabolite identifiers so we are best of
 Before we go ahead with this however, we should note that in some cases the Biocrates data appears to have multiple HMDB IDs listed per metabolite.
 We can visualise this like so.
 
-```{r, echo=FALSE}
-# Function to count entries and record NA information
-count_entries_with_na <- function(data, column, delimiter = ",") {
-  data %>%
-    mutate(
-      was_na = is.na(.[[column]]) | .[[column]] == "", 
-      entry_count = sapply(.[[column]], function(cell) {
-        if (is.na(cell) || cell == "") {
-          0  # Treat NA or empty as 0 entries for counting
-        } else {
-          length(unlist(strsplit(as.character(cell), delimiter)))
-        }
-      }),
-      id_label = case_when(
-        entry_count == 0 ~ "No ID",
-        entry_count == 1 ~ "Single ID",
-        entry_count >= 2 ~ "Multiple IDs"
-      )
-    )
-}
-
-columns_to_inspect <- c("HMDB")  # Could also include "CHEBI", "LIMID"
-
-for (col in columns_to_inspect) {
-  result <- count_entries_with_na(FeatureMetadata_Biocrates, col)
-  
-  plot <- ggplot(result, aes(x = entry_count, fill = id_label)) +
-    geom_histogram(binwidth = 1, boundary = -0.5, color = "black") +
-    scale_fill_manual(values = c(
-      "No ID" = "#FB8072",       # soft red
-      "Single ID" = "#B3DE69",  # soft green
-      "Multiple IDs" = "#80B1D3"    # soft blue
-    )) +
-    labs(title = paste("Number of", col, "IDs per Biocrates Cell"),
-         x = "Number of Entries",
-         y = "Frequency",
-         fill = "Cell Type") +
-    theme_minimal() +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 22),
-      legend.position = c(0.95, 0.95),             # top right corner
-      legend.justification = c("right", "top"),
-      legend.title = element_text(size = 20),        # larger legend title
-      legend.text = element_text(size = 18)          # larger legend text
-    )
-  
-  print(plot)
-}
+```{r}
+# Count entries and record NA information
+result_bioc_hmdb_count <- MetaProViz:::CountEntries(FeatureMetadata_Biocrates, "HMDB")
+# Access the processed data:
+processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$result
+# Display the plot:
+print(result_bioc_hmdb_count$plot)
 ```
 
 ### 3. Make connection to PK and assess overlap
 
-Now finally we can connect the experimental Biocrates table to the MetalinksDB PK using the HMDB sources.
+Now finally we can connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs and the `CheckMatchID()` function.
 
 ```{r}
-MetaProViz:::CheckMatchID(InputData = FeatureMetadata_Biocrates,
+Biocrates_to_MetalinksDB <- MetaProViz:::CheckMatchID(InputData = FeatureMetadata_Biocrates,
                      PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
                      SettingsInfo = c(InputID="HMDB", PriorID="hmdb", GroupingVariable=NULL))
 ```
 
-But because we have multiple HMDB IDs per individual Biocrates metabolite in many cases, we also want to take this into account when assessing coverage.
-We do this by counting a link to the PK for any of the HMDB IDs for an individual metabolite only once.
+This returns some warning messages and 4 tables:
 
-\_\_\_TODO\_\_\_\
+-   InputData_Matched: a summary table with links to the prior knowledge.
+    This is however with any NA values or duplicates of the InputID (e.g. 'HMDB') removed from the table.
 
-\
+-   InputData_Matched_NA_and_duplicates: the same kind of summary table but with all NA and duplicates included.
+    Helpful for plotting.
+
+-   InputData_Matched_only_NA: the same kind of summary table but with only rows where the InputID was NA.
+    Helpful for inspecting which rows were NA.
+
+<!-- -->
+
+-   InputData_Matched_only_duplicates: the same kind of summary table but with only rows where the InputID was duplicated (or triplicated, etc).
+    Helpful for inspecting which IDs on the input side were duplicated.
+
+In some cases we will expect to have only input ID linked to one entry in the PK.
+But this won't always be the case, and as already discussed in the last section above, in many cases here we will have multiple HMDB IDs per single biocrates metabolite cell.
+The `CheckMatchID()` has been designed with this in mind, by default splitting any comma separated values in the InputID (or PriorID) into separate entities, counting the number of links between these, and reporting this to the user.
+
+Let's take a look at the InputData_Matched data:
+
+```{r, echo=FALSE}
+irrelevant_cols <- c('INCHI','SMILES','Key','IUPAC','Molecule','MESH','TrivialName_Prior2023')
+
+# Check how our data looks like:
+Biocrates_to_MetalinksDB$InputData_Matched[c(1:8),] %>%
+  dplyr::select(-any_of(irrelevant_cols)) %>%
+  kableExtra::kbl(caption = "Preview of the DF `InputData_Matched` showing coverage of identifiers (some columns hidden)", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+Now let's take a look here at the duplicated IDs:
+
+```{r, echo=FALSE}
+# Check how our data looks like:
+table_to_show <- Biocrates_to_MetalinksDB$InputData_Matched_only_duplicates
+table_to_show[c(1:nrow(table_to_show)),] %>%
+  dplyr::select(-any_of(irrelevant_cols)) %>%
+  kableExtra::kbl(caption = "Preview of the DF `InputData_Matched_only_duplicates` showing coverage of identifiers (some columns hidden)", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+
+Now it would be nice to visualise the linkages to get an idea of how well the experimental data (Biocrates in this case) matches to the PK (MetalinksDB in this case).
+Note again that we also want to take into account the multiple IDs for each metabolite when assessing coverage.
+In the plot below we do this by counting a link to the PK for any of the HMDB IDs for an individual metabolite only once.
+
+```{r, fig.width=8, fig.height=6}
+# Define your color scheme and labels
+fill_vals <- c("FALSE" = "red", "TRUE" = "#009E73")
+fill_lbls <- c("No Match", "Found Match")
+
+# Call the function with desired parameters
+p <- MetaProViz:::GenerateStackedBar(
+  data = Biocrates_to_MetalinksDB$InputData_Matched_NA_and_duplicates,
+  group_col = "Class",
+  fill_col = "found_match_in_PK",
+  fill_values = fill_vals,
+  fill_labels = fill_lbls,
+  plot_title = "Mapping status between Biocrates and MetalinksDB \nusing HMDB, grouped by metabolite class",
+  x_label = "Frequency",
+  y_label = "Class",
+  legend_position = c(0.95, 0.05)
+)
+
+p
+```
+
 \
 
 :::: {.progress .progress-striped .active}
