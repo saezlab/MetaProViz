@@ -48,17 +48,21 @@ knitr::opts_chunk$set(
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
 - 1.
-To understand detected metabolite IDs in measured data.\
-- 2.
-To access metabolite prior knowledge and metabolite-gene prior knowledge networks.\
-- 3.
-To link experimental data to prior knowledge - the Do's and Don'ts.\
-- 4.
-To deal with many-to-many mapping in your metabolite identifiers.\
-- 5.
-To perform pathway enrichment analysis.\
+[To understand detected metabolite IDs in measured data.](#sect1)
 
---\> Revamp: Christina/Macabe Add links to jump to parts and box around\
+\- 2.
+[To access metabolite prior knowledge and metabolite-gene prior knowledge networks.](#sect2)
+
+\- 3.
+[To link experimental data to prior knowledge - the Do's and Don'ts.](#sect3)
+
+\- 4.
+[To deal with many-to-many mapping in your metabolite identifiers.](#sect4)
+
+\- 5.
+[To perform pathway enrichment analysis.](#sect5)\
+
+\
 First if you have not done yet, install the required dependencies and load the libraries:
 
 ```{r message=FALSE, warning=FALSE}
@@ -72,6 +76,10 @@ library(rlang)
 library(purrr)
 library(dplyr)
 library(stringr)
+
+#source("RefactorPriorKnowledge.R") 
+#source("R/RefactorPriorKnoweldge.R") # note -typo in Knowledge...
+devtools::load_all()
 
 #Please install the Biocmanager Dependencies:
 #BiocManager::install("clusterProfiler")
@@ -133,7 +141,7 @@ FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="BiocratesFeatureTable")
 :::
 ::::
 
-# 1. Metabolite IDs in measured data
+# 1. Metabolite IDs in measured data {#sect1}
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -314,7 +322,7 @@ FeatureMetadata_Cells_AddIDs [2:8, ]%>%
 :::
 ::::
 
-# 2. Accessing Prior Knowledge
+# 2. Accessing Prior Knowledge {#sect2}
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -499,7 +507,7 @@ df_upset_pk_comparison[c(1:8),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-```{r}
+```{r, fig.width=8, fig.height=6}
 MetaProViz:::GenerateUpset(df = df_upset_pk_comparison,
                           class_col = "Type",
                           intersect_cols = c("Hallmarks", "Gaude", "Metalinks"),
@@ -520,7 +528,7 @@ So ideally it is best to use a PK with inherent coverage of metabolites if possi
 :::
 ::::
 
-# 3. Linking experimental data to prior knowledge
+# 3. Linking experimental data to prior knowledge {#sect3}
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -574,7 +582,7 @@ df_upset_biocft[c(1:8),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-```{r}
+```{r, fig.width=12, fig.height=9}
 MetaProViz:::GenerateUpset(df = df_upset_biocft,
                           class_col = "Class",
                           intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
@@ -610,7 +618,7 @@ In this case, MetalinksDB uses HMDBs as metabolite identifiers so we are best of
 Before we go ahead with this however, we should note that in some cases the Biocrates data appears to have multiple HMDB IDs listed per metabolite.
 We can visualise this like so.
 
-```{r}
+```{r, fig.width=8, fig.height=6}
 # Count entries and record NA information
 result_bioc_hmdb_count <- MetaProViz:::CountEntries(FeatureMetadata_Biocrates, "HMDB")
 # Access the processed data:
@@ -652,7 +660,7 @@ The `CheckMatchID()` has been designed with this in mind, by default splitting a
 Let's take a look at the InputData_Matched data:
 
 ```{r, echo=FALSE}
-irrelevant_cols <- c('INCHI','SMILES','Key','IUPAC','Molecule','MESH','TrivialName_Prior2023')
+irrelevant_cols <- c('INCHI','SMILES','Key','IUPAC','Molecule','MESH','TrivialName_Prior2023', 'Detection','CID')
 
 # Check how our data looks like:
 Biocrates_to_MetalinksDB$InputData_Matched[c(1:8),] %>%
@@ -676,7 +684,7 @@ Now it would be nice to visualise the linkages to get an idea of how well the ex
 Note again that we also want to take into account the multiple IDs for each metabolite when assessing coverage.
 In the plot below we do this by counting a link to the PK for any of the HMDB IDs for an individual metabolite only once.
 
-```{r, fig.width=8, fig.height=6}
+```{r, fig.width=10, fig.height=6}
 # Define your color scheme and labels
 fill_vals <- c("FALSE" = "red", "TRUE" = "#009E73")
 fill_lbls <- c("No Match", "Found Match")
@@ -702,14 +710,132 @@ These are represented by bars that are completely green, such as the Amino Acids
 
 However for a number of other classes of metabolites, we see that they will not be represented in the MetalinksDB PK at all, either because we do not have a HMDB ID associated with the Biocrates metabolite (represented by grey bars), or because MetalinksDB does not include a HMDB ID for that metabolite (represented by red bars).
 This poor coverage of course could be a concern for our analysis if we are interested in analysing many of these classes, since it will mean in this case that our experimental results for Phosphatidylglycerols for instance will not be linked to PK.
-In any case we will certainly need to keep this in mind for downstream analysis and the interpretation of results, so that we don't overinterpret results that for instance have a large number of Amino Acids, or falsely assume that the absence of Phosphatidylinositols in our PK integration results means that they are not present or important in our data.\
+In any case we will certainly need to keep this in mind for downstream analysis and the interpretation of results, so that we don't overinterpret results that for instance have a large number of Amino Acids, or falsely assume that the absence of Phosphatidylinositols in our PK integration results means that they are not present or important in our data.
+
+### Bonus: are multiple IDs helpful or a hindrance?
+
+Let's turn back to consider the number of HMDB IDs we have in the Biocrates data and ask ourself a question: is it helpful or detrimental to have multiple IDs?
+
+To answer this, we will take only the first HMDB of each cell with multiple HMDB IDs and test to see this has worked.
+
+```{r}
+extract_first_id <- function(id_col) {
+  sapply(as.character(id_col), function(x) {
+    # Check for NA or empty string
+    if (is.na(x) || x == "") {
+      return(NA)
+    }
+    # Split on comma (adjust the delimiter if needed)
+    parts <- unlist(strsplit(x, split = ","))
+    # Return the first value after trimming any whitespace
+    return(trimws(parts[1]))
+  })
+}
+
+# Create a copy of the df
+FeatureMetadata_Biocrates_singleHMDB <- FeatureMetadata_Biocrates
+# Get the first entry of each HMDB ID
+FeatureMetadata_Biocrates_singleHMDB$HMDB_single <- extract_first_id(FeatureMetadata_Biocrates$HMDB)
+
+# Visually check that the single ID function has worked 
+# Count entries and record NA information
+result_bioc_hmdb_count_single <- MetaProViz:::CountEntries(FeatureMetadata_Biocrates_singleHMDB, "HMDB_single")
+# Access the processed data:
+processed_df_bioc_hmdb_count_single <- result_bioc_hmdb_count_single$result
+# Display the plot:
+print(result_bioc_hmdb_count_single$plot)
+```
+
+Now that we can see we only have either NA or singular values for our HMDB IDs, let's map this table to MetalinksDB using the same function as we did earlier, but this time using the `HMDB_single` column.
+
+```{r, fig.width=8, fig.height=6, echo=TRUE}
+Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::CheckMatchID(InputData = FeatureMetadata_Biocrates_singleHMDB,
+                     PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
+                     SettingsInfo = c(InputID="HMDB_single", PriorID="hmdb", GroupingVariable=NULL))
+```
+
+```{r, echo=FALSE}
+# # Call the same function as earlier to 
+# p <- MetaProViz:::GenerateStackedBar(
+#   data = Biocrates_to_MetalinksDB$InputData_Matched_NA_and_duplicates,
+#   group_col = "Class",
+#   fill_col = "found_match_in_PK",
+#   fill_values = fill_vals,
+#   fill_labels = fill_lbls,
+#   plot_title = "Mapping status between Biocrates and MetalinksDB \nusing ALL HMDB, grouped by metabolite class",
+#   x_label = "Frequency",
+#   y_label = "Class",
+#   legend_position = c(0.95, 0.05)
+# )
+# 
+# p
+
+# Call the function with desired parameters
+p <- MetaProViz:::GenerateStackedBar(
+  data = Biocrates_to_MetalinksDB_singleHMDB$InputData_Matched_NA_and_duplicates,
+  group_col = "Class",
+  fill_col = "found_match_in_PK",
+  fill_values = fill_vals,
+  fill_labels = fill_lbls,
+  plot_title = "Mapping status between Biocrates and MetalinksDB \nusing only FIRST (single) HMDB, grouped by metabolite class",
+  x_label = "Frequency",
+  y_label = "Class",
+  legend_position = c(0.95, 0.05)
+)
+
+p
+```
+
+This doesn't appear to look that different to before, but if we look closely we can see that some classes have shifted a bit, such as Phosphatidylethanolamines for instance.
+To better visualise these differences we will zoom in on these changes by filtering only to the successful matches between the Biocrates kit and MetalinksDB, comparing which metabolites were found using only the single hits versus using both.
+
+```{r, echo=FALSE, fig.width=10, fig.height=6}
+Biocrates_to_MetalinksDB_foundPKmatch <- Biocrates_to_MetalinksDB$InputData_Matched_NA_and_duplicates %>%
+  filter(found_match_in_PK == TRUE)
+Biocrates_to_MetalinksDB_singleHMDB_foundPKmatch <- Biocrates_to_MetalinksDB_singleHMDB$InputData_Matched_NA_and_duplicates %>%
+  filter(found_match_in_PK == TRUE)
+
+Biocrates_to_MetalinksDB_foundPKmatch <- Biocrates_to_MetalinksDB_foundPKmatch %>%
+  mutate(found_with_singleHMDB = TrivialName %in% Biocrates_to_MetalinksDB_singleHMDB_foundPKmatch$TrivialName)
+
+# Define your color scheme and labels
+fill_vals <- c("TRUE" = "#009E73", "FALSE" = "#004A13")
+fill_lbls <- c("Biocrates metabolite <---> MetalinksDB: using only multi HMDB","Biocrates metabolite <---> MetalinksDB: using single or multi HMDB")
+
+# Call the function with desired parameters
+p <- MetaProViz:::GenerateStackedBar(
+  data = Biocrates_to_MetalinksDB_foundPKmatch,
+  group_col = "Class",
+  fill_col = "found_with_singleHMDB",
+  fill_values = fill_vals,
+  fill_labels = fill_lbls,
+  plot_title = "Comparison of successful mapping status between Biocrates and MetalinksDB \nusing either single or multi HMDB, grouped by metabolite class",
+  x_label = "Frequency",
+  y_label = "Class",
+  legend_position = c(0.95, 0.05)
+)
+
+p
+```
+
+```{r, echo=FALSE}
+single_only <- table(Biocrates_to_MetalinksDB_foundPKmatch$found_with_singleHMDB)
+print("Counts of linkages made using only a Single HMDB")
+print(single_only)
+
+increase_in_coverage <- (100/single_only['TRUE'])*single_only['FALSE']
+cat("\nUsing Multi HMDBs increased coverage over Single HMDBs by:", sprintf("%.2f", unname(increase_in_coverage)), "%\n")
+```
+
+This has shown that in this case, although the results were overshadowed by the poor overall linkage of the experimental data to the PK, using Multi HMDBs has resulted in nearly 20% (n=29) more metabolites from Biocrates being able to be linked to MetalinksDB than what would have been possible if we only used the first HMDB available to us.
+Hence while having multiple IDs for a single metabolite may add to confusion as a user, we would recommend against prematurely dropping any IDs until you map to the PK or have thoroughly assessed what impact the removal may have.
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
 :::
 ::::
 
-# 4. Translate IDs
+# 4. Translate IDs {#sect4}
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -749,8 +875,32 @@ KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-\
-Here it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping.
+Here we can immediately see that despite the ID translation, some of the translations between the KEGG MetaboliteID and the HMDB or PubChem IDs have failed, resulting in NA values.
+To get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.
+
+```{r, echo=FALSE, fig.width=8, fig.height=6}
+df_binary_keggmapping <- data.frame(
+  trivname = KEGG_Pathways_Translated$TranslatedDF$MetaboliteID,
+  HMDB = as.integer(!is.na(KEGG_Pathways_Translated[["TranslatedDF"]]$hmdb)),
+  PubChem  = as.integer(!is.na(KEGG_Pathways_Translated[["TranslatedDF"]]$pubchem))
+)
+
+df_upset_keggmapping <- df_binary_keggmapping %>%
+  mutate(
+    None = as.integer(rowSums(across(c(HMDB, PubChem))) == 0),
+    Term = KEGG_Pathways_Translated[["TranslatedDF"]]$term 
+  )
+
+MetaProViz:::GenerateUpset(df = df_upset_keggmapping,
+                          #class_col = "Term",
+                          class_col = NULL,
+                          intersect_cols = c("HMDB", "PubChem", "None"),
+                          plot_title = "IDs available after KEGG ID translation",
+                          palette_type = "polychrome",
+                          output_file = NULL)
+```
+
+We can also note from the previous table that it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping.
 In fact it is very common that an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs) or even a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).\
 This comes with many implications for the analysis that will be discussed in the next section.
 
@@ -892,7 +1042,7 @@ This is something we are currently working on and hope to provide within the nex
 :::
 ::::
 
-# 5. Run enrichment analysis
+# 5. Run enrichment analysis {#sect5}
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
