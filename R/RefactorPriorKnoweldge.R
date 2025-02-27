@@ -685,8 +685,6 @@ CheckMatchID <- function(InputData,
     stop(message)
   }
 
-  ### This is after the main input checks, so could save original df here for later merging to get Null and duplicates back.
-  # Assignment here... e.g. InputData_Original
   ### This is after the main input checks (before NA removal), so we will save original df here for later merging to get the Null and duplicates back.
   InputData_Original <- InputData
 
@@ -972,7 +970,6 @@ CheckMatchID <- function(InputData,
       distinct(!!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
   }
 
-  # 5. Merge back on input data to retain Nulls: TODO (and duplications might be added back in? would need to change start of function)
   # 5. Merge back on input data to retain Nulls and duplications in case the user wants this (e.g. for plotting or inspecting further)
 
   # Function: add_NA_to_table
@@ -1088,7 +1085,6 @@ CheckMatchID <- function(InputData,
 
 
   ## ------------------ Save Results ----------------------##
-  ResList <- list("InputData_Matched" = summary_df)
   ResList <- list("InputData_Matched" = summary_df,
                   "InputData_Matched_NA_and_duplicates" = summary_df_with_NA_and_duplicates,
                   "InputData_Matched_only_NA" = summary_df_only_NA,
@@ -1105,7 +1101,6 @@ CheckMatchID <- function(InputData,
                        PrintPlot=FALSE)))
 
    #Return
-   invisible(return(ResList[["InputData_Matched"]]))
    invisible(return(ResList))
 }
 
@@ -1334,16 +1329,27 @@ AddInfo <- function(mat,
 ### ### ### Helper function to create complex upset plots to visualise PK coverage ### ### ###
 ##########################################################################################
 
-#' Docstring TODO
+#' Generate Complex Upset Plot for PK Coverage
 #'
-#' @param df TODO
-#' @param class_col TODO... etc
+#' This helper function creates a complex upset plot to visualize Prior Knowledge (PK) coverage by
+#' displaying the intersections among a set of metabolite ID columns. The plot groups the data based on
+#' a specified class column and uses a color palette ("viridis" or "polychrome") to represent the class levels.
+#'
+#' @param df A data frame containing the data to be plotted.
+#' @param class_col A string specifying the name of the column in \code{df} that represents the class of each observation.
+#'                  This column is coerced to a factor. Default is \code{"Class"}.
+#' @param intersect_cols A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
+#'                       Default is \code{c("LIMID", "HMDB", "CHEBI", "None")}.
+#' @param plot_title A string specifying the title of the plot. Default is \code{"Metabolite IDs"}.
+#' @param palette_type A string specifying the color palette to use for the fill aesthetic. Options are \code{"viridis"} (default) and \code{"polychrome"}.
+#' @param output_file An optional string specifying the file path to save the plot. If \code{NULL} (default), the plot is not saved.
+#' @param width Numeric value specifying the width of the saved plot (if \code{output_file} is provided). Default is \code{14}.
+#' @param height Numeric value specifying the height of the saved plot (if \code{output_file} is provided). Default is \code{8}.
+#' @param dpi Numeric value specifying the resolution (dots per inch) of the saved plot (if \code{output_file} is provided). Default is \code{300}.
+#'
+#' @return A \code{ggplot} object representing the generated upset plot.
 #'
 #' @noRd
-
-# Functions to create the complex upset plots
-
-# Define the function
 GenerateUpset <- function(df,
                           class_col = "Class",
                           intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
@@ -1353,10 +1359,6 @@ GenerateUpset <- function(df,
                           width = 14,
                           height = 8,
                           dpi = 300) {
-  # Load required libraries
-  library(ComplexUpset)
-  library(ggplot2)
-  library(viridis)  # For viridis palette
 
   # Match palette_type argument
   palette_type <- match.arg(palette_type)
@@ -1366,7 +1368,7 @@ GenerateUpset <- function(df,
 
   # Choose the appropriate scale based on palette_type
   if(palette_type == "viridis"){
-    fill_scale <- scale_fill_viridis_d(option = "viridis")
+    fill_scale <- viridis::scale_fill_viridis_d(option = "viridis")
   } else if(palette_type == "polychrome"){
     if (!requireNamespace("Polychrome", quietly = TRUE)) {
       stop("Package 'Polychrome' is required for the polychrome palette. Please install it.")
@@ -1379,8 +1381,8 @@ GenerateUpset <- function(df,
       stop("Not enough colors in the Polychrome palette for the number of classes!")
     }
     # Create a named palette that maps each level to a color
-    my_palette_named <- setNames(my_palette[1:length(class_levels)], class_levels)
-    fill_scale <- scale_fill_manual(values = my_palette_named)
+    my_palette_named <- stats::setNames(my_palette[1:length(class_levels)], class_levels)
+    fill_scale <- ggplot2::scale_fill_manual(values = my_palette_named)
   }
 
   # Create the upset plot
@@ -1389,34 +1391,107 @@ GenerateUpset <- function(df,
     intersect = intersect_cols,
     name = plot_title,
     base_annotations = list(
-      "Intersection size" = intersection_size(
+      "Intersection size" = ComplexUpset::intersection_size(
         # Use aes_string to allow a dynamic fill mapping
-        mapping = aes_string(fill = class_col),
+        mapping = ggplot2::aes_string(fill = class_col),
         counts = TRUE
       ) +
         fill_scale +
-        theme(
+        ggplot2::theme(
           legend.position = "right",
-          axis.text.x = element_text(angle = 90, hjust = 1)
+          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
         )
     ),
     set_sizes = (
-      upset_set_size() +
-        theme(axis.text.y = element_text(size = 10))
+      ComplexUpset::upset_set_size() +
+        ggplot2::theme(axis.text.y = ggplot2::element_text(size = 10))
     )
   ) +
-    theme_minimal(base_size = 14) +
-    theme(
-      plot.margin = margin(1, 1, 1, 1, "cm")
+    ggplot2::theme_minimal(base_size = 14) +
+    ggplot2::theme(
+      plot.margin = ggplot2::margin(1, 1, 1, 1, "cm")
     )
 
   # If an output file is provided, save the plot
   if(!is.null(output_file)){
-    ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
+    ggplot2::ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
   }
 
   # Return the plot object so it can be printed in the notebook
   return(p)
 }
 
+
+
+##########################################################################################
+### ### ### Helper function to create stacked bar plots to visualise PK coverage ### ### ###
+##########################################################################################
+
+#' Generate Stacked Bar Plot for PK Coverage
+#'
+#' This helper function creates a stacked bar plot to visualize Prior Knowledge (PK) coverage.
+#' The plot groups data by a specified column and fills the bars according to another column,
+#' allowing you to inspect the distribution of match statuses (or any categorical variable).
+#'
+#' @param data A data frame containing the data to be plotted.
+#' @param group_col A string specifying the name of the column to group the data by.
+#' @param fill_col A string specifying the name of the column to use for fill aesthetics.
+#' @param fill_values A vector of color values to be used for the fill aesthetic.
+#' @param fill_labels A vector of labels corresponding to the fill levels for the legend.
+#' @param plot_title A string specifying the title of the plot.
+#' @param x_label A string for the x-axis label. Defaults to "Frequency".
+#' @param y_label A string for the y-axis label. If \code{NULL}, the value of \code{group_col} is used.
+#' @param legend_position A numeric vector of length 2 specifying the (x, y) position of the legend.
+#'                        Defaults to \code{c(0.95, 0.05)}.
+#'
+#' @return A \code{ggplot} object representing the stacked bar plot.
+#' @noRd
+GenerateStackedBar <- function(data,
+                               group_col,
+                               fill_col,
+                               fill_values,
+                               fill_labels,
+                               plot_title,
+                               x_label = "Frequency",
+                               y_label = NULL,
+                               legend_position = c(0.95, 0.05)) {
+  # Convert column names to symbols for tidy evaluation
+  group_sym <- rlang::sym(group_col)
+  fill_sym  <- rlang::sym(fill_col)
+
+  # Determine order of groups by overall frequency (ascending)
+  group_order <- data %>%
+    dplyr::group_by(!!group_sym) %>%
+    dplyr::summarise(total = dplyr::n(), .groups = 'drop') %>%
+    dplyr::arrange(total) %>%
+    dplyr::pull(!!group_sym)
+
+  # Summarize data by group and fill status, then reorder the group factor
+  summary_data <- data %>%
+    dplyr::group_by(!!group_sym, !!fill_sym) %>%
+    dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
+    dplyr::mutate(!!group_sym := factor(!!group_sym, levels = group_order))
+
+  # If y_label is not provided, use the grouping column name
+  if (is.null(y_label)) {
+    y_label <- group_col
+  }
+
+  # Create the plot
+  ggplot2::ggplot(summary_data, ggplot2::aes_string(y = group_col,
+                                                    x = "count",
+                                                    fill = paste0("as.factor(", fill_col, ")"))) +
+    ggplot2::geom_bar(stat = "identity") +
+    ggplot2::scale_fill_manual(values = fill_values,
+                               labels = fill_labels,
+                               name = "Match Status") +
+    ggplot2::labs(title = plot_title,
+                  x = x_label,
+                  y = y_label) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 1),
+                   legend.position = legend_position,
+                   legend.justification = c("right", "bottom"),
+                   plot.title = ggplot2::element_text(hjust = 0.4))
+}
 
