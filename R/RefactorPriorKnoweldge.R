@@ -687,6 +687,8 @@ CheckMatchID <- function(InputData,
 
   ### This is after the main input checks, so could save original df here for later merging to get Null and duplicates back.
   # Assignment here... e.g. InputData_Original
+  ### This is after the main input checks (before NA removal), so we will save original df here for later merging to get the Null and duplicates back.
+  InputData_Original <- InputData
 
   if(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])) >=1){#remove NAs:
      message <- paste0(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])), " NA values were removed from column", SettingsInfo[["InputID"]])
@@ -732,6 +734,8 @@ CheckMatchID <- function(InputData,
     stop(message)
   }
 
+  ### This is after the main input checks (before NA removal), so we will save original df here for later merging to get the Null and duplicates back.
+  PriorKnowledge_Original <- PriorKnowledge
 
   if(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])) >=1){#remove NAs:
     message <- paste0(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])), " NA values were removed from column", SettingsInfo[["PriorID"]])
@@ -969,6 +973,104 @@ CheckMatchID <- function(InputData,
   }
 
   # 5. Merge back on input data to retain Nulls: TODO (and duplications might be added back in? would need to change start of function)
+  # 5. Merge back on input data to retain Nulls and duplications in case the user wants this (e.g. for plotting or inspecting further)
+
+  # Function: add_NA_to_table
+  #
+  # Description:
+  #   This function takes two data frames:
+  #     - table_with_NA: the original table that may contain rows where the key column is NA.
+  #     - table_without_NA: a processed table (e.g. from a join) that contains extra columns and excludes rows where the key is NA.
+  #
+  #   The function extracts rows from table_with_NA where the key is NA, extends these rows by adding any extra columns
+  #   (present in table_without_NA but not in table_with_NA) with NA values, and then binds these extended rows to table_without_NA.
+  #
+  # Parameters:
+  #   table_with_NA: Data frame containing the original data (e.g. FeatureMetadata_Biocrates).
+  #   table_without_NA: Data frame containing the processed data with extra columns (e.g. tempnew).
+  #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
+  #
+  # Returns:
+  #   A combined data frame that includes the rows from table_without_NA along with the extended NA rows from table_with_NA.
+  add_NA_to_table <- function(table_with_NA, table_without_NA, key) {
+
+    # Subset rows from the original table where the key column is NA
+    na_rows <- dplyr::filter(table_with_NA, is.na(.data[[key]]))
+
+    # Identify extra columns present in table_without_NA that are not in the original table
+    extra_cols <- setdiff(names(table_without_NA), names(table_with_NA))
+
+    # Extend the NA rows by adding the extra columns, setting their values to NA
+    na_rows_extended <- dplyr::mutate(na_rows, !!!setNames(rep(list(NA), length(extra_cols)), extra_cols))
+
+    # Reorder columns to match the structure of table_without_NA
+    na_rows_extended <- dplyr::select(na_rows_extended, dplyr::all_of(names(table_without_NA)))
+
+    # Combine the processed table with the extended NA rows
+    combined_table <- dplyr::bind_rows(table_without_NA, na_rows_extended)
+
+    return(combined_table)
+  }
+
+
+  # Function: create_duplicates_table
+  #
+  # Description:
+  #   This function takes two data frames:
+  #     - table_with_duplicates: the original table that may contain duplicate rows based on the key.
+  #     - table_without_duplicates: a deduplicated table (e.g. from a join) that includes extra columns.
+  #
+  #   The function identifies duplicate rows (non-NA keys that appear more than once, excluding the first occurrence)
+  #   in table_with_duplicates, then left joins these duplicate rows with the extra columns from table_without_duplicates.
+  #   This ensures that all duplicate rows receive the same extra column values as the first occurrence.
+  #
+  # Parameters:
+  #   table_with_duplicates: Data frame containing the original data that may include duplicate keys.
+  #   table_without_duplicates: Data frame with the processed data (first occurrence for each key and extra columns).
+  #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
+  #
+  # Returns:
+  #   A data frame containing the duplicate rows, extended with the extra columns from table_without_duplicates.
+  create_duplicates_table <- function(table_with_duplicates, table_without_duplicates, key) {
+
+    # Identify extra columns present in table_without_duplicates that are not in the original table
+    extra_cols <- setdiff(names(table_without_duplicates), names(table_with_duplicates))
+
+    # Extract duplicate rows: for each non-NA key, keep rows beyond the first occurrence
+    dup_rows <- table_with_duplicates %>%
+      dplyr::filter(!is.na(.data[[key]])) %>%
+      dplyr::group_by(.data[[key]]) %>%
+      dplyr::filter(dplyr::row_number() > 1) %>%
+      dplyr::ungroup()
+
+    # For each duplicate row, join the extra columns from table_without_duplicates so that all duplicates
+    # receive the same extra values as the first occurrence
+    dup_rows_extended <- dplyr::left_join(
+      dup_rows,
+      dplyr::select(table_without_duplicates, dplyr::all_of(c(key, extra_cols))),
+      by = key
+    ) %>%
+      dplyr::select(dplyr::all_of(names(table_without_duplicates)))
+
+    return(dup_rows_extended)
+  }
+
+  # Create the table with NA rows added
+  temp_results_NAs_added <- add_NA_to_table(FeatureMetadata_Biocrates, tempnew, SettingsInfo[["InputID"]])
+  # Create the table with duplicate key (SettingsInfo[["InputID"]]) rows extended
+  temp_results_of_duplicates <- create_duplicates_table(FeatureMetadata_Biocrates, tempnew, SettingsInfo[["InputID"]])
+  # Combine these to get a summary table that includes both NA and duplicate rows
+  summary_df_with_NA_and_duplicates <- bind_rows(temp_results_NAs_added, temp_results_of_duplicates)
+
+  # Now for the user let's also create separate dfs with just the NA values and just the duplicates, in case they want to inspect this easier
+  summary_df_only_NA <- summary_df_with_NA_and_duplicates %>%
+    dplyr::filter(is.na(.data[[SettingsInfo[["InputID"]]]]))
+
+  summary_df_only_duplicates <- summary_df_with_NA_and_duplicates %>%
+    dplyr::filter(!is.na(.data[[SettingsInfo[["InputID"]]]])) %>%  # Exclude NA values
+    dplyr::group_by(.data[[SettingsInfo[["InputID"]]]]) %>%
+    dplyr::filter(dplyr::n() > 1) %>%             # Keep groups with duplicates
+    dplyr::ungroup()
 
   # 6. Messages and summarise
   message <- paste0("InputData has multiple IDs per measurement = ", InputData_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
@@ -987,6 +1089,10 @@ CheckMatchID <- function(InputData,
 
   ## ------------------ Save Results ----------------------##
   ResList <- list("InputData_Matched" = summary_df)
+  ResList <- list("InputData_Matched" = summary_df,
+                  "InputData_Matched_NA_and_duplicates" = summary_df_with_NA_and_duplicates,
+                  "InputData_Matched_only_NA" = summary_df_only_NA,
+                  "InputData_Matched_only_duplicates" = summary_df_only_duplicates)
 
   suppressMessages(suppressWarnings(
   MetaProViz:::SaveRes(InputList_DF=ResList,
@@ -1000,6 +1106,7 @@ CheckMatchID <- function(InputData,
 
    #Return
    invisible(return(ResList[["InputData_Matched"]]))
+   invisible(return(ResList))
 }
 
 
