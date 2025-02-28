@@ -616,7 +616,7 @@ LoadMetalinks <- function(types = NULL,
   #Decide on useful selections term-metabolite for MetaProViz.
   #MetalinksDB_Pathways <- merge(MetalinksDB[, c(1:3)], TablesList[["pathway"]], by="hmdb", all.x=TRUE)
 
-  MetalinksDB_Type <-MetalinksDB[, c(1:3, 7,13)]%>%
+  MetalinksDB_Type <-MetalinksDB[, c(1:3, 5:7,13, 15)]%>%
     subset(!is.na(protein_type))%>%
     dplyr::mutate(term = gsub('\"', '', protein_type))%>%
     unite(term_specific, c("term", "type"), sep = "_", remove = FALSE)%>%
