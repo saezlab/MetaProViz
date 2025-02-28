@@ -685,8 +685,8 @@ CheckMatchID <- function(InputData,
     stop(message)
   }
 
-  ### This is after the main input checks, so could save original df here for later merging to get Null and duplicates back.
-  # Assignment here... e.g. InputData_Original
+  ### This is after the main input checks (before NA removal), so we will save original df here for later merging to get the Null and duplicates back.
+  InputData_Original <- InputData
 
   if(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])) >=1){#remove NAs:
      message <- paste0(sum(is.na(InputData[[SettingsInfo[["InputID"]]]])), " NA values were removed from column", SettingsInfo[["InputID"]])
@@ -732,6 +732,8 @@ CheckMatchID <- function(InputData,
     stop(message)
   }
 
+  ### This is after the main input checks (before NA removal), so we will save original df here for later merging to get the Null and duplicates back.
+  PriorKnowledge_Original <- PriorKnowledge
 
   if(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])) >=1){#remove NAs:
     message <- paste0(sum(is.na(PriorKnowledge[[SettingsInfo[["PriorID"]]]])), " NA values were removed from column", SettingsInfo[["PriorID"]])
@@ -968,7 +970,104 @@ CheckMatchID <- function(InputData,
       distinct(!!sym(SettingsInfo[["InputID"]]), .keep_all = TRUE)
   }
 
-  # 5. Merge back on input data to retain Nulls: TODO (and duplications might be added back in? would need to change start of function)
+  # 5. Merge back on input data to retain Nulls and duplications in case the user wants this (e.g. for plotting or inspecting further)
+
+  # Function: add_NA_to_table
+  #
+  # Description:
+  #   This function takes two data frames:
+  #     - table_with_NA: the original table that may contain rows where the key column is NA.
+  #     - table_without_NA: a processed table (e.g. from a join) that contains extra columns and excludes rows where the key is NA.
+  #
+  #   The function extracts rows from table_with_NA where the key is NA, extends these rows by adding any extra columns
+  #   (present in table_without_NA but not in table_with_NA) with NA values, and then binds these extended rows to table_without_NA.
+  #
+  # Parameters:
+  #   table_with_NA: Data frame containing the original data (e.g. FeatureMetadata_Biocrates).
+  #   table_without_NA: Data frame containing the processed data with extra columns (e.g. tempnew).
+  #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
+  #
+  # Returns:
+  #   A combined data frame that includes the rows from table_without_NA along with the extended NA rows from table_with_NA.
+  add_NA_to_table <- function(table_with_NA, table_without_NA, key) {
+
+    # Subset rows from the original table where the key column is NA
+    na_rows <- dplyr::filter(table_with_NA, is.na(.data[[key]]))
+
+    # Identify extra columns present in table_without_NA that are not in the original table
+    extra_cols <- setdiff(names(table_without_NA), names(table_with_NA))
+
+    # Extend the NA rows by adding the extra columns, setting their values to NA
+    na_rows_extended <- dplyr::mutate(na_rows, !!!setNames(rep(list(NA), length(extra_cols)), extra_cols))
+
+    # Reorder columns to match the structure of table_without_NA
+    na_rows_extended <- dplyr::select(na_rows_extended, dplyr::all_of(names(table_without_NA)))
+
+    # Combine the processed table with the extended NA rows
+    combined_table <- dplyr::bind_rows(table_without_NA, na_rows_extended)
+
+    return(combined_table)
+  }
+
+
+  # Function: create_duplicates_table
+  #
+  # Description:
+  #   This function takes two data frames:
+  #     - table_with_duplicates: the original table that may contain duplicate rows based on the key.
+  #     - table_without_duplicates: a deduplicated table (e.g. from a join) that includes extra columns.
+  #
+  #   The function identifies duplicate rows (non-NA keys that appear more than once, excluding the first occurrence)
+  #   in table_with_duplicates, then left joins these duplicate rows with the extra columns from table_without_duplicates.
+  #   This ensures that all duplicate rows receive the same extra column values as the first occurrence.
+  #
+  # Parameters:
+  #   table_with_duplicates: Data frame containing the original data that may include duplicate keys.
+  #   table_without_duplicates: Data frame with the processed data (first occurrence for each key and extra columns).
+  #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
+  #
+  # Returns:
+  #   A data frame containing the duplicate rows, extended with the extra columns from table_without_duplicates.
+  create_duplicates_table <- function(table_with_duplicates, table_without_duplicates, key) {
+
+    # Identify extra columns present in table_without_duplicates that are not in the original table
+    extra_cols <- setdiff(names(table_without_duplicates), names(table_with_duplicates))
+
+    # Extract duplicate rows: for each non-NA key, keep rows beyond the first occurrence
+    dup_rows <- table_with_duplicates %>%
+      dplyr::filter(!is.na(.data[[key]])) %>%
+      dplyr::group_by(.data[[key]]) %>%
+      dplyr::filter(dplyr::row_number() > 1) %>%
+      dplyr::ungroup()
+
+    # For each duplicate row, join the extra columns from table_without_duplicates so that all duplicates
+    # receive the same extra values as the first occurrence
+    dup_rows_extended <- dplyr::left_join(
+      dup_rows,
+      dplyr::select(table_without_duplicates, dplyr::all_of(c(key, extra_cols))),
+      by = key
+    ) %>%
+      dplyr::select(dplyr::all_of(names(table_without_duplicates)))
+
+    return(dup_rows_extended)
+  }
+
+  # Create the table with NA rows added
+  temp_results_NAs_added <- add_NA_to_table(InputData_Original, summary_df, SettingsInfo[["InputID"]])
+  # Create the table with duplicate key (SettingsInfo[["InputID"]]) rows extended
+  temp_results_of_duplicates <- create_duplicates_table(InputData_Original, summary_df, SettingsInfo[["InputID"]])
+  # Combine these to get a summary table that includes both NA and duplicate rows
+  summary_df_with_NA_and_duplicates <- bind_rows(temp_results_NAs_added, temp_results_of_duplicates)
+
+  # Now for the user let's also create separate dfs with just the NA values and just the duplicates, in case they want to inspect this easier
+  summary_df_only_NA <- summary_df_with_NA_and_duplicates %>%
+    dplyr::filter(is.na(.data[[SettingsInfo[["InputID"]]]]))
+
+  summary_df_only_duplicates <- summary_df_with_NA_and_duplicates %>%
+    dplyr::filter(!is.na(.data[[SettingsInfo[["InputID"]]]])) %>%  # Exclude NA values
+    dplyr::group_by(.data[[SettingsInfo[["InputID"]]]]) %>%
+    dplyr::filter(dplyr::n() > 1) %>%             # Keep groups with duplicates
+    dplyr::ungroup()
 
   # 6. Messages and summarise
   message <- paste0("InputData has multiple IDs per measurement = ", InputData_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
@@ -986,7 +1085,10 @@ CheckMatchID <- function(InputData,
 
 
   ## ------------------ Save Results ----------------------##
-  ResList <- list("InputData_Matched" = summary_df)
+  ResList <- list("InputData_Matched" = summary_df,
+                  "InputData_Matched_NA_and_duplicates" = summary_df_with_NA_and_duplicates,
+                  "InputData_Matched_only_NA" = summary_df_only_NA,
+                  "InputData_Matched_only_duplicates" = summary_df_only_duplicates)
 
   suppressMessages(suppressWarnings(
   MetaProViz:::SaveRes(InputList_DF=ResList,
@@ -999,7 +1101,7 @@ CheckMatchID <- function(InputData,
                        PrintPlot=FALSE)))
 
    #Return
-   invisible(return(ResList[["InputData_Matched"]]))
+   invisible(return(ResList))
 }
 
 
@@ -1227,53 +1329,82 @@ AddInfo <- function(mat,
 ### ### ### Helper function to create complex upset plots to visualise PK coverage ### ### ###
 ##########################################################################################
 
-#' Docstring TODO
+#' Generate Complex Upset Plot for PK Coverage (Optional Class Grouping)
 #'
-#' @param df TODO
-#' @param class_col TODO... etc
+#' This helper function creates a complex upset plot to visualize Prior Knowledge (PK) coverage by
+#' displaying the intersections among a set of metabolite ID columns. If a class column is provided,
+#' the data is grouped by that column and a color palette ("viridis" or "polychrome") is used to represent
+#' the class levels, along with a corresponding legend (which can be hidden if there are too many unique classes).
+#' If no class column is provided (\code{class_col = NULL}), a basic upset plot is generated.
+#'
+#' @param df A data frame containing the data to be plotted.
+#' @param class_col An optional string specifying the name of the column in \code{df} that represents the class
+#'                  of each observation. This column is coerced to a factor if provided. Default is \code{NULL}.
+#' @param intersect_cols A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
+#'                       Default is \code{c("LIMID", "HMDB", "CHEBI", "None")}.
+#' @param plot_title A string specifying the title of the plot. Default is \code{"Metabolite IDs"}.
+#' @param palette_type A string specifying the color palette to use for the fill aesthetic when \code{class_col} is provided.
+#'                     Options are \code{"viridis"} (default) and \code{"polychrome"}.
+#' @param output_file An optional string specifying the file path to save the plot. If \code{NULL} (default), the plot is not saved.
+#' @param width Numeric value specifying the width of the saved plot (if \code{output_file} is provided). Default is \code{14}.
+#' @param height Numeric value specifying the height of the saved plot (if \code{output_file} is provided). Default is \code{8}.
+#' @param dpi Numeric value specifying the resolution (dots per inch) of the saved plot (if \code{output_file} is provided). Default is \code{300}.
+#' @param max_legend_terms Numeric value specifying the maximum number of unique terms in \code{class_col}
+#'                         for which the legend should be displayed. If the number of levels exceeds this value,
+#'                         the legend will be hidden. Default is \code{20}. Ignored if \code{class_col} is \code{NULL}.
+#'
+#' @return A \code{ggplot} object representing the generated upset plot.
 #'
 #' @noRd
-
-# Functions to create the complex upset plots
-
-# Define the function
 GenerateUpset <- function(df,
-                          class_col = "Class",
+                          class_col = NULL,
                           intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
                           plot_title = "Metabolite IDs",
                           palette_type = c("viridis", "polychrome"),
                           output_file = NULL,
                           width = 14,
                           height = 8,
-                          dpi = 300) {
-  # Load required libraries
-  library(ComplexUpset)
-  library(ggplot2)
-  library(viridis)  # For viridis palette
+                          dpi = 300,
+                          max_legend_terms = 20) {
 
-  # Match palette_type argument
   palette_type <- match.arg(palette_type)
 
-  # Ensure the class column is a factor
-  df[[class_col]] <- as.factor(df[[class_col]])
-
-  # Choose the appropriate scale based on palette_type
-  if(palette_type == "viridis"){
-    fill_scale <- scale_fill_viridis_d(option = "viridis")
-  } else if(palette_type == "polychrome"){
-    if (!requireNamespace("Polychrome", quietly = TRUE)) {
-      stop("Package 'Polychrome' is required for the polychrome palette. Please install it.")
+  # If a class column is provided, process it for fill aesthetics
+  if (!is.null(class_col)) {
+    df[[class_col]] <- as.factor(df[[class_col]])
+    if(palette_type == "viridis"){
+      fill_scale <- ggplot2::scale_fill_viridis_d(option = "viridis")
+    } else if(palette_type == "polychrome"){
+      if (!requireNamespace("Polychrome", quietly = TRUE)) {
+        stop("Package 'Polychrome' is required for the polychrome palette. Please install it.")
+      }
+      class_levels <- levels(df[[class_col]])
+      my_palette <- Polychrome::palette36.colors(n = 36)
+      if(length(my_palette) < length(class_levels)) {
+        stop("Not enough colors in the Polychrome palette for the number of classes!")
+      }
+      my_palette_named <- stats::setNames(my_palette[1:length(class_levels)], class_levels)
+      fill_scale <- ggplot2::scale_fill_manual(values = my_palette_named)
     }
-    # Get the levels of the class column
-    class_levels <- levels(df[[class_col]])
-    # Get 36 colors from Polychrome (you can adjust if needed)
-    my_palette <- Polychrome::palette36.colors(n = 36)
-    if(length(my_palette) < length(class_levels)) {
-      stop("Not enough colors in the Polychrome palette for the number of classes!")
-    }
-    # Create a named palette that maps each level to a color
-    my_palette_named <- setNames(my_palette[1:length(class_levels)], class_levels)
-    fill_scale <- scale_fill_manual(values = my_palette_named)
+    # Build the base annotation with a mapping for fill based on the class column.
+    base_annotation <- list(
+      "Intersection size" = ComplexUpset::intersection_size(
+        mapping = ggplot2::aes_string(fill = class_col),
+        counts = TRUE
+      ) + fill_scale +
+        ggplot2::theme(
+          legend.position = "right",
+          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
+        )
+    )
+  } else {
+    # No class column provided: use default annotation without fill mapping.
+    base_annotation <- list(
+      "Intersection size" = ComplexUpset::intersection_size(counts = TRUE) +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
+        )
+    )
   }
 
   # Create the upset plot
@@ -1281,35 +1412,183 @@ GenerateUpset <- function(df,
     data = df,
     intersect = intersect_cols,
     name = plot_title,
-    base_annotations = list(
-      "Intersection size" = intersection_size(
-        # Use aes_string to allow a dynamic fill mapping
-        mapping = aes_string(fill = class_col),
-        counts = TRUE
-      ) +
-        fill_scale +
-        theme(
-          legend.position = "right",
-          axis.text.x = element_text(angle = 90, hjust = 1)
-        )
-    ),
+    base_annotations = base_annotation,
     set_sizes = (
-      upset_set_size() +
-        theme(axis.text.y = element_text(size = 10))
+      ComplexUpset::upset_set_size() +
+        ggplot2::theme(axis.text.y = ggplot2::element_text(size = 10))
     )
   ) +
-    theme_minimal(base_size = 14) +
-    theme(
-      plot.margin = margin(1, 1, 1, 1, "cm")
+    ggplot2::theme_minimal(base_size = 14) +
+    ggplot2::theme(
+      plot.margin = ggplot2::margin(1, 1, 1, 1, "cm")
     )
 
-  # If an output file is provided, save the plot
-  if(!is.null(output_file)){
-    ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
+  # If a class column was provided, hide the legend if there are too many unique terms
+  if (!is.null(class_col) && length(levels(df[[class_col]])) > max_legend_terms) {
+    p <- p + ggplot2::theme(legend.position = "none")
   }
 
-  # Return the plot object so it can be printed in the notebook
+  # Save the plot if output_file is provided
+  if (!is.null(output_file)) {
+    ggplot2::ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
+  }
+
   return(p)
 }
 
+
+##########################################################################################
+### ### ### Helper function to create stacked bar plots to visualise PK coverage ### ### ###
+##########################################################################################
+
+#' Generate Stacked Bar Plot for PK Coverage
+#'
+#' This helper function creates a stacked bar plot to visualize Prior Knowledge (PK) coverage.
+#' The plot groups data by a specified column and fills the bars according to another column,
+#' allowing you to inspect the distribution of match statuses (or any categorical variable).
+#'
+#' @param data A data frame containing the data to be plotted.
+#' @param group_col A string specifying the name of the column to group the data by.
+#' @param fill_col A string specifying the name of the column to use for fill aesthetics.
+#' @param fill_values A vector of color values to be used for the fill aesthetic.
+#' @param fill_labels A vector of labels corresponding to the fill levels for the legend.
+#' @param plot_title A string specifying the title of the plot.
+#' @param x_label A string for the x-axis label. Defaults to "Frequency".
+#' @param y_label A string for the y-axis label. If \code{NULL}, the value of \code{group_col} is used.
+#' @param legend_position A numeric vector of length 2 specifying the (x, y) position of the legend.
+#'                        Defaults to \code{c(0.95, 0.05)}.
+#'
+#' @return A \code{ggplot} object representing the stacked bar plot.
+#' @noRd
+GenerateStackedBar <- function(data,
+                               group_col,
+                               fill_col,
+                               fill_values,
+                               fill_labels,
+                               plot_title,
+                               x_label = "Frequency",
+                               y_label = NULL,
+                               legend_position = c(0.95, 0.05)) {
+  # Convert column names to symbols for tidy evaluation
+  group_sym <- rlang::sym(group_col)
+  fill_sym  <- rlang::sym(fill_col)
+
+  # Determine order of groups by overall frequency (ascending)
+  group_order <- data %>%
+    dplyr::group_by(!!group_sym) %>%
+    dplyr::summarise(total = dplyr::n(), .groups = 'drop') %>%
+    dplyr::arrange(total) %>%
+    dplyr::pull(!!group_sym)
+
+  # Summarize data by group and fill status, then reorder the group factor
+  summary_data <- data %>%
+    dplyr::group_by(!!group_sym, !!fill_sym) %>%
+    dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
+    dplyr::mutate(!!group_sym := factor(!!group_sym, levels = group_order))
+
+  # If y_label is not provided, use the grouping column name
+  if (is.null(y_label)) {
+    y_label <- group_col
+  }
+
+  # Create the plot
+  ggplot2::ggplot(summary_data, ggplot2::aes_string(y = group_col,
+                                                    x = "count",
+                                                    fill = paste0("as.factor(", fill_col, ")"))) +
+    ggplot2::geom_bar(stat = "identity") +
+    ggplot2::scale_fill_manual(values = fill_values,
+                               labels = fill_labels,
+                               name = "Match Status") +
+    ggplot2::labs(title = plot_title,
+                  x = x_label,
+                  y = y_label) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 1),
+                   legend.position = legend_position,
+                   legend.justification = c("right", "bottom"),
+                   plot.title = ggplot2::element_text(hjust = 0.4))
+}
+
+
+
+##########################################################################################
+### ### ### Helper function to count number of entries for an ID column value and plot ### ### ###
+##########################################################################################
+
+#' Count Entries and Generate a Histogram Plot for a Specified Column
+#'
+#' This function processes a data frame column by counting the number of entries within each cell.
+#' It considers both \code{NA} values and empty strings as zero entries, and categorizes each cell as
+#' "No ID", "Single ID", or "Multiple IDs" based on the count. A histogram is then generated to visualize
+#' the distribution of entry counts.
+#'
+#' @param data A data frame containing the data to be analyzed.
+#' @param column A string specifying the name of the column in \code{data} to analyze.
+#' @param delimiter A string specifying the delimiter used to split cell values. Defaults to \code{","}.
+#' @param fill_colors A named character vector providing colors for each category. Defaults to
+#'   \code{c("No ID" = "#FB8072", "Single ID" = "#B3DE69", "Multiple IDs" = "#80B1D3")}.
+#' @param binwidth Numeric value specifying the bin width for the histogram. Defaults to \code{1}.
+#' @param title_prefix A string to use as the title of the plot. If \code{NULL} (default), the title
+#'   will be generated as "Number of <column> IDs per Biocrates Cell".
+#'
+#' @return A list with two elements:
+#'   \item{result}{A data frame that includes three additional columns: \code{was_na} (logical indicator
+#'                  of missing or empty cells), \code{entry_count} (number of entries in each cell), and
+#'                  \code{id_label} (a categorical label based on the entry count).}
+#'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
+#'
+#' @noRd
+CountEntries <- function(data,
+                                   column,
+                                   delimiter = ",",
+                                   fill_colors = c("No ID" = "#FB8072",
+                                                   "Single ID" = "#B3DE69",
+                                                   "Multiple IDs" = "#80B1D3"),
+                                   binwidth = 1,
+                                   title_prefix = NULL) {
+  # Process the data: count entries and label each cell based on the number of entries.
+  processed_data <- dplyr::mutate(
+    data,
+    was_na = is.na(.data[[column]]) | .data[[column]] == "",
+    entry_count = sapply(.data[[column]], function(cell) {
+      if (is.na(cell) || cell == "") {
+        0  # Treat NA or empty as 0 entries for counting
+      } else {
+        length(unlist(strsplit(as.character(cell), delimiter)))
+      }
+    }),
+    id_label = dplyr::case_when(
+      entry_count == 0 ~ "No ID",
+      entry_count == 1 ~ "Single ID",
+      entry_count >= 2 ~ "Multiple IDs"
+    )
+  )
+
+  # Generate the plot title if not provided
+  if (is.null(title_prefix)) {
+    plot_title <- paste("Number of", column, "IDs per Biocrates Cell")
+  } else {
+    plot_title <- title_prefix
+  }
+
+  # Create the histogram plot using ggplot2
+  plot_obj <- ggplot2::ggplot(processed_data, ggplot2::aes(x = entry_count, fill = id_label)) +
+    ggplot2::geom_histogram(binwidth = binwidth, boundary = -0.5, color = "black") +
+    ggplot2::scale_fill_manual(values = fill_colors) +
+    ggplot2::labs(title = plot_title,
+                  x = "Number of Entries",
+                  y = "Frequency",
+                  fill = "Cell Type") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 22),
+      legend.position = c(0.95, 0.95),
+      legend.justification = c("right", "top"),
+      legend.title = ggplot2::element_text(size = 20),
+      legend.text = ggplot2::element_text(size = 18)
+    )
+
+  # Return the processed data and the plot object as a list
+  return(list(result = processed_data, plot = plot_obj))
+}
 
