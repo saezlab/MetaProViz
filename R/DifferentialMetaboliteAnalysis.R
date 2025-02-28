@@ -377,29 +377,29 @@ DMA <-function(InputData,
     DMA_Output_List <- c(DMA_Output_List, list("VSTres"=Bartlett_output))
   }
 
+  if(CoRe==TRUE){
+    suppressMessages(suppressWarnings(
+      SaveRes(InputList_DF=list("Feature_Metadata"=Feature_Metadata),
+              InputList_Plot= NULL,
+              SaveAs_Table=SaveAs_Table,
+              SaveAs_Plot=NULL,
+              FolderPath= Folder,
+              FileName= "DMA",
+              CoRe=CoRe,
+              PrintPlot=PrintPlot)))
+
+    DMA_Output_List <- c(DMA_Output_List, list("Feature_Metadata"=Feature_Metadata))
+  }
+
   suppressMessages(suppressWarnings(
     SaveRes(InputList_DF=DMA_Output,#This needs to be a list, also for single comparisons
-                         InputList_Plot= volplotList,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=SaveAs_Plot,
-                         FolderPath= Folder,
-                         FileName= "DMA",
-                         CoRe=CoRe,
-                         PrintPlot=PrintPlot)))
-
-
-  suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=list("Feature_Metadata"=Feature_Metadata),#This needs to be a list, also for single comparisons
-            InputList_Plot= NULL,
+            InputList_Plot= volplotList,
             SaveAs_Table=SaveAs_Table,
-            SaveAs_Plot=NULL,
+            SaveAs_Plot=SaveAs_Plot,
             FolderPath= Folder,
             FileName= "DMA",
             CoRe=CoRe,
             PrintPlot=PrintPlot)))
-
-  DMA_Output_List <- c(DMA_Output_List, list("Feature_Metadata"=Feature_Metadata))
-
 
   DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
 
