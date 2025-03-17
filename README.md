@@ -17,11 +17,12 @@ issues](https://img.shields.io/github/issues/saezlab/MetaProViz)](https://github
 and **Vi**suali**z**ation), a free open-source R-package that provides
 mechanistic hypotheses from metabolomics data by integrating prior
 knowledge from literature with metabolomics. MetaProViz offers an
-interactive framework consisting of four modules: Processing,
-differential analysis, functional analysis and visualization of both
-intracellular and exometabolomics (=consumption-release (CoRe) data).
-Those modules and their functions can be used independently from each
-other or in combination (**Fig.1**).
+interactive framework consisting of five modules: Processing,
+differential analysis, prior knwoledge access and refactoring,
+functional analysis and visualization of both intracellular and
+exometabolomics (=consumption-release (CoRe) data). Those modules and
+their functions can be used independently from each other or in
+combination (**Fig.1**).
 
   
 <center>
@@ -86,8 +87,8 @@ data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html
 media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)  
 - [Enrichment
 Analysis](https://saezlab.github.io/MetaProViz/articles/EnrichmentAnalysis.html)  
-- [Metadata
-Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)  
+- [Sample Metadata
+Analysis](https://saezlab.github.io/MetaProViz/articles/Sample%20Metadata%20Analysis.html)  
   
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
