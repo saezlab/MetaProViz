@@ -213,12 +213,19 @@ ResList <- list()
 for(item in names(DFs)){
   #Get the right DF:
   InputData <- DFs[[item]]
-  #Perform DMA
+
   message(paste("Running DMA for", item))
+  #Create Folder for saving each comparison
+  dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", sep=""), showWarnings = FALSE)
+  dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", item, sep=""), showWarnings = FALSE)
+  
+  #Perform DMA
   TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
                    SettingsFile_Sample =  InputData[,c(1:13)],
                    SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
-                   PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+                   PerformShapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+                   FolderPath = paste(getwd(),"/MetaProViz_Results/DMA/", item, sep="")) 
+  
   #Add Results to list
   ResList[[item]] <- TvN
 }
@@ -243,13 +250,19 @@ ResList <- list()
 for(item in names(DFs)){
   #Get the right DF:
   InputData <- DFs[[item]]
-  #Perform DMA
+  
   message(paste("Running DMA for", item))
+  #Create Folder for saving each comparison
+  dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", sep=""), showWarnings = FALSE)
+  dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", item, sep=""), showWarnings = FALSE)
+  
+  #Perform DMA
   TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
-                         SettingsFile_Sample =  InputData[,c(1:13)],
-                         SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
-                         SettingsFile_Metab = Tissue_MetaData,
-                         PerformShapiro=FALSE) #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+                   SettingsFile_Sample =  InputData[,c(1:13)],
+                   SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
+                   PerformShapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
+                   FolderPath = paste(getwd(),"/MetaProViz_Results/DMA/", item, sep="")) 
+  
   #Add Results to list
   ResList[[item]] <- TvN
 }
@@ -258,7 +271,6 @@ for(item in names(DFs)){
 \
 \
 \
-
 
 We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
 Here we can also use the `MetaproViz::VizVolcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
