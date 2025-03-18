@@ -59,8 +59,12 @@ TranslateID <- function(InputData,
     SaveAs_Table = "csv", ## EDIT: name the options here and use match.arg
     FolderPath = NULL) {
     
+    ## check arguments
+    From <- match.arg(From)
+    To <- match.arg(To, several.ok = TRUE)
+    
+    
     ## add ability to also get metabolite names that are human readable from an ID type!
-
     MetaProViz_Init()
 
     ## ------------------  Check Input ------------------- ##
@@ -140,7 +144,7 @@ TranslateID <- function(InputData,
     ############################################################################
     ## ------------------ Translate To-From for each pair ------------------- ##
     TranslatedDF <- OmnipathR::translate_ids(
-        InputData,
+        d = InputData,
         !!sym(SettingsInfo[['InputID']]) :=  !!sym(From),
         !!!syms(To), ## list of symbols, hence three !!!
         ramp = TRUE,
