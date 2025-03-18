@@ -34,8 +34,8 @@
 #'
 #' @seealso \code{\link{metaproviz_log}}
 MetaProViz_logfile <- function(){
-  #Creates the path for the log file
-  OmnipathR::logfile('MetaProViz')
+    ## Creates the path for the log file
+    OmnipathR::logfile('MetaProViz')
 }
 
 
@@ -56,8 +56,8 @@ MetaProViz_logfile <- function(){
 #' @seealso \code{\link{metaproviz_logfile}}
 #'
 MetaProViz_log <- function(){
-  #Opens log file for browsing
-  OmnipathR::read_log('MetaProViz')
+    ## opens log file for browsing
+    OmnipathR::read_log('MetaProViz')
 }
 
 
@@ -82,34 +82,36 @@ MetaProViz_set_loglevel <- function(level, target = 'logfile'){
 #'
 #' @noRd
 MPV_trace <- function() {#MPV=MetaProViz
-  # Useful for debugging
-  MetaProViz_set_loglevel('trace', target = 'console')
+    ## Useful for debugging
+    MetaProViz_set_loglevel("trace", target = "console")
 }
 
 #' Set the console log level to "trace"
 #'
-#' @importFrom OmnipathR set_loglevel
+#' @importFrom OmnipathR set_loglevel 
 #' @importFrom logger log_info
 #' @importFrom utils packageVersion
 #'
 #' @noRd
 #'
 MetaProViz_Init <- function(){
-  # Only run the first time a MetaProViz function is used in an environment --> Creates log file
-  if(is.null(metaproviz.env$init)){
-    #Initial log
-    OmnipathR:::init_config(pkg = "MetaProViz")
-    OmnipathR:::init_log(pkg = "MetaProViz")
-    log_info('Welcome to MetaProViz!')
-    log_info('MetaProViz version: %s', packageVersion("MetaProViz"))
+    
+    ## only run the first time a MetaProViz function is used in an 
+    ## environment --> Creates log file
+    if (is.null(metaproviz.env$init)) {
+        ## initial log
+        OmnipathR:::init_config(pkg = "MetaProViz")
+        OmnipathR:::init_log(pkg = "MetaProViz")
+        log_info("Welcome to MetaProViz!")
+        log_info("MetaProViz version: %s", packageVersion("MetaProViz"))
 
-    #Do we run in a build server like bioconductor?
-    buildserver <- OmnipathR:::.on_buildserver()
+        ## Do we run in a build server like bioconductor?
+        buildserver <- OmnipathR:::.on_buildserver()
 
-    if(buildserver){
-      set_loglevel('trace', target = 'console', pkg = "MetaProViz")
+        if (buildserver) {
+            set_loglevel("trace", target = "console", pkg = "MetaProViz")
+        }
+
+        metaproviz.env$init <- TRUE
     }
-
-    metaproviz.env$init <- TRUE
-  }
 }
