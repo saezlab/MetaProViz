@@ -33,7 +33,7 @@
 #' @return A data frame containing the KEGG pathways for ORA.
 #'
 #' @examples
-#' KEGG_Pathways <- MetaProViz::LoadKEGG()
+#' KEGG_Pathways <- LoadKEGG()
 #'
 #' @export
 #'
@@ -199,7 +199,7 @@ LoadGaude <- function() {
 #' @return A data frame containing the Prior Knowledge.
 #'
 #' @examples
-#' ChemicalClass <- MetaProViz::LoadRAMP()
+#' ChemicalClass <- LoadRAMP()
 #'
 #' @export
 #'
@@ -213,7 +213,7 @@ LoadRAMP <- function(version = "2.5.4",
     ## ------------ Folder ----------- ##
     if(!is.null(SaveAs_Table)) {
         Folder <- SavePath(FolderName = "PriorKnowledge",
-            FolderPath=FolderPath)
+            FolderPath = FolderPath)
 
         SubFolder <- file.path(Folder, "MetaboliteSet")
         if (!dir.exists(SubFolder)) {
@@ -433,11 +433,11 @@ LoadMetalinks <- function(types = NULL,
     pathway = NULL,
     hmdb_ids = NULL,
     uniprot_ids = NULL,
-    SaveAs_Table = "csv",
-    FolderPath = NULL){
+    SaveAs_Table = "csv", ## EDIT: name the options here and use match.arg
+    FolderPath = NULL) {
   
     ## ------------ Create log file ----------- ##
-    MetaProViz_Init()
+    #MetaProViz_Init()
 
     logger::log_info("MetaLinksDB.")
     #------------------------------------------------------------------
@@ -701,7 +701,7 @@ LoadMetalinks <- function(types = NULL,
     DF_List <- list("MetalinksDB" = MetalinksDB, 
         "MetalinksDB_Type" = MetalinksDB_Type)
     suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF = DF_List,#This needs to be a list, also for single comparisons
+        SaveRes(InputList_DF = DF_List, #This needs to be a list, also for single comparisons
             InputList_Plot = NULL,
             SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = NULL,
