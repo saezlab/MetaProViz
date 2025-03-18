@@ -317,7 +317,7 @@ Shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 ```
 
 <div class="vscroll-plot">
-```{r, warning=FALSE, echo=FALSE, fig.width=7, fig.height=5, fig.align="left"}
+```{r dma_anova, warning=FALSE, echo=FALSE, fig.width=7, fig.height=5, fig.align="left"}
 # Perform multiple comparison All_vs_One using annova:
 DMA_Annova <- MetaProViz::DMA(InputData=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
                               SettingsFile_Sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
