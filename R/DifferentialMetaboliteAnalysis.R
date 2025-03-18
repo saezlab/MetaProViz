@@ -297,7 +297,7 @@ DMA <-function(InputData,
             select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))
 
         ## Add to Metadata file:
-        if(!is.null(SettingsFile_Metab)){
+        if (!is.null(SettingsFile_Metab)){
             Feature_Metadata <- merge(
                 tibble::rownames_to_column(SettingsFile_Metab, "Metabolite"), 
                 Feature_Metadata , by = "Metabolite", all.x = TRUE)
@@ -432,7 +432,7 @@ Log2FC_fun <-function(InputData,
     MetaProViz_Init()
 
     ## ------------ Assignments ----------- ##
-    if (!("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) {
+    if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ## all-vs-all: Generate all pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
         denominator <-unique(conditions)
@@ -443,7 +443,7 @@ Log2FC_fun <-function(InputData,
         ## Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ##all-vs-one: Generate the pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
@@ -473,10 +473,10 @@ Log2FC_fun <-function(InputData,
         ##Are sample numbers enough?
         filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
         ## only keep numeric columns with metabolite values
-        dplyr::select_if(is.numeric)
+        dplyr::select_if (is.numeric)
     Denom <- InputData %>%
         dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-        dplyr::select_if(is.numeric)
+        dplyr::select_if (is.numeric)
 
     Num_Miss <- replace(Num, Num == 0, NA)
     Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
@@ -486,9 +486,9 @@ Log2FC_fun <-function(InputData,
 
     if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) == 0){
         Metabolites_Miss <- colnames(Num_Miss)
-    } else if(ncol(Num_Miss) == 0 & ncol(Denom_Miss) > 0) {
+    } else if (ncol(Num_Miss) == 0 & ncol(Denom_Miss) > 0) {
         Metabolites_Miss <- colnames(Denom_Miss)
-    } else if(ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
+    } else if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
         Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
         Metabolites_Miss <- unique(Metabolites_Miss)
     } else {
@@ -498,9 +498,9 @@ Log2FC_fun <-function(InputData,
 
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if (!("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) {
+    if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         MultipleComparison <- TRUE
-    } else if ("Denominator" %in% names(SettingsInfo) & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         MultipleComparison <- TRUE
     } else if ("Denominator" %in% names(SettingsInfo) & "Numerator" %in% names(SettingsInfo)) {
         MultipleComparison <- FALSE
@@ -513,11 +513,11 @@ Log2FC_fun <-function(InputData,
         C1 <- InputData %>% ## Numerator
             dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1, column]) %>%
             ## only keep numeric columns with metabolite values
-            dplyr::select_if(is.numeric)
+            dplyr::select_if (is.numeric)
         C2 <- InputData %>% ## Deniminator
             dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[2, column]) %>%
             ## only keep numeric columns with metabolite values
-            dplyr::select_if(is.numeric)
+            dplyr::select_if (is.numeric)
 
         ## ------------  Calculate Log2FC ----------- ##
         ## For C1_Mean and C2_Mean use 0 to obtain values, leading to 
@@ -859,11 +859,11 @@ DMA_Stat_single <- function(InputData,
         dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% 
             SettingsInfo[["Numerator"]]) %>%
         ## only keep numeric columns with metabolite values
-        dplyr::select_if(is.numeric)
+        dplyr::select_if (is.numeric)
     Denom <- InputData %>%
         dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% 
             SettingsInfo[["Denominator"]]) %>%
-        dplyr::select_if(is.numeric)
+        dplyr::select_if (is.numeric)
 
     Num_Miss <- replace(Num, Num == 0, NA)
     Num_Miss <- Num_Miss[, colSums(is.na(Num_Miss)) > 0, drop = FALSE]
@@ -893,13 +893,13 @@ DMA_Stat_single <- function(InputData,
             dplyr::filter(
                 SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1, column]) %>%
             ## only keep numeric columns with metabolite values
-            dplyr::select_if(is.numeric)
+            dplyr::select_if (is.numeric)
         ## Denominator
         C2 <- InputData %>%
             dplyr::filter(
                 SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[2,column]) %>%
             ## only keep numeric columns with metabolite values
-            dplyr::select_if(is.numeric)
+            dplyr::select_if (is.numeric)
     }
 
     ## For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
@@ -998,7 +998,7 @@ AOV <-function(InputData,
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, 
     ## one_vs_all or all_vs_all.
-    if(!("Denominator" %in% names(SettingsInfo))  & !("Numerator" %in% names(SettingsInfo))){ ## EDIT: line 1001-1028 is replicated across several functions and should be written as a function
+    if (!"Denominator" %in% names(SettingsInfo)  & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: line 1001-1028 is replicated across several functions and should be written as a function
         
         ## all-vs-all: Generate all pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1010,7 +1010,7 @@ AOV <-function(InputData,
         ## Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if("Denominator" %in% names(SettingsInfo)  & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo)  & !"Numerator" %in% names(SettingsInfo)) {
         
         ## all-vs-one: Generate the pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1110,7 +1110,7 @@ AOV <-function(InputData,
     ## make sure the right comparisons are returned:
     if (all_vs_all) {
         STAT_C1vC2 <- merged_list
-    } else if(!all_vs_all) { ## EDIT: the additional else is not needed, just use else
+    } else if (!all_vs_all) { ## EDIT: the additional else is not needed, just use else
         ## remove the comparisons that are not needed:
         modified_df_list <- list()
         for (df_name in names(merged_list)) {
@@ -1162,7 +1162,7 @@ Kruskal <-function(InputData,
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, 
     ## one_vs_all or all_vs_all.
-    if(!("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) { ## EDIT: this is replicated and should be written as a function
+    if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: this is replicated and should be written as a function
         
         ## all-vs-all: Generate all pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1175,7 +1175,7 @@ Kruskal <-function(InputData,
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
         
-    } else if("Denominator" %in% names(SettingsInfo) & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ## all-vs-one: Generate the pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
@@ -1326,7 +1326,7 @@ Welch <-function(InputData,
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, 
     ## one_vs_all or all_vs_all.
-    if(!("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) { ## EDIT: this is replicated and should be written as a function
+    if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: this is replicated and should be written as a function
         
         ## all-vs-all: Generate all pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1339,7 +1339,7 @@ Welch <-function(InputData,
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
         
-    } else if("Denominator" %in% names(SettingsInfo) & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ## all-vs-one: Generate the pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
@@ -1488,13 +1488,13 @@ DMA_Stat_limma <- function(InputData,
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, one_vs_all 
     ## or all_vs_all.
-    if (!("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) { ## EDIT: can be simplified, define MultiComarison = TRUE and only when '"Denominator" %in% names(SettingsInfo)' adjust the values
+    if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: can be simplified, define MultiComarison = TRUE and only when '"Denominator" %in% names(SettingsInfo)' adjust the values
         MultipleComparison = TRUE
         all_vs_all = TRUE
-    } else if (("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         MultipleComparison = TRUE
         all_vs_all = FALSE
-    } else if (("Denominator" %in% names(SettingsInfo)) & ("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo) & "Numerator" %in% names(SettingsInfo)) {
         MultipleComparison = FALSE
         all_vs_all = FALSE
     }
@@ -1530,11 +1530,11 @@ DMA_Stat_limma <- function(InputData,
     }
 
     ## check if the order of the "sample" column is the same in both data frames
-    if(!identical(targets$sample, Limma_input$sample)) {
+    if (!identical(targets$sample, Limma_input$sample)) {
         stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile_Sample and Input_data contain the same rownames and sample numbers.")
     }
 
-    targets_limma <-targets[,-2] %>%
+    targets_limma <- targets[, -2] %>%
         dplyr::rename("condition"="condition_limma_compatible")
 
     ## we need to transpose the df to run limma. Also, if the data is not 
@@ -1703,7 +1703,7 @@ DMA_Stat_limma <- function(InputData,
     results_list_new <- list()
     
     ## match the lists using name_match_df
-    for (i in seq_len(nrow(name_match_df))= {
+    for (i in seq_len(nrow(name_match_df))) {
         old_name <- name_match_df$`names(results_list)`[i]
         new_name <- name_match_df$New[i]
         results_list_new[[new_name]] <- results_list[[old_name]]
@@ -1811,7 +1811,7 @@ Shapiro <-function(InputData,
 
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if (!("Denominator" %in% names(SettingsInfo) & !("Numerator" %in% names(SettingsInfo))) { ## EDIT: this is replicated across several functions and should be written as fct
+    if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: this is replicated across several functions and should be written as fct
         
         ## all-vs-all: Generate all pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1823,7 +1823,7 @@ Shapiro <-function(InputData,
         ## settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if("Denominator" %in% names(SettingsInfo)  & !("Numerator" %in% names(SettingsInfo))) {
+    } else if ("Denominator" %in% names(SettingsInfo)  & !"Numerator" %in% names(SettingsInfo)) {
         
         ## all-vs-one: Generate the pairwise combinations
         conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
@@ -1838,7 +1838,7 @@ Shapiro <-function(InputData,
         ## settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
-    } else if("Denominator" %in% names(SettingsInfo)  & "Numerator" %in% names(SettingsInfo)) {
+    } else if ("Denominator" %in% names(SettingsInfo)  & "Numerator" %in% names(SettingsInfo)) {
         
         ## one-vs-one: Generate the comparisons
         denominator <- SettingsInfo[["Denominator"]]
@@ -1861,7 +1861,7 @@ Shapiro <-function(InputData,
     ## prepare the input (Shapiro test can not handle NAs):
     Input_shaptest <- replace(InputData, is.na(InputData), 0) %>% 
         dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-        dplyr::select_if(is.numeric)
+        dplyr::select_if (is.numeric)
     
     ## we have to remove features with zero variance if there are any.
     temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0
@@ -1877,7 +1877,7 @@ Shapiro <-function(InputData,
     if (length(Input_shaptest) == 1) {
         Input_shaptest <- InputData
     } else {
-        if(length(columns_with_zero_variance) == 0) {
+        if (length(columns_with_zero_variance) == 0) {
             Input_shaptest <-Input_shaptest
         } else {
             message("The following features have zero variance and are removed prior to performing the shaprio test: ", columns_with_zero_variance)
@@ -1885,7 +1885,7 @@ Shapiro <-function(InputData,
             ## doesn't simplify the result to a vector, preserving the data 
             ## frame structure
             Input_shaptest <- Input_shaptest[, 
-                !(names(Input_shaptest) %in% columns_with_zero_variance), drop = FALSE]
+                !names(Input_shaptest) %in% columns_with_zero_variance, drop = FALSE]
         }
     }
 
@@ -1918,7 +1918,7 @@ Shapiro <-function(InputData,
         }
     }
 
-    if( nrow(subset_data) >= 3 & nrow(subset_data) <= 5000) {
+    if ( nrow(subset_data) >= 3 & nrow(subset_data) <= 5000) {
         ## make the output DF
         DF_shapiro_results <- as.data.frame(
             matrix(NA, nrow = length(UniqueConditions), 
