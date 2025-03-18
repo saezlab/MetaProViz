@@ -733,7 +733,7 @@ FeatureFiltering <-function(InputData,
             "Filtering value selected: ", FeatureFilt_Value)
         logger::log_info(message)
         message(message)
-        if (CoReE) {
+        if (CoRe) {
             feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]][!SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] == SettingsInfo[["CoRe_media"]]]
         } else {
             feat_filt_Conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
