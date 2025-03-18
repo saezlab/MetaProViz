@@ -1086,7 +1086,7 @@ CheckMatchID <- function(InputData,
         " unique ", SettingsInfo[["PriorID"]], " IDs. Of those IDs, ", 
         nrow(dplyr::filter(summary_df, matches_count == 1)), 
         " are detected in the data, which is ", 
-        nrow(dplyr::filter(summary_df, matches_count == 1)) / dplyr::n_distinct(PK_long[[SettingsInfo[["PriorID"]]]])) * 100, "%.") ## EDIT: consider precomputing repeated objects
+        nrow(dplyr::filter(summary_df, matches_count == 1)) / dplyr::n_distinct(PK_long[[SettingsInfo[["PriorID"]]]]) * 100, "%.") ## EDIT: consider precomputing repeated objects
 
     if (nrow(dplyr::filter(summary_df, ActionRequired == "Check")) >= 1) {
         #warning <- paste0("There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category") # "Check"
@@ -1136,7 +1136,7 @@ ClusterPK <- function(
     SettingsInfo = c(InputID = "MetaboliteID", GroupingVariable = "term"),
     Clust = c("Graph", "Hierarchical"), # Options: "Graph", "Hierarchical",
     matrix = c("percentage", "pearson", "spearman", "kendall"), # Choose "pearson", "spearman", "kendall", or "percentage"
-    min = 2 # minimum pathways per cluster) {
+    min = 2) { # minimum pathways per cluster
     
     # Cluster PK before running enrichment analysis --> add another column that groups the data based on the pathway overlap:
     # provide different options for clustering (e.g. % of overlap, semantics similarity) --> Ramp uses % of overlap, semnatics similarity: https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html

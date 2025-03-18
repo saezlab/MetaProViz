@@ -64,15 +64,15 @@ VizPCA <- function(InputData,
                    SettingsInfo = NULL,
                    SettingsFile_Sample = NULL,
                    ColorPalette = NULL,
-                   ColorScale = "discrete",
+                   ColorScale = "discrete", ## EDIT: would list here the option and use match.arg
                    ShapePalette = NULL,
                    ShowLoadings = FALSE,
                    Scaling = TRUE,
                    PCx = 1,
                    PCy = 2,
-                   Theme = NULL,#theme_classic()
+                   Theme = NULL, ##theme_classic() ## EDIT: why not preset it, would simplify some things downstream?
                    PlotName = '',
-                   SaveAs_Plot = "svg",
+                   SaveAs_Plot = "svg", ## EDIT: would list here the option and use match.arg
                    PrintPlot = TRUE,
                    FolderPath = NULL) {
 
@@ -95,12 +95,12 @@ VizPCA <- function(InputData,
     # CheckInput` Specific
     if (!is.logical(ShowLoadings)) {
         message <- paste("The Show_Loadings value should be either TRUE if loadings are to be shown on the PCA plot or FALSE if not.")
-        logger::log_trace(paste("Error ", message, sep=""))
+        logger::log_trace(paste0("Error ", message))
         stop(message)
     }
     if (!is.logical(Scaling)) {
         message <- paste("The Scaling value should be either TRUE if data scaling is to be performed prior to the PCA or FALSE if not.")
-        logger::log_trace(paste("Error ", message, sep=""))
+        logger::log_trace(paste0("Error ", message))
         stop(message)
     }
 
@@ -123,7 +123,7 @@ VizPCA <- function(InputData,
     ##--- Prepare colour and shape palette
     if (is.null(ColorPalette)) {
         if ((ColorScale == "discrete")) {
-            safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100", ## could this be defined outside of the function?
+            safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100", ## EDIT: could this be defined outside of the function?
                 "#332288", "#AA4499","#999933", "#44AA99", "#882215", "#6699CC", 
                 "#117733", "#888888","#CC6677", "black", "gold1", "darkorchid4",
                 "red", "orange", "blue")
@@ -143,7 +143,7 @@ VizPCA <- function(InputData,
     logger::log_info(paste("VizPCA shape:", paste(safe_shape_palette, collapse = ", ")))
 
     ##--- Prepare the color scheme:
-    if (("color" %in% names(SettingsInfo)) & ("shape" %in% names(SettingsInfo))) {
+    if ("color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
         if((SettingsInfo[["shape"]] == SettingsInfo[["color"]])){
             SettingsFile_Sample$shape <- SettingsFile_Sample[, paste(SettingsInfo[["color"]])]
             SettingsFile_Sample<- SettingsFile_Sample %>%
@@ -153,7 +153,7 @@ VizPCA <- function(InputData,
                 dplyr::rename("color" = paste(SettingsInfo[["color"]]),
                     "shape" = paste(SettingsInfo[["shape"]]))
         }
-    } else if(("color" %in% names(SettingsInfo)) & !("shape" %in% names(SettingsInfo))) {
+    } else if("color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
         if ("color" %in% names(SettingsInfo)) {
             SettingsFile_Sample <- SettingsFile_Sample %>%
                 dplyr::rename("color"=paste(SettingsInfo[["color"]]))

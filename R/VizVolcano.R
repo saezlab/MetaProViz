@@ -66,7 +66,7 @@
 #'
 #' @export
 #'
-VizVolcano <- function(PlotSettings = "Standard",
+VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options and use match.arg
     InputData,
     SettingsInfo = NULL,
     SettingsFile_Metab = NULL,
@@ -81,7 +81,7 @@ VizVolcano <- function(PlotSettings = "Standard",
     SelectLab = "",
     PlotName = "",
     Subtitle = "",
-    ComparisonName = c(InputData="Cond1", InputData2= "Cond2"),
+    ComparisonName = c(InputData = "Cond1", InputData2 =  "Cond2"),
     ColorPalette = NULL,
     ShapePalette = NULL,
     Theme = NULL,
@@ -96,18 +96,18 @@ VizVolcano <- function(PlotSettings = "Standard",
     ## ------------ Check Input files ----------- ##
     ## HelperFunction `CheckInput`
     if (PlotSettings == "PEA") {
-        ## Those relationships are checked in the VizVolcano_PEA() function!
-        SettingsFile <- NULL ## For PEA the SettingsFile_Metab is the prior knowledge file, and hence this will not have features as row names.
-        Info <- NULL ## If SettingsFileMetab=NULL, SetingsInfo has to be NULL to, otherwise we will get an error.
+        ## those relationships are checked in the VizVolcano_PEA() function!
+        SettingsFile <- NULL ## for PEA the SettingsFile_Metab is the prior knowledge file, and hence this will not have features as row names.
+        Info <- NULL ## if SettingsFileMetab=NULL, SetingsInfo has to be NULL to, otherwise we will get an error.
     } else {
-        SettingsFile <-SettingsFile_Metab
+        SettingsFile <- SettingsFile_Metab
         Info <- SettingsInfo
     }
 
     CheckInput(InputData = as.data.frame(t(InputData)),
         InputData_Num = FALSE, SettingsFile_Sample = NULL,
-        SettingsFile_Metab = SettingsFile, ## Set above
-        SettingsInfo = Info, ## Set above
+        SettingsFile_Metab = SettingsFile, ## set above
+        SettingsInfo = Info, ## set above
         SaveAs_Plot = SaveAs_Plot,
         SaveAs_Table = NULL, CoRe = FALSE, PrintPlot = PrintPlot,
         PlotSettings = "Feature")
@@ -123,7 +123,7 @@ VizVolcano <- function(PlotSettings = "Standard",
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (!(paste(x) %in% colnames(InputData)) | !(paste(y) %in% colnames(InputData))) {
+    if (!paste(x) %in% colnames(InputData) | !paste(y) %in% colnames(InputData)) { ## EDIT: why is paste needed here?
         message <- "Check input. The column name of x and/or y does not exist in 'Input_data'."
         logger::log_trace(paste0("Error ", message))
         stop(message)
@@ -148,7 +148,7 @@ VizVolcano <- function(PlotSettings = "Standard",
     }
 
     Plot_options <- c("Standard", "Compare", "PEA")
-    if (PlotSettings %in% !Plot_options){
+    if (PlotSettings %in% !Plot_options) {
         message <- paste0(
             "'PlotSettings' option is incorrect. The allowed options are the following: ",
             paste(Plot_options, collapse = ", "), ".")
@@ -167,24 +167,24 @@ VizVolcano <- function(PlotSettings = "Standard",
     ## Extract required columns and merge with SettingsFile
     if (!is.null(SettingsFile_Metab)) {
         ##--- Prepare the color scheme:
-        if(("color" %in% names(SettingsInfo)) & ("shape" %in% names(SettingsInfo))) {
-            if((SettingsInfo[["shape"]] == SettingsInfo[["color"]])){
+        if (("color" %in% names(SettingsInfo)) & ("shape" %in% names(SettingsInfo))) {
+            if ((SettingsInfo[["shape"]] == SettingsInfo[["color"]])) {
                 SettingsFile_Metab$shape <- SettingsFile_Metab[, paste(SettingsInfo[["color"]])]
                 SettingsFile_Metab<- SettingsFile_Metab %>%
-                    dplyr::rename("color"=paste(SettingsInfo[["color"]]))
+                    dplyr::rename("color" = paste(SettingsInfo[["color"]]))
             } else {
-                SettingsFile_Metab <- SettingsFile_Metab%>%
+                SettingsFile_Metab <- SettingsFile_Metab %>%
                     dplyr::rename("color"=paste(SettingsInfo[["color"]]),
-                         "shape"=paste(SettingsInfo[["shape"]]))
+                         "shape" = paste(SettingsInfo[["shape"]]))
             }
-        } else if(("color" %in% names(SettingsInfo)) & !("shape" %in% names(SettingsInfo))) {
+        } else if ("color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
             SettingsFile_Metab <- SettingsFile_Metab %>%
                 dplyr::rename("color" = paste(SettingsInfo[["color"]]))
-        } else if(!("color" %in% names(SettingsInfo) & ("shape" %in% names(SettingsInfo))) {
+        } else if (!"color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
             SettingsFile_Metab <- SettingsFile_Metab %>%
                 dplyr::rename("shape" = paste(SettingsInfo[["shape"]]))
         }
-        if("individual" %in% names(SettingsInfo)){
+        if ("individual" %in% names(SettingsInfo)) {
             SettingsFile_Metab <- SettingsFile_Metab %>%
                 dplyr::rename("individual" = paste(SettingsInfo[["individual"]]))
         }
@@ -193,7 +193,7 @@ VizVolcano <- function(PlotSettings = "Standard",
         ##--- Merge InputData with SettingsFile:
         common_columns <- character() ## Initialize an empty character vector
         for (col_name in colnames(InputData[, c(x, y)])) {
-            if(col_name %in% colnames(SettingsFile_Metab)) {
+            if (col_name %in% colnames(SettingsFile_Metab)) {
                 common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
             }
         }
@@ -210,14 +210,14 @@ VizVolcano <- function(PlotSettings = "Standard",
                 dplyr::filter(!is.na(x) | !is.na(x))
         } else {
             VolcanoData <- merge(x = SettingsFile_Metab, 
-                    y=InputData[, c(x, y)], by = 0, all.y = TRUE) %>%
+                    y = InputData[, c(x, y)], by = 0, all.y = TRUE) %>%
                 tibble::remove_rownames() %>%
                 tibble::column_to_rownames("Row.names") %>%
                 dplyr::mutate(FeatureNames = rownames(InputData)) %>%
                 dplyr::filter(!is.na(x) | !is.na(x))
         }
 
-    } else{
+    } else {
         VolcanoData <- InputData[, c(x, y)] %>%
             dplyr::mutate(FeatureNames = rownames(InputData)) %>%
             dplyr::filter(!is.na(x) | !is.na(x))
@@ -230,22 +230,23 @@ VizVolcano <- function(PlotSettings = "Standard",
         xlab <- bquote(.(as.symbol(xlab)))
     }
 
-    if (is.null(ylab)){#use column name of x provided by user
+    if (is.null(ylab)) {
+        ## use column name of x provided by user
         ylab <- bquote(.(as.symbol(y)))
-    } else if(!is.null(ylab)) {
+    } else if (!is.null(ylab)) {
         ylab <- bquote(.(as.symbol(ylab)))
     }
 
     ## ----------- Set the plot parameters: ------------ ##
     ##--- Prepare colour and shape palette
-    if(is.null(ColorPalette)){
+    if (is.null(ColorPalette)) {
         if ("color" %in% names(SettingsInfo)) {
-        safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  ## could this be defined outside of the function?
+        safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  ## EDIT: could this be defined outside of the function?
             "#332288", "#AA4499", "#999933", "#44AA99", "#882215", 
             "#6699CC", "#117733", "#888888", "#CC6677", "black", "gold1", 
             "darkorchid4", "red", "orange", "blue")
         } else {
-            safe_colorblind_palette <- c("#888888", "#44AA99", "#44AA99","#CC6677")  ## could this be defined outside of the function?
+            safe_colorblind_palette <- c("#888888", "#44AA99", "#44AA99","#CC6677")  ## EDIT: could this be defined outside of the function?
         }
     ## check that length is enough for what the user wants to colour
     ## stop(" The maximum number of pathways in the Input_pathways must be less than ",length(safe_colorblind_palette),". Please summarize sub-pathways together where possible and repeat.")
@@ -253,10 +254,10 @@ VizVolcano <- function(PlotSettings = "Standard",
         safe_colorblind_palette <- ColorPalette
         ## check that length is enough for what the user wants to colour
     }
-    if(is.null(ShapePalette)) {
+    if (is.null(ShapePalette)) {
         safe_shape_palette <- c(15,17,16,18,25,7,8,11,12)
         ## check that length is enough for what the user wants to shape
-    } else{
+    } else {
         safe_shape_palette <-shape_palette
         #check that length is enough for what the user wants to shape
     }
@@ -264,7 +265,8 @@ VizVolcano <- function(PlotSettings = "Standard",
     ############################################################################################################
     ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
-    if(PlotSettings == "Standard"){#####--- 1. Standard
+    if (PlotSettings == "Standard") {
+        #####--- 1. Standard
         VolcanoRes <- VizVolcano_Standard(InputData = VolcanoData,
             SettingsFile_Metab = SettingsFile_Metab,
             SettingsInfo = SettingsInfo,
@@ -277,7 +279,8 @@ VizVolcano <- function(PlotSettings = "Standard",
             Features = Features, SaveAs_Plot = SaveAs_Plot,
             PrintPlot = PrintPlot, Folder = Folder)
 
-    } else if (PlotSettings == "Compare") { #####--- 2. Compare
+    } else if (PlotSettings == "Compare") { 
+        #####--- 2. Compare
         VolcanoRes <- VizVolcano_Compare(InputData = VolcanoData,
             InputData2 = InputData2, SettingsFile_Metab = SettingsFile_Metab,
             SettingsInfo = SettingsInfo, y = y, x = x, xlab = xlab, ylab = ylab,
@@ -288,10 +291,11 @@ VizVolcano <- function(PlotSettings = "Standard",
             Features = Features, ComparisonName = ComparisonName,
             SaveAs_Plot = SaveAs_Plot, PrintPlot = PrintPlot, Folder = Folder)
 
-    } else if(PlotSettings=="PEA"){#####--- 3. PEA
+    } else if (PlotSettings=="PEA") {
+        #####--- 3. PEA
         VolcanoRes <- VizVolcano_PEA(InputData = VolcanoData,
             InputData2 = InputData2, SettingsFile_Metab = SettingsFile_Metab, 
-            #Problem: we need to know the column name of the features!
+            ## Problem: we need to know the column name of the features!
             SettingsInfo = SettingsInfo, y = y, x = x, xlab = xlab, ylab = ylab,
             xCutoff = xCutoff, yCutoff = yCutoff, Connectors = Connectors,
             SelectLab = SelectLab, PlotName = PlotName, Subtitle = Subtitle,
@@ -299,8 +303,10 @@ VizVolcano <- function(PlotSettings = "Standard",
             ShapePalette = safe_shape_palette, Theme = Theme,  
             Features = Features, SaveAs_Plot = SaveAs_Plot,
             PrintPlot = PrintPlot, Folder = Folder)
-  }
-  return(invisible(VolcanoRes))
+    }
+    
+    ## return
+    invisible(VolcanoRes)
 }
 
 ################################################################################################
@@ -356,7 +362,7 @@ VizVolcano_Standard <- function(InputData,
     Subtitle = "",
     ColorPalette,
     ShapePalette,
-    Theme = NULL,
+    Theme = NULL, ## EDIT: preset the Theme to simplify downstream
     Features = "Metabolites",
     SaveAs_Plot,
     PrintPlot,
@@ -371,8 +377,10 @@ VizVolcano_Standard <- function(InputData,
         ## Create the list of individual plots that should be made:
         IndividualPlots <- unique(InputData$individual)
 
-        PlotList <- list() ##Empty list to store all the plots
-        PlotList_adaptedGrid <- list() ##Empty list to store all the plots
+        ## empty list to store all the plots
+        PlotList <- list() ## EDIT: define once outside the if/else statements for all conditions and delete the other instances
+        ## empty list to store all the plots
+        PlotList_adaptedGrid <- list() ## EDIT: define once outside the if/else statements for all conditions and delete the other instances
 
         for (i in IndividualPlots) {
             InputVolcano <- subset(InputData, individual == paste(i))
@@ -409,16 +417,16 @@ VizVolcano_Standard <- function(InputData,
                     keyvalsshape <-NULL
                 }
 
-                if(!("color" %in% names(SettingsInfo)) & !("shape" %in% names(SettingsInfo))) {
+                if (!"color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
                     LegendPos<- "none"
                 }
 
                 ## Prepare the Plot:
                 Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                    lab = InputVolcano$FeatureNames, #Metabolite name
+                    lab = InputVolcano$FeatureNames, ## metabolite name
                         selectLab = SelectLab, x = paste(x), y = paste(y),
                         xlab = xlab, ylab = ylab, pCutoff = yCutoff,
-                        FCcutoff = xCutoff, #Cut off Log2FC, automatically 2
+                        FCcutoff = xCutoff, ## cut off Log2FC, automatically 2
                         pointSize = 3, labSize = 3, axisLabSize = 10,
                         titleLabSize = 12, subtitleLabSize = 11,
                         captionLabSize = 10, col = safe_colorblind_palette,
@@ -447,10 +455,10 @@ VizVolcano_Standard <- function(InputData,
                         Theme
                 }
 
-                ## Store the plot in the 'plots' list
+                ## store the plot in the 'plots' list
                 PlotList[[i]] <- Plot
 
-                ## Set the total heights and widths
+                ## set the total heights and widths
                 PlotTitle <- paste0(PlotName, ": ", i)
                 Plot_Sized <-  plotGrob_Volcano(InputPlot = Plot, 
                     SettingsInfo = SettingsInfo,  PlotName = PlotTitle, 
@@ -459,11 +467,12 @@ VizVolcano_Standard <- function(InputData,
                     valueOnly = TRUE)
                 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', 
                     valueOnly = TRUE)
-                Plot_Sized %<>%
+                Plot_Sized %<>% ## EDIT: what is the added value to use %<>% ?
                     {ggplot2::ggplot() + annotation_custom(.)} %>%
                     add(theme(panel.background = element_rect(fill = "transparent")))
 
-                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+                ## removes empty spaces and replaces /,\ with -
+                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
                 SaveList <- list()
@@ -484,7 +493,7 @@ VizVolcano_Standard <- function(InputData,
                         PlotUnit = "cm")))
             }
         }
-    } else if(!"individual" %in% names(SettingsInfo)) {
+    } else if (!"individual" %in% names(SettingsInfo)) {
         
         PlotList <- list() ##Empty list to store all the plots
         PlotList_adaptedGrid <- list() ## Empty list to store all the plots
@@ -503,7 +512,7 @@ VizVolcano_Standard <- function(InputData,
                 }
 
                 LegendPos<- "right"
-            } else{
+            } else {
                 keyvals <-NULL
             }
       
@@ -519,11 +528,11 @@ VizVolcano_Standard <- function(InputData,
                 }
 
                 LegendPos<- "right"
-            } else{
+            } else {
                 keyvalsshape <-NULL
             }
 
-            if (!("color" %in% names(SettingsInfo)) & !("shape" %in% names(SettingsInfo))) {
+            if (!"color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
                 LegendPos<- "none"
             }
 
@@ -556,7 +565,7 @@ VizVolcano_Standard <- function(InputData,
                 gridlines.minor = FALSE, drawConnectors = Connectors)
             
             ## Add the theme
-            if(!is.null(Theme)) {
+            if (!is.null(Theme)) {
                 Plot <- Plot+Theme
             }
 
@@ -654,7 +663,7 @@ VizVolcano_Compare <- function(InputData,
     Subtitle = "",
     ColorPalette,
     ShapePalette,
-    Theme = NULL,
+    Theme = NULL, ## EDIT: preset the Theme to simplify downstream
     Features = "Metabolites",
     ComparisonName,
     SaveAs_Plot,
@@ -664,7 +673,7 @@ VizVolcano_Compare <- function(InputData,
     #####################
     ##--- Check InputData
     if (!is.data.frame(InputData2)) {
-        if(!(paste(x) %in% colnames(InputData2)) | !(paste(y) %in% colnames(InputData2))) {
+        if (!paste(x) %in% colnames(InputData2) | !paste(y) %in% colnames(InputData2)) { ## EDIT: why is paste needed here?
             message <- paste0("Check 'InputData2'. The column name of ", x, " and/or ", y, " does not exist in 'InputData2'.")
             logger::log_trace(paste0("Error ", message))
             stop(message)
@@ -711,15 +720,17 @@ VizVolcano_Compare <- function(InputData,
         ## Create the list of individual plots that should be made:
         IndividualPlots <- unique(InputCompare$individual)
 
-        PlotList <- list() ## Empty list to store all the plots
-        PlotList_adaptedGrid <- list() ## Empty list to store all the plots
+        ## empty list to store all the plots
+        PlotList <- list() ## EDIT: define outside and use for all conditions
+        ## empty list to store all the plots
+        PlotList_adaptedGrid <- list() ## EDIT: define outside and use for all conditions
 
-        for (i in IndividualPlots){
+        for (i in IndividualPlots) {
             InputVolcano <- subset(InputCompare, individual == paste(i))
 
             if (nrow(InputVolcano) >= 1) {
-                ## Prepare the colour scheme:
-                if("color" %in% names(SettingsInfo)) {
+                ## prepare the colour scheme:
+                if ("color" %in% names(SettingsInfo)) {
                     color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
                     keyvals <- c()
@@ -728,7 +739,8 @@ VizVolcano_Compare <- function(InputData,
                         names(col) <- InputVolcano$color[row]
                         keyvals <- c(keyvals, col)
                     }
-                } else{ #here we will use the conditions if no other color is provided!
+                } else { 
+                    ## here we will use the conditions if no other color is provided!
                     color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$comparison))]
 
                     keyvals <- c()
@@ -739,8 +751,8 @@ VizVolcano_Compare <- function(InputData,
                     }
                 }
                 
-                ## Prepare the shape scheme:
-                if (("shape" %in% names(SettingsInfo)) & !("color" %in% names(SettingsInfo))) {
+                ## prepare the shape scheme:
+                if ("shape" %in% names(SettingsInfo) & !"color" %in% names(SettingsInfo)) {
                     shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
                     keyvalsshape <- c()
@@ -750,9 +762,10 @@ VizVolcano_Compare <- function(InputData,
                         names(sha) <- InputVolcano$shape[row]
                         keyvalsshape <- c(keyvalsshape, sha)
                     }
-                } else if("shape" %in% names(SettingsInfo) & "color" %in% names(SettingsInfo)) {
+                } else if ("shape" %in% names(SettingsInfo) & "color" %in% names(SettingsInfo)) {
                     
-                    ## Here we have already used color from SettingsInfo and we need to use shape for the conditions
+                    ## here we have already used color from SettingsInfo and 
+                    ## we need to use shape for the conditions
                     message("For Plot_setting= `Consitions`we can only use colour or shape from SettingsFile_Metab. We ignore shape and use it to label the Comparison_name.")
                     shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
@@ -763,10 +776,9 @@ VizVolcano_Compare <- function(InputData,
                         names(sha) <- InputVolcano$comparison[row]
                         keyvalsshape <- c(keyvalsshape, sha)
                     }
-                } else if(!("shape" %in% names(SettingsInfo)) & !("color" %in% names(SettingsInfo)) | !("shape" %in% names(SettingsInfo)) & ("color" %in% names(SettingsInfo))) { ## correct? Are there brackets missing between OR?
+                } else if (!"shape" %in% names(SettingsInfo) & !"color" %in% names(SettingsInfo) | !"shape" %in% names(SettingsInfo) & "color" %in% names(SettingsInfo)) { ## EDIT: correct? Are there brackets missing between OR?
                     
                     shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
-
                     keyvalsshape <- c()
                     
                     for (row in seq_len(nrow(InputVolcano))) {
@@ -777,9 +789,9 @@ VizVolcano_Compare <- function(InputData,
                     }
                 }
             
-                ## Prepare the Plot:
+                ## prepare the Plot:
                 Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                    lab = InputVolcano$FeatureNames, ## Metabolite name
+                    lab = InputVolcano$FeatureNames, ## metabolite name
                     selectLab = SelectLab, x = paste(x), y = paste(y),
                     xlab = xlab, ylab = ylab, pCutoff = yCutoff,
                     FCcutoff = xCutoff, ## Cut off Log2FC, automatically 2
@@ -787,7 +799,7 @@ VizVolcano_Compare <- function(InputData,
                     titleLabSize = 12, subtitleLabSize = 11,
                     captionLabSize = 10, col = safe_colorblind_palette,
                     colCustom = keyvals, shapeCustom = keyvalsshape,
-                    colAlpha = 1, title = paste(PlotName, ": ", i, sep = ""),
+                    colAlpha = 1, title = paste0(PlotName, ": ", i),
                     subtitle = Subtitle,
                     caption = paste0("Total = ", (nrow(InputVolcano) / 2), " ", Features),
                     xlim =  c(
@@ -803,15 +815,15 @@ VizVolcano_Compare <- function(InputData,
                     legendPosition = 'right', legendLabSize = 7,
                     legendIconSize = 4, gridlines.major = FALSE,
                     gridlines.minor = FALSE, drawConnectors = Connectors)
-                ## Add the theme
-                if(!is.null(Theme)) {
+                ## add the theme
+                if (!is.null(Theme)) {
                     Plot <- Plot+Theme
                 }
 
-                ## Store the plot in the 'plots' list
+                ## store the plot in the 'plots' list
                 PlotList[[i]] <- Plot
 
-                ## Set the total heights and widths
+                ## set the total heights and widths
                 PlotTitle <- paste(PlotName, ": ", i, sep = "")
                 Plot_Sized <-  plotGrob_Volcano(InputPlot = Plot, 
                     SettingsInfo = SettingsInfo, 
@@ -824,20 +836,21 @@ VizVolcano_Compare <- function(InputData,
                     {ggplot2::ggplot() + annotation_custom(.)} %>%
                     add(theme(panel.background = element_rect(fill = "transparent")))
 
-                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i) ## removes empty spaces and replaces /,\ with -
+                ## remove empty spaces and replaces /,\ with -
+                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i) 
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
                 SaveList <- list()
                 SaveList[[cleaned_i]] <- Plot_Sized
 
-                ##----- Save
+                ##----- save
                 suppressMessages(suppressWarnings(
                     SaveRes(InputList_DF = NULL,
                         InputList_Plot = SaveList,
                         SaveAs_Table = NULL,
                         SaveAs_Plot = SaveAs_Plot,
                         FolderPath = Folder,
-                        FileName = paste("Volcano_",PlotName, sep=""),
+                        FileName = paste0("Volcano_",PlotName),
                         CoRe = FALSE,
                         PrintPlot = PrintPlot,
                         PlotHeight = PlotHeight,
@@ -846,7 +859,7 @@ VizVolcano_Compare <- function(InputData,
             }
         }
 
-    } else if(!"individual" %in% names(SettingsInfo)) {
+    } else if (!"individual" %in% names(SettingsInfo)) {
         PlotList <- list() ## Empty list to store all the plots
         PlotList_adaptedGrid <- list() ## Empty list to store all the plots
 
@@ -854,7 +867,7 @@ VizVolcano_Compare <- function(InputData,
             InputVolcano <- InputCompare
             
             ## Prepare the colour scheme:
-            if("color" %in% names(SettingsInfo)) {
+            if ("color" %in% names(SettingsInfo)) {
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
                 keyvals <- c()
@@ -863,7 +876,7 @@ VizVolcano_Compare <- function(InputData,
                     names(col) <- InputVolcano$color[row]
                     keyvals <- c(keyvals, col)
                 }
-            } else{ #here we will use the conditions if no other color is provided!
+            } else { #here we will use the conditions if no other color is provided!
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$comparison))]
 
                 keyvals <- c()
@@ -874,7 +887,7 @@ VizVolcano_Compare <- function(InputData,
                 }
             }
             ## Prepare the shape scheme:
-            if (("shape" %in% names(SettingsInfo)) & !("color" %in% names(SettingsInfo))) {
+            if ("shape" %in% names(SettingsInfo) & !"color" %in% names(SettingsInfo)) {
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
                 keyvalsshape <- c()
@@ -887,17 +900,18 @@ VizVolcano_Compare <- function(InputData,
                 ## Here we have already used color from SettingsInfo and we need to use shape for the conditions
                 message("For PlotSettings Comparison we can only use colour or shape from SettingsFile_Metab. Hence, we ignore shape and use it to label the ComparisonName.")
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
-
+                
                 keyvalsshape <- c()
                 for (row in seq_len(nrow(InputVolcano))) {
                     sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                     names(sha) <- InputVolcano$comparison[row]
                     keyvalsshape <- c(keyvalsshape, sha)
                 }
-            } else if(!("shape" %in% names(SettingsInfo)) & !("color" %in% names(SettingsInfo)) | !("shape" %in% names(SettingsInfo)) & ("color" %in% names(SettingsInfo))) {
+            } else if (!"shape" %in% names(SettingsInfo) & !"color" %in% names(SettingsInfo) | !"shape" %in% names(SettingsInfo) & "color" %in% names(SettingsInfo)) {
+                
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
-
                 keyvalsshape <- c()
+                
                 for (row in seq_len(nrow(InputVolcano))) {
                     sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                     names(sha) <- InputVolcano$comparison[row]
@@ -906,7 +920,7 @@ VizVolcano_Compare <- function(InputData,
             }
             ## Prepare the Plot:
             Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                lab = InputVolcano$FeatureNames,#Metabolite name
+                lab = InputVolcano$FeatureNames, ##Metabolite name
                 selectLab = SelectLab, x = paste(x), y = paste(y),
                 xlab  =xlab, ylab =ylab, pCutoff = yCutoff,
                 FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
@@ -922,7 +936,7 @@ VizVolcano_Compare <- function(InputData,
                 ylim = c(0, ceiling(-log10(Reduce(min,InputVolcano[[y]])))),
                 cutoffLineType = "dashed", cutoffLineCol = "black",
                 cutoffLineWidth = 0.5,
-                legendLabels=c(
+                legendLabels = c(
                     paste(x," < |", xCutoff, "|"), 
                     paste(x," > |", xCutoff, "|"), 
                     paste(y, ' < ', yCutoff) , 
@@ -946,7 +960,7 @@ VizVolcano_Compare <- function(InputData,
                 valueOnly = TRUE)
             PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', 
                 valueOnly = TRUE)
-            Plot_Sized %<>%
+            Plot_Sized %<>% ## EDIT: added value of %<>%?
                 {ggplot2::ggplot() + annotation_custom(.)} %>%
                 add(theme(panel.background = element_rect(fill = "transparent")))
             PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
@@ -966,7 +980,7 @@ VizVolcano_Compare <- function(InputData,
     }
   
     ## return
-    invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid))
+    invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))
 }
 
 
@@ -1027,7 +1041,7 @@ VizVolcano_PEA <- function(InputData,
                            Subtitle = "",
                            ColorPalette,
                            ShapePalette,
-                           Theme = NULL,
+                           Theme = NULL, ## EDIT: predefine the theme and simplify downstream
                            Features = "Metabolites",
                            SaveAs_Plot,
                            PrintPlot,
@@ -1037,18 +1051,18 @@ VizVolcano_PEA <- function(InputData,
     ##--- Check PEA settings
     if (!is.vector(SettingsInfo)) {
         message <- "You have chosen Settings=`PEA` that requires to provide a vector for 'SettingsInfo'."
-        logger::log_trace(paste("Error ", message, sep = ""))
+        logger::log_trace(paste0("Error ", message))
         stop(message)
     }
     if (is.null(SettingsFile_Metab)) {
         message <- "You have chosen Settings=`PEA` that requires to provide a DF 'SettingsFile_Metab' including the pathways used for the enrichment analysis."
-        logger::log_trace(paste("Error ", message, sep = ""))
+        logger::log_trace(paste0("Error ", message))
         stop(message)
     }
     if (!is.null(SettingsFile_Metab) & !is.null(SettingsFile_Metab)) { 
-        if(!("PEA_Feature" %in% names(SettingsInfo)) | !("PEA_score" %in% names(SettingsInfo)) | !("PEA_stat" %in% names(SettingsInfo)) | !("PEA_Pathway" %in% names(SettingsInfo))) {
+        if (!"PEA_Feature" %in% names(SettingsInfo) | !"PEA_score" %in% names(SettingsInfo) | !"PEA_stat" %in% names(SettingsInfo) | !"PEA_Pathway" %in% names(SettingsInfo)) {
             message <- "You have chosen Settings=`PEA` that requires to provide a vector for 'SettingsInfo' including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`."
-            logger::log_trace(paste("Error ", message, sep=""))
+            logger::log_trace(paste0("Error ", message))
             stop(message)
         }
     }
@@ -1076,9 +1090,10 @@ VizVolcano_PEA <- function(InputData,
     ## Create the list of individual plots that should be made:
     IndividualPlots <- unique(InputData2$PEA_Pathway)
 
-    PlotList <- list() ## Empty list to store all the plots
-    PlotList_adaptedGrid <- list() ## Empty list to store all the plots
-
+    ## empty list to store all the plots
+    PlotList <- list() ## EDIT: define outside the if/else and delete other instances
+    ## empty list to store all the plots
+    
     for (i in IndividualPlots) {
         InputData2_Select<- InputData2 %>%
             filter(PEA_Pathway == paste(i)) ## Select pathway we plot and use the score and stats
@@ -1093,7 +1108,7 @@ VizVolcano_PEA <- function(InputData,
 
         if (nrow(InputVolcano) >= 1) {
             ## Prepare the colour scheme:
-            if("color" %in% names(SettingsInfo)){
+            if ("color" %in% names(SettingsInfo)) {
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
                 keyvals <- c()
@@ -1104,7 +1119,7 @@ VizVolcano_PEA <- function(InputData,
                 }
 
                 LegendPos<- "right"
-            } else{
+            } else {
                 keyvals <- NULL
             }
             ## Prepare the shape scheme:
@@ -1118,18 +1133,18 @@ VizVolcano_PEA <- function(InputData,
                     keyvalsshape <- c(keyvalsshape, sha)
                 }
 
-                LegendPos<- "right"
+                LegendPos <- "right"
             } else {
                 keyvalsshape <-NULL
             }
 
-            if (!("color" %in% names(SettingsInfo)) & !("shape" %in% names(SettingsInfo))) {
-                LegendPos<- "none"
+            if (!"color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
+                LegendPos <- "none"
             }
 
-            #Prepare the Plot:
-            Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                lab = InputVolcano$PEA_Feature,#Metabolite name
+            ## prepare the Plot:
+            Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+                lab = InputVolcano$PEA_Feature, ## metabolite name
                 selectLab = SelectLab, x = paste(x), y = paste(y),
                 xlab = xlab, ylab = ylab, pCutoff = yCutoff,
                 FCcutoff = xCutoff, ## Cut off Log2FC, automatically 2
@@ -1137,11 +1152,11 @@ VizVolcano_PEA <- function(InputData,
                 titleLabSize = 12, subtitleLabSize = 11,
                 captionLabSize = 10, col=safe_colorblind_palette,
                 colCustom = keyvals, shapeCustom = keyvalsshape,
-                colAlpha = 1, title = paste(PlotName, ": ", i, sep = ""),
-                subtitle = paste(SettingsInfo[["PEA_score"]],"= ", 
+                colAlpha = 1, title = paste0(PlotName, ": ", i),
+                subtitle = paste0(SettingsInfo[["PEA_score"]],"= ", 
                     InputData2_Select$PEA_score, ", ", 
                     SettingsInfo[["PEA_stat"]], "= ", 
-                    InputData2_Select$PEA_stat, sep = ""),
+                    InputData2_Select$PEA_stat),
                 caption = paste0("Total = ", nrow(InputVolcano), " of ", 
                     nrow(SettingsFile_Metab_Select), " ", Features, 
                     " in pathway"),

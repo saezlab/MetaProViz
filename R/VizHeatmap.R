@@ -78,22 +78,22 @@ VizHeatmap <- function(InputData,
         PrintPlot = PrintPlot)
 
     # CheckInput` Specific
-    if (!is.logical(Enforce_FeatureNames) | !is.logical(Enforce_SampleNames)){
+    if (!is.logical(Enforce_FeatureNames) | !is.logical(Enforce_SampleNames)) {
         message <- paste0("Check input. The Enforce_FeatureNames and Enforce_SampleNames value should be either TRUE or FALSE.")
-        logger::log_trace(paste("Error ", message, sep = ""))
+        logger::log_trace(paste0("Error ", message))
         stop(message)
     }
 
     Scale_options <- c("row","column", "none")
-    if (Scale %in% !Scale_options){
+    if (Scale %in% !Scale_options) {
         message <- paste0("Check input. The selected Scale option is not valid. Please select one of the folowwing: ",paste(Scale_options,collapse = ", "),"." )
-        logger::log_trace(paste("Error ", message, sep = ""))
+        logger::log_trace(paste0("Error ", message))
         stop(message)
     }
 
 
     ## ------------ Create Results output folder ----------- ##
-    if(!is.null(SaveAs_Plot)){
+    if (!is.null(SaveAs_Plot)) {
         Folder <- SavePath(FolderName = "Heatmap", FolderPath = FolderPath)
     }
 
@@ -101,14 +101,14 @@ VizHeatmap <- function(InputData,
     ## -------------- Load Data --------------- ##
     data <- InputData
 
-    if(!is.null(SettingsFile_Metab)){ ##removes information about metabolites that are not included in the InputData
+    if (!is.null(SettingsFile_Metab)) { ##removes information about metabolites that are not included in the InputData
         SettingsFile_Metab <- merge(x = SettingsFile_Metab, 
                 y = as.data.frame(t(InputData)), by = 0, all.y = TRUE) %>%
             tibble::column_to_rownames("Row.names")
         SettingsFile_Metab <- SettingsFile_Metab[, -c((ncol(SettingsFile_Metab)-nrow(InputData)+1):ncol(SettingsFile_Metab))]
     }
 
-    if(!is.null(SettingsFile_Sample)){ ## removes information about samples that are not included in the InputData
+    if (!is.null(SettingsFile_Sample)) { ## removes information about samples that are not included in the InputData
         SettingsFile_Sample <- merge(x = SettingsFile_Sample, 
                 y = InputData, by = 0, all.y = TRUE) %>%
             tibble::column_to_rownames("Row.names")
@@ -117,19 +117,24 @@ VizHeatmap <- function(InputData,
 
 
     ## -------------- Plot --------------- ##
-    if("individual_Metab" %in% names(SettingsInfo) & !("individual_Sample" %in% names(SettingsInfo))) {
+    if ("individual_Metab" %in% names(SettingsInfo) & !"individual_Sample" %in% names(SettingsInfo)) {
     
-        #Ensure that groups that are assigned NAs do not cause problems:
-        SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]] <-ifelse(is.na(SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]]), "NA", SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]])
+        ## ensure that groups that are assigned NAs do not cause problems:
+        SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]] <-ifelse(
+            is.na(SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]]), 
+            "NA", 
+            SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]])
         unique_paths <- unique(SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]])
 
-        for (i in unique_paths){# Check pathways with 1 metabolite
-            selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
-            selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
+        for (i in unique_paths) {
+            ## check pathways with 1 metabolite
+            selected_path <- SettingsFile_Metab %>% 
+                filter(get(SettingsInfo[["individual_Metab"]]) == i)
+            selected_path_metabs <- colnames(data) [colnames(data) %in% row.names(selected_path)]
             
-            if(length(selected_path_metabs) == 1) {
+            if (length(selected_path_metabs) == 1) {
                 message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-                logger::log_trace(paste("Warning ", message, sep=""))
+                logger::log_trace(paste0("Warning ", message))
                 warning(message)
                 unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
             }
@@ -137,21 +142,27 @@ VizHeatmap <- function(InputData,
 
         IndividualPlots <-unique_paths
 
-        PlotList <- list()#Empty list to store all the plots
-        PlotList_adaptedGrid <- list()#Empty list to store all the plots
+        ## empty list to store all the plots
+        PlotList <- list()
+        ## empty list to store all the plots
+        PlotList_adaptedGrid <- list()
 
         for (i in IndividualPlots) {
-            selected_path <- SettingsFile_Metab %>% filter(get(SettingsInfo[["individual_Metab"]]) == i)
+            selected_path <- SettingsFile_Metab %>% 
+                filter(get(SettingsInfo[["individual_Metab"]]) == i)
             selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-            data_path <- data %>% dplyr::select(all_of(selected_path_metabs))
+            data_path <- data %>% 
+                dplyr::select(all_of(selected_path_metabs))
 
-            # Column annotation
+            ## column annotation
             col_annot_vars <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
             col_annot<- NULL
             if (length(col_annot_vars) > 0) {
-                for (x in 1:length(col_annot_vars)) {
+                for (x in seq_along(col_annot_vars)) {
                     annot_sel <- col_annot_vars[[x]]
-                    col_annot[x] <- SettingsFile_Sample %>% select(annot_sel) %>% as.data.frame()
+                    col_annot[x] <- SettingsFile_Sample %>% 
+                        select(annot_sel) %>% a
+                    s.data.frame()
                     names(col_annot)[x] <- annot_sel
                 }
                 col_annot<- as.data.frame(col_annot)
@@ -162,13 +173,15 @@ VizHeatmap <- function(InputData,
             row_annot_vars <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
             row_annot<- NULL
             if (length(row_annot_vars) > 0) {
-                for (y in 1:length(row_annot_vars)) {
+                for (y in seq_along(row_annot_vars)) {
                     annot_sel <- row_annot_vars[[y]]
-                    row_annot[y] <- SettingsFile_Metab %>% select(all_of(annot_sel))
-                    row_annot <- row_annot %>% as.data.frame()
+                    row_annot[y] <- SettingsFile_Metab %>% 
+                        select(all_of(annot_sel))
+                    row_annot <- row_annot %>% 
+                        as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
-                row_annot<- as.data.frame(row_annot)
+                row_annot <- as.data.frame(row_annot)
                 rownames(row_annot) <- rownames(SettingsFile_Metab)
             }
 
@@ -187,7 +200,7 @@ VizHeatmap <- function(InputData,
             # if (Enforce_FeatureNames) {
             #     show_rownames <- TRUE
             #     cellheight_Feature <- 9
-            # } else if(nrow(Features) > 100) {
+            # } else if (nrow(Features) > 100) {
             #     show_rownames <- FALSE
             #     cellheight_Feature <- 1
             # } else {
@@ -206,7 +219,7 @@ VizHeatmap <- function(InputData,
             # if (Enforce_SampleNames) {
             #     show_colnames <- TRUE
             #     cellwidth_Sample <- 9
-            # } else if(nrow(data_path) > 50) {
+            # } else if (nrow(data_path) > 50) {
             #     show_colnames <- FALSE
             #     cellwidth_Sample <- 1
             # } else {
@@ -229,25 +242,26 @@ VizHeatmap <- function(InputData,
                     legend = T,
                     cellwidth = cellwidth_Sample,
                     cellheight = cellheight_Feature,
-                    fontsize_row= 10,
+                    fontsize_row = 10,
                     fontsize_col = 10,
-                    fontsize=9,
-                    main = paste(PlotName, " Metabolites: ", i, sep=" " ),
+                    fontsize = 9,
+                    main = paste(PlotName, " Metabolites: ", i, sep = " "),
                     silent = TRUE)
 
-                ## Store the plot in the 'plots' list
-                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+                ## store the plot in the 'plots' list
+                ## removes empty spaces and replaces /,\ with -
+                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)
                 PlotList[[cleaned_i]] <- heatmap
 
-                #Width and height according to Sample and metabolite number
+                ## width and height according to Sample and metabolite number
                 Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                     SettingsInfo = SettingsInfo, 
                     SettingsFile_Sample = SettingsFile_Sample, 
                     SettingsFile_Metab = SettingsFile_Metab, 
                     PlotName = cleaned_i)
-                PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-                PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
-                Plot_Sized %<>%
+                PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
+                PlotWidth <- grid::convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
+                Plot_Sized %<>% ## EDIT: what is the added value here to use %<>%
                     {ggplot2::ggplot() + annotation_custom(.)} %>%
                     add(theme(panel.background = element_rect(fill = "transparent")))
 
@@ -260,7 +274,7 @@ VizHeatmap <- function(InputData,
                         SaveAs_Table = NULL,
                         SaveAs_Plot = SaveAs_Plot,
                         FolderPath = Folder,
-                        FileName = paste("Heatmap_",PlotName, sep=""),
+                        FileName = paste0("Heatmap_", PlotName),
                         CoRe = FALSE,
                         PrintPlot = PrintPlot,
                         PlotHeight = PlotHeight,
@@ -268,17 +282,17 @@ VizHeatmap <- function(InputData,
                         PlotUnit = "cm")))
             } else {
                 message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
-                logger::log_trace(paste("Message ", message, sep=""))
+                logger::log_trace(paste0("Message ", message))
                 message(message)
             }
         }
         
         ## Return if assigned:
-        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))) ## needed? 
+        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))) ## EDIT: needed? I would return at the end of fct and not somewhere in the middle
 
-    } else if (!("individual_Metab" %in% names(SettingsInfo)) & ("individual_Sample" %in% names(SettingsInfo))) {
+    } else if (!"individual_Metab" %in% names(SettingsInfo) & "individual_Sample" %in% names(SettingsInfo)) {
         ##Ensure that groups that are assigned NAs do not cause problems:
-        SettingsFile_Sample[[SettingsInfo[["individual_Sample"]]]] <-ifelse(
+        SettingsFile_Sample[[SettingsInfo[["individual_Sample"]]]] <- ifelse(
             is.na(SettingsFile_Sample[[SettingsInfo[["individual_Sample"]]]]), 
             "NA", 
             SettingsFile_Sample[[SettingsInfo[["individual_Sample"]]]])
@@ -292,15 +306,17 @@ VizHeatmap <- function(InputData,
             if (length(selected_path_metabs) == 1) {
                 message <- paste0("The metadata group ", i, 
                     " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-                logger::log_trace(paste("Warning ", message, sep=""))
+                logger::log_trace(paste0("Warning ", message))
                 warning(message)
                 unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
             }
         }
 
-        IndividualPlots <-unique_paths_Sample
-        PlotList <- list()#Empty list to store all the plots
-        PlotList_adaptedGrid <- list()#Empty list to store all the plots
+        IndividualPlots <- unique_paths_Sample
+        ## empty list to store all the plots
+        PlotList <- list() ## EDIT: why not moving this to before/outside the if/else statements as you do this for every condition and delete it in the other conditions
+        ## empty list to store all the plots
+        PlotList_adaptedGrid <- list() ## EDIT: why not moving this to before/outside the if/else statements as you do this for every condition and delete it in the other conditions
 
         for (i in IndividualPlots) {
          
@@ -339,7 +355,7 @@ VizHeatmap <- function(InputData,
             row_annot_vars <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
             row_annot<- NULL
             if (length(row_annot_vars) > 0) {
-                for (y in 1:length(row_annot_vars)){
+                for (y in 1:length(row_annot_vars)) {
                     annot_sel <- row_annot_vars[[y]]
                     row_annot[y] <- SettingsFile_Metab %>% 
                         select(all_of(annot_sel))
@@ -363,7 +379,7 @@ VizHeatmap <- function(InputData,
             #     if (Enforce_FeatureNames) {
             #         show_rownames <- TRUE
             #   cellheight_Feature <- 9
-            # }else if(nrow(Features)>100){
+            # }else if (nrow(Features)>100) {
             #   show_rownames <- FALSE
             #   cellheight_Feature <- 1
             # }else{
@@ -374,14 +390,14 @@ VizHeatmap <- function(InputData,
             #Check number of samples
             show_colnames <- TRUE
             cellwidth_Sample <- 9
-            if(!Enforce_SampleNames & nrow(data_path) > 50) {
+            if (!Enforce_SampleNames & nrow(data_path) > 50) {
                 show_colnames <- FALSE
                 cellwidth_Sample <- 1
             }
-            # if(Enforce_SampleNames==TRUE){
+            # if (Enforce_SampleNames==TRUE) {
             #   show_colnames <- TRUE
             #   cellwidth_Sample <- 9
-            # }else if(nrow(data_path)>50){
+            # }else if (nrow(data_path)>50) {
             #   show_colnames <- FALSE
             #   cellwidth_Sample <- 1
             # }else{
@@ -407,21 +423,22 @@ VizHeatmap <- function(InputData,
                     fontsize_row= 10,
                     fontsize_col = 10,
                     fontsize = 9,
-                    main = paste(PlotName," Samples: ", i, sep=" " ),
+                    main = paste(PlotName," Samples: ", i, sep = " "),
                     silent = TRUE)
 
-                #----- Save
-                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
+                ##----- Save
+                ## removes empty spaces and replaces /,\ with -
+                cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)
                 PlotList[[cleaned_i]] <- heatmap
 
-                #Width and height according to Sample and metabolite number
+                ## width and height according to Sample and metabolite number
                 Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                     SettingsInfo = SettingsInfo, 
                     SettingsFile_Sample = SettingsFile_Sample, 
                     SettingsFile_Metab = SettingsFile_Metab, 
                     PlotName= cleaned_i)
-                PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-                PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+                PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
+                PlotWidth <- grid::convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
                 Plot_Sized %<>%
                     {ggplot2::ggplot() + annotation_custom(.)} %>%
                     add(theme(panel.background = element_rect(fill = "transparent")))
@@ -435,7 +452,7 @@ VizHeatmap <- function(InputData,
                         SaveAs_Table = NULL,
                         SaveAs_Plot = SaveAs_Plot,
                         FolderPath = Folder,
-                        FileName = paste("Heatmap_", PlotName, sep = ""),
+                        FileName = paste0("Heatmap_", PlotName),
                         CoRe = FALSE,
                         PrintPlot = PrintPlot,
                         PlotHeight = PlotHeight,
@@ -443,12 +460,12 @@ VizHeatmap <- function(InputData,
                         PlotUnit = "cm")))
             } else {
                 message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
-                logger::log_trace(paste("Message ", message, sep=""))
+                logger::log_trace(paste0("Message ", message))
                 message(message)
             }
         }
         ## Return if assigned:
-        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))) ## needed?
+        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))) ## EDIT: needed? I would return at the end of the function
 
     } else if (("individual_Metab" %in% names(SettingsInfo)) & ("individual_Sample" %in% names(SettingsInfo))) {
         
@@ -460,7 +477,7 @@ VizHeatmap <- function(InputData,
 
         unique_paths <- unique(SettingsFile_Metab[[SettingsInfo[["individual_Metab"]]]])
 
-        ## Check pathways with 1 metabolite
+        ## check pathways with 1 metabolite
         for (i in unique_paths) {
             selected_path <- SettingsFile_Metab %>% 
                 filter(get(SettingsInfo[["individual_Metab"]]) == i)
@@ -469,9 +486,10 @@ VizHeatmap <- function(InputData,
             if (length(selected_path_metabs) == 1) {
                 message <- paste0("The metadata group ", i, 
                     " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-                logger::log_trace(paste("Warning ", message, sep = ""))
+                logger::log_trace(paste0("Warning ", message))
                 warning(message)
-                unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
+                ## remove the pathway
+                unique_paths <- unique_paths[!unique_paths %in% i]
             }
         }
 
@@ -492,7 +510,7 @@ VizHeatmap <- function(InputData,
             if (length(selected_path_metabs) == 1) {
                 message <- paste0("The metadata group ", i, 
                     " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-                logger::log_trace(paste("Warning ", message, sep = ""))
+                logger::log_trace(paste0("Warning ", message))
                 warning(message)
                 unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
             }
@@ -516,7 +534,7 @@ VizHeatmap <- function(InputData,
             row_annot<- NULL
             
             if (length(row_annot_vars) > 0) {
-                for (y in 1:length(row_annot_vars)){
+                for (y in 1:length(row_annot_vars)) {
                       annot_sel <- row_annot_vars[[y]]
                       row_annot[y] <- SettingsFile_Metab %>% 
                           select(all_of(annot_sel))
@@ -569,10 +587,10 @@ VizHeatmap <- function(InputData,
                     show_rownames <- FALSE
                     cellheight_Feature <- 1
                 }
-                # if(Enforce_FeatureNames==TRUE){
+                # if (Enforce_FeatureNames==TRUE) {
                 #   show_rownames <- TRUE
                 #   cellheight_Feature <- 9
-                # }else if(nrow(Features)>100){
+                # }else if (nrow(Features)>100) {
                 #   show_rownames <- FALSE
                 #   cellheight_Feature <- 1
                 # }else{
@@ -587,10 +605,10 @@ VizHeatmap <- function(InputData,
                     show_colnames <- FALSE
                     cellwidth_Sample <- 1
                 }
-                # if(Enforce_SampleNames==TRUE){
+                # if (Enforce_SampleNames==TRUE) {
                 #   show_colnames <- TRUE
                 #   cellwidth_Sample <- 9
-                # }else if(nrow(data_path)>50){
+                # }else if (nrow(data_path)>50) {
                 #   show_colnames <- FALSE
                 #   cellwidth_Sample <- 1
                 # }else{
@@ -616,63 +634,65 @@ VizHeatmap <- function(InputData,
                         fontsize_row= 10,
                         fontsize_col = 10,
                         fontsize=9,
-                        main = paste(PlotName," Metabolites: ", i, " Sample:", s, sep="" ),
+                        main = paste0(PlotName," Metabolites: ", i, " Sample:", s),
                         silent = TRUE)
 
                     ## Store the plot in the 'plots' list
                     cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
                     cleaned_s <- gsub("[[:space:],/\\\\]", "-", s)#removes empty spaces and replaces /,\ with -
-                    PlotList[[paste(cleaned_i,cleaned_s, sep="_")]] <- heatmap
+                    PlotList[[paste(cleaned_i, cleaned_s, sep = "_")]] <- heatmap
 
                     #-------- Plot width and heights
                     #Width and height according to Sample and metabolite number
-                    PlotName <- paste(cleaned_i,cleaned_s, sep="_")
+                    PlotName <- paste(cleaned_i, cleaned_s, sep = "_")
                     Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                         SettingsInfo = SettingsInfo, 
                         SettingsFile_Sample = SettingsFile_Sample, 
                         SettingsFile_Metab = SettingsFile_Metab, 
                         PlotName = PlotName)
-                    PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', 
+                    PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", 
                         valueOnly = TRUE)
-                    PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', 
+                    PlotWidth <- grid::convertUnit(Plot_Sized$width, "cm", 
                         valueOnly = TRUE)
                     Plot_Sized %<>%
                         {ggplot2::ggplot() + annotation_custom(.)} %>%
-                        add(theme(panel.background = element_rect(fill = "transparent")))
+                        add(theme(panel.background = element_rect(fill = "transparent"))) ## EDIT: not sure if the %<>% makes this call so much easier to understand. What is the added value?
 
-                    PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- Plot_Sized
+                    PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep = "_")]] <- Plot_Sized
 
                     #----- Save
                     suppressMessages(suppressWarnings(
-                        SaveRes(InputList_DF=NULL,
-                            InputList_Plot= PlotList_adaptedGrid,
-                            SaveAs_Table=NULL,
-                            SaveAs_Plot=SaveAs_Plot,
-                            FolderPath= Folder,
-                            FileName=paste("Heatmap_",PlotName, sep=""),
-                            CoRe=FALSE,
-                            PrintPlot=PrintPlot,
-                            PlotHeight=PlotHeight,
-                            PlotWidth= PlotWidth,
-                            PlotUnit="cm")))
+                        SaveRes(InputList_DF = NULL,
+                            InputList_Plot = PlotList_adaptedGrid,
+                            SaveAs_Table = NULL,
+                            SaveAs_Plot = SaveAs_Plot,
+                            FolderPath = Folder,
+                            FileName = paste0("Heatmap_", PlotName),
+                            CoRe = FALSE,
+                            PrintPlot = PrintPlot,
+                            PlotHeight = PlotHeight,
+                            PlotWidth = PlotWidth,
+                            PlotUnit = "cm")))
                 }
                 else {
                     message(i , " includes <= 2 objects and is hence not plotted.")
                 }
             }
         }
-        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))) ## needed? 
+        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))) ## EDIT: needed? I would return at the end of the fct
         
-    } else if(!("individual_Metab" %in% names(SettingsInfo)) & !("individual_Sample" %in% names(SettingsInfo))) {
+    } else if (!"individual_Metab" %in% names(SettingsInfo) & !"individual_Sample" %in% names(SettingsInfo)) {
 
-        PlotList <- list() # Empty list to store all the plots
-        PlotList_adaptedGrid <- list() # Empty list to store all the plots
+        ## empty list to store all the plots
+        PlotList <- list() 
+        ## empty list to store all the plots
+        PlotList_adaptedGrid <- list() 
 
         ## Column annotation
         col_annot_vars <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
         col_annot<- NULL
         if (length(col_annot_vars) > 0) {
-            for (i in 1:length(col_annot_vars)){
+            for (i in 1:length(col_annot_vars)) {
                 annot_sel <- col_annot_vars[[i]]
                 col_annot[i] <- SettingsFile_Sample %>% 
                     select(annot_sel) %>% 
@@ -687,7 +707,7 @@ VizHeatmap <- function(InputData,
         row_annot_vars <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
         row_annot<- NULL
         if (length(row_annot_vars) > 0) {
-            for (i in 1:length(row_annot_vars)){
+            for (i in 1:length(row_annot_vars)) {
                 annot_sel <- row_annot_vars[[i]]
                 row_annot[i] <- SettingsFile_Metab %>% 
                     select(all_of(annot_sel))
@@ -703,14 +723,14 @@ VizHeatmap <- function(InputData,
         Features <- as.data.frame(t(data))
         show_rownames <- TRUE
         cellheight_Feature <- 9
-        if(!Enforce_FeatureNames & nrow(Features) > 100){
+        if (!Enforce_FeatureNames & nrow(Features) > 100) {
             show_rownames <- FALSE
             cellheight_Feature <- 1
         }
-        #     if(Enforce_FeatureNames==TRUE){
+        #     if (Enforce_FeatureNames==TRUE) {
         #   show_rownames <- TRUE
         #   cellheight_Feature <- 9
-        # }else if(nrow(Features)>100){
+        # }else if (nrow(Features)>100) {
         #   show_rownames <- FALSE
         #   cellheight_Feature <- 1
         # }else{
@@ -725,10 +745,10 @@ VizHeatmap <- function(InputData,
             show_colnames <- FALSE
             cellwidth_Sample <- 1
         }
-        # if(Enforce_SampleNames==TRUE){
+        # if (Enforce_SampleNames==TRUE) {
         #   show_colnames <- TRUE
         #   cellwidth_Sample <- 9
-        # }else if(nrow(data)>50){
+        # }else if (nrow(data)>50) {
         #   show_colnames <- FALSE
         #   cellwidth_Sample <- 1
         # }else{
@@ -767,15 +787,15 @@ VizHeatmap <- function(InputData,
                 SettingsFile_Sample = SettingsFile_Sample, 
                 SettingsFile_Metab = SettingsFile_Metab, 
                 PlotName = PlotName)
-            PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', 
+            PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", 
                 valueOnly = TRUE)
-            PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', 
+            PlotWidth <- grid::convertUnit(Plot_Sized$width, "cm", 
                 valueOnly = TRUE)
-            Plot_Sized %<>%
+            Plot_Sized %<>% ## EDIT: added value of using %<>%
                 {ggplot2::ggplot() + annotation_custom(.)} %>%
                 add(theme(panel.background = element_rect(fill = "transparent")))
 
-            PlotList_adaptedGrid[[paste("Heatmap_",PlotName, sep="")]] <- Plot_Sized
+            PlotList_adaptedGrid[[paste0("Heatmap_", PlotName)]] <- Plot_Sized
 
             #----- Save
             suppressMessages(suppressWarnings(
@@ -784,7 +804,7 @@ VizHeatmap <- function(InputData,
                     SaveAs_Table = NULL,
                     SaveAs_Plot = SaveAs_Plot,
                     FolderPath = Folder,
-                    FileName = paste("Heatmap_", PlotName, sep=""),
+                    FileName = paste0("Heatmap_", PlotName),
                     CoRe = FALSE,
                     PrintPlot = PrintPlot,
                     PlotHeight = PlotHeight,
@@ -792,9 +812,13 @@ VizHeatmap <- function(InputData,
                     PlotUnit = "cm")))
         } else {
             message <- paste0(PlotName , " includes <= 2 objects and is hence not plotted.")
-            logger::log_trace(paste("Message ", message, sep = ""))
+            logger::log_trace(paste0("Message ", message))
             message(message)
         }
     }
-    return(invisible(list("Plot"=PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
+    
+    ## return 
+    invisible(list(
+        "Plot" = PlotList, 
+        "Plot_Sized" = PlotList_adaptedGrid)) ## EDIT: make sure there is one return statement at the end of the fct
 }
