@@ -45,7 +45,7 @@
 #' @description Import and process .csv file to create toy data DF.
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' ToyData("IntraCells_Raw")
 #'
 #' @importFrom readr read_csv cols
 #' @importFrom magrittr %>% extract2
@@ -55,44 +55,46 @@
 #' @export
 #'
 ToyData <- function(Dataset) {
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+    
+    ## ------------ Create log file ----------- ##
+    MetaProViz_Init()
 
-  #Available Datasets:
-  datasets <- list(
-    IntraCells_Raw = "MS55_RawPeakData.csv",
-    IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
-    CultureMedia_Raw = "MS51_RawPeakData.csv",
-    Cells_MetaData = "MappingTable_SelectPathways.csv",
-    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv",
-    Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv",
-    Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv",
-    Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv",
-    Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv",
-    Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv",
-    Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv",
-    AlaninePathways = "AlaninePathways.csv",
-    EquivalentFeatures = "EquivalentFeatureTable.csv",
-    BiocratesFeatureTable = "BiocratesFeatureTable.csv"
-  )
+    ## available Datasets:
+    datasets <- list(
+        IntraCells_Raw = "MS55_RawPeakData.csv",
+        IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
+        CultureMedia_Raw = "MS51_RawPeakData.csv",
+        Cells_MetaData = "MappingTable_SelectPathways.csv",
+        Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv",
+        Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv",
+        Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv",
+        Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv",
+        Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv",
+        Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv",
+        Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv",
+        AlaninePathways = "AlaninePathways.csv",
+        EquivalentFeatures = "EquivalentFeatureTable.csv",
+        BiocratesFeatureTable = "BiocratesFeatureTable.csv"
+    )
 
-  rncols <- c("Code", "Metabolite")
+    rncols <- c("Code", "Metabolite")
 
-  #Load dataset:
-  if (!Dataset %in% names(datasets)) {
-    message <- sprintf("No such dataset: `%s`. Available datasets: %s", Dataset, paste(names(datasets), collapse = ", "))
-    logger::log_trace(paste("Error ", message, sep=""))
-    stop(message)
+    ## Load dataset:
+    if (!Dataset %in% names(datasets)) {
+        message <- sprintf("No such dataset: `%s`. Available datasets: %s", 
+            Dataset, paste(names(datasets), collapse = ", "))
+        logger::log_trace(paste("Error ", message, sep="")) ## EDIT: why not use match.arg?
+        stop(message)
   }
 
-  datasets %>%
-  magrittr::extract2(Dataset) %>%
-    system.file("data", ., package = "MetaProViz") %>%
-    readr::read_csv(col_types = readr::cols()) %>%
-    {`if`(
-    (rncol <- names(.) %>% intersect(rncols)) %>% length,
-    tibble::column_to_rownames(., rncol),
-    .
-    )}
+    datasets %>%
+    magrittr::extract2(Dataset) %>%
+        system.file("data", ., package = "MetaProViz") %>%
+        readr::read_csv(col_types = readr::cols()) %>%
+        {`if`(
+            (rncol <- names(.) %>% intersect(rncols)) %>% length,
+            tibble::column_to_rownames(., rncol),
+            .
+        )} ## EDIT: this looks quite complicated, could it be simplified or documentation be added?
 }
 
