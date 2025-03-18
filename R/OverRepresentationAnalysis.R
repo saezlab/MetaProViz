@@ -42,115 +42,127 @@
 #' @export
 
 ClusterORA <- function(InputData,
-                       SettingsInfo=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-                       RemoveBackground=TRUE,
-                       PathwayFile,
-                       PathwayName="",
-                       minGSSize=10,
-                       maxGSSize=1000 ,
-                       SaveAs_Table= "csv",
-                       FolderPath = NULL){
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+    SettingsInfo = c(ClusterColumn = "RG2_Significant", 
+        BackgroundColumn = "BG_Method", PathwayTerm = "term", 
+        PathwayFeature = "Metabolite"),
+    RemoveBackground = TRUE,
+    PathwayFile,
+    PathwayName = "",
+    minGSSize = 10,
+    maxGSSize = 1000 ,
+    SaveAs_Table = "csv",
+    FolderPath = NULL) {
+  
+    ## ------------ Create log file ----------- ##
+    MetaProViz_Init()
 
+    ## ------------ Check Input files ----------- ##
+    Pathways <- CheckInput_ORA(InputData = InputData,
+        SettingsInfo = SettingsInfo, RemoveBackground = RemoveBackground,
+        PathwayFile = PathwayFile, PathwayName = PathwayName,
+        minGSSize = minGSSize, maxGSSize = maxGSSize, 
+        SaveAs_Table = SaveAs_Table, pCutoff = NULL, PercentageCutoff = NULL)
 
-   ## ------------ Check Input files ----------- ##
-  Pathways <- CheckInput_ORA(InputData=InputData,
-                                          SettingsInfo=SettingsInfo,
-                                          RemoveBackground=RemoveBackground,
-                                          PathwayFile=PathwayFile,
-                                          PathwayName=PathwayName,
-                                          minGSSize=minGSSize,
-                                          maxGSSize=maxGSSize,
-                                          SaveAs_Table=SaveAs_Table,
-                                          pCutoff=NULL,
-                                          PercentageCutoff=NULL)
+    ## ------------ Create Results output folder ----------- ##
+    if (!is.null(SaveAs_Table)) {
+        Folder <- SavePath(FolderName = "ClusterORA", FolderPath = FolderPath)
+        }
 
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
-    Folder <- SavePath(FolderName= "ClusterORA",
-                                    FolderPath=FolderPath)
+    ############################################################################
+    ## ------------ Prepare Data ----------- ##
+    ## open the data
+    if (RemoveBackground) {
+        df <- subset(InputData, 
+            !InputData[[SettingsInfo[["BackgroundColumn"]]]] == "FALSE") %>%
+            rownames_to_column("Metabolite")
+    } else{
+        df <- InputData %>%
+            rownames_to_column("Metabolite")
     }
 
-  ############################################################################################################
-  ## ------------ Prepare Data ----------- ##
-  # open the data
-  if(RemoveBackground==TRUE){
-    df <- subset(InputData, !InputData[[SettingsInfo[["BackgroundColumn"]]]] == "FALSE")%>%
-      rownames_to_column("Metabolite")
-  } else{
-    df <- InputData%>%
-      rownames_to_column("Metabolite")
-  }
+    ## select universe
+    allMetabolites <- as.character(df$Metabolite)
 
-  #Select universe
-  allMetabolites <- as.character(df$Metabolite)
+    ## select clusters
+    grps_labels <- unlist(unique(df[[SettingsInfo[["ClusterColumn"]]]]))
 
-  #Select clusters
-  grps_labels <- unlist(unique(df[[SettingsInfo[["ClusterColumn"]]]]))
+    ## load Pathways
+    Pathway <- Pathways
+    ## term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
+    Term2gene <- Pathway[, c("term", "gene")]
+    ## term and description
+    term2name <- Pathway[, c("term", "Description")]
 
-  #Load Pathways
-  Pathway <- Pathways
-  Term2gene <- Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
-  term2name <- Pathway[,c("term", "Description")]# term and description
+    ## add the number of genes present in each pathway
+    Pathway$Count <- 1
+    Pathway_Mean <- aggregate(Pathway$Count, 
+        by = list(term = Pathway$term), FUN = sum)
+    names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
+    Pathway <- merge(x = Pathway, y = Pathway_Mean, by = "term", all.x = TRUE)
+    Pathway$Count <- NULL
 
-  #Add the number of genes present in each pathway
-  Pathway$Count <- 1
-  Pathway_Mean <- aggregate(Pathway$Count, by=list(term=Pathway$term), FUN=sum)
-  names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
-  Pathway <- merge(x= Pathway, y=Pathway_Mean,by="term", all.x=TRUE)
-  Pathway$Count <- NULL
+    ## ------------ Run ----------- ##
+    ## make an empty list to store the created DFs
+    df_list = list()
+    clusterGo_list = list()
+    
+    ## run ORA
+    for (g in grps_labels) {
+        grpMetabolites <- subset(df, df[[SettingsInfo[["ClusterColumn"]]]] == g)
+        message("Number of metabolites in cluster `", g, "`: ",
+            nrow(grpMetabolites), sep = "")
 
-  ## ------------ Run ----------- ##
-  df_list = list()# Make an empty list to store the created DFs
-  clusterGo_list = list()
-  #Run ORA
-  for(g in grps_labels){
-    grpMetabolites <- subset(df, df[[SettingsInfo[["ClusterColumn"]]]] == g)
-    message("Number of metabolites in cluster `",g, "`: ", nrow(grpMetabolites), sep="")
+        clusterGo <- clusterProfiler::enricher(
+            gene = as.character(grpMetabolites$Metabolite),
+            pvalueCutoff = 1,
+            pAdjustMethod = "BH",
+            universe = allMetabolites,
+            minGSSize = minGSSize,
+            maxGSSize = maxGSSize,
+            qvalueCutoff = 1,
+            TERM2GENE = Term2gene ,
+            TERM2NAME = term2name)
+        clusterGoSummary <- data.frame(clusterGo)
+        clusterGo_list[[g]]<- clusterGo
+        if (!(nrow(clusterGoSummary) == 0)) {
+            ## add pathway information (% of genes in pathway detected)
+            clusterGoSummary <- merge(
+                x = select(clusterGoSummary, -Description), 
+                y = select(Pathway, term, Metabolites_in_Pathway), 
+                by.x = "ID", by.y = "term", all = TRUE)
+            clusterGoSummary$Count[is.na(clusterGoSummary$Count)] <- 0
+            clusterGoSummary$Percentage_of_Pathway_detected <-round(
+                clusterGoSummary$Count / clusterGoSummary$Metabolites_in_Pathway * 100,
+                digits = 2)
+            clusterGoSummary <- clusterGoSummary[!duplicated(clusterGoSummary$ID), ]
+            clusterGoSummary <- clusterGoSummary[order(clusterGoSummary$p.adjust), ]
+            clusterGoSummary <- clusterGoSummary %>%
+                dplyr::rename("Metabolites_in_pathway"="geneID")
 
-    clusterGo <- clusterProfiler::enricher(gene=as.character(grpMetabolites$Metabolite),
-                                           pvalueCutoff = 1,
-                                           pAdjustMethod = "BH",
-                                           universe = allMetabolites,
-                                           minGSSize=minGSSize,
-                                           maxGSSize=maxGSSize,
-                                           qvalueCutoff = 1,
-                                           TERM2GENE=Term2gene ,
-                                           TERM2NAME = term2name)
-    clusterGoSummary <- data.frame(clusterGo)
-    clusterGo_list[[g]]<- clusterGo
-    if(!(dim(clusterGoSummary)[1] == 0)){
-      #Add pathway information (% of genes in pathway detected)
-      clusterGoSummary <- merge(x= clusterGoSummary%>% select(-Description), y=Pathway%>% select(term, Metabolites_in_Pathway), by.x="ID",by.y="term", all=TRUE)
-      clusterGoSummary$Count[is.na(clusterGoSummary$Count)] <- 0
-      clusterGoSummary$Percentage_of_Pathway_detected <-round(((clusterGoSummary$Count/clusterGoSummary$Metabolites_in_Pathway)*100),digits=2)
-      clusterGoSummary <- clusterGoSummary[!duplicated(clusterGoSummary$ID),]
-      clusterGoSummary <- clusterGoSummary[order(clusterGoSummary$p.adjust),]
-      clusterGoSummary <- clusterGoSummary%>%
-        dplyr::rename("Metabolites_in_pathway"="geneID")
-
-      g_save <- gsub("/", "-", g)
-      df_list[[g_save]] <- clusterGoSummary
-    }else{
-      message("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
+            g_save <- gsub("/", "-", g)
+            df_list[[g_save]] <- clusterGoSummary
+        } else {
+            message("None of the Input_data Metabolites of the cluster ", g,
+                " were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
+        }
     }
-  }
-  #Save files
-  suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=df_list,
-                         InputList_Plot= NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=NULL,
-                         FolderPath= Folder,
-                         FileName= paste("ClusterGoSummary",PathwayName, sep="_"),
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)))
+  
+    ## save files
+    suppressMessages(suppressWarnings(
+        SaveRes(InputList_DF = df_list,
+            InputList_Plot = NULL,
+            SaveAs_Table = SaveAs_Table,
+            SaveAs_Plot = NULL,
+            FolderPath = Folder,
+            FileName = paste("ClusterGoSummary", PathwayName, sep = "_"),
+            CoRe = FALSE,
+            PrintPlot = FALSE)))
 
-  #return <- clusterGoSummary
-  ORA_Output <- list("DF"= df_list, "ClusterGo"=clusterGo_list)
+    ## return <- clusterGoSummary
+    ORA_Output <- list("DF" = df_list, "ClusterGo" = clusterGo_list)
 
-  invisible(return(ORA_Output))
+    ## return
+    invisible(ORA_Output)
 }
 
 
@@ -176,126 +188,139 @@ ClusterORA <- function(InputData,
 #' @export
 #'
 StandardORA <- function(InputData,
-                        SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-                        pCutoff=0.05,
-                        PercentageCutoff=10,
-                        PathwayFile,
-                        PathwayName="",
-                        minGSSize=10,
-                        maxGSSize=1000 ,
-                        SaveAs_Table="csv",
-                        FolderPath = NULL
+    SettingsInfo = c(pvalColumn = "p.adj", PercentageColumn = "t.val", 
+        PathwayTerm = "term", PathwayFeature = "Metabolite"),
+    pCutoff = 0.05,
+    PercentageCutoff = 10,
+    PathwayFile,
+    PathwayName = "",
+    minGSSize = 10,
+    maxGSSize = 1000 ,
+    SaveAs_Table = "csv",
+    FolderPath = NULL) {
+  
+    ## ------------ Create log file ----------- ##
+    MetaProViz_Init()
 
-){
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+    ## ------------ Check Input files ----------- ##
+    Pathways <- CheckInput_ORA(InputData = InputData,
+        SettingsInfo = SettingsInfo,
+        RemoveBackground = FALSE,
+        PathwayFile = PathwayFile,
+        PathwayName = PathwayName,
+        minGSSize = minGSSize,
+        maxGSSize = maxGSSize,
+        SaveAs_Table = SaveAs_Table,
+        pCutoff = pCutoff,
+        PercentageCutoff = PercentageCutoff)
 
- ## ------------ Check Input files ----------- ##
-  Pathways <- CheckInput_ORA(InputData=InputData,
-                                          SettingsInfo=SettingsInfo,
-                                          RemoveBackground=FALSE,
-                                          PathwayFile=PathwayFile,
-                                          PathwayName=PathwayName,
-                                          minGSSize=minGSSize,
-                                          maxGSSize=maxGSSize,
-                                          SaveAs_Table=SaveAs_Table,
-                                          pCutoff=pCutoff,
-                                          PercentageCutoff=PercentageCutoff)
-
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
-    Folder <- SavePath(FolderName= "ORA",
-                                    FolderPath=FolderPath)
-  }
-
-  ############################################################################################################
-  ## ------------ Load the data and check ----------- ##
-  InputData<- InputData %>%
-    rownames_to_column("Metabolite")
-
-  #Select universe
-  allMetabolites <- as.character(InputData$Metabolite)
-
-  #select top changed metabolites (Up and down together)
-  #check if the metabolites are significantly changed.
-  value <- PercentageCutoff/100
-
-  allMetabolites_DF <- InputData[order(InputData[[SettingsInfo[["PercentageColumn"]]]]),]# rank by t.val
-  selectMetabolites_DF <- allMetabolites_DF[c(1:(ceiling(value * nrow(allMetabolites_DF))),(nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))),]
-  selectMetabolites_DF$`Top/Bottom`<- "TRUE"
-  selectMetabolites_DF <-merge(allMetabolites_DF,selectMetabolites_DF[,c("Metabolite", "Top/Bottom")], by="Metabolite", all.x=TRUE)
-
-  InputSelection <- selectMetabolites_DF%>%
-    mutate(`Top/Bottom_Percentage` = case_when(`Top/Bottom`==TRUE ~ 'TRUE',
-                                 TRUE ~ 'FALSE'))%>%
-    mutate(Significant = case_when(get(SettingsInfo[["pvalColumn"]]) <= pCutoff ~ 'TRUE',
-                                  TRUE ~ 'FALSE'))%>%
-    mutate(Cluster_ChangedMetabolites = case_when(Significant==TRUE & `Top/Bottom_Percentage`==TRUE ~ 'TRUE',
-                                   TRUE ~ 'FALSE'))
-  InputSelection$`Top/Bottom` <- NULL #remove column as its not needed for output
-
-  selectMetabolites <- InputSelection%>%
-    subset(Cluster_ChangedMetabolites==TRUE)
-  selectMetabolites <-as.character(selectMetabolites$Metabolite)
-
-  #Load Pathways
-  Pathway <- Pathways
-  Term2gene <- Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
-  term2name <- Pathway[,c("term", "Description")]# term and description
-
-  #Add the number of genes present in each pathway
-  Pathway$Count <- 1
-  Pathway_Mean <- aggregate(Pathway$Count, by=list(term=Pathway$term), FUN=sum)
-  names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
-  Pathway <- merge(x= Pathway, y=Pathway_Mean,by="term", all.x=TRUE)
-  Pathway$Count <- NULL
-
-  ## ------------ Run ----------- ##
-  #Run ORA
-  clusterGo <- clusterProfiler::enricher(gene=selectMetabolites,
-                                           pvalueCutoff = 1,
-                                           pAdjustMethod = "BH",
-                                           universe = allMetabolites,
-                                           minGSSize=minGSSize,
-                                           maxGSSize=maxGSSize,
-                                           qvalueCutoff = 1,
-                                           TERM2GENE=Term2gene ,
-                                           TERM2NAME = term2name)
-  clusterGoSummary <- data.frame(clusterGo)
-
-  #Make DF:
-  if(!(dim(clusterGoSummary)[1] == 0)){
-      #Add pathway information % of genes in pathway detected)
-      clusterGoSummary <- merge(x= clusterGoSummary%>% select(-Description), y=Pathway%>% select(term, Metabolites_in_Pathway),by.x="ID",by.y="term", all=TRUE)
-      clusterGoSummary$Count[is.na(clusterGoSummary$Count)] <- 0
-      clusterGoSummary$Percentage_of_Pathway_detected <-round(((clusterGoSummary$Count/clusterGoSummary$Metabolites_in_Pathway)*100),digits=2)
-      clusterGoSummary <- clusterGoSummary[!duplicated(clusterGoSummary$ID),]
-      clusterGoSummary <- clusterGoSummary[order(clusterGoSummary$p.adjust),]
-      clusterGoSummary <- clusterGoSummary%>%
-        dplyr::rename("Metabolites_in_pathway"="geneID")
-  }else{
-    stop("None of the Input_data Metabolites were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
+    ## ------------ Create Results output folder ----------- ##
+    if(!is.null(SaveAs_Table)) {
+        Folder <- SavePath(FolderName= "ORA", FolderPath = FolderPath)
     }
 
-  #Return and save list of DFs
-  ORA_output_list <- list("InputSelection" = InputSelection , "ClusterGoSummary" = clusterGoSummary)
+    ############################################################################
+    ## ------------ Load the data and check ----------- ##
+    InputData<- InputData %>%
+        rownames_to_column("Metabolite")
 
-  #save:
-  suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=ORA_output_list,
-                         InputList_Plot= NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=NULL,
-                         FolderPath= Folder,
-                         FileName= paste(PathwayName),
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)))
+    ## select universe
+    allMetabolites <- as.character(InputData$Metabolite)
 
-  #Return
-  ORA_output_list <- c( ORA_output_list, list("ClusterGo"=clusterGo))
+    ## select top changed metabolites (Up and down together)
+    ## check if the metabolites are significantly changed.
+    value <- PercentageCutoff / 100
 
-  invisible(return(ORA_output_list))
-  }
+    ## rank by t.val
+    allMetabolites_DF <- InputData[
+        order(InputData[[SettingsInfo[["PercentageColumn"]]]]), ]
+    selectMetabolites_DF <- allMetabolites_DF[
+        c(seq_len(ceiling(value * nrow(allMetabolites_DF))),
+            (nrow(allMetabolites_DF) - (ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))), ]
+    selectMetabolites_DF$`Top/Bottom` <- "TRUE"
+    selectMetabolites_DF <- merge(allMetabolites_DF, 
+        selectMetabolites_DF[, c("Metabolite", "Top/Bottom")], 
+        by = "Metabolite", all.x = TRUE)
+
+    InputSelection <- selectMetabolites_DF %>%
+        mutate(`Top/Bottom_Percentage` = case_when(
+            `Top/Bottom` ~ 'TRUE',
+            TRUE ~ 'FALSE')) %>%
+        mutate(Significant = case_when(
+            get(SettingsInfo[["pvalColumn"]]) <= pCutoff ~ 'TRUE',
+            TRUE ~ 'FALSE'))%>%
+        mutate(Cluster_ChangedMetabolites = case_when(
+            Significant & `Top/Bottom_Percentage` ~ 'TRUE',
+            TRUE ~ 'FALSE'))
+    ## remove column as its not needed for output
+    InputSelection$`Top/Bottom` <- NULL 
+
+    selectMetabolites <- InputSelection %>%
+        subset(Cluster_ChangedMetabolites)
+    selectMetabolites <- as.character(selectMetabolites$Metabolite)
+
+    ## load Pathways
+    Pathway <- Pathways
+    ## term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
+    Term2gene <- Pathway[, c("term", "gene")]
+    ## term and description
+    term2name <- Pathway[, c("term", "Description")]
+
+    ## add the number of genes present in each pathway
+    Pathway$Count <- 1
+    Pathway_Mean <- aggregate(Pathway$Count, 
+        by = list(term = Pathway$term), FUN = sum)
+    names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
+    Pathway <- merge(x = Pathway, y = Pathway_Mean, by = "term", all.x = TRUE)
+    Pathway$Count <- NULL
+
+    ## ------------ Run ----------- ##
+    ## run ORA
+    clusterGo <- clusterProfiler::enricher(gene = selectMetabolites,
+        pvalueCutoff = 1,
+        pAdjustMethod = "BH",
+        universe = allMetabolites,
+        minGSSize = minGSSize,
+        maxGSSize = maxGSSize,
+        qvalueCutoff = 1,
+        TERM2GENE = Term2gene ,
+        TERM2NAME = term2name)
+    clusterGoSummary <- data.frame(clusterGo)
+
+    ## make DF:
+    if(!(nrow(clusterGoSummary) == 0)){
+        ## add pathway information % of genes in pathway detected)
+        clusterGoSummary <- merge(x = select(clusterGoSummary, -Description), 
+            y = select(Pathway, term, Metabolites_in_Pathway), 
+            by.x = "ID", by.y = "term", all = TRUE)
+        clusterGoSummary$Count[is.na(clusterGoSummary$Count)] <- 0
+        clusterGoSummary$Percentage_of_Pathway_detected <- round(
+            clusterGoSummary$Count / clusterGoSummary$Metabolites_in_Pathway * 100,
+            digits = 2)
+        clusterGoSummary <- clusterGoSummary[!duplicated(clusterGoSummary$ID), ]
+        clusterGoSummary <- clusterGoSummary[order(clusterGoSummary$p.adjust), ]
+        clusterGoSummary <- clusterGoSummary %>%
+            dplyr::rename("Metabolites_in_pathway" = "geneID")
+    } else {
+        stop("None of the Input_data Metabolites were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
+    }
+
+    ## return and save list of DFs
+    ORA_output_list <- list("InputSelection" = InputSelection , 
+        "ClusterGoSummary" = clusterGoSummary)
+
+    ## save
+    suppressMessages(suppressWarnings(
+        SaveRes(InputList_DF = ORA_output_list,
+            InputList_Plot = NULL, SaveAs_Table = SaveAs_Table,
+            SaveAs_Plot = NULL, FolderPath = Folder,
+            FileName = paste(PathwayName), CoRe = FALSE,
+            PrintPlot = FALSE)))
+
+  ## return
+  ORA_output_list <- c(ORA_output_list, list("ClusterGo" = clusterGo))
+  invisible(ORA_output_list)
+}
 
 
 #################################
