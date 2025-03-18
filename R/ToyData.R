@@ -88,7 +88,7 @@ ToyData <- function(Dataset) {
   }
 
     datasets %>%
-    magrittr::extract2(Dataset) %>%
+    magrittr::extract2(Dataset) %>% ## EDIT: why? can you not just use datasets[[Dataset]]?
         system.file("data", ., package = "MetaProViz") %>%
         readr::read_csv(col_types = readr::cols()) %>%
         {`if`(
