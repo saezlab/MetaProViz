@@ -4,7 +4,7 @@
 \alias{MCA_rules}
 \title{MCA regulatory rules Import}
 \usage{
-MCA_rules(Method)
+MCA_rules(Method = c("2Cond", "CoRe"))
 }
 \arguments{
 \item{Method}{Either "2Cond" or "CoRe" depending which regulatory rules you would like to load}

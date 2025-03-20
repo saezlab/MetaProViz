@@ -5,8 +5,8 @@
 \title{Find metabolites with high variability across total pool samples}
 \usage{
 PoolEstimation(
+  se,
   InputData,
-  SettingsFile_Sample = NULL,
   SettingsInfo = NULL,
   CutoffCV = 30,
   SaveAs_Plot = "svg",
@@ -18,9 +18,7 @@ PoolEstimation(
 \arguments{
 \item{InputData}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.}
 
-\item{SettingsFile_Sample}{\emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}}
-
-\item{SettingsInfo}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
+\item{SettingsInfo}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile.). \strong{Default = NULL}}
 
 \item{CutoffCV}{\emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 30}}
 
@@ -31,6 +29,8 @@ PoolEstimation(
 \item{PrintPlot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+
+\item{SettingsFile_Sample}{\emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}}
 }
 \value{
 List with two elements: DF (including input and output table) and Plot (including all plots generated)
@@ -39,10 +39,18 @@ List with two elements: DF (including input and output table) and Plot (includin
 Find metabolites with high variability across total pool samples
 }
 \examples{
+## load the data
 Intra <- ToyData("IntraCells_Raw")
-Res <- PoolEstimation(InputData=Intra[ ,-c(1:3)],
-                                SettingsFile_Sample=Intra[ , c(1:3)],
-                                SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"))
+
+## create SummarizedExperiment
+a <- t(Intra[, -c(1:3)])
+rD <- DataFrame(feature = rownames(a))
+cD <- Intra[, c(1:3)]
+se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+
+## apply the function
+PoolEstimation(se = se,
+    SettingsInfo = c(Conditions = "Conditions", PoolSamples = "Pool"))
 
 }
 \keyword{Coefficient}

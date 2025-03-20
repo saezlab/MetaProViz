@@ -36,8 +36,10 @@ List with at least three DFs: 1) Original data and the new column of translated 
 Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
-KEGG_Pathways <- MetaProViz::LoadKEGG()
-Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem", "hmdb"))
+KEGG_Pathways <- LoadKEGG()
+Res <- TranslateID(InputData = KEGG_Pathways, 
+    SettingsInfo = c(InputID = "MetaboliteID", GroupingVariable = "term"), 
+    From = c("kegg"), To = c("pubchem", "hmdb"))
 
 }
 \keyword{IDs}

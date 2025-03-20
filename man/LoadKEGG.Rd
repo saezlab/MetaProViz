@@ -16,6 +16,6 @@ Import and process KEGG.
 Imports KEGG pathways into the environment
 }
 \examples{
-KEGG_Pathways <- MetaProViz::LoadKEGG()
+KEGG_Pathways <- LoadKEGG()
 
 }

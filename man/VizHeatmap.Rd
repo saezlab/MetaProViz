@@ -47,7 +47,7 @@ Heatmap visualization
 }
 \examples{
 Intra <- ToyData("IntraCells_Raw")
-Res <- MetaProViz::VizHeatmap(InputData=Intra[,-c(1:3)])
+Res <- VizHeatmap(InputData = Intra[,-c(1:3)])
 
 }
 \keyword{Heatmap}
