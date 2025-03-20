@@ -44,7 +44,7 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
-#' ## load data and 
+#' ## load the data and mapping Info
 #' Intra <- ToyData("IntraCells_Raw")
 #' MappingInfo <- ToyData(Data = "Cells_MetaData")
 #' Media <- ToyData("CultureMedia_Raw")
@@ -52,8 +52,8 @@
 #' ## create SummarizedExperiment objects
 #' ## se_intra
 #' rD <- MappingInfo
-#' cD <- Intra[-c(49:58) , c(1:3)]
-#' a <- t(Intra[-c(49:58) ,-c(1:3)])
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' a <- t(Intra[-c(49:58), -c(1:3)])
 #' 
 #' ## obtain overlapping metabolites
 #' metabolites <- intersect(rownames(a), rownames(rD))
@@ -77,13 +77,9 @@
 #'     se = se_intra,
 #'     SettingsInfo = c(Conditions = "Conditions", 
 #'         Biological_Replicates = "Biological_Replicates"))
-#'          #InputData = Intra[-c(49:58), -c(1:3)],
-#'     #SettingsFile_Sample = Intra[-c(49:58), c(1:3)],
 #'  
 #' ResM <- PreProcessing(
 #'     se = se_media,
-#'     #InputData = Media[-c(40:45) , -c(1:3)],
-#'     #SettingsFile_Sample = Media[-c(40:45), c(1:3)] ,
 #'     SettingsInfo = c(Conditions = "Conditions", 
 #'         Biological_Replicates = "Biological_Replicates", 
 #'         CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"),
@@ -196,7 +192,7 @@ PreProcessing <- function(
     if (TIC) {
         
         ## perform TIC normalization
-        l_tic <- TICNorm(se = se_MVI
+        l_tic <- TICNorm(se = se_MVI,
             SettingsInfo = SettingsInfo,
             TIC = TIC)
         se_tic <- l_tic[["data"]][["se"]]
@@ -333,13 +329,13 @@ PreProcessing <- function(
 #' @return DF with the merged analytical replicates
 #'
 #' @examples
-#' ## load data
+#' ## load the data
 #' Intra <- ToyData("IntraCells_Raw")
 #' 
 #' ## create SummarizedExperiment
-#' a <- t(Intra[-c(49:58) ,-c(1:3)])
+#' a <- t(Intra[-c(49:58), -c(1:3)])
 #' rD <- DataFrame(feature = rownames(a))
-#' cD <- Intra[-c(49:58) , c(1:3)]
+#' cD <- Intra[-c(49:58), c(1:3)]
 #' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
 #' 
 #' ## apply the function
@@ -497,7 +493,7 @@ ReplicateSum <- function(se, ##InputData, ## EDIT: the name of this function is 
 #' @return List with two elements: DF (including input and output table) and Plot (including all plots generated)
 #'
 #' @examples
-#' ## load data
+#' ## load the data
 #' Intra <- ToyData("IntraCells_Raw")
 #' 
 #' ## create SummarizedExperiment
@@ -775,10 +771,18 @@ PoolEstimation <- function(se, InputData,
 #' @return List with two elements: filtered matrix  and features filtered
 #'
 #' @examples
+#' ## load the data
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- FeatureFiltering(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                                      SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
-#'                                      SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' 
+#' ## create SummarizedExperiment
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' rD <- DataFrame(feature = rownames(a))
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' FeatureFiltering(se = se,
+#'     SettingsInfo = c(Conditions = "Conditions", 
+#'     Biological_Replicates = "Biological_Replicates"))
 #'
 #' @keywords feature filtering or modified feature filtering
 #'
@@ -869,7 +873,7 @@ FeatureFiltering <- function(se, ##InputData,
             filtered_matrix <- assay(se)[-miss, ]
         }
     } else if (FeatureFilt ==  "Standard") {
-        message <- paste0 ("FeatureFiltering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y). ", 
+        message <- paste0("FeatureFiltering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y). ", 
             "Filtering value selected:", FeatureFilt_Value)
         logger::log_info(message)
         message(message)
@@ -938,10 +942,19 @@ FeatureFiltering <- function(se, ##InputData,
 #' @return DF with imputed values
 #'
 #' @examples
+#' ## load the data
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- MVImputation(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                                  SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
-#'                                  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' 
+#' ## create SummarizedExperiment
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' rD <- DataFrame(feature = rownames(a))
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' ## apply the function
+#' MVImputation(se = se, 
+#'     SettingsInfo = c(Conditions = "Conditions", 
+#'         Biological_Replicates = "Biological_Replicates"))
 #'
 #' @keywords Half minimum missing value imputation
 #'
@@ -1083,10 +1096,17 @@ MVImputation <- function(se, ##InputData,
 #' @return List with two elements: DF (including output table) and Plot (including all plots generated)
 #'
 #' @examples
+#' ## load data
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- TICNorm(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                             SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
-#'                             SettingsInfo = c(Conditions = "Conditions"))
+#' 
+#' ## create SummarizedExperiment
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' rD <- DataFrame(feature = rownames(a))
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' ## apply the function
+#' TICNorm(se = se, SettingsInfo = c(Conditions = "Conditions"))
 #'
 #' @keywords total ion count normalisation
 #'
@@ -1256,12 +1276,20 @@ TICNorm <- function(se, ##InputData,
 #' @return List with two elements: DF (including output table) and Plot (including all plots generated)
 #'
 #' @examples
+#' ## load the data
 #' Media <- ToyData("CultureMedia_Raw") %>% 
-#'     subset(!Conditions=="Pool") %>% 
-#'     dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
-#' Res <- CoReNorm(InputData = Media[, -c(1:3)],
-#'                             SettingsFile_Sample = Media[, c(1:3)],
-#'                             SettingsInfo = c(Conditions = "Conditions", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"))
+#'     subset(!Conditions=="Pool")
+#'     
+#' ## create the SummarizedExperiment
+#' a <- t(Media[, -c(1:3)])
+#' rD <- DataFrame(feature = rownames(a))
+#' cD <- Media[, c(1:3)]
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' ## apply the function
+#' Res <- CoReNorm(se = se, 
+#'     SettingsInfo = c(Conditions = "Conditions", 
+#'         CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"))
 #'
 #' @keywords Consumption Release Metaqbolomics, Normalisation, Exometabolomics
 #'
@@ -1564,7 +1592,7 @@ CoReNorm <-function(
             }
     } else {
         CoRe_norm_factor <- rep(1, 
-            sum(colData(se)[, SettingsInfo[["Conditions"]]] != SettingsInfo[["CoRe_media"]])
+            sum(colData(se)[, SettingsInfo[["Conditions"]]] != SettingsInfo[["CoRe_media"]]))
     }
 
     ## remove CoRe_media samples from the data
@@ -1615,7 +1643,7 @@ CoReNorm <-function(
 ### ### ### PreProcessing helper function: Outlier detection ### ### ###
 ################################################################################################
 
-#' OutlierDetection
+#' @name OutlierDetection
 #'
 #' @param InputData DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
 #' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
@@ -1626,10 +1654,19 @@ CoReNorm <-function(
 #' @return List with two elements: : DF (including output tables) and Plot (including all plots generated)
 #'
 #' @examples
+#' ## load the data
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- OutlierDetection(InputData=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                                      SettingsFile_Sample=Intra[-c(49:58), c(1:3)],
-#'                                      SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' 
+#' ## create SummarizedExperiment object
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' rD <- DataFrame(feature = rownames(a))
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' ## apply the function
+#' Res <- OutlierDetection(se = se,
+#'     SettingsInfo = c(Conditions = "Conditions", 
+#'         Biological_Replicates = "Biological_Replicates"))
 #'
 #' @keywords Hotellins T2 outlier detection
 #'
