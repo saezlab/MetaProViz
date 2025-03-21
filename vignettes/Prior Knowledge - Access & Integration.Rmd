@@ -540,12 +540,21 @@ These results tell us that:\
 
     -   LIMID: then you would miss at least 89 metabolites with CHEBI+HMDB
 
--   There are two things to note about these observations above:\
+However there are two things to note about these observations above.
 
-    -   These numbers are minimums, the real values are a little higher once you add for instance metabolites with just CHEBI or just LIMID, etc.
+The first is that these numbers are minimums, the real values are a little higher once you add for instance metabolites with just CHEBI or just LIMID, etc.
+So actually, relying upon only LIMID means we miss 151 biocrates metabolites (89 with only HMDB/ChEBI + 22 with only CHEBI + 8 with only HMDB and 32 with no LIMID/CHEBI/HMDB identifiers).
 
-    -   This process isn't considering what the values of these IDs are exactly; maybe some of the HMDB ids are shared for instance for a single metabolite.
-    -> Macabe: What exactly do you want to say with the last bullet point?
+The second point is more nuanced but just as important: we need to keep in mind that there is not a direct 1:1 relationship between the number of Biocrates metabolites with, for instance, a ChEBI ID, and the number of unique ChEBI IDs that they map to.
+This upset plot is treating each Biocrates metabolite as an individual entry and categorising whether it has a ChEBI, HMDB, LIMID ID, etc.
+However we are not considering what those ChEBI, HMDB, LIMIDs actually are.
+So it is possible that there are cases where the number of metabolites is higher, or lower, than the number of unique IDs due to multimapping.
+
+For example, let's say we had 3 Biocrates metabolites with only HMDB IDs.
+These would count as 3 entries in the upset plot.
+But two of these Biocrates metabolites could both map to the same HMDB ID, whereas the other Biocrates metabolite could map to 6 different HMDBs.
+In this case, there are 3 Biocrates metabolites with HMDBs but 7 unique HMDBs.
+So this upset plot should be interpreted with this in mind.
 
 ### 2. Select identifiers to link to PK of interest
 We have inspected the experimental coverage of the metabolite IDs from the Biocrates kit. Next, we have to choose which metabolite identifier to use to link to the PK of choice. Often this choice is dictated by the prior knowledge resource as most of them use a specific identifier.\
