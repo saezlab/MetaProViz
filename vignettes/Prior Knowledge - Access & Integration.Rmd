@@ -568,8 +568,18 @@ processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$result
 print(result_bioc_hmdb_count$plot)
 ```
 
---> Macabe: Explanation why and how this can impact when we match the data to the PK? what is recommended? Maybe refer to your bonus section below!
---> Christina: CountEntries function review. Is this needed or have we already done this elsewhere (CheckMatchID)?
+From this plot we can make a few observations.
+First of all, as already pointed out in the previous section, the number of biocrates cells without any HMDB at all is very high (n=253).
+Secondly, we can see that while a number of biocrates cells have only a single HMDB ID associated with them (n=314), the majority of biocrates metabolites actually have multiple entries (n=452).
+For those with multiple, this ranges from 2-20 HMDB entries per biocrates cell!
+
+With so many biocrates cells linked to multiple HMDB IDs, how should we deal w0.ith this?
+Should we only select a single HMDB ID in cases where we have multiple?
+We discuss the pros and cons of this later in section: [Bonus: Are multiple metabolite IDs helpful or a hindrance?].
+But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `CheckMatchID()` has been designed to handle.
+
+--\> Christina: CountEntries function review.
+Is this needed or have we already done this elsewhere (CheckMatchID)?
 
 ### 3. Make connection to PK and assess overlap
 Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::CheckMatchID()` function.\
@@ -653,7 +663,8 @@ However for a number of other classes of metabolites, we see that they will not 
 This poor coverage of course could be a concern for our analysis if we are interested in analysing many of these classes, since it will mean in this case that our experimental results for Phosphatidylglycerols for instance will not be linked to PK.
 In any case we will certainly need to keep this in mind for downstream analysis and the interpretation of results, so that we don't overinterpret results that for instance have a large number of Amino Acids, or falsely assume that the absence of Phosphatidylinositols in our PK integration results means that they are not present or important in our data.
 
-### Bonus: Are multiple metabolite IDs helpful or a hindrance?
+### Bonus: Are multiple metabolite IDs helpful or a hindrance? {#sect4_bonus}
+
 Let's turn back to consider the number of HMDB IDs we have in the Biocrates data and ask ourself a question: is it helpful or detrimental to have multiple IDs?
 
 To answer this, we will take only the first HMDB of each cell with multiple HMDB IDs and test to see this has worked.
