@@ -274,12 +274,12 @@ LoadRAMP <- function(version = "2.5.4",
     }
 
     ##-------------- Save and return
-    DF_List <- list("ChemicalClass_MetabSet"=HMDB_ChemicalClass)
+    DF_List <- list("ChemicalClass_MetabSet" = HMDB_ChemicalClass)
     suppressMessages(suppressWarnings(
         SaveRes(
             ## This needs to be a list, also for single comparisons
-            InputList_DF = DF_List, 
-            InputList_Plot = NULL,
+            data = DF_List, 
+            plot = NULL,
             SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = NULL,
             FolderPath = SubFolder,
@@ -394,8 +394,8 @@ Make_GeneMetabSet <- function(Input_GeneSet,
     ##-------------- Save and return
     DF_List <- list("GeneMetabSet" = GeneMetabSet, "MetabSet" = MetabSet)
     suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF = DF_List, ##This needs to be a list, also for single comparisons
-            InputList_Plot = NULL,
+        SaveRes(data = DF_List, ##This needs to be a list, also for single comparisons
+            plot = NULL,
             SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = NULL,
             FolderPath = SubFolder,
@@ -701,8 +701,8 @@ LoadMetalinks <- function(types = NULL,
     DF_List <- list("MetalinksDB" = MetalinksDB, 
         "MetalinksDB_Type" = MetalinksDB_Type)
     suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF = DF_List, #This needs to be a list, also for single comparisons
-            InputList_Plot = NULL,
+        SaveRes(data = DF_List, #This needs to be a list, also for single comparisons
+            plot = NULL,
             SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = NULL,
             FolderPath = SubFolder,
