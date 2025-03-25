@@ -45,10 +45,19 @@
 #' @return Dependent on parameter settings, list of lists will be returned for DMA (DF of each comparison), Shapiro (Includes DF and Plot), Bartlett (Includes DF and Histogram), VST (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")[-c(49:58) ,]
-#' ResI <- MetaProViz::DMA(InputData=Intra[ ,-c(1:3)],
-#'                        SettingsFile_Sample=Intra[ , c(1:3)],
-#'                        SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+#' ## load data
+#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' 
+#' ## create SummarizedExperiment
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' rD <- DataFrame(feature = rownames(a))
+#' cD <- Intra[-c(49:58) , c(1:3)]
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' ## apply the function
+#' ResI <- MetaProViz::DMA(se, 
+#'     SettingsInfo = c(Conditions = "Conditions", 
+#'         Numerator = NULL, Denominator  = "HK2"))
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #'
@@ -61,12 +70,12 @@
 #'
 #' @export
 #'
-DMA <-function(InputData,
-    SettingsFile_Sample,
+DMA <-function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
     StatPval = c("lmFit", "aov", "krustal.test", "welch"),
     StatPadj = p.adjust.methods,
-    SettingsFile_Metab = NULL,
+    ##SettingsFile_Metab = NULL,
     CoRe = FALSE,
     VST = FALSE,
     PerformShapiro = TRUE,
@@ -87,38 +96,38 @@ DMA <-function(InputData,
     StatPadj <- match.arg(StatPadj)
     
     ## HelperFunction `CheckInput`
-    CheckInput(InputData = InputData, SettingsFile_Sample = SettingsFile_Sample,
-        SettingsFile_Metab = SettingsFile_Metab, SettingsInfo = SettingsInfo,
+    CheckInput(se = se, SettingsInfo = SettingsInfo,
         SaveAs_Plot = SaveAs_Plot, SaveAs_Table = SaveAs_Table, CoRe = CoRe,
         PrintPlot = PrintPlot)
 
     # HelperFunction `CheckInput` Specific
-    Settings <- CheckInput_DMA(InputData = InputData,
-        SettingsFile_Sample = SettingsFile_Sample, SettingsInfo = SettingsInfo,
+    Settings <- CheckInput_DMA(se, ##InputData = InputData,
+        ##SettingsFile_Sample = SettingsFile_Sample, 
+        SettingsInfo = SettingsInfo,
         StatPval = StatPval, StatPadj = StatPadj,
         PerformShapiro = PerformShapiro, PerformBartlett = PerformBartlett,
         VST = VST, Transform = Transform)
 
     ## ------------ Create Results output folder ----------- ##
     if (!is.null(SaveAs_Plot) | !is.null(SaveAs_Table)) {
-    Folder <- SavePath(FolderName = "DMA", FolderPath = FolderPath)
+        Folder <- SavePath(FolderName = "DMA", FolderPath = FolderPath)
+    
+        if (PerformShapiro) {
+            SubFolder_S <- file.path(Folder, "Shapiro")
+            if (!dir.exists(SubFolder_S)) 
+                dir.create(SubFolder_S)
+        }
 
-    if (PerformShapiro) {
-        SubFolder_S <- file.path(Folder, "Shapiro")
-        if (!dir.exists(SubFolder_S)) 
-            dir.create(SubFolder_S)
-    }
+        if (PerformBartlett) {
+            SubFolder_B <- file.path(Folder, "Bartlett")
+            if (!dir.exists(SubFolder_B)) 
+                dir.create(SubFolder_B)
+        }
 
-    if (PerformBartlett) {
-        SubFolder_B <- file.path(Folder, "Bartlett")
-        if (!dir.exists(SubFolder_B)) 
-            dir.create(SubFolder_B)
-    }
-
-    if (VST) {
-        SubFolder_V <- file.path(Folder, "VST")
-        if (!dir.exists(SubFolder_V))
-            dir.create(SubFolder_V)
+        if (VST) {
+            SubFolder_V <- file.path(Folder, "VST")
+            if (!dir.exists(SubFolder_V))
+                dir.create(SubFolder_V)
         }
     }
 
@@ -133,10 +142,8 @@ DMA <-function(InputData,
         
         tryCatch({
             Shapiro_output <- suppressWarnings(
-                Shapiro(InputData = InputData,
-                    SettingsFile_Sample = SettingsFile_Sample,
-                    SettingsInfo = SettingsInfo, StatPval = StatPval,
-                    QQplots = FALSE))
+                Shapiro(se = se, SettingsInfo = SettingsInfo, 
+                    StatPval = StatPval, QQplots = FALSE))
             }, error = function(e) {
                 message(
                     "Error occurred during Shapiro that performs the Shapiro-Wilk test. Message: ", 
@@ -160,9 +167,7 @@ DMA <-function(InputData,
             
                 tryCatch({
                     Bartlett_output <- suppressWarnings(
-                        Bartlett(InputData = InputData,
-                            SettingsFile_Sample = SettingsFile_Sample,
-                            SettingsInfo=SettingsInfo))
+                        Bartlett(se = se, SettingsInfo = SettingsInfo))
                     },
                     error = function(e) {
                         message(
@@ -176,15 +181,14 @@ DMA <-function(InputData,
     ############################################################################
     #### Prepare the data ######
     ## 1. Metabolite names:
-    savedMetaboliteNames <-  data.frame("InputName" = colnames(InputData))
+    savedMetaboliteNames <-  data.frame("InputName" = rownames(se))
     savedMetaboliteNames$Metabolite <- paste0("M", 
-        seq(1, length(colnames(InputData))))
-    colnames(InputData) <- savedMetaboliteNames$Metabolite
+        seq(1, nrow(se)))
+    rownames(se) <- savedMetaboliteNames$Metabolite
 
     ############################################################################
     ######## Calculate Log2FC, pval, padj, tval and add additional info ########
-    Log2FC_table <- Log2FC_fun(InputData = InputData,
-        SettingsFile_Sample = SettingsFile_Sample, SettingsInfo = SettingsInfo,
+    Log2FC_table <- Log2FC_fun(se, SettingsInfo = SettingsInfo,
         CoRe = CoRe, Transform = Transform)
 
     ############################################################################
@@ -192,23 +196,21 @@ DMA <-function(InputData,
     if (!Settings[["MultipleComparison"]]) {
         
         if (StatPval == "lmFit") {
-            STAT_C1vC2 <- DMA_Stat_limma(InputData = InputData,
-                SettingsFile_Sample = SettingsFile_Sample,
+            STAT_C1vC2 <- DMA_Stat_limma(se, 
                 SettingsInfo = SettingsInfo, StatPadj = StatPadj,
                 Log2FC_table = Log2FC_table, CoRe = CoRe, Transform = Transform)
 
         } else {
-            STAT_C1vC2 <-DMA_Stat_single(InputData = InputData,
-                SettingsFile_Sample = SettingsFile_Sample,
-                SettingsInfo = SettingsInfo, Log2FC_table = Log2FC_table,
-                StatPval = StatPval, StatPadj = StatPadj)
+            STAT_C1vC2 <- DMA_Stat_single(se, 
+                SettingsInfo = SettingsInfo, StatPadj = StatPadj, 
+                Log2FC_table = Log2FC_table, StatPval = StatPval)
         }
     } else { ## MultipleComparison = TRUE
     
         ## Correct data heteroscedasticity
         if (StatPval != "lmFit" & VST) {
-            VST_res <- vst(InputData)
-            InputData <- VST_res[["DFs"]][["Corrected_data"]]
+            VST_res <- vst(se)
+            se <- VST_res[["data"]][["se"]]
         }
 
         if (Settings[["all_vs_all"]]) {
@@ -222,26 +224,19 @@ DMA <-function(InputData,
         }
 
         if (StatPval == "aov") {
-            STAT_C1vC2 <- AOV(InputData = InputData,
-                SettingsFile_Sample = SettingsFile_Sample,
-                SettingsInfo = SettingsInfo,
-                Log2FC_table = Log2FC_table)
+            STAT_C1vC2 <- AOV(se, 
+                SettingsInfo = SettingsInfo, Log2FC_table = Log2FC_table)
         } else if (StatPval == "kruskal.test") {
-            STAT_C1vC2 <- Kruskal(InputData = InputData,
-                SettingsFile_Sample = SettingsFile_Sample,
+            STAT_C1vC2 <- Kruskal(se,
                 SettingsInfo = SettingsInfo, Log2FC_table = Log2FC_table,
                 StatPadj = StatPadj)
         } else if (StatPval == "welch") {
-            STAT_C1vC2 <- Welch(InputData = InputData, 
-                SettingsFile_Sample = SettingsFile_Sample,
+            STAT_C1vC2 <- Welch(se,
                 SettingsInfo = SettingsInfo, Log2FC_table = Log2FC_table)
-    
         } else if (StatPval == "lmFit") {
-            STAT_C1vC2 <- DMA_Stat_limma(InputData = InputData,
-                SettingsFile_Sample = SettingsFile_Sample,
-                SettingsInfo = SettingsInfo, StatPadj = StatPadj,
-                Log2FC_table = Log2FC_table, CoRe = CoRe,
-                Transform = Transform)
+            STAT_C1vC2 <- DMA_Stat_limma(se, 
+                SettingsInfo = SettingsInfo, Log2FC_table = Log2FC_table,
+                StatPadj = StatPadj, CoRe = CoRe, Transform = Transform)
         }
     }
 
@@ -257,10 +252,10 @@ DMA <-function(InputData,
 
     ############################################################################
     ################  Add the metabolite Metadata if available #################
-    if (!is.null(SettingsFile_Metab)) {
+    if (!is.null(rowData(se))) {
         DMA_Output <- lapply(DMA_Output, function(df){
             merge(df, 
-                tibble::rownames_to_column(SettingsFile_Metab, "Metabolite"), 
+                tibble::rownames_to_column(as.data.frame(rowData(se)), "Metabolite"), 
                 by = "Metabolite", all.x = TRUE)
       })
     }
@@ -277,7 +272,7 @@ DMA <-function(InputData,
             
             ## Filter only columns where the part after "CoRe_" is in valid_conditions
             core_col <- core_col[str_remove(core_col, "^CoRe_") %in% 
-                unique(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])]
+                unique(colData(se)[[SettingsInfo[["Conditions"]]]])]
 
             ## Select only the relevant columns and return
             df %>%
@@ -297,9 +292,9 @@ DMA <-function(InputData,
             select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))
 
         ## Add to Metadata file:
-        if (!is.null(SettingsFile_Metab)){
+        if (!is.null(rowData(se))){
             Feature_Metadata <- merge(
-                tibble::rownames_to_column(SettingsFile_Metab, "Metabolite"), 
+                tibble::rownames_to_column(rowData(se), "Metabolite"), 
                 Feature_Metadata , by = "Metabolite", all.x = TRUE)
         }
     }
@@ -312,24 +307,32 @@ DMA <-function(InputData,
         VolPlot_SettingsFile <- DMA_Output
     } else {
         x <- "Log2FC"
-        VolPlot_SettingsInfo= NULL
-        VolPlot_SettingsFile = NULL
+        VolPlot_SettingsInfo <- NULL
+        VolPlot_SettingsFile <- NULL
     }
 
     volplotList = list()
     for (DF in names(DMA_Output)) { # DF = names(DMA_Output)[2]
-        Volplotdata<- DMA_Output[[DF]]
+        Volplotdata <- DMA_Output[[DF]] |>
+            column_to_rownames("Metabolite")
 
+        cD <- data.frame(name = colnames(Volplotdata |> select(-feature)))
+        rownames(cD) <- cD$name
+        se_volcano <- SummarizedExperiment(
+            assays = column_to_rownames(DMA_Output[[DF]], "Metabolite") |> select(-feature), 
+            colData = cD,
+            rowData = column_to_rownames(DMA_Output[[DF]], "Metabolite"))
+        
         if (CoRe) {
             VolPlot_SettingsFile <- DMA_Output[[DF]] %>%
                 tibble::column_to_rownames("Metabolite")
         }
 
         dev.new()
-        VolcanoPlot <- invisible(VizVolcano(PlotSettings = "Standard",
-            InputData = tibble::column_to_rownames(Volplotdata, "Metabolite"),
+        VolcanoPlot <- invisible(VizVolcano(PlotSettings = "Standard", ### continue from here
+            se = se_volcano, ##InputData = tibble::column_to_rownames(Volplotdata, "Metabolite"),
             SettingsInfo = VolPlot_SettingsInfo,
-            SettingsFile_Metab = VolPlot_SettingsFile,
+            ##SettingsFile_Metab = VolPlot_SettingsFile,
             y = "p.adj", x = x, PlotName = DF,
             Subtitle = bquote(italic("Differential Metabolite Analysis")),
             SaveAs_Plot = NULL))
@@ -348,8 +351,8 @@ DMA <-function(InputData,
     
     if (PerformShapiro & exists("Shapiro_output")) {
         suppressMessages(suppressWarnings(
-            SaveRes(InputList_DF = Shapiro_output[["DF"]],
-                InputList_Plot = Shapiro_output[["Plot"]][["Distributions"]],
+            SaveRes(data = Shapiro_output[["DF"]],
+                plot = Shapiro_output[["Plot"]][["Distributions"]],
                 SaveAs_Table = SaveAs_Table, SaveAs_Plot = SaveAs_Plot,
                 FolderPath = SubFolder_S, FileName = "ShapiroTest",
                 CoRe = CoRe, PrintPlot = PrintPlot)))
@@ -358,8 +361,8 @@ DMA <-function(InputData,
 
     if (PerformBartlett & exists("Bartlett_output")) {
         suppressMessages(suppressWarnings(
-            SaveRes(InputList_DF = Bartlett_output[["DF"]],
-                InputList_Plot = Bartlett_output[["Plot"]],
+            SaveRes(data = Bartlett_output[["DF"]],
+                plot = Bartlett_output[["Plot"]],
                 SaveAs_Table = SaveAs_Table, SaveAs_Plot = SaveAs_Plot,
                 FolderPath = SubFolder_B, FileName = "BartlettTest",
                 CoRe = CoRe, PrintPlot = PrintPlot)))
@@ -369,8 +372,8 @@ DMA <-function(InputData,
 
     if (VST & exists("VST_res")) {
         suppressMessages(suppressWarnings(
-            SaveRes(InputList_DF = VST_res[["DF"]],
-                InputList_Plot = VST_res[["Plot"]], SaveAs_Table = SaveAs_Table,
+            SaveRes(data = VST_res[["DF"]],
+                plot = VST_res[["Plot"]], SaveAs_Table = SaveAs_Table,
                 SaveAs_Plot = SaveAs_Plot, FolderPath = SubFolder_V,
                 FileName = "VST_res", CoRe = CoRe, PrintPlot = PrintPlot)))
         DMA_Output_List <- c(DMA_Output_List, list("VSTres" = Bartlett_output))
@@ -378,8 +381,8 @@ DMA <-function(InputData,
 
     if (CoRE) {
         suppressMessages(suppressWarnings(
-            SaveRes(InputList_DF = list("Feature_Metadata" = Feature_Metadata),
-                InputList_Plot = NULL, SaveAs_Table = SaveAs_Table,
+            SaveRes(data = list("Feature_Metadata" = Feature_Metadata),
+                plot = NULL, SaveAs_Table = SaveAs_Table,
                 SaveAs_Plot = NULL, FolderPath = Folder, FileName = "DMA",
                 CoRe = CoRe, PrintPlot = PrintPlot)))
         DMA_Output_List <- c(DMA_Output_List, 
@@ -387,8 +390,8 @@ DMA <-function(InputData,
     }
 
     suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF = DMA_Output, ##This needs to be a list, also for single comparisons
-            InputList_Plot = volplotList, SaveAs_Table = SaveAs_Table,
+        SaveRes(data = DMA_Output, ##This needs to be a list, also for single comparisons
+            plot = volplotList, SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = SaveAs_Plot, FolderPath = Folder, FileName = "DMA",
             CoRe = CoRe, PrintPlot = PrintPlot)))
     DMA_Output_List <- c(DMA_Output_List, 
@@ -422,8 +425,8 @@ DMA <-function(InputData,
 #'
 #' @noRd
 #'
-Log2FC_fun <-function(InputData,
-    SettingsFile_Sample,
+Log2FC_fun <-function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo=c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
     CoRe=FALSE,
     Transform=TRUE) {
@@ -434,8 +437,8 @@ Log2FC_fun <-function(InputData,
     ## ------------ Assignments ----------- ##
     if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ## all-vs-all: Generate all pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
-        denominator <-unique(conditions)
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
+        denominator <- unique(conditions)
         numerator <- denominator
         comparisons <- combn(unique(conditions), 2) %>% 
             as.matrix()
@@ -445,7 +448,7 @@ Log2FC_fun <-function(InputData,
         all_vs_all <- TRUE
     } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ##all-vs-one: Generate the pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
         numerator <- unique(conditions)
         
@@ -469,20 +472,16 @@ Log2FC_fun <-function(InputData,
     }
 
     ## ------------ Check Missingness ------------- ##
-    Num <- InputData %>% 
-        ##Are sample numbers enough?
-        filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
-        ## only keep numeric columns with metabolite values
-        dplyr::select_if (is.numeric)
-    Denom <- InputData %>%
-        dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-        dplyr::select_if (is.numeric)
+    cols_num <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% numerator
+    Num <- t(assay(se)[, cols_num])
+    cols_denom <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% denominator
+    Denom <- t(assay(se)[, cols_denom])
 
     Num_Miss <- replace(Num, Num == 0, NA)
-    Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
+    Num_Miss <- Num_Miss[, colSums(is.na(Num_Miss)) > 0, drop = FALSE]
 
     Denom_Miss <- replace(Denom, Denom == 0, NA)
-    Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
+    Denom_Miss <- Denom_Miss[, colSums(is.na(Denom_Miss)) > 0, drop = FALSE]
 
     if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) == 0){
         Metabolites_Miss <- colnames(Num_Miss)
@@ -509,15 +508,12 @@ Log2FC_fun <-function(InputData,
     ############################################################################
     ## ----------------- Log2FC ----------------------------
     Log2FC_table <- list() ## Create an empty list to store results data frames
-    for (column in seq_len(dim(comparisons)[2])) {
-        C1 <- InputData %>% ## Numerator
-            dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1, column]) %>%
-            ## only keep numeric columns with metabolite values
-            dplyr::select_if (is.numeric)
-        C2 <- InputData %>% ## Deniminator
-            dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[2, column]) %>%
-            ## only keep numeric columns with metabolite values
-            dplyr::select_if (is.numeric)
+    
+    for (column in seq_len(ncol(comparisons))) {
+        cols_num <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% comparisons[1, column]
+        C1 <- t(assay(se)[, cols_num]) ## Numerator
+        cols_denom <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% comparisons[2, column]
+        C2 <- t(assay(se)[, cols_denom]) ## Denominator
 
         ## ------------  Calculate Log2FC ----------- ##
         ## For C1_Mean and C2_Mean use 0 to obtain values, leading to 
@@ -526,31 +522,39 @@ Log2FC_fun <-function(InputData,
         C1_Zero <- C1
         C1_Zero[is.na(C1_Zero)] <- 0
         Mean_C1 <- C1_Zero %>%
+            as.data.frame() |>
             dplyr::summarise_all("mean")
 
         C2_Zero <- C2
         C2_Zero[is.na(C2_Zero)] <- 0
         Mean_C2 <- C2_Zero %>%
+            as.data.frame() |>
             dplyr::summarise_all("mean")
 
         ## calculate absolute distance between the means. log2 transform and 
         ## add sign (-/+):
         ## CoRe values can be negative and positive, which can does not allow 
         ## us to calculate a Log2FC.
-        if (CoRe) {
-            Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
-                tibble::rownames_to_column("Metabolite")
-            Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
-                tibble::rownames_to_column("Metabolite")
-            Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by = "Metabolite", 
-                    all = TRUE) %>%
-                dplyr::rename("C1"=2, "C2"=3)
-
-            ## Deal with NA/0s
-            ## create column to enable the check if mean values of 0 are due 
-            ## to missing values (NA/0) and not by coincidence
-            Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
-
+        
+        
+        ## Mean values could be 0, which can not be used to calculate a 
+        ## Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) 
+        ## for A and/or B being 0, with x being set to 1
+        Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
+            tibble::rownames_to_column("Metabolite")
+        Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
+            tibble::rownames_to_column("Metabolite")
+        Mean_Merge <- merge(Mean_C1_t, Mean_C2_t, by = "Metabolite", 
+                all = TRUE) %>%
+            dplyr::rename("C1" = 2, "C2" = 3)
+        
+        ## Deal with NA/0s
+        ## create column to enable the check if mean values of 0 are due 
+        ## to missing values (NA/0) and not by coincidence
+        Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
+        
+        if (CoRe) { ## EDIT: can this be simplified? Identify steps that are identical between CoRe and !CoRe and try to remove duplicated code
+            
             if (any(
                 (!Mean_Merge$`NA/0` & Mean_Merge$C1 == 0) | (!Mean_Merge$`NA/0` & Mean_Merge$C2 == 0))) {
                 
@@ -583,7 +587,7 @@ Log2FC_fun <-function(InputData,
                             ## here we have a "false" 0 value that occured at 
                             ## random and not due to 0/NAs in the input data, 
                             ## hence we add the constant +1
-                            C1 == 0 & !`NA/0` ~ paste(C2 + 1),
+                            C1 == 0 & !`NA/0` ~ paste(C2 + 1), ## EDIT: is this correct
                             ## here we have a "false" 0 value that occured at 
                             ## random and not due to 0/NAs in the input data, 
                             ## hence we add the constant +1
@@ -646,7 +650,7 @@ Log2FC_fun <-function(InputData,
                 sep = "_")
             names(CoRe_info)[4] <- "CoRe_specific"
 
-            CoRe_info <-CoRe_info %>%
+            CoRe_info <- CoRe_info %>%
                 dplyr::mutate(CoRe = case_when(
                     CoRe_specific == "Released" ~ 'Released',
                     CoRe_specific == "Consumed" ~ 'Consumed',
@@ -706,21 +710,8 @@ Log2FC_fun <-function(InputData,
             } else {
                 Log2FC_table <- Log2FC_C1vC2
             }
-        } else if (!CoRe) {
-            ## Mean values could be 0, which can not be used to calculate a 
-            ## Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) 
-            ## for A and/or B being 0, with x being set to 1
-            Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
-                tibble::rownames_to_column("Metabolite")
-            Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
-                tibble::rownames_to_column("Metabolite")
-            Mean_Merge <- merge(Mean_C1_t, Mean_C2_t, by = "Metabolite", 
-                    all = TRUE) %>%
-                dplyr::rename("C1" = 2, "C2" = 3)
-            ## create column to enable the check if mean values of 0 are due 
-            ## to missing values (NA/0) and not by coincidence
-            Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
-
+        } else { ## !Core
+            
             Mean_Merge <- Mean_Merge %>%
                 dplyr::mutate(C1_Adapted = case_when(
                     ## here we have a "true" 0 value due to 0/NAs in the input data
@@ -769,7 +760,7 @@ Log2FC_fun <-function(InputData,
                 ## calculate FoldChange
                 Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted 
                 Mean_Merge$Log2FC <- gtools::foldchange2logratio(
-                    Mean_Merge$FC_C1vC2, base=2)
+                    Mean_Merge$FC_C1vC2, base = 2)
             }
 
             if (!Transform) {
@@ -814,8 +805,6 @@ Log2FC_fun <-function(InputData,
 
 
 
-
-
 ##########################################################################################
 ### ### ### DMA helper function: Internal Function to perform single comparison ### ### ###
 ##########################################################################################
@@ -840,8 +829,8 @@ Log2FC_fun <-function(InputData,
 #'
 #' @noRd
 #'
-DMA_Stat_single <- function(InputData,
-    SettingsFile_Sample,
+DMA_Stat_single <- function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo,
     Log2FC_table = NULL,
     StatPval = "t.test", ## FEAT: add options
@@ -855,16 +844,11 @@ DMA_Stat_single <- function(InputData,
     StatPadj <- match.arg(StatPadj)
     
     ## ------------ Check Missingness ------------- ##
-    Num <- InputData %>%#Are sample numbers enough?
-        dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% 
-            SettingsInfo[["Numerator"]]) %>%
-        ## only keep numeric columns with metabolite values
-        dplyr::select_if (is.numeric)
-    Denom <- InputData %>%
-        dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% 
-            SettingsInfo[["Denominator"]]) %>%
-        dplyr::select_if (is.numeric)
-
+    cols_num <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Numerator"]]
+    Num <- t(assay(se)[, cols_num])
+    cols_denom <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% SettingsInfo[["Denominator"]]
+    Denom <- t(assay(se)[, cols_denom])
+    
     Num_Miss <- replace(Num, Num == 0, NA)
     Num_Miss <- Num_Miss[, colSums(is.na(Num_Miss)) > 0, drop = FALSE]
 
@@ -889,25 +873,19 @@ DMA_Stat_single <- function(InputData,
     ## ------------ Perform Hypothesis testing ----------- ##
     for (column in seq_len(ncol(comparisons))) {
         ## Numerator
-        C1 <- InputData %>% 
-            dplyr::filter(
-                SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[1, column]) %>%
-            ## only keep numeric columns with metabolite values
-            dplyr::select_if (is.numeric)
+        cols_num <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% comparisons[1, column]
+        C1 <- t(assay(se)[, cols_num])
         ## Denominator
-        C2 <- InputData %>%
-            dplyr::filter(
-                SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% comparisons[2,column]) %>%
-            ## only keep numeric columns with metabolite values
-            dplyr::select_if (is.numeric)
-    }
+        cols_denom <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% comparisons[2, column]
+        C2 <- t(assay(se)[, cols_denom])
+    } ## EDIT: What is going on here? Should the for loop be extended to all downstream operations?
 
     ## For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
     C1[is.na(C1)] <- 0
     C2[is.na(C2)] <- 0
 
     #### 1. p.value and test statistics (=t.val)
-    T_C1vC2 <- mapply(StatPval, x = as.data.frame(C2), y = as.data.frame(C1), 
+    T_C1vC2 <- mapply(FUN = StatPval, x = as.data.frame(C2), y = as.data.frame(C1), 
         SIMPLIFY = FALSE)
 
     VecPVAL_C1vC2 <- c()
@@ -915,14 +893,15 @@ DMA_Stat_single <- function(InputData,
     for (i in 1:length(T_C1vC2)) {
         ## extract p-values and t-values
         p_value <- unlist(T_C1vC2[[i]][3])
-        t_value <- unlist(T_C1vC2[[i]])[1]## FEAT: I would do this rather by calling explicitly the name instead of indexing
-        VecPVAL_C1vC2[i] <- p_value ## FEAT: why not write directly to VecPVAL_C1vC2 and VecTVAL_C1vC2?
+        t_value <- unlist(T_C1vC2[[i]])[1]## EDIT: I would do this rather by calling explicitly the name instead of indexing
+        VecPVAL_C1vC2[i] <- p_value ## EDITs: why not write directly to VecPVAL_C1vC2 and VecTVAL_C1vC2?
         VecTVAL_C1vC2[i] <- t_value
     }
     Metabolite <- colnames(C2)
     PVal_C1vC2 <- data.frame(Metabolite, p.val = VecPVAL_C1vC2, t.val = VecTVAL_C1vC2)
 
-    ## we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
+    ## we set p.val= NA, for metabolites that had 1 or more replicates with 
+    ## NA/0 values and remove them prior to p-value adjustment
     PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
     PVal_C1vC2 <- PVal_C1vC2 %>%
         dplyr::mutate(p.val = case_when(
@@ -936,7 +915,8 @@ DMA_Stat_single <- function(InputData,
     PVal_C1vC2 <- PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
     ## perform adjustment
-    VecPADJ_C1vC2 <- stats::p.adjust((PVal_C1vC2[, 2]), method = StatPadj, n = length((PVal_C1vC2[, 2]))) ## p-adjusted
+    VecPADJ_C1vC2 <- stats::p.adjust(PVal_C1vC2[, 2], method = StatPadj, 
+        n = length((PVal_C1vC2[, 2]))) ## p-adjusted
     Metabolite <- PVal_C1vC2[, 1]
     PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
     STAT_C1vC2 <- merge(PVal_C1vC2, PADJ_C1vC2, by = "Metabolite")
@@ -987,10 +967,10 @@ DMA_Stat_single <- function(InputData,
 #'
 #' @noRd
 #'
-AOV <-function(InputData,
-               SettingsFile_Sample,
-               SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
-               Log2FC_table = NULL){
+AOV <-function(se, ##InputData,
+    ##SettingsFile_Sample,
+    SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
+    Log2FC_table = NULL){
 
     ## ------------ Create log file ----------- ##
     MetaProViz_Init()
@@ -1001,9 +981,9 @@ AOV <-function(InputData,
     if (!"Denominator" %in% names(SettingsInfo)  & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: line 1001-1028 is replicated across several functions and should be written as a function
         
         ## all-vs-all: Generate all pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <-unique(conditions)
-        numerator <-unique(conditions)
+        numerator <- unique(conditions)
         comparisons <- combn(unique(conditions), 2) %>% 
             as.matrix()
         
@@ -1013,9 +993,9 @@ AOV <-function(InputData,
     } else if ("Denominator" %in% names(SettingsInfo)  & !"Numerator" %in% names(SettingsInfo)) {
         
         ## all-vs-one: Generate the pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
-        numerator <-unique(conditions)
+        numerator <- unique(conditions)
         
         ## remove denom from num
         numerator <- numerator[!numerator %in% denominator]
@@ -1029,16 +1009,16 @@ AOV <-function(InputData,
 
     #############################################################################################
     ## 1. Anova p.val
-    aov.res <- apply(InputData, 2, function(x) stats::aov(x ~ conditions))
+    aov.res <- apply(assay(se), 1, function(x) stats::aov(x ~ conditions))
 
     ## 2. Tukey test p.adj
     posthoc.res <- lapply(aov.res, stats::TukeyHSD, conf.level = 0.95)
-    Tukey_res <- do.call('rbind', 
-        lapply(posthoc.res, function(x) x[1][[1]][, 'p adj'])) %>% 
+    Tukey_res <- do.call("rbind", 
+        lapply(posthoc.res, function(x) x[1][[1]][, "p adj"])) %>% 
         as.data.frame()
 
-    comps <-   paste(comparisons[1, ], comparisons[2, ], sep = "-") ## normal
-    opp_comps <-  paste(comparisons[2, ], comparisons[1, ], sep = "-")
+    comps <-paste(comparisons[1, ], comparisons[2, ], sep = "-") ## normal
+    opp_comps <- paste(comparisons[2, ], comparisons[1, ], sep = "-")
 
     ## if opposite comparisons is true
     if (sum(opp_comps %in%  colnames(Tukey_res)) > 0) {
@@ -1048,8 +1028,8 @@ AOV <-function(InputData,
     }
 
     ## 3. t.val
-    Tukey_res_diff <- do.call('rbind', 
-        lapply(posthoc.res, function(x) x[1][[1]][,'diff'])) %>% ## EDIT: could be "recycled" from l1036?
+    Tukey_res_diff <- do.call("rbind", 
+        lapply(posthoc.res, function(x) x[1][[1]][, "diff"])) %>% ## EDIT: could be "recycled" from l1043?
         as.data.frame()
 
     ## if oposite comparisons is true
@@ -1060,9 +1040,9 @@ AOV <-function(InputData,
     }
 
     ## Make output DFs:
-    Pval_table <- Tukey_res
-    Pval_table <- tibble::rownames_to_column(Pval_table,"Metabolite")
-    Tval_table <- tibble::rownames_to_column(Tukey_res_diff,"Metabolite")
+    Pval_table <- Tukey_res |>
+        tibble::rownames_to_column("Metabolite")
+    Tval_table <- tibble::rownames_to_column(Tukey_res_diff, "Metabolite")
     
     ## here we need to adapt for one_vs_all or all_vs_all
     common_col_names <- setdiff(names(Tukey_res_diff), "row.names")
@@ -1149,8 +1129,8 @@ AOV <-function(InputData,
 #'
 #' @noRd
 #'
-Kruskal <-function(InputData,
-    SettingsFile_Sample,
+Kruskal <- function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
     Log2FC_table = NULL,
     StatPadj = p.adjust.methods) {
@@ -1158,14 +1138,16 @@ Kruskal <-function(InputData,
     ## ------------ Create log file ----------- ##
     MetaProViz_Init()
 
+    ## match arguments
     StatPadj <- match.arg(StatPadj)
+    
     ## ------------ Denominator/numerator ----------- ##
     ## Denominator and numerator: Define if we compare one_vs_one, 
     ## one_vs_all or all_vs_all.
     if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: this is replicated and should be written as a function
         
         ## all-vs-all: Generate all pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- unique(conditions)
         numerator <- unique(conditions)
         comparisons <- combn(unique(conditions), 2) %>%
@@ -1177,9 +1159,9 @@ Kruskal <-function(InputData,
         
     } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ## all-vs-one: Generate the pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
-        numerator <-unique(conditions)
+        numerator <- unique(conditions)
         
         ## Remove denom from num
         numerator <- numerator[!numerator %in% denominator]
@@ -1193,14 +1175,14 @@ Kruskal <-function(InputData,
 
     #############################################################################################
     ## Kruskal test (p.val)
-    aov.res <- apply(InputData,2,function(x) stats::kruskal.test(x~conditions))
-    anova_res <- do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
+    aov.res <- apply(assay(se), 2, function(x) stats::kruskal.test(x ~ conditions))
+    anova_res <- do.call("rbind", lapply(aov.res, function(x) x["p.value"]))
     anova_res <- as.matrix(dplyr::mutate_all(as.data.frame(anova_res), 
         function(x) as.numeric(as.character(x))))
     colnames(anova_res) = c("Kruskal_p.val")
 
     ## Dunn test (p.adj)
-    Dunndata <- InputData %>%
+    Dunndata <- assay(se) %>%
         dplyr::mutate(conditions = conditions) %>%
         dplyr::select(conditions, everything()) %>%
         as.data.frame()
@@ -1251,7 +1233,7 @@ Kruskal <-function(InputData,
         as.data.frame()
     Tval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Tres), 
             function(x) as.numeric(as.character(x)))) %>%
-        as.data.frame()%>%
+        as.data.frame() %>%
         tibble::rownames_to_column("Metabolite")
 
     common_col_names <- setdiff(names(Dunn_Pres), "row.names")
@@ -1315,8 +1297,9 @@ Kruskal <-function(InputData,
 #'
 #' @noRd
 #'
-Welch <-function(InputData,
-    SettingsFile_Sample,
+Welch <-function(##InputData,
+    se,
+    ##SettingsFile_Sample,
     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = NULL),
     Log2FC_table = NULL) {
     
@@ -1329,7 +1312,7 @@ Welch <-function(InputData,
     if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: this is replicated and should be written as a function
         
         ## all-vs-all: Generate all pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- unique(conditions)
         numerator <- unique(conditions)
         comparisons <- combn(unique(conditions), 2) %>%
@@ -1341,7 +1324,7 @@ Welch <-function(InputData,
         
     } else if ("Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) {
         ## all-vs-one: Generate the pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
         numerator <-unique(conditions)
         
@@ -1359,16 +1342,16 @@ Welch <-function(InputData,
     ## 1. Welch's ANOVA using oneway.test is not used by the Games post.hoc 
     ## function
     #aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
-    games_data <- merge(SettingsFile_Sample, InputData, by = 0) %>%
+    games_data <- merge(colData(se), t(assay(se)), by = 0) %>%
         dplyr::rename("conditions" = SettingsInfo[["Conditions"]])
     games_data$conditions <- conditions
     posthoc.res.list <- list()
 
     ## 2. Games post hoc test
-    for (col in names(InputData)) { # col = names(Input_data)[1]
+    for (row in rownames(se)) { # col = names(Input_data)[1]
         posthoc.res <- rstatix::games_howell_test(data = games_data, ## EDIT: why use :: ?? if you define those in the NAMESPACE, also applies to other instances in the package
                 detailed =TRUE, 
-                formula = as.formula(paste0(`col`, " ~ ", "conditions"))) %>% 
+                formula = as.formula(paste0(`row`, " ~ ", "conditions"))) %>% 
             as.data.frame()
 
         result.df <- rbind(
@@ -1378,11 +1361,11 @@ Welch <-function(InputData,
             data.frame(p.adj = posthoc.res[,"p.adj"],
                 t.val = -posthoc.res[,"statistic"],
                 row.names = paste(posthoc.res[["group2"]], posthoc.res[["group1"]], sep = "-")))
-        posthoc.res.list[[col]] <- result.df
+        posthoc.res.list[[row]] <- result.df
     }
     
-    Games_Pres <- do.call('rbind', lapply(posthoc.res.list, 
-            function(x) x[,'p.adj'])) %>% 
+    Games_Pres <- do.call("rbind", lapply(posthoc.res.list, 
+            function(x) x[, "p.adj"])) %>% 
         as.data.frame()
     colnames(Games_Pres) <- rownames(posthoc.res.list[[1]])
     comps <-   paste(comparisons[1, ], comparisons[2, ], sep = "-")# normal
@@ -1393,8 +1376,8 @@ Welch <-function(InputData,
     Games_Pres[Games_Pres == 0] <- 0.000001
 
     ## 3. t.val
-    Games_Tres <- do.call('rbind', 
-            lapply(posthoc.res.list, function(x) x[,'t.val'])) %>% 
+    Games_Tres <- do.call("rbind", 
+            lapply(posthoc.res.list, function(x) x[, "t.val"])) %>% 
         as.data.frame()
     colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
     Games_Tres <- Games_Tres[, colnames(Games_Tres) %in% comps] %>% 
@@ -1472,8 +1455,8 @@ Welch <-function(InputData,
 #'
 #' @noRd
 #'
-DMA_Stat_limma <- function(InputData,
-    SettingsFile_Sample,
+DMA_Stat_limma <- function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = NULL),
     Log2FC_table = NULL,
     StatPadj = p.adjust.methods,
@@ -1501,41 +1484,53 @@ DMA_Stat_limma <- function(InputData,
 
     ## ensure that Input_data is ordered by conditions and sample names are 
     ## the same as in Input_SettingsFile_Sample:
-    targets <- SettingsFile_Sample %>%
+    targets <- colData(se) |>
+        as.data.frame() |>
         tibble::rownames_to_column("sample")
-    targets<- targets[,c("sample", SettingsInfo[["Conditions"]])] %>%
-        dplyr::rename("condition" = 2) %>%
-        ## order the column "sample" alphabetically
-        dplyr::arrange(sample)
-    ## make appropriate condition names accepted by limma
-    targets$condition_limma_compatible <- make.names(targets$condition) ## EDIT: mutate(condition_limma_compatible = make.names(...))
+    targets <- targets[, c("sample", SettingsInfo[["Conditions"]])] %>%
+        dplyr::rename("condition" = 2) |># %>%
+        ### order the column "sample" alphabetically
+        #dplyr::arrange(sample)
+        ## make appropriate condition names accepted by limma
+        mutate(condition_limma_compatible = make.names(condition))
 
+    ## create Limma_input
+    Limma_input <- assay(se) %>%
+        t() |>
+        as.data.frame() |>
+        tibble::rownames_to_column("sample")
+    
+    ## update Limma_input if MultipleComparison == FALSE
     if (!MultipleComparison) {
         ## subset the data:
         targets <- targets %>%
-            subset(condition == SettingsInfo[["Numerator"]] | condition == SettingsInfo[["Denominator"]]) %>%
+            subset(condition == SettingsInfo[["Numerator"]] | condition == SettingsInfo[["Denominator"]]) #%>%
             ## order the column "sample" alphabetically ## EDIT: is this actually needed after the arrange(smaple) step above?
-            dplyr::arrange(sample)
+            #dplyr::arrange(sample)
 
-        Limma_input <- InputData%>%
-            tibble::rownames_to_column("sample") 
-        Limma_input <-merge(targets[, 1:2],  Limma_input, by = "sample", all.x = TRUE) ## EDIT: more robust to use column names instead of column indices
+        #Limma_input <- assay(se) %>%
+        #    tibble::rownames_to_column("sample") 
+        Limma_input <- merge(targets[, 1:2],  Limma_input, 
+            by = "sample", all.x = TRUE) ## EDIT: more robust to use column names instead of column indices
         Limma_input <- Limma_input[, -2] %>%
             ## Order the column "sample" alphabetically
             arrange(sample)
-    } else if (MultipleComparison) { ## EDIT: the other if statement is not needed, only else
-        Limma_input <- InputData %>%
-            tibble::rownames_to_column("sample") %>%
-            dplyr::arrange(sample)#Order the column "sample" alphabetically
-    }
+    }# else if (MultipleComparison) { ## EDIT: the other if statement is not needed, only else
+    #    Limma_input <- assay(se) %>%
+    #        t() |>
+    #        as.data.frame() |>
+    #        tibble::rownames_to_column("sample") %>%
+    #        dplyr::arrange(sample)#Order the column "sample" alphabetically
+    #}
 
     ## check if the order of the "sample" column is the same in both data frames
-    if (!identical(targets$sample, Limma_input$sample)) {
-        stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile_Sample and Input_data contain the same rownames and sample numbers.")
-    }
+    #if (!identical(targets$sample, Limma_input$sample)) {
+    #    stop("The order of the 'sample' column is different in both data frames. Please make sure that Input_SettingsFile_Sample and Input_data contain the same rownames and sample numbers.")
+    #}
 
-    targets_limma <- targets[, -2] %>%
-        dplyr::rename("condition"="condition_limma_compatible")
+    targets_limma <- targets |>
+        dplyr::select(-c("condition")) %>%
+        dplyr::rename("condition" = "condition_limma_compatible")
 
     ## we need to transpose the df to run limma. Also, if the data is not 
     ## log2 transformed, we will not calculate the Log2FC as limma just 
@@ -1630,7 +1625,7 @@ DMA_Stat_limma <- function(InputData,
                 ## set row name
                 rownames(cont.matrix)[i] <- paste(unique_conditions[condition], 
                     "_vs_", unique_conditions[1], sep = "")
-            } else{
+            } else {
                 
                 comparison[1] <- 1
                 comparison[condition] <- -1
@@ -1654,11 +1649,10 @@ DMA_Stat_limma <- function(InputData,
             limma::makeContrasts(contrasts = Name_Comp, levels = colnames(design))) %>%
             dplyr::rename(!!paste(make.names(SettingsInfo[["Numerator"]]), 
                 "_vs_", make.names(SettingsInfo[["Denominator"]]), sep = "") := 1)
-        cont.matrix <-as.matrix(cont.matrix)
+        cont.matrix <- as.matrix(cont.matrix)
     }
 
     ## fit the linear model with contrasts
-    #fit2 <- limma::contrasts.fit(fit, cont.matrix)
     fit2 <- limma::contrasts.fit(fit, cont.matrix)
   
     ## Perform empirical Bayes moderation
@@ -1676,7 +1670,7 @@ DMA_Stat_limma <- function(InputData,
                 sort.by = "n", adjust.method = StatPadj) %>% # coef= the comparison the test is done for!
             dplyr::rename("Log2FC" = 1, "t.val" = 3, "p.val" = 4, "p.adj" = 5)
 
-        res.t <- res.t%>%
+        res.t <- res.t %>%
             tibble::rownames_to_column("Metabolite")
 
         ## store the data frame in the results list, named after the contrast
@@ -1709,7 +1703,7 @@ DMA_Stat_limma <- function(InputData,
         results_list_new[[new_name]] <- results_list[[old_name]]
     }
 
-    if (!is.null(Log2FC_table)) { ## EDIT: the two if statements could be combined
+    if (!is.null(Log2FC_table)) {
         if (CoRe) {
             ##If CoRe=TRUE, we need to exchange the Log2FC with the Distance 
             ## and we need to combine the lists
@@ -1733,10 +1727,11 @@ DMA_Stat_limma <- function(InputData,
     }
 
     ## add input data
-    Cond <- SettingsFile_Sample %>%
+    Cond <- colData(se) |>
+        as.data.frame() |>
         tibble::rownames_to_column("Code")
 
-    InputReturn <- merge(Cond[, c("Code", SettingsInfo[["Conditions"]])], 
+    limma_return <- merge(Cond[, c("Code", SettingsInfo[["Conditions"]])], 
         as.data.frame(t(Limma_input)), by.x = "Code", by.y = 0, all.y = TRUE)
 
     for (DFs in names(STAT_C1vC2)) {
@@ -1744,22 +1739,22 @@ DMA_Stat_limma <- function(InputData,
         parts <- unlist(strsplit(DFs, "_vs_"))
         C1 <- parts[1]
         C2 <- parts[2]
-        InputReturn_Filt <- InputReturn %>%
+        limma_return_filt <- limma_return %>%
             dplyr::filter(get(SettingsInfo[["Conditions"]]) == C1 | get(SettingsInfo[["Conditions"]]) == C2) %>%
             tibble::column_to_rownames("Code")
-        InputReturn_Filt <-as.data.frame(t(InputReturn_Filt[, -c(1)]))
+        limma_return_filt <- as.data.frame(t(limma_return_filt[, -c(1)]))
 
         if (Transform) {
             ## add prefix & suffix to each column since the data have been 
             ## log2 transformed!
-            colnames(InputReturn_Filt) <- paste0("log2(", 
-                colnames(InputReturn_Filt), ")")
+            colnames(limma_return_filt) <- paste0("log2(", 
+                colnames(limma_return_filt), ")")
         }
 
-        InputReturn_Merge <- merge(STAT_C1vC2[[DFs]], InputReturn_Filt, 
+        limma_return_merge <- merge(STAT_C1vC2[[DFs]], limma_return_filt, 
             by.x = "Metabolite", by.y = 0, all.x = TRUE)
 
-        STAT_C1vC2[[DFs]] <- InputReturn_Merge
+        STAT_C1vC2[[DFs]] <- limma_return_merge
     }
 
     ## return
@@ -1791,8 +1786,8 @@ DMA_Stat_limma <- function(InputData,
 #'
 #' @noRd
 #'
-Shapiro <-function(InputData,
-    SettingsFile_Sample,
+Shapiro <- function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = NULL),
     StatPval = "t-test", ## EDIT: the options should be outlined here and match.arg should be used to improve robustness
     QQplots = TRUE) {
@@ -1814,8 +1809,8 @@ Shapiro <-function(InputData,
     if (!"Denominator" %in% names(SettingsInfo) & !"Numerator" %in% names(SettingsInfo)) { ## EDIT: this is replicated across several functions and should be written as fct
         
         ## all-vs-all: Generate all pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
-        denominator <-unique(conditions)
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
+        denominator <- unique(conditions)
         numerator <- unique(conditions)
         comparisons <- combn(unique(conditions), 2) %>% 
             as.matrix()
@@ -1826,7 +1821,7 @@ Shapiro <-function(InputData,
     } else if ("Denominator" %in% names(SettingsInfo)  & !"Numerator" %in% names(SettingsInfo)) {
         
         ## all-vs-one: Generate the pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
         numerator <- unique(conditions)
         
@@ -1859,58 +1854,69 @@ Shapiro <-function(InputData,
     ## across the samples of one condition. this needs to be repeated for 
     ## each condition:
     ## prepare the input (Shapiro test can not handle NAs):
-    Input_shaptest <- replace(InputData, is.na(InputData), 0) %>% 
-        dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-        dplyr::select_if (is.numeric)
+    cols <- colData(se)[[SettingsInfo[["Conditions"]]]] %in% numerator | 
+        colData(se)[[SettingsInfo[["Conditions"]]]] %in% denominator
+    se_shaptest <- se[, cols]
+    assay(se_shaptest)[is.na(assay(se_shaptest))] <- 0
     
     ## we have to remove features with zero variance if there are any.
-    temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0
+    ##temp <- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0
+    rows <- apply(assay(se_shaptest), MARGIN = 1, function(row) var(row, na.rm = TRUE)) != 0 ## EDIT: is this easier?
+    se_shaptest <- se_shaptest[rows, ]
     
     ## remove NAs from temp
-    temp <- temp[complete.cases(temp)]
+    ##temp <- temp[complete.cases(temp)]
     
     ## extract column names where temp is TRUE
-    columns_with_zero_variance <- names(temp[temp])
+    ##columns_with_zero_variance <- names(temp[temp])
 
     #handle a specific case where after filtering and selecting numeric 
     ## variables, there's only one column left in Input_shaptest
-    if (length(Input_shaptest) == 1) {
-        Input_shaptest <- InputData
+    if (nrow(se_shaptest) == 1) {
+        se_shaptest <- se
     } else {
-        if (length(columns_with_zero_variance) == 0) {
-            Input_shaptest <-Input_shaptest
-        } else {
-            message("The following features have zero variance and are removed prior to performing the shaprio test: ", columns_with_zero_variance)
-            ## drop = FALSE argument is used to ensure that the subset operation 
-            ## doesn't simplify the result to a vector, preserving the data 
-            ## frame structure
-            Input_shaptest <- Input_shaptest[, 
-                !names(Input_shaptest) %in% columns_with_zero_variance, drop = FALSE]
+        if (!any(rows)) {
+            message(
+                "The following features have zero variance and are removed prior to performing the shapiro test: ", 
+                names(rows[!rows]))
         }
     }
 
-    Input_shaptest_Cond <- merge(
-        data.frame(Conditions = SettingsFile_Sample[, SettingsInfo[["Conditions"]], drop = FALSE]), 
-        Input_shaptest, by = 0, all.y = TRUE)
+    #Input_shaptest_Cond <- merge(
+    #    data.frame(Conditions = SettingsFile_Sample[, SettingsInfo[["Conditions"]], drop = FALSE]), 
+     #   Input_shaptest, by = 0, all.y = TRUE)
 
-    UniqueConditions <- SettingsFile_Sample %>%
-        subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator, select = c(SettingsInfo[["Conditions"]]))
-    UniqueConditions <- unique(UniqueConditions[[SettingsInfo[["Conditions"]]]])
+    UniqueConditions <- colData(se_shaptest)[, SettingsInfo[["Conditions"]]] |>
+        unique()
+    #UniqueConditions <- SettingsFile_Sample %>%
+    #    subset(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator | SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator, select = c(SettingsInfo[["Conditions"]]))
+    #UniqueConditions <- unique(UniqueConditions[[SettingsInfo[["Conditions"]]]])
 
     ## Generate the results
     shapiro_results <- list()
     for (i in UniqueConditions) {
         ## Subset the data for the current condition
-        subset_data <- Input_shaptest_Cond %>%
-            tibble::column_to_rownames("Row.names") %>%
-            subset(get(SettingsInfo[["Conditions"]]) == i, select = -c(1))
+        cols_i <- colData(se_shaptest)[, SettingsInfo[["Conditions"]]] == i
+        subset_data <- assay(se_shaptest)[, cols_i] |>
+            t() |>
+            as.data.frame()
+        
+        #Input_shaptest_Cond %>%
+         #   tibble::column_to_rownames("Row.names") %>%
+         #   subset(get(SettingsInfo[["Conditions"]]) == i, select = -c(1))
 
         ## check the sample size (shapiro.test(x) : sample size must be 
         ## between 3 and 5000):
         if (nrow(subset_data) < 3) {
-            warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided <3 Samples for condition ", i, ". Hence Shaprio test can not be performed for this condition.", sep="")
-        }else if (nrow(subset_data) > 5000) {
-            warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
+            warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided <3 Samples for condition ", 
+                i, 
+                ". Hence Shaprio test can not be performed for this condition.", 
+                sep = "")
+        } else if (nrow(subset_data) > 5000) {
+            warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", 
+                i, 
+                ". Hence Shaprio test will not be performed for this condition.", 
+                sep = "")
         } else {
             ## apply Shapiro-Wilk test to each feature in the subset
             shapiro_results[[i]] <- as.data.frame(
@@ -1918,15 +1924,14 @@ Shapiro <-function(InputData,
         }
     }
 
-    if ( nrow(subset_data) >= 3 & nrow(subset_data) <= 5000) {
+    if (nrow(subset_data) >= 3 & nrow(subset_data) <= 5000) {
         ## make the output DF
         DF_shapiro_results <- as.data.frame(
-            matrix(NA, nrow = length(UniqueConditions), 
-                ncol = ncol(Input_shaptest)))
+            matrix(NA, nrow = length(UniqueConditions), ncol = nrow(se_shaptest)))
         rownames(DF_shapiro_results) <- UniqueConditions
-        colnames(DF_shapiro_results) <- colnames(Input_shaptest)
+        colnames(DF_shapiro_results) <- rownames(se_shaptest)
         for (k in seq_along(UniqueConditions)) {
-            for (l in seq_len(ncol(Input_shaptest))) {
+            for (l in seq_len(ncol(se_shaptest))) {
                 DF_shapiro_results[k, l] <- shapiro_results[[UniqueConditions[k]]][[l]]$p.value
             }
         }
@@ -1981,10 +1986,12 @@ Shapiro <-function(InputData,
             DF_shapiro_results <- DF_shapiro_results[, c(include_columns, exclude_columns)]
 
             ## make Group wise data distribution plot and QQ plots
-            subset_data <- Input_shaptest_Cond %>%
-                tibble::column_to_rownames("Row.names") %>%
-                subset(get(SettingsInfo[["Conditions"]]) ==  colnames(transpose), 
-                    select = -c(1))
+            cols <- colData(se_shaptest)[, SettingsInfo[["Conditions"]]] == colnames(transpose)
+            subset_data <- assay(se_shaptest)[, cols]
+            #subset_data <-  %>%
+            #    tibble::column_to_rownames("Row.names") %>%
+            #    subset(get(SettingsInfo[["Conditions"]]) ==  colnames(transpose), 
+            #        select = -c(1))
             all_data <- unlist(subset_data)
 
             plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
@@ -2020,28 +2027,28 @@ Shapiro <-function(InputData,
 
                 ## QQ plots for each groups for each metabolite for normality visual check
                 qq_plot_list <- list()
-                for (col_name in colnames(subset_data)) {
+                for (row_name in rownames(subset_data)) {
                     qq_plot <- ggplot2::ggplot(
-                            data.frame(x = subset_data[[col_name]]), 
+                            data.frame(x = subset_data[row_name,]), 
                             aes(sample = x)) +
                         ggplot2::geom_qq() +
                         ggplot2::geom_qq_line(color = "red") +
-                        ggplot2::labs(title = paste("QQPlot for", col_name),
+                        ggplot2::labs(title = paste("QQPlot for", row_name),
                             x = "Theoretical", y = "Sample") + 
                         theme_minimal()
                     plot.new()
                     plot(qq_plot)
-                    qq_plot_list[[col_name]] <- recordPlot() ## EDIT: not sure if it works but could it be just qq_plot_list[[col_name]] <- qq_plot (delete plot.new, recordPlot)
+                    qq_plot_list[[row_name]] <- recordPlot() ## EDIT: not sure if it works but could it be just qq_plot_list[[col_name]] <- qq_plot (delete plot.new, recordPlot)
 
-                    col_name2 <- (gsub("/", "_", col_name))#remove "/" cause this can not be safed in a PDF name
-                    col_name2 <- gsub("-", "", col_name2)
-                    col_name2 <- gsub("/", "", col_name2)
-                    col_name2 <- gsub(" ", "", col_name2)
-                    col_name2 <- gsub("\\*", "", col_name2)
-                    col_name2 <- gsub("\\+", "", col_name2)
-                    col_name2 <- gsub(",", "", col_name2)
-                    col_name2 <- gsub("\\(", "", col_name2)
-                    col_name2 <- gsub("\\)", "", col_name2) ## EDIT: col_name2 not used in the function?
+                    row_name2 <- (gsub("/", "_", row_name))#remove "/" cause this can not be safed in a PDF name
+                    row_name2 <- gsub("-", "", row_name2)
+                    row_name2 <- gsub("/", "", row_name2)
+                    row_name2 <- gsub(" ", "", row_name2)
+                    row_name2 <- gsub("\\*", "", row_name2)
+                    row_name2 <- gsub("\\+", "", row_name2)
+                    row_name2 <- gsub(",", "", row_name2)
+                    row_name2 <- gsub("\\(", "", row_name2)
+                    row_name2 <- gsub("\\)", "", row_name2) ## EDIT: row_name2 not used in the function?
 
                     dev.off() ## EDIT: is this needed?
                 }
@@ -2053,16 +2060,15 @@ Shapiro <-function(InputData,
         ##-------- Return
         
         ## here we make a list
-        if (QQplots) { ## EDIT: why return a nested list?
-            Shapiro_output_list <- list(
-                "DF" = list(
-                    "Shapiro_result" = tibble::rownames_to_column(DF_shapiro_results, "Code")),
-                "Plot"= list("Distributions" = Density_plots, "QQ_plots" = QQ_plots))
-        } else {
-            Shapiro_output_list <- list(
-                "DF" = list(
-                    "Shapiro_result" = tibble::rownames_to_column(DF_shapiro_results, "Code")),
-                "Plot"=list("Distributions" = Density_plots))
+        l_shapiro <- list(
+            "data" = list(
+                "Shapiro_result" = tibble::rownames_to_column(
+                    DF_shapiro_results, "Code")),
+            "plot" = list(
+                "Distributions" = Density_plots))
+        
+        if (QQplots) {
+            l_shapiro[["plot"]][["QQ_plots"]] <- QQ_plots
         }
 
         ## return
@@ -2092,8 +2098,8 @@ Shapiro <-function(InputData,
 #'
 #' @noRd
 #'
-Bartlett <-function(InputData,
-    SettingsFile_Sample,
+Bartlett <-function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo) {
 
     ## ------------ Create log file ----------- ##
@@ -2101,41 +2107,43 @@ Bartlett <-function(InputData,
 
     ############################################################################
 
-    conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+    conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
 
     # Use Bartletts test
-    bartlett_res <-  apply(InputData, 2, 
+    bartlett_res <-  apply(assay(se), 1, 
         function(x) stats::bartlett.test(x ~ conditions))
 
     ## make the output DF
-    DF_bartlett_results <- as.data.frame(matrix(NA, nrow = ncol(InputData)), ncol = 1)
-    rownames(DF_bartlett_results) <- colnames(InputData)
-    colnames(DF_bartlett_results) <- "Bartlett p.val"
+    DF_bartlett_results <- data.frame("Bartlett_pvalue" = rep(NA, nrow(se)))
+    #matrix(NA, nrow = nrow(InputData)), ncol = 1)
+    rownames(DF_bartlett_results) <- rownames(se)
+    ##colnames(DF_bartlett_results) <- "Bartlett p.val"
 
-    for (l in seq_along(bartlett_res)) {
-        DF_bartlett_results[l, 1] <-bartlett_res[[l]]$p.value
+    for (i in seq_along(bartlett_res)) {
+        DF_bartlett_results[i, "Bartlett_pvalue"] <- bartlett_res[[i]]$p.value
     }
     DF_bartlett_results <- DF_bartlett_results %>% 
         dplyr::mutate(
-            `Var homogeneity`= case_when(`Bartlett p.val` <  0.05 ~ FALSE,
-            `Bartlett p.val` >= 0.05 ~ TRUE))
+            Variance_homogeneity = case_when(
+                Bartlett_pvalue <  0.05 ~ FALSE,
+                Bartlett_pvalue >= 0.05 ~ TRUE))
     
-    ## if p<0.05 then unequal variances
+    ## if p < 0.05 then unequal variances
     message("For ", 
-        round(sum(DF_bartlett_results$`Var homogeneity`) / nrow(DF_bartlett_results), 
+        round(
+            sum(DF_bartlett_results$Variance_homogeneity) / nrow(DF_bartlett_results), 
             digits = 4) * 100, 
         "% of metabolites the group variances are equal.")
 
     DF_bartlett_results <- DF_bartlett_results %>% 
         tibble::rownames_to_column("Metabolite") %>% 
         relocate("Metabolite")
-    DF_Bartlett_results_out <- DF_bartlett_results
 
     #### Plots:
     ## Make density plots
     Bartlettplot <- ggplot2::ggplot(
-            data.frame(x = DF_Bartlett_results_out), 
-            aes(x = DF_Bartlett_results_out$`Bartlett p.val`)) +
+            data.frame(x = DF_bartlett_results), 
+            aes(x = DF_bartlett_results$Bartlett_pvalue)) +
         ggplot2::geom_histogram(aes(y = ..density..), 
             colour = "black", fill = "white")  +
         ggplot2::geom_density(alpha = 0.2, fill = "grey45")+
@@ -2144,8 +2152,8 @@ Bartlett <-function(InputData,
         ggplot2::geom_vline(aes(xintercept = 0.05, color = "darkred"))
 
     Bartlett_output_list <- list(
-        "DF" = list("Bartlett_result" = DF_Bartlett_results_out), 
-        "Plot"=list("Histogram" = Bartlettplot))
+        "data" = list("Bartlett_result" = DF_bartlett_results), 
+        "plot" = list("Histogram" = Bartlettplot))
 
     ## return
     suppressWarnings(invisible(Bartlett_output_list))
@@ -2157,11 +2165,17 @@ Bartlett <-function(InputData,
 ### ### ### Variance stabilizing transformation function ### ###
 ################################################################
 
-#' This function performs a variance stabilizing transformation (VST) on the input data.
+#' @title Variance stabilizing transformation (VST) on assay of SummarizedExperiment
+#' 
+#' @description This function performs a variance stabilizing transformation 
+#' (VST) on the assay of a SummarizedExperiment.
 #'
-#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param se SummarizedExperiment with unique sample identifiers as colnames 
+#'     and metabolite numerical values in columns with metabolite identifiers 
+#'     as rownames. Use NA for metabolites that were not detected.
 #'
-#' @return List with two entries: DF (including the results DF) and Plots (including the scedasticity_plot)
+#' @return list with two entries: "data" (including the vst-adjusted assay) and 
+#' "plot" (including the scedasticity_plot)
 #'
 #' @keywords Heteroscedasticity, variance stabilizing transformation
 #'
@@ -2175,64 +2189,82 @@ Bartlett <-function(InputData,
 #'
 #' @noRd
 #'
-vst <- function(InputData){
+vst <- function(se) {
 
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+    ## ------------ Create log file ----------- ##
+    MetaProViz_Init()
 
-  # model the mean and variance relationship on the data
-  suppressMessages(melted <- reshape2::melt(InputData))
-  het.data <- melted %>%
-    dplyr::group_by(variable) %>% # make a dataframe to save the values
-    dplyr::summarise(mean=mean(value), sd=sd(value))
-  het.data$lm <- 1 # add a common group for the lm function to account for the whole data together
+    ## model the mean and variance relationship on the data
+    suppressMessages(
+        melted <- assay(se) |>
+            t() |>
+            reshape2::melt())
+    het_data <- melted %>%
+        ## make a dataframe to save the values
+        dplyr::group_by(Var2) %>% ## EDIT: should this be according to metabolites? ## was: variable
+        dplyr::summarise(mean = mean(value), sd = sd(value))
+    ## add a common group for the lm function to account for the whole data together
+    het_data$lm <- 1
 
-  invisible(het_plot <-
-              ggplot2::ggplot(het.data, ggplot2::aes(x = mean, y = sd)) +
-              ggplot2::geom_point() +
-              ggplot2::theme_bw() +
-              ggplot2::scale_x_continuous(trans='log2') +
-              ggplot2::scale_y_continuous(trans='log2') +
-              ggplot2::xlab("log(mean)") +
-              ggplot2::ylab("log(sd)") +
-              ggplot2::geom_abline(intercept = 0, slope = 1)  +
-              ggplot2::ggtitle(" Data heteroscedasticity")  +
-              ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
+    invisible(het_plot <- ggplot2::ggplot(het_data, ggplot2::aes(x = mean, y = sd)) +
+        ggplot2::geom_point() +
+        ggplot2::theme_bw() +
+        ggplot2::scale_x_continuous(trans='log2') +
+        ggplot2::scale_y_continuous(trans='log2') +
+        ggplot2::xlab("log(mean)") +
+        ggplot2::ylab("log(sd)") +
+        ggplot2::geom_abline(intercept = 0, slope = 1)  +
+        ggplot2::ggtitle(" Data heteroscedasticity")  +
+        ggplot2::geom_smooth(ggplot2::aes(group = lm), method = "lm", 
+            formula = y~x, color = "red"))
 
-  # select data
-  prevst.data <- het.data
-  prevst.data$mean <- log(prevst.data$mean)
-  prevst.data$sd <- log(prevst.data$sd)
+    # select data
+    prevst_data <- het_data
+    prevst_data$mean <- log(prevst_data$mean)
+    prevst_data$sd <- log(prevst_data$sd)
+    
+    ## calculate the slope of the log data ## EDIT: why are you not using some prebuild function from e.g. vsn2?
+    data_fit <- stats::lm(sd ~ mean, prevst_data)
+    coef(data_fit)
 
-  # calculate the slope of the log data
-  data.fit <- stats::lm(sd~mean, prevst.data)
-  coef(data.fit)
+    ## make the vst transformation
+    data_vst <- as.data.frame(t(assay(se)) ^ (1 - coef(data_fit)["mean"][1]))
 
-  # Make the vst transformation
-  data.vst <- as.data.frame(InputData^(1-coef(data.fit)['mean'][1]))
+    ## heteroscedasticity visual check again
+    suppressMessages(melted_vst <- reshape::melt(data_vst))
+    het_vst_data <- melted_vst %>%
+        ## make a dataframe to save the values
+        dplyr::group_by(variable) %>%
+        dplyr::summarise(mean = mean(value), sd = sd(value))
+    ## add a common group for the lm function to account for the whole data together
+    het_vst_data$lm <- 1 
 
-  # Heteroscedasticity visual check again
-  suppressMessages(melted.vst <- reshape::melt(data.vst))
-  het.vst.data <- melted.vst %>%
-    dplyr::group_by(variable) %>% # make a dataframe to save the values
-    dplyr::summarise(mean=mean(value), sd=sd(value))
-  het.vst.data$lm <- 1 # add a common group for the lm function to account for the whole data together
+    ## plot variable stadard deviation as a function of the mean
+    invisible(hom_plot <- ggplot2::ggplot(het_vst_data,  
+            ggplot2::aes(x = mean, y = sd)) +
+        ggplot2::geom_point() +
+        ggplot2::theme_bw() +
+        ggplot2::scale_x_continuous(trans = "log2") +
+        ggplot2::scale_y_continuous(trans = "log2") +
+        ggplot2::xlab("log(mean)") +
+        ggplot2::ylab("log(sd)") +
+        ggplot2::geom_abline(intercept = 0)  +
+        ggplot2::ggtitle("Vst transformed data")  +
+        ggplot2::geom_smooth(ggplot2::aes(group = lm), method='lm', 
+            formula = y ~ x, color = "red"))
 
-  # plot variable stadard deviation as a function of the mean
-  invisible(hom_plot <-
-              ggplot2::ggplot(het.vst.data,  ggplot2::aes(x = mean, y = sd)) +
-              ggplot2::geom_point() +
-              ggplot2::theme_bw() +
-              ggplot2::scale_x_continuous(trans='log2') +
-              ggplot2::scale_y_continuous(trans='log2') +
-              ggplot2::xlab("log(mean)") +
-              ggplot2::ylab("log(sd)") +
-              ggplot2::geom_abline(intercept = 0)  +
-              ggplot2::ggtitle("Vst transformed data")  +
-              ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
+    scedasticity_plot <- patchwork::wrap_plots(het_plot, hom_plot)
 
-  invisible(scedasticity_plot <- patchwork::wrap_plots(het_plot,hom_plot))
+    ## assemble the object to return
+    assay(se) <- t(data_vst)
+    l <- list(
+        "data" = list(
+            "se" = se,
+            "assay" = data_vst), 
+        "plot" = list(
+            "scedasticity_plot" = scedasticity_plot))
 
-  return(invisible(list("DFs" = list("Corrected_data" = data.vst), "Plots" = list("scedasticity_plot" = scedasticity_plot))))
+    ## return
+    invisible(l)
 }
 
