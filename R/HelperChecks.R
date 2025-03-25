@@ -45,10 +45,12 @@
 #'
 #' @noRd
 #'
-CheckInput <- function(InputData,
+CheckInput <- function(
+    se,
+    ##InputData,
     InputData_Num = TRUE,
-    SettingsFile_Sample = NULL,
-    SettingsFile_Metab = NULL,
+    ##SettingsFile_Sample = NULL,
+    ##SettingsFile_Metab = NULL,
     SettingsInfo = NULL,
     SaveAs_Plot = NULL,
     SaveAs_Table = NULL,
@@ -58,22 +60,44 @@ CheckInput <- function(InputData,
     PlotSettings = NULL) {
   
     ############## Parameters valid for multiple MetaProViz functions
+    
+    ## obtain colnames and rownames from se
+    cols_se <- colnames(se)
+    rows_se <- rownames(se)
+    cols_a <- colnames(assay(se))
+    rows_a <- rownames(assay(se))
+    cols_cD <- colnames(colData(se))
+    rows_cD <- rownames(colData(se))
+    cols_rD <- colnames(rowData(se))
+    rows_rD <- rownames(rowData(se))
 
     #-------------InputData
-    if (!is.data.frame(InputData)) {
-        message <- paste0("InputData should be a data.frame. It's currently a ", 
-            paste(class(InputData)), ".")
+    if (!is(se, "SummarizedExperiment")) {
+        message <- paste0("InputData should be a SummarizedExperiment object. It is currently a ", 
+                          paste(class(se)), ".")
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (any(duplicated(row.names(InputData)))) {
-        message <- paste0("Duplicated row.names of InputData, whilst row.names must be unique")
+    # if (!is.data.frame(InputData)) {
+    #     message <- paste0("InputData should be a data.frame. It's currently a ", 
+    #         paste(class(InputData)), ".")
+    #     logger::log_trace(paste0("Error ", message))
+    #     stop(message)
+    # }
+    if (any(duplicated(rows_se))) {
+        message <- paste0("Duplicated rownames of se, whilst rownames must be unique")
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
+    # if (any(duplicated(row.names(InputData)))) {
+    #     message <- paste0("Duplicated row.names of InputData, whilst row.names must be unique")
+    #     logger::log_trace(paste0("Error ", message))
+    #     stop(message)
+    # }
 
     if (InputData_Num) {
-        Test_num <- apply(InputData, 2, function(x) is.numeric(x))
+        Test_num <- apply(assay(se), 2, function(x) is.numeric(x))
+        ##Test_num <- apply(InputData, 2, function(x) is.numeric(x))
         if (!any(Test_num)) {
             message <- paste0("InputData needs to be of class numeric")
             logger::log_trace(paste0("Error ", message))
@@ -81,30 +105,46 @@ CheckInput <- function(InputData,
         }
     }
 
-    if (sum(duplicated(colnames(InputData))) > 0) {
-        message <- paste0("InputData contained duplicates column names, whilst col.names must be unique.")
+    if (any(duplicated(cols_se))) {
+        message <- paste0("se contains duplicates column names, whilst colnames must be unique.")
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
+    # if (sum(duplicated(colnames(InputData))) > 0) {
+    #     message <- paste0("InputData contained duplicates column names, whilst col.names must be unique.")
+    #     logger::log_trace(paste0("Error ", message))
+    #     stop(message)
+    # }
 
     #-------------SettingsFile
-    if (!is.null(SettingsFile_Sample)) {
-        Test_match <- merge(SettingsFile_Sample, InputData, 
-            by = "row.names", all =  FALSE)
-        if (nrow(Test_match) ==  0) {
-            message <- paste0("row.names InputData need to match row.names SettingsFile_Sample.")
-            logger::log_trace(paste0("Error ", message))
-            stop(message)
-        }
+    if (!all(cols_se == rows_cD)) {
+        message <- paste0("colnames assay(se) need to match rownames colData(se).")
+        logger::log_trace(paste0("Error ", message))
+        stop(message)
     }
+    
+    # if (!is.null(SettingsFile_Sample)) {
+    #     Test_match <- merge(SettingsFile_Sample, InputData, 
+    #         by = "row.names", all =  FALSE)
+    #     if (nrow(Test_match) ==  0) {
+    #         message <- paste0("row.names InputData need to match row.names SettingsFile_Sample.")
+    #         logger::log_trace(paste0("Error ", message))
+    #         stop(message)
+    #     }
+    # }
 
-    if (!is.null(SettingsFile_Metab)) {
-        Test_match <- merge(SettingsFile_Metab, as.data.frame(t(InputData)), 
-            by = "row.names", all =  FALSE)
-        if (nrow(Test_match) ==  0) {
-            stop("col.names InputData need to match row.names SettingsFile_Metab.")
-        }
+    if (!all(rows_a == rows_rD)) {
+        message <- paste0("rownames assay(se) need to match rownames rowData(se).")
+        logger::log_trace(paste0("Error ", message))
+        stop(message)
     }
+    # if (!is.null(SettingsFile_Metab)) {
+    #     Test_match <- merge(SettingsFile_Metab, as.data.frame(t(InputData)), 
+    #         by = "row.names", all =  FALSE)
+    #     if (nrow(Test_match) ==  0) {
+    #         stop("col.names InputData need to match row.names SettingsFile_Metab.")
+    #     }
+    # }
 
     #-------------SettingsInfo
     if (!is.vector(SettingsInfo) & !is.null(SettingsInfo)) {
@@ -118,9 +158,9 @@ CheckInput <- function(InputData,
         
         ## Conditions
         if ("Conditions" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["Conditions"]] %in% colnames(SettingsFile_Sample)) {
+            if (!SettingsInfo[["Conditions"]] %in% cols_cD) {
                 message <- paste0("The ", SettingsInfo[["Conditions"]], 
-                    " column selected as Conditions in SettingsInfo was not found in SettingsFile. Please check your input.")
+                    " column selected as Conditions in SettingsInfo was not found in colData(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -128,9 +168,9 @@ CheckInput <- function(InputData,
 
         ## Biological replicates
         if ("Biological_Replicates" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["Biological_Replicates"]] %in% colnames(SettingsFile_Sample)) {
+            if (!SettingsInfo[["Biological_Replicates"]] %in% cols_cD) {
                 message <- paste0("The ", SettingsInfo[["Biological_Replicates"]], 
-                    " column selected as Biological_Replicates in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                    " column selected as Biological_Replicates in SettingsInfo was not found in colData(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -138,9 +178,9 @@ CheckInput <- function(InputData,
 
         ## Numerator
         if ("Numerator" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["Numerator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]) {
+            if (!SettingsInfo[["Numerator"]] %in% colData(se)[[SettingsInfo[["Conditions"]]]]) {
                 message <- paste0("The ", SettingsInfo[["Numerator"]], 
-                    " column selected as numerator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                    " column selected as numerator in SettingsInfo was not found in colData(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -148,9 +188,9 @@ CheckInput <- function(InputData,
 
         ## Denominator
         if ("Denominator" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["Denominator"]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]) {
+            if (!SettingsInfo[["Denominator"]] %in% colData(se)[[SettingsInfo[["Conditions"]]]]) {
                 message <- paste0("The ", SettingsInfo[["Denominator"]], 
-                    " column selected as denominator in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                    " column selected as denominator in SettingsInfo was not found in colData(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -167,22 +207,23 @@ CheckInput <- function(InputData,
 
         ## Superplot
         if ("Superplot" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["Superplot"]] %in% colnames(SettingsFile_Sample)) {
+            if (!SettingsInfo[["Superplot"]] %in% cols_cD) {
                 message <- paste0("The ", SettingsInfo[["Superplot"]], 
-                    " column selected as Superplot column in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                    " column selected as Superplot column in SettingsInfo was not found in colData(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
         }
 
         if (!is.null(PlotSettings)) {
+            
             if (PlotSettings == "Sample") {
                 
                 ## plot colour
                 if ("color" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["color"]] %in% colnames(SettingsFile_Sample)) {
+                    if (!SettingsInfo[["color"]] %in% cols_cD) {
                         message <- paste0("The ", SettingsInfo[["color"]], 
-                            " column selected as color in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                            " column selected as color in SettingsInfo was not found in colData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -190,9 +231,9 @@ CheckInput <- function(InputData,
 
                 ## plot shape
                 if ("shape" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["shape"]] %in% colnames(SettingsFile_Sample)) {
+                    if (!SettingsInfo[["shape"]] %in% cols_cD) {
                         message <- paste0("The ", SettingsInfo[["shape"]], 
-                            " column selected as shape in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                            " column selected as shape in SettingsInfo was not found in colData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -200,8 +241,8 @@ CheckInput <- function(InputData,
 
                 ## plot individual
                 if ("individual" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["individual"]] %in% colnames(SettingsFile_Sample)) {
-                        message <- paste0("The ", SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                    if (!SettingsInfo[["individual"]] %in% cols_cD) {
+                        message <- paste0("The ", SettingsInfo[["individual"]], " column selected as individual in SettingsInfo was not found in colData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -210,9 +251,9 @@ CheckInput <- function(InputData,
                 
                 ## plot color
                 if ("color" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["color"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["color"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["color"]], 
-                            " column selected as color in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+                            " column selected as color in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -220,9 +261,9 @@ CheckInput <- function(InputData,
 
                 ## plot shape
                 if ("shape" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["shape"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["shape"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["shape"]], 
-                            " column selected as shape in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+                            " column selected as shape in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -230,9 +271,9 @@ CheckInput <- function(InputData,
 
                 ## Plot individual
                 if ("individual" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["individual"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["individual"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["individual"]], 
-                            " column selected as individual in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+                            " column selected as individual in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -241,9 +282,9 @@ CheckInput <- function(InputData,
         
                 # plot colour sample
                 if ("color_Sample" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["color_Sample"]] %in% colnames(SettingsFile_Sample)) {
+                    if (!SettingsInfo[["color_Sample"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["color_Sample"]], 
-                            " column selected as color_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                            " column selected as color_Sample in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -251,14 +292,14 @@ CheckInput <- function(InputData,
 
                 ## plot colour Metab
                 if ("color_Metab" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["color_Metab"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["color_Metab"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["color_Metab"]], 
-                            " column selected as color_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+                            " column selected as color_Metab in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
-                    if (sum(colnames(InputData) %in% SettingsFile_Metab$Metabolite) < length(InputData)) {
-                        message <- paste0("The InputData contains metabolites not found in SettingsFile_Metab.")
+                    if (!all(rows_a == rows_rD)) {
+                        message <- paste0("assay(se) has to contain the same metabolites as in rowData(se).")
                         logger::log_trace(paste0("Warning ", message))
                         warning(message)
                     }
@@ -266,9 +307,9 @@ CheckInput <- function(InputData,
 
                 ## plot shape_metab
                 if ("shape_Metab" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["shape_Metab"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["shape_Metab"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["shape_Metab"]], 
-                            " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+                            " column selected as shape_Metab in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -276,9 +317,9 @@ CheckInput <- function(InputData,
 
                 ## plot shape_metab
                 if ("shape_Sample" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["shape_Sample"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["shape_Sample"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["shape_Sample"]], 
-                            " column selected as shape_Metab in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                            " column selected as shape_Metab in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -286,9 +327,9 @@ CheckInput <- function(InputData,
 
                 ## plot individual_Metab
                 if ("individual_Metab" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["individual_Metab"]] %in% colnames(SettingsFile_Metab)) {
+                    if (!SettingsInfo[["individual_Metab"]] %in% cols_rD) {
                         message <- paste0("The ", SettingsInfo[["individual_Metab"]], 
-                            " column selected as individual_Metab in SettingsInfo was not found in SettingsFile_Metab. Please check your input.")
+                            " column selected as individual_Metab in SettingsInfo was not found in rowData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -296,9 +337,9 @@ CheckInput <- function(InputData,
 
                 ## plot individual_Sample
                 if ("individual_Sample" %in% names(SettingsInfo)) {
-                    if (!SettingsInfo[["individual_Sample"]] %in% colnames(SettingsFile_Sample)) {
+                    if (!SettingsInfo[["individual_Sample"]] %in% cols_cD) {
                         message <- paste0("The ", SettingsInfo[["individual_Sample"]], 
-                            " column selected as individual_Sample in SettingsInfo was not found in SettingsFile_Sample. Please check your input.")
+                            " column selected as individual_Sample in SettingsInfo was not found in colData(se). Please check your input.")
                         logger::log_trace(paste0("Error ", message))
                         stop(message)
                     }
@@ -380,7 +421,7 @@ CheckInput <- function(InputData,
 #'
 #' @noRd
 #'
-CheckInput_PreProcessing <- function(SettingsFile_Sample,
+CheckInput_PreProcessing <- function(se,
     SettingsInfo,
     CoRe = FALSE,
     FeatureFilt = "Modified",
@@ -401,9 +442,9 @@ CheckInput_PreProcessing <- function(SettingsFile_Sample,
             message(message)
             
             if ("CoRe_media" %in% names(SettingsInfo)) {
-                if (length(grep(SettingsInfo[["CoRe_media"]], SettingsFile_Sample[[SettingsInfo[["Conditions"]]]])) < 1) {     
+                if (length(grep(SettingsInfo[["CoRe_media"]], colData(se)[[SettingsInfo[["Conditions"]]]])) < 1) {     
                     ## check for CoRe_media samples
-                    message <- paste0("No CoRe_media samples were provided in the 'Conditions' in the SettingsFile_Sample. ",
+                    message <- paste0("No CoRe_media samples were provided in the 'Conditions' in colData(se). ",
                         "For a CoRe experiment control media samples without cells have to be measured and be added ",
                         "in the 'Conditions' column labeled as 'CoRe_media' (see @param section). Please make sure ",
                         "that you used the correct labelling or whether you need CoRe = FALSE for your analysis")
@@ -450,12 +491,12 @@ CheckInput_PreProcessing <- function(SettingsFile_Sample,
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (!is.numeric(MVI_Percentage) |HotellinsConfidence > 100 | HotellinsConfidence < 0) {
+    if (!is.numeric(MVI_Percentage) | HotellinsConfidence > 100 | HotellinsConfidence < 0) {
         message <- paste0("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (!is.numeric(HotellinsConfidence) |HotellinsConfidence > 1 | HotellinsConfidence < 0) {
+    if (!is.numeric(HotellinsConfidence) | HotellinsConfidence > 1 | HotellinsConfidence < 0) {
         message <- paste0("Check input. The selected HotellinsConfidence value ",
             "should be numeric and between 0 and 1.")
         logger::log_trace(paste("Error ", message, sep=""))
@@ -491,8 +532,10 @@ CheckInput_PreProcessing <- function(SettingsFile_Sample,
 #'
 #' @noRd
 #'
-CheckInput_DMA <- function(InputData,
-    SettingsFile_Sample,
+CheckInput_DMA <- function(
+    se,
+    #InputData,
+    #SettingsFile_Sample,
     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
     StatPval = "lmFit", ## EDIT: show here the options and match with match.arg
     StatPadj = p.adjust.methods,
@@ -501,9 +544,10 @@ CheckInput_DMA <- function(InputData,
     PerformBartlett = TRUE,
     Transform = TRUE) {
 
+    ## match arguments
     StatPadj <- match.arg(StatPadj)
     
-    #-------------SettingsInfo
+    ##-------------SettingsInfo
     if (is.null(SettingsInfo)) {
         message <- paste0("You have to provide SettingsInfo's for Conditions.")
         logger::log_trace(paste0("Error ", message))
@@ -516,7 +560,7 @@ CheckInput_DMA <- function(InputData,
     if (!("Denominator" %in% names(SettingsInfo)) & !("Numerator" %in% names(SettingsInfo))) { ## EDIT: written several times in the funciton, write a function
         
         ## all-vs-all: Generate all pairwise combinations
-        conditions <- SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions <- colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- unique(conditions)
         numerator <- unique(conditions)
         comparisons <- utils::combn(unique(conditions), 2) %>% 
@@ -529,7 +573,7 @@ CheckInput_DMA <- function(InputData,
     } else if ("Denominator" %in% names(SettingsInfo) & !("Numerator" %in% names(SettingsInfo))) {
         
         ## all-vs-one: Generate the pairwise combinations
-        conditions = SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]
+        conditions = colData(se)[[SettingsInfo[["Conditions"]]]]
         denominator <- SettingsInfo[["Denominator"]]
         numerator <-unique(conditions)
         
@@ -588,30 +632,31 @@ CheckInput_DMA <- function(InputData,
     }
 
     ## ------------ Sample Numbers ----------- ##
-    Num <- InputData %>%
+    Num <- assay(se)[, colData(se)[[SettingsInfo[["Conditions"]]]] %in% numerator]## %>%
         ## are sample numbers enough?
-        dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
+        ##dplyr::filter(colData(se)[[SettingsInfo[["Conditions"]]]] %in% numerator) %>%
         ## only keep numeric columns with metabolite values
-        dplyr::select_if (is.numeric)
-    Denom <- InputData %>%
-        dplyr::filter(SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
-        dplyr::select_if (is.numeric)
+        #dplyr::select_if (is.numeric)
+    Denom <- assay(se)[, colData(se)[[SettingsInfo[["Conditions"]]]] %in% denominator]## %>%
+        ##as.data.frame() |>
+        #dplyr::select(colData(se)[[SettingsInfo[["Conditions"]]]] %in% denominator) %>%
+        ##dplyr::select_if (is.numeric)
 
-    if (nrow(Num) == 1) {
+    if (ncol(Num) == 1) {
         message <- paste0("There is only one sample available for ", 
-            numerator, ", so no statistical test can be performed.")
+            numerator, ". No statistical test can be performed.")
         logger::log_trace(paste0("Error ", message))
         stop(message)
-    } else if (nrow(Denom) == 1) {
+    } else if (ncol(Denom) == 1) {
         message <- paste0("There is only one sample available for ", 
-            denominator, ", so no statistical test can be performed.")
+            denominator, ". No statistical test can be performed.")
         logger::log_trace(paste0("Error ", message))
         stop(message)
-    } else if (nrow(Num) == 0) {
+    } else if (ncol(Num) == 0) {
         message <- paste0("There is no sample available for ", numerator, ".")
         logger::log_trace(paste0("Error ", message))
         stop(message)
-    } else if (nrow(Denom) == 0) {
+    } else if (ncol(Denom) == 0) {
         message <- paste0("There is no sample available for ", denominator, ".")
         logger::log_trace(paste0("Error ", message))
         stop(message)
@@ -619,35 +664,35 @@ CheckInput_DMA <- function(InputData,
 
     ## ------------ Check Missingness ------------- ##
     Num_Miss <- replace(Num, Num == 0, NA)
-    Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
+    Num_Miss <- Num_Miss[rowSums(is.na(Num_Miss)) > 0, , drop = FALSE]
 
     Denom_Miss <- replace(Denom, Denom == 0, NA)
-    Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
+    Denom_Miss <- Denom_Miss[rowSums(is.na(Denom_Miss)) > 0, , drop = FALSE]
 
-    if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) == 0) {
-        Metabolites_Miss <- colnames(Num_Miss)
-        if (ncol(Num_Miss) <= 10) {
+    if (nrow(Num_Miss) > 0 & nrow(Denom_Miss) == 0) {
+        Metabolites_Miss <- rownames(Num_Miss)
+        if (nrow(Num_Miss) <= 10) {
             message <- paste0("In `Numerator` ", paste0(toString(numerator)), 
-                ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s): ", 
-                paste0(colnames(Num_Miss), collapse = ", "), 
+                ", NA/0 values exist in ", nrow(Num_Miss), " Metabolite(s): ", 
+                paste0(rownames(Num_Miss), collapse = ", "), 
                 ". Those metabolite(s) might return p.val= NA, p.adj.= NA, ",
                 "t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
             logger::log_info(message)
             message(message)
         } else {
             message <- paste0("In `Numerator` ", paste0(toString(numerator)), 
-                ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", 
+                ", NA/0 values exist in ", nrow(Num_Miss), " Metabolite(s).", 
                 " Those metabolite(s) might return p.val= NA, p.adj.= NA, ",
                 "t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
             logger::log_info(message)
             message(message)
         }
-    } else if (ncol(Num_Miss) == 0 & ncol(Denom_Miss) > 0) {
-        Metabolites_Miss <- colnames(Denom_Miss)
-        if (ncol(Num_Miss) <= 10) {
+    } else if (nrow(Num_Miss) == 0 & nrow(Denom_Miss) > 0) {
+        Metabolites_Miss <- rownames(Denom_Miss)
+        if (nrow(Num_Miss) <= 10) {
             message <- paste0("In `Denominator` ", paste0(toString(denominator)), 
-                ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s): ", 
-                paste0(colnames(Denom_Miss), collapse = ", "), 
+                ", NA/0 values exist in ", nrow(Denom_Miss), " Metabolite(s): ", 
+                paste0(rownames(Denom_Miss), collapse = ", "), 
                 ". Those metabolite(s) might return p.val= NA, p.adj.= NA, ",
                 "t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
             logger::log_info(message)
@@ -655,18 +700,18 @@ CheckInput_DMA <- function(InputData,
         } else {
             message <- paste0("In `Denominator` ", 
                 paste0(toString(denominator)), 
-                ", NA/0 values exist in ", ncol(Denom_Miss), " Metabolite(s).", 
+                ", NA/0 values exist in ", nrow(Denom_Miss), " Metabolite(s).", 
                 " Those metabolite(s) might return p.val= NA, p.adj.= NA, ",
                 "t.val= NA. The Log2FC = Inf, if all replicates are 0/NA.")
             logger::log_info(message)
             message(message)
         }
-    } else if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
-        Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+    } else if (nrow(Num_Miss) > 0 & nrow(Denom_Miss) > 0) {
+        Metabolites_Miss <- c(rownames(Num_Miss), rownames(Denom_Miss))
         Metabolites_Miss <- unique(Metabolites_Miss)
 
         message <- paste0("In `Numerator` ", paste0(toString(numerator)), 
-            ", NA/0 values exist in ", ncol(Num_Miss), " Metabolite(s).", 
+            ", NA/0 values exist in ", nrow(Num_Miss), " Metabolite(s).", 
             " and in `denominator`",paste0(toString(denominator)), " ",
             ncol(Denom_Miss), " Metabolite(s).", 
             ". Those metabolite(s) might return p.val= NA, p.adj.= NA, t.val= NA. ",
@@ -678,7 +723,7 @@ CheckInput_DMA <- function(InputData,
         logger::log_info(message)
         message(message)
 
-        Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+        Metabolites_Miss <- c(rownames(Num_Miss), rownames(Denom_Miss))
         Metabolites_Miss <- unique(Metabolites_Miss)
     }
 
@@ -740,8 +785,10 @@ CheckInput_DMA <- function(InputData,
 #'
 #' @noRd
 #'
-CheckInput_ORA <- function(InputData,
-    SettingsInfo=c(pvalColumn = "p.adj", PercentageColumn = "t.val", 
+CheckInput_ORA <- function(
+    se,
+    ##InputData,
+    SettingsInfo = c(pvalColumn = "p.adj", PercentageColumn = "t.val", 
         PathwayTerm = "term", PathwayFeature = "Metabolite"),
     pCutoff = 0.05, 
     PercentageCutoff = 10,
@@ -752,16 +799,20 @@ CheckInput_ORA <- function(InputData,
     SaveAs_Table = "csv", ## EDIT: name here the options and use match.arg
     RemoveBackground) {
     
+    ## obtain colnames and rownames from assay(se)
+    cols_a <- colnames(assay(se))
+    rows_a <- rownames(assay(se))
+    
     ## 1. The input data:
-    if (class(InputData) != "data.frame") {
+    if (is(assay(se), "matrix")) {
         message <- paste0(
-            "InputData should be a data.frame. It's currently a ", 
-            paste(class(InputData), "."))
+            "assay(se) should be a matrix. It's currently a ", 
+            paste(class(assay(se)), "."))
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (any(duplicated(row.names(InputData)))) {
-        message <- paste0("Duplicated row.names of InputData, whilst row.names must be unique")
+    if (any(duplicated(rows_a))) {
+        message <- paste0("Duplicated rownames of assay(se), whilst rownames must be unique")
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
@@ -778,10 +829,10 @@ CheckInput_ORA <- function(InputData,
     if (!is.null(SettingsInfo)) {
         ## "ClusterColumn"
         if ("ClusterColumn" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["ClusterColumn"]] %in% colnames(InputData)) {
+            if (!SettingsInfo[["ClusterColumn"]] %in% cols_a) {
                 message <- paste0("The ", SettingsInfo[["ClusterColumn"]], 
                     " column selected as ClusterColumn in SettingsInfo was not ",
-                    "found in InputData. Please check your input.")
+                    "found in assay(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -789,10 +840,10 @@ CheckInput_ORA <- function(InputData,
 
         ## "BackgroundColumn"
         if ("BackgroundColumn" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["BackgroundColumn"]] %in% colnames(InputData)) {
+            if (!SettingsInfo[["BackgroundColumn"]] %in% cols_a) {
                 message <- paste0("The ", SettingsInfo[["BackgroundColumn"]], 
                     " column selected as BackgroundColumn in SettingsInfo was ",
-                    "not found in InputData. Please check your input.")
+                    "not found in assay(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -800,10 +851,10 @@ CheckInput_ORA <- function(InputData,
 
         ## "pvalColumn"
         if ("pvalColumn" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["pvalColumn"]] %in% colnames(InputData)) {
+            if (!SettingsInfo[["pvalColumn"]] %in% cols_a) {
                 message <- paste0("The ", SettingsInfo[["pvalColumn"]], 
                     " column selected as pvalColumn in SettingsInfo was not ",
-                    "found in InputData. Please check your input.")
+                    "found in assay(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -811,10 +862,10 @@ CheckInput_ORA <- function(InputData,
 
         ## "PercentageColumn"
         if ("PercentageColumn" %in% names(SettingsInfo)) {
-            if (!SettingsInfo[["PercentageColumn"]] %in% colnames(InputData)) {
+            if (!SettingsInfo[["PercentageColumn"]] %in% cols_a) {
                 message <- paste0("The ", SettingsInfo[["PercentageColumn"]], 
                     " column selected as PercentageColumn in SettingsInfo was ",
-                    "not found in InputData. Please check your input.")
+                    "not found in assay(se). Please check your input.")
                 logger::log_trace(paste0("Error ", message))
                 stop(message)
             }
@@ -849,7 +900,7 @@ CheckInput_ORA <- function(InputData,
                 stop(message)
             } else {
                 PathwayFile <- PathwayFile %>%
-                    dplyr::rename("gene"=SettingsInfo[["PathwayFeature"]])
+                    dplyr::rename("gene" = SettingsInfo[["PathwayFeature"]])
             }
         } else {
             message <- paste0("SettingsInfo must provide the column name for PathwayFeature in PathwayFile")
@@ -1178,7 +1229,7 @@ CheckInput_MCA <- function(InputData_C1,
     }
 
     #------------- SaveAs
-    SaveAs_Table_options <- c("txt","csv", "xlsx")
+    SaveAs_Table_options <- c("txt", "csv", "xlsx")
     if (!is.null(SaveAs_Table)) {
         if (!(SaveAs_Table %in% SaveAs_Table_options)| is.null(SaveAs_Table)) {
             message <- paste0("Check input. The selected SaveAs_Table option is not valid. Please select one of the folowwing: ", paste(SaveAs_Table_options, collapse = ", "), "." )
