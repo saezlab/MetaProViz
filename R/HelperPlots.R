@@ -188,7 +188,7 @@ set_width <- partial(set_size, dim = 'widths')
 adjust_layout <- function(gtbl, param) {
 
     c('widths', 'heights') %>%
-    reduce(
+    purrr::reduce(
         ~set_sizes(.x, .y, param[[.y]]),
         .init = gtbl
     )
@@ -464,7 +464,6 @@ in_gtable <- function(name, gtbl) {
 #' @keywords Plot helper function
 #' @noRd
 #'
-
 plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
 
     if (PlotType == "Scree") {
@@ -563,8 +562,8 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     Plot_Sized <- InputPlot %>%
         ggplotGrob %>%
         withCanvasSize(width = 12, height = 11) %>%
-        adjust_layout(PCA_PARAM) %>%
-        adjust_title(PlotName) %>%
+        adjust_layout(param = PCA_PARAM) %>%
+        adjust_title(titles = PlotName) %>%
         adjust_legend(
             InputPlot,
             sections = c("color", "shape"),
@@ -588,15 +587,14 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 
 #' @param InputPlot This is the ggplot object generated within the VizHeatmap function.
 #' @param SettingsInfo Passed to VizHeatmap
-#' @param SettingsFile_Sample Passed to VizHeatmap
-#' @param SettingsFile_Metab Passed to VizHeatmap
+#' @param se Passed to VizHeatmap
 #' @param PlotName Passed to VizHeatmap
 #'
 #' @keywords Heatmap helper function
 #' @noRd
 
-PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample, 
-    SettingsFile_Metab, PlotName){
+PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, se, 
+    PlotName) {
 
     ## set the parameters for the plot we would like to use as a basis, 
     ## before we start adjusting it:
@@ -617,7 +615,7 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample,
     ## adjust the parameters:
     Input <- InputPlot$gtable
 
-    Plot_Sized <- Input  %>%
+    Plot_Sized <- Input %>%
         withCanvasSize(width = 12, height = 11) %>%
         adjust_layout(HEAT_PARAM) %>%
         adjust_title(c(PlotName))
@@ -633,7 +631,7 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample,
             for (x in seq_along(names)) {
                 names_sel <- names[[x]]
                 legend_names[x] <- names_sel
-                colour_names[x] <- SettingsFile_Sample[names[[x]]]
+                colour_names[x] <- colData(se)[names[[x]]]
             }
         } else {
             colour_names <- NULL
@@ -647,7 +645,7 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample,
             for (x in seq_along(names)) {
                 names_sel <- names[[x]]
                 legend_names_M[x] <- names_sel
-                colour_names_M[x] <- SettingsFile_Metab[names[[x]]]
+                colour_names_M[x] <- rowData(se)[names[[x]]]
             }
         } else {
             colour_names_M <- NULL
@@ -764,7 +762,7 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle) {
 
 #' @param InputPlot This is the ggplot object generated within the VizSuperplots function.
 #' @param SettingsInfo Passed to VizSuperplots
-#' @param SettingsFile_Sample Passed to VizSuperplots
+#' @param se Passed to VizSuperplots
 #' @param Subtitle Passed to VizSuperplots
 #' @param PlotName Passed to VizSuperplots
 #' @param PlotType Passed to VizSuperplots
@@ -774,14 +772,14 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle) {
 
 plotGrob_Superplot <- function(InputPlot,
     SettingsInfo,
-    SettingsFile_Sample,
+    se,
     Subtitle,
     PlotName,
     PlotType) {
     
     ## set the parameters for the plot we would like to use as a basis, 
     ## before we start adjusting it:
-    X_Con <- SettingsFile_Sample %>%
+    X_Con <- colData(se) %>%
         dplyr::distinct(Conditions)
 
     X_Tick <- unit(max(char2cm(X_Con[[1]])) * 0.6, "cm")
