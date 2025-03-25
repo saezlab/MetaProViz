@@ -102,8 +102,8 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 #' @noRd
 #'
 
-SaveRes<- function(InputList_DF = NULL,
-    InputList_Plot= NULL,
+SaveRes <- function(data = NULL,
+    plot = NULL,
     SaveAs_Table = NULL, ## EDIT: name the options here and use match.arg ## EDIT: should have a different name, e.g. saveAsFormat ? ## EDIT: camel case and snake case notation should not be mixed
     SaveAs_Plot = NULL,
     FolderPath,
@@ -118,35 +118,22 @@ SaveRes<- function(InputList_DF = NULL,
     if (!is.null(SaveAs_Table)) {
         ## Excel File: One file with multiple sheets:
         
-        if (SaveAs_Table == "xlsx") {
-            ## make FileName
-            ##FileName <- paste0(FileName, "_", Sys.Date(), sep = "") EDIT: is this better?
-            if(!CoRe | is.null(CoRe)) {
-                FileName <- paste0(FolderPath, "/" , FileName, "_", Sys.Date(), sep = "")
-                ##FileName <- paste0(FolderPath, "/", FileName)
-            } else {
-                FileName <- paste0(FolderPath, "/CoRe_" , FileName,"_", Sys.Date(), sep = "")
-                ##FileName <- paste0(FolderPath, "/CoRe_", FileName)
-            }
-      
-            ## save Excel
-            writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx"), 
-                col_names = TRUE)
-        } else {
-            for (DF in names(InputList_DF)) {
+        for (data_i in names(data)) { ## EDIT: not every entry in list is a data.frame, check and adjust accordingly
                 ## make FileName
                 
-                ##FileName <- paste0(FileName, "_", DF, "_", Sys.Date(), sep = "") EDIT: is this better?
-                if (!CoRe | is.null(CoRe)) {
-                    FileName_Save <- paste0(FolderPath,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
-                    ##FileName <- paste0(FolderPath, "/", FileName)
-                } else {
-                    FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
-                    ##FileName <- paste0(FolderPath, "/CoRe_", FileName)
-                }
-
-                ## unlist DF columns if needed
-                InputList_DF[[DF]] <- InputList_DF[[DF]] %>%
+            ##FileName <- paste0(FileName, "_", data_i, "_", Sys.Date(), sep = "") EDIT: is this better?
+            if (!CoRe | is.null(CoRe)) {
+                FileName_Save <- paste0(FolderPath,"/" , FileName, "_", data_i,"_", Sys.Date(), sep = "")
+                ##FileName <- paste0(FolderPath, "/", FileName)
+            } else {
+                FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName, "_", data_i,"_", Sys.Date(), sep = "")
+                ##FileName <- paste0(FolderPath, "/CoRe_", FileName)
+            }
+                
+            if (!is(data[[data_i]], "SummarizedExperiment")) {
+                
+                ## unlist data_i columns if needed
+                data[[data_i]] <- data[[data_i]] %>%
                     mutate(
                         across(
                             where(is.list),
@@ -154,28 +141,37 @@ SaveRes<- function(InputList_DF = NULL,
                         )
                     )
                 ## Save table
-                if (SaveAs_Table == "csv"){
-                    InputList_DF[[DF]] %>%
+                ## save Excel
+                if (SaveAs_Table == "xlsx") {
+                    writexl::write_xlsx(data[[data_i]], paste0(FileName_Save, ".xlsx"),
+                                        col_names = TRUE)    
+                }
+                ## save csv
+                if (SaveAs_Table == "csv") {
+                    data[[data_i]] %>%
                         readr::write_csv(paste0(FileName_Save, ".csv"))
-                } else if (SaveAs_Table == "txt") {
-                    InputList_DF[[DF]] %>%
+                } 
+                if (SaveAs_Table == "txt") {
+                    data[[data_i]] %>%
                         readr::write_delim(paste0(FileName_Save, ".csv"))
                 }
+            } else {
+                saveRDS(data[[data_i]], file = paste0(FileName_Save, ".RDS"))
             }
         }
     }
 
     ################ Save Plots:
     if(!is.null(SaveAs_Plot)){
-        for (Plot in names(InputList_Plot)) {
+        for (plot_i in names(plot)) {
          ## make FileName
             ##FileName <- paste0(FileName, "_", Sys.Date(), sep = "") EDIT: is this better?
         
             if (!CoRe | is.null(CoRe)) {
-                FileName_Save <- paste0(FolderPath,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
+                FileName_Save <- paste0(FolderPath,"/" , FileName,"_", plot_i, "_",Sys.Date(), sep = "")
                 ##FileName <- paste0(FolderPath, "/", FileName)
             } else {
-                FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
+                FileName_Save <- paste0(FolderPath,"/CoRe_" , FileName,"_", plot_i,"_",Sys.Date(), sep = "")
                 ##FileName <- paste0(FolderPath, "/CoRe_", FileName)
             }
 
@@ -191,12 +187,12 @@ SaveRes<- function(InputList_DF = NULL,
             }
 
             ggplot2::ggsave(filename = paste0(FileName_Save, ".", SaveAs_Plot), 
-                plot = InputList_Plot[[Plot]], width = PlotWidth, 
+                plot = plot[[plot_i]], width = PlotWidth, 
                 height = PlotHeight, unit = PlotUnit)
 
             if (PrintPlot) {
                 suppressMessages(suppressWarnings(
-                    plot(InputList_Plot[[Plot]])))
+                    plot(plot[[plot_i]])))
             }
         }
     }
