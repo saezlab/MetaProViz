@@ -112,13 +112,6 @@ PreProcessing <- function(
   
     ## ------------ Create log file ----------- ##
     MetaProViz_Init()
-
-    ## obtain InputData and SettingsFile_Sample
-    InputData <- assay(se) |>
-        t() |>
-        as.data.frame() 
-    SettingsFile_Sample <- colData(se) |>
-        as.data.frame()
     
     ## ------------------ Check Input ------------------- ##
     ## HelperFunction `CheckInput`
@@ -207,14 +200,14 @@ PreProcessing <- function(
         ##se_tic <- se_MVI ## EDIT: could also use the SE object returned from TICNorm?
 
         ## perform TIC normalization (TIC = FALSE)
-        l_notic <- TICNorm(se = se_tic, ## EDIT: could it have the same name l_tic?
+        l_tic <- TICNorm(se = se_tic, ## EDIT: could it have the same name l_tic?
             SettingsInfo = SettingsInfo,
             TIC = TIC)
         se_tic <- l_tic[["data"]][["se"]]
         
         ## add plots to PlotList
         PlotList <- list()
-        PlotList[["RLAPlot"]] <- l_notic[["plot"]][["beforeTicNormalization"]]
+        PlotList[["RLAPlot"]] <- l_tic[["plot"]][["beforeTicNormalization"]]
     }
 
     ## ------------- 4. CoRe media QC (blank) and normalization ------------- ##
@@ -251,7 +244,7 @@ PreProcessing <- function(
                     list(FeatureFiltering = c(FeatureFilt), ## EDIT: are the c() needed?
                         FeatureFilt_Value = c(FeatureFilt_Value),
                         RemovedMetabolites = c("None"))), ## EDIT: for simplicity why not only return here l_filtered[["RemovedMetabolites"]]? / have only one return not dependong on length(l_filtered[["RemovedMetabolites"]])?
-                "se_preprocessed" = l_outlier[["data"]][["se"]])
+                "se_processed" = l_outlier[["data"]][["se"]])
         } else {
             l <- list(
                 "se_raw"= se,
@@ -260,7 +253,7 @@ PreProcessing <- function(
                         FeatureFiltering = rep(FeatureFilt, length(l_filtered[["RemovedMetabolites"]])),
                         FeatureFilt_Value = rep(FeatureFilt_Value, length(l_filtered[["RemovedMetabolites"]])),
                         RemovedMetabolites = l_filtered[["RemovedMetabolites"]])),
-                "se_preprocessed" = l_outlier[["data"]][["se"]]) 
+                "se_processed" = l_outlier[["data"]][["se"]]) 
         }
     } else {
         l <- list(
@@ -1701,7 +1694,7 @@ OutlierDetection <-function(se, ##InputData,
 
     ## load the data
     data_norm <- assay(se)# %>%
-        #dplyr::mutate_all(~ replace(., is.nan(.), 0)) ## EDIT: this is repeated and should be done via a function
+    #dplyr::mutate_all(~ replace(., is.nan(.), 0)) ## EDIT: this is repeated and should be done via a function
     
     ## replace NA with 0
     data_norm[is.na(data_norm)] <- 0 ## EDIT: what is the difference to the call before?
@@ -1742,14 +1735,17 @@ OutlierDetection <-function(se, ##InputData,
             zero_var_metab_warning <- TRUE 
         }
 
-        for (metab in metabolite_zero_var_list) {  
+        #for (metab in metabolite_zero_var_list) {  
             ## remove the metabolites with zero variance from the data to do PCA
-            data_norm <- data_norm[!rownames(data_norm) %in% metab]
-        }
+        data_norm <- data_norm[!rownames(data_norm) %in% unlist(metabolite_zero_var_list), ]
+        #}
 
         ##---  PCA
+        ## remove features with zero variance
+        #sds <- apply(data_norm, 2, sd, na.rm = TRUE)
+        #data_norm_pca <- data_norm[, sds != 0]
         PCA.res <- prcomp(t(data_norm), center =  TRUE, scale. =  TRUE)
-        se_tmp <- se[rownames(data_norm), ]
+        se_tmp <- se[rownames(data_norm), colnames(data_norm)]
         assay(se_tmp) <- data_norm
         #outlier_PCA_data <- data_norm
         #outlier_PCA_data$Conditions <- Conditions
@@ -1991,8 +1987,8 @@ OutlierDetection <-function(se, ##InputData,
     ## define updated SummarizedExperiment for plotting
     se_tmp <- se[-zero_var_metab_export_df$Metabolite, ]
     se_tmp@colData <- MetaData_Sample[, !colnames(MetaData_Sample) %in% rownames(se)] |>
-        as.data.frame() |>
-        tibble::column_to_rownames(var = "Row.names") |>
+        #as.data.frame() |>
+        #tibble::column_to_rownames(var = "Row.names") |>
         DataFrame()
     
     ## 1. Shape Outliers
@@ -2026,8 +2022,8 @@ OutlierDetection <-function(se, ##InputData,
     }
 
     ## add data_norm_filtered_full to assay
-    tmp <- data_norm_filtered_full |>
-        tibble::column_to_rownames(var = "Row.names")
+    tmp <- data_norm_filtered_full# |>
+        #tibble::column_to_rownames(var = "Row.names")
     assay(se_tmp) <- tmp[, rownames(se_tmp)] |>
         t()
     
