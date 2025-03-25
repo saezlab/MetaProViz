@@ -67,10 +67,9 @@
 #' @export
 #'
 VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options and use match.arg
-    InputData,
+    se, 
     SettingsInfo = NULL,
-    SettingsFile_Metab = NULL,
-    InputData2 = NULL,
+    se2 = NULL,
     y = "p.adj",
     x = "Log2FC",
     xlab = NULL,#"~Log[2]~FC"
@@ -81,7 +80,7 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
     SelectLab = "",
     PlotName = "",
     Subtitle = "",
-    ComparisonName = c(InputData = "Cond1", InputData2 =  "Cond2"),
+    ComparisonName = c(se = "Cond1", se2 =  "Cond2"),
     ColorPalette = NULL,
     ShapePalette = NULL,
     Theme = NULL,
@@ -100,13 +99,13 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
         SettingsFile <- NULL ## for PEA the SettingsFile_Metab is the prior knowledge file, and hence this will not have features as row names.
         Info <- NULL ## if SettingsFileMetab=NULL, SetingsInfo has to be NULL to, otherwise we will get an error.
     } else {
-        SettingsFile <- SettingsFile_Metab
+        SettingsFile <- rowData(se)
         Info <- SettingsInfo
     }
 
-    CheckInput(InputData = as.data.frame(t(InputData)),
-        InputData_Num = FALSE, SettingsFile_Sample = NULL,
-        SettingsFile_Metab = SettingsFile, ## set above
+    CheckInput(se, #InputData = as.data.frame(t(InputData)),
+        InputData_Num = FALSE, #SettingsFile_Sample = NULL,
+        #SettingsFile_Metab = SettingsFile, ## set above
         SettingsInfo = Info, ## set above
         SaveAs_Plot = SaveAs_Plot,
         SaveAs_Table = NULL, CoRe = FALSE, PrintPlot = PrintPlot,
@@ -123,32 +122,28 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (!paste(x) %in% colnames(InputData) | !paste(y) %in% colnames(InputData)) { ## EDIT: why is paste needed here?
+    if (!x %in% colnames(se) | !y %in% colnames(se)) {
         message <- "Check input. The column name of x and/or y does not exist in 'Input_data'."
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-
     if (!is.null(SelectLab) & !is.vector(SelectLab)) {
         message <- "Check input. 'SelectLab' must be either NULL or a vector."
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-
     if (!is.logical(Connectors)) {
         message <- "Check input. The 'Connectors' value should be either TRUE if connectors from names to points are to be added to the plot or FALSE if not."
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-
     if (!is.null(PlotName) & !is.vector(PlotName)) {
         message <- "Check input. 'PlotName' must be either NULL or a vector."
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-
     Plot_options <- c("Standard", "Compare", "PEA")
-    if (PlotSettings %in% !Plot_options) {
+    if (!PlotSettings %in% Plot_options) {
         message <- paste0(
             "'PlotSettings' option is incorrect. The allowed options are the following: ",
             paste(Plot_options, collapse = ", "), ".")
@@ -165,63 +160,65 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
     ############################################################################
     ## ----------- Prepare InputData ------------ ##
     ## Extract required columns and merge with SettingsFile
-    if (!is.null(SettingsFile_Metab)) {
+    ##if (!is.null(SettingsFile_Metab)) {
         ##--- Prepare the color scheme:
-        if (("color" %in% names(SettingsInfo)) & ("shape" %in% names(SettingsInfo))) {
-            if ((SettingsInfo[["shape"]] == SettingsInfo[["color"]])) {
-                SettingsFile_Metab$shape <- SettingsFile_Metab[, paste(SettingsInfo[["color"]])]
-                SettingsFile_Metab<- SettingsFile_Metab %>%
-                    dplyr::rename("color" = paste(SettingsInfo[["color"]]))
+        if ("color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
+            if (SettingsInfo[["shape"]] == SettingsInfo[["color"]]) {
+                rowData(se)$shape <- rowData(se)[, SettingsInfo[["color"]]]
+                rowData(se) <- rowData(se) %>%
+                    dplyr::rename("color" = SettingsInfo[["color"]])
             } else {
-                SettingsFile_Metab <- SettingsFile_Metab %>%
-                    dplyr::rename("color"=paste(SettingsInfo[["color"]]),
-                         "shape" = paste(SettingsInfo[["shape"]]))
+                rowData(se) <- rowData(se) %>%
+                    dplyr::rename(
+                        "color"= SettingsInfo[["color"]],
+                        "shape" = SettingsInfo[["shape"]])
             }
         } else if ("color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
-            SettingsFile_Metab <- SettingsFile_Metab %>%
-                dplyr::rename("color" = paste(SettingsInfo[["color"]]))
+            rowData(se) <- rowData(se) %>%
+                as.data.frame() |>
+                dplyr::rename("color" = SettingsInfo[["color"]])
         } else if (!"color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
-            SettingsFile_Metab <- SettingsFile_Metab %>%
-                dplyr::rename("shape" = paste(SettingsInfo[["shape"]]))
+            rowData(se) <- rowData(se) %>%
+                dplyr::rename("shape" = SettingsInfo[["shape"]])
         }
         if ("individual" %in% names(SettingsInfo)) {
-            SettingsFile_Metab <- SettingsFile_Metab %>%
+            rowData(se) <- rowData(se) %>%
                 dplyr::rename("individual" = paste(SettingsInfo[["individual"]]))
         }
 
 
         ##--- Merge InputData with SettingsFile:
         common_columns <- character() ## Initialize an empty character vector
-        for (col_name in colnames(InputData[, c(x, y)])) {
-            if (col_name %in% colnames(SettingsFile_Metab)) {
+        for (col_name in colnames(assay(se)[, c(x, y)])) {
+            if (col_name %in% colnames(rowData(se))) {
                 common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
             }
         }
-        SettingsFile_Metab <- SettingsFile_Metab %>% #rename those column since they otherwise will cause issues when we merge the DFs later
-            dplyr::rename_at(vars(common_columns), ~ paste0(., "_SettingsFile_Metab"))
+        rowData(se) <- rowData(se) %>% #rename those column since they otherwise will cause issues when we merge the DFs later
+            dplyr::rename_at(vars(common_columns), ~ paste0(., "_rowData"))
 
         if (PlotSettings == "PEA") {
-            VolcanoData <- merge(x = SettingsFile_Metab, 
+            VolcanoData <- merge(x = rowData(se), 
                     y = InputData[, c(x, y)], 
                     by.x = SettingsInfo[["PEA_Feature"]], by.y = 0, 
                     all.y = TRUE) %>%
                 tibble::remove_rownames() %>%
-                dplyr::mutate(FeatureNames = SettingsInfo[["PEA_Feature"]]) %>%
-                dplyr::filter(!is.na(x) | !is.na(x))
+                dplyr::mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])
         } else {
-            VolcanoData <- merge(x = SettingsFile_Metab, 
+            VolcanoData <- merge(x = rowData(se), 
                     y = InputData[, c(x, y)], by = 0, all.y = TRUE) %>%
                 tibble::remove_rownames() %>%
                 tibble::column_to_rownames("Row.names") %>%
-                dplyr::mutate(FeatureNames = rownames(InputData)) %>%
-                dplyr::filter(!is.na(x) | !is.na(x))
+                dplyr::mutate(FeatureNames = rownames(se))
         }
+        VolcanoData <- VolcanoData |>
+            dplyr::filter(!is.na(x) | !is.na(x)) ## EDIT: why two times??
 
-    } else {
-        VolcanoData <- InputData[, c(x, y)] %>%
-            dplyr::mutate(FeatureNames = rownames(InputData)) %>%
-            dplyr::filter(!is.na(x) | !is.na(x))
-    }
+    ##} else {
+    ##    VolcanoData <- InputData[, c(x, y)] %>%
+    ##        dplyr::mutate(FeatureNames = rownames(InputData)) %>%
+    ##        dplyr::filter(!is.na(x) | !is.na(x))
+    ##}
 
     ## Rename the x and y lab if the information has been passed:
     if (is.null(xlab)) { #use column name of x provided by user
@@ -258,7 +255,7 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
         safe_shape_palette <- c(15,17,16,18,25,7,8,11,12)
         ## check that length is enough for what the user wants to shape
     } else {
-        safe_shape_palette <-shape_palette
+        safe_shape_palette <- shape_palette
         #check that length is enough for what the user wants to shape
     }
 
@@ -267,8 +264,8 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
 
     if (PlotSettings == "Standard") {
         #####--- 1. Standard
-        VolcanoRes <- VizVolcano_Standard(InputData = VolcanoData,
-            SettingsFile_Metab = SettingsFile_Metab,
+        VolcanoRes <- VizVolcano_Standard(se = se, #InputData = VolcanoData,
+            ##SettingsFile_Metab = SettingsFile_Metab,
             SettingsInfo = SettingsInfo,
             y = y, x = x, xlab = xlab, ylab = ylab,
             xCutoff = xCutoff, yCutoff = yCutoff,
@@ -281,8 +278,8 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
 
     } else if (PlotSettings == "Compare") { 
         #####--- 2. Compare
-        VolcanoRes <- VizVolcano_Compare(InputData = VolcanoData,
-            InputData2 = InputData2, SettingsFile_Metab = SettingsFile_Metab,
+        VolcanoRes <- VizVolcano_Compare(se = se, #InputData = VolcanoData,
+            se2 = se2, ##InputData2 = InputData2, SettingsFile_Metab = SettingsFile_Metab,
             SettingsInfo = SettingsInfo, y = y, x = x, xlab = xlab, ylab = ylab,
             xCutoff = xCutoff, yCutoff = yCutoff, Connectors = Connectors,
             SelectLab = SelectLab, PlotName = PlotName, Subtitle = Subtitle,
@@ -293,8 +290,8 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
 
     } else if (PlotSettings=="PEA") {
         #####--- 3. PEA
-        VolcanoRes <- VizVolcano_PEA(InputData = VolcanoData,
-            InputData2 = InputData2, SettingsFile_Metab = SettingsFile_Metab, 
+        VolcanoRes <- VizVolcano_PEA(se = se, ##InputData = VolcanoData,
+            se2 = se2, ##InputData2 = InputData2, SettingsFile_Metab = SettingsFile_Metab, 
             ## Problem: we need to know the column name of the features!
             SettingsInfo = SettingsInfo, y = y, x = x, xlab = xlab, ylab = ylab,
             xCutoff = xCutoff, yCutoff = yCutoff, Connectors = Connectors,
@@ -347,8 +344,8 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
 #'
 #' @noRd
 #'
-VizVolcano_Standard <- function(InputData,
-    SettingsFile_Metab,
+VizVolcano_Standard <- function(se, #InputData,
+    #SettingsFile_Metab,
     SettingsInfo,
     y = "p.adj",
     x = "Log2FC",
@@ -375,7 +372,7 @@ VizVolcano_Standard <- function(InputData,
     #Plots
     if ("individual" %in% names(SettingsInfo)) {
         ## Create the list of individual plots that should be made:
-        IndividualPlots <- unique(InputData$individual)
+        IndividualPlots <- unique(rowData(se)$individual)
 
         ## empty list to store all the plots
         PlotList <- list() ## EDIT: define once outside the if/else statements for all conditions and delete the other instances
@@ -383,7 +380,7 @@ VizVolcano_Standard <- function(InputData,
         PlotList_adaptedGrid <- list() ## EDIT: define once outside the if/else statements for all conditions and delete the other instances
 
         for (i in IndividualPlots) {
-            InputVolcano <- subset(InputData, individual == paste(i))
+            InputVolcano <- subset(assay(se), rowData(se)$individual == i)
 
             if (nrow(InputVolcano) >= 1) {
                 if ("color" %in% names(SettingsInfo)) {
@@ -423,7 +420,7 @@ VizVolcano_Standard <- function(InputData,
 
                 ## Prepare the Plot:
                 Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                    lab = InputVolcano$FeatureNames, ## metabolite name
+                    lab = rownames(se), ## metabolite name
                         selectLab = SelectLab, x = paste(x), y = paste(y),
                         xlab = xlab, ylab = ylab, pCutoff = yCutoff,
                         FCcutoff = xCutoff, ## cut off Log2FC, automatically 2
@@ -449,7 +446,8 @@ VizVolcano_Standard <- function(InputData,
                         legendPosition = LegendPos, legendLabSize = 7,
                         legendIconSize = 4, gridlines.major = FALSE,
                         gridlines.minor = FALSE, drawConnectors = Connectors)
-                ## Add the theme
+               
+                 ## Add the theme
                 if (!is.null(Theme)) {
                     Plot <- Plot +
                         Theme
@@ -480,8 +478,8 @@ VizVolcano_Standard <- function(InputData,
 
                 #----- Save
                 suppressMessages(suppressWarnings(
-                    SaveRes(InputList_DF = NULL,
-                        InputList_Plot = SaveList,
+                    SaveRes(data = NULL,
+                        plot = SaveList,
                         SaveAs_Table = NULL,
                         SaveAs_Plot = SaveAs_Plot,
                         FolderPath = Folder,
@@ -493,7 +491,7 @@ VizVolcano_Standard <- function(InputData,
                         PlotUnit = "cm")))
             }
         }
-    } else if (!"individual" %in% names(SettingsInfo)) {
+    } else if (!"individual" %in% names(SettingsInfo)) { ## EDIT: idnetify what is identical in the two ifs and simplify as much as possible
         
         PlotList <- list() ##Empty list to store all the plots
         PlotList_adaptedGrid <- list() ## Empty list to store all the plots
@@ -538,7 +536,7 @@ VizVolcano_Standard <- function(InputData,
 
             ## Prepare the Plot:
             Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                lab = InputVolcano$FeatureNames,#Metabolite name
+                lab = rownames(se), ## metabolite name
                 selectLab = SelectLab, x = paste(x), y = paste(y),
                 xlab = xlab, ylab = ylab, pCutoff = yCutoff, 
                 FCcutoff = xCutoff, ## Cut off Log2FC, automatically 2
@@ -588,8 +586,8 @@ VizVolcano_Standard <- function(InputData,
 
             #----- Save
             suppressMessages(suppressWarnings(
-                SaveRes(InputList_DF = NULL,
-                    InputList_Plot = list(
+                SaveRes(data = NULL,
+                    plot = list(
                         "Plot_Sized" = PlotList_adaptedGrid[["Plot_Sized"]]),
                     SaveAs_Table = NULL,
                     SaveAs_Plot = SaveAs_Plot,
@@ -603,7 +601,11 @@ VizVolcano_Standard <- function(InputData,
         }
     }
     
-    invisible(list("Plot" = PlotList,"Plot_Sized" = PlotList_adaptedGrid))
+    invisible(list(
+        "data" = list(NULL), 
+        "plot" = list(
+            "Plot" = PlotList,
+            "Plot_Sized" = PlotList_adaptedGrid)))
 }
 
 ################################################################################
@@ -647,9 +649,9 @@ VizVolcano_Standard <- function(InputData,
 #'
 #' @noRd
 #'
-VizVolcano_Compare <- function(InputData, 
-    InputData2, 
-    SettingsFile_Metab,
+VizVolcano_Compare <- function(se, 
+    se2, 
+    ##SettingsFile_Metab,
     SettingsInfo, 
     y = "p.adj", 
     x = "Log2FC", 
@@ -672,16 +674,16 @@ VizVolcano_Compare <- function(InputData,
 
     #####################
     ##--- Check InputData
-    if (!is.data.frame(InputData2)) {
-        if (!paste(x) %in% colnames(InputData2) | !paste(y) %in% colnames(InputData2)) { ## EDIT: why is paste needed here?
-            message <- paste0("Check 'InputData2'. The column name of ", x, " and/or ", y, " does not exist in 'InputData2'.")
+    if (!is.data.frame(assay(se2))) {
+        if (!x %in% colnames(se2) | !y %in% colnames(se2)) { 
+            message <- paste0("Check 'se2'. The column name of ", x, " and/or ", y, " does not exist in 'se2'.")
             logger::log_trace(paste0("Error ", message))
             stop(message)
         }
     }
 
-    if (any(duplicated(row.names(InputData2)))) {
-        message <- paste("Duplicated row.names of 'InputData2', whilst row.names must be unique")
+    if (any(duplicated(rownames(se2)))) {
+        message <- paste("Duplicated rownames of 'se2', whilst rownames must be unique")
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
@@ -691,27 +693,27 @@ VizVolcano_Compare <- function(InputData,
     safe_shape_palette <- ShapePalette
 
     ##--- Prepare Input Data
-    if (!is.null(SettingsFile_Metab)) {
-        InputData2 <- merge(
-                x = tibble::rownames_to_column(SettingsFile_Metab, "FeatureNames"), 
-                y = tibble::rownames_to_column(InputData2[, c(x, y)], "FeatureNames"), 
+    if (!is.null(rowData(se))) {
+        rowData(se2) <- merge(
+                x = tibble::rownames_to_column(rowData(se), "FeatureNames"), 
+                y = tibble::rownames_to_column(assay(se2[, c(x, y)], "FeatureNames"), 
                 by = "FeatureNames", all.y = TRUE) %>%
             filter(!is.na(x) | !is.na(x))
-        InputData[,"comparison"] <- as.character(paste(ComparisonName[["InputData"]]))
-        InputData2[,"comparison"] <- as.character(paste(ComparisonName[["InputData2"]]))
-        InputCompare  <- rbind(InputData,InputData2)
+        rowData(se)[,"comparison"] <- as.character(paste(ComparisonName[["se"]]))
+        rowData(se2)[,"comparison"] <- as.character(paste(ComparisonName[["se2"]]))
+        InputCompare  <- rbind(rowData(se), rowData(se2))
 
     } else {
-        InputData2 <-  InputData2[, c(x, y)] %>%
-            mutate(FeatureNames = rownames(InputData2)) %>%
+        rowData(se2) <-  rowData(se2[, c(x, y)] %>%
+            mutate(FeatureNames = rownames(se2)) %>%
             na.omit()
 
         ## Combine DFs and add appropriate column names
-        InputData[,"comparison"]  <- as.character(paste(ComparisonName[["InputData"]]))
-        InputData2[,"comparison"]  <- as.character(paste(ComparisonName[["InputData2"]]))
+        rowData(se)[,"comparison"]  <- as.character(paste(ComparisonName[["se"]]))
+        rowData(se2)[,"comparison"]  <- as.character(paste(ComparisonName[["se2"]]))
         InputCompare  <- rbind(
-            InputData[, c("FeatureNames", x, y, "comparison")],
-            InputData2[, c("FeatureNames", x, y, "comparison")])
+            rowData(se)[, c("FeatureNames", x, y, "comparison")],
+            rowData(se2)[, c("FeatureNames", x, y, "comparison")])
     }
     
     #####################
@@ -791,7 +793,7 @@ VizVolcano_Compare <- function(InputData,
             
                 ## prepare the Plot:
                 Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                    lab = InputVolcano$FeatureNames, ## metabolite name
+                    lab = rownames(se), ## metabolite name
                     selectLab = SelectLab, x = paste(x), y = paste(y),
                     xlab = xlab, ylab = ylab, pCutoff = yCutoff,
                     FCcutoff = xCutoff, ## Cut off Log2FC, automatically 2
@@ -845,8 +847,8 @@ VizVolcano_Compare <- function(InputData,
 
                 ##----- save
                 suppressMessages(suppressWarnings(
-                    SaveRes(InputList_DF = NULL,
-                        InputList_Plot = SaveList,
+                    SaveRes(data = NULL,
+                        plot = SaveList,
                         SaveAs_Table = NULL,
                         SaveAs_Plot = SaveAs_Plot,
                         FolderPath = Folder,
@@ -920,7 +922,7 @@ VizVolcano_Compare <- function(InputData,
             }
             ## Prepare the Plot:
             Plot <- EnhancedVolcano::EnhancedVolcano(InputVolcano,
-                lab = InputVolcano$FeatureNames, ##Metabolite name
+                lab = rownames(se), ##Metabolite name
                 selectLab = SelectLab, x = paste(x), y = paste(y),
                 xlab  =xlab, ylab =ylab, pCutoff = yCutoff,
                 FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
@@ -967,8 +969,8 @@ VizVolcano_Compare <- function(InputData,
 
             ##----- Save
             suppressMessages(suppressWarnings(
-                SaveRes(InputList_DF = NULL,
-                    InputList_Plot = list(
+                SaveRes(data = NULL,
+                    plot = list(
                         "Plot_Sized" = PlotList_adaptedGrid[["Plot_Sized"]]),
                     SaveAs_Table = NULL, SaveAs_Plot = SaveAs_Plot,
                     FolderPath = Folder,
@@ -980,7 +982,11 @@ VizVolcano_Compare <- function(InputData,
     }
   
     ## return
-    invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))
+    invisible(list(
+        "data" = list(NULL),
+        "plot" = list(
+            "Plot" = PlotList, 
+            "Plot_Sized" = PlotList_adaptedGrid)))
 }
 
 
@@ -1024,10 +1030,81 @@ VizVolcano_Compare <- function(InputData,
 #' @importFrom logger log_trace
 #'
 #' @noRd
+#' 
+#' @examples
+#' Intra <- ToyData("IntraCells_Raw")
+#' MappingInfo <- ToyData(Data = "Cells_MetaData")
+#' 
+#' ## find overlapping metabolites
+#' features <- intersect(colnames(Intra[, -c(1:3)]), rownames(MappingInfo))
+#' 
+#' ## create SummarizedExperiment object
+#' a <- t(Intra[-c(49:58), features])
+#' rD <- DataFrame(MappingInfo[features, ])
+#' rD$feature <- rownames(rD)
+#' cD <- DataFrame(Intra[-c(49:58), c(1:3)])
+#' se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+#' 
+#' l_preprocessed <- PreProcessing(se = se,
+#'     SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"),
+#'     FeatureFilt = "Modified",
+#'     FeatureFilt_Value = 0.8,
+#'     TIC = TRUE,
+#'     MVI = TRUE,
+#'     HotellinsConfidence = 0.99,
+#'     CoRe = FALSE,
+#'     SaveAs_Plot = "svg",
+#'     SaveAs_Table = "csv",
+#'     PrintPlot = TRUE,
+#'     FolderPath = NULL)
+#' 
+#' se_preprocessed <- l_preprocessed[["data"]][["se_processed"]]
+#' 
+#' ## run Anova
+#' DMA_Annova <- DMA(se_preprocessed,
+#'     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL , Denominator = "HK2"), ## we compare all_vs_HK2
+#'     StatPval = "aov",
+#'     StatPadj = "fdr")
+#'     
+#' ## run ORA
+#' DM_ORA_res<- list()
+#' comparisons <- names(DMA_Annova[["DMA"]])
+#' for(comparison in comparisons) {
+#'     ## Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
+#'     DMA <- DMA_Annova[["DMA"]][[comparison]]
+#'     ## we remove metabolites that do not have a KEGG ID/KEGG pathway
+#'     DMA <- DMA[complete.cases(DMA),-1] %>% 
+#'         ## we use the KEGG trivial names to match with the KEGG pathways
+#'         dplyr::rename("Metabolite"="KEGGCompound")
+#'         
+#'     ## Perform ORA
+#'     DM_ORA_res[[comparison]] <- StandardORA(InputData= DMA %>% remove_rownames()%>%tibble::column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
+#'         SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+#'         PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+#'         PathwayName="KEGG",
+#'         minGSSize=3,
+#'         maxGSSize=1000,
+#'         pCutoff=0.01,
+#'         PercentageCutoff=10)
+#' }
+#' 
+#' ## obtain DMA_786M1A_vs_HK2 and DM_ORA_786M1A_vs_HK2 objects
+#' DMA_786M1A_vs_HK2 <- DMA_Annova[["DMA"]][["786-M1A_vs_HK2"]]
+#' DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGoSummary"]]
+#' 
+#' 
+#' InputPEA <- DMA_786M1A_vs_HK2 %>%
+#'     filter(!is.na(KEGGCompound)) %>%
+#'     tibble::column_to_rownames("KEGGCompound")
 #'
-VizVolcano_PEA <- function(InputData,
-                           InputData2,
-                           SettingsFile_Metab,
+#' ## InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name
+#' InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
+#'      dplyr::rename("term" = "ID")
+#' 
+#' VizVolcano_PEA(se, se2, SettingsInfo = )
+VizVolcano_PEA <- function(se,
+                           se2, #InputData2,
+                           ##SettingsFile_Metab,
                            SettingsInfo,
                            y = "p.adj",
                            x = "Log2FC",
@@ -1205,17 +1282,18 @@ VizVolcano_PEA <- function(InputData,
 
             #----- Save
             suppressMessages(suppressWarnings(
-                SaveRes(InputList_DF = NULL, InputList_Plot= SaveList,
+                SaveRes(data = NULL, plot= SaveList,
                     SaveAs_Table = NULL, SaveAs_Plot = SaveAs_Plot,
                     FolderPath = Folder, 
                     FileName = paste0("Volcano_", PlotName),
                     CoRe = FALSE, PrintPlot = PrintPlot,
                     PlotHeight = PlotHeight, PlotWidth = PlotWidth,
                     PlotUnit = "cm")))
-
         }
     }
 
     ## return
-    invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid))
+    invisible(list(
+        "data" = list(NULL),
+        "plot" = list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
 }
