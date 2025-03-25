@@ -52,17 +52,19 @@
 #' @keywords PCA
 #'
 #' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
+#' @import ggfortify
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
 #' @importFrom logger log_info log_trace
+#' @importFrom S4Vectors DataFrame
 #'
 #' @export
 #'
-VizPCA <- function(InputData,
+VizPCA <- function(se, #InputData,
                    SettingsInfo = NULL,
-                   SettingsFile_Sample = NULL,
+                   #SettingsFile_Sample = NULL,
                    ColorPalette = NULL,
                    ColorScale = "discrete", ## EDIT: would list here the option and use match.arg
                    ShapePalette = NULL,
@@ -83,9 +85,9 @@ VizPCA <- function(InputData,
     logger::log_info("VizPCA: PCA plot visualization")
     ## ------------ Check Input files ----------- ##
     ## HelperFunction `CheckInput`
-    CheckInput(InputData = InputData,
-        SettingsFile_Sample = SettingsFile_Sample,
-        SettingsFile_Metab = NULL,
+    CheckInput(se = se, ##InputData = InputData,
+        ##SettingsFile_Sample = SettingsFile_Sample,
+        ##SettingsFile_Metab = NULL,
         SettingsInfo = SettingsInfo,
         SaveAs_Plot = SaveAs_Plot,
         SaveAs_Table = NULL,
@@ -104,8 +106,8 @@ VizPCA <- function(InputData,
         stop(message)
     }
 
-    if (any(is.na(InputData))) {
-        InputData[is.na(InputData)] <- 0 #replace NA with 0
+    if (any(is.na(assay(se)))) {
+        assay(se)[is.na(assay(se))] <- 0 #replace NA with 0
         message <- paste("NA values are included in InputData that were set to 0 prior to performing PCA.")
         logger::log_info(message)
         message(message)
@@ -133,6 +135,7 @@ VizPCA <- function(InputData,
     } else {
         safe_colorblind_palette <-ColorPalette
     }
+    
     if (is.null(ShapePalette)) {
         safe_shape_palette <- c(15, 17, 16, 18, 6, 7, 8, 11, 12)
     } else {
@@ -145,46 +148,56 @@ VizPCA <- function(InputData,
     ##--- Prepare the color scheme:
     if ("color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
         if((SettingsInfo[["shape"]] == SettingsInfo[["color"]])){
-            SettingsFile_Sample$shape <- SettingsFile_Sample[, paste(SettingsInfo[["color"]])]
-            SettingsFile_Sample<- SettingsFile_Sample %>%
-                dplyr::rename("color"=paste(SettingsInfo[["color"]]))
+            colData(se)[, "shape"] <- colData(se)[, SettingsInfo[["color"]]]
+            se@colData <- colData(se) |>
+                as.data.frame() |>
+                dplyr::rename("color" = SettingsInfo[["color"]]) |>
+                DataFrame()
         } else {
-            SettingsFile_Sample <- SettingsFile_Sample %>%
-                dplyr::rename("color" = paste(SettingsInfo[["color"]]),
-                    "shape" = paste(SettingsInfo[["shape"]]))
+            se@colData <- colData(se) |>
+                as.data.frame() |>
+                dplyr::rename(
+                    "color" = SettingsInfo[["color"]],
+                    "shape" = SettingsInfo[["shape"]]) |>
+                DataFrame()
         }
     } else if("color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
         if ("color" %in% names(SettingsInfo)) {
-            SettingsFile_Sample <- SettingsFile_Sample %>%
-                dplyr::rename("color"=paste(SettingsInfo[["color"]]))
+            se@colData <- colData(se) %>%
+                as.data.frame() |>
+                dplyr::rename("color" = SettingsInfo[["color"]]) |>
+                DataFrame()
         }
         if ("shape" %in% names(SettingsInfo)) {
-            SettingsFile_Sample <- SettingsFile_Sample %>%
-                dplyr::rename("shape"=paste(SettingsInfo[["shape"]]))
+            se@colData <- colData(se) %>%
+                as.data.frame() |>
+                dplyr::rename("shape" = SettingsInfo[["shape"]]) |>
+                DataFrame()
         }
     }
 
     ##--- Prepare Input Data:
-    if (!is.null(SettingsFile_Sample)){
-        InputPCA  <- merge(
-            x = tibble::rownames_to_column(SettingsFile_Sample, "UniqueID"), 
-            y = tibble::rownames_to_column(InputData, "UniqueID"), 
-            by = "UniqueID", all.y = TRUE) %>%
-            tibble::column_to_rownames("UniqueID")
-    } else {
-        InputPCA  <- InputData
-    }
+    ##if (!is.null(SettingsFile_Sample)){
+    InputPCA <- merge(colData(se), t(assay(se)), by = "row.names", all.y = TRUE) 
+        ##InputPCA  <- merge(
+       ##     x = tibble::rownames_to_column(as.data.frame(colData(se)), "UniqueID"), 
+       ##     y = tibble::rownames_to_column(InputData, "UniqueID"), 
+       ##     by = "UniqueID", all.y = TRUE) %>%
+       ##     tibble::column_to_rownames("UniqueID")
+   ## } else {
+##        InputPCA  <- InputData
+  ##  }
 
     ##--- Prepare the color and shape settings:
-    if ("color" %in% names(SettingsFile_Sample)) {
+    if ("color" %in% names(colData(se))) {
         if (ColorScale == "discrete") {
             InputPCA$color <- as.factor(InputPCA$color)
             color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
-        } else if(ColorScale=="continuous") {
-            if (is.numeric(InputPCA$color) | is.integer(InputPCA$color)){
+        } else if (ColorScale=="continuous") {
+            if (is.numeric(InputPCA$color) | is.integer(InputPCA$color)) {
                 InputPCA$color <- as.numeric(InputPCA$color)
                 color_select <- safe_colorblind_palette
-            } else{
+            } else {
                 InputPCA$color <- as.factor(InputPCA$color)
                 ## Overwrite color pallette
                 safe_colorblind_palette <- metaproviz_palette()
@@ -200,7 +213,7 @@ VizPCA <- function(InputData,
 
     logger::log_info("VizPCA ColorScale: ", ColorScale)
 
-    if ("shape" %in% names(SettingsFile_Sample)) {
+    if ("shape" %in% names(colData(se))) {
         shape_select <- safe_shape_palette[1:length(unique(InputPCA$shape))]
 
         if (!is.character(InputPCA$shape)) {
@@ -210,19 +223,19 @@ VizPCA <- function(InputData,
     }
 
     ##---  #assign column and legend name
-    if ("color" %in% names(SettingsFile_Sample)) {
+    if ("color" %in% names(colData(se))) {
         InputPCA  <- InputPCA %>%
-            dplyr::rename(!!paste(SettingsInfo[["color"]]) :="color")
-        Param_Col <-paste(SettingsInfo[["color"]])
+            dplyr::rename(!!SettingsInfo[["color"]] :="color")
+        Param_Col <- SettingsInfo[["color"]]
     } else{
         color_select <- NULL
         Param_Col <- NULL
     }
 
-    if ("shape" %in% names(SettingsFile_Sample)) {
+    if ("shape" %in% names(colData(se))) {
         InputPCA  <- InputPCA %>%
-            dplyr::rename(!!paste(SettingsInfo[["shape"]]) :="shape")
-        Param_Sha <- paste(SettingsInfo[["shape"]])
+            dplyr::rename(!!SettingsInfo[["shape"]] :="shape")
+        Param_Sha <- SettingsInfo[["shape"]]
     } else {
         shape_select <-NULL
         Param_Sha <-NULL
@@ -233,8 +246,10 @@ VizPCA <- function(InputData,
     PlotList_adaptedGrid <- list()
 
     ## Make the plot:
-    PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(InputData), 
-            scale. = as.logical(Scaling)), data = InputPCA,
+    PCA <- ggplot2::autoplot(
+            object = stats::prcomp(as.matrix(InputPCA[, rownames(se)]), 
+                scale. = as.logical(Scaling)), 
+            data = InputPCA,
             x = PCx, y = PCy, colour = Param_Col, fill =  Param_Col, 
             shape = Param_Sha, size = 3, alpha = 0.8, label = TRUE,
             label.size = 2.5, label.repel = TRUE,
@@ -285,8 +300,8 @@ VizPCA <- function(InputData,
 
     suppressMessages(suppressWarnings(
         SaveRes(
-            InputList_DF = NULL,
-            InputList_Plot = PlotList_adaptedGrid,
+            data = NULL,
+            plot = PlotList_adaptedGrid,
             SaveAs_Table = NULL,
             SaveAs_Plot = SaveAs_Plot,
             FolderPath = Folder,
