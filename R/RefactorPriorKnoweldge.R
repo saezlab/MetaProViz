@@ -36,8 +36,8 @@
 #'
 #' @examples
 #' KEGG_Pathways <- LoadKEGG()
-#' Res <- TranslateID(InputData= KEGG_Pathways, 
-#'     SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), 
+#' Res <- TranslateID(InputData = KEGG_Pathways, 
+#'     SettingsInfo = c(InputID = "MetaboliteID", GroupingVariable = "term"), 
 #'     From = c("kegg"), To = c("pubchem", "hmdb"))
 #'
 #' @keywords Translate metabolite IDs
@@ -63,9 +63,8 @@ TranslateID <- function(InputData,
     From <- match.arg(From)
     To <- match.arg(To, several.ok = TRUE)
     
-    
     ## add ability to also get metabolite names that are human readable from an ID type!
-    MetaProViz_Init()
+    #MetaProViz_Init()
 
     ## ------------------  Check Input ------------------- ##
     # HelperFunction `CheckInput`
