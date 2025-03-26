@@ -161,58 +161,60 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
     ## ----------- Prepare InputData ------------ ##
     ## Extract required columns and merge with SettingsFile
     ##if (!is.null(SettingsFile_Metab)) {
-        ##--- Prepare the color scheme:
-        if ("color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
-            if (SettingsInfo[["shape"]] == SettingsInfo[["color"]]) {
-                rowData(se)$shape <- rowData(se)[, SettingsInfo[["color"]]]
-                rowData(se) <- rowData(se) %>%
-                    dplyr::rename("color" = SettingsInfo[["color"]])
-            } else {
-                rowData(se) <- rowData(se) %>%
-                    dplyr::rename(
-                        "color"= SettingsInfo[["color"]],
-                        "shape" = SettingsInfo[["shape"]])
-            }
-        } else if ("color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
+    ##--- Prepare the color scheme:
+    if ("color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
+        if (SettingsInfo[["shape"]] == SettingsInfo[["color"]]) {
+            rowData(se)$shape <- rowData(se)[, SettingsInfo[["color"]]]
             rowData(se) <- rowData(se) %>%
-                as.data.frame() |>
                 dplyr::rename("color" = SettingsInfo[["color"]])
-        } else if (!"color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
-            rowData(se) <- rowData(se) %>%
-                dplyr::rename("shape" = SettingsInfo[["shape"]])
-        }
-        if ("individual" %in% names(SettingsInfo)) {
-            rowData(se) <- rowData(se) %>%
-                dplyr::rename("individual" = paste(SettingsInfo[["individual"]]))
-        }
-
-
-        ##--- Merge InputData with SettingsFile:
-        common_columns <- character() ## Initialize an empty character vector
-        for (col_name in colnames(assay(se)[, c(x, y)])) {
-            if (col_name %in% colnames(rowData(se))) {
-                common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
-            }
-        }
-        rowData(se) <- rowData(se) %>% #rename those column since they otherwise will cause issues when we merge the DFs later
-            dplyr::rename_at(vars(common_columns), ~ paste0(., "_rowData"))
-
-        if (PlotSettings == "PEA") {
-            VolcanoData <- merge(x = rowData(se), 
-                    y = InputData[, c(x, y)], 
-                    by.x = SettingsInfo[["PEA_Feature"]], by.y = 0, 
-                    all.y = TRUE) %>%
-                tibble::remove_rownames() %>%
-                dplyr::mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])
         } else {
-            VolcanoData <- merge(x = rowData(se), 
-                    y = InputData[, c(x, y)], by = 0, all.y = TRUE) %>%
-                tibble::remove_rownames() %>%
-                tibble::column_to_rownames("Row.names") %>%
-                dplyr::mutate(FeatureNames = rownames(se))
+            rowData(se) <- rowData(se) %>%
+                dplyr::rename(
+                    "color"= SettingsInfo[["color"]],
+                    "shape" = SettingsInfo[["shape"]])
         }
-        VolcanoData <- VolcanoData |>
-            dplyr::filter(!is.na(x) | !is.na(x)) ## EDIT: why two times??
+    } else if ("color" %in% names(SettingsInfo) & !"shape" %in% names(SettingsInfo)) {
+        rowData(se) <- rowData(se) %>%
+            as.data.frame() |>
+            dplyr::rename("color" = SettingsInfo[["color"]])
+    } else if (!"color" %in% names(SettingsInfo) & "shape" %in% names(SettingsInfo)) {
+        rowData(se) <- rowData(se) %>%
+            dplyr::rename("shape" = SettingsInfo[["shape"]])
+    }
+    if ("individual" %in% names(SettingsInfo)) {
+        rowData(se) <- rowData(se) %>%
+            dplyr::rename("individual" = paste(SettingsInfo[["individual"]]))
+    }
+
+
+    ##--- Merge assay(se) with SettingsFile:
+    common_columns <- character() ## Initialize an empty character vector
+    for (col_name in colnames(assay(se)[, c(x, y)])) {
+        if (col_name %in% colnames(rowData(se))) {
+            common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
+        }
+    }
+    rowData(se) <- rowData(se) %>% #rename those column since they otherwise will cause issues when we merge the DFs later
+        as.data.frame() |>
+        dplyr::rename_at(vars(common_columns), ~ paste0(., "_rowData")) |>
+        DataFrame()
+
+    if (PlotSettings == "PEA") {
+        VolcanoData <- merge(x = as.data.frame(rowData(se)), 
+                y = assay(se)[, c(x, y)], 
+                by.x = SettingsInfo[["PEA_Feature"]], by.y = 0, 
+                all.y = TRUE) %>%
+            tibble::remove_rownames() %>%
+            dplyr::mutate(FeatureNames = SettingsInfo[["PEA_Feature"]])
+    } else {
+        VolcanoData <- merge(x = as.data.frame(rowData(se)), 
+                y = assay(se)[, c(x, y)], by = 0, all.y = TRUE) %>%
+            tibble::remove_rownames() %>%
+            tibble::column_to_rownames("Row.names") %>%
+            dplyr::mutate(FeatureNames = rownames(se))
+    }
+    VolcanoData <- VolcanoData |>
+        dplyr::filter(!is.na(x) | !is.na(x)) ## EDIT: why two times??
 
     ##} else {
     ##    VolcanoData <- InputData[, c(x, y)] %>%
@@ -252,16 +254,20 @@ VizVolcano <- function(PlotSettings = "Standard", ## EDIT: name here the options
         ## check that length is enough for what the user wants to colour
     }
     if (is.null(ShapePalette)) {
-        safe_shape_palette <- c(15,17,16,18,25,7,8,11,12)
+        safe_shape_palette <- c(15, 17, 16, 18, 25, 7, 8, 11, 12)
         ## check that length is enough for what the user wants to shape
     } else {
         safe_shape_palette <- shape_palette
         #check that length is enough for what the user wants to shape
     }
 
-    ############################################################################################################
+    ############################################################################
     ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
+    ## update SummarizedExperiment
+    assay(se) <- VolcanoData[, colnames(se)]
+    rowData(se) <- VolcanoData
+    
     if (PlotSettings == "Standard") {
         #####--- 1. Standard
         VolcanoRes <- VizVolcano_Standard(se = se, #InputData = VolcanoData,
@@ -496,7 +502,7 @@ VizVolcano_Standard <- function(se, #InputData,
         PlotList <- list() ##Empty list to store all the plots
         PlotList_adaptedGrid <- list() ## Empty list to store all the plots
 
-        InputVolcano <- InputData
+        InputVolcano <- assay(se)
         if (nrow(InputVolcano) >= 1) {
             if ("color" %in% names(SettingsInfo)) {
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
@@ -1061,31 +1067,32 @@ VizVolcano_Compare <- function(se,
 #' se_preprocessed <- l_preprocessed[["data"]][["se_processed"]]
 #' 
 #' ## run Anova
-#' DMA_Annova <- DMA(se_preprocessed,
+#' DMA_Annova <- DMA(se = se_preprocessed,
 #'     SettingsInfo = c(Conditions = "Conditions", Numerator = NULL , Denominator = "HK2"), ## we compare all_vs_HK2
 #'     StatPval = "aov",
 #'     StatPadj = "fdr")
 #'     
 #' ## run ORA
 #' DM_ORA_res<- list()
+#' LoadKEGG()
 #' comparisons <- names(DMA_Annova[["DMA"]])
-#' for(comparison in comparisons) {
+#' for (comparison in comparisons) {
 #'     ## Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
 #'     DMA <- DMA_Annova[["DMA"]][[comparison]]
 #'     ## we remove metabolites that do not have a KEGG ID/KEGG pathway
-#'     DMA <- DMA[complete.cases(DMA),-1] %>% 
+#'     DMA <- DMA[!is.na(assay(DMA)$KEGG.ID) & !is.na(assay(DMA)$KEGGCompound), ] #%>% 
 #'         ## we use the KEGG trivial names to match with the KEGG pathways
-#'         dplyr::rename("Metabolite"="KEGGCompound")
+#'         #dplyr::rename("Metabolite"="KEGGCompound")
 #'         
 #'     ## Perform ORA
-#'     DM_ORA_res[[comparison]] <- StandardORA(InputData= DMA %>% remove_rownames()%>%tibble::column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
-#'         SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-#'         PathwayFile=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
-#'         PathwayName="KEGG",
-#'         minGSSize=3,
-#'         maxGSSize=1000,
-#'         pCutoff=0.01,
-#'         PercentageCutoff=10)
+#'     DM_ORA_res[[comparison]] <- StandardORA(se = DMA, #Input data requirements: column `t.val` and column `Metabolite`
+#'         SettingsInfo = c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+#'         PathwayFile = KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. 
+#'         PathwayName = "KEGG",
+#'         minGSSize = 3,
+#'         maxGSSize = 1000,
+#'         pCutoff = 0.01,
+#'         PercentageCutoff = 10)
 #' }
 #' 
 #' ## obtain DMA_786M1A_vs_HK2 and DM_ORA_786M1A_vs_HK2 objects
@@ -1131,12 +1138,12 @@ VizVolcano_PEA <- function(se,
         logger::log_trace(paste0("Error ", message))
         stop(message)
     }
-    if (is.null(SettingsFile_Metab)) {
-        message <- "You have chosen Settings=`PEA` that requires to provide a DF 'SettingsFile_Metab' including the pathways used for the enrichment analysis."
-        logger::log_trace(paste0("Error ", message))
-        stop(message)
-    }
-    if (!is.null(SettingsFile_Metab) & !is.null(SettingsFile_Metab)) { 
+    #if (is.null(SettingsFile_Metab)) {
+    ##    message <- "You have chosen Settings=`PEA` that requires to provide a DF 'SettingsFile_Metab' including the pathways used for the enrichment analysis."
+    #    logger::log_trace(paste0("Error ", message))
+    #    stop(message)
+    #}
+    if (!is.null(rowData(se))) { 
         if (!"PEA_Feature" %in% names(SettingsInfo) | !"PEA_score" %in% names(SettingsInfo) | !"PEA_stat" %in% names(SettingsInfo) | !"PEA_Pathway" %in% names(SettingsInfo)) {
             message <- "You have chosen Settings=`PEA` that requires to provide a vector for 'SettingsInfo' including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`."
             logger::log_trace(paste0("Error ", message))
@@ -1149,16 +1156,20 @@ VizVolcano_PEA <- function(se,
     safe_shape_palette <- ShapePalette
 
     ## Prepare data:
-    InputData <- InputData %>%
+    InputData <- assay(se) |>
+        t() |>
+        data.frame() |>
         dplyr::rename("PEA_Feature"= !!SettingsInfo[["PEA_Feature"]])
 
 
-    InputData2 <- InputData2 %>%
+    InputData2 <- assay(se2) |>
+        t() |>
+        data.frame() %>%
         dplyr::rename("PEA_score"= !!SettingsInfo[["PEA_score"]],
             "PEA_stat"= !!SettingsInfo[["PEA_stat"]],
             "PEA_Pathway"= !!SettingsInfo[["PEA_Pathway"]])
 
-    SettingsFile_Metab <- SettingsFile_Metab %>%
+    SettingsFile_Metab <- rowData(se) %>%
         dplyr::rename("PEA_Pathway"= !!SettingsInfo[["PEA_Pathway"]],
             "PEA_Feature"= !!SettingsInfo[["PEA_Feature"]])
 
@@ -1282,7 +1293,7 @@ VizVolcano_PEA <- function(se,
 
             #----- Save
             suppressMessages(suppressWarnings(
-                SaveRes(data = NULL, plot= SaveList,
+                SaveRes(data = NULL, plot = SaveList,
                     SaveAs_Table = NULL, SaveAs_Plot = SaveAs_Plot,
                     FolderPath = Folder, 
                     FileName = paste0("Volcano_", PlotName),

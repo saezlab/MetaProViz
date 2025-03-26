@@ -46,8 +46,22 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- ToyData("IntraCells_Raw")[,-c(1:3)]
-#' Res <- VizPCA(Intra)
+#' Intra <- ToyData("IntraCells_Raw")
+#' MappingInfo <- ToyData(Data = "Cells_MetaData")
+#' 
+#' ## create SummarizedExperiment objects
+#' ## se_intra
+#' rD <- MappingInfo
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' 
+#' ## obtain overlapping metabolites
+#' metabolites <- intersect(rownames(a), rownames(rD))
+#' rD <- rD[metabolites, ]
+#' a <- a[metabolites, ]
+#' se_intra <- SummarizedExperiment::SummarizedExperiment(assays = a, rowData = rD, colData = cD)
+#' 
+#' Res <- VizPCA(se = se)
 #'
 #' @keywords PCA
 #'

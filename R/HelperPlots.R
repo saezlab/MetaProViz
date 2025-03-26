@@ -780,6 +780,7 @@ plotGrob_Superplot <- function(InputPlot,
     ## set the parameters for the plot we would like to use as a basis, 
     ## before we start adjusting it:
     X_Con <- colData(se) %>%
+        as.data.frame() |>
         dplyr::distinct(Conditions)
 
     X_Tick <- unit(max(char2cm(X_Con[[1]])) * 0.6, "cm")

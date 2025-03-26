@@ -55,8 +55,7 @@
 #'
 #' @export
 #'
-MetaAnalysis <- function(InputData,
-    SettingsFile_Sample,
+MetaAnalysis <- function(se, 
     Scaling = TRUE,
     Percentage = 0.1,
     StatCutoff = 0.05,
@@ -73,10 +72,16 @@ MetaAnalysis <- function(InputData,
     ############################################################################
     ## ------------ Check Input files ----------- ##
     ## HelperFunction `CheckInput`
-    CheckInput(InputData = InputData, SettingsFile_Sample = SettingsFile_Sample,
-        SettingsFile_Metab = NULL, SettingsInfo = NULL, 
+    CheckInput(se, SettingsInfo = NULL, 
         SaveAs_Plot = SaveAs_Plot, SaveAs_Table = SaveAs_Table,
         CoRe = FALSE, PrintPlot = PrintPlot)
+    
+    ## EDIT: the objects should also be adjusted downstream
+    InputData <- assay(se) |>
+        t() |>
+        as.data.frame()
+    SettingsFile_Sample <- colData(se) |>
+        as.data.frame()
 
     ## Specific checks: Check the column names of the demographics --> 
     ## need to be R usable (no empty spaces, -, etc.)
@@ -332,8 +337,8 @@ MetaAnalysis <- function(InputData,
 
     ## Save the results
     SaveRes(
-        InputList_DF = ResList,
-        InputList_Plot = NULL,
+        data = ResList,
+        plot = NULL,
         SaveAs_Table = SaveAs_Table,
         SaveAs_Plot = FALSE,
         FolderPath = Folder,
@@ -362,8 +367,8 @@ MetaAnalysis <- function(InputData,
 #'
 #' @examples
 #' Tissue_Norm <- ToyData("Tissue_Norm")
-#' Res <- MetaPK(InputData=Tissue_Norm[,-c(1:13)],
-#'                           SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+#' Res <- MetaPK(se = se) #InputData=Tissue_Norm[,-c(1:13)],
+#'                      #     SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
 #'
 #' @keywords prior knowledge, metadata
 #'
@@ -373,8 +378,8 @@ MetaAnalysis <- function(InputData,
 #'
 #' @export
 #'
-MetaPK <- function(InputData,
-    SettingsFile_Sample,
+MetaPK <- function(se, ##InputData,
+    ##SettingsFile_Sample,
     SettingsInfo = NULL,
     SaveAs_Table = "csv",
     FolderPath = NULL) {
@@ -405,13 +410,15 @@ MetaPK <- function(InputData,
     ## create Prior Knowledge file format to perform enrichment analysis ##
     ## use the Sample metadata for this:
     if (is.null(SettingsInfo)) {
-        MetaData <- names(SettingsFile_Sample)
-        SettingsFile_Sample_subset <- SettingsFile_Sample %>%
+        MetaData <- colnames(colData(se))
+        SettingsFile_Sample_subset <- colData(se) %>%
+            as.data.frame()
             tibble::rownames_to_column("SampleID")
     } else {
         MetaData <- SettingsInfo
-        SettingsFile_Sample_subset <- SettingsFile_Sample[, MetaData, 
+        SettingsFile_Sample_subset <- coldata(se)[, MetaData, 
                 drop = FALSE] %>%
+            as.data.frame()
             tibble::rownames_to_column("SampleID")
     }
 

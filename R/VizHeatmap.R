@@ -37,9 +37,26 @@
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
-#' @examples
+#' @examples#' 
+#' ## load the data and mapping Info
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- VizHeatmap(InputData = Intra[,-c(1:3)])
+#' MappingInfo <- ToyData(Data = "Cells_MetaData")
+#' Media <- ToyData("CultureMedia_Raw")
+#' 
+#' ## create SummarizedExperiment objects
+#' ## se_intra
+#' rD <- MappingInfo
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' 
+#' ## obtain overlapping metabolites
+#' metabolites <- intersect(rownames(a), rownames(rD))
+#' rD <- rD[metabolites, ]
+#' a <- a[metabolites, ]
+#' se_intra <- SummarizedExperiment::SummarizedExperiment(assays = a, rowData = rD, colData = cD)
+#' 
+#' 
+#' Res <- VizHeatmap(se = se_intra, Scale = "row")
 #'
 #' @keywords Heatmap
 #'
@@ -51,10 +68,10 @@
 #'
 #' @export
 #'
-VizHeatmap <- function(InputData,
+VizHeatmap <- function(se, #InputData,
                        SettingsInfo = NULL,
-                       SettingsFile_Sample = NULL,
-                       SettingsFile_Metab = NULL,
+                       #SettingsFile_Sample = NULL,
+                       #SettingsFile_Metab = NULL,
                        PlotName = "",
                        Scale = "row",
                        SaveAs_Plot = "svg",
@@ -68,9 +85,9 @@ VizHeatmap <- function(InputData,
 
     ## ------------ Check Input files ----------- ##
     # HelperFunction `CheckInput`
-    CheckInput(InputData = InputData,
-        SettingsFile_Sample = SettingsFile_Sample,
-        SettingsFile_Metab = SettingsFile_Metab,
+    CheckInput(se, #InputData = InputData,
+        #SettingsFile_Sample = SettingsFile_Sample,
+        #SettingsFile_Metab = SettingsFile_Metab,
         SettingsInfo = SettingsInfo,
         SaveAs_Plot = SaveAs_Plot,
         SaveAs_Table = NULL,
@@ -85,7 +102,7 @@ VizHeatmap <- function(InputData,
     }
 
     Scale_options <- c("row","column", "none")
-    if (Scale %in% !Scale_options) {
+    if (!Scale %in% Scale_options) {
         message <- paste0("Check input. The selected Scale option is not valid. Please select one of the folowwing: ",paste(Scale_options,collapse = ", "),"." )
         logger::log_trace(paste0("Error ", message))
         stop(message)
@@ -99,7 +116,12 @@ VizHeatmap <- function(InputData,
 
     #####################################################
     ## -------------- Load Data --------------- ##
-    data <- InputData
+    data <- assay(se) |> t() #InputData ## EDIT: the objects should be adjusted downstream
+    SettingsFile_Metab <- rowData(se) |>
+        as.data.frame()
+     
+    SettingsFile_Sample <- colData(se) |>
+        as.data.frame()
 
     if (!is.null(SettingsFile_Metab)) { ##removes information about metabolites that are not included in the InputData
         SettingsFile_Metab <- merge(x = SettingsFile_Metab, 
@@ -256,8 +278,9 @@ VizHeatmap <- function(InputData,
                 ## width and height according to Sample and metabolite number
                 Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                     SettingsInfo = SettingsInfo, 
-                    SettingsFile_Sample = SettingsFile_Sample, 
-                    SettingsFile_Metab = SettingsFile_Metab, 
+                    se = se,
+                    #SettingsFile_Sample = SettingsFile_Sample, 
+                    #SettingsFile_Metab = SettingsFile_Metab, 
                     PlotName = cleaned_i)
                 PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
                 PlotWidth <- grid::convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
@@ -434,8 +457,9 @@ VizHeatmap <- function(InputData,
                 ## width and height according to Sample and metabolite number
                 Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                     SettingsInfo = SettingsInfo, 
-                    SettingsFile_Sample = SettingsFile_Sample, 
-                    SettingsFile_Metab = SettingsFile_Metab, 
+                    se = se,
+                    #SettingsFile_Sample = SettingsFile_Sample, 
+                    #SettingsFile_Metab = SettingsFile_Metab, 
                     PlotName= cleaned_i)
                 PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
                 PlotWidth <- grid::convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
@@ -647,8 +671,9 @@ VizHeatmap <- function(InputData,
                     PlotName <- paste(cleaned_i, cleaned_s, sep = "_")
                     Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                         SettingsInfo = SettingsInfo, 
-                        SettingsFile_Sample = SettingsFile_Sample, 
-                        SettingsFile_Metab = SettingsFile_Metab, 
+                        se = se,
+                        #SettingsFile_Sample = SettingsFile_Sample, 
+                        #SettingsFile_Metab = SettingsFile_Metab, 
                         PlotName = PlotName)
                     PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", 
                         valueOnly = TRUE)
@@ -784,8 +809,9 @@ VizHeatmap <- function(InputData,
             #Width and height according to Sample and metabolite number
             Plot_Sized <- PlotGrob_Heatmap(InputPlot = heatmap, 
                 SettingsInfo = SettingsInfo, 
-                SettingsFile_Sample = SettingsFile_Sample, 
-                SettingsFile_Metab = SettingsFile_Metab, 
+                se = se,
+                #SettingsFile_Sample = SettingsFile_Sample, 
+                #SettingsFile_Metab = SettingsFile_Metab, 
                 PlotName = PlotName)
             PlotHeight <- grid::convertUnit(Plot_Sized$height, "cm", 
                 valueOnly = TRUE)
@@ -799,8 +825,8 @@ VizHeatmap <- function(InputData,
 
             #----- Save
             suppressMessages(suppressWarnings(
-                SaveRes(InputList_DF = NULL,
-                    InputList_Plot = PlotList_adaptedGrid,
+                SaveRes(data = NULL,
+                    plot = PlotList_adaptedGrid,
                     SaveAs_Table = NULL,
                     SaveAs_Plot = SaveAs_Plot,
                     FolderPath = Folder,
@@ -819,6 +845,6 @@ VizHeatmap <- function(InputData,
     
     ## return 
     invisible(list(
-        "Plot" = PlotList, 
-        "Plot_Sized" = PlotList_adaptedGrid)) ## EDIT: make sure there is one return statement at the end of the fct
+        "data" = list(NULL),
+        "plot" =  list("Plot" = PlotList,  "Plot_Sized" = PlotList_adaptedGrid))) ## EDIT: make sure there is one return statement at the end of the fct
 }

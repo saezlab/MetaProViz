@@ -244,9 +244,9 @@ DMA <-function(se, ##InputData,
     ###############  Add the previous metabolite names back ###############
     DMA_Output <- lapply(STAT_C1vC2, function(df) {
         merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
-        merged_df[, -1] %>% 
+        #merged_df[, -1] %>% 
             ## remove the names we used as part of the function and add back the input names.
-            dplyr::rename("Metabolite" = 1)
+        #    dplyr::rename("Metabolite" = 1)
     })
 
 
@@ -312,6 +312,7 @@ DMA <-function(se, ##InputData,
     }
 
     volplotList = list()
+    se_l <- list()
     for (DF in names(DMA_Output)) { # DF = names(DMA_Output)[2]
         Volplotdata <- DMA_Output[[DF]] |>
             column_to_rownames("Metabolite")
@@ -323,10 +324,11 @@ DMA <-function(se, ##InputData,
             colData = cD,
             rowData = column_to_rownames(DMA_Output[[DF]], "Metabolite"))
         
-        if (CoRe) {
-            VolPlot_SettingsFile <- DMA_Output[[DF]] %>%
-                tibble::column_to_rownames("Metabolite")
-        }
+        se_l[[DF]] <- se_volcano
+        #if (CoRe) { ## EDIT: needed
+        #    VolPlot_SettingsFile <- DMA_Output[[DF]] %>%
+        #        tibble::column_to_rownames("Metabolite")
+        #}
 
         dev.new()
         VolcanoPlot <- invisible(VizVolcano(PlotSettings = "Standard", ### continue from here
@@ -343,6 +345,9 @@ DMA <-function(se, ##InputData,
 
         dev.off()
     }
+    
+    ## assign names to se_l
+    names(se_l) <- names(DMA_Output)
 
     ############################################################################
     ##----- Save and Return
@@ -379,7 +384,7 @@ DMA <-function(se, ##InputData,
         DMA_Output_List <- c(DMA_Output_List, list("VSTres" = Bartlett_output))
     }
 
-    if (CoRE) {
+    if (CoRe) {
         suppressMessages(suppressWarnings(
             SaveRes(data = list("Feature_Metadata" = Feature_Metadata),
                 plot = NULL, SaveAs_Table = SaveAs_Table,
@@ -390,12 +395,12 @@ DMA <-function(se, ##InputData,
     }
 
     suppressMessages(suppressWarnings(
-        SaveRes(data = DMA_Output, ##This needs to be a list, also for single comparisons
+        SaveRes(data = se_l, ##This needs to be a list, also for single comparisons
             plot = volplotList, SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = SaveAs_Plot, FolderPath = Folder, FileName = "DMA",
             CoRe = CoRe, PrintPlot = PrintPlot)))
     DMA_Output_List <- c(DMA_Output_List, 
-        list("DMA" = DMA_Output, "VolcanoPlot" = volplotList))
+        list("DMA" = se_l, "VolcanoPlot" = volplotList))
 
     ## return
     invisible(DMA_Output_List)
@@ -2072,7 +2077,7 @@ Shapiro <- function(se, ##InputData,
         }
 
         ## return
-        suppressWarnings(invisible(Shapiro_output_list))
+        suppressWarnings(invisible(l_shapiro))
     }
 }
 

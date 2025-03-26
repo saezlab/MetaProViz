@@ -34,7 +34,7 @@
 #'
 #' @noRd
 #'
-SavePath<- function(FolderName, FolderPath) {
+SavePath <- function(FolderName, FolderPath) {
   
     ## check if FolderName includes special characters that are not allowed
     cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)

@@ -41,7 +41,7 @@
 #' @return Saves results as individual .csv files.
 #' @export
 
-ClusterORA <- function(InputData,
+ClusterORA <- function(se, #InputData,
     SettingsInfo = c(ClusterColumn = "RG2_Significant", 
         BackgroundColumn = "BG_Method", PathwayTerm = "term", 
         PathwayFeature = "Metabolite"),
@@ -57,7 +57,7 @@ ClusterORA <- function(InputData,
     MetaProViz_Init()
 
     ## ------------ Check Input files ----------- ##
-    Pathways <- CheckInput_ORA(InputData = InputData,
+    Pathways <- CheckInput_ORA(se = se, ##InputData = InputData,
         SettingsInfo = SettingsInfo, RemoveBackground = RemoveBackground,
         PathwayFile = PathwayFile, PathwayName = PathwayName,
         minGSSize = minGSSize, maxGSSize = maxGSSize, 
@@ -66,10 +66,11 @@ ClusterORA <- function(InputData,
     ## ------------ Create Results output folder ----------- ##
     if (!is.null(SaveAs_Table)) {
         Folder <- SavePath(FolderName = "ClusterORA", FolderPath = FolderPath)
-        }
+    }
 
     ############################################################################
     ## ------------ Prepare Data ----------- ##
+    InputData <- assay(se)
     ## open the data
     if (RemoveBackground) {
         df <- subset(InputData, 
@@ -159,7 +160,11 @@ ClusterORA <- function(InputData,
             PrintPlot = FALSE)))
 
     ## return <- clusterGoSummary
-    ORA_Output <- list("DF" = df_list, "ClusterGo" = clusterGo_list)
+    ORA_Output <- list(
+        "data" = list(
+            "DF" = df_list, 
+            "ClusterGo" = clusterGo_list)
+    )
 
     ## return
     invisible(ORA_Output)
@@ -187,7 +192,7 @@ ClusterORA <- function(InputData,
 #'
 #' @export
 #'
-StandardORA <- function(InputData,
+StandardORA <- function(se,
     SettingsInfo = c(pvalColumn = "p.adj", PercentageColumn = "t.val", 
         PathwayTerm = "term", PathwayFeature = "Metabolite"),
     pCutoff = 0.05,
@@ -203,7 +208,7 @@ StandardORA <- function(InputData,
     MetaProViz_Init()
 
     ## ------------ Check Input files ----------- ##
-    Pathways <- CheckInput_ORA(InputData = InputData,
+    Pathways <- CheckInput_ORA(se = se,
         SettingsInfo = SettingsInfo,
         RemoveBackground = FALSE,
         PathwayFile = PathwayFile,
@@ -221,43 +226,44 @@ StandardORA <- function(InputData,
 
     ############################################################################
     ## ------------ Load the data and check ----------- ##
-    InputData<- InputData %>%
-        rownames_to_column("Metabolite")
+    #InputData <- se |> 
+    #    assay() |> 
+    #    rownames_to_column("Metabolite")
 
     ## select universe
-    allMetabolites <- as.character(InputData$Metabolite)
+    allMetabolites <- assay(se)$KEGGCompound
 
     ## select top changed metabolites (Up and down together)
     ## check if the metabolites are significantly changed.
     value <- PercentageCutoff / 100
 
     ## rank by t.val
-    allMetabolites_DF <- InputData[
-        order(InputData[[SettingsInfo[["PercentageColumn"]]]]), ]
+    allMetabolites_DF <- assay(se)[
+        order(assay(se)[, SettingsInfo[["PercentageColumn"]]]), ]
     selectMetabolites_DF <- allMetabolites_DF[
-        c(seq_len(ceiling(value * nrow(allMetabolites_DF))),
-            (nrow(allMetabolites_DF) - (ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))), ]
-    selectMetabolites_DF$`Top/Bottom` <- "TRUE"
+        c(seq_len(ceiling(value * nrow(se))),
+            (nrow(se) - (ceiling(value * nrow(se)))):(nrow(se))), ]
+    selectMetabolites_DF$`Top/Bottom` <- TRUE
     selectMetabolites_DF <- merge(allMetabolites_DF, 
-        selectMetabolites_DF[, c("Metabolite", "Top/Bottom")], 
-        by = "Metabolite", all.x = TRUE)
+        selectMetabolites_DF[, c("Top/Bottom"), drop = FALSE], 
+        by = "row.names", all.x = TRUE)
 
     InputSelection <- selectMetabolites_DF %>%
         mutate(`Top/Bottom_Percentage` = case_when(
-            `Top/Bottom` ~ 'TRUE',
-            TRUE ~ 'FALSE')) %>%
+            `Top/Bottom` ~ TRUE,
+            TRUE ~ FALSE)) %>%
         mutate(Significant = case_when(
-            get(SettingsInfo[["pvalColumn"]]) <= pCutoff ~ 'TRUE',
-            TRUE ~ 'FALSE'))%>%
+            get(SettingsInfo[["pvalColumn"]]) <= pCutoff ~ TRUE,
+            TRUE ~ FALSE)) %>%
         mutate(Cluster_ChangedMetabolites = case_when(
-            Significant & `Top/Bottom_Percentage` ~ 'TRUE',
-            TRUE ~ 'FALSE'))
+            Significant & `Top/Bottom_Percentage` ~ TRUE,
+            TRUE ~ FALSE))
     ## remove column as its not needed for output
     InputSelection$`Top/Bottom` <- NULL 
 
     selectMetabolites <- InputSelection %>%
         subset(Cluster_ChangedMetabolites)
-    selectMetabolites <- as.character(selectMetabolites$Metabolite)
+    selectMetabolites <- as.character(selectMetabolites$KEGGCompound)
 
     ## load Pathways
     Pathway <- Pathways
@@ -288,7 +294,7 @@ StandardORA <- function(InputData,
     clusterGoSummary <- data.frame(clusterGo)
 
     ## make DF:
-    if(!(nrow(clusterGoSummary) == 0)){
+    if(!nrow(clusterGoSummary) == 0){
         ## add pathway information % of genes in pathway detected)
         clusterGoSummary <- merge(x = select(clusterGoSummary, -Description), 
             y = select(Pathway, term, Metabolites_in_Pathway), 
@@ -304,22 +310,35 @@ StandardORA <- function(InputData,
     } else {
         stop("None of the Input_data Metabolites were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }
-
+    
+    ## create SummarizedExperiment output
+    cols_a <- c("RichFactor", "FoldEnrichment", "zScore", "pvalue", "p.adjust", "qvalue", "Count", "Metabolites_in_Pathway", "Percentage_of_Pathway_detected")
+    a <- as.matrix(clusterGoSummary[, cols_a])
+    cD <- DataFrame(feature = cols_a)
+    rownames(cD) <- cols_a
+    rD <- DataFrame(clusterGoSummary[, !colnames(clusterGoSummary) %in% cols_a])
+    rownames(rD) <- rownames(a)
+    se_go <- SummarizedExperiment(assays = a, rowData = rD, colData = cD)
+    
     ## return and save list of DFs
-    ORA_output_list <- list("InputSelection" = InputSelection , 
-        "ClusterGoSummary" = clusterGoSummary)
+    ORA_output_list <- list(
+        "data" = list(
+            "se" = se_go, 
+            "InputSelection" = InputSelection , 
+            "ClusterGoSummary" = clusterGoSummary)
+    )
 
     ## save
     suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF = ORA_output_list,
-            InputList_Plot = NULL, SaveAs_Table = SaveAs_Table,
+        SaveRes(data = ORA_output_list,
+            plot = NULL, SaveAs_Table = SaveAs_Table,
             SaveAs_Plot = NULL, FolderPath = Folder,
             FileName = paste(PathwayName), CoRe = FALSE,
             PrintPlot = FALSE)))
 
-  ## return
-  ORA_output_list <- c(ORA_output_list, list("ClusterGo" = clusterGo))
-  invisible(ORA_output_list)
+    ## return
+    ORA_output_list[["data"]][["ClusterGo"]] <- clusterGo
+    invisible(ORA_output_list)
 }
 
 
