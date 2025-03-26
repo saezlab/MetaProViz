@@ -5,8 +5,7 @@
 \title{Merges the analytical replicates of an experiment}
 \usage{
 ReplicateSum(
-  InputData,
-  SettingsFile_Sample,
+  se,
   SettingsInfo = c(Conditions = "Conditions", Biological_Replicates =
     "Biological_Replicates", Analytical_Replicates = "Analytical_Replicates"),
   SaveAs_Table = "csv",
@@ -14,14 +13,14 @@ ReplicateSum(
 )
 }
 \arguments{
-\item{InputData}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#@param SettingsFile_Sample DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.}
-
 \item{SettingsInfo}{\emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_SettingsFile_Sample", Analytical_Replicates="ColumnName_SettingsFile_Sample").\strong{Default = NULL}}
 
 \item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
 
 \item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+
+\item{InputData}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#@param SettingsFile_Sample DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.}
 }
 \value{
 DF with the merged analytical replicates
@@ -30,10 +29,20 @@ DF with the merged analytical replicates
 Merges the analytical replicates of an experiment
 }
 \examples{
+## load the data
 Intra <- ToyData("IntraCells_Raw")
-Res <- ReplicateSum(InputData=Intra[-c(49:58) ,-c(1:3)],
-                                SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
-                                SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+
+## create SummarizedExperiment
+a <- t(Intra[-c(49:58), -c(1:3)])
+rD <- DataFrame(feature = rownames(a))
+cD <- Intra[-c(49:58), c(1:3)]
+se <- SummarizedExperiment(assay = a, rowData = rD, colData = cD)
+
+## apply the function
+ReplicateSum(se = se,
+    SettingsInfo = c(Conditions = "Conditions", 
+        Biological_Replicates = "Biological_Replicates", 
+        Analytical_Replicates = "Analytical_Replicates"))
 
 }
 \keyword{Analytical}

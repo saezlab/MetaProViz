@@ -43,8 +43,24 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
-#' Res <- VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
+#' Intra <- ToyData("IntraCells_Raw")
+#' MappingInfo <- ToyData(Data = "Cells_MetaData")
+#' 
+#' ## create SummarizedExperiment objects
+#' ## se_intra
+#' rD <- MappingInfo
+#' cD <- Intra[-c(49:58), c(1:3)]
+#' a <- t(Intra[-c(49:58), -c(1:3)])
+#' 
+#' ## obtain overlapping metabolites
+#' metabolites <- intersect(rownames(a), rownames(rD))
+#' rD <- rD[metabolites, ]
+#' a <- a[metabolites, ]
+#' se_intra <- SummarizedExperiment::SummarizedExperiment(assays = a, rowData = rD, colData = cD)
+#' 
+#' ## apply the functions
+#' Res <- VizSuperplot(se = se_intra, 
+#'     SettingsInfo = c(Conditions = "Conditions", Superplot = NULL))
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
@@ -59,365 +75,446 @@
 #'
 #' @export
 #'
-VizSuperplot <- function(InputData,
-                         SettingsFile_Sample,
-                         SettingsInfo = c(Conditions="Conditions", Superplot = NULL),
-                         PlotType = "Box", # Bar, Box, Violin
-                         PlotName = "",
-                         PlotConditions = NULL,
-                         StatComparisons = NULL,
-                         StatPval =NULL,
-                         StatPadj=NULL,
-                         xlab= NULL,
-                         ylab= NULL,
-                         Theme = NULL,
-                         ColorPalette = NULL,
-                         ColorPalette_Dot =NULL,
-                         SaveAs_Plot = "svg",
-                         PrintPlot=TRUE,
-                         FolderPath = NULL){
+VizSuperplot <- function(se,
+    SettingsInfo = c(Conditions="Conditions", Superplot = NULL),
+    PlotType = "Box", # Bar, Box, Violin
+    PlotName = "",
+    PlotConditions = NULL,
+    StatComparisons = NULL,
+    StatPval = NULL,
+    StatPadj = NULL,
+    xlab = NULL,
+    ylab = NULL,
+    Theme = NULL,
+    ColorPalette = NULL,
+    ColorPalette_Dot = NULL,
+    SaveAs_Plot = "svg",
+    PrintPlot = TRUE,
+    FolderPath = NULL) {
 
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+    ## ------------ Create log file ----------- ##
+    MetaProViz_Init()
 
-  logger::log_info("VizSuperplot: Superplot visualization")
+    logger::log_info("VizSuperplot: Superplot visualization")
 
-  ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(InputData=InputData,
-                          SettingsFile_Sample=SettingsFile_Sample,
-                          SettingsFile_Metab=NULL,
-                          SettingsInfo=SettingsInfo,
-                          SaveAs_Plot=SaveAs_Plot,
-                          SaveAs_Table=NULL,
-                          CoRe=FALSE,
-                          PrintPlot= PrintPlot)
+    ## ------------ Check Input files ----------- ##
+    ## HelperFunction `CheckInput`
+    CheckInput(se,
+        SettingsInfo = SettingsInfo,
+        SaveAs_Plot = SaveAs_Plot,
+        SaveAs_Table = NULL,
+        CoRe = FALSE,
+        PrintPlot = PrintPlot)
 
-  # CheckInput` Specific
-  if(is.null(SettingsInfo)==TRUE){
-    message <- paste0("You must provide the column name for Conditions via SettingsInfo=c(Conditions=ColumnName) in order to plot the x-axis conditions.")
-    logger::log_trace(paste("Error ", message, sep=""))
-    stop(message)
-  }
-
-  if(PlotType %in% c("Box", "Bar", "Violin") == FALSE){
-    message <- paste0("PlotType must be either Box, Bar or Violin.")
-    logger::log_trace(paste("Error ", message, sep=""))
-    stop(message)
-  }
-
-  if(is.null(PlotConditions) == FALSE){
-    for (Condition in PlotConditions){
-      if(Condition %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]]==FALSE){
-        message <- paste0("Check Input. The PlotConditions ",Condition," were not found in the Conditions Column.")
+    ## CheckInput` Specific
+    if(is.null(SettingsInfo)){
+        message <- paste0("You must provide the column name for Conditions via SettingsInfo=c(Conditions=ColumnName) in order to plot the x-axis conditions.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
-      }
     }
-  }
 
-  if(is.null(StatComparisons)==FALSE){
-    for (Comp in StatComparisons){
-      if(is.null(PlotConditions)==FALSE){
-        if(PlotConditions[Comp[1]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] ==FALSE){
-          message <- paste0("Check Input. The StatComparisons condition ",Comp[1], " is not found in the Conditions Column of the SettingsFile_Sample.")
-          logger::log_trace(paste("Error ", message, sep=""))
-          stop(message)
+    if (!PlotType %in% c("Box", "Bar", "Violin")) { ## EDIT: why not with match.arg?
+        message <- paste0("PlotType must be either Box, Bar or Violin.")
+        logger::log_trace(paste("Error ", message, sep = ""))
+        stop(message)
+    }
+
+    if(!is.null(PlotConditions)) {
+        for (Condition in PlotConditions) {
+            if(!Condition %in% colData(se)[[SettingsInfo[["Conditions"]]]]) {
+                message <- paste0("Check Input. The PlotConditions ",Condition," were not found in the Conditions Column.")
+                logger::log_trace(paste("Error ", message, sep = ""))
+                stop(message)
+            }
         }
-        if(PlotConditions[Comp[2]] %in% SettingsFile_Sample[[SettingsInfo[["Conditions"]]]] ==FALSE){
-          message <- paste0("Check Input. The StatComparisons condition ",Comp[2], " is not found in the Conditions Column of the SettingsFile_Sample.")
-          logger::log_trace(paste("Error ", message, sep=""))
-          stop(message)
+    }
+
+    if (!is.null(StatComparisons)) {
+        for (Comp in StatComparisons) {
+            if (!is.null(PlotConditions)) {
+                if (!PlotConditions[Comp[1]] %in% colData(se)[[SettingsInfo[["Conditions"]]]]) {
+                    message <- paste0(
+                        "Check Input. The StatComparisons condition ", Comp[1], 
+                        " is not found in the Conditions Column of colData(se).")
+                    stop(message)
+                }
+                if (!PlotConditions[Comp[2]] %in% colData(se)[[SettingsInfo[["Conditions"]]]]) {
+                    message <- paste0(
+                        "Check Input. The StatComparisons condition ", Comp[2], 
+                        " is not found in the Conditions Column of colData(se).")
+                    logger::log_trace(paste("Error ", message, sep = ""))
+                    stop(message)
+                }
+            }
         }
-      }
-    }
-  }
-
-  if(is.null(ColorPalette)){
-    ColorPalette <- "grey"
-  }
-
-  ## ------------ Check Input SettingsInfo ----------- ##
-  #7. Check StatComparisons & PlotConditions
-  if(is.null(PlotConditions)){
-    Number_Cond <- length(unique(tolower(SettingsFile_Sample[["Conditions"]])))
-    if(Number_Cond<=2){
-      MultipleComparison = FALSE
-    }else{
-      MultipleComparison = TRUE
-    }
-  }else if(length(PlotConditions)>2){
-    MultipleComparison = TRUE
-  }else if(length(PlotConditions)<=2){
-    Number_Cond <- length(unique(tolower(SettingsFile_Sample[["Conditions"]])))
-    if(Number_Cond<=2){
-      MultipleComparison = FALSE
-    }else{
-      MultipleComparison = TRUE
-    }
-  }
-
-  if(is.null(StatPval)==FALSE){
-    if(MultipleComparison == TRUE & (StatPval=="t.test" | StatPval=="wilcox.test")){
-      message <- paste0("Check input. The selected StatPval option for Hypothesis testing,", StatPval, " is for multiple comparison, but you have only 2 conditions. Hence aov is performed.")
-      logger::log_trace(paste("Warning ", message, sep=""))
-      warning(message)
-      StatPval <- "aov"
-    }else if(MultipleComparison == FALSE & (StatPval=="aov" | StatPval=="kruskal.test")){
-      message <- paste0("Check input. The selected StatPval option for Hypothesis testing,", StatPval, " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
-      logger::log_trace(paste("Warning ", message, sep=""))
-      warning(message)
-      StatPval <- "t.test"
-      }
     }
 
-  if(is.null(StatPval)==TRUE & MultipleComparison == FALSE){
-    StatPval <- "t.test"
-  }
-
-  if(is.null(StatPval)==TRUE & MultipleComparison == TRUE){
-    StatPval <- "aov"
-  }
-
-  STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
-  if(is.null(StatPadj)==FALSE){
-    if(StatPadj %in% STAT_padj_options == FALSE){
-      message <- paste0("Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
-      logger::log_trace(paste("Error ", message, sep=""))
-      stop(message)
-  }
-  }
-
-  if(is.null(StatPadj)==TRUE){
-    StatPadj <- "fdr"
-  }
-
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Plot)==FALSE){
-    Folder <- SavePath(FolderName=  paste(PlotType, "Plots", sep=""),
-                                    FolderPath=FolderPath)
-  }
-  logger::log_info("VizSuperplot results saved at ", Folder)
-
-  ###############################################################################################################################################################################################################
-  ## ------------ Prepare Input ----------- ##
-  SettingsFile_Sample<- SettingsFile_Sample%>%
-    dplyr::rename("Conditions"= paste(SettingsInfo[["Conditions"]]) )
-
-  if("Superplot" %in% names(SettingsInfo)){
-    SettingsFile_Sample<- SettingsFile_Sample%>%
-      dplyr::rename("Superplot"= paste(SettingsInfo[["Superplot"]]) )
-
-    data <- merge(SettingsFile_Sample[c("Conditions","Superplot")] ,InputData, by=0)
-    data <- tibble::column_to_rownames(data, "Row.names")
-  }else{
-    data <- merge(SettingsFile_Sample[c("Conditions")] ,InputData, by=0)
-    data <- tibble::column_to_rownames(data, "Row.names")
-  }
-
-  # Rename the x and y lab if the information has been passed:
-  if(is.null(xlab)==TRUE){#use column name of x provided by user
-    xlab <- bquote(.(as.symbol(SettingsInfo[["Conditions"]])))
-  }else if(is.null(xlab)==FALSE){
-    xlab <- bquote(.(as.symbol(xlab)))
-  }
-
-  if(is.null(ylab)==TRUE){#use column name of x provided by user
-    ylab <- bquote(.(as.symbol("Intensity")))
-  }else if(is.null(ylab)==FALSE){
-    ylab <- bquote(.(as.symbol(ylab)))
-  }
-
-  #Set the theme:
-  if(is.null(Theme)==TRUE){
-    Theme <- ggplot2::theme_classic()
-  }
-
-  ## ------------ Create plots ----------- ##
-  # make a list for plotting all plots together
-  PlotList <- list()#Empty list to store all the plots
-  PlotList_adaptedGrid <- list()#Empty list to store all the plots
-
-  for (i in colnames(InputData)){
-    #Prepare the dfs:
-    suppressWarnings(dataMeans <- data %>%
-                       dplyr::select(i, Conditions)
-                     %>% dplyr::group_by(Conditions)
-                     %>% dplyr::summarise_at(vars(i), list(mean = mean, sd = sd))
-                     %>% as.data.frame())
-    names(dataMeans)[2] <- "Intensity"
-
-    if("Superplot" %in% names(SettingsInfo)){
-      suppressWarnings(plotdata <- data %>%
-                         dplyr::select(i,Conditions, Superplot)
-                     %>%  dplyr::group_by(Conditions)
-                     %>% as.data.frame() )
-    }else{
-      suppressWarnings(plotdata <- data %>%
-                         dplyr::select(i,Conditions)
-                       %>%  dplyr::group_by(Conditions)
-                       %>% as.data.frame() )
-    }
-    names(plotdata)[1] <- c("Intensity")
-    plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
-
-    # Take only selected conditions
-    if(is.null(PlotConditions) == FALSE){
-      dataMeans <- dataMeans %>% dplyr::filter(Conditions %in% PlotConditions)
-      plotdata <- plotdata %>% dplyr::filter(Conditions %in% PlotConditions)
-      plotdata$Conditions <- factor(plotdata$Conditions, levels = PlotConditions)
+    if (is.null(ColorPalette)) {
+        ColorPalette <- "grey"
     }
 
-    # Make the Plot
-    Plot <- ggplot2::ggplot(plotdata, aes(x = Conditions, y = Intensity))
-
-    # Add graph style and error bar
-    data_summary <- function(x){#calculate error bar!
-      m <- mean(x)
-      ymin <- m-sd(x)
-      ymax <- m+sd(x)
-      return(c(y=m,ymin=ymin,ymax=ymax))
+    ## ------------ Check Input SettingsInfo ----------- ##
+    #7. Check StatComparisons & PlotConditions
+    if (is.null(PlotConditions)) {
+        Number_Cond <- length(unique(tolower(colData(se)[["Conditions"]])))
+        if (Number_Cond <= 2) {
+            MultipleComparison <- FALSE
+        } else {
+            MultipleComparison <- TRUE
+        }
+    } else if(length(PlotConditions) > 2) {
+        MultipleComparison <- TRUE
+    } else if(length(PlotConditions) <= 2) {
+        Number_Cond <- length(unique(tolower(colData(se)[["Conditions"]])))
+        if (Number_Cond <= 2) {
+            MultipleComparison <- FALSE
+        } else {
+            MultipleComparison <- TRUE
+        }
     }
 
-    if (PlotType == "Bar"){
-      Plot <- Plot+  ggplot2::geom_bar(stat = "summary", fun = "mean", fill = ColorPalette)+ ggplot2::stat_summary(fun.data=data_summary,
-                                                                                            geom="errorbar", color="black", width=0.2)
-    } else if (PlotType == "Violin"){
-      Plot <- Plot+ ggplot2::geom_violin(fill = ColorPalette)+ ggplot2::stat_summary(fun.data=data_summary,
-                                                              geom="errorbar", color="black", width=0.2)
-    } else if (PlotType == "Box"){
-      Plot <- Plot +  ggplot2::geom_boxplot(fill=ColorPalette,  width=0.5, position=position_dodge(width = 0.5))
+    if(!is.null(StatPval)) {
+        if (MultipleComparison & (StatPval == "t.test" | StatPval == "wilcox.test")) {
+            message <- paste0(
+                "Check input. The selected StatPval option for Hypothesis testing,", 
+                StatPval, 
+                " is for multiple comparison, but you have only 2 conditions. Hence aov is performed.")
+            logger::log_trace(paste("Warning ", message, sep = ""))
+            warning(message)
+            StatPval <- "aov"
+        } else if(!MultipleCompariso & (StatPval=="aov" | StatPval=="kruskal.test")) {
+            message <- paste0(
+                "Check input. The selected StatPval option for Hypothesis testing,", 
+                StatPval, 
+                " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
+            logger::log_trace(paste("Warning ", message, sep=""))
+            warning(message)
+            StatPval <- "t.test"
+        }
     }
 
-    # Add Superplot
-    if ("Superplot" %in% names(SettingsInfo)){
-      if(is.null(ColorPalette_Dot)==FALSE){
-        Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
-          ggplot2::labs(color=SettingsInfo[["Superplot"]], fill = SettingsInfo[["Superplot"]])+
-          ggplot2::scale_color_manual(values = ColorPalette_Dot)
-      }else{
-        Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
-          ggplot2::labs(color=SettingsInfo[["Superplot"]], fill = SettingsInfo[["Superplot"]])
-      }
-    }else{
-      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity),size=2)
+    if (is.null(StatPval) & !MultipleComparison) {
+        StatPval <- "t.test"
     }
 
-    ####---- Add stats:
-    if(StatPval=="t.test" | StatPval=="wilcox.test"){
-      # One vs. One comparison: t-test
-      if(is.null(StatComparisons)==FALSE){
-        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = StatComparisons,
-                                                 label = "p.format", method = StatPval, hide.ns = TRUE,
-                                               position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
-      }else{
-        comparison <- unique(plotdata$Conditions)
-        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = comparison ,
-                                                 label = "p.format", method = StatPval, hide.ns = TRUE,
-                                                 position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+    if(is.null(StatPval) & MultipleComparison) {
+        StatPval <- "aov"
+    }
 
-      }
-      Plot <- Plot +ggplot2::labs(caption = paste("p.val using pairwise ", StatPval))
-      }else{
-        #All-vs-All comparisons table:
-        conditions <- SettingsFile_Sample$Conditions
-        denominator <-unique(SettingsFile_Sample$Conditions)
-        numerator <-unique(SettingsFile_Sample$Conditions)
-        comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+    STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", 
+        "BH", "BY", "fdr", "none") ## EDIT: p.adjust.methods?, use match.arg
+    if (!is.null(StatPadj)) {
+        if (!StatPadj %in% STAT_padj_options) {
+            message <- paste0(
+                "Check input. The selected StatPadj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",
+                paste(STAT_padj_options, collapse = ", "), "." )
+            logger::log_trace(paste("Error ", message, sep=""))
+            stop(message)
+        }
+    }
 
-        #Prepare Stat results using DMA STAT helper functions
-        if(StatPval=="aov"){
-        STAT_C1vC2 <- AOV(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
-                          SettingsInfo=c(Conditions="Conditions", Numerator = unique(SettingsFile_Sample$Conditions), Denominator  = unique(SettingsFile_Sample$Conditions)),
-                          SettingsFile_Sample= SettingsFile_Sample,
-                          Log2FC_table=NULL)
-        }else if(StatPval=="kruskal.test"){
-          STAT_C1vC2 <-Kruskal(InputData=data.frame("Intensity" = plotdata[,-c(2:3)]),
-                                            SettingsInfo=c(Conditions="Conditions", Numerator = unique(SettingsFile_Sample$Conditions), Denominator  = unique(SettingsFile_Sample$Conditions)),
-                                            SettingsFile_Sample= SettingsFile_Sample,
-                                            Log2FC_table=NULL)
+    if (is.null(StatPadj)) {
+        StatPadj <- "fdr"
+    }
+
+    ## ------------ Create Results output folder ----------- ##
+    if(!is.null(SaveAs_Plot)) {
+        Folder <- SavePath(FolderName = paste(PlotType, "Plots", sep = ""),
+            FolderPath = FolderPath)
+    }
+    logger::log_info("VizSuperplot results saved at ", Folder)
+
+    ############################################################################
+    ## ------------ Prepare Input ----------- ##
+    se@colData <- colData(se) |>
+        as.data.frame() |>
+        dplyr::rename("Conditions"= paste(SettingsInfo[["Conditions"]])) |>
+        DataFrame()
+
+    if("Superplot" %in% names(SettingsInfo)) {
+        se@colData <- colData(se) %>%
+            as.data.frame() |>
+            dplyr::rename("Superplot" = paste(SettingsInfo[["Superplot"]])) |>
+            DataFrame()
+        
+
+        data <- merge(colData(se)[c("Conditions", "Superplot")], 
+                t(assay(se)), by = 0) |>
+            tibble::column_to_rownames("Row.names")
+    } else {
+        data <- merge(colData(se)[c("Conditions")], t(assay(se)), 
+                by = 0) |>
+            tibble::column_to_rownames("Row.names")
+    }
+
+    ## Rename the x and y lab if the information has been passed:
+    if(is.null(xlab)) { #use column name of x provided by user
+        xlab <- bquote(.(as.symbol(SettingsInfo[["Conditions"]])))
+    } else if(!is.null(xlab)) {
+        xlab <- bquote(.(as.symbol(xlab)))
+    }
+
+    if(is.null(ylab)) { ## use column name of x provided by user
+        ylab <- bquote(.(as.symbol("Intensity")))
+    } else if(!is.null(ylab)) {
+        ylab <- bquote(.(as.symbol(ylab)))
+    }
+
+    ## Set the theme:
+    if(is.null(Theme)){
+        Theme <- ggplot2::theme_classic()
+    }
+
+    ## ------------ Create plots ----------- ##
+    ## make a list for plotting all plots together
+    PlotList <- list() #Empty list to store all the plots
+    PlotList_adaptedGrid <- list() #Empty list to store all the plots
+
+    for (i in rownames(se)) {
+        #Prepare the dfs:
+        suppressWarnings(
+            dataMeans <- data %>%
+                dplyr::select(i, Conditions) %>% 
+                dplyr::group_by(Conditions) %>% 
+                dplyr::summarise_at(vars(i), list(mean = mean, sd = sd)) %>% 
+                as.data.frame())
+        names(dataMeans)[2] <- "Intensity"
+
+        if ("Superplot" %in% names(SettingsInfo)) {
+            suppressWarnings( ## EDIT: could be simplified with less code duplications
+                plotdata <- data %>%
+                    dplyr::select(i, Conditions, Superplot) %>%
+                    dplyr::group_by(Conditions) %>%
+                    as.data.frame() )
+        } else {
+            suppressWarnings(
+                plotdata <- data %>%
+                    dplyr::select(i, Conditions) %>%
+                    dplyr::group_by(Conditions) %>%
+                    as.data.frame())
+        }
+        names(plotdata)[1] <- c("Intensity")
+        plotdata$Conditions <- factor(plotdata$Conditions) ## Change conditions to factor
+
+        ## Take only selected conditions
+        if (!is.null(PlotConditions)) {
+            dataMeans <- dataMeans %>% 
+                dplyr::filter(Conditions %in% PlotConditions)
+            plotdata <- plotdata %>% 
+                dplyr::filter(Conditions %in% PlotConditions)
+            plotdata$Conditions <- factor(plotdata$Conditions, 
+                levels = PlotConditions)
         }
 
-        #Prepare df to add stats to plot
-        df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE)%>%
-          tidyr::separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
-          tidyr::unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
-        df$p.adj <- round(sapply(STAT_C1vC2, function(x) x$p.adj),5)
+        ## Make the Plot
+        Plot <- ggplot2::ggplot(plotdata, aes(x = Conditions, y = Intensity))
 
-        # Add the 'res' column by repeating 'position' to match the number of rows
-        position <- c(max(dataMeans$Intensity + 2*dataMeans$sd),
-                      max(dataMeans$Intensity + 2*dataMeans$sd)+0.04* max(dataMeans$Intensity + 2*dataMeans$sd) ,
-                      max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
-
-        df <- df %>%
-          dplyr::mutate(y.position = rep(position, length.out = dplyr::n()))
-
-        # select stats based on comparison_table
-        if(is.null(StatComparisons)== FALSE){
-          # Generate the comparisons
-          df_select <- data.frame()
-          for(comp in StatComparisons){
-            entry <- paste0(PlotConditions[comp[1]], "_vs_", PlotConditions[comp[2]])
-            df_select <- rbind(df_select, data.frame(entry))
-          }
-
-          df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons", all.x=TRUE)%>%
-            tibble::column_to_rownames("entry")
-
-          if(all(is.na(df_merge))==TRUE){#in case the reverse comparisons are needed
-            df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons_rev", all.x=TRUE)%>%
-              tibble::column_to_rownames("entry")
-          }
-        }else{
-          df_merge <- df[,-2]%>%
-            tibble::column_to_rownames("comparisons")
-          }
-
-
-        # add stats to plot
-        if(PlotType == "Bar"){
-          Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.05)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
-        }else{
-          Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+        ## Add graph style and error bar
+        data_summary <- function(x){ #calculate error bar! #### should this be moved outside of the function?
+            m <- mean(x)
+            ymin <- m-sd(x)
+            ymax <- m+sd(x)
+            c(y = m,ymin = ymin, ymax = ymax)
         }
-        Plot <- Plot +ggplot2::labs(caption = paste("p.adj using ", StatPval, "and", StatPadj))
-     }
 
-    Plot <- Plot + Theme+ ggplot2::labs(title = PlotName,
-                                subtitle = i)# ggtitle(paste(i))
-    Plot <- Plot + ggplot2::theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ ggplot2::xlab(xlab)+ ggplot2::ylab(ylab)
+        if (PlotType == "Bar") {
+            Plot <- Plot + 
+                ggplot2::geom_bar(stat = "summary", fun = "mean", 
+                        fill = ColorPalette) + 
+                    ggplot2::stat_summary(fun.data = data_summary, geom = "errorbar", 
+                        color = "black", width = 0.2)
+        } else if (PlotType == "Violin") {
+            Plot <- Plot + ggplot2::geom_violin(fill = ColorPalette) + 
+                ggplot2::stat_summary(fun.data = data_summary, geom = "errorbar", 
+                    color = "black", width = 0.2)
+        } else if (PlotType == "Box") {
+            Plot <- Plot + 
+                ggplot2::geom_boxplot(fill = ColorPalette, width = 0.5, 
+                    position = position_dodge(width = 0.5))
+        }
 
-    ## Store the plot in the 'plots' list
-    PlotList[[i]] <- Plot
+        ## Add Superplot
+        if ("Superplot" %in% names(SettingsInfo)) {
+            if(!is.null(ColorPalette_Dot)) {
+                Plot <- Plot + 
+                    ggbeeswarm::geom_beeswarm(
+                        aes(x = Conditions, y = Intensity, color = as.factor(Superplot)),
+                        size = 3) +
+                    ggplot2::labs(color = SettingsInfo[["Superplot"]], 
+                        fill = SettingsInfo[["Superplot"]]) +
+                    ggplot2::scale_color_manual(values = ColorPalette_Dot)
+            } else {
+                Plot <- Plot + 
+                    ggbeeswarm::geom_beeswarm(
+                        aes(x = Conditions, y = Intensity, color = as.factor(Superplot)),
+                        size = 3) +
+                    ggplot2::labs(color = SettingsInfo[["Superplot"]], 
+                        fill = SettingsInfo[["Superplot"]])
+            }
+        } else {
+            Plot <- Plot + 
+                ggbeeswarm::geom_beeswarm(aes(x = Conditions, y = Intensity), 
+                    size = 2)
+        }
 
-    # Make plot into nice format:
-    Plot_Sized <-  plotGrob_Superplot(InputPlot=Plot, SettingsInfo=SettingsInfo, SettingsFile_Sample=SettingsFile_Sample,  PlotName = PlotName, Subtitle = i, PlotType=PlotType)
-    PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-    PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
-    Plot_Sized %<>%
-      {ggplot2::ggplot() + annotation_custom(.)} %>%
-      add(theme(panel.background = element_rect(fill = "transparent")))
-
-   ####################################################################################################################################
-    ## --------------- save -----------------##
-    cleaned_i <- gsub("[[:space:],/\\\\*]", "-", i)#removes empty spaces and replaces /,\ with -
-    PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
-
-    SaveList <- list()
-    SaveList[[cleaned_i]] <- Plot_Sized
-    #----- Save
-    suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=NULL,
-                           InputList_Plot= SaveList,
-                           SaveAs_Table=NULL,
-                           SaveAs_Plot=SaveAs_Plot,
-                           FolderPath= Folder,
-                           FileName= paste(PlotType, "Plots_",PlotName, sep=""),
-                           CoRe=FALSE,
-                           PrintPlot=PrintPlot,
-                           PlotHeight=PlotHeight,
-                           PlotWidth=PlotWidth,
-                           PlotUnit="cm")))
-  }
-  return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+        ####---- Add stats:
+        if (StatPval == "t.test" | StatPval == "wilcox.test") {
+            ## One vs. One comparison: t-test
+            if (!is.null(StatComparisons)) {
+                Plot <- Plot + 
+                    ggpubr::stat_compare_means(comparisons = StatComparisons,
+                        label = "p.format", method = StatPval, hide.ns = TRUE,
+                        position = position_dodge(0.9), vjust = 0.25, 
+                        show.legend = FALSE)
+            } else {
+                comparison <- unique(plotdata$Conditions)
+                Plot <- Plot + 
+                    ggpubr::stat_compare_means(comparisons = comparison ,
+                        label = "p.format", method = StatPval, hide.ns = TRUE,
+                        position = position_dodge(0.9), vjust = 0.25, 
+                        show.legend = FALSE)
+    
+            }
+            Plot <- Plot +
+                ggplot2::labs(caption = paste("p.val using pairwise ", StatPval))
+        } else {
+            ## All-vs-All comparisons table:
+            conditions <- colData(se)$Conditions
+            denominator <- unique(colData(se)$Conditions)
+            numerator <- unique(colData(se)$Conditions)
+            comparisons <- combn(unique(conditions), 2) %>% 
+                as.matrix()
+    
+            ## Prepare Stat results using DMA STAT helper functions
+            cols_tmp <- "Intensity"
+            cD_tmp <- plotdata[, !colnames(plotdata) %in% cols_tmp, drop = FALSE]
+            a_tmp <- as.matrix(plotdata[, cols_tmp, drop = FALSE]) |>
+                t()
+            colnames(a_tmp) <- rownames(plotdata)
+            rD_tmp <- DataFrame(feature = "Intensity")
+            rownames(rD_tmp) <- "Intensity"
+            se_tmp <- SummarizedExperiment(assays = a_tmp, rowData = rD_tmp, colData = cD_tmp)
+            if (StatPval == "aov") {
+                STAT_C1vC2 <- AOV(
+                    se = se_tmp,
+                    SettingsInfo = c(
+                        Conditions = "Conditions", 
+                        Numerator = "Conditions", #unique(colData(se)$Conditions), 
+                        Denominator = "Conditions"), #unique(colData(se)$Conditions)),
+                    #SettingsFile_Sample = SettingsFile_Sample,
+                    Log2FC_table = NULL)
+            
+            } else if (StatPval == "kruskal.test") {
+                STAT_C1vC2 <- Kruskal(
+                    se = se_tmp,
+                    SettingsInfo = c(
+                        Conditions = "Conditions", 
+                        Numerator = "Conditions",##unique(SettingsFile_Sample$Conditions), 
+                        Denominator = "Conditions"),##unique(SettingsFile_Sample$Conditions)),
+                    #SettingsFile_Sample= SettingsFile_Sample,
+                    Log2FC_table=NULL)
+            }
+    
+            ## Prepare df to add stats to plot
+            df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE) %>%
+                tidyr::separate(comparisons, into = c("group1", "group2"), 
+                    sep = "_vs_", remove = FALSE) %>%
+                tidyr::unite(comparisons_rev, c("group2", "group1"), 
+                    sep="_vs_", remove = FALSE)
+            df$p.adj <- round(sapply(STAT_C1vC2, function(x) x$p.adj), 5)
+    
+            ## Add the 'res' column by repeating 'position' to match the number of rows
+            position <- c(max(dataMeans$Intensity + 2 * dataMeans$sd),
+                max(dataMeans$Intensity + 2 * dataMeans$sd) + 0.04 * max(dataMeans$Intensity + 2 * dataMeans$sd),
+                max(dataMeans$Intensity + 2 * dataMeans$sd) + 0.08 * max(dataMeans$Intensity + 2 * dataMeans$sd))
+    
+            df <- df %>%
+              dplyr::mutate(y.position = rep(position, length.out = dplyr::n()))
+    
+            ## select stats based on comparison_table
+            if (!is.null(StatComparisons)) {
+                # Generate the comparisons
+                df_select <- data.frame()
+                for (comp in StatComparisons) {
+                    entry <- paste0(PlotConditions[comp[1]], "_vs_", PlotConditions[comp[2]])
+                    df_select <- rbind(df_select, data.frame(entry))
+                }
+    
+                df_merge <- merge(df_select, df, by.x = "entry", 
+                        by.y = "comparisons", all.x = TRUE) %>%
+                    tibble::column_to_rownames("entry")
+    
+                if (all(is.na(df_merge))) { ##in case the reverse comparisons are needed
+                    df_merge <- merge(df_select, df, by.x = "entry", 
+                            by.y = "comparisons_rev", all.x = TRUE) %>%
+                        tibble::column_to_rownames("entry")
+                }
+            } else {
+                df_merge <- df[, -2] %>%
+                    tibble::column_to_rownames("comparisons")
+            }
+    
+            ## add stats to plot
+            if (PlotType == "Bar") {
+                Plot <- Plot + 
+                    ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, 
+                        tip.length = 0.01, step.increase = 0.05) ## http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+            } else {
+                Plot <- Plot +
+                    ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, 
+                        tip.length = 0.01, step.increase = 0.01) ## http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+            }
+            Plot <- Plot +
+                ggplot2::labs(caption = paste("p.adj using ", StatPval, "and", StatPadj))
+        }
+    
+        Plot <- Plot + 
+            Theme + 
+            ggplot2::labs(title = PlotName, subtitle = i) + ## ggtitle(paste(i))
+            ggplot2::theme(legend.position = "right", 
+                plot.title = element_text(size = 12, face = "bold"), 
+                axis.text.x = element_text(angle = 90, hjust = 1)) + 
+            ggplot2::xlab(xlab) + ggplot2::ylab(ylab)
+    
+        ## Store the plot in the 'plots' list
+        PlotList[[i]] <- Plot
+    
+        # Make plot into nice format:
+        Plot_Sized <-  plotGrob_Superplot(InputPlot = Plot, 
+            SettingsInfo = SettingsInfo, se = se,
+            PlotName = PlotName, Subtitle = i, PlotType = PlotType)
+        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized %<>%
+            {ggplot2::ggplot() + annotation_custom(.)} %>%
+            add(theme(panel.background = element_rect(fill = "transparent")))
+    
+        ############################################################################
+        ## --------------- save -----------------##
+        cleaned_i <- gsub("[[:space:],/\\\\*]", "-", i) ##removes empty spaces and replaces /,\ with -
+        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
+    
+        SaveList <- list()
+        SaveList[[cleaned_i]] <- Plot_Sized
+        
+        ##----- Save
+        suppressMessages(suppressWarnings(
+            SaveRes(data = NULL,
+                plot = SaveList,
+                SaveAs_Table = NULL,
+                SaveAs_Plot = SaveAs_Plot,
+                FolderPath = Folder,
+                FileName = paste(PlotType, "Plots_",PlotName, sep=""),
+                CoRe = FALSE,
+                PrintPlot = PrintPlot,
+                PlotHeight = PlotHeight,
+                PlotWidth = PlotWidth,
+                PlotUnit = "cm")))
+    }
+    
+    ## return
+    invisible(list(
+        "data" = list(NULL),
+        "plot" = list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
 }
+

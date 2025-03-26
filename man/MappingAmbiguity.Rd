@@ -36,9 +36,12 @@ List with at least 4 DFs: 1-3) From-to-To: 1. MappingIssues, 2. MappingIssues Su
 Create Mapping Ambiguities between two ID types
 }
 \examples{
-KEGG_Pathways <- MetaProViz::LoadKEGG()
-InputDF <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem"))[["TranslatedDF"]]
-Res <- MetaProViz::MappingAmbiguity(InputData= InputDF, From = "MetaboliteID", To = "pubchem", GroupingVariable = "term", Summary=TRUE)
+KEGG_Pathways <- LoadKEGG()
+InputDF <- TranslateID(InputData= KEGG_Pathways, 
+    SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), 
+    From = c("kegg"), To = c("pubchem"))[["TranslatedDF"]]
+Res <- MappingAmbiguity(InputData = InputDF, From = "MetaboliteID", 
+    To = "pubchem", GroupingVariable = "term", Summary = TRUE)
 
 }
 \keyword{Mapping}

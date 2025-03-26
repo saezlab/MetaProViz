@@ -42,21 +42,21 @@ This script performs metabolite clustering analysis and computes clusters of met
 }
 \examples{
 
-Media <- MetaProViz::ToyData("CultureMedia_Raw")
-ResM <- MetaProViz::PreProcessing(InputData = Media[-c(40:45) ,-c(1:3)],
+Media <- ToyData("CultureMedia_Raw")
+ResM <- PreProcessing(InputData = Media[-c(40:45) ,-c(1:3)],
                                   SettingsFile_Sample = Media[-c(40:45) ,c(1:3)] ,
                                   SettingsInfo = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", CoRe_norm_factor = "GrowthFactor", CoRe_media = "blank"),
                                   CoRe=TRUE)
 
-MediaDMA <- MetaProViz::DMA(InputData=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
+MediaDMA <- DMA(InputData=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
                             SettingsFile_Sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)],
                             SettingsInfo = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"),
                             StatPval ="aov",
                             CoRe=TRUE)
 
-IntraDMA <- MetaProViz::ToyData(Data="IntraCells_DMA")
+IntraDMA <- ToyData(Data="IntraCells_DMA")
 
-Res <- MetaProViz::MCA_CoRe(InputData_Intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
+Res <- MCA_CoRe(InputData_Intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
                             InputData_CoRe = MediaDMA[["DMA"]][["786-M1A_vs_HK2"]])
 
 }

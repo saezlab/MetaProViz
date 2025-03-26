@@ -30,6 +30,6 @@ A data frame containing the toy data.
 Import and process .csv file to create toy data DF.
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")
+ToyData("IntraCells_Raw")
 
 }

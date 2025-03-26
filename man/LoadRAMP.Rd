@@ -20,6 +20,6 @@ A data frame containing the Prior Knowledge.
 Import and process file to create Prior Knowledge.
 }
 \examples{
-ChemicalClass <- MetaProViz::LoadRAMP()
+ChemicalClass <- LoadRAMP()
 
 }

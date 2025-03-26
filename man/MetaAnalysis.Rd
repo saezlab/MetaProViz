@@ -45,8 +45,8 @@ List of DFs: prcomp results, loadings, Top-Bottom features, annova results, resu
 This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
 }
 \examples{
-Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-Res <- MetaProViz::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
+Tissue_Norm <- ToyData("Tissue_Norm")
+Res <- MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
                                 SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
 
 }
