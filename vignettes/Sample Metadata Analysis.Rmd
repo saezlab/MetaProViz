@@ -535,7 +535,6 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
 
 ## Pathway enrichment
 Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
-
 ```{r}
 #Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
