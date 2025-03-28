@@ -21,6 +21,7 @@ ToyData(Dataset)
 \item{\code{"Tissue_TvN_Proteomics"}: }
 \item{\code{"Tissue_TvN_RNAseq"}: }
 \item{\code{"EquivalentFeatures"}: }
+\item{\code{"BiocratesFeatureTable"}: }
 }}
 }
 \value{
