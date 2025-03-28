@@ -104,12 +104,16 @@ TranslateID <- function(InputData,
 
   # Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
   doublons <- InputData %>%
+    dplyr::filter(!is.na(!!sym(SettingsInfo[['InputID']]]))) %>%
     dplyr::group_by(!!sym(SettingsInfo[['InputID']]), !!sym(SettingsInfo[['GroupingVariable']]))%>%
     dplyr::filter(dplyr::n() > 1) %>%
-    dplyr::ungroup()
+    dplyr::summarize()
 
   if(nrow(doublons) > 0){
-    message <- sprintf('The following ID types are duplicated within one group: %s',paste(doublons, collapse = ', '))
+    message <- sprintf(
+        'The following IDs are duplicated within one group: %s',
+        paste(doublons %>% dplyr::pull(SettingsInfo[['InputID']]), collapse = ', ')
+    )
     logger::log_warn(message)
     warning(message)
   }
