@@ -49,7 +49,6 @@ Imports:
     hash,
     inflection,
     kableExtra,
-    KEGGREST,
     limma,
     logger,
     magrittr,
