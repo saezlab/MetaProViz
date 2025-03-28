@@ -389,19 +389,20 @@ DMA <-function(InputData,
               PrintPlot=PrintPlot)))
 
     DMA_Output_List <- c(DMA_Output_List, list("Feature_Metadata"=Feature_Metadata))
-   }
+  }
 
   suppressMessages(suppressWarnings(
     SaveRes(InputList_DF=DMA_Output,#This needs to be a list, also for single comparisons
-                         InputList_Plot= volplotList,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=SaveAs_Plot,
-                         FolderPath= Folder,
-                         FileName= "DMA",
-                         CoRe=CoRe,
-                         PrintPlot=PrintPlot)))
+            InputList_Plot= volplotList,
+            SaveAs_Table=SaveAs_Table,
+            SaveAs_Plot=SaveAs_Plot,
+            FolderPath= Folder,
+            FileName= "DMA",
+            CoRe=CoRe,
+            PrintPlot=PrintPlot)))
 
- DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
+  DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
+
 
   return(invisible(DMA_Output_List))
 }
