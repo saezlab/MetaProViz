@@ -104,7 +104,7 @@ TranslateID <- function(InputData,
 
   # Check that SettingsInfo[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
   doublons <- InputData %>%
-    dplyr::filter(!is.na(!!sym(SettingsInfo[['InputID']]]))) %>%
+    dplyr::filter(!is.na(!!sym(SettingsInfo[['InputID']]))) %>%
     dplyr::group_by(!!sym(SettingsInfo[['InputID']]), !!sym(SettingsInfo[['GroupingVariable']]))%>%
     dplyr::filter(dplyr::n() > 1) %>%
     dplyr::summarize()
