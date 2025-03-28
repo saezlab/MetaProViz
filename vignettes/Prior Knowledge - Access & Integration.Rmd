@@ -417,9 +417,6 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 ## Comparison of PK gene and metabolite coverage
 We have now loaded a number of different PK sources (details above) and aim to compare the overlap in coverage between these PK sources to understand if there are certain genes or metabolites covered by one PK resource but not the others. Here we will focus on comparing the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB).\
 `MetaProViz:::GenerateUpset()` helper function, which will generate an Upset plot showing the overlap of coverage (similar to how a Venn diagram works, but better able to visualize multiple combinations clearly).
-
--> Macabe: Add all of this restructuring into the function that makes the UpSetPlot, so the user can pass a list of PK resources they want to compare and via SettingsInfo the columns name with gene-metab names. return both, the plot and the summary table created. The GenerateUpset can stay a helper function and what I describe could be MetaProViz::Compare. This can be an exported function and we should add some tests for the input. Additionally as used below, we can add the UpSetPlot automatically into the TranslateID function. For both plots: Adapt using our ggplot helper functions for saving!
--> Macabe / Christina: Add gene-information such as metabolic enzyme, transporter, receptor or other to the gene lists and to the upset plot
 ```{r}
 # Ensure no NA values and extract unique features
 hallmarks_features <- unique(na.omit(Hallmarks_GeneMetab$GeneMetabSet$feature))
@@ -578,12 +575,8 @@ Should we only select a single HMDB ID in cases where we have multiple?
 We discuss the pros and cons of this later in section: [Bonus: Are multiple metabolite IDs helpful or a hindrance?].
 But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `CheckMatchID()` has been designed to handle.
 
---\> Christina: CountEntries function review.
-Is this needed or have we already done this elsewhere (CheckMatchID)?
-
 ### 3. Make connection to PK and assess overlap
 Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::CheckMatchID()` function.\
---> Christina: Is it properly exported and documented?
 ```{r}
 Biocrates_to_MetalinksDB <- MetaProViz:::CheckMatchID(InputData = FeatureMetadata_Biocrates,
                      PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
@@ -633,8 +626,6 @@ table_to_show[c(1:nrow(table_to_show)),] %>%
 Now it would be nice to visualise the linkages to get an idea of how well the experimental data (Biocrates in this case) matches to the PK (MetalinksDB in this case).
 Note again that we also want to take into account the multiple IDs for each metabolite when assessing coverage.
 In the plot below we do this by counting a link to the PK for any of the HMDB IDs for an individual metabolite only once.
-
---> Macabe: Lets add the stacked bar into CheckMatchID and return the plot there automatically.
 ```{r, fig.width=10, fig.height=6}
 # Define your color scheme and labels
 fill_vals <- c("FALSE" = "red", "TRUE" = "#009E73")
