@@ -539,7 +539,7 @@ Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for ea
 #Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-LoadKEGG()
+MetaProViz::LoadKEGG()
 
 for(comparison in names(ResList)){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
