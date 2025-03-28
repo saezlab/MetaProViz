@@ -384,28 +384,7 @@ LoadMetalinks <- function(types = NULL,
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
-  #------------------------------------------------------------------
-  #Get the directory and filepath of cache results of R
-  directory <- rappdirs::user_cache_dir()#get chache directory
-  File_path <-paste(directory, "/metalinks.db", sep="")
-
-  if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
-    # Connect to the SQLite database
-    con <- DBI::dbConnect(RSQLite::SQLite(), File_path, synchronous = NULL)
-    message("Cached file loaded from: ", File_path)
-  }else{# load from API
-
-    #--------------------------------------------------------------------------------------------
-    #Python availability via Liana: https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
-    metalinks_db_url <- "https://figshare.com/ndownloader/files/47567597"
-    # Download the Metalinks database file and save where the cache is stored
-    download.file(metalinks_db_url, destfile =  File_path , mode = "wb")#WB: This mode is used for writing binary files. It opens the destination file for writing in binary mode.
-    message("Metalinks database downloaded and saved to: ", File_path)
-
-    # Connect to the SQLite database
-    con <- DBI::dbConnect(RSQLite::SQLite(), File_path, synchronous = NULL)
-  }
-
+  con <- OmnipathR::metalinksdb_sqlite()
   #------------------------------------------------------------------
   #Query the database for a specific tables
   tables <- DBI::dbListTables(con)
