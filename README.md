@@ -17,11 +17,12 @@ issues](https://img.shields.io/github/issues/saezlab/MetaProViz)](https://github
 and **Vi**suali**z**ation), a free open-source R-package that provides
 mechanistic hypotheses from metabolomics data by integrating prior
 knowledge from literature with metabolomics. MetaProViz offers an
-interactive framework consisting of four modules: Processing,
-differential analysis, functional analysis and visualization of both
-intracellular and exometabolomics (=consumption-release (CoRe) data).
-Those modules and their functions can be used independently from each
-other or in combination (**Fig.1**).
+interactive framework consisting of five modules: Processing,
+differential analysis, prior knwoledge access and refactoring,
+functional analysis and visualization of both intracellular and
+exometabolomics (=consumption-release (CoRe) data). Those modules and
+their functions can be used independently from each other or in
+combination (**Fig.1**).
 
   
 <center>
@@ -84,10 +85,10 @@ you can also follow the links below:
 data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)  
 - [Consumption-Release (CoRe) metabolomics data from cell culture
 media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)  
-- [Enrichment
-Analysis](https://saezlab.github.io/MetaProViz/articles/EnrichmentAnalysis.html)  
-- [Metadata
-Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)  
+- [Prior Knowledge Access &
+Integration](https://saezlab.github.io/MetaProViz/articles/Prior%20Knowledge%20-%20Access%20&%20Integration.html)  
+- [Sample Metadata
+Analysis](https://saezlab.github.io/MetaProViz/articles/Sample%20Metadata%20Analysis.html)  
   
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
@@ -136,9 +137,10 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
     @Manual{,
       title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
-      author = {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez-Rodriguez and Christian Frezza},
-      year = {2023},
-      note = {R package version 2.1.6},
+
+      author = {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez and Christian Frezza},
+      year = {2024},
+      note = {R package version 2.1.7},
     }
 
 ## References

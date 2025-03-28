@@ -403,6 +403,7 @@ DMA <-function(InputData,
 
   DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
 
+
   return(invisible(DMA_Output_List))
 }
 

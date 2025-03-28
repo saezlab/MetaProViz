@@ -43,80 +43,45 @@ LoadKEGG <- function(){
   logger::log_info("Load KEGG.")
 
   #------------------------------------------------------------------
-  #Get the directory and filepath of cache results of R
-  directory <- rappdirs::user_cache_dir()#get chache directory
-  File_path <-paste(directory, "/KEGG_Metabolite.rds", sep="")
+  # Remove Metabolites
+  to_remove <-
+    list(
+      ### 1. Ions should be removed
+      Remove_Ions = c("Calcium cation","Potassium cation","Sodium cation","H+","Cl-", "Fatty acid", "Superoxide","H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+",  "Zinc cation", "Nickel", "NH4+"),
+      ### 2. Unspecific small molecules
+      Remove_Small = c("Nitric oxide","Hydrogen peroxide", "Superoxide","H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-",  "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
+    ) %>%
+    unlist()
 
-  if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
-    KEGG_Metabolite <- readRDS(File_path)
-    message("Cached file loaded from: ", File_path)
-  }else{# load from KEGG
-    RequiredPackages <- c("KEGGREST")
-    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-    if(length(new.packages)) install.packages(new.packages)
 
-    suppressMessages(library(KEGGREST))
-   
-    # 1. Make a list of all available human pathways in KEGG
-    Pathways_H <- as.data.frame(KEGGREST::keggList("pathway", "hsa"))  # hsa = human
+  # remotes::install_github("saezlab/OmnipathR@devel")
+  KEGG_H <- OmnipathR::kegg_link('compound', 'pathway') %>%
+    dplyr::mutate(across(everything(), ~stringr::str_replace(., '^\\w+:', ''))) %>%
+    purrr::set_names(c('pathway', 'compound')) %>%
+    dplyr::inner_join(OmnipathR::kegg_list('pathway'), by = c(pathway = 'id')) %>%
+    dplyr::inner_join(OmnipathR::kegg_list('compound'), by = c(compound = 'id')) %>%
+    dplyr::inner_join(
+      OmnipathR::kegg_conv('compound', 'pubchem') %>%
+        dplyr::mutate(across(everything(), ~stringr::str_replace(., '^\\w+:', ''))),
+      by = c(compound = 'id_b')
+    ) %>%
+    dplyr::rename(pathway_name = name.x, compound_name = name.y, pubchem = id_a)%>%
+    dplyr::mutate(
+      compound_names = stringr::str_split(compound_name, '; '),
+      compound_name = purrr::map_chr(compound_names, ~extract(.x, 1L))
+    ) %>%
+    dplyr::filter(
+      purrr::map_lgl(
+        compound_names,
+        ~intersect(.x, to_remove) %>% length() == 0
+      )
+    )%>%
+    dplyr::rename(term = pathway_name, Metabolite = compound_name, MetaboliteID = compound, Description = pathway) #Update vignettes and remove rename
 
-    # 2. Initialize the result data frame
-    KEGG_H <- data.frame(KEGGPathway = character(nrow(Pathways_H)),
-                         #PathID = 1:nrow(Pathways_H),
-                         Compound = 1:nrow(Pathways_H),
-                         KEGG_CompoundID = 1:nrow(Pathways_H),
-                         stringsAsFactors = FALSE)
-
-    # 3. Iterate over each pathway and extract the needed information
-    for (k in 1:nrow(Pathways_H)) {
-      path <- rownames(Pathways_H)[k]
-
-      tryCatch({#try-catch block is used to catch any errors that occur during the query process
-        # Query the pathway information
-        query <- KEGGREST::keggGet(path)
-
-        # Extract the necessary information and store it in the result data frame
-        KEGG_H[k, "KEGGPathway"] <- Pathways_H[k,]
-        #KEGG_H[k, "PathID"] <- path
-        KEGG_H[k, "Compound"] <- paste(query[[1]]$COMPOUND, collapse = ";")
-        KEGG_H[k, "KEGG_CompoundID"] <- paste(names(query[[1]]$COMPOUND), collapse = ";")
-      }, error = function(e) {
-        # If an error occurs, store "error" in the corresponding row and continue to the next query
-        KEGG_H[k, "KEGGPathway"] <- "error"
-        message(paste("`Error in .getUrl(url, .flatFileParser) : Not Found (HTTP 404).` for pathway", path, "- Skipping and continuing to the next query."))
-      })
-    }
-
-    # 3. Remove the pathways that do not have any metabolic compounds associated to them
-    KEGG_H_Select <-KEGG_H%>%
-      subset(!KEGG_CompoundID=="")%>%
-      subset(!KEGGPathway=="")
-
-    # 4. Make the Metabolite DF
-    KEGG_Metabolite <- separate_longer_delim(KEGG_H_Select[,-5], c(Compound, KEGG_CompoundID), delim = ";")
-
-    # 5. Remove Metabolites
-    ### 5.1. Ions should be removed
-    Remove_Ions <- c("Calcium cation","Potassium cation","Sodium cation","H+","Cl-", "Fatty acid", "Superoxide","H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+",  "Zinc cation", "Nickel", "NH4+")
-    ### 5.2. Unspecific small molecules
-    Remove_Small <- c("Nitric oxide","Hydrogen peroxide", "Superoxide","H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-",  "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
-
-    KEGG_Metabolite <- KEGG_Metabolite[!(KEGG_Metabolite$Compound %in% c(Remove_Ions, Remove_Small)), ]
-
-    #Change syntax as required for ORA
-    KEGG_Metabolite <- KEGG_Metabolite%>%
-      dplyr::rename("term"=1,
-                    "Metabolite"=2,
-                    "MetaboliteID"=3)
-    KEGG_Metabolite$Description <- KEGG_Metabolite$term
-
-    #Save the results as an RDS file in the Cache directory of R
-    if(!dir.exists(directory)) {dir.create(directory)}
-    saveRDS(KEGG_Metabolite, file = paste(directory, "/KEGG_Metabolite.rds", sep=""))
-  }
 
   #Return into environment
-  assign("KEGG_Pathways", KEGG_Metabolite, envir=.GlobalEnv)
+  assign("KEGG_Pathways", KEGG_H, envir=.GlobalEnv)
+  #return(KEGG_H) change all of this to return
 }
 
 
@@ -429,11 +394,6 @@ LoadMetalinks <- function(types = NULL,
     con <- DBI::dbConnect(RSQLite::SQLite(), File_path, synchronous = NULL)
     message("Cached file loaded from: ", File_path)
   }else{# load from API
-    RequiredPackages <- c("tidyverse", "RSQLite", "DBI")
-    new.packages <- RequiredPackages[!(RequiredPackages %in% installed.packages()[,"Package"])]
-    if(length(new.packages)) install.packages(new.packages)
-
-    suppressMessages(library(tidyverse))
 
     #--------------------------------------------------------------------------------------------
     #Python availability via Liana: https://github.com/saezlab/liana-py/blob/main/liana/resource/get_metalinks.py
@@ -621,7 +581,7 @@ LoadMetalinks <- function(types = NULL,
   #Decide on useful selections term-metabolite for MetaProViz.
   #MetalinksDB_Pathways <- merge(MetalinksDB[, c(1:3)], TablesList[["pathway"]], by="hmdb", all.x=TRUE)
 
-  MetalinksDB_Type <-MetalinksDB[, c(1:3, 7,13)]%>%
+  MetalinksDB_Type <-MetalinksDB[, c(1:3, 5:7,13, 15)]%>%
     subset(!is.na(protein_type))%>%
     dplyr::mutate(term = gsub('\"', '', protein_type))%>%
     unite(term_specific, c("term", "type"), sep = "_", remove = FALSE)%>%

@@ -38,6 +38,7 @@
 #'         \item{\code{"Tissue_TvN_Proteomics"}: }
 #'         \item{\code{"Tissue_TvN_RNAseq"}: }
 #'         \item{\code{"EquivalentFeatures"}: }
+#'         \item{\code{"BiocratesFeatureTable"}: }
 #'     }
 #'
 #' @return A data frame containing the toy data.

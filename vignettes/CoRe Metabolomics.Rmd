@@ -284,6 +284,8 @@ DMA_Annova <-  MetaProViz::DMA(InputData=Media_Preprocessed[,-c(1:6)],
 
 #Inspect the DMA results tables:
 DMA_786M1A_vs_HK2 <- DMA_Annova[["DMA"]][["786-M1A_vs_HK2"]]
+DMA_786O_vs_HK2 <- DMA_Annova[["DMA"]][["786-O_vs_HK2"]]
+
 Shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 ```
 
@@ -300,6 +302,7 @@ DMA_Annova <-  MetaProViz::DMA(InputData=Media_Preprocessed[,-c(1:6)],
 
 #Inspect the DMA results tables:
 DMA_786M1A_vs_HK2 <- DMA_Annova[["DMA"]][["786-M1A_vs_HK2"]]
+DMA_786O_vs_HK2 <- DMA_Annova[["DMA"]][["786-O_vs_HK2"]]
 Shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 ```
 </div>
@@ -317,7 +320,55 @@ DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-Using the DMA results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `VizVolcano()`. You can see some examples below.
+Using the DMA results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `VizVolcano()`. You can see some examples below.\
+\
+Additionally to the individual comparison that there is also a summary table created including the individual information about metabolite consumption or release based on the mean measured value:\
+```{r}
+CoRe_MetaInfo <- DMA_Annova[["Feature_Metadata"]]
+```
+```{r, echo=FALSE}
+# Check how our data looks like:
+CoRe_MetaInfo[c(2, 13:16),-c(3:5)]%>%
+  kableExtra::kbl(caption = "1. Preview of the consumption-release information for each metabolite and cell line.", row.names=FALSE) %>%
+  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+```
+\
+We can also visualize this information by assigning -1 to released, +1 to consumed and 0 for NA:
+```{r, echo=FALSE}
+CoRe_MetaInfo_transformed <- CoRe_MetaInfo[, -c(2:5)] %>%
+  column_to_rownames("Metabolite") %>%  # Set "Metabolite" as row names
+  mutate_all(~ case_when(
+    . == "Released" ~ 1,
+    . == "Consumed" ~ -1,
+    TRUE ~ 0
+  )) %>%
+  t() %>%  # Transpose the dataframe
+  as.data.frame() %>% # Convert back to dataframe after transposing
+  select_if(~ any(. != 0))%>% # Keep only columns with non-zero entries
+  t() %>%  # Transpose the dataframe
+  as.data.frame()
+
+heatmap <- pheatmap::pheatmap(
+  CoRe_MetaInfo_transformed, 
+  color = c("#00CEFF", "gray", "#FF84FF"),  # Color scale for values
+  cluster_rows = TRUE,               # Optionally cluster rows
+  cluster_cols = TRUE,               # Optionally cluster columns
+  show_rownames = TRUE,              # Show row names (metabolites)
+  show_colnames = TRUE,             # Show column names (conditions)
+  cellwidth = 9,
+  cellheight = 9
+)
+
+#Save
+Plot_Sized <- MetaProViz:::PlotGrob_Heatmap(InputPlot=heatmap, SettingsInfo=NULL, SettingsFile_Sample=NULL, SettingsFile_Metab=NULL, PlotName= "test")
+Plot_Sized %<>%
+      {ggplot2::ggplot() + annotation_custom(.)} %>%
+      add(theme(panel.background = element_rect(fill = "transparent")))
+
+Plot_Sized 
+#ggplot2::ggsave(filename = "Plot.svg", plot = Plot_Sized , width = 12,  height = 27, unit="cm")
+
+```
 
 ### ORA using the DMA results
 Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values. Given that for CoRe data it is important to consider weather a metabolite was consumed or released, it is sensible to perform ORA on each metabolite cluster.\
@@ -356,14 +407,6 @@ MC_ORA_786M1A_vs_HK2_Consumed[c(1:5),-1]%>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
-```{r, eval=FALSE, include=FALSE}
-#Load the prior knowledge for enrichment analysis:
-MetalinksDB_Select <- MetaProViz::LoadMetalinks(tissue_location = c("Kidney", "Blood"),
-                                                biospecimen_location = c( "Blood", "Urine"))
-
-
-```
-
 ## MCA
 Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups based on logical regulatory rules. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
 
@@ -398,7 +441,7 @@ Lastly, we will get clusters of metabolites that are defined by the metabolite c
 2. RG2_Significant taking into account genes that are significant (UP, DOWN, significant positive, significant negative)\
 3. RG3_SignificantChange only takes into account genes that have significant changes (UP, DOWN).\
 \
-In order to define which group a metabolite is assigned to, we set two different thresholds. For intracellular those are based on the differential metabolite abundance (`Log2FC`) and the `significance` (e.g. p.adj). For the CoRe data this is based on the `Log2 Distance` and the `significance` (e.g. p.adj). For `Log2FC` we recommend a threshold of 0.5 or 1, whilst for the `Log2 Distance` one should check the distance ranges and base the threhold on this.\
+In order to define which group a metabolite is assigned to, we set two different thresholds. For intracellular those are based on the differential metabolite abundance (`Log2FC`) and the `significance` (e.g. p.adj). For the CoRe data this is based on the `Log2 Distance` and the `significance` (e.g. p.adj). For `Log2FC` we recommend a threshold of 0.5 or 1, whilst for the `Log2 Distance` one should check the distance ranges and base the threshold on this.\
 \
 Regulatory rules:\
 \
@@ -423,6 +466,34 @@ Plot<- easyalluvial::alluvial_wide(MCA_CoRe[,c(1:3,5,6)], fill_by = 'last_variab
                      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))  
               
 #ggplot2::ggsave("AlluvialOverview_RG3SignificantChange2.svg", plot=Plot, width=8, height=15)
+
+#######################
+#Summarize "Not Detected", "Significant Negative", "Significant Positive", "Not Significant" into "No Change
+
+MCA_CoRe_Compressed <- MCA_CoRe %>%
+  mutate(Intra = case_when(
+    Intra %in% c("UP", "DOWN") ~ Intra,  # Keep "UP" and "DOWN" as they are
+    Intra %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  )) %>%
+  mutate(CoRe = case_when(
+    CoRe %in% c("UP", "DOWN") ~ CoRe,  # Keep "UP" and "DOWN" as they are
+    CoRe %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  ))%>%
+  distinct(Intra, CoRe, Core_Direction, .keep_all = TRUE)%>%  # Keep only unique rows based on these columns
+  filter(!Core_Direction=="Not Detected")#remove the "Not Detected" as we are only interested in the released/consumed metabolites
+
+
+Plot1<- easyalluvial::alluvial_wide(MCA_CoRe_Compressed[,c(1:3,5)], fill_by = 'last_variable' )+ 
+      ggplot2::ggtitle("Regulatory rules resulting in the regulatory clusters that are based on signifcant change") +
+      ggplot2::theme_classic() +
+      ggplot2::theme(axis.text.y=ggplot2::element_blank(),  #remove y axis labels
+                     axis.ticks.y=ggplot2::element_blank(), #remove y axis ticks
+                     axis.title.y=ggplot2::element_blank(),
+                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))  
+
+#ggplot2::ggsave("AlluvialOverview_RG2_NoChange.svg", plot=Plot1, width=8, height=15)
 ```
 \
 Now we can load the corresponding pre-processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
@@ -433,7 +504,7 @@ Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 #Perform metabolite clustering:
 MCA_CoRe_res <- MetaProViz::MCA_CoRe(InputData_Intra =Intra_DMA_786M1A_vs_HK2%>%rownames_to_column("Metabolite") ,
                                      InputData_CoRe = DMA_786M1A_vs_HK2,
-                                     SettingsInfo_Intra=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=1),
+                                     SettingsInfo_Intra=c(ValueCol="Log2FC",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=0.8),
                                      SettingsInfo_CoRe=c(DirectionCol="CoRe", ValueCol="Log2(Distance)",StatCol="p.adj", StatCutoff= 0.05, ValueCutoff=28),
                                      FeatureID= "Metabolite",
                                      BackgroundMethod="Intra&CoRe",
@@ -454,16 +525,19 @@ ClusterSummary[-c(1:26),] %>%
   kableExtra::kbl(caption = "MetaProViz::MCA_CoRe Summary of number of metabolites per cluster.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
-
+\
+Now we can also create Bargraphs of the clusters to visualize the results. Here we create two summary bargraphs for the Regulation Grouping RG2 and RG3:\
 ```{r, echo=FALSE}
 #Create some summary Bargraphs:
 ClusterSummary_RG2 <- ClusterSummary%>%
   filter(`Regulation Grouping`=="RG2_Significant")%>%
-  filter(!`SiRCle cluster Name`=="Background = FALSE")
+  filter(!`SiRCle cluster Name`=="Background = FALSE")%>%
+  filter(!`SiRCle cluster Name`=="None")
 
 ClusterSummary_RG3 <- ClusterSummary%>%
   filter(`Regulation Grouping`=="RG3_Change")%>%
-  filter(!`SiRCle cluster Name`=="Background = FALSE")
+  filter(!`SiRCle cluster Name`=="Background = FALSE")%>%
+  filter(!`SiRCle cluster Name`=="None")
 
 #Barplot for RG2:
 Plot_RG2 <- ggplot2::ggplot(ClusterSummary_RG2 , ggplot2::aes(fill=`SiRCle cluster Name`, y=`Number of Features`, x=`SiRCle cluster Name`)) + 
@@ -511,20 +585,82 @@ Plot_Sized_RG3 <- Plot_Sized
 gridExtra::grid.arrange(Plot_Sized_RG2, Plot_Sized_RG3, ncol=2)
 ```
 
-```{r, eval=FALSE}
-MCA_res_select <- MCA_res %>%
-  filter(stringr::str_detect(RG2_Significant, "Opposite"))%>%
-  select("Metabolite")
+```{r, eval=FALSE, include=FALSE}
+#Input:
+Input_Plot <-   Media_Preprocessed%>% 
+  dplyr::filter(Conditions %in% c("786-M1A", "HK2", "786-O"))%>%
+  dplyr::select(-c(1:6))
+  
+# Plot Heatmap of each metabolite cluster:
+MetaData_Metab_RG2 <- merge(x=DMA_Annova[["Feature_Metadata"]],
+                        y=MCA_res[,c(1,14)],
+                        by="Metabolite",
+                        all.y=TRUE)%>%
+   column_to_rownames("Metabolite")
 
 
-MetaProViz:::VizSuperplot(InputData =Input_Superplot[,c(1:6)],#We just plot six metabolites
-                                           SettingsFile_Sample =MetaData_Sample,
-                                           SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
-                                           PlotType = "Bar", #Bar, Box, Violin
-                                           PlotConditions = c("HK2", "786-O", "786-M1A", "786-M2A", "OSRC2", "OSLM1B", "RFX631"),#sets the order in which the samples should be plotted
-                                           StatComparisons = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
+MetaProViz::VizHeatmap(InputData = Input_Plot,
+                       SettingsFile_Sample = MetaData_Sample,
+                       SettingsInfo = c(individual_Metab = "RG2_Significant",
+                                        color_Sample = list("Conditions"),
+                                        color_Metab = list("Pathway", "CoRe_786-M1A", "CoRe_HK2", "CoRe_786-O")),
+                       SettingsFile_Metab =  MetaData_Metab_RG2,
+                       PlotName = "Pathway")
 
+# Plot Superplots:
+Metabolite_list <- MetaData_Metab_RG2%>%
+  rownames_to_column("Metabolite")%>%
+  dplyr::filter(RG2_Significant =="Both_DOWN (Released/Consumed)")%>%
+  dplyr::select(Metabolite)%>%
+  pull()
 
+MetaProViz::VizSuperplot(InputData =Input_Plot%>%select(all_of(Metabolite_list)) ,#We just plot selected metabolites
+                         SettingsFile_Sample =MetaData_Sample %>% dplyr::filter(Conditions %in% c("HK2", "786-O", "786-M1A")),
+                         SettingsInfo = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
+                         PlotType = "Bar", #Bar, Box, Violin
+                         PlotConditions = c("HK2", "786-O", "786-M1A"),#sets the order in which the samples should be plotted
+                         StatComparisons = list(c(1,2),c(1,3), c(2,3)))#Stat comparisons to be included on the plot
+
+```
+
+### MetaLinksDB metabolite-receptor and metabolite-transporter sets
+The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters [@Farr_Dimitrov2024].\
+To remove potential false positives and decrease the number of putative metabolite-receptor interactions, we filter the MetalinksDB resource to metabolites that are annotated as present in the kidney, blood, or urine in HMDB and known to be extracellular.\
+```{r}
+# Selection as described in ST2 of Farr_Dimitrov2024:
+MetaLinksDB_Res <- MetaProViz::LoadMetalinks(cell_location =c("Extracellular"), 
+                                             tissue_location = c("Kidney", "All Tissues"),
+                                             biospecimen_location = c("Blood",  "Urine"))
+
+#Here we add a UniquePair column combining hmdb-protein connection, removing duplications originating from different PK resources
+MetaLinksDB_Res[["MetalinksDB_Select"]] <- MetaLinksDB_Res[["MetalinksDB"]]%>%
+                                           tidyr::unite("UniquePair", c("hmdb", "gene_symbol"), sep = "_", remove=FALSE)%>%
+                                           distinct(UniquePair, .keep_all = TRUE)
+```
+\
+Now we can use this information to understand if the metabolites that are consumed in the 786-M1A cells and Released in the HK2 cells are connected to specific receptors or transporters and are in the bioRCM cluster "Both_DOWN (Released/Consumed)\
+```{r, echo=FALSE}
+MetaLinksDB_Res[["MetalinksDB_BothDOWN"]] <-merge(x=MetaLinksDB_Res[["MetalinksDB_Select"]],
+                                                  y=MCA_res[,c(1,14,48)]%>% dplyr::filter(RG2_Significant=="Both_DOWN (Released/Consumed)") ,
+                                                  by.x="hmdb",
+                                                  by.y="CoRe_DF_HMDB",
+                                                  all.y=TRUE)
+
+#write.csv(MetaLinksDB_Res[["MetalinksDB_BothDOWN"]], "MetalinksDB_BothDOWN.csv")
+
+# Lets summarise the findings:
+message("The following metabolites are not connected to any receptor or transporter in the MetalinksDB: ", 
+        MetaLinksDB_Res[["MetalinksDB_BothDOWN"]] %>%
+          filter(is.na(UniquePair)) %>%
+          pull(Metabolite) %>%
+          paste(collapse = ", "))
+
+message("The following metabolites are connected to at least one receptor or transporter in the MetalinksDB: ", 
+        MetaLinksDB_Res[["MetalinksDB_BothDOWN"]] %>%
+          filter(!is.na(UniquePair)) %>%
+          pull(Metabolite) %>%
+          unique() %>%
+          paste(collapse = ", "))
 ```
 
 ### ORA on each metabolite cluster

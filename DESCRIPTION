@@ -1,13 +1,15 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 2.1.6
+
+Version: 2.1.7
+
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
-    person("Dimitrios", "Prymidis", role = "aut"),
     person("Denes", "Turei", role = "aut",
            comment = c(ORCID = "0000-0002-7249-9379")),
+    person("Dimitrios", "Prymidis", role = "aut"),
     person("Macabe", "Daley", role = "aut",
            comment = c(ORCID = "0000-0002-8026-7068")),
     person("Julio", "Saez-Rodriguez", role = "aut",
@@ -49,7 +51,6 @@ Imports:
     hash,
     inflection,
     kableExtra,
-    KEGGREST,
     limma,
     logger,
     magrittr,

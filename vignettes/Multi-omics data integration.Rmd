@@ -1,0 +1,257 @@
+---
+title: "Multi-omics Data Integration"
+author:
+  - name: Christina Schmidt
+    affiliation:
+      - Heidelberg University
+  - name: Macabe Daley
+    affiliation:
+      - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options:
+  chunk_output_type: console
+  markdown:
+    wrap: sentence
+---
+
+```{=html}
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+```
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# <img src="Hexagon_MetaProViz.png" align="right" width="200"/>
+
+\
+[In this tutorial we showcase how to use **MetaProViz** prior knowledge and integrate metabolomics with proteomics:]{style="text-decoration:underline"}:\
+- 1. Load example data and enhance metabolite IDs present.\
+- 2. Use MetaLinksDB to build a metabolite-receptor and metabolite-transporter network.\
+- 3. Use Gaude gene-metabolite sets to perform gene-metabolite enrichment analysis.\
+
+\
+First if you have not done yet, install the required dependencies and load the libraries:
+
+```{r message=FALSE, warning=FALSE}
+# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 2. Install the latest development version from GitHub using devtools
+#devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+library(MetaProViz)
+
+library(stringr)
+
+```
+
+\
+\
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+# 1. Loading the example data
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+\
+[As part of the **MetaProViz** package you can load the example data using the function `toy_data()`]{style="text-decoration:underline"}:\
+For this vignette we will focus on ccRCC patients tissue data:\
+\
+## Metabolomics:
+Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs. We have performed differential analysis (details can be found in the vignette [Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)) and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
+```{r}
+### Metabolomics:
+# Load the example data:
+Metab_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
+```
+\
+We have three metabolite ID types provided in the data, HMDB, KEGG and PubChem. First we will translate KEGG and PubChem to HMDB and see if we can increase our feature space:
+```{r}
+# Translate KEGG IDs to HMDB IDs
+Metab_TvsN_TranslatedKEGG <- MetaProViz::TranslateID(InputData= Metab_TvsN,
+                                                     SettingsInfo = c(InputID="KEGG", GroupingVariable="SUPER_PATHWAY"),
+                                                     From = c("kegg"),
+                                                     To = c("hmdb"))
+
+#Count cases where KEGG is present, HMDB was not present and now has been added. 
+#Count cases where originally we only had one HMDB ID, but now have multiple.
+#Count cases where KEGG and HMDB is present and the translation does not include present HMDB
+
+#Translate PuChem IDs to HMDB IDs
+Metab_TvsN_TranslatedPubChem <- MetaProViz::TranslateID(InputData= Metab_TvsN,
+                                                     SettingsInfo = c(InputID="PUBCHEM", GroupingVariable="SUPER_PATHWAY"),
+                                                     From = c("pubchem"),
+                                                     To = c("hmdb"))
+
+
+#Create a new column with all HMDB IDs present
+
+```
+
+```{r}
+# Add additional potential IDs:
+Metab_TvsN <- MetaProViz::EquivalentIDs(InputData= Metab_TvsN,
+                                        SettingsInfo = c(InputID="Group_HMDB"),# ID in the measured data, here we use the HMDB ID
+                                        From = "hmdb")
+
+```
+
+--> Christina/Macabe: add additional IDs, maybe translate from KEGG to HMDB and from pubchem to HMDB. 
+--> Check what happened to pubchem IDs! --> can also be used for mapping!
+
+
+
+## Proteomics:
+--> Christina: explain sircle and link to appers .etc
+
+```{r}
+### Proteomics:
+Prot_TvN <- MetaProViz::ToyData(Data="Tissue_TvN_Proteomics")
+
+```
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+# 2. MetaLinksDB (metabolite-receptor & metabolite-transporter sets)
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+## 2.1 Load and contextualize MetaLinksDB
+The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters [@Farr_Dimitrov2024].\
+To remove potential false positives and decrease the number of putative metabolite-receptor interactions, we filter the MetalinksDB resource to metabolites that are annotated as present in the kidney, blood, or urine in HMDB and known to be extracellular.\
+```{r}
+# Selection as described in ST2 of Farr_Dimitrov2024:
+MetaLinksDB_Res <- MetaProViz::LoadMetalinks(cell_location =c("Extracellular"), 
+                                             tissue_location = c("Kidney", "All Tissues"),
+                                             biospecimen_location = c("Blood",  "Urine"))
+
+MetaLinksDB <- MetaLinksDB_Res[["MetalinksDB"]]
+```
+
+## 2.2. MetaLinksDB coverage in measured data
+First we merge the measured data with our contextualised prior knowledge:\
+```{r}
+# Add metabolomics data
+MetaLinksDB <- merge(x= MetaLinksDB,
+                     y= Metab_TvsN%>% dplyr::rename_with(~ paste0(.x, "_Metab")),
+                     by.x="hmdb",
+                     by.y="Group_HMDB_Metab",
+                     all.x=TRUE)
+
+# Add proteomics data
+MetaLinksDB <- merge(x= MetaLinksDB,
+                     y= Prot_TvN %>% dplyr::rename_with(~ paste0(.x, "_Prot")),
+                     by.x="gene_symbol",
+                     by.y="gene_name_Prot",
+                     all.x=TRUE)
+
+
+# Filter
+MetaLinksDB_Select <- MetaLinksDB%>%
+  dplyr::filter(!is.na(t.val_Metab) | !is.na(t.val_Prot))#only keep MetaLinksDB entries that contain one of the two datatypes.
+  
+```
+
+--> Macabe/Christina: Adapt merge for any possible ID using MetaProViz::CheckMatchID()
+--> Macabe: Just plot and add reference to the prior knwoledge vignette for long explanation
+
+## 2.3. Enrichment analysis
+To perform enrichment analysis, we joined the differential results of proteomics and metabolomics with the metabolite-receptor interactions from MetalinksDB and calculated the mean of the t-values to obtain differential abundance summaries for each interaction and correct for multiple testing using
+the false discovery rate.
+```{r}
+# Calculate mean t-values
+MetaLinksDB_Select$Mean_tval <- (ifelse(is.na(MetaLinksDB_Select$t.val_Metab), 0, MetaLinksDB_Select$t.val_Metab) + # Set NAs to 0 to also include cases where we do not detect a pair?
+                                 ifelse(is.na(MetaLinksDB_Select$t.val_Prot), 0, MetaLinksDB_Select$t.val_Prot)) / 2
+```
+
+
+
+--> Macabe/Christina: Same method as in original publication
+
+## 2.4. Visualisation
+--> Macabe: we can plot everything or the selection based on enrichment analysis scores. Or label top scored pairs as you did with MOFA results (at least if thats easy in R networkplots). 
+--> Here: three different shapes (if easily doable): Metabolites, Prot-Transporter, Prot-Receptor
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+# 3. Gene-Metabolite Sets
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+## 3.1 Load and convert Gaude gene-sets to gene-metabolite set
+Here we load the Gaude [@Gaude2016] gene-set and convert the gene names to metabolite names using a PK network of metabolic reactions calls CosmosR [@Dugourd2021].\
+With this, we can perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics/transcriptomics measuring the enzymes expression.\
+
+```{r}
+#Load the example gene-sets:
+MetaProViz::LoadGaude()
+
+#Translate gene names to metabolite names
+Gaude_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Gaude_Pathways,
+                                                     SettingsInfo=c(Target="gene"),
+                                                     PKName="Gaude")
+
+Gaude_GeneMetabSet <- Gaude_GeneMetab[["GeneMetabSet"]] 
+```
+
+## 3.2. Gaude coverage in measured data
+--> Macabe: Just plot: Here maybe select all data covered and make a volcano plot of each data type (Proteomics X proteins of X, metabolomics)
+
+
+## 3.3. Gene-Metabolite Set Enrichment analysis
+ORA
+
+## 3.4. Visualisation
+
+--> Macabe: I dont think network makes sense here, but volcano plots of each pathway, having shapes for uniqueness and colour for protein/metabolites
+
+
+::: {.progress .progress-striped .active}
+::: {.progress-bar .progress-bar-success style="width: 100%"}
+:::
+:::
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
+
+# Bibliography
