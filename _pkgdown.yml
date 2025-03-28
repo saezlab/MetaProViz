@@ -30,7 +30,7 @@ navbar:
         href: articles/CoRe Metabolomics.html
       - text: Enrichment Analysis
         href: articles/Prior Knowledge - Access & Integration.html
-      - text: Metadata Analysis
+      - text: Sample Metadata Analysis
         href: articles/Sample Metadata Analysis.html
     #customize intro:
     reference:
