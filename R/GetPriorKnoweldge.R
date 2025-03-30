@@ -385,6 +385,7 @@ LoadMetalinks <- function(types = NULL,
   }
 
   con <- OmnipathR::metalinksdb_sqlite()
+  on.exit(DBI::dbDisconnect(con))
   #------------------------------------------------------------------
   #Query the database for a specific tables
   tables <- DBI::dbListTables(con)
@@ -397,7 +398,6 @@ LoadMetalinks <- function(types = NULL,
   }
 
   # Close the connection
-  DBI::dbDisconnect(con)
 
   MetalinksDB <- TablesList[["edges"]]#extract the edges table
   #------------------------------------------------------------------
