@@ -28,7 +28,7 @@
 #' @title KEGG
 #' @description Import and process KEGG.
 #' @importFrom utils read.csv
-#' @importFrom KEGGREST keggGet keggList
+#' @importFrom OmnipathR kegg_link kegg_conv
 #' @return A data frame containing the KEGG pathways for ORA.
 #'
 #' @examples
