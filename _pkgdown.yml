@@ -25,13 +25,13 @@ navbar:
       icon: fa-book-open # icons can be found here: https://fontawesome.com/icons?d=gallery
       menu:
       - text: Standard Metabolomics
-        href: articles/Standard Metabolomics.html
+        href: articles/standard-metabolomics.html
       - text: CoRe Metabolomics
-        href: articles/CoRe Metabolomics.html
-      - text: Enrichment Analysis
-        href: articles/Prior Knowledge - Access & Integration.html
+        href: articles/core-metabolomics.html
+      - text: Prior knowledge
+        href: articles/prior-knowledge.html
       - text: Sample Metadata Analysis
-        href: articles/Sample Metadata Analysis.html
+        href: articles/sample-metadata.html
     #customize intro:
     reference:
       text: Reference
