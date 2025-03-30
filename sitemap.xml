@@ -1,22 +1,21 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
-<url><loc>/articles/CoRe Metabolomics.html</loc></url>
-<url><loc>/articles/EnrichmentAnalysis.html</loc></url>
-<url><loc>/articles/Metadata Analysis.html</loc></url>
-<url><loc>/articles/Standard Metabolomics.html</loc></url>
+<url><loc>/articles/core-metabolomics.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/prior-knowledge.html</loc></url>
+<url><loc>/articles/sample-metadata.html</loc></url>
+<url><loc>/articles/standard-metabolomics.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
-<url><loc>/reference/AddInfo.html</loc></url>
-<url><loc>/reference/CleanMapping.html</loc></url>
 <url><loc>/reference/ClusterORA.html</loc></url>
-<url><loc>/reference/ClusterPK.html</loc></url>
 <url><loc>/reference/DMA.html</loc></url>
-<url><loc>/reference/DetectedID.html</loc></url>
+<url><loc>/reference/EquivalentIDs.html</loc></url>
+<url><loc>/reference/LoadGaude.html</loc></url>
 <url><loc>/reference/LoadHallmarks.html</loc></url>
 <url><loc>/reference/LoadKEGG.html</loc></url>
 <url><loc>/reference/LoadMetalinks.html</loc></url>
+<url><loc>/reference/LoadRAMP.html</loc></url>
 <url><loc>/reference/MCA_2Cond.html</loc></url>
 <url><loc>/reference/MCA_CoRe.html</loc></url>
 <url><loc>/reference/MCA_rules.html</loc></url>
@@ -28,7 +27,6 @@
 <url><loc>/reference/MetaProViz_logfile.html</loc></url>
 <url><loc>/reference/MetaProViz_set_loglevel.html</loc></url>
 <url><loc>/reference/PoolEstimation.html</loc></url>
-<url><loc>/reference/PossibleID.html</loc></url>
 <url><loc>/reference/PreProcessing.html</loc></url>
 <url><loc>/reference/ReplicateSum.html</loc></url>
 <url><loc>/reference/StandardORA.html</loc></url>

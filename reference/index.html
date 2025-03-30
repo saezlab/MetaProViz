@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,8 +19,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span> Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/Standard%20Metabolomics.html">Standard Metabolomics</a></li>
     <li><a class="dropdown-item" href="../articles/CoRe%20Metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/EnrichmentAnalysis.html">Enrichment Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/Metadata%20Analysis.html">Metadata Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/Prior%20Knowledge%20-%20Access%20&amp;%20Integration.html">Enrichment Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/Sample%20Metadata%20Analysis.html">Sample Metadata Analysis</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -52,28 +52,10 @@
 
       <dl><dt>
 
-          <code><a href="AddInfo.html">AddInfo()</a></code>
-
-        </dt>
-        <dd>Adds extra columns to enrichment output that inform about 1. The amount of genes associated with term in prior knowledge, 2. The amount of genes detected in input data associated with term in prior knowledge, and 3. The percentage of genes detected in input data associated with term in prior knowledge.</dd>
-      </dl><dl><dt>
-
-          <code><a href="CleanMapping.html">CleanMapping()</a></code>
-
-        </dt>
-        <dd>Reduce mapping ambiguities by using detected IDs</dd>
-      </dl><dl><dt>
-
           <code><a href="ClusterORA.html">ClusterORA()</a></code>
 
         </dt>
         <dd><div class="section"> <h3 id="-">—————————<a class="anchor" aria-label="anchor" href="#-"></a></h3> </div></dd>
-      </dl><dl><dt>
-
-          <code><a href="ClusterPK.html">ClusterPK()</a></code>
-
-        </dt>
-        <dd>Deal with detected input features. If we only have one ID, could it also be another one?</dd>
       </dl><dl><dt>
 
           <code><a href="DMA.html">DMA()</a></code>
@@ -82,16 +64,22 @@
         <dd>This function allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.</dd>
       </dl><dl><dt>
 
-          <code><a href="DetectedID.html">DetectedID()</a></code>
+          <code><a href="EquivalentIDs.html">EquivalentIDs()</a></code>
 
         </dt>
-        <dd>Clean translated ID in prior knowledge based on measured features</dd>
+        <dd>Find additional potential IDs for "kegg", "pubchem", "chebi", "hmdb"</dd>
+      </dl><dl><dt>
+
+          <code><a href="LoadGaude.html">LoadGaude()</a></code>
+
+        </dt>
+        <dd>Prior Knowledge Import</dd>
       </dl><dl><dt>
 
           <code><a href="LoadHallmarks.html">LoadHallmarks()</a></code>
 
         </dt>
-        <dd>Toy Data Import</dd>
+        <dd>Prior Knowledge Import</dd>
       </dl><dl><dt>
 
           <code><a href="LoadKEGG.html">LoadKEGG()</a></code>
@@ -104,6 +92,12 @@
 
         </dt>
         <dd>Function to</dd>
+      </dl><dl><dt>
+
+          <code><a href="LoadRAMP.html">LoadRAMP()</a></code>
+
+        </dt>
+        <dd>Prior Knowledge Import</dd>
       </dl><dl><dt>
 
           <code><a href="MCA_2Cond.html">MCA_2Cond()</a></code>
@@ -170,12 +164,6 @@
 
         </dt>
         <dd>Find metabolites with high variability across total pool samples</dd>
-      </dl><dl><dt>
-
-          <code><a href="PossibleID.html">PossibleID()</a></code>
-
-        </dt>
-        <dd>Deal with detected input features.</dd>
       </dl><dl><dt>
 
           <code><a href="PreProcessing.html">PreProcessing()</a></code>
@@ -260,7 +248,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Dimitrios Prymidis, Denes Turei, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

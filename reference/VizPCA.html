@@ -9,7 +9,7 @@ PCA plot visualization"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,8 +21,8 @@ PCA plot visualization"></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span> Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/Standard%20Metabolomics.html">Standard Metabolomics</a></li>
     <li><a class="dropdown-item" href="../articles/CoRe%20Metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/EnrichmentAnalysis.html">Enrichment Analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/Metadata%20Analysis.html">Metadata Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/Prior%20Knowledge%20-%20Access%20&amp;%20Integration.html">Enrichment Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/Sample%20Metadata%20Analysis.html">Sample Metadata Analysis</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -59,6 +59,8 @@ PCA plot visualization</p>
 <span>  ShapePalette <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ShowLoadings <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  Scaling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  PCx <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  PCy <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  Theme <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  PlotName <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  SaveAs_Plot <span class="op">=</span> <span class="st">"svg"</span>,</span>
@@ -99,6 +101,14 @@ PCA plot visualization</p>
 <dd><p><em>Optional: </em> TRUE or FALSE for whether a data scaling is used <strong>Default = TRUE</strong></p></dd>
 
 
+<dt id="arg-pcx">PCx<a class="anchor" aria-label="anchor" href="#arg-pcx"></a></dt>
+<dd><p><em>Optional: </em> Numeric value of the PC that should be plotted on the x-axis <strong>Default = 1</strong></p></dd>
+
+
+<dt id="arg-pcy">PCy<a class="anchor" aria-label="anchor" href="#arg-pcy"></a></dt>
+<dd><p><em>Optional: </em> Numeric value of the PC that should be plotted on the y-axis <strong>Default = 2</strong></p></dd>
+
+
 <dt id="arg-theme">Theme<a class="anchor" aria-label="anchor" href="#arg-theme"></a></dt>
 <dd><p><em>Optional: </em> Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). <strong>Default = "discrete"</strong></p></dd>
 
@@ -132,7 +142,7 @@ PCA plot visualization</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Intra</span> <span class="op">&lt;-</span> <span class="fu"><a href="ToyData.html">ToyData</a></span><span class="op">(</span><span class="st">"IntraCells_Raw"</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">VizPCA</span><span class="op">(</span><span class="va">Intra</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ggplot2::autoplot(stats::prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),     data = InputPCA, colour = Param_Col, fill = Param_Col, shape = Param_Sha,     size = 3, alpha = 0.8, label = T, label.size = 2.5, label.repel = TRUE,     loadings = as.logical(ShowLoadings), loadings.label = as.logical(ShowLoadings),     loadings.label.vjust = 1.2, loadings.label.size = 2.5, loadings.colour = "grey10",     loadings.label.colour = "grey10"):</span> Objects of class <span style="color: #0000BB;">&lt;prcomp&gt;</span> are not supported by autoplot.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ggplot2::autoplot(stats::prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),     data = InputPCA, x = PCx, y = PCy, colour = Param_Col, fill = Param_Col,     shape = Param_Sha, size = 3, alpha = 0.8, label = T, label.size = 2.5,     label.repel = TRUE, loadings = as.logical(ShowLoadings),     loadings.label = as.logical(ShowLoadings), loadings.label.vjust = 1.2,     loadings.label.size = 2.5, loadings.colour = "grey10", loadings.label.colour = "grey10"):</span> Objects of class <span style="color: #0000BB;">&lt;prcomp&gt;</span> are not supported by autoplot.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Have you loaded the required package?</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -142,7 +152,7 @@ PCA plot visualization</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Dimitrios Prymidis, Denes Turei, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

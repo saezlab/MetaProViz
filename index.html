@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,8 +37,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
 <li><a class="dropdown-item" href="articles/Standard%20Metabolomics.html">Standard Metabolomics</a></li>
     <li><a class="dropdown-item" href="articles/CoRe%20Metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="articles/EnrichmentAnalysis.html">Enrichment Analysis</a></li>
-    <li><a class="dropdown-item" href="articles/Metadata%20Analysis.html">Metadata Analysis</a></li>
+    <li><a class="dropdown-item" href="articles/Prior%20Knowledge%20-%20Access%20&amp;%20Integration.html">Enrichment Analysis</a></li>
+    <li><a class="dropdown-item" href="articles/Sample%20Metadata%20Analysis.html">Sample Metadata Analysis</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
@@ -66,7 +66,7 @@
 <h2 id="short-introduction">
 <strong>Short Introduction</strong><a class="anchor" aria-label="anchor" href="#short-introduction"></a>
 </h2>
-<p><strong>MetaProViz</strong> (<strong>Meta</strong>bolomics <strong>Pr</strong>ocessing, functi<strong>o</strong>nal analysis and <strong>Vi</strong>suali<strong>z</strong>ation), a free open-source R-package that provides mechanistic hypotheses from metabolomics data by integrating prior knowledge from literature with metabolomics. MetaProViz offers an interactive framework consisting of four modules: Processing, differential analysis, functional analysis and visualization of both intracellular and exometabolomics (=consumption-release (CoRe) data). Those modules and their functions can be used independently from each other or in combination (<strong>Fig.1</strong>).</p>
+<p><strong>MetaProViz</strong> (<strong>Meta</strong>bolomics <strong>Pr</strong>ocessing, functi<strong>o</strong>nal analysis and <strong>Vi</strong>suali<strong>z</strong>ation), a free open-source R-package that provides mechanistic hypotheses from metabolomics data by integrating prior knowledge from literature with metabolomics. MetaProViz offers an interactive framework consisting of five modules: Processing, differential analysis, prior knwoledge access and refactoring, functional analysis and visualization of both intracellular and exometabolomics (=consumption-release (CoRe) data). Those modules and their functions can be used independently from each other or in combination (<strong>Fig.1</strong>).</p>
 <center>
 <figure><img src="https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true" style="width:90.0%" alt="Fig. 1: Overview of MetaProViz functions."><figcaption aria-hidden="true"><strong>Fig. 1:</strong> Overview of MetaProViz functions.
 </figcaption></figure>
@@ -82,14 +82,15 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 <p>We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within <strong>MetaProViz</strong>. You can find those tutorial on the top under the “Tutorials” button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:<br>
 - <a href="https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html" class="external-link">Standard metabolomics data</a><br>
 - <a href="https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html" class="external-link">Consumption-Release (CoRe) metabolomics data from cell culture media</a><br>
-- <a href="https://saezlab.github.io/MetaProViz/articles/EnrichmentAnalysis.html" class="external-link">Enrichment Analysis</a><br>
-- <a href="https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html" class="external-link">Metadata Analysis</a></p>
+- <a href="https://saezlab.github.io/MetaProViz/articles/Prior%20Knowledge%20-%20Access%20&amp;%20Integration.html" class="external-link">Prior Knowledge Access &amp; Integration</a><br>
+- <a href="https://saezlab.github.io/MetaProViz/articles/Sample%20Metadata%20Analysis.html" class="external-link">Sample Metadata Analysis</a></p>
 <p>Here you will find a brief overview and information about the installation of the package and its dependencies.</p>
 </div>
 <div class="section level2">
 <h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs [@Hakimi2016]. Cell-lines data from intra- and extracellular metabolomics data from cell culture media from <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418" class="external-link">metabolomics workbench project PR001418</a>. <img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;"></p>
+<p>clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs (Hakimi et al. 2016). Cell-lines data from intra- and extracellular metabolomics data from cell culture media from <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418" class="external-link">metabolomics workbench project PR001418</a>. <img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;"><br>
+Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle (Mora et al. 2024), originally from <a href="https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127" class="external-link">PDC000127</a> (Clark et al. 2019).</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -100,28 +101,6 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 <p>Now <strong>MetaProViz</strong> can be imported as:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
-</h3>
-<p>If you are using <strong>MetaProViz</strong> the following packages are required:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="st">"tidyverse"</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="st">"ggplot2"</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="st">"factoextra"</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="st">"qcc"</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="st">"hash"</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="st">"reshape"</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="st">"gridExtra"</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="st">"inflection"</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="st">"patchwork"</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="st">"clusterProfiler"</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="st">"ggupset"</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="st">"gtools"</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="st">"EnhancedVolcano"</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="st">"writexl"</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="st">"pheatmap"</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="st">"ggfortify"</span></span></code></pre></div>
-<p>While we have done our best to ensure all the dependencies are documented, if they aren’t please let us know and we will try to resolve them.</p>
-</div>
 <div class="section level3">
 <h3 id="windows-specifications">Windows specifications<a class="anchor" aria-label="anchor" href="#windows-specifications"></a>
 </h3>
@@ -136,12 +115,28 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">@</span>Manual{,</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  title <span class="ot">=</span> {MetaProViz<span class="sc">:</span> METabolomics pre<span class="sc">-</span>PRocessing, functiOnal analysis and VIZualisation},</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  author <span class="ot">=</span> {Christina Schmidt, Dimitrios Prymidis, Macabe Daley, Denes Turei, Julio Saez<span class="sc">-</span>Rodriguez and Christian Frezza},</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2023</span>},</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">2</span>.<span class="fl">1.3</span>},</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">@</span>Manual{,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  title <span class="ot">=</span> {MetaProViz<span class="sc">:</span> METabolomics pre<span class="sc">-</span>PRocessing, functiOnal analysis and VIZualisation},</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  author <span class="ot">=</span> {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez<span class="sc">-</span>Rodriguez and Christian Frezza},</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2024</span>},</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">2</span>.<span class="fl">1.7</span>},</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-Clark2019" class="csl-entry">
+Clark, David J, Saravana M Dhanasekaran, Francesca Petralia, Jianbo Pan, Xiaoyu Song, Yingwei Hu, Felipe da Veiga Leprevost, et al. 2019. “Integrated Proteogenomic Characterization of Clear Cell Renal Cell Carcinoma.” <em>Cell</em> 179 (4): 964–983.e31. <a href="https://doi.org/10.1016/j.cell.2019.10.007" class="external-link uri">https://doi.org/10.1016/j.cell.2019.10.007</a>.
+</div>
+<div id="ref-Hakimi2016" class="csl-entry">
+Hakimi, A Ari, Ed Reznik, Chung-Han Lee, Chad J Creighton, A Rose Brannon, Augustin Luna, B Arman Aksoy, et al. 2016. “An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma.” <em>Cancer Cell</em> 29 (1): 104–16. <a href="https://doi.org/10.1016/j.ccell.2015.12.004" class="external-link uri">https://doi.org/10.1016/j.ccell.2015.12.004</a>.
+</div>
+<div id="ref-Mora_Schmidt2024" class="csl-entry">
+Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and Mikael Bodén. 2024. “SiRCle (Signature Regulatory Clustering) Model Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.” <em>Genome Medicine</em> 16 (1): 144. <a href="https://doi.org/10.1186/s13073-024-01415-3" class="external-link uri">https://doi.org/10.1186/s13073-024-01415-3</a>.
+</div>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -162,9 +157,9 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Christina Schmidt <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3867-0881" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Dimitrios Prymidis <br><small class="roles"> Author </small>  </li>
 <li>Denes Turei <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7249-9379" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Macabe Daley <br><small class="roles"> Author </small>  </li>
+<li>Dimitrios Prymidis <br><small class="roles"> Author </small>  </li>
+<li>Macabe Daley <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8026-7068" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Julio Saez-Rodriguez <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8552-8976" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Christian Frezza <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3293-7397" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
@@ -198,7 +193,7 @@ The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, ca
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Dimitrios Prymidis, Denes Turei, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

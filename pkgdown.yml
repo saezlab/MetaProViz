@@ -2,8 +2,8 @@ pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
-  CoRe Metabolomics: CoRe Metabolomics.html
-  EnrichmentAnalysis: EnrichmentAnalysis.html
-  Metadata Analysis: Metadata Analysis.html
-  Standard Metabolomics: Standard Metabolomics.html
-last_built: 2024-12-20T18:34Z
+  core-metabolomics: core-metabolomics.html
+  prior-knowledge: prior-knowledge.html
+  sample-metadata: sample-metadata.html
+  standard-metabolomics: standard-metabolomics.html
+last_built: 2025-03-30T22:57Z
