@@ -64,7 +64,6 @@ Imports:
     qcc,
     rappdirs,
     readr,
-    reshape,
     rlang,
     rstatix,
     stringr,
