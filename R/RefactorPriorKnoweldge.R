@@ -440,7 +440,7 @@ EquivalentIDs <- function(InputData,
 #'
 #' @keywords Mapping ambiguity
 #'
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR ambiguity
 #'
@@ -588,9 +588,9 @@ MappingAmbiguity <- function(InputData,
       tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
       filter(is.na(!!sym(Comp[[comp]]$From)))
     if(nrow(Removed)>0){
-      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- bind_rows(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]],
+      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- dplyr::bind_rows(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]],
                                                                                          test<- Removed%>%
-                                                                                            bind_cols(setNames(as.list(rep(NA, length(setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))),
+                                                                                            dplyr::bind_cols(setNames(as.list(rep(NA, length(setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))),
                                                                                                                setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))
       )
     }
@@ -1059,7 +1059,7 @@ CheckMatchID <- function(InputData,
   # Create the table with duplicate key (SettingsInfo[["InputID"]]) rows extended
   temp_results_of_duplicates <- create_duplicates_table(InputData_Original, summary_df, SettingsInfo[["InputID"]])
   # Combine these to get a summary table that includes both NA and duplicate rows
-  summary_df_with_NA_and_duplicates <- bind_rows(temp_results_NAs_added, temp_results_of_duplicates)
+  summary_df_with_NA_and_duplicates <- dplyr::bind_rows(temp_results_NAs_added, temp_results_of_duplicates)
 
   # Now for the user let's also create separate dfs with just the NA values and just the duplicates, in case they want to inspect this easier
   summary_df_only_NA <- summary_df_with_NA_and_duplicates %>%
