@@ -56,6 +56,7 @@ jobs:
       - name: Install remotes
         run: |
           Rscript -e 'install.packages("remotes")'
+          Rscript -e 'remotes::install_github("r-lib/remotes")'  # see: https://github.com/r-lib/remotes/issues/798
           Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
       - name: Install MetaProViz from git by remotes
