@@ -14,7 +14,7 @@ Browse the current MetaProViz log file
 }
 \examples{
 \dontrun{
-metaproviz_log()
+MetaProViz_log()
 # then you can browse the log file, and exit with `q`
 }
 

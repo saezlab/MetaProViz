@@ -14,7 +14,7 @@ logfile is available.
 Path to the current MetaProViz log file
 }
 \examples{
-metaproviz_logfile()
+MetaProViz_logfile()
 # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 
 }

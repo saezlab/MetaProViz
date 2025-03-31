@@ -25,7 +25,7 @@
 #'     logfile is available.
 #'
 #' @examples
-#' metaproviz_logfile()
+#' MetaProViz_logfile()
 #' # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 #'
 #' @importFrom OmnipathR logfile
@@ -45,7 +45,7 @@ MetaProViz_logfile <- function(){
 #'
 #' @examples
 #' \dontrun{
-#' metaproviz_log()
+#' MetaProViz_log()
 #' # then you can browse the log file, and exit with `q`
 #' }
 #'
@@ -69,7 +69,7 @@ MetaProViz_log <- function(){
 #' @return Returns `NULL`.
 #'
 #' @examples
-#' metaproviz_set_loglevel(logger::FATAL, target = 'console')
+#' MetaProViz_set_loglevel(logger::FATAL, target = 'console')
 #'
 #' @export
 MetaProViz_set_loglevel <- function(level, target = 'logfile'){
