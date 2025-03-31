@@ -690,7 +690,7 @@ FeatureFiltering <-function(InputData,
       filtered_matrix <- InputData[,-miss]
     }
   }else if(FeatureFilt ==  "Standard"){
-    message <- paste0 ("FeatureFiltering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729–6736., doi:10.1021/ac051080y). ","Filtering value selected:", FeatureFilt_Value)
+    message <- paste0 ("FeatureFiltering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). ","Filtering value selected:", FeatureFilt_Value)
     logger::log_info(message)
     message(message)
 
@@ -1277,7 +1277,7 @@ OutlierDetection <-function(InputData,
                             CoRe=FALSE,
                             HotellinsConfidence=0.99){
   # Message:
-  message <- paste("Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979). ",
+  message <- paste("Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). ",
                    "HotellinsConfidence value selected: ", HotellinsConfidence, sep= "")
   logger::log_info(message)
   message(message)
