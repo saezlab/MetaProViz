@@ -72,7 +72,7 @@ jobs:
           Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
       - name: Install MetaProViz from git by remotes
-        run: Rscript -e 'remotes::install_github("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
+        run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
 
       - name: Build and check package
         run: |
