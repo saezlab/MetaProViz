@@ -60,10 +60,11 @@
 #' @keywords Volcano plot, pathways
 #'
 #' @importFrom ggplot2 ggplot theme
-#' @importFrom dplyr rename filter mutate
+#' @importFrom dplyr rename filter mutate rename_with
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
 #' @importFrom logger log_trace
+#' @importFrom tidyselect all_of
 #'
 #' @export
 #'
@@ -199,7 +200,9 @@ VizVolcano <- function(PlotSettings="Standard",
        }
      }
      SettingsFile_Metab <- SettingsFile_Metab%>%#rename those column since they otherwise will cause issues when we merge the DFs later
-      dplyr::rename_at(vars(common_columns), ~ paste0(., "_SettingsFile_Metab"))
+      # this should not be handled like this, use suffixes for dplyr::join
+       # instead
+      dplyr::rename_with(~paste0(.x, "_SettingsFile_Metab"), tidyselect::all_of(common_columns))
 
     if(PlotSettings=="PEA"){
       VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x=SettingsInfo[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
