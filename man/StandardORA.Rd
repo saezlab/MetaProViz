@@ -35,9 +35,9 @@ StandardORA(
 
 \item{maxGSSize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 
-\item{Save_as_Results}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
+\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 Saves results as individual .csv files.

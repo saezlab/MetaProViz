@@ -19,13 +19,27 @@ VizHeatmap(
 )
 }
 \arguments{
-\item{InputData}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.}
+\item{InputData}{DF with unique sample identifiers as row names and
+metabolite numerical values in columns with metabolite identifiers as column
+names. Includes experimental design and outlier column.}
 
-\item{SettingsInfo}{\emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_SettingsFile_Metab",individual_Sample= "ColumnName_SettingsFile_Sample", color_Metab="ColumnName_SettingsFile_Metab", color_Sample= list("ColumnName_SettingsFile_Sample", "ColumnName_SettingsFile_Sample",...)).\strong{Default = NULL}}
+\item{SettingsInfo}{\emph{Optional: } NULL or Named vector  where you can
+include vectors or lists for annotation c(individual_Metab=
+"ColumnName_SettingsFile_Metab",individual_Sample=
+"ColumnName_SettingsFile_Sample",
+color_Metab="ColumnName_SettingsFile_Metab", color_Sample=
+list("ColumnName_SettingsFile_Sample",
+"ColumnName_SettingsFile_Sample",...)).\strong{Default = NULL}}
 
-\item{SettingsFile_Sample}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}}
+\item{SettingsFile_Sample}{DF which contains information about the samples,
+which will be combined with your input data based on the unique sample
+identifiers. and other columns with required PlotSettingInfo.\strong{Default
+= NULL}}
 
-\item{SettingsFile_Metab}{\emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}}
+\item{SettingsFile_Metab}{\emph{Optional: } DF with column "Metabolite"
+including the Metabolite names (needs to match Metabolite names of
+Input_data) and other columns with required PlotSettingInfo. \strong{Default
+= NULL}}
 
 \item{PlotName}{\emph{Optional: } String which is added to the output files of the plot}
 
@@ -37,7 +51,10 @@ VizHeatmap(
 
 \item{Enforce_SampleNames}{\emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}}
 
-\item{Folder_Name}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
+\item{PrintPlot}{\emph{Optional: } print the plots to the active graphic
+device.}
+
+\item{FolderPath}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
 }
 \value{
 List with two elements: Plot and Plot_Sized

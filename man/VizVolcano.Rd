@@ -32,6 +32,10 @@ VizVolcano(
 )
 }
 \arguments{
+\item{PlotSettings}{\emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}}
+
+\item{InputData}{DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.}
+
 \item{SettingsInfo}{\emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}}
 
 \item{SettingsFile_Metab}{\emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}}
@@ -72,11 +76,8 @@ VizVolcano(
 
 \item{Features}{\emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}}
 
-\item{Settings}{\emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}}
-
-\item{Input_data}{DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.}
-
-\item{FeatureID}{{Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}}
+\item{PrintPlot}{\emph{Optional: } print the plots to the active graphic
+device.}
 }
 \value{
 List with two elements: Plot and Plot_Sized
