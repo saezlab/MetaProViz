@@ -224,10 +224,8 @@ TranslateID <- function(InputData,
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR id_types translate_ids
 #' @importFrom logger log_warn log_trace
-#' @importFrom stringr str_to_lower
-#'
+#' @importFrom stringr str_to_lower str_split
 #' @export
-#'
 EquivalentIDs <- function(InputData,
                           SettingsInfo = c(InputID="MetaboliteID"),
                           From = "hmdb",
@@ -384,13 +382,13 @@ EquivalentIDs <- function(InputData,
 
     OtherIDs <- merge(OtherIDs, EquivalentFeatures_Long, by.x= SettingsInfo[['InputID']] , by.y= "hmdb", all.x=TRUE)%>%
       rowwise() %>%
-      mutate(AllIDs = paste(unique(na.omit(unlist(str_split(paste(na.omit(c(AllIDs.x, AllIDs.y)), collapse = ","), ",\\s*")))), collapse = ",")) %>%
+      mutate(AllIDs = paste(unique(na.omit(unlist(stringr::str_split(paste(na.omit(c(AllIDs.x, AllIDs.y)), collapse = ","), ",\\s*")))), collapse = ",")) %>%
       ungroup()%>%
       rowwise() %>%
       mutate(
         PotentialAdditionalIDs = paste(
           setdiff(
-            unlist(str_split(AllIDs, ",\\s*")),  # Split merged_column into individual IDs
+            unlist(stringr::str_split(AllIDs, ",\\s*")),  # Split merged_column into individual IDs
             as.character(!!sym(SettingsInfo[['InputID']]))  # Split hmdb into individual IDs
           ),
           collapse = ", "  # Combine the remaining IDs back into a comma-separated string
