@@ -55,3 +55,8 @@ jobs:
 
       - name: Install MetaProViz from git by remotes
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
+
+      - name: Build and check package
+        run: |
+          R CMD build .
+          R CMD check *.tar.gz --no-manual
