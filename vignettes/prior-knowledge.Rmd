@@ -68,7 +68,7 @@ First if you have not done yet, install the required dependencies and load the l
 ```{r message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 # 2. Install the latest development version from GitHub using devtools
-#devtools::install_github("https://github.com/saezlab/MetaProViz")
+# devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
 library(magrittr)
@@ -77,10 +77,10 @@ library(purrr)
 library(dplyr)
 library(stringr)
 
-#Please install the Biocmanager Dependencies:
-#BiocManager::install("clusterProfiler")
-#BiocManager::install("EnhancedVolcano")
-#BiocManager::install("cosmosR")
+# Please install the Biocmanager Dependencies:
+# BiocManager::install("clusterProfiler")
+# BiocManager::install("EnhancedVolcano")
+# BiocManager::install("cosmosR")
 ```
 
 \
@@ -105,7 +105,7 @@ library(stringr)
 Example datasets is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].\
 
 ```{r}
-#Load the Pre-processed intracellular data:
+# Load the Pre-processed intracellular data:
 FeatureMetadata_Cells <- MetaProViz::ToyData(Data="Cells_MetaData")
 ```
 
@@ -146,7 +146,7 @@ FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="BiocratesFeatureTable")
 The difficulty with assigning metabolite IDs to measured data is the uncertainty in the detection of metabolites. Indeed, differentiation of structural isomers (both constitutional isomers and stereoisomers) as for example the distinction between enantiomers. This leads to loss of information and hence uncertainty is assigning metabolite IDs.\
 One example is the metabolite Alanine, which can occur in its L- or D- form. If in an experiment those enantiomers have not been distinguished, the correct way would be to either assign two metabolite IDs (L- and D-Alanine) or a more general Alanine ID without chiral information. Yet, in reality this is not as trivial:\
 ```{r, echo=FALSE}
-#Create DF for Alanine:
+# Create DF for Alanine:
 Alanine <- data.frame(
   TrivialName = c("D-Alanine", "L-Alanine", "Alanine", "Alanine zwitterion"),
   HMDB= c("HMDB0001310",  "HMDB0000161", NA, NA),
@@ -163,7 +163,7 @@ Alanine%>%
 \
 Indeed, dependent on the database, the Alanine metabolite can have different IDs available:\
 ```{r, echo=FALSE}
-#Print Plot:
+# Print Plot:
 AlaninePlot <- Alanine%>%
   tidyr::pivot_longer(cols = c("HMDB", "ChEBI", "KEGG", "PubChem"),
                                names_to = "Conditions",
@@ -187,7 +187,7 @@ Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
       add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-#ggplot2::ggsave(filename = "AlaninePlot.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "AlaninePlot.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
 
 Plot_Sized
 ```
@@ -219,7 +219,7 @@ Alanine%>%
 ```
 \
 ```{r, echo=FALSE}
-#BarGraph
+# BarGraph
 Plot <- ggplot2::ggplot(Alanine, ggplot2::aes(fill=TrivialName, y=`PathwayCount`, x=Database)) +
         ggplot2::geom_bar(position="stack", stat="identity")+
         ggplot2::scale_fill_manual(values = c("D-Alanine" = "#9F0162"  , "L-Alanine" = "#006384", "Alanine" = "grey", "Alanine zwitterion" = "#00735C"))+
@@ -236,7 +236,7 @@ Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
       add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-#ggplot2::ggsave(filename = "AlaninePlot_Pathways.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "AlaninePlot_Pathways.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
 
 Plot_Sized
 ```
@@ -252,7 +252,7 @@ Alanine_Path <- Pathways%>%
                    .groups = 'drop')
 
 
-#BarGraph
+# BarGraph
 Plot <- ggplot2::ggplot(Alanine_Path, ggplot2::aes(fill=commonNames, y=PathwayCount , x=pathwaySource)) +
         ggplot2::geom_bar(position="stack", stat="identity")+
         ggplot2::scale_fill_manual(values = c("D-Alanine" = "#9F0162"  , "L-Alanine" = "#006384", "Alanine" = "grey", "Alanine zwitterion" = "#00735C"))+
@@ -309,7 +309,7 @@ To address these issues and  provide a standardized way to access and integrate 
 KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000].
 **(KEGG_Pathways)**\
 ```{r}
-#This will use KEGGREST to query the KEGG API to load the pathways:
+# This will use KEGGREST to query the KEGG API to load the pathways:
 MetaProViz::LoadKEGG()
 ```
 \
@@ -338,7 +338,7 @@ ChemicalClass_MetabSet[c(1:5,80:83, 500:503),]%>%
 The function `Make_GeneMetabSet` can be used to convert gene names to metabolite names by using a PK network of metabolic reactions calls CosmosR [@Dugourd2021]. This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB [@Castanza2022]. Moreover, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
 The Hallmarks [@Liberzon2015] gene-set and Gaude [@Gaude2016] gene-set is available in the package `MetaProViz` and can be loaded using the function `LoadHallmarks()` and `LoadGaude` respectively.\
 ```{r}
-#Load the example gene-sets:
+# Load the example gene-sets:
 MetaProViz::LoadHallmarks()
 
 MetaProViz::LoadGaude()
@@ -360,7 +360,7 @@ Gaude_Pathways[c(486:490, 1504, 1507, 1531, 49:50, 779),]%>%
 \
 Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.
 ```{r}
-#Translate gene names to metabolite names
+# Translate gene names to metabolite names
 Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
                                                      SettingsInfo=c(Target="gene"),
                                                      PKName="Hallmarks")
@@ -381,8 +381,8 @@ Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
 ```
 \
 ```{r, echo=FALSE, include =FALSE}
-#plot out how the metabolite set size is different from the original gene-set size
-#Show bar graph of the size of the gene set versus the metabolite set --> Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
+# plot out how the metabolite set size is different from the original gene-set size
+# Show bar graph of the size of the gene set versus the metabolite set --> Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
 
 
 ```
@@ -915,7 +915,7 @@ Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 Plot_Sized_A <- Plot_Sized
-#ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_KEGG-to-HMDB.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_KEGG-to-HMDB.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
 
 PlotB <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.character(`Count(hmdb_to_KEGG)`))) +
         ggplot2::geom_bar(position="stack", stat="identity")+
@@ -933,7 +933,7 @@ Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-#ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_HMDB-to-KEGG.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_HMDB-to-KEGG.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
 
 Plot_Sized_B <- Plot_Sized
 
@@ -986,21 +986,21 @@ The full scope of different methods is beyond the scope of MetaProViz, but are a
 ```{r, echo=FALSE, eval=FALSE}
 # Future
 
-#Run metabolite-gene analysis - Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
+# Run metabolite-gene analysis - Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
 #- Maybe add the data from the paper of the 3D cell culture model of ccRCC
 
-#Run footprinting analysis - Maybe move to extra vignette - ocean method --\> MetaProViz::RunOcean
+# Run footprinting analysis - Maybe move to extra vignette - ocean method --\> MetaProViz::RunOcean
 
-#Reactome - As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome` - Remove unspecific metabolites - Translate ChEBI to HMDB and KEGG - FYI: See code I used to access via API
+# Reactome - As we already did most of the API retrieval, we can consider to add `MetaProViz::LoadReactome` - Remove unspecific metabolites - Translate ChEBI to HMDB and KEGG - FYI: See code I used to access via API
 
-#ocean PK - Add HMDB and CheBI IDs to the KEGG IDs.
+# ocean PK - Add HMDB and CheBI IDs to the KEGG IDs.
 #- Make ocean PK accessible via MetaProViz
 
-#Lipid prediction - This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
+# Lipid prediction - This goes into the direction of linex where we will use the lipidPKN and the reaction rules to also use lipids that are not in the prior knowledge when doing downstream analsyis!
 #- linex2 PKN is manually curated - instead of using this we may want to make am updateable version.
 #- Now we can at least do understand the classes present \* LipidMaps IDs, can we link other ID types?
 
-#Viz: - Showcase specific viz options - Add network plot
+# Viz: - Showcase specific viz options - Add network plot
 
 
 
@@ -1021,7 +1021,7 @@ The raw data are available via [metabolomics workbench study ST002224](https://w
 We have performed pre-processing and differential analysis (details can be found in the vignette vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)) and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
 
 ```{r}
-#Load the Pre-processed intracellular data:
+# Load the Pre-processed intracellular data:
 Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
 ```
 

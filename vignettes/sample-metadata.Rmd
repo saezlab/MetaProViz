@@ -50,20 +50,20 @@ First if you have not done yet, install the required dependencies and load the l
 ```{r message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 # 2. Install the latest development version from GitHub using devtools
-#devtools::install_github("https://github.com/saezlab/MetaProViz")
+# devtools::install_github("https://github.com/saezlab/MetaProViz")
 
 library(MetaProViz)
 
-#dependencies that need to be loaded:
+# dependencies that need to be loaded:
 library(magrittr)
 library(dplyr)
 library(rlang)
 library(tidyr)
 library(tibble)
 
-#Please install the Biocmanager Dependencies:
-#BiocManager::install("clusterProfiler")
-#BiocManager::install("EnhancedVolcano")
+# Please install the Biocmanager Dependencies:
+# BiocManager::install("clusterProfiler")
+# BiocManager::install("EnhancedVolcano")
 ```
 \
 \
@@ -171,10 +171,10 @@ TissueTypeList <- MetaRes[["res_summary"]]%>%
   select(FeatureID)%>%
   pull()
 
-#select columns Tissue_norm that are in TissueTypeList if they exist
+# select columns Tissue_norm that are in TissueTypeList if they exist
 Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
 
-#Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
+# Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
 MetaProViz:::VizHeatmap(InputData = Input_Heatmap,
                        SettingsFile_Sample = Tissue_Norm[,c(1:13)],
                        SettingsInfo = c(color_Sample = list("TISSUE_TYPE")),
@@ -196,7 +196,7 @@ We will perform multiple comparisons based on the different patient demographics
 5. Tumour versus Normal: Subset of `Old` patients
 \
 ```{r Display_Not_Run, eval=FALSE}
-#Prepare the different selections
+# Prepare the different selections
 EarlyStage <- Tissue_Norm%>%
   filter(STAGE== "EARLY-STAGE")
 LateStage <- Tissue_Norm%>%
@@ -208,7 +208,7 @@ Young <- Tissue_Norm%>%
 
 DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
 
-#Run DMA
+# Run DMA
 ResList <- list()
 for(item in names(DFs)){
   #Get the right DF:
@@ -233,7 +233,7 @@ for(item in names(DFs)){
 \
 <div class="vscroll-plot">
 ```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-#Prepare the different selections
+# Prepare the different selections
 EarlyStage <- Tissue_Norm%>%
   filter(STAGE== "EARLY-STAGE")
 LateStage <- Tissue_Norm%>%
@@ -245,7 +245,7 @@ Young <- Tissue_Norm%>%
 
 DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
 
-#Run DMA
+# Run DMA
 ResList <- list()
 for(item in names(DFs)){
   #Get the right DF:
@@ -275,7 +275,7 @@ for(item in names(DFs)){
 We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
 Here we can also use the `MetaproViz::VizVolcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
 ```{r}
-#Early versus Late Stage
+# Early versus Late Stage
 MetaProViz::VizVolcano(PlotSettings="Compare",
                        InputData=ResList[["EarlyStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        InputData2= ResList[["LateStage"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
@@ -295,7 +295,7 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
 Here we can observe that Tumour versus Normal has lower significance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
 We can also check if the top changed metabolites comparing Tumour versus Normal correlate with the main metabolite drivers that separate patients based on their `TISSUE_TYPE`, which are Tumour or Normal.\
 ```{r}
-#Get the top changed metabolites
+# Get the top changed metabolites
 top_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>%
   arrange(desc(t.val)) %>%
   slice(1:25)%>%
@@ -307,7 +307,7 @@ bottom_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>%
   select(Metabolite)  %>%
   pull()
 
-#Check if those overlap with the top demographics drivers
+# Check if those overlap with the top demographics drivers
 ggVennDiagram::ggVennDiagram(list(Top = top_entries,
                                   Bottom = bottom_entries,
                                   TissueTypeList = TissueTypeList))+
@@ -320,7 +320,7 @@ MetaData_Metab <- merge(x=Tissue_MetaData,
                    all.y=TRUE)%>%
   column_to_rownames("Row.names")
 
-#Make a Volcano plot:
+# Make a Volcano plot:
 MetaProViz::VizVolcano(PlotSettings="Standard",
                        InputData=ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        SettingsFile_Metab =  MetaData_Metab,
@@ -332,14 +332,14 @@ MetaProViz::VizVolcano(PlotSettings="Standard",
 \
 Lastly, we can perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison and plot significant pathways. Noteworthy, since not all metabolites have KEGG IDs, we will lose information. To prevent this we can try to increase the KEGG IDs mapped by using `MetaProViz::TranslateID`. For details on this please visit the vignette `Prior Knowledge - Access & Integration`.\
 ```{r, eval=FALSE, echo=FALSE}
-#https://www.nature.com/articles/s41588-024-01662-5
-#https://github.com/AndersonHu85/ccRCC_multiomics/tree/main
+# https://www.nature.com/articles/s41588-024-01662-5
+# https://github.com/AndersonHu85/ccRCC_multiomics/tree/main
 
 ```
 \
 For results with p.adjusted value < 0.1 and a minimum of 10% of the pathway detected will be visualized as Volcano plots:\
 ```{r, eval=FALSE}
-#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
 LoadKEGG()
@@ -388,7 +388,7 @@ for(comparison in names(ResList)){
 \
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
 LoadKEGG()
@@ -467,7 +467,7 @@ MCAres <-  MetaProViz::MCA_2Cond(InputData_C1=ResList[["Young"]][["DMA"]][["TUMO
 \
 Now we can use this information to colour code our volcano plot. We will plot individual vocano plots for each metabolite pathway as defined by the feature metadata provided as part of the data in [@Hakimi2016].
 ```{r, eval=FALSE}
-#Add metabolite information such as KEGG ID or pathway to results
+# Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
                    y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
                    by=0,
@@ -497,7 +497,7 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
 \
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-#Add metabolite information such as KEGG ID or pathway to results
+# Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
                    y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
                    by=0,
@@ -536,7 +536,7 @@ MetaProViz::VizVolcano(PlotSettings="Compare",
 ## Pathway enrichment
 Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
 ```{r}
-#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
 MetaProViz::LoadKEGG()
