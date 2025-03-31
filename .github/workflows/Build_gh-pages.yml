@@ -23,7 +23,7 @@ jobs:
       - name: Install libglpk40
         run: |
           apt-get update
-          apt-get install -y libglpk40
+          apt-get install -y libglpk40 git
 
       - uses: r-lib/actions/setup-pandoc@v2 #installs pandoc
 
