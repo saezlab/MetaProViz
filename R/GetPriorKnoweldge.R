@@ -101,7 +101,7 @@ LoadHallmarks <- function() {
   MetaProViz_Init()
 
   # Read the .csv files
-  Hallmark <- system.file("data", "Hallmarks.csv", package = "MetaProViz")
+  Hallmark <- system.file("extdata", "Hallmarks.csv", package = "MetaProViz")
   Hallmark <- read.csv(Hallmark, check.names=FALSE)
 
   # Return into environment
@@ -123,7 +123,7 @@ LoadGaude <- function() {
   MetaProViz_Init()
 
   # Read the .csv files
-  MetabolicSig <- system.file("data", "Compilled_MetabolicSig_2025-01-07.csv", package = "MetaProViz")
+  MetabolicSig <- system.file("extdata", "Compilled_MetabolicSig_2025-01-07.csv", package = "MetaProViz")
   MetabolicSig <- read.csv(MetabolicSig, check.names=FALSE)
 
   # Return into environment
