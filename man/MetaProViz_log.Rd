@@ -20,5 +20,5 @@ metaproviz_log()
 
 }
 \seealso{
-\code{\link{metaproviz_logfile}}
+\code{\link{MetaProViz_logfile}}
 }

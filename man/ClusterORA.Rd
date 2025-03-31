@@ -3,6 +3,8 @@
 \name{ClusterORA}
 \alias{ClusterORA}
 \title{\subsection{---------------------------}{
+
+ClusterORA
 }}
 \usage{
 ClusterORA(
@@ -41,9 +43,5 @@ ClusterORA(
 Saves results as individual .csv files.
 }
 \description{
-This script allows you
-ClusterORA
-}
-\details{
 Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
 }
