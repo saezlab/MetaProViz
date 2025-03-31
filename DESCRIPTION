@@ -33,6 +33,7 @@ Depends:
     R (>= 4.4.1),
     ggplot2 (>= 3.3.5)
 Imports:
+    broom,
     clusterProfiler,
     ComplexUpset,
     cosmosR,
@@ -42,6 +43,8 @@ Imports:
     ggbeeswarm,
     ggfortify,
     ggplot2,
+    ggpubr,
+    ggrepel,
     ggupset,
     ggVennDiagram,
     grid,
@@ -59,11 +62,15 @@ Imports:
     Polychrome,
     purrr,
     qcc,
+    rappdirs,
     readr,
     reshape,
     rlang,
+    rstatix,
     stringr,
     tibble,
+    tidyr,
+    tidyselect,
     writexl,
     yaml
 Suggests:
