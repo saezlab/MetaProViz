@@ -52,7 +52,7 @@
 #'
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
 #'
-#' @importFrom dplyr rename
+#' @importFrom dplyr rename full_join
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom purrr map reduce
@@ -282,7 +282,7 @@ DMA <-function(InputData,
   })
 
   # Merge all dataframes by "Metabolite"
-  merged_df <- purrr::reduce(df_list_selected, full_join, by = "Metabolite")
+  merged_df <- purrr::reduce(df_list_selected, dplyr::full_join, by = "Metabolite")
   names(merged_df) <- gsub("\\.x$", "", names(merged_df))#It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to be added to the column names. We only keep one column (.x)
 
   Feature_Metadata <- merged_df %>%
