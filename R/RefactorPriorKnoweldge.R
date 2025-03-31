@@ -41,7 +41,7 @@
 #' @keywords Translate metabolite IDs
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across n
-#' @importFrom tidyselect all_of
+#' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR id_types translate_ids
 #' @importFrom logger log_warn
@@ -218,9 +218,9 @@ TranslateID <- function(InputData,
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across rowwise
-#' @importFrom tidyr separate_rows
+#' @importFrom tidyr separate_rows unnest
 #' @importFrom purrr map_chr
-#' @importFrom tidyselect all_of
+#' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR id_types translate_ids
 #' @importFrom logger log_warn log_trace

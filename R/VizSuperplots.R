@@ -52,6 +52,7 @@
 #' @importFrom ggpubr stat_pvalue_manual
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom tidyr separate unite
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom ggbeeswarm geom_beeswarm
