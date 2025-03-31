@@ -403,6 +403,7 @@ ReplicateSum <- function(InputData,
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_info log_trace
+#' @importFrom ggplot2 after_stat
 #'
 #' @export
 #'
@@ -534,7 +535,7 @@ PoolEstimation <- function(InputData,
   # 2. Histogram of CVs
   logger::log_trace('CV histogram.')
   HistCV <-suppressWarnings(invisible(ggplot(result_df_final_out, aes(CV)) +
-                        geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
+                        geom_histogram(aes(y=ggplot2::after_stat(density)), color="black", fill="white")+
                         geom_vline(aes(xintercept=CutoffCV),
                                    color="darkred", linetype="dashed", size=1)+
                         geom_density(alpha=.2, fill="#FF6666") +
@@ -1065,7 +1066,7 @@ CoReNorm <-function(InputData,
 
     #Make histogram of CVs
     HistCV <- invisible(ggplot2::ggplot(cv_result_df, aes(CV)) +
-                          ggplot2::geom_histogram(aes(y=after_stat(density)), color="black", fill="white")+
+                          ggplot2::geom_histogram(aes(y=ggplot2::after_stat(density)), color="black", fill="white")+
                           ggplot2::geom_vline(aes(xintercept=CutoffCV),
                                      color="darkred", linetype="dashed", linewidth=1)+
                           ggplot2::geom_density(alpha=.2, fill="#FF6666") +

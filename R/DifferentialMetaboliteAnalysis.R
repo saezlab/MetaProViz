@@ -1525,7 +1525,8 @@ DMA_Stat_limma <- function(InputData,
 #' @keywords Shapiro test,Normality testing, Density plot, QQplot
 #'
 #' @importFrom stats shapiro.test
-#' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous theme_minimal labs ggplot_build geom_qq geom_qq_line
+#' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous
+#' @importFrom ggplot2 theme_minimal labs ggplot_build geom_qq geom_qq_line after_stat
 #' @importFrom dplyr rename select_if filter
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -1677,20 +1678,20 @@ Shapiro <-function(InputData,
       all_data <- unlist(subset_data)
 
       plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
-        ggplot2::geom_histogram(ggplot2::aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white")  +
+        ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(density)), binwidth=.5, colour="black", fill="white")  +
         ggplot2::geom_density(alpha = 0.2, fill = "grey45")
 
       density_values <- ggplot2::ggplot_build(plot)$data[[2]]
 
       plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
-        ggplot2::geom_histogram( ggplot2::aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
+        ggplot2::geom_histogram( ggplot2::aes(y=ggplot2::after_stat(density)), binwidth=.5, colour="black", fill="white") +
         ggplot2::geom_density(alpha=.2, fill="grey45") +
         ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
 
       density_values2 <- ggplot2::ggplot_build(plot)$data[[2]]
 
       suppressWarnings(sampleDist <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
-                         ggplot2::geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
+                         ggplot2::geom_histogram(aes(y=ggplot2::after_stat(density)), binwidth=.5, colour="black", fill="white") +
                          ggplot2::geom_density(alpha=.2, fill="grey45") +
                          ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
                          ggplot2::theme_minimal()+
