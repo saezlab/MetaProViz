@@ -52,12 +52,13 @@
 #' @importFrom ggplot2 geom_bar labs scale_color_manual theme xlab ylab element_text
 #' @importFrom ggpubr stat_pvalue_manual
 #' @importFrom grid convertUnit
-#' @importFrom dplyr rename select group_by summarise_at filter mutate n
+#' @importFrom dplyr rename select group_by summarise filter mutate n across
 #' @importFrom tidyr separate unite
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom ggbeeswarm geom_beeswarm
 #' @importFrom logger log_trace log_info
+#' @importFrom tidyselect all_of
 #'
 #' @export
 #'
@@ -242,11 +243,20 @@ VizSuperplot <- function(InputData,
 
   for (i in colnames(InputData)){
     #Prepare the dfs:
-    suppressWarnings(dataMeans <- data %>%
-                       dplyr::select(i, Conditions)
-                     %>% dplyr::group_by(Conditions)
-                     %>% dplyr::summarise_at(vars(i), list(mean = mean, sd = sd))
-                     %>% as.data.frame())
+    suppressWarnings(
+      dataMeans <-
+        data %>%
+        dplyr::select(i, Conditions) %>%
+        dplyr::group_by(Conditions) %>%
+        dplyr::summarise(
+          dplyr::across(
+            tidyselect::all_of(i),
+            list(mean = mean, sd = sd)
+          )
+        ) %>%
+        as.data.frame()
+    )
+
     names(dataMeans)[2] <- "Intensity"
 
     if("Superplot" %in% names(SettingsInfo)){
