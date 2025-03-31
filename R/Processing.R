@@ -264,7 +264,7 @@ PreProcessing <- function(InputData,
 #' Merges the analytical replicates of an experiment
 #'
 #' @param InputData DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#'#@param SettingsFile_Sample DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.
+#' @param SettingsFile_Sample DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.
 #' @param SettingsInfo  \emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_SettingsFile_Sample", Analytical_Replicates="ColumnName_SettingsFile_Sample").\strong{Default = NULL}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}

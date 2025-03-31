@@ -26,14 +26,13 @@
 
 #' Volcano plot visualization
 #'
-#' @param Settings \emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
+#' @param PlotSettings \emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
 #' @param SettingsInfo \emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}
 #' @param SettingsFile_Metab \emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}
-#' @param Input_data DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param InputData DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.
 #' @param InputData2 \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}
 #' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
-#' @param FeatureID {Optional: } Column name including the feature names, e.g. metabolite names. \strong{Default = "Metabolite"}
 #' @param PlotName \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
 #' @param ComparisonName \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(InputData="Cond1", InputData2= "Cond2")}
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
@@ -49,6 +48,8 @@
 #' @param FolderPath {Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
+#' @param PrintPlot \emph{Optional: } print the plots to the active graphic
+#' device.
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'

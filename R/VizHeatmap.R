@@ -24,16 +24,32 @@
 
 #' Heatmap visualization
 #'
-#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param SettingsInfo  \emph{Optional: } NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_SettingsFile_Metab",individual_Sample= "ColumnName_SettingsFile_Sample", color_Metab="ColumnName_SettingsFile_Metab", color_Sample= list("ColumnName_SettingsFile_Sample", "ColumnName_SettingsFile_Sample",...)).\strong{Default = NULL}
-#' @param SettingsFile_Sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.\strong{Default = NULL}
-#' @param SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. \strong{Default = NULL}
+#' @param InputData DF with unique sample identifiers as row names and
+#' metabolite numerical values in columns with metabolite identifiers as column
+#' names. Includes experimental design and outlier column.
+#' @param SettingsInfo  \emph{Optional: } NULL or Named vector  where you can
+#' include vectors or lists for annotation c(individual_Metab=
+#' "ColumnName_SettingsFile_Metab",individual_Sample=
+#' "ColumnName_SettingsFile_Sample",
+#' color_Metab="ColumnName_SettingsFile_Metab", color_Sample=
+#' list("ColumnName_SettingsFile_Sample",
+#' "ColumnName_SettingsFile_Sample",...)).\strong{Default = NULL}
+#' @param SettingsFile_Sample DF which contains information about the samples,
+#' which will be combined with your input data based on the unique sample
+#' identifiers. and other columns with required PlotSettingInfo.\strong{Default
+#' = NULL}
+#' @param SettingsFile_Metab  \emph{Optional: } DF with column "Metabolite"
+#' including the Metabolite names (needs to match Metabolite names of
+#' Input_data) and other columns with required PlotSettingInfo. \strong{Default
+#' = NULL}
 #' @param PlotName \emph{Optional: } String which is added to the output files of the plot
 #' @param Scale \emph{Optional: } String with the information for Scale row, column or none. \strong{Default = row}
 #' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param Enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param Enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
-#' @param Folder_Name {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+#' @param PrintPlot \emph{Optional: } print the plots to the active graphic
+#'     device.
+#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -48,9 +64,7 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_trace
-#'
 #' @export
-#'
 VizHeatmap <- function(InputData,
                        SettingsInfo= NULL,
                        SettingsFile_Sample=NULL,
