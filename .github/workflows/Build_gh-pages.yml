@@ -1,7 +1,10 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples and adapted
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  schedule:
+    - cron: '0 4 * * *'
 
 name: Build_gh-pages.yml #shown when action is run
 
@@ -16,6 +19,10 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }} #to push results to gh-pages branch!
+
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
     steps: #Series of steps that is executed sequencially: https://github.com/r-lib/actions/
       - uses: actions/checkout@v4 # goes to gh-pages branch to work there

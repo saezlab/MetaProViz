@@ -4,7 +4,10 @@
 # a github action.
 on:
   push:
-    branches: [development, main]
+    branches:
+      - main
+  schedule:
+    - cron: '0 4 * * *'
 
 name: R-CMD-check
 
@@ -24,6 +27,11 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
+
 
     steps:
       - uses: actions/checkout@v4
