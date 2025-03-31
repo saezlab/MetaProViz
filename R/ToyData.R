@@ -88,7 +88,7 @@ ToyData <- function(Dataset) {
 
   datasets %>%
   magrittr::extract2(Dataset) %>%
-    system.file("data", ., package = "MetaProViz") %>%
+    system.file("extdata", ., package = "MetaProViz") %>%
     readr::read_csv(col_types = readr::cols()) %>%
     {`if`(
     (rncol <- names(.) %>% intersect(rncols)) %>% length,
