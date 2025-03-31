@@ -870,7 +870,8 @@ MVImputation <-function(InputData,
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom gridExtra grid.arrange
-#' @importFrom ggplot2 ggplot geom_boxplot geom_hline labs theme_classic theme_minimal theme annotation_custom aes_string
+#' @importFrom ggplot2 ggplot geom_boxplot geom_hline labs theme_classic
+#' @importFrom ggplot2 theme_minimal theme annotation_custom aes_string element_text
 #' @importFrom logger log_info log_trace
 #'
 #' @noRd
@@ -909,7 +910,7 @@ TICNorm <-function(InputData,
     ggplot2::geom_hline(yintercept = 0, color = "red", linetype = "solid") +
     ggplot2::labs(title = "Before TIC Normalization")+
     ggplot2::theme_classic()+
-    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
     ggplot2::theme(legend.position = "none")
 
   #RLA_data_raw_Sized <- plotGrob_Processing(InputPlot = RLA_data_raw, PlotName= "Before TIC Normalization", PlotType= "RLA")
@@ -943,15 +944,15 @@ TICNorm <-function(InputData,
       ggplot2::geom_hline(yintercept = 0, color = "red", linetype = "solid") +
       ggplot2::labs(title = "After TIC Normalization")+
       ggplot2::theme_classic() +
-      ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
       ggplot2::theme(legend.position = "none")
 
     #RLA_data_norm_Sized <- plotGrob_Processing(InputPlot = RLA_data_norm, PlotName= "After TIC Normalization", PlotType= "RLA")
 
     #Combine Plots
     dev.new()
-    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1))+ ggplot2::theme(legend.position = "none"),
-                                                           RLA_data_norm+ ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1))+ ggplot2::theme(legend.position = "none"),
+    norm_plots <- suppressWarnings(gridExtra::grid.arrange(RLA_data_raw+ ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+ ggplot2::theme(legend.position = "none"),
+                                                           RLA_data_norm+ ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+ ggplot2::theme(legend.position = "none"),
                                                            ncol = 2))
     dev.off()
     norm_plots <- ggplot2::ggplot() +ggplot2::theme_minimal()+ ggplot2::annotation_custom(norm_plots)
@@ -1395,11 +1396,11 @@ OutlierDetection <-function(InputData,
 
     HotellingT2plot <- HotellingT2plot +
       ggplot2::theme_classic()+
-      ggplot2::theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))+
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1))+
       ggplot2::ggtitle(paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"))+
       ggplot2::scale_linetype_discrete(name = LegendTitle,)+
-      ggplot2::theme(plot.title = element_text(size = 13))+#, face = "bold")) +
-      ggplot2::theme(axis.text = element_text(size = 7))
+      ggplot2::theme(plot.title = ggplot2::element_text(size = 13))+#, face = "bold")) +
+      ggplot2::theme(axis.text = ggplot2::element_text(size = 7))
     #HotellingT2plot_Sized <- plotGrob_Processing(InputPlot = HotellingT2plot, PlotName= paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"), PlotType= "Hotellings")
 
     if(loop==1){

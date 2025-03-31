@@ -48,7 +48,8 @@
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
-#' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot geom_bar labs scale_color_manual theme xlab ylab
+#' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot
+#' @importFrom ggplot2 geom_bar labs scale_color_manual theme xlab ylab element_text
 #' @importFrom ggpubr stat_pvalue_manual
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select group_by summarise_at filter mutate n
@@ -386,7 +387,7 @@ VizSuperplot <- function(InputData,
 
     Plot <- Plot + Theme+ ggplot2::labs(title = PlotName,
                                 subtitle = i)# ggtitle(paste(i))
-    Plot <- Plot + ggplot2::theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ ggplot2::xlab(xlab)+ ggplot2::ylab(ylab)
+    Plot <- Plot + ggplot2::theme(legend.position = "right",plot.title = ggplot2::element_text(size=12, face = "bold"), axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+ ggplot2::xlab(xlab)+ ggplot2::ylab(ylab)
 
     ## Store the plot in the 'plots' list
     PlotList[[i]] <- Plot
