@@ -49,7 +49,8 @@
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
 #' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot
-#' @importFrom ggplot2 geom_bar labs scale_color_manual theme xlab ylab element_text
+#' @importFrom ggplot2 position_dodge element_text
+#' @importFrom ggplot2 geom_bar labs scale_color_manual theme xlab ylab
 #' @importFrom ggpubr stat_pvalue_manual
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select group_by summarise filter mutate n across
@@ -298,7 +299,7 @@ VizSuperplot <- function(InputData,
       Plot <- Plot+ ggplot2::geom_violin(fill = ColorPalette)+ ggplot2::stat_summary(fun.data=data_summary,
                                                               geom="errorbar", color="black", width=0.2)
     } else if (PlotType == "Box"){
-      Plot <- Plot +  ggplot2::geom_boxplot(fill=ColorPalette,  width=0.5, position=position_dodge(width = 0.5))
+      Plot <- Plot +  ggplot2::geom_boxplot(fill=ColorPalette,  width=0.5, position=ggplot2::position_dodge(width = 0.5))
     }
 
     # Add Superplot
@@ -321,12 +322,12 @@ VizSuperplot <- function(InputData,
       if(is.null(StatComparisons)==FALSE){
         Plot <- Plot+ ggpubr::stat_compare_means(comparisons = StatComparisons,
                                                  label = "p.format", method = StatPval, hide.ns = TRUE,
-                                               position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+                                               position = ggplot2::position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
       }else{
         comparison <- unique(plotdata$Conditions)
         Plot <- Plot+ ggpubr::stat_compare_means(comparisons = comparison ,
                                                  label = "p.format", method = StatPval, hide.ns = TRUE,
-                                                 position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+                                                 position = ggplot2::position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
 
       }
       Plot <- Plot +ggplot2::labs(caption = paste("p.val using pairwise ", StatPval))
@@ -408,7 +409,7 @@ VizSuperplot <- function(InputData,
     PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
-      add(theme(panel.background = element_rect(fill = "transparent")))
+      add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
    ####################################################################################################################################
     ## --------------- save -----------------##

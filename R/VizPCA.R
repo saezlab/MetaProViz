@@ -276,7 +276,7 @@ VizPCA <- function(InputData,
   PlotWidth <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
   PCA %<>%
     {ggplot2::ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = element_rect(fill = "transparent")))
+    add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
   PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 

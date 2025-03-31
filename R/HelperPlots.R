@@ -449,6 +449,8 @@ in_gtable <- function(name, gtbl) {
 #' @param PlotType Generated within the processing functions.
 #'
 #' @keywords Plot helper function
+#' @importFrom ggplot2 annotation_custom theme
+#' @importFrom magrittr %>% %<>% add
 #' @noRd
 #'
 
@@ -498,7 +500,7 @@ plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
 
   Plot_Sized %<>%
     {ggplot2::ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = element_rect(fill = "transparent")))
+    add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
   return(Plot_Sized)
 }

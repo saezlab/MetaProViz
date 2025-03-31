@@ -493,7 +493,7 @@ VizVolcano_Standard <- function(InputData,
         PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = element_rect(fill = "transparent")))
+          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
@@ -605,7 +605,7 @@ VizVolcano_Standard <- function(InputData,
       PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
-        add(theme(panel.background = element_rect(fill = "transparent")))
+        add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
       PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
@@ -849,7 +849,7 @@ VizVolcano_Compare <- function(InputData,
         PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = element_rect(fill = "transparent")))
+          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
@@ -979,7 +979,7 @@ VizVolcano_Compare <- function(InputData,
       PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
-        add(theme(panel.background = element_rect(fill = "transparent")))
+        add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
       PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
@@ -1209,7 +1209,7 @@ VizVolcano_PEA <- function(InputData,
 
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
-        add(theme(panel.background = element_rect(fill = "transparent")))
+        add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
       PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized

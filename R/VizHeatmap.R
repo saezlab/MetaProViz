@@ -239,7 +239,7 @@ VizHeatmap <- function(InputData,
         PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = element_rect(fill = "transparent")))
+          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
@@ -382,7 +382,7 @@ VizHeatmap <- function(InputData,
         PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = element_rect(fill = "transparent")))
+          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
@@ -551,7 +551,7 @@ VizHeatmap <- function(InputData,
             PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
             Plot_Sized %<>%
               {ggplot2::ggplot() + annotation_custom(.)} %>%
-              add(theme(panel.background = element_rect(fill = "transparent")))
+              add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
             PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- Plot_Sized
 
@@ -665,7 +665,7 @@ VizHeatmap <- function(InputData,
     PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
-      add(theme(panel.background = element_rect(fill = "transparent")))
+      add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
     PlotList_adaptedGrid[[paste("Heatmap_",PlotName, sep="")]] <- Plot_Sized
 
