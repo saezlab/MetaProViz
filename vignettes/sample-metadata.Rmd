@@ -218,14 +218,14 @@ for(item in names(DFs)){
   #Create Folder for saving each comparison
   dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", sep=""), showWarnings = FALSE)
   dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", item, sep=""), showWarnings = FALSE)
-  
+
   #Perform DMA
   TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
                    SettingsFile_Sample =  InputData[,c(1:13)],
                    SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
                    PerformShapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
-                   FolderPath = paste(getwd(),"/MetaProViz_Results/DMA/", item, sep="")) 
-  
+                   FolderPath = paste(getwd(),"/MetaProViz_Results/DMA/", item, sep=""))
+
   #Add Results to list
   ResList[[item]] <- TvN
 }
@@ -250,19 +250,19 @@ ResList <- list()
 for(item in names(DFs)){
   #Get the right DF:
   InputData <- DFs[[item]]
-  
+
   message(paste("Running DMA for", item))
   #Create Folder for saving each comparison
   dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", sep=""), showWarnings = FALSE)
   dir.create(paste(getwd(),"/MetaProViz_Results/DMA/", item, sep=""), showWarnings = FALSE)
-  
+
   #Perform DMA
   TvN <- MetaProViz::DMA(InputData =  InputData[,-c(1:13)],
                    SettingsFile_Sample =  InputData[,c(1:13)],
                    SettingsInfo = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
                    PerformShapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
-                   FolderPath = paste(getwd(),"/MetaProViz_Results/DMA/", item, sep="")) 
-  
+                   FolderPath = paste(getwd(),"/MetaProViz_Results/DMA/", item, sep=""))
+
   #Add Results to list
   ResList[[item]] <- TvN
 }
@@ -311,7 +311,7 @@ bottom_entries <- ResList[["TissueType"]][["DMA"]][["TUMOR_vs_NORMAL"]] %>%
 ggVennDiagram::ggVennDiagram(list(Top = top_entries,
                                   Bottom = bottom_entries,
                                   TissueTypeList = TissueTypeList))+
-  scale_fill_gradient(low = "blue", high = "red")
+  ggplot2::scale_fill_gradient(low = "blue", high = "red")
 
 
 MetaData_Metab <- merge(x=Tissue_MetaData,
@@ -364,13 +364,13 @@ for(comparison in names(ResList)){
                                  PercentageCutoff=10)
 
   DM_ORA_res[[comparison]] <- Res
-  
+
   #Select to plot:
   Res_Select <- Res[["ClusterGoSummary"]]%>%
     filter(p.adjust<0.1)%>%
-    #filter(pvalue<0.05)%>%  
+    #filter(pvalue<0.05)%>%
     filter(Percentage_of_Pathway_detected>10)
-  
+
   if(is.null(Res_Select)==FALSE){
      MetaProViz::VizVolcano(PlotSettings="PEA",
                        InputData= DMA_Select, #Must be the data you have used as an input for the pathway analysis
@@ -413,13 +413,13 @@ for(comparison in names(ResList)){
                                  PercentageCutoff=10)
 
   DM_ORA_res[[comparison]] <- Res
-  
+
   #Select to plot:
   Res_Select <- Res[["ClusterGoSummary"]]%>%
     filter(p.adjust<0.1)%>%
-    #filter(pvalue<0.05)%>%  
+    #filter(pvalue<0.05)%>%
     filter(Percentage_of_Pathway_detected>10)
-  
+
   if(is.null(Res_Select)==FALSE){
      MetaProViz::VizVolcano(PlotSettings="PEA",
                        InputData= DMA_Select, #Must be the data you have used as an input for the pathway analysis
@@ -561,13 +561,13 @@ for(comparison in names(ResList)){
                                  PercentageCutoff=10)
 
   DM_ORA_res[[comparison]] <- Res
-  
+
   #Select to plot:
   Res_Select <- Res[["ClusterGoSummary"]]%>%
     filter(p.adjust<0.1)%>%
-    #filter(pvalue<0.05)%>%  
+    #filter(pvalue<0.05)%>%
     filter(Percentage_of_Pathway_detected>10)
-  
+
   if(is.null(Res_Select)==FALSE){
      MetaProViz::VizVolcano(PlotSettings="PEA",
                        InputData= DMA_Select, #Must be the data you have used as an input for the pathway analysis
