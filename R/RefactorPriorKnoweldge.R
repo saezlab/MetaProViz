@@ -62,7 +62,7 @@ TranslateID <- function(InputData,
 
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           InputData_Num=FALSE,
                           SaveAs_Table=SaveAs_Table)
 
@@ -120,7 +120,7 @@ TranslateID <- function(InputData,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "ID_Translation")
@@ -182,7 +182,7 @@ TranslateID <- function(InputData,
 
   ## ------------------ Save the results ------------------- ##
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=ResList,
+    SaveRes(InputList_DF=ResList,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -253,7 +253,7 @@ EquivalentIDs <- function(InputData,
 
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           InputData_Num=FALSE,
                           SaveAs_Table=SaveAs_Table)
 
@@ -293,7 +293,7 @@ EquivalentIDs <- function(InputData,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "EquivalentIDs")
@@ -407,7 +407,7 @@ EquivalentIDs <- function(InputData,
   ResList <- list("EquivalentIDs" = OutputDF)
 
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=ResList,
+    SaveRes(InputList_DF=ResList,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -460,7 +460,7 @@ MappingAmbiguity <- function(InputData,
   MetaProViz_Init()
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `CheckInput`
-  MetaProViz:::CheckInput(InputData=InputData,
+  CheckInput(InputData=InputData,
                           InputData_Num=FALSE,
                           SaveAs_Table=SaveAs_Table)
 
@@ -500,7 +500,7 @@ MappingAmbiguity <- function(InputData,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(SaveAs_Table)==FALSE ){
-    Folder <- MetaProViz:::SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(FolderName= "PriorKnowledge",
                                     FolderPath=FolderPath)
 
     SubFolder <- file.path(Folder, "MappingAmbiguities")
@@ -628,7 +628,7 @@ MappingAmbiguity <- function(InputData,
 
   ## ------------------ Save the results ------------------- ##
   suppressMessages(suppressWarnings(
-    MetaProViz:::SaveRes(InputList_DF=ResList,
+    SaveRes(InputList_DF=ResList,
                          InputList_Plot= NULL,
                          SaveAs_Table=SaveAs_Table,
                          SaveAs_Plot=NULL,
@@ -1095,7 +1095,7 @@ CheckMatchID <- function(InputData,
                   "InputData_Matched_only_duplicates" = summary_df_only_duplicates)
 
   suppressMessages(suppressWarnings(
-  MetaProViz:::SaveRes(InputList_DF=ResList,
+  SaveRes(InputList_DF=ResList,
                        InputList_Plot= NULL,
                        SaveAs_Table=SaveAs_Table,
                        SaveAs_Plot=NULL,
