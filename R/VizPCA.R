@@ -52,6 +52,8 @@
 #' @keywords PCA
 #'
 #' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
+#  required for autoplot.prcomp:
+#' @importFrom ggfortify fortify_map
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
