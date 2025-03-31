@@ -20,10 +20,10 @@ jobs:
     steps: #Series of steps that is executed sequencially: https://github.com/r-lib/actions/
       - uses: actions/checkout@v4 # goes to gh-pages branch to work there
 
-      - name: Install libglpk40
+      - name: Install system dependencies
         run: |
           apt-get update
-          apt-get install -y libglpk40 git
+          apt-get install -y libglpk40 git libxml2-dev libcurl4-openssl-dev libssl-dev libfontconfig1-dev
 
       - uses: r-lib/actions/setup-pandoc@v2 #installs pandoc
 
