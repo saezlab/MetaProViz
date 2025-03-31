@@ -30,7 +30,7 @@ jobs:
       - name: Set up R dependency cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.R_LIBS_USER }}
+          path: /usr/local/lib/R/site-library
           key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{ hashFiles('DESCRIPTION') }}
           restore-keys: |
             ${{ runner.os }}-r-${{ matrix.config.r }}-
