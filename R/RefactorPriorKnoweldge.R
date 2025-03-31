@@ -1121,10 +1121,8 @@ CheckMatchID <- function(InputData,
 #' InputData = KEGG_Pathways
 #'
 #'
+#' @importFrom igraph graph_from_adjacency_matrix components
 #' @noRd
-
-
-
 ClusterPK <- function(InputData, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
                       SettingsInfo= c(InputID="MetaboliteID", GroupingVariable="term"),
                       Clust = "Graph", # Options: "Graph", "Hierarchical",

@@ -50,6 +50,7 @@ Imports:
     gridExtra,
     gtools,
     hash,
+    igraph,
     inflection,
     kableExtra,
     limma,
