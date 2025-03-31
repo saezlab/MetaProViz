@@ -39,8 +39,10 @@
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return Saves results as individual .csv files.
+#'
+#' @importFrom logger log_info
+#' @importFrom dplyr rename select
 #' @export
-
 ClusterORA <- function(InputData,
                        SettingsInfo=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                        RemoveBackground=TRUE,
@@ -107,7 +109,7 @@ ClusterORA <- function(InputData,
   #Run ORA
   for(g in grps_labels){
     grpMetabolites <- subset(df, df[[SettingsInfo[["ClusterColumn"]]]] == g)
-    message("Number of metabolites in cluster `",g, "`: ", nrow(grpMetabolites), sep="")
+    log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
     clusterGo <- clusterProfiler::enricher(gene=as.character(grpMetabolites$Metabolite),
                                            pvalueCutoff = 1,
@@ -133,7 +135,7 @@ ClusterORA <- function(InputData,
       g_save <- gsub("/", "-", g)
       df_list[[g_save]] <- clusterGoSummary
     }else{
-      message("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
+      log_info("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
     }
   }
   #Save files
