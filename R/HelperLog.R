@@ -32,7 +32,7 @@
 #'
 #' @export
 #'
-#' @seealso \code{\link{metaproviz_log}}
+#' @seealso \code{\link{MetaProViz_log}}
 MetaProViz_logfile <- function(){
   #Creates the path for the log file
   OmnipathR::logfile('MetaProViz')
@@ -53,7 +53,7 @@ MetaProViz_logfile <- function(){
 #'
 #' @export
 #'
-#' @seealso \code{\link{metaproviz_logfile}}
+#' @seealso \code{\link{MetaProViz_logfile}}
 #'
 MetaProViz_log <- function(){
   #Opens log file for browsing
