@@ -25,14 +25,14 @@ jobs:
       (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
     steps: #Series of steps that is executed sequencially: https://github.com/r-lib/actions/
-      - uses: actions/checkout@v4 # goes to gh-pages branch to work there
-
       - name: Install system dependencies
         run: |
           apt-get update
           apt-get install -y libglpk40 git libxml2-dev libcurl4-openssl-dev libssl-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev cmake
           echo "R_VERSION=`R --version | head -n 1 | awk '{print $3}' | cut -b 1-3`" >> $GITHUB_ENV
           echo "R_LIBS_USER=`Rscript -e 'cat(.libPaths()[1L])'`" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4 # goes to gh-pages branch to work there
 
       - uses: r-lib/actions/setup-pandoc@v2 #installs pandoc
 
