@@ -49,7 +49,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom stats as.formula aov TukeyHSD
 #' @importFrom broom tidy
-#' @importFrom tidyr separate_rows
+#' @importFrom tidyr separate_rows pivot_wider
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_info
 #'
@@ -256,16 +256,15 @@ MetaAnalysis <- function(InputData,
    ## ---------- Plot ------------##
    # Plot DF
    Data_Heat <- Stat_results %>%
-     dplyr::filter(tukeyHSD_p.adjusted < StatCutoff)%>%#Filter for significant results
-     dplyr::filter(Explained_Variance > VarianceCutoff)%>%#Exclude Residuals row
-     dplyr::distinct(term, PC, .keep_all = TRUE)%>%#only keep unique term~PC combinations AND STATS
-     dplyr::select(term, PC, Explained_Variance)
+     dplyr::filter(tukeyHSD_p.adjusted < StatCutoff) %>%  # Filter for significant results
+     dplyr::filter(Explained_Variance > VarianceCutoff) %>%  # Exclude Residuals row
+     dplyr::distinct(term, PC, .keep_all = TRUE) %>%  # only keep unique term~PC combinations AND STATS
+     dplyr::select(term, PC, Explained_Variance) %>%
+     tidyr::pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
+     tibble::column_to_rownames("term") %>%
+     dplyr::mutate_all(~replace(., is.na(.), 0L))
 
-  Data_Heat <- reshape2::dcast( Data_Heat, term ~ PC, value.var = "Explained_Variance")%>%
-       tibble::column_to_rownames("term")%>%
-       dplyr::mutate_all(~replace(., is.na(.), 0))
-
-   if(nrow(Data_Heat) > 2){
+   if(nrow(Data_Heat) > 2L){
 
      #Plot
      invisible(VizHeatmap(InputData = Data_Heat,

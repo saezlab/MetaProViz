@@ -1822,13 +1822,17 @@ Bartlett <-function(InputData,
 
 #' This function performs a variance stabilizing transformation (VST) on the input data.
 #'
-#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param InputData Data frame with unique sample identifiers
+# not true: no need to have row names, they are not used here, and in general,
+# it is not a good practice to use row names
+#'     as row names and metabolite numerical values in columns with metabolite
+#'     identifiers as column names. Use NA for metabolites that were not detected.
 #'
 #' @return List with two entries: DF (including the results DF) and Plots (including the scedasticity_plot)
 #'
 #' @keywords Heteroscedasticity, variance stabilizing transformation
 #'
-#' @importFrom reshape2 melt
+#' @importFrom tidyr pivot_longer
 #' @importFrom stats lm
 #' @importFrom ggplot2 ggplot geom_point theme_bw scale_x_continuous scale_y_continuous xlab ylab geom_abline ggtitle geom_smooth aes
 #' @importFrom patchwork wrap_plots
@@ -1844,8 +1848,9 @@ vst <- function(InputData){
   MetaProViz_Init()
 
   # model the mean and variance relationship on the data
-  suppressMessages(melted <- reshape2::melt(InputData))
-  het.data <- melted %>%
+  het.data <-
+    InputData %>%
+    tidyr::pivot_longer(-1L, names_to = 'variable') %>%
     dplyr::group_by(variable) %>% # make a dataframe to save the values
     dplyr::summarise(mean=mean(value), sd=sd(value))
   het.data$lm <- 1 # add a common group for the lm function to account for the whole data together
@@ -1875,8 +1880,9 @@ vst <- function(InputData){
   data.vst <- as.data.frame(InputData^(1-coef(data.fit)['mean'][1]))
 
   # Heteroscedasticity visual check again
-  suppressMessages(melted.vst <- reshape::melt(data.vst))
-  het.vst.data <- melted.vst %>%
+  het.vst.data <-
+    data.vst %>%
+    tidyr::pivot_longer(-1L, names_to = 'variable') %>%
     dplyr::group_by(variable) %>% # make a dataframe to save the values
     dplyr::summarise(mean=mean(value), sd=sd(value))
   het.vst.data$lm <- 1 # add a common group for the lm function to account for the whole data together
