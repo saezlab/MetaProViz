@@ -344,9 +344,12 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 #' @param uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
 #' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
-
+#'
+#' @importFrom DBI dbListTables dbDisconnect dbGetQuery
+#' @importFrom OmnipathR metalinksdb_sqlite
+#' @importFrom logger log_info
+#' @importFrom dplyr mutate
 #' @export
-
 LoadMetalinks <- function(types = NULL,
                           cell_location = NULL,
                           tissue_location = NULL,
