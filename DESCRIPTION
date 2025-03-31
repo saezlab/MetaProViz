@@ -30,8 +30,7 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends:
-    R (>= 4.4.1),
-    ggplot2 (>= 3.3.5)
+    R (>= 4.4.1)
 Imports:
     broom,
     clusterProfiler,
@@ -42,7 +41,7 @@ Imports:
     factoextra,
     ggbeeswarm,
     ggfortify,
-    ggplot2,
+    ggplot2 (>= 3.3.5),
     ggpubr,
     ggrepel,
     ggupset,
