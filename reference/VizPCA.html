@@ -73,7 +73,11 @@ PCA plot visualization</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-settingsinfo">SettingsInfo<a class="anchor" aria-label="anchor" href="#arg-settingsinfo"></a></dt>
+<dl><dt id="arg-inputdata">InputData<a class="anchor" aria-label="anchor" href="#arg-inputdata"></a></dt>
+<dd><p>DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.</p></dd>
+
+
+<dt id="arg-settingsinfo">SettingsInfo<a class="anchor" aria-label="anchor" href="#arg-settingsinfo"></a></dt>
 <dd><p><em>Optional: </em> NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). <strong>Default = NULL</strong></p></dd>
 
 
@@ -128,10 +132,6 @@ PCA plot visualization</p>
 <dt id="arg-folderpath">FolderPath<a class="anchor" aria-label="anchor" href="#arg-folderpath"></a></dt>
 <dd><p><em>Optional:</em> Path to the folder the results should be saved at. <strong>default: NULL</strong></p></dd>
 
-
-<dt id="arg-input-data">Input_data<a class="anchor" aria-label="anchor" href="#arg-input-data"></a></dt>
-<dd><p>DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -142,8 +142,7 @@ PCA plot visualization</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Intra</span> <span class="op">&lt;-</span> <span class="fu"><a href="ToyData.html">ToyData</a></span><span class="op">(</span><span class="st">"IntraCells_Raw"</span><span class="op">)</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">VizPCA</span><span class="op">(</span><span class="va">Intra</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ggplot2::autoplot(stats::prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),     data = InputPCA, x = PCx, y = PCy, colour = Param_Col, fill = Param_Col,     shape = Param_Sha, size = 3, alpha = 0.8, label = T, label.size = 2.5,     label.repel = TRUE, loadings = as.logical(ShowLoadings),     loadings.label = as.logical(ShowLoadings), loadings.label.vjust = 1.2,     loadings.label.size = 2.5, loadings.colour = "grey10", loadings.label.colour = "grey10"):</span> Objects of class <span style="color: #0000BB;">&lt;prcomp&gt;</span> are not supported by autoplot.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Have you loaded the required package?</span>
+<span class="r-plt img"><img src="VizPCA-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

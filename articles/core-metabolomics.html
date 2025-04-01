@@ -113,11 +113,11 @@ load the libraries:</li>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
 <span><span class="co"># 2. Install the latest development version from GitHub using devtools</span></span>
-<span><span class="co">#devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
+<span><span class="co"># devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#dependencies that need to be loaded:</span></span>
+<span><span class="co"># dependencies that need to be loaded:</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
@@ -125,9 +125,9 @@ load the libraries:</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sinhrks/ggfortify" class="external-link">ggfortify</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Please install the Biocmanager Dependencies:</span></span>
-<span><span class="co">#BiocManager::install("clusterProfiler")</span></span>
-<span><span class="co">#BiocManager::install("EnhancedVolcano")</span></span></code></pre></div>
+<span><span class="co"># Please install the Biocmanager Dependencies:</span></span>
+<span><span class="co"># BiocManager::install("clusterProfiler")</span></span>
+<span><span class="co"># BiocManager::install("EnhancedVolcano")</span></span></code></pre></div>
 <br><br><div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 100%">
 
@@ -515,7 +515,7 @@ Amino acid metabolism
 package <code>KEGGREST</code> and can be used to perform pathway
 analysis. <strong>(KEGG_Pathways)</strong><br></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#This will use KEGGREST to query the KEGG API to load the pathways:</span></span>
+<code class="sourceCode R"><span><span class="co"># This will use KEGGREST to query the KEGG API to load the pathways:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/LoadKEGG.html">LoadKEGG</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -861,7 +861,7 @@ You can pass these additional information via the parameter
 the condition name for the <code>CoRe_media</code> in the
 <code>Input_data</code> file.<br></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Prepare the input:</span></span>
+<code class="sourceCode R"><span><span class="co"># Prepare the input:</span></span>
 <span><span class="va">Media_input</span> <span class="op">&lt;-</span> <span class="va">Media</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="op">!</span><span class="va">Conditions</span><span class="op">==</span><span class="st">"Pool"</span>, select <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="co">#remove pool samples and remove the information columns</span></span>
 <span></span>
@@ -899,7 +899,7 @@ the condition name for the <code>CoRe_media</code> in the
 <span><span class="co">#&gt; different from the rest. They will not be included in the sum of the CoRe_media</span></span>
 <span><span class="co">#&gt; samples.</span></span>
 <span><span class="co">#&gt; CoRe data are normalised by substracting mean (blank) from each sample and multiplying with the CoRe_norm_factor</span></span>
-<span><span class="co">#&gt; Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979). HotellinsConfidence value selected: 0.99</span></span>
+<span><span class="co">#&gt; Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). HotellinsConfidence value selected: 0.99</span></span>
 <span><span class="co">#&gt; There are possible outlier samples in the data</span></span>
 <span><span class="co">#&gt; Filtering round  1  Outlier Samples:  MS51-06</span></span>
 <span><span class="co">#&gt; Filtering round  2  Outlier Samples:  MS51-09</span></span></code></pre>
@@ -1191,7 +1191,7 @@ plot is generated and saved.<br></p>
 <span>                               SettingsFile_Metab <span class="op">=</span> <span class="va">MappingInfo</span>,</span>
 <span>                               CoRe<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Inspect the DMA results tables:</span></span>
+<span><span class="co"># Inspect the DMA results tables:</span></span>
 <span><span class="va">DMA_786M1A_vs_HK2</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-M1A_vs_HK2"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">DMA_786O_vs_HK2</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
@@ -2018,7 +2018,7 @@ column “term”, “Metabolite” and “Description”, and the
 <code>Input_data</code> requirements are column “t.val” and column
 “Metabolite”.<br></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
+<code class="sourceCode R"><span><span class="co"># Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
 <span><span class="va">DM_ORA_res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">comparisons</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -2040,7 +2040,7 @@ column “term”, “Metabolite” and “Description”, and the
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
-<span><span class="co">#Lets check how the results look like:</span></span>
+<span><span class="co"># Lets check how the results look like:</span></span>
 <span><span class="va">MC_ORA_786M1A_vs_HK2_Consumed</span> <span class="op">&lt;-</span> <span class="va">DM_ORA_res</span><span class="op">[[</span><span class="st">"786-M1A_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"Consumed"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -2365,7 +2365,7 @@ on the <code>Log2 Distance</code> and the <code>significance</code>
 distance ranges and base the threshold on this.<br><br>
 Regulatory rules:<br><br></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Example of all possible flows:</span></span>
+<code class="sourceCode R"><span><span class="co"># Example of all possible flows:</span></span>
 <span><span class="va">MCA_CoRe</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_rules.html">MCA_rules</a></span><span class="op">(</span>Method<span class="op">=</span><span class="st">"CoRe"</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -4559,10 +4559,10 @@ Now we can load the corresponding pre-processed intracellular example
 data for the comparison of 786M-1A versus HK2 (For the detailed
 pre-processing please see the vignette “Standard Metabolomics”).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Load the Pre-processed intracellular data:</span></span>
+<code class="sourceCode R"><span><span class="co"># Load the Pre-processed intracellular data:</span></span>
 <span><span class="va">Intra_DMA_786M1A_vs_HK2</span><span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ToyData.html">ToyData</a></span><span class="op">(</span>Data<span class="op">=</span><span class="st">"IntraCells_DMA"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Perform metabolite clustering:</span></span>
+<span><span class="co"># Perform metabolite clustering:</span></span>
 <span><span class="va">MCA_CoRe_res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_CoRe.html">MCA_CoRe</a></span><span class="op">(</span>InputData_Intra <span class="op">=</span><span class="va">Intra_DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span> ,</span>
 <span>                                     InputData_CoRe <span class="op">=</span> <span class="va">DMA_786M1A_vs_HK2</span>,</span>
 <span>                                     SettingsInfo_Intra<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ValueCol<span class="op">=</span><span class="st">"Log2FC"</span>,StatCol<span class="op">=</span><span class="st">"p.adj"</span>, StatCutoff<span class="op">=</span> <span class="fl">0.05</span>, ValueCutoff<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span>,</span>
@@ -4571,7 +4571,7 @@ pre-processing please see the vignette “Standard Metabolomics”).</p>
 <span>                                     BackgroundMethod<span class="op">=</span><span class="st">"Intra&amp;CoRe"</span>,</span>
 <span>                                     FolderPath<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Lets check how the results look like:</span></span>
+<span><span class="co"># Lets check how the results look like:</span></span>
 <span><span class="va">MCA_res</span> <span class="op">&lt;-</span> <span class="va">MCA_CoRe_res</span><span class="op">[[</span><span class="st">"MCA_CoRe_Results"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">ClusterSummary</span> <span class="op">&lt;-</span> <span class="va">MCA_CoRe_res</span><span class="op">[[</span><span class="st">"MCA_CoRe_Summary"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -4986,11 +4986,11 @@ metabolites that are annotated as present in the kidney, blood, or urine
 in HMDB and known to be extracellular.<br></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Selection as described in ST2 of Farr_Dimitrov2024:</span></span>
-<span><span class="va">MetaLinksDB_Res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/LoadMetalinks.html">LoadMetalinks</a></span><span class="op">(</span>cell_location <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Extracellular"</span><span class="op">)</span>, </span>
+<span><span class="va">MetaLinksDB_Res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/LoadMetalinks.html">LoadMetalinks</a></span><span class="op">(</span>cell_location <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Extracellular"</span><span class="op">)</span>,</span>
 <span>                                             tissue_location <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Kidney"</span>, <span class="st">"All Tissues"</span><span class="op">)</span>,</span>
 <span>                                             biospecimen_location <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Blood"</span>,  <span class="st">"Urine"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Here we add a UniquePair column combining hmdb-protein connection, removing duplications originating from different PK resources</span></span>
+<span><span class="co"># Here we add a UniquePair column combining hmdb-protein connection, removing duplications originating from different PK resources</span></span>
 <span><span class="va">MetaLinksDB_Res</span><span class="op">[[</span><span class="st">"MetalinksDB_Select"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">MetaLinksDB_Res</span><span class="op">[[</span><span class="st">"MetalinksDB"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                                           <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unite.html" class="external-link">unite</a></span><span class="op">(</span><span class="st">"UniquePair"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hmdb"</span>, <span class="st">"gene_symbol"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_"</span>, remove<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                                           <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">UniquePair</span>, .keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -7408,7 +7408,7 @@ plot for together. If you have further information such as replicates or
 patient ID, we can use this for the colour of the plotted samples per
 condition as in the superplots style as described in by Lord et al <span class="citation">(Lord et al. 2020)</span>.<br><br></p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Lets select metabolites to plot</span></span>
+<code class="sourceCode R"><span><span class="co"># Lets select metabolites to plot</span></span>
 <span><span class="va">metabolite_list</span> <span class="op">&lt;-</span> <span class="va">MCA_res</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">RG2_Significant</span>, <span class="st">"Opposite"</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">Metabolite</span><span class="op">)</span></span>
@@ -7902,7 +7902,7 @@ Consumed
 <p><br>
 Now we can make the different plots:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
+<code class="sourceCode R"><span><span class="co"># Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -7917,7 +7917,7 @@ Figure: Standard figure displaying DMA results.
 </div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
+<span><span class="co"># If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shape<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -7932,7 +7932,7 @@ Figure: Standard figure displaying DMA results.
 </div>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#Of course, we can also adapt both, color and shape for the same parameter:</span></span>
+<span><span class="co"># Of course, we can also adapt both, color and shape for the same parameter:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shape<span class="op">=</span><span class="st">"CoRe_specific"</span>, color<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -7949,7 +7949,7 @@ Figure: Standard figure displaying DMA results.
 Of course, here we may also want an individual plot for each of the
 consumption/release metabolites.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#individual plot for each metabolite behaviour:</span></span>
+<code class="sourceCode R"><span><span class="co"># individual plot for each metabolite behaviour:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"CoRe"</span>, shape<span class="op">=</span><span class="st">"CoRe_specific"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -7992,7 +7992,7 @@ default <code>Plot_SettingsFile=NULL</code>, in which case the
 <code>Plot_SettingsInfo</code> information (here <code>color</code>)
 will be used from Input_data.<br></p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
+<code class="sourceCode R"><span><span class="co"># Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"CoRe"</span>, shape<span class="op">=</span><span class="st">"CoRe_specific"</span>, color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -8035,7 +8035,7 @@ metabolic pathways and shaped for metabolic clusters.
 have performed multiple comparisons and seek to compare two of them in
 one plot:<br></p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Make the plot</span></span>
+<code class="sourceCode R"><span><span class="co"># Make the plot</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>                       InputData<span class="op">=</span><span class="va">DMA_786M1A_vs_HK2</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>                       InputData2<span class="op">=</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-O_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
@@ -8052,7 +8052,7 @@ Figure: Comparison.
 Of course you have option to use shape or color to further customize
 your graph as well as make individual plots:<br></p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Make the plot</span></span>
+<code class="sourceCode R"><span><span class="co"># Make the plot</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -8096,17 +8096,17 @@ have performed ORA on each cluster (consumed, released,
 consumed/released). Here, I will plot the ORA results of the metabolites
 that are released in both conditions, HK2 and 786-M1A.</p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Prepare the Input:</span></span>
-<span><span class="co">#1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab.</span></span>
+<code class="sourceCode R"><span><span class="co"># Prepare the Input:</span></span>
+<span><span class="co"># 1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab.</span></span>
 <span><span class="va">InputPEA</span> <span class="op">&lt;-</span> <span class="va">DMA_786M1A_vs_HK2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">KEGGCompound</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#2. InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name</span></span>
+<span><span class="co"># 2. InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name</span></span>
 <span><span class="va">InputPEA2</span> <span class="op">&lt;-</span> <span class="va">MC_ORA_786M1A_vs_HK2_Consumed</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">"term"</span><span class="op">=</span><span class="st">"ID"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#3. SettingsFile_Metab= Pathways used for pathway analysis: Must have same column names as SettingsFile_Metab for Pathway name and feature names need to match features in the InputData. PEA_Feature passes this column name!</span></span></code></pre></div>
+<span><span class="co"># 3. SettingsFile_Metab= Pathways used for pathway analysis: Must have same column names as SettingsFile_Metab for Pathway name and feature names need to match features in the InputData. PEA_Feature passes this column name!</span></span></code></pre></div>
 <p><br></p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"PEA"</span>,</span>
@@ -8155,14 +8155,14 @@ that are released in both conditions, HK2 and 786-M1A.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] stringr_1.5.1    ggfortify_0.4.17 rlang_1.1.5      tibble_3.2.1     dplyr_1.1.4      magrittr_2.0.3  </span></span>
-<span><span class="co">#&gt; [7] MetaProViz_2.1.7 ggplot2_3.5.1   </span></span>
+<span><span class="co">#&gt; [1] stringr_1.5.1    ggfortify_0.4.17 ggplot2_3.5.1    rlang_1.1.5      tibble_3.2.1     dplyr_1.1.4     </span></span>
+<span><span class="co">#&gt; [7] magrittr_2.0.3   MetaProViz_2.1.7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] splines_4.4.3           later_1.4.1             ggplotify_0.1.2         R.oo_1.27.0            </span></span>
 <span><span class="co">#&gt;   [5] cellranger_1.1.0        XML_3.99-0.18           factoextra_1.0.7        lifecycle_1.0.4        </span></span>
 <span><span class="co">#&gt;   [9] httr2_1.1.2             tcltk_4.4.3             rstatix_0.7.2           lattice_0.22-5         </span></span>
-<span><span class="co">#&gt;  [13] vroom_1.6.5             MASS_7.3-64             backports_1.5.0         limma_3.62.2           </span></span>
+<span><span class="co">#&gt;  [13] vroom_1.6.5             MASS_7.3-64             backports_1.5.0         limma_3.63.11          </span></span>
 <span><span class="co">#&gt;  [17] sass_0.4.9              rmarkdown_2.29          jquerylib_0.1.4         yaml_2.3.10            </span></span>
 <span><span class="co">#&gt;  [21] ggtangle_0.0.6          zip_2.3.2               sessioninfo_1.2.3       EnhancedVolcano_1.24.0 </span></span>
 <span><span class="co">#&gt;  [25] qcc_2.7                 cowplot_1.1.3           DBI_1.2.3               RColorBrewer_1.1-3     </span></span>

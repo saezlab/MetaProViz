@@ -1,0 +1,158 @@
+HMDB,TrivialName,KEGG.ID,KEGGCompound,Pathway,PotentialAdditionalIDs,AllIDs
+HMDB0000001,methylhistidine,C01152,N(pi)-Methyl-L-histidine,Amino acid metabolism,"HMDB0000479, HMDB0004935, HMDB0006703, HMDB0006704","HMDB0000001,HMDB0000479,HMDB0004935,HMDB0006703,HMDB0006704"
+HMDB0000014,deoxycytidine,C00881,Deoxycytidine,Pyrimidine metabolism,,
+HMDB0000033,carnosine,C00386,Carnosine,Not assigned,,
+HMDB0000043,betaine,C00719,Betaine,Not assigned,HMDB0059606,"HMDB0000043,HMDB0059606"
+HMDB0000045,AMP,C00020,AMP,Purine metabolism,,
+HMDB0000050,adenosine,C00212,Adenosine,Purine metabolism,"HMDB0004401, HMDB0004402, HMDB0004421","HMDB0000050,HMDB0004401,HMDB0004402,HMDB0004421"
+HMDB0000052,argininosuccinate,C03406,N-(L-Arginino)succinate,"Alanine, aspartate and glutamate metabolism",HMDB0001006,"HMDB0000052,HMDB0001006"
+HMDB0000056,beta-alanine,C00099,beta-Alanine,Pyrimidine metabolism,,
+HMDB0000058,cAMP,C00575,Cyclic AMP,Purine metabolism,,
+HMDB0000064,creatine,C00300,Creatine,Arginine and proline metabolism,,
+HMDB0000072,aconitate,C00417,cis-Aconitate,Citrate cycle (TCA cycle),HMDB0000461,"HMDB0000072,HMDB0000461"
+HMDB0000078,cysteinylglycine,C01419,Cys-Gly,Glutathione metabolism,HMDB0028775,"HMDB0000078,HMDB0028775"
+HMDB0000082,CTP,C00063,CTP,Pyrimidine metabolism,,
+HMDB0000086,glycerophosphocholine,C00670,sn-Glycero-3-phosphocholine,Glycerophospholipid metabolism,HMDB0000049,"HMDB0000086,HMDB0000049"
+HMDB0000089,cytidine,C00475,Cytidine,Pyrimidine metabolism,,
+HMDB0000094,citrate,C00158,Citrate,Citrate cycle (TCA cycle),,
+HMDB0000095,CMP,C00055,CMP,Pyrimidine metabolism,,
+HMDB0000097,choline,C00114,Choline,Glycerophospholipid metabolism,,
+HMDB0000099,cystathionine,C02291,L-Cystathionine,Cysteine and methionine metabolism,HMDB0003614,"HMDB0000099,HMDB0003614"
+HMDB0000101,deoxyadenosine,C00559,Deoxyadenosine,Purine metabolism,"HMDB0005778, HMDB0011722","HMDB0000101,HMDB0005778,HMDB0011722"
+HMDB0000114,glycerophosphoethanolamine,C01233,sn-Glycero-3-phosphoethanolamine,Glycerophospholipid metabolism,,
+HMDB0000123,glycine,C00037,Glycine,Amino acid metabolism,,
+HMDB0000124,fructose 6-Phosphate,C00085,D-Fructose 6-phosphate,Not assigned,,
+HMDB0000125,glutathione,C00051,Glutathione,Glutathione metabolism,"HMDB0001463, HMDB0006960","HMDB0000125,HMDB0001463,HMDB0006960"
+HMDB0000126,glycerol 3-phosphate,C00093,sn-Glycerol 3-phosphate,Glycerophospholipid metabolism,HMDB0002722,"HMDB0000126,HMDB0002722"
+HMDB0000127,glucuronic acid,C00191,D-Glucuronate,Not assigned,,
+HMDB0000133,guanosine,C00387,Guanosine,Purine metabolism,,
+HMDB0000134,fumarate,C00122,Fumarate,Citrate cycle (TCA cycle),,
+HMDB0000148,glutamate,C00025,L-Glutamate,Amino acid metabolism,HMDB0003339,"HMDB0000148,HMDB0003339"
+HMDB0000156,malate,C00149,(S)-Malate,Citrate cycle (TCA cycle),HMDB0000744,"HMDB0000156,HMDB0000744"
+HMDB0000157,hypoxanthine,C00262,Hypoxanthine,Purine metabolism,,
+HMDB0000158,tyrosine,C00082,L-Tyrosine,Amino acid metabolism,HMDB0000647,"HMDB0000158,HMDB0000647"
+HMDB0000159,phenylalanine,C00079,L-Phenylalanine,Amino acid metabolism,HMDB0000612,"HMDB0000159,HMDB0000612"
+HMDB0000161,alanine,C00041,L-Alanine,Amino acid metabolism,HMDB0001310,"HMDB0000161,HMDB0001310"
+HMDB0000162,proline,C00148,L-Proline,Amino acid metabolism,HMDB0003411,"HMDB0000162,HMDB0003411"
+HMDB0000167,threonine,C00188,L-Threonine,Amino acid metabolism,HMDB0004041,"HMDB0000167,HMDB0004041"
+HMDB0000168,asparagine,C00152,L-Asparagine,Amino acid metabolism,HMDB0033780,"HMDB0000168,HMDB0033780"
+HMDB0000172,isoleucine,C00407,L-Isoleucine,"Valine, leucine and isoleucine biosynthesis",HMDB0000557,"HMDB0000172,HMDB0000557"
+HMDB0000175,IMP,C00130,IMP,Purine metabolism,,
+HMDB0000177,histidine,C00135,L-Histidine,Amino acid metabolism,HMDB0003412,"HMDB0000177,HMDB0003412"
+HMDB0000182,lysine,C00047,L-Lysine,Amino acid metabolism,"HMDB0062809, HMDB0003405","HMDB0000182,HMDB0062809,HMDB0003405"
+HMDB0000187,serine,C00065,L-Serine,Amino acid metabolism,"HMDB0000589, HMDB0062263, HMDB0003406","HMDB0000187,HMDB0000589,HMDB0062263,HMDB0003406"
+HMDB0000190,lactate,C00186,(S)-Lactate,Glycolysis / Gluconeogenesis,"HMDB0003328, HMDB0062492","HMDB0000190,HMDB0003328,HMDB0062492"
+HMDB0000191,aspartate,C00049,L-Aspartate,Amino acid metabolism,HMDB0006483,"HMDB0000191,HMDB0006483"
+HMDB0000192,cystine,C00491,L-Cystine,Cysteine and methionine metabolism,,HMDB0000192
+HMDB0000195,inosine,C00294,Inosine,Purine metabolism,,
+HMDB0000201,acetylcarnitine,C02571,O-Acetylcarnitine,Fatty acyl carnitines,"HMDB0240773, HMDB0000456, HMDB0000515","HMDB0000201,HMDB0240773,HMDB0000456,HMDB0000515"
+HMDB0000207,oleic acid,C00712,(9Z)-Octadecenoic acid,Not assigned,HMDB0002066,"HMDB0000207,HMDB0002066"
+HMDB0000208,2-ketoglutarate,C00026,2-Oxoglutarate,Citrate cycle (TCA cycle),"HMDB0002812, HMDB0062781","HMDB0000208,HMDB0002812,HMDB0062781"
+HMDB0000210,pantothenate,C00864,Pantothenate,Vitamin digestion and absorption,"HMDB0250782, HMDB0062717","HMDB0000210,HMDB0250782,HMDB0062717"
+HMDB0000211,myo-inositol,C00137,myo-Inositol,Not assigned,HMDB0002256,"HMDB0000211,HMDB0002256"
+HMDB0000214,ornithine,C00077,L-Ornithine,Amino acid metabolism,"HMDB0000818, HMDB0004984, HMDB0003374","HMDB0000214,HMDB0000818,HMDB0004984,HMDB0003374"
+HMDB0000218,orotidine,C01103,Orotidine 5'-phosphate,Pyrimidine metabolism,,
+HMDB0000220,palmitate,C00249,Hexadecanoic acid,Fatty acid biosynthesis,HMDB0060083,"HMDB0000220,HMDB0060083"
+HMDB0000221,NADPH,C00005,NADPH,Glutathione metabolism,"HMDB0000799, HMDB0006341","HMDB0000221,HMDB0000799,HMDB0006341"
+HMDB0000224,phosphoethanolamine,C00346,Ethanolamine phosphate,Glycerophospholipid metabolism,"HMDB0012279, HMDB0060151, HMDB0060152","HMDB0000224,HMDB0012279,HMDB0060151,HMDB0060152"
+HMDB0000226,orotate,C00295,Orotate,Pyrimidine metabolism,,
+HMDB0000230,N-acetylneuramic acid,C19910,N-Acetyl-beta-neuraminate,Not assigned,HMDB0000800,"HMDB0000230,HMDB0000800"
+HMDB0000235,thiamine,C00378,Thiamine,Vitamin digestion and absorption,,
+HMDB0000243,pyruvate,C00022,Pyruvate,Glycolysis / Gluconeogenesis,,
+HMDB0000251,taurine,C00245,Taurine,Not assigned,,
+HMDB0000254,succinate,C00042,Succinate,Citrate cycle (TCA cycle),,
+HMDB0000263,phosphoenolpyruvate,C00074,Phosphoenolpyruvate,Citrate cycle (TCA cycle),,
+HMDB0000267,pyroglutamic-acid,C01879,5-Oxoproline,Glutathione metabolism,"HMDB0000805, HMDB0060262","HMDB0000267,HMDB0000805,HMDB0060262"
+HMDB0000285,UTP,C00075,UTP,Pyrimidine metabolism,,
+HMDB0000288,UMP,C00105,UMP,Pyrimidine metabolism,,
+HMDB0000289,uric acid,C00366,Urate,Purine metabolism,,
+HMDB0000292,xanthine,C00385,Xanthine,Purine metabolism,,
+HMDB0000295,UDP,C00015,UDP,Pyrimidine metabolism,,
+HMDB0000296,uridine,C00299,Uridine,Pyrimidine metabolism,,
+HMDB0000466,methylindole,C08313,Skatole,Not assigned,,
+HMDB0000517,arginine,C00062,L-Arginine,Amino acid metabolism,"HMDB0062762, HMDB0003416","HMDB0000517,HMDB0062762,HMDB0003416"
+HMDB0000538,ATP,C00002,ATP,Purine metabolism,HMDB0257997,"HMDB0000538,HMDB0257997"
+HMDB0000562,creatinine,C00791,Creatinine,Arginine and proline metabolism,,
+HMDB0000625,gluconate,C00257,D-Gluconic acid,Pentose phosphate pathway,HMDB0003373,"HMDB0000625,HMDB0003373"
+HMDB0000630,cytosine,C00380,Cytosine,Pyrimidine metabolism,,
+HMDB0000641,glutamine,C00064,L-Glutamine,Amino acid metabolism,HMDB0003423,"HMDB0000641,HMDB0003423"
+HMDB0000660,fructose,C02336,beta-D-Fructose,Not assigned,,
+HMDB0000670,homoarginine,C01924,L-Homoarginine,Arginine and proline metabolism,,
+HMDB0000671,indole-3-lactate,C02043,Indolelactate,Not assigned,,
+HMDB0000673,linoleic acid,C01595,Linoleate,Fatty acid biosynthesis,,
+HMDB0000687,leucine,C00123,L-Leucine,"Valine, leucine and isoleucine biosynthesis",HMDB0013773,"HMDB0000687,HMDB0013773"
+HMDB0000688,isovalerylcarnitine,C20826,Isovalerylcarnitine,Fatty acyl carnitines,,
+HMDB0000691,malonate,C00383,Malonate,Pyrimidine metabolism,,
+HMDB0000696,methionine,C00073,L-Methionine,Amino acid metabolism,,HMDB0000696
+HMDB0000725,trans-4-hydroxyproline,C01157,Hydroxyproline,Amino acid metabolism,"HMDB0006055, HMDB0036576","HMDB0000725,HMDB0006055,HMDB0036576"
+HMDB0000738,indole,C00463,Indole,Not assigned,,
+HMDB0000749,mesaconate,C01732,Mesaconate,Citrate cycle (TCA cycle),,
+HMDB0000755,4-hydroxyphenyllactate,C03672,3-(4-Hydroxyphenyl)lactate,Not assigned,,
+HMDB0000797,SAICAR,C04823,1-(5'-Phosphoribosyl)-5-amino-4-(N-succinocarboxamide)-imidazole,Purine metabolism,HMDB0006274,"HMDB0000797,HMDB0006274"
+HMDB0000812,N-acetylaspartate,C01042,N-Acetyl-L-aspartate,"Alanine, aspartate and glutamate metabolism",,
+HMDB0000824,propionylcarnitine,C03017,O-Propanoylcarnitine,Fatty acyl carnitines,HMDB0062514,"HMDB0000824,HMDB0062514"
+HMDB0000827,stearic acid,C01530,Octadecanoic acid,Fatty acid biosynthesis,,
+HMDB0000828,N-carbamoylaspartate,C00438,N-Carbamoyl-L-aspartate,Pyrimidine metabolism,,
+HMDB0000883,valine,C00183,L-Valine,"Valine, leucine and isoleucine biosynthesis",HMDB0034366,"HMDB0000883,HMDB0034366"
+HMDB0000895,acetylcholine,C01996,Acetylcholine,Glycerophospholipid metabolism,,
+HMDB0000902,NAD,C00003,NAD+,Oxidative phosphorylation,HMDB0249146,"HMDB0000902,HMDB0249146"
+HMDB0000904,citrulline,C00327,L-Citrulline,Arginine and proline metabolism,,HMDB0000904
+HMDB0000929,tryptophan,C00078,L-Tryptophan,Amino acid metabolism,HMDB0013609,"HMDB0000929,HMDB0013609"
+HMDB0000939,S-adenosylhomocysteine,C00021,S-Adenosyl-L-homocysteine,Cysteine and methionine metabolism,,
+HMDB0000965,hypotaurine,C00519,Hypotaurine,Not assigned,,
+HMDB0000998,dCTP,C00458,dCTP,Pyrimidine metabolism,,
+HMDB0001031,deoxyribose 5-phosphate,C00673,2-Deoxy-D-ribose 5-phosphate,Pentose phosphate pathway,,
+HMDB0001049,glutamylcysteine,C00669,gamma-L-Glutamyl-L-cysteine,Glutathione metabolism,HMDB0029146,"HMDB0001049,HMDB0029146"
+HMDB0001058,"fructose 1,6-bisphosphate",C00354,"D-Fructose 1,6-bisphosphate",Glycolysis / Gluconeogenesis,"HMDB0003973, HMDB0060444","HMDB0001058,HMDB0003973,HMDB0060444"
+HMDB0001066,S-lactoylglutathione,C03451,(R)-S-Lactoylglutathione,Glutathione metabolism,,
+HMDB0001067,N-acetylaspartylglutamate,C12270,N-Acetylaspartylglutamate,"Alanine, aspartate and glutamate metabolism",HMDB0255414,"HMDB0001067,HMDB0255414"
+HMDB0001096,carbamoyl phosphate,C00169,Carbamoyl phosphate,Purine metabolism,,
+HMDB0001112,glyceraldehyde 3-phosphate,C00118,D-Glyceraldehyde 3-phosphate,Glycolysis / Gluconeogenesis,HMDB0304402,"HMDB0001112,HMDB0304402"
+HMDB0001138,N-acetylglutamate,C00624,N-Acetyl-L-glutamate,Amino acid metabolism,,
+HMDB0001149,5-aminolevulinic acid,C00430,5-Aminolevulinate,Not assigned,,
+HMDB0001173,5-methylthioadenosine (MTA),C00170,5'-Methylthioadenosine,Cysteine and methionine metabolism,,
+HMDB0001176,CMP-acetylneuraminic acid,C00128,CMP-N-acetylneuraminate,Not assigned,"HMDB0001040, HMDB0062695, HMDB0250377","HMDB0001176,HMDB0001040,HMDB0062695,HMDB0250377"
+HMDB0001178,ADP-ribose,C00301,ADP-ribose,Purine metabolism,HMDB0303049,"HMDB0001178,HMDB0303049"
+HMDB0001185,S-adenosylmethionine,C00019,S-Adenosyl-L-methionine,Cysteine and methionine metabolism,HMDB0062709,"HMDB0001185,HMDB0062709"
+HMDB0001201,GDP,C00035,GDP,Purine metabolism,,
+HMDB0001206,acetyl-CoA,C00024,Acetyl-CoA,Citrate cycle (TCA cycle),HMDB0247926,"HMDB0001206,HMDB0247926"
+HMDB0001248,FAD,C00016,FAD,Vitamin digestion and absorption,HMDB0252293,"HMDB0001248,HMDB0252293"
+HMDB0001273,GTP,C00044,GTP,Purine metabolism,HMDB0247873,"HMDB0001273,HMDB0247873"
+HMDB0001316,6-phosphogluconate,C00345,6-Phospho-D-gluconate,Pentose phosphate pathway,,
+HMDB0001325,trimethyllysine,C03793,"N6,N6,N6-Trimethyl-L-lysine",Amino acid metabolism,,
+HMDB0001341,ADP,C00008,ADP,Purine metabolism,,
+HMDB0001342,dTTP,C00459,dTTP,Pyrimidine metabolism,,
+HMDB0001397,GMP,C00144,GMP,Purine metabolism,,
+HMDB0001401,glucose 6-phosphate,C00092,D-Glucose 6-phosphate,Glycolysis / Gluconeogenesis,"HMDB0001549, HMDB0006793","HMDB0001401,HMDB0001549,HMDB0006793"
+HMDB0001413,citicoline,C00307,CDP-choline,Glycerophospholipid metabolism,,
+HMDB0001439,FAICAR,C04734,FAICAR,Purine metabolism,,
+HMDB0001473,dihydroxyacetone phosphate,C00111,Glycerone phosphate,Glycolysis / Gluconeogenesis,HMDB0011735,"HMDB0001473,HMDB0011735"
+HMDB0001487,NADH,C00004,NADH,Oxidative phosphorylation,,
+HMDB0001511,phosphocreatine,C02305,Phosphocreatine,Arginine and proline metabolism,,
+HMDB0001517,AICAR,C04677,1-(5'-Phosphoribosyl)-5-amino-4-imidazolecarboxamide,Purine metabolism,,
+HMDB0001532,dATP,C00131,dATP,Purine metabolism,,
+HMDB0001546,CDP,C00112,CDP,Pyrimidine metabolism,,
+HMDB0001564,CDP-ethanolamine,C00570,CDP-ethanolamine,Glycerophospholipid metabolism,,
+HMDB0001565,phosphorylcholine,C00588,Choline phosphate,Glycerophospholipid metabolism,HMDB0000284,"HMDB0001565,HMDB0000284"
+HMDB0001586,glucose 1-phosphate,C00103,D-Glucose 1-phosphate,Glycolysis / Gluconeogenesis,HMDB0001306,"HMDB0001586,HMDB0001306"
+HMDB0002005,methionine sulfoxide,C02989,L-Methionine S-oxide,Cysteine and methionine metabolism,,HMDB0002005
+HMDB0002013,butyryl-carnitine,C02862,O-Butanoylcarnitine,Fatty acyl carnitines,HMDB0062510,"HMDB0002013,HMDB0062510"
+HMDB0002393,methylaspartate,C12269,N-Methyl-D-aspartic acid,Not assigned,,
+HMDB0002757,cysteic acid,C00506,L-Cysteate,Cysteine and methionine metabolism,HMDB0303991,"HMDB0002757,HMDB0303991"
+HMDB0003337,glutathione oxidized,C00127,Glutathione disulfide,Glutathione metabolism,HMDB0000656,"HMDB0000656,HMDB0003337"
+HMDB0003345,glucose,C00267,alpha-D-Glucose,Glycolysis / Gluconeogenesis,HMDB0061922,"HMDB0003345,HMDB0061922"
+HMDB0003349,dihydroorotate,C00337,(S)-Dihydroorotate,Pyrimidine metabolism,"HMDB0000528, HMDB0011746","HMDB0000528,HMDB0003349,HMDB0011746"
+HMDB0003357,acetylornithine,C00437,N-Acetylornithine,Arginine and proline metabolism,HMDB0006489,"HMDB0003357,HMDB0006489"
+HMDB0003464,4-guanidinobutanoate,C01035,4-Guanidinobutanoate,Arginine and proline metabolism,HMDB0005991,"HMDB0003464,HMDB0005991"
+HMDB0005765,ophthalmate,C21016,Ophthalmate,Cysteine and methionine metabolism,,
+HMDB0011649,glycerophosphoinositol,C01225,sn-Glycero-3-phospho-1-inositol,Not assigned,,
+HMDB0011733,Gly-Gly,C02037,N-Glycylglycine,Amino acid metabolism,,
+HMDB0011745,N-acetylmethionine,C02712,N-Acetylmethionine,Amino acid metabolism,,
+HMDB0028818,glutamylglutamate,C01425,Glutamyl-glutamic acid,Amino acid metabolism,,
+HMDB0032055,N-acetylhistidine,C02997,N-Acetyl-L-histidine,Amino acid metabolism,,
+HMDB0059655,2-hydroxyglutarate,C02630,2-Hydroxyglutarate,Citrate cycle (TCA cycle),,
+HMDB0060067,CMP-2-aminoethylphosphonate,C05673,CMP-2-aminoethylphosphonate,Not assigned,,
+HMDB0060180,2/3-phosphoglycerate,C00197,3-Phospho-D-glycerate,Glycolysis / Gluconeogenesis,,
+HMDB0249529,cyclic ADP-ribose,C13050,Cyclic ADP-ribose,Purine metabolism,,
+HMDB0258206,sedoheptulose 7-phosphate,C05382,Sedoheptulose 7-phosphate,Pentose phosphate pathway,"HMDB0001068, HMDB0062754","HMDB0001068,HMDB0258206,HMDB0062754"
+HMDB0304435,NADP,C00006,NADP+,Glutathione metabolism,"HMDB0000217, HMDB0246919","HMDB0000217,HMDB0304435,HMDB0246919"

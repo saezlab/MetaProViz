@@ -118,21 +118,64 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Metabolites with high NA load (&gt;20%) in Control_media samples are: dihydroorotate.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Metabolites with only NAs (=100%) in Control_media samples are: hydroxyphenylpyruvate. Those NAs are set zero as we consider them true zeros</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Total Ion Count (TIC) normalization: Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ggplot2::autoplot(stats::prcomp(as.matrix(InputData), scale. = as.logical(Scaling)),     data = InputPCA, x = PCx, y = PCy, colour = Param_Col, fill = Param_Col,     shape = Param_Sha, size = 3, alpha = 0.8, label = T, label.size = 2.5,     label.repel = TRUE, loadings = as.logical(ShowLoadings),     loadings.label = as.logical(ShowLoadings), loadings.label.vjust = 1.2,     loadings.label.size = 2.5, loadings.colour = "grey10", loadings.label.colour = "grey10"):</span> Objects of class <span style="color: #0000BB;">&lt;prcomp&gt;</span> are not supported by autoplot.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Have you loaded the required package?</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 8 of variables have high variability (CV &gt; 30) in the CoRe_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The CoRe_media samples  MS51-06  were found to be different from the rest. They will not be included in the sum of the CoRe_media samples.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> CoRe data are normalised by substracting mean (blank) from each sample and multiplying with the CoRe_norm_factor</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). HotellinsConfidence value selected: 0.99</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> There are possible outlier samples in the data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering round  1  Outlier Samples:  MS51-06  </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering round  2  Outlier Samples:  MS51-09  </span>
+<span class="r-plt img"><img src="MCA_CoRe-1.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-5.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-6.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-7.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-8.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-9.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-10.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-11.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-12.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-13.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-14.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-15.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-16.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">MediaDMA</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="DMA.html">DMA</a></span><span class="op">(</span>InputData<span class="op">=</span><span class="va">ResM</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"Preprocessing_output"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span> ,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>                            SettingsFile_Sample<span class="op">=</span><span class="va">ResM</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"Preprocessing_output"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span> , <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>                            SettingsInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions <span class="op">=</span> <span class="st">"Conditions"</span>, Numerator <span class="op">=</span> <span class="cn">NULL</span>, Denominator  <span class="op">=</span> <span class="st">"HK2"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                            StatPval <span class="op">=</span><span class="st">"aov"</span>,</span></span>
 <span class="r-in"><span>                            CoRe<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'ResM' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> There are no NA/0 values</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition HK2 75.71 % of the metabolites follow a normal distribution and 24.29 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition 786-O 95.83 % of the metabolites follow a normal distribution and 4.17 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition 786-M1A 97.22 % of the metabolites follow a normal distribution and 2.78 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition 786-M2A 88.89 % of the metabolites follow a normal distribution and 11.11 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition OSRC2 93.06 % of the metabolites follow a normal distribution and 6.94 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition OSLM1B 86.11 % of the metabolites follow a normal distribution and 13.89 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For the condition RFX631 97.22 % of the metabolites follow a normal distribution and 2.78 % of the metabolites are not-normally distributed according to the shapiro test. You have chosen aov, which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> For 62.86% of metabolites the group variances are equal.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No condition was specified as numerator and HK2 was selected as a denominator. Performing multiple testing `all-vs-one` using aov.</span>
+<span class="r-plt img"><img src="MCA_CoRe-17.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-18.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-19.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-20.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-21.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-22.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-23.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-24.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-25.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-26.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-27.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-28.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-29.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="MCA_CoRe-30.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">IntraDMA</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="ToyData.html">ToyData</a></span><span class="op">(</span>Data<span class="op">=</span><span class="st">"IntraCells_DMA"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu">MCA_CoRe</span><span class="op">(</span>InputData_Intra <span class="op">=</span> <span class="va">IntraDMA</span><span class="op">%&gt;%</span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                            InputData_CoRe <span class="op">=</span> <span class="va">MediaDMA</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-M1A_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in IntraDMA %&gt;% tibble::rownames_to_column("Metabolite"):</span> could not find function "%&gt;%"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

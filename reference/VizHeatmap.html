@@ -67,19 +67,33 @@
 
 
 <dl><dt id="arg-inputdata">InputData<a class="anchor" aria-label="anchor" href="#arg-inputdata"></a></dt>
-<dd><p>DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.</p></dd>
+<dd><p>DF with unique sample identifiers as row names and
+metabolite numerical values in columns with metabolite identifiers as column
+names. Includes experimental design and outlier column.</p></dd>
 
 
 <dt id="arg-settingsinfo">SettingsInfo<a class="anchor" aria-label="anchor" href="#arg-settingsinfo"></a></dt>
-<dd><p><em>Optional: </em> NULL or Named vector  where you can include vectors or lists for annotation c(individual_Metab= "ColumnName_SettingsFile_Metab",individual_Sample= "ColumnName_SettingsFile_Sample", color_Metab="ColumnName_SettingsFile_Metab", color_Sample= list("ColumnName_SettingsFile_Sample", "ColumnName_SettingsFile_Sample",...)).<strong>Default = NULL</strong></p></dd>
+<dd><p><em>Optional: </em> NULL or Named vector  where you can
+include vectors or lists for annotation c(individual_Metab=
+"ColumnName_SettingsFile_Metab",individual_Sample=
+"ColumnName_SettingsFile_Sample",
+color_Metab="ColumnName_SettingsFile_Metab", color_Sample=
+list("ColumnName_SettingsFile_Sample",
+"ColumnName_SettingsFile_Sample",...)).<strong>Default = NULL</strong></p></dd>
 
 
 <dt id="arg-settingsfile-sample">SettingsFile_Sample<a class="anchor" aria-label="anchor" href="#arg-settingsfile-sample"></a></dt>
-<dd><p>DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers. and other columns with required PlotSettingInfo.<strong>Default = NULL</strong></p></dd>
+<dd><p>DF which contains information about the samples,
+which will be combined with your input data based on the unique sample
+identifiers. and other columns with required PlotSettingInfo.<strong>Default
+= NULL</strong></p></dd>
 
 
 <dt id="arg-settingsfile-metab">SettingsFile_Metab<a class="anchor" aria-label="anchor" href="#arg-settingsfile-metab"></a></dt>
-<dd><p><em>Optional: </em> DF with column "Metabolite" including the Metabolite names (needs to match Metabolite names of Input_data) and other columns with required PlotSettingInfo. <strong>Default = NULL</strong></p></dd>
+<dd><p><em>Optional: </em> DF with column "Metabolite"
+including the Metabolite names (needs to match Metabolite names of
+Input_data) and other columns with required PlotSettingInfo. <strong>Default
+= NULL</strong></p></dd>
 
 
 <dt id="arg-plotname">PlotName<a class="anchor" aria-label="anchor" href="#arg-plotname"></a></dt>
@@ -102,7 +116,12 @@
 <dd><p><em>Optional: </em> If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. <strong>Default = FALSE</strong></p></dd>
 
 
-<dt id="arg-folder-name">Folder_Name<a class="anchor" aria-label="anchor" href="#arg-folder-name"></a></dt>
+<dt id="arg-printplot">PrintPlot<a class="anchor" aria-label="anchor" href="#arg-printplot"></a></dt>
+<dd><p><em>Optional: </em> print the plots to the active graphic
+device.</p></dd>
+
+
+<dt id="arg-folderpath">FolderPath<a class="anchor" aria-label="anchor" href="#arg-folderpath"></a></dt>
 <dd><p>Optional: String which is added to the resulting folder name <strong>default: NULL</strong></p></dd>
 
 </dl></div>

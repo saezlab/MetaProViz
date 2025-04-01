@@ -1,0 +1,48 @@
+Regulation Grouping,SiRCle cluster Name,Number of Features
+RG1_All,Background = FALSE,151
+RG1_All,Intra Significant Positive + CoRe Not Significant_Released,2
+RG1_All,Intra UP + CoRe UP_Released,1
+RG1_All,Intra DOWN + CoRe DOWN_Released/Consumed,3
+RG1_All,Intra UP + CoRe Not Significant_Released/Consumed,2
+RG1_All,Intra Not Significant + CoRe Not Significant_Consumed,2
+RG1_All,Intra Significant Negative + CoRe DOWN_Consumed,6
+RG1_All,Intra Significant Positive + CoRe DOWN_Released/Consumed,2
+RG1_All,Intra DOWN + CoRe DOWN_Consumed,3
+RG1_All,Intra Not Significant + CoRe Not Significant_Released/Consumed,4
+RG1_All,Intra DOWN + CoRe UP_Released,1
+RG1_All,Intra Significant Negative + CoRe UP_Released,1
+RG1_All,Intra Significant Positive + CoRe Not Significant_Consumed,2
+RG1_All,Intra Significant Positive + CoRe UP_Released/Consumed,1
+RG1_All,Intra Not Significant + CoRe Not Significant_Released,3
+RG1_All,Intra Not Significant + CoRe UP_Released,2
+RG1_All,Intra DOWN + CoRe Not Significant_Released/Consumed,2
+RG1_All,Intra Not Significant + CoRe DOWN_Consumed,4
+RG1_All,Intra Not Significant + CoRe UP_Released/Consumed,2
+RG1_All,Intra Significant Negative + CoRe DOWN_Released/Consumed,1
+RG1_All,Intra Not Significant + CoRe DOWN_Released/Consumed,1
+RG1_All,Intra Significant Positive + CoRe Not Significant_Released/Consumed,1
+RG1_All,Intra Significant Negative + CoRe Not Significant_Released,1
+RG1_All,Intra UP + CoRe Not Significant_Consumed,1
+RG1_All,Intra Significant Positive + CoRe UP_Released,1
+RG2_Significant,Background = FALSE,151
+RG2_Significant,None,20
+RG2_Significant,Both_UP (Released),2
+RG2_Significant,Both_DOWN (Released/Consumed),4
+RG2_Significant,Both_DOWN (Consumed),9
+RG2_Significant,Opposite (Released/Consumed DOWN),2
+RG2_Significant,Opposite (Released UP),2
+RG2_Significant,Both_UP (Released/Consumed),1
+RG2_Significant,CoRe_UP (Released),2
+RG2_Significant,CoRe_DOWN (Consumed),4
+RG2_Significant,CoRe_UP (Released/Consumed),2
+RG2_Significant,CoRe_DOWN (Released/Consumed),1
+RG3_Change,Background = FALSE,151
+RG3_Change,None,20
+RG3_Change,Both_UP (Released),1
+RG3_Change,Both_DOWN (Released/Consumed),3
+RG3_Change,CoRe_DOWN (Consumed),10
+RG3_Change,CoRe_DOWN (Released/Consumed),4
+RG3_Change,Both_DOWN (Consumed),3
+RG3_Change,Opposite (Released UP),1
+RG3_Change,CoRe_UP (Released),4
+RG3_Change,CoRe_UP (Released/Consumed),3

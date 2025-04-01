@@ -81,7 +81,15 @@ Volcano plot visualization</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-settingsinfo">SettingsInfo<a class="anchor" aria-label="anchor" href="#arg-settingsinfo"></a></dt>
+<dl><dt id="arg-plotsettings">PlotSettings<a class="anchor" aria-label="anchor" href="#arg-plotsettings"></a></dt>
+<dd><p><em>Optional: </em> Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) <strong>Default = "Standard"</strong></p></dd>
+
+
+<dt id="arg-inputdata">InputData<a class="anchor" aria-label="anchor" href="#arg-inputdata"></a></dt>
+<dd><p>DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.</p></dd>
+
+
+<dt id="arg-settingsinfo">SettingsInfo<a class="anchor" aria-label="anchor" href="#arg-settingsinfo"></a></dt>
 <dd><p><em>Optional: </em> NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").<strong>Default = NULL</strong></p></dd>
 
 
@@ -161,16 +169,9 @@ Volcano plot visualization</p>
 <dd><p><em>Optional: </em> Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. <strong>Default = "metabolites"</strong></p></dd>
 
 
-<dt id="arg-settings">Settings<a class="anchor" aria-label="anchor" href="#arg-settings"></a></dt>
-<dd><p><em>Optional: </em> Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) <strong>Default = "Standard"</strong></p></dd>
-
-
-<dt id="arg-input-data">Input_data<a class="anchor" aria-label="anchor" href="#arg-input-data"></a></dt>
-<dd><p>DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.</p></dd>
-
-
-<dt id="arg-featureid">FeatureID<a class="anchor" aria-label="anchor" href="#arg-featureid"></a></dt>
-<dd><p>Optional:  Column name including the feature names, e.g. metabolite names. <strong>Default = "Metabolite"</strong></p></dd>
+<dt id="arg-printplot">PrintPlot<a class="anchor" aria-label="anchor" href="#arg-printplot"></a></dt>
+<dd><p><em>Optional: </em> print the plots to the active graphic
+device.</p></dd>
 
 </dl></div>
     <div class="section level2">

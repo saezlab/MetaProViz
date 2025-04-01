@@ -114,20 +114,20 @@ load the libraries:</li>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
 <span><span class="co"># 2. Install the latest development version from GitHub using devtools</span></span>
-<span><span class="co">#devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
+<span><span class="co"># devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#dependencies that need to be loaded:</span></span>
+<span><span class="co"># dependencies that need to be loaded:</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rlang.r-lib.org" class="external-link">rlang</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sinhrks/ggfortify" class="external-link">ggfortify</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Please install the Biocmanager Dependencies:</span></span>
-<span><span class="co">#BiocManager::install("clusterProfiler")</span></span>
-<span><span class="co">#BiocManager::install("EnhancedVolcano")</span></span></code></pre></div>
+<span><span class="co"># Please install the Biocmanager Dependencies:</span></span>
+<span><span class="co"># BiocManager::install("clusterProfiler")</span></span>
+<span><span class="co"># BiocManager::install("EnhancedVolcano")</span></span></code></pre></div>
 <br><br><div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 100%">
 
@@ -426,7 +426,7 @@ package <code>KEGGREST</code> and can be used to perform pathway
 analysis <span class="citation">(Kanehisa and Goto 2000)</span>.
 <strong>(KEGG_Pathways)</strong><br></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#This will use KEGGREST to query the KEGG API to load the pathways:</span></span>
+<code class="sourceCode R"><span><span class="co"># This will use KEGGREST to query the KEGG API to load the pathways:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/LoadKEGG.html">LoadKEGG</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -654,7 +654,7 @@ depends on the SD, which in turn works for normally distributed
 data.<br></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Select Pool samples:</span></span>
-<span><span class="co">#Get the Pool data</span></span>
+<span><span class="co"># Get the Pool data</span></span>
 <span><span class="va">PoolData</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/ToyData.html">ToyData</a></span><span class="op">(</span>Data<span class="op">=</span><span class="st">"IntraCells_Raw"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Conditions</span><span class="op">==</span><span class="st">"Pool"</span>, select <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"</span></span>
 <span></span>
@@ -805,7 +805,7 @@ detection plots are returned and can be easily viewed.<br></p>
 <span><span class="co">#&gt; 3 metabolites where removed: AICAR, FAICAR, SAICAR</span></span>
 <span><span class="co">#&gt; Missing Value Imputation: Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0</span></span>
 <span><span class="co">#&gt; Total Ion Count (TIC) normalization: Total Ion Count (TIC) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022</span></span>
-<span><span class="co">#&gt; Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360–378, doi:https://doi.org/10.1214/aoms/1177732979). HotellinsConfidence value selected: 0.99</span></span>
+<span><span class="co">#&gt; Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val &lt; 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). HotellinsConfidence value selected: 0.99</span></span>
 <span><span class="co">#&gt; There are possible outlier samples in the data</span></span>
 <span><span class="co">#&gt; Filtering round  1  Outlier Samples:  MS55_29</span></span></code></pre>
 <p><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-2.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-3.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-4.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-5.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-6.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-7.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-8.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-9.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-10.png" width="576" style="display: block; margin: auto auto auto 0;"><img src="standard-metabolomics_files/figure-html/unnamed-chunk-14-11.png" width="576" style="display: block; margin: auto auto auto 0;"></p>
@@ -1071,7 +1071,7 @@ and saved.<br></p>
 <span>                              StatPval <span class="op">=</span><span class="st">"aov"</span>,</span>
 <span>                              StatPadj<span class="op">=</span><span class="st">"fdr"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#Inspect the DMA results tables:</span></span>
+<span><span class="co"># Inspect the DMA results tables:</span></span>
 <span><span class="va">DMA_786M1A_vs_HK2</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"786-M1A_vs_HK2"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">Shapiro</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"ShapiroTest"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"Shapiro_result"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <div class="vscroll-plot">
@@ -1494,7 +1494,7 @@ column “term”, “Metabolite” and “Description”, and the
 <code>Input_data</code> requirements are column “t.val” and column
 “Metabolite”.<br></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
+<code class="sourceCode R"><span><span class="co"># Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
 <span><span class="va">DM_ORA_res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">comparisons</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"DMA"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -1518,7 +1518,7 @@ column “term”, “Metabolite” and “Description”, and the
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; </span></span>
 <span></span>
-<span><span class="co">#Lets check how the results look like:</span></span>
+<span><span class="co"># Lets check how the results look like:</span></span>
 <span><span class="va">DM_ORA_786M1A_vs_HK2</span> <span class="op">&lt;-</span> <span class="va">DM_ORA_res</span><span class="op">[[</span><span class="st">"786-M1A_vs_HK2"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"ClusterGoSummary"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -1827,7 +1827,7 @@ DOWN, significant positive, significant negative)<br>
 3. RG3_SignificantChange only takes into account genes that have
 significant changes (UP, DOWN).<br><br></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Example of all possible flows:</span></span>
+<code class="sourceCode R"><span><span class="co"># Example of all possible flows:</span></span>
 <span><span class="va">MCA_2Cond</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/MCA_rules.html">MCA_rules</a></span><span class="op">(</span>Method<span class="op">=</span><span class="st">"2Cond"</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -5066,7 +5066,7 @@ volcano plot. In order to choose the right column we need to provide a
 vector Plot_SettingsInfo with this information.<br></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
+<span><span class="co"># Now we need to add our Plot_SettingsFile and the Plot_SettingsInfo:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"RG2_Significant"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -5081,7 +5081,7 @@ metabolic clusters from MCA results.
 </div>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
+<span><span class="co"># If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_SettingsInfo</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shape<span class="op">=</span><span class="st">"RG2_Significant"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -5096,7 +5096,7 @@ metabolic clusters from MCA results.
 </div>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">#Of course, we can also adapt both, color and shape for the same parameter:</span></span>
+<span><span class="co"># Of course, we can also adapt both, color and shape for the same parameter:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shape<span class="op">=</span><span class="st">"RG2_Significant"</span>, color<span class="op">=</span><span class="st">"RG2_Significant"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -5121,7 +5121,7 @@ default <code>Plot_SettingsFile=NULL</code>, in which case the
 <code>Plot_SettingsInfo</code> information (here <code>color</code>)
 will be used from Input_data.<br></p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
+<code class="sourceCode R"><span><span class="co"># Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MappingInfo</span>,</span>
@@ -5139,7 +5139,7 @@ We immediately see that there are many pathways displayed on the plot,
 which can make it difficult to interpret. Hence, we will change our plot
 settings in order to get individual plots for each of the pathways:</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Now we can generate a plot for each pathway and color for the metabolite clusters:</span></span>
+<code class="sourceCode R"><span><span class="co"># Now we can generate a plot for each pathway and color for the metabolite clusters:</span></span>
 <span><span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/VizVolcano.html">VizVolcano</a></span><span class="op">(</span>PlotSettings<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>                       SettingsInfo<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"RG2_Significant"</span>, individual<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>                       SettingsFile_Metab<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -5193,17 +5193,17 @@ pathways used to run the pathway analysis, the differential metabolite
 data used as input for the pathway analysis and the results of the
 pathway analysis:</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Prepare the Input:</span></span>
-<span><span class="co">#1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab.</span></span>
+<code class="sourceCode R"><span><span class="co"># Prepare the Input:</span></span>
+<span><span class="co"># 1. InputData=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file SettingsFile_Metab.</span></span>
 <span><span class="va">InputPEA</span> <span class="op">&lt;-</span> <span class="va">DMA_786M1A_vs_HK2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">KEGGCompound</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#2. InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name</span></span>
+<span><span class="co"># 2. InputData2=Pathway analysis output: Must have same column names as SettingsFile_Metab for Pathway name</span></span>
 <span><span class="va">InputPEA2</span> <span class="op">&lt;-</span> <span class="va">DM_ORA_786M1A_vs_HK2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">"term"</span><span class="op">=</span><span class="st">"ID"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#3. SettingsFile_Metab= Pathways used for pathway analysis: Must have same column names as SettingsFile_Metab for Pathway name and feature names need to match features in the InputData. PEA_Feature passes this column name!</span></span></code></pre></div>
+<span><span class="co"># 3. SettingsFile_Metab= Pathways used for pathway analysis: Must have same column names as SettingsFile_Metab for Pathway name and feature names need to match features in the InputData. PEA_Feature passes this column name!</span></span></code></pre></div>
 <p><br>
 Now we can produce the plots:</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
@@ -5253,14 +5253,14 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] tibble_3.2.1     ggfortify_0.4.17 rlang_1.1.5      dplyr_1.1.4      magrittr_2.0.3   MetaProViz_2.1.7</span></span>
-<span><span class="co">#&gt; [7] ggplot2_3.5.1   </span></span>
+<span><span class="co">#&gt; [1] tibble_3.2.1     ggfortify_0.4.17 ggplot2_3.5.1    rlang_1.1.5      dplyr_1.1.4      magrittr_2.0.3  </span></span>
+<span><span class="co">#&gt; [7] MetaProViz_2.1.7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] splines_4.4.3           later_1.4.1             ggplotify_0.1.2         R.oo_1.27.0            </span></span>
 <span><span class="co">#&gt;   [5] cellranger_1.1.0        XML_3.99-0.18           factoextra_1.0.7        lifecycle_1.0.4        </span></span>
 <span><span class="co">#&gt;   [9] httr2_1.1.2             tcltk_4.4.3             rstatix_0.7.2           lattice_0.22-5         </span></span>
-<span><span class="co">#&gt;  [13] vroom_1.6.5             MASS_7.3-64             backports_1.5.0         limma_3.62.2           </span></span>
+<span><span class="co">#&gt;  [13] vroom_1.6.5             MASS_7.3-64             backports_1.5.0         limma_3.63.11          </span></span>
 <span><span class="co">#&gt;  [17] sass_0.4.9              rmarkdown_2.29          jquerylib_0.1.4         yaml_2.3.10            </span></span>
 <span><span class="co">#&gt;  [21] ggtangle_0.0.6          zip_2.3.2               sessioninfo_1.2.3       EnhancedVolcano_1.24.0 </span></span>
 <span><span class="co">#&gt;  [25] qcc_2.7                 cowplot_1.1.3           DBI_1.2.3               RColorBrewer_1.1-3     </span></span>
@@ -5274,8 +5274,8 @@ Now we can produce the plots:</p>
 <span><span class="co">#&gt;  [57] Formula_1.2-5           systemfonts_1.2.1       tools_4.4.3             progress_1.2.3         </span></span>
 <span><span class="co">#&gt;  [61] treeio_1.30.0           ragg_1.3.3              Rcpp_1.0.14             glue_1.8.0             </span></span>
 <span><span class="co">#&gt;  [65] gridExtra_2.3           xfun_0.51               qvalue_2.38.0           GenomeInfoDb_1.42.3    </span></span>
-<span><span class="co">#&gt;  [69] withr_3.0.2             fastmap_1.2.0           digest_0.6.37           timechange_0.3.0       </span></span>
-<span><span class="co">#&gt;  [73] R6_2.6.1                gridGraphics_0.5-1      textshaping_1.0.0       colorspace_2.1-1       </span></span>
+<span><span class="co">#&gt;  [69] withr_3.0.2             fastmap_1.2.0           digest_0.6.37           gridGraphics_0.5-1     </span></span>
+<span><span class="co">#&gt;  [73] timechange_0.3.0        R6_2.6.1                textshaping_1.0.0       colorspace_2.1-1       </span></span>
 <span><span class="co">#&gt;  [77] GO.db_3.20.0            gtools_3.9.5            RSQLite_2.3.9           R.methodsS3_1.8.2      </span></span>
 <span><span class="co">#&gt;  [81] tidyr_1.3.1             generics_0.1.3          data.table_1.17.0       prettyunits_1.2.0      </span></span>
 <span><span class="co">#&gt;  [85] httr_1.4.7              htmlwidgets_1.6.4       inflection_1.3.6        pkgconfig_2.0.3        </span></span>
