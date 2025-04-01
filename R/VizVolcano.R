@@ -199,10 +199,19 @@ VizVolcano <- function(PlotSettings="Standard",
          common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
        }
      }
-     SettingsFile_Metab <- SettingsFile_Metab%>%#rename those column since they otherwise will cause issues when we merge the DFs later
-      # this should not be handled like this, use suffixes for dplyr::join
-       # instead
-      dplyr::rename_with(~paste0(.x, "_SettingsFile_Metab"), tidyselect::all_of(common_columns))
+
+     if (length(common_columns)) {
+
+       SettingsFile_Metab %<>%  # rename those column since they otherwise
+                                   # will cause issues when we merge the DFs
+                                   # later
+        # this should not be handled like this, use suffixes for dplyr::join
+        # instead
+        dplyr::rename_with(
+          ~paste0(.x, "_SettingsFile_Metab"),
+          tidyselect::all_of(common_columns)
+        )
+    }
 
     if(PlotSettings=="PEA"){
       VolcanoData <- merge(x=SettingsFile_Metab ,y=InputData[, c(x, y)], by.x=SettingsInfo[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
