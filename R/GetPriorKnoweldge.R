@@ -92,7 +92,7 @@ LoadKEGG <- function(){
 #'
 #' @title Prior Knowledge Import
 #' @description Import and process .csv file to create Prior Knowledge.
-#' @importFrom utils read.csv
+#' @importFrom readr read_csv cols
 #' @return A data frame containing the Prior Knowledge.
 #' @export
 #'
@@ -101,8 +101,8 @@ LoadHallmarks <- function() {
   MetaProViz_Init()
 
   # Read the .csv files
-  Hallmark <- system.file("extdata", "Hallmarks.csv", package = "MetaProViz")
-  Hallmark <- read.csv(Hallmark, check.names=FALSE)
+  Hallmark <- system.file("extdata", "Hallmarks.csv.gz", package = "MetaProViz")
+  Hallmark <- readr::read_csv(Hallmark, col_types = readr::cols())
 
   # Return into environment
   assign("Hallmark_Pathways", Hallmark, envir=.GlobalEnv)
@@ -114,7 +114,7 @@ LoadHallmarks <- function() {
 #'
 #' @title Prior Knowledge Import
 #' @description Import and process .csv file to create Prior Knowledge.
-#' @importFrom utils read.csv
+#' @importFrom readr read_csv cols
 #' @return A data frame containing the Prior Knowledge.
 #' @export
 #'
@@ -128,7 +128,7 @@ LoadGaude <- function() {
       "Compilled_MetabolicSig_2025-01-07.csv.gz",
       package = "MetaProViz"
   )
-  MetabolicSig <- read.csv(MetabolicSig, check.names=FALSE)
+  MetabolicSig <- readr::read_csv(MetabolicSig, col_types = readr::cols())
 
   # Return into environment
   assign("Gaude_Pathways", MetabolicSig, envir=.GlobalEnv)

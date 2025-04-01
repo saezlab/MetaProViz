@@ -1049,20 +1049,20 @@ MCA_CoRe <- function(InputData_Intra,
 #' @param Method Either "2Cond" or "CoRe" depending which regulatory rules you would like to load
 #' @title MCA regulatory rules Import
 #' @description Import and process .csv file to create toy data.
-#' @importFrom utils read.csv
+#' @importFrom readr read_csv cols
 #' @return A data frame containing the toy data.
 #' @export
 #'
-MCA_rules<- function(Method){
+MCA_rules <- function(Method){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
   # Read the .csv files
   Cond <- system.file("extdata", "MCA_2Cond.csv.gz", package = "MetaProViz")
-  Cond<- read.csv( Cond, check.names=FALSE)
+  Cond <- readr::read_csv( Cond, col_types = readr::cols())
 
   CoRe <- system.file("extdata", "MCA_CoRe.csv.gz", package = "MetaProViz")
-  CoRe<- read.csv(CoRe, check.names=FALSE)
+  CoRe <- readr::read_csv(CoRe, col_types = readr::cols())
 
   # Return the toy data into environment
   if(Method=="2Cond"){
