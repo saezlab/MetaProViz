@@ -71,6 +71,7 @@ MetaProViz_log <- function(){
 #' @examples
 #' MetaProViz_set_loglevel(logger::FATAL, target = 'console')
 #'
+#' @importFrom OmnipathR set_loglevel
 #' @export
 MetaProViz_set_loglevel <- function(level, target = 'logfile'){
   #To change log-level e.g. to see all messages being printed
@@ -97,14 +98,14 @@ MPV_trace <- function() {#MPV=MetaProViz
 MetaProViz_Init <- function(){
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
   if(is.null(metaproviz.env$init)){
-    #Initial log
-    OmnipathR:::init_config(pkg = "MetaProViz")
-    OmnipathR:::init_log(pkg = "MetaProViz")
+    # Initial log
+    (OmnipathR%:::%init_config)(pkg = "MetaProViz")
+    (OmnipathR%:::%init_log)(pkg = "MetaProViz")
     log_info('Welcome to MetaProViz!')
     log_info('MetaProViz version: %s', packageVersion("MetaProViz"))
 
-    #Do we run in a build server like bioconductor?
-    buildserver <- OmnipathR:::.on_buildserver()
+    # Do we run in a build server like bioconductor?
+    buildserver <- (OmnipathR%:::%.on_buildserver)()
 
     if(buildserver){
       set_loglevel('trace', target = 'console', pkg = "MetaProViz")
