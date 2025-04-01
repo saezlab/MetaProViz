@@ -123,7 +123,11 @@ LoadGaude <- function() {
   MetaProViz_Init()
 
   # Read the .csv files
-  MetabolicSig <- system.file("extdata", "Compilled_MetabolicSig_2025-01-07.csv", package = "MetaProViz")
+  MetabolicSig <- system.file(
+      "extdata",
+      "Compilled_MetabolicSig_2025-01-07.csv.gz",
+      package = "MetaProViz"
+  )
   MetabolicSig <- read.csv(MetabolicSig, check.names=FALSE)
 
   # Return into environment

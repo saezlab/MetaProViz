@@ -1058,10 +1058,10 @@ MCA_rules<- function(Method){
   MetaProViz_Init()
 
   # Read the .csv files
-  Cond <- system.file("extdata", "MCA_2Cond.csv", package = "MetaProViz")
+  Cond <- system.file("extdata", "MCA_2Cond.csv.gz", package = "MetaProViz")
   Cond<- read.csv( Cond, check.names=FALSE)
 
-  CoRe <- system.file("extdata", "MCA_CoRe.csv", package = "MetaProViz")
+  CoRe <- system.file("extdata", "MCA_CoRe.csv.gz", package = "MetaProViz")
   CoRe<- read.csv(CoRe, check.names=FALSE)
 
   # Return the toy data into environment

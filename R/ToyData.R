@@ -61,20 +61,20 @@ ToyData <- function(Dataset) {
 
   #Available Datasets:
   datasets <- list(
-    IntraCells_Raw = "MS55_RawPeakData.csv",
-    IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv",
-    CultureMedia_Raw = "MS51_RawPeakData.csv",
-    Cells_MetaData = "MappingTable_SelectPathways.csv",
-    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv",
-    Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv",
-    Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv",
-    Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv",
-    Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv",
-    Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv",
-    Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv",
-    AlaninePathways = "AlaninePathways.csv",
-    EquivalentFeatures = "EquivalentFeatureTable.csv",
-    BiocratesFeatureTable = "BiocratesFeatureTable.csv"
+    IntraCells_Raw = "MS55_RawPeakData.csv.gz",
+    IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv.gz",
+    CultureMedia_Raw = "MS51_RawPeakData.csv.gz",
+    Cells_MetaData = "MappingTable_SelectPathways.csv.gz",
+    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv.gz",
+    Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv.gz",
+    Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv.gz",
+    Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv.gz",
+    Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv.gz",
+    Tissue_TvN_Proteomics ="ccRCC-Tissue_TvN_Proteomics.csv.gz",
+    Tissue_TvN_RNAseq = "ccRCC-Tissue_TvN_RNAseq.csv.gz",
+    AlaninePathways = "AlaninePathways.csv.gz",
+    EquivalentFeatures = "EquivalentFeatureTable.csv.gz",
+    BiocratesFeatureTable = "BiocratesFeatureTable.csv.gz"
   )
 
   rncols <- c("Code", "Metabolite")
