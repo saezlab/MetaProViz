@@ -1077,12 +1077,18 @@ VizVolcano_PEA <- function(InputData,
   #####################
   ##--- Check PEA settings
   if(is.vector(SettingsInfo)==FALSE){
-    message <- paste0("You have chosen Settings=`PEA` that requires you to provide a vector for SettingsInfo.")
+    message <- paste0(
+      "You have chosen Settings=`PEA` that requires you to ",
+      "provide a vector for SettingsInfo."
+    )
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
   if(is.null(SettingsFile_Metab)==TRUE){
-    message <- pasteo("You have chosen Settings=`PEA` that requires you to provide a DF SettingsFile_Metab including the pathways used for the enrichment analysis.")
+    message <- paste0(
+      "You have chosen Settings=`PEA` that requires you to provide a DF ",
+      "SettingsFile_Metab including the pathways used for the enrichment analysis."
+    )
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
