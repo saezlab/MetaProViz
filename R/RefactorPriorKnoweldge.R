@@ -1322,189 +1322,328 @@ AddInfo <- function(mat,
 
 
 ##########################################################################################
-### ### ### Helper function to create complex upset plots to visualise PK coverage ### ### ###
+### ### ### Compare Prior Knowledge resources against each other or themselves ### ### ###
 ##########################################################################################
 
-#' Generate Complex Upset Plot for PK Coverage (Optional Class Grouping)
+#' Compare Prior Knowledge Resources and/or Columns within a Single Resource and Generate an UpSet Plot
 #'
-#' This helper function creates a complex upset plot to visualize Prior Knowledge (PK) coverage by
-#' displaying the intersections among a set of metabolite ID columns. If a class column is provided,
-#' the data is grouped by that column and a color palette ("viridis" or "polychrome") is used to represent
-#' the class levels, along with a corresponding legend (which can be hidden if there are too many unique classes).
-#' If no class column is provided (\code{class_col = NULL}), a basic upset plot is generated.
+#' This function compares gene and/or metabolite features across multiple prior knowledge (PK) resources or,
+#' if a single resource is provided with a vector of column names in \code{SettingsInfo}, compares columns within that resource.
 #'
-#' @param df A data frame containing the data to be plotted.
-#' @param class_col An optional string specifying the name of the column in \code{df} that represents the class
-#'                  of each observation. This column is coerced to a factor if provided. Default is \code{NULL}.
-#' @param intersect_cols A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
-#'                       Default is \code{c("LIMID", "HMDB", "CHEBI", "None")}.
-#' @param plot_title A string specifying the title of the plot. Default is \code{"Metabolite IDs"}.
-#' @param palette_type A string specifying the color palette to use for the fill aesthetic when \code{class_col} is provided.
-#'                     Options are \code{"viridis"} (default) and \code{"polychrome"}.
-#' @param output_file An optional string specifying the file path to save the plot. If \code{NULL} (default), the plot is not saved.
-#' @param width Numeric value specifying the width of the saved plot (if \code{output_file} is provided). Default is \code{14}.
-#' @param height Numeric value specifying the height of the saved plot (if \code{output_file} is provided). Default is \code{8}.
-#' @param dpi Numeric value specifying the resolution (dots per inch) of the saved plot (if \code{output_file} is provided). Default is \code{300}.
-#' @param max_legend_terms Numeric value specifying the maximum number of unique terms in \code{class_col}
-#'                         for which the legend should be displayed. If the number of levels exceeds this value,
-#'                         the legend will be hidden. Default is \code{20}. Ignored if \code{class_col} is \code{NULL}.
+#' In the multi-resource mode, each element in \code{InputData} represents a PK resource (either as a data frame or a recognized resource name)
+#' from which a set of features is extracted. A binary summary table is then constructed and used to create an UpSet plot.
 #'
-#' @return A \code{ggplot} object representing the generated upset plot.
+#' In the within-resource mode, a single data frame is provided (with \code{InputData} containing one element) and its \code{SettingsInfo} entry
+#' is a vector of column names to compare (e.g., binary indicators for different annotations). In this case, the function expects the data frame
+#' to have a grouping column named \code{"Class"} (or, alternatively, a column specified via the \code{class_col} attribute in \code{SettingsInfo})
+#' that is used for grouping in the UpSet plot.
 #'
-#' @noRd
-GenerateUpset <- function(df,
-                          class_col = NULL,
-                          intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
-                          plot_title = "Metabolite IDs",
-                          palette_type = c("viridis", "polychrome"),
-                          output_file = NULL,
-                          width = 14,
-                          height = 8,
-                          dpi = 300,
-                          max_legend_terms = 20) {
+#' @param InputData A named list where each element corresponds to a prior knowledge (PK) resource. Each element can be:
+#'        \itemize{
+#'          \item A data frame containing gene/metabolite identifiers (and additional columns for within-resource comparison),
+#'          \item A character string indicating the resource name. Recognized names include (but are not limited to): \code{"Hallmarks"},
+#'                \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or \code{"LoadRAMP"}). In the latter case, the function
+#'                will attempt to load the corresponding data automatically.
+#'        }
+#'
+#' @param SettingsInfo A named list (with names matching those in \code{InputData}) where each element is either a character string or a
+#'        character vector indicating the column name(s) to extract features. For multiple-resource comparisons, these refer to the columns
+#'        containing feature identifiers. For within-resource comparisons, the vector should list the columns to compare (e.g., \code{c("CHEBI", "HMDB", "LIMID")}).
+#'        In within-resource mode, the input data frame is expected to contain a column named \code{"Class"} (or a grouping column specified via the
+#'        \code{class_col} attribute). \emph{If no grouping column is found, a default grouping column named \code{"Group"} (with all rows assigned the same value) is created.}
+#'
+#' @param filter_by Character. Optional filter for the resulting features when comparing multiple resources.
+#'        Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. This parameter is ignored in within-resource mode.
+#'
+#' @param plot_title Character. Title for the UpSet plot. Default is \code{"Overlap of Prior Knowledge Resources"}.
+#' @param palette_type Character. Color palette to be used in the plot. Default is \code{"polychrome"}.
+#' @param output_file Character. Optional file path to save the generated plot; if \code{NULL}, the plot is not saved.
+#'
+#' @return A list containing two elements:
+#' \item{summary_table}{A data frame representing either:
+#'                        \itemize{
+#'                          \item the binary summary matrix of feature presence/absence across multiple resources, or
+#'                          \item the original data frame (augmented with binary columns and a \code{None} column) in within-resource mode.
+#'                        }
+#' \item{upset_plot}{The UpSet plot object generated by the function.}
+#'
+#' @examples
+#' ## Example 1: Multi-Resource Comparison
+#'
+#' # Using automatic data loading for multiple resources.
+#' InputData <- list(Hallmarks = "Hallmarks", Gaude = "Gaude",
+#'                 MetalinksDB = "MetalinksDB", RAMP = "LoadRAMP")
+#' res <- ComparePK(InputData = InputData)
+#'
+#' # Filtering to include only gene features:
+#' res_genes <- ComparePK(InputData = InputData, filter_by = "gene")
+#'
+#' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single Data Frame)
+#'
+#' # Assume FeatureMetadata_Biocrates is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
+#' # Here the "Class" column is used as the grouping variable in the UpSet plot.
+#' InputData_single <- list(Biocft = FeatureMetadata_Biocrates)
+#' SettingsInfo_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
+#'
+#' res_single <- ComparePK(InputData = InputData_single, SettingsInfo = SettingsInfo_single,
+#'                           plot_title = "Overlap of BioCrates Columns")
+#'
+#' ## Example 3: Custom Data Frames with Custom Column Names
+#'
+#' # Example with preloaded data frames and custom column names:
+#' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), stringsAsFactors = FALSE)
+#' gaude_df <- data.frame(feature = c("GENE2", "GENE3"), stringsAsFactors = FALSE)
+#' metalinks_df <- data.frame(hmdb = c("HMDB0001", "HMDB0002"),
+#'                            gene_symbol = c("GENE1", "GENE4"), stringsAsFactors = FALSE)
+#' ramp_df <- data.frame(class_source_id = c("HMDB0001", "HMDB0003"), stringsAsFactors = FALSE)
+#' InputData <- list(Hallmarks = hallmarks_df, Gaude = gaude_df,
+#'                 MetalinksDB = metalinks_df, RAMP = ramp_df)
+#' SettingsInfo <- list(Hallmarks = "feature", Gaude = "feature",
+#'                      MetalinksDB = c("hmdb", "gene_symbol"), RAMP = "class_source_id")
+#' res <- ComparePK(InputData = InputData, SettingsInfo = SettingsInfo, filter_by = "metabolite")
+#'
+#' @importFrom dplyr mutate select
+#' @importFrom utils write.csv
+#' @export
+ComparePK <- function(InputData, SettingsInfo = NULL,
+                      filter_by = c("both", "gene", "metabolite"),
+                      plot_title = "Overlap of Prior Knowledge Resources",
+                      palette_type = "polychrome",
+                      output_file = NULL) {
 
-  palette_type <- match.arg(palette_type)
+  # Match filter argument
+  filter_by <- match.arg(filter_by)
 
-  # If a class column is provided, process it for fill aesthetics
-  if (!is.null(class_col)) {
-    df[[class_col]] <- as.factor(df[[class_col]])
-    if(palette_type == "viridis"){
-      fill_scale <- ggplot2::scale_fill_viridis_d(option = "viridis")
-    } else if(palette_type == "polychrome"){
-      if (!requireNamespace("Polychrome", quietly = TRUE)) {
-        stop("Package 'Polychrome' is required for the polychrome palette. Please install it.")
+  # Validate InputData input
+  if (!is.list(InputData) || length(InputData) < 1) {
+    stop("InputData must be a non-empty list.")
+  }
+  if (is.null(names(InputData)) || any(names(InputData) == "")) {
+    stop("InputData must be a named list with resource names.")
+  }
+
+  # Define resource lookup table with information on how to retrieve and transform each resource.
+  resource_definitions <- list(
+    hallmarks = list(
+      var = "Hallmark_Pathways",
+      load_fun = MetaProViz::LoadHallmarks,
+      transform_fun = function(x) {
+        resource_object <- MetaProViz::Make_GeneMetabSet(Input_GeneSet = x,
+                                                         SettingsInfo = c(Target = "gene"),
+                                                         PKName = "Hallmarks")
+        if ("GeneMetabSet" %in% names(resource_object)) {
+          resource_object$GeneMetabSet
+        } else {
+          stop("Make_GeneMetabSet for Hallmarks did not return 'GeneMetabSet'.")
+        }
+      },
+      default_col = "feature"
+    ),
+    gaude = list(
+      var = "Gaude_Pathways",
+      load_fun = MetaProViz::LoadGaude,
+      transform_fun = function(x) {
+        resource_object <- MetaProViz::Make_GeneMetabSet(Input_GeneSet = x,
+                                                         SettingsInfo = c(Target = "gene"),
+                                                         PKName = "Gaude")
+        if ("GeneMetabSet" %in% names(resource_object)) {
+          resource_object$GeneMetabSet
+        } else {
+          stop("Make_GeneMetabSet for Gaude did not return 'GeneMetabSet'.")
+        }
+      },
+      default_col = "feature"
+    ),
+    metalinksdb = list(
+      var = "MetalinksDB",
+      load_fun = MetaProViz::LoadMetalinks,
+      transform_fun = function(x) {
+        if ("MetalinksDB" %in% names(x)) {
+          x$MetalinksDB
+        } else {
+          stop("Loaded MetalinksDB does not contain a 'MetalinksDB' element.")
+        }
+      },
+      default_col = c("hmdb", "gene_symbol")
+    ),
+    ramp = list(
+      var = "ChemicalClass_MetabSet",
+      load_fun = MetaProViz::LoadRAMP,
+      transform_fun = function(x) {
+        x  # for RAMP, assume the global variable itself is the data frame.
+      },
+      default_col = "class_source_id"
+    )
+  )
+
+  # Preprocess InputData: auto‑load resources if they are provided as strings.
+  for (res in names(InputData)) {
+    if (!inherits(InputData[[res]], "data.frame") && is.character(InputData[[res]])) {
+      resource_id <- tolower(InputData[[res]])
+      if (resource_id %in% names(resource_definitions)) {
+        res_def <- resource_definitions[[resource_id]]
+        if (exists(res_def$var, envir = .GlobalEnv)) {
+          resource_object <- get(res_def$var, envir = .GlobalEnv)
+        } else {
+          resource_object <- res_def$load_fun()
+        }
+        InputData[[res]] <- res_def$transform_fun(resource_object)
+        if (is.null(SettingsInfo[[res]])) {
+          SettingsInfo[[res]] <- res_def$default_col
+        }
       }
-      class_levels <- levels(df[[class_col]])
-      my_palette <- Polychrome::palette36.colors(n = 36)
-      if(length(my_palette) < length(class_levels)) {
-        stop("Not enough colors in the Polychrome palette for the number of classes!")
-      }
-      my_palette_named <- stats::setNames(my_palette[1:length(class_levels)], class_levels)
-      fill_scale <- ggplot2::scale_fill_manual(values = my_palette_named)
     }
-    # Build the base annotation with a mapping for fill based on the class column.
-    base_annotation <- list(
-      "Intersection size" = ComplexUpset::intersection_size(
-        mapping = ggplot2::aes_string(fill = class_col),
-        counts = TRUE
-      ) + fill_scale +
-        ggplot2::theme(
-          legend.position = "right",
-          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
-        )
+  }
+
+  # Initialize SettingsInfo if not provided.
+  if (is.null(SettingsInfo)) {
+    SettingsInfo <- list()
+  }
+
+  # Determine if we are in within-resource mode.
+  # If only one resource is provided and its SettingsInfo entry has >1 column, assume within-resource comparison.
+  single_resource <- (length(InputData) == 1)
+  within_resource_mode <- FALSE
+  if (single_resource) {
+    resource_name <- names(InputData)[1]
+    if (!is.null(SettingsInfo[[resource_name]]) &&
+        length(SettingsInfo[[resource_name]]) > 1) {
+      within_resource_mode <- TRUE
+    }
+  }
+
+  if (within_resource_mode) {
+    # ===== Within-Resource Comparison Mode =====
+    # Retrieve the single data frame.
+    resource_data <- InputData[[resource_name]]
+
+    # Identify the intersection columns based on SettingsInfo.
+    intersect_cols <- SettingsInfo[[resource_name]]
+    missing_cols <- setdiff(intersect_cols, colnames(resource_data))
+    if (length(missing_cols) > 0) {
+      stop("The following intersection column(s) specified in SettingsInfo were not found in resource '",
+           resource_name, "': ", paste(missing_cols, collapse = ", "))
+    }
+
+    # Identify a column for grouping. If none exists, create a default grouping column.
+    if ("Class" %in% colnames(resource_data)) {
+      class_col <- "Class"
+    } else if (!is.null(attr(SettingsInfo[[resource_name]], "class_col"))) {
+      class_col <- attr(SettingsInfo[[resource_name]], "class_col")
+    } else {
+      # No grouping column provided—create a default column named "Group" with the same value for all rows.
+      resource_data$Group <- "All"
+      class_col <- "Group"
+    }
+
+    # Convert the specified intersection columns to binary (0/1). Here non-NA and values > 0 are treated as present.
+    for (col in intersect_cols) {
+      resource_data[[col]] <- as.integer(!is.na(resource_data[[col]]) & (resource_data[[col]] > 0))
+    }
+
+    # Create a "None" column if it does not exist.
+    if (!("None" %in% colnames(resource_data))) {
+      resource_data$None <- as.integer(rowSums(resource_data[, intersect_cols, drop = FALSE]) == 0)
+    }
+
+    # Generate the UpSet plot.
+    upset_plot <- MetaProViz:::VizUpset(
+      df = resource_data,
+      class_col = class_col,
+      intersect_cols = c(intersect_cols, "None"),
+      plot_title = plot_title,
+      palette_type = palette_type,
+      output_file = output_file
     )
+
+    return(list(summary_table = resource_data, upset_plot = upset_plot))
+
   } else {
-    # No class column provided: use default annotation without fill mapping.
-    base_annotation <- list(
-      "Intersection size" = ComplexUpset::intersection_size(counts = TRUE) +
-        ggplot2::theme(
-          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
-        )
+    # ===== Multi-Resource Comparison Mode =====
+    # Process each resource in InputData.
+    for (res in names(InputData)) {
+      resource_val <- InputData[[res]]
+      if (!inherits(resource_val, "data.frame")) {
+        if (!is.character(resource_val)) {
+          stop("Each element in InputData must be either a data frame or a character string indicating a resource name.")
+        }
+        resource_id <- tolower(resource_val)
+        if (resource_id %in% c("loadramp")) {
+          resource_id <- "ramp"
+        }
+        if (!resource_id %in% names(resource_definitions)) {
+          stop("Unknown resource identifier: ", resource_val,
+               ". Please provide a data frame or a valid resource name.")
+        }
+        res_def <- resource_definitions[[resource_id]]
+        if (exists(res_def$var, envir = .GlobalEnv)) {
+          resource_object <- get(res_def$var, envir = .GlobalEnv)
+        } else {
+          resource_object <- res_def$load_fun()
+        }
+        InputData[[res]] <- res_def$transform_fun(resource_object)
+        if (is.null(SettingsInfo[[res]])) {
+          SettingsInfo[[res]] <- res_def$default_col
+        }
+      } else {
+        resource_id <- tolower(res)
+        if (is.null(SettingsInfo[[res]]) && resource_id %in% names(resource_definitions)) {
+          SettingsInfo[[res]] <- resource_definitions[[resource_id]]$default_col
+        } else if (is.null(SettingsInfo[[res]])) {
+          stop("SettingsInfo must be provided for resource: ", res)
+        }
+      }
+    }
+
+    # Extract features from each resource based on SettingsInfo.
+    resource_features <- list()
+    for (res in names(InputData)) {
+      resource_data <- InputData[[res]]
+      cols <- SettingsInfo[[res]]
+      if (!all(cols %in% colnames(resource_data))) {
+        stop(paste("Column(s)", paste(cols, collapse = ", "),
+                   "not found in resource", res))
+      }
+      features <- if (length(cols) > 1) {
+        unique(unlist(lapply(cols, function(col) na.omit(resource_data[[col]]))))
+      } else {
+        unique(na.omit(resource_data[[cols]]))
+      }
+      resource_features[[res]] <- as.character(features)
+    }
+
+    # Compile all unique features across resources.
+    all_features <- unique(unlist(resource_features))
+
+    # Create the binary summary table.
+    df_binary <- data.frame(Feature = all_features, stringsAsFactors = FALSE)
+    for (res in names(resource_features)) {
+      df_binary[[res]] <- as.integer(all_features %in% resource_features[[res]])
+    }
+    df_binary$Type <- ifelse(grepl("^HMDB", df_binary$Feature), "metabolite (HMDB)", "gene")
+    resource_cols <- names(resource_features)
+    df_binary$None <- as.integer(rowSums(df_binary[, resource_cols, drop = FALSE]) == 0)
+
+    # Optionally filter the summary table.
+    if (filter_by == "gene") {
+      df_binary <- subset(df_binary, Type == "gene")
+    } else if (filter_by == "metabolite") {
+      df_binary <- subset(df_binary, Type == "metabolite (HMDB)")
+    }
+
+    # Generate the UpSet plot.
+    upset_plot <- MetaProViz:::VizUpset(
+      df = df_binary,
+      class_col = "Type",
+      intersect_cols = resource_cols,
+      plot_title = plot_title,
+      palette_type = palette_type,
+      output_file = output_file
     )
+
+    return(list(summary_table = df_binary, upset_plot = upset_plot))
   }
-
-  # Create the upset plot
-  p <- ComplexUpset::upset(
-    data = df,
-    intersect = intersect_cols,
-    name = plot_title,
-    base_annotations = base_annotation,
-    set_sizes = (
-      ComplexUpset::upset_set_size() +
-        ggplot2::theme(axis.text.y = ggplot2::element_text(size = 10))
-    )
-  ) +
-    ggplot2::theme_minimal(base_size = 14) +
-    ggplot2::theme(
-      plot.margin = ggplot2::margin(1, 1, 1, 1, "cm")
-    )
-
-  # If a class column was provided, hide the legend if there are too many unique terms
-  if (!is.null(class_col) && length(levels(df[[class_col]])) > max_legend_terms) {
-    p <- p + ggplot2::theme(legend.position = "none")
-  }
-
-  # Save the plot if output_file is provided
-  if (!is.null(output_file)) {
-    ggplot2::ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
-  }
-
-  return(p)
 }
-
-
-##########################################################################################
-### ### ### Helper function to create stacked bar plots to visualise PK coverage ### ### ###
-##########################################################################################
-
-#' Generate Stacked Bar Plot for PK Coverage
-#'
-#' This helper function creates a stacked bar plot to visualize Prior Knowledge (PK) coverage.
-#' The plot groups data by a specified column and fills the bars according to another column,
-#' allowing you to inspect the distribution of match statuses (or any categorical variable).
-#'
-#' @param data A data frame containing the data to be plotted.
-#' @param group_col A string specifying the name of the column to group the data by.
-#' @param fill_col A string specifying the name of the column to use for fill aesthetics.
-#' @param fill_values A vector of color values to be used for the fill aesthetic.
-#' @param fill_labels A vector of labels corresponding to the fill levels for the legend.
-#' @param plot_title A string specifying the title of the plot.
-#' @param x_label A string for the x-axis label. Defaults to "Frequency".
-#' @param y_label A string for the y-axis label. If \code{NULL}, the value of \code{group_col} is used.
-#' @param legend_position A numeric vector of length 2 specifying the (x, y) position of the legend.
-#'                        Defaults to \code{c(0.95, 0.05)}.
-#'
-#' @return A \code{ggplot} object representing the stacked bar plot.
-#' @noRd
-GenerateStackedBar <- function(data,
-                               group_col,
-                               fill_col,
-                               fill_values,
-                               fill_labels,
-                               plot_title,
-                               x_label = "Frequency",
-                               y_label = NULL,
-                               legend_position = c(0.95, 0.05)) {
-  # Convert column names to symbols for tidy evaluation
-  group_sym <- rlang::sym(group_col)
-  fill_sym  <- rlang::sym(fill_col)
-
-  # Determine order of groups by overall frequency (ascending)
-  group_order <- data %>%
-    dplyr::group_by(!!group_sym) %>%
-    dplyr::summarise(total = dplyr::n(), .groups = 'drop') %>%
-    dplyr::arrange(total) %>%
-    dplyr::pull(!!group_sym)
-
-  # Summarize data by group and fill status, then reorder the group factor
-  summary_data <- data %>%
-    dplyr::group_by(!!group_sym, !!fill_sym) %>%
-    dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
-    dplyr::mutate(!!group_sym := factor(!!group_sym, levels = group_order))
-
-  # If y_label is not provided, use the grouping column name
-  if (is.null(y_label)) {
-    y_label <- group_col
-  }
-
-  # Create the plot
-  ggplot2::ggplot(summary_data, ggplot2::aes_string(y = group_col,
-                                                    x = "count",
-                                                    fill = paste0("as.factor(", fill_col, ")"))) +
-    ggplot2::geom_bar(stat = "identity") +
-    ggplot2::scale_fill_manual(values = fill_values,
-                               labels = fill_labels,
-                               name = "Match Status") +
-    ggplot2::labs(title = plot_title,
-                  x = x_label,
-                  y = y_label) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 1),
-                   legend.position = legend_position,
-                   legend.justification = c("right", "bottom"),
-                   plot.title = ggplot2::element_text(hjust = 0.4))
-}
-
 
 
 ##########################################################################################
