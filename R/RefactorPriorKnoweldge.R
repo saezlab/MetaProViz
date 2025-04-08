@@ -1408,6 +1408,7 @@ AddInfo <- function(mat,
 ComparePK <- function(InputData, SettingsInfo = NULL,
                       filter_by = c("both", "gene", "metabolite"),
                       plot_title = "Overlap of Prior Knowledge Resources",
+                      name_col = "TrivialName",
                       palette_type = "polychrome",
                       output_file = NULL) {
 
@@ -1536,19 +1537,36 @@ ComparePK <- function(InputData, SettingsInfo = NULL,
       class_col <- "Group"
     }
 
-    # Convert the specified intersection columns to binary (0/1). Here non-NA and values > 0 are treated as present.
+    # Convert the specified intersection columns to binary (0/1). Here non-NA and values != 0 are treated as present.
+    binary_suffix <- "_bin"
     for (col in intersect_cols) {
-      resource_data[[col]] <- as.integer(!is.na(resource_data[[col]]) & (resource_data[[col]] > 0))
+      new_col <- paste0(col, binary_suffix)
+      resource_data[[new_col]] <- as.integer(!is.na(resource_data[[col]]) & (resource_data[[col]] != 0))
     }
 
-    # Create a "None" column if it does not exist.
-    if (!("None" %in% colnames(resource_data))) {
-      resource_data$None <- as.integer(rowSums(resource_data[, intersect_cols, drop = FALSE]) == 0)
+    # Identify the binary columns based on the suffix
+    bin_cols <- grep(paste0(binary_suffix, "$"), colnames(resource_data), value = TRUE)
+
+    # Create the "None" column using the binary columns
+    resource_data$None <- as.integer(rowSums(resource_data[, bin_cols, drop = FALSE]) == 0)
+
+    # Create df_summary, potentially with the name column (default is TrivialName, if not found, it will not be included - only used to help interpret summary table)
+    if (name_col %in% colnames(resource_data)) {
+      summary_cols <- c(name_col, bin_cols, "None", class_col)
     }
+    else {
+      summary_cols <- c(bin_cols, "None", class_col)
+    }
+    df_summary <- resource_data[, summary_cols, drop = FALSE]
+    # Rename the cols again
+    # Find indices of columns ending in "_bin"
+    bin_cols_idx <- grep("_bin$", names(df_summary))
+    # Remove the suffix from these column names
+    names(df_summary)[bin_cols_idx] <- sub("_bin$", "", names(df_summary)[bin_cols_idx])
 
     # Generate the UpSet plot.
     upset_plot <- MetaProViz:::VizUpset(
-      df = resource_data,
+      df = df_summary,
       class_col = class_col,
       intersect_cols = c(intersect_cols, "None"),
       plot_title = plot_title,
@@ -1556,7 +1574,7 @@ ComparePK <- function(InputData, SettingsInfo = NULL,
       output_file = output_file
     )
 
-    return(list(summary_table = resource_data, upset_plot = upset_plot))
+    return(list(summary_table = df_summary, upset_plot = upset_plot))
 
   } else {
     # ===== Multi-Resource Comparison Mode =====
