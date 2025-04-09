@@ -678,7 +678,7 @@ fill_vals <- c("FALSE" = "red", "TRUE" = "#009E73")
 fill_lbls <- c("No Match", "Found Match")
 
 # Call the function with desired parameters
-p <- MetaProViz:::GenerateStackedBar(
+p <- MetaProViz:::VizStackedbar(
   data = Biocrates_to_MetalinksDB$InputData_Matched_NA_and_duplicates,
   group_col = "Class",
   fill_col = "found_match_in_PK",
@@ -759,7 +759,7 @@ Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::CheckMatchID(InputData = Fea
 # p
 
 # Call the function with desired parameters
-p <- MetaProViz:::GenerateStackedBar(
+p <- MetaProViz:::VizStackedbar(
   data = Biocrates_to_MetalinksDB_singleHMDB$InputData_Matched_NA_and_duplicates,
   group_col = "Class",
   fill_col = "found_match_in_PK",
@@ -791,7 +791,7 @@ fill_vals <- c("TRUE" = "#009E73", "FALSE" = "#004A13")
 fill_lbls <- c("Biocrates metabolite <---> MetalinksDB: using only multi HMDB","Biocrates metabolite <---> MetalinksDB: using single or multi HMDB")
 
 # Call the function with desired parameters
-p <- MetaProViz:::GenerateStackedBar(
+p <- MetaProViz:::VizStackedbar(
   data = Biocrates_to_MetalinksDB_foundPKmatch,
   group_col = "Class",
   fill_col = "found_with_singleHMDB",
@@ -870,25 +870,14 @@ Here we can immediately see that despite the ID translation, some of the transla
 To get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.\
 
 ```{r, echo=FALSE, fig.width=8, fig.height=6}
-df_binary_keggmapping <- data.frame(
-  trivname = KEGG_Pathways_Translated$TranslatedDF$MetaboliteID,
-  HMDB = as.integer(!is.na(KEGG_Pathways_Translated[["TranslatedDF"]]$hmdb)),
-  PubChem  = as.integer(!is.na(KEGG_Pathways_Translated[["TranslatedDF"]]$pubchem))
-)
+pk_list <- list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF)
+SettingsInfo <- list(kegg_translated = c("hmdb", "pubchem"))
 
-df_upset_keggmapping <- df_binary_keggmapping %>%
-  mutate(
-    None = as.integer(rowSums(across(c(HMDB, PubChem))) == 0),
-    Term = KEGG_Pathways_Translated[["TranslatedDF"]]$term
-  )
+pk_comp_res_keggtrans <- MetaProViz:::ComparePK(InputData = pk_list, 
+                               SettingsInfo = SettingsInfo,
+                               plot_title = "IDs available after KEGG ID Translation")
 
-MetaProViz:::GenerateUpset(df = df_upset_keggmapping,
-                          #class_col = "Term",
-                          class_col = NULL,
-                          intersect_cols = c("HMDB", "PubChem", "None"),
-                          plot_title = "IDs available after KEGG ID translation",
-                          palette_type = "polychrome",
-                          output_file = NULL)
+pk_comp_res_keggtrans$upset_plot
 ```
 
 \

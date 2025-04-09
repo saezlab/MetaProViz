@@ -55,7 +55,8 @@ TranslateID <- function(InputData,
                         To = c("pubchem","chebi","hmdb"),
                         Summary=FALSE,
                         SaveAs_Table= "csv",
-                        FolderPath=NULL
+                        FolderPath=NULL,
+                        ShowUpset=FALSE #TODO
   ){# Add ability to also get metabolite names that are human readable from an ID type!
 
   MetaProViz_Init()
@@ -190,6 +191,20 @@ TranslateID <- function(InputData,
                          FileName= "TranslateID",
                          CoRe=FALSE,
                          PrintPlot=FALSE)))
+
+  ## ------------------ Show Upset plot of the results ------------------- ##
+  ## TODO: current issue with Lists vs doubles
+  # if (ShowUpset==TRUE) {
+  #   pk_list <- list(translated = TranslatedDF)
+  #   SettingsInfo <- list(translated = To)
+  #   print(pk_list)
+  #   print(To)
+  #   pk_comp_res <- MetaProViz:::ComparePK(InputData = pk_list,
+  #                                         SettingsInfo = SettingsInfo,
+  #                                         plot_title = "IDs available after ID Translation")
+  #   ## Add Upset plot
+  #   ResList[["Translated_UpsetPlot"]] <- pk_comp_res$upset_plot
+  #}
 
   #Return
   invisible(return(ResList))
@@ -1541,7 +1556,7 @@ ComparePK <- function(InputData, SettingsInfo = NULL,
     binary_suffix <- "_bin"
     for (col in intersect_cols) {
       new_col <- paste0(col, binary_suffix)
-      resource_data[[new_col]] <- as.integer(!is.na(resource_data[[col]]) & (resource_data[[col]] != 0))
+      resource_data[[new_col]] <- as.integer(!is.na(resource_data[[col]]) & (resource_data[[col]] != 0) & (resource_data[[col]] != ''))
     }
 
     # Identify the binary columns based on the suffix
