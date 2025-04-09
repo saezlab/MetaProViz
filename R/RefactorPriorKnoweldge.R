@@ -1705,7 +1705,7 @@ ComparePK <- function(InputData, SettingsInfo = NULL,
 #'                  \code{id_label} (a categorical label based on the entry count).}
 #'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
 #'
-#' @noRd
+#' @export
 CountEntries <- function(data,
                                    column,
                                    delimiter = ",",
