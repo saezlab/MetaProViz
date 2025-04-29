@@ -1732,6 +1732,7 @@ count_ids <- function(data,
   #we need to specify that NA is counted as none
   #we need to check for duplications (i.e. is the trivialname duplicated in the data frame, remove this and give a warning)
   #give the user the change to pass multiple columns to analyse, which would mean we create a plot for each column and label the plot with the column name
+  #add count_ids function into Equivalent IDs: make a plot before and after equivalent IDs and put them side by side to return as the QC plot of the function
 
 
 
