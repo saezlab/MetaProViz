@@ -413,6 +413,9 @@ EquivalentIDs <- function(InputData,
       select(-AllIDs.x, -AllIDs.y)
   }
 
+  ## ------------------ Create count_ids plot ------------------- ##
+  #QC plot of before and after
+
   ## ------------------ Create Output ------------------- ##
   OutputDF <- OtherIDs
 
