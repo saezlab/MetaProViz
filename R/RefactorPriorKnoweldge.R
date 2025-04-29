@@ -1718,14 +1718,23 @@ ComparePK <- function(InputData,
 #'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
 #'
 #' @export
-CountEntries <- function(data,
-                                   column,
-                                   delimiter = ",",
-                                   fill_colors = c("No ID" = "#FB8072",
+count_ids <- function(data,
+                      column,
+                      delimiter = ",",
+                      fill_colors = c("No ID" = "#FB8072",
                                                    "Single ID" = "#B3DE69",
                                                    "Multiple IDs" = "#80B1D3"),
-                                   binwidth = 1,
-                                   title_prefix = NULL) {
+                      binwidth = 1,
+                      title_prefix = NULL) {
+  #@Macabe:
+  #move named fill colors inside of the function. if the user provides other string of colors, we change them.
+  #plot title should not automatically include biocrates cell
+  #we need to specify that NA is counted as none
+  #we need to check for duplications (i.e. is the trivialname duplicated in the data frame, remove this and give a warning)
+  #give the user the change to pass multiple columns to analyse, which would mean we create a plot for each column and label the plot with the column name
+
+
+
   # Process the data: count entries and label each cell based on the number of entries.
   processed_data <- dplyr::mutate(
     data,
