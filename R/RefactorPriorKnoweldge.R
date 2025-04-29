@@ -1419,25 +1419,37 @@ AddInfo <- function(mat,
 #'
 #' @importFrom dplyr mutate select
 #' @importFrom utils write.csv
+#'
 #' @export
-ComparePK <- function(InputData, SettingsInfo = NULL,
+ComparePK <- function(InputData,
+                      SettingsInfo = NULL,
                       filter_by = c("both", "gene", "metabolite"),
                       plot_title = "Overlap of Prior Knowledge Resources",
                       name_col = "TrivialName",
                       palette_type = "polychrome",
                       output_file = NULL) {
+  ###########################################################################
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
 
+  ## ------------ Check Input files ----------- ##
   # Match filter argument
   filter_by <- match.arg(filter_by)
 
   # Validate InputData input
   if (!is.list(InputData) || length(InputData) < 1) {
-    stop("InputData must be a non-empty list.")
+    message <- paste0("InputData must be a non-empty list.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
   if (is.null(names(InputData)) || any(names(InputData) == "")) {
-    stop("InputData must be a named list with resource names.")
+    message <- paste0("InputData must be a named list with resource names.")
+    logger::log_trace(paste("Error ", message, sep=""))
+    stop(message)
   }
 
+  ###########################################################################
+  ## ----------- Input ----------- ##
   # Define resource lookup table with information on how to retrieve and transform each resource.
   resource_definitions <- list(
     hallmarks = list(

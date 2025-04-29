@@ -25,22 +25,37 @@
 #' If no class column is provided (\code{class_col = NULL}), a basic upset plot is generated.
 #'
 #' @param df A data frame containing the data to be plotted.
-#' @param class_col An optional string specifying the name of the column in \code{df} that represents the class
-#'                  of each observation. This column is coerced to a factor if provided. Default is \code{NULL}.
-#' @param intersect_cols A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
-#'                       Default is \code{c("LIMID", "HMDB", "CHEBI", "None")}.
-#' @param plot_title A string specifying the title of the plot. Default is \code{"Metabolite IDs"}.
-#' @param palette_type A string specifying the color palette to use for the fill aesthetic when \code{class_col} is provided.
-#'                     Options are \code{"viridis"} (default) and \code{"polychrome"}.
-#' @param output_file An optional string specifying the file path to save the plot. If \code{NULL} (default), the plot is not saved.
-#' @param width Numeric value specifying the width of the saved plot (if \code{output_file} is provided). Default is \code{14}.
-#' @param height Numeric value specifying the height of the saved plot (if \code{output_file} is provided). Default is \code{8}.
-#' @param dpi Numeric value specifying the resolution (dots per inch) of the saved plot (if \code{output_file} is provided). Default is \code{300}.
-#' @param max_legend_terms Numeric value specifying the maximum number of unique terms in \code{class_col}
+#' @param class_col \emph{Optional: } An optional string specifying the name of the column in \code{df} that represents the class
+#'                  of each observation. This column is coerced to a factor if provided. \strong{Default = NULL}
+#' @param intersect_cols \emph{Optional: } A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
+#'                       \strong{Default = c("LIMID", "HMDB", "CHEBI", "None")}.
+#' @param plot_title \emph{Optional: } A string specifying the title of the plot. \strong{Default = "Metabolite IDs"}.
+#' @param palette_type \emph{Optional: } A string specifying the color palette to use for the fill aesthetic when \code{class_col} is provided.
+#'                     Options are \code{"viridis"} and \code{"polychrome"}. \strong{Default = c("viridis", "polychrome")}
+#' @param output_file \emph{Optional: } An optional string specifying the file path to save the plot. If \code{NULL}, the plot is not saved. \strong{Default = NULL}
+#' @param width \emph{Optional: } Numeric value specifying the width of the saved plot (if \code{output_file} is provided). \strong{Default = 14}.
+#' @param height \emph{Optional: } Numeric value specifying the height of the saved plot (if \code{output_file} is provided). \strong{Default = 8}.
+#' @param dpi \emph{Optional: } Numeric value specifying the resolution (dots per inch) of the saved plot (if \code{output_file} is provided). \strong{Default = 300}.
+#' @param max_legend_terms \emph{Optional: } Numeric value specifying the maximum number of unique terms in \code{class_col}
 #'                         for which the legend should be displayed. If the number of levels exceeds this value,
-#'                         the legend will be hidden. Default is \code{20}. Ignored if \code{class_col} is \code{NULL}.
+#'                         the legend will be hidden. Ignored if \code{class_col} is \code{NULL}. \strong{Default = 20}.
+#' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
+#' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{Default= NULL}
+
 #'
 #' @return A \code{ggplot} object representing the generated upset plot.
+#'
+#' @examples
+#' # example code
+#'
+#' @keywords upset plot, complex upset
+#'
+#' @importFrom ggplot2 scale_fill_manual scale_fill_viridis_d element_text theme
+#' @importFrom Polychrome palette36.colors
+#' @importFrom ComplexUpset intersection_size
+#' @importFrom logger log_info log_trace
+#' @importFrom stats setNames
 #'
 #' @export
 VizUpset <- function(df,
@@ -52,9 +67,39 @@ VizUpset <- function(df,
                      width = 14,
                      height = 8,
                      dpi = 300,
-                     max_legend_terms = 20) {
+                     max_legend_terms = 20,
+                     SaveAs_Plot = "svg",
+                     PrintPlot=TRUE,
+                     FolderPath = NULL) {
 
-  palette_type <- match.arg(palette_type)
+  ###########################################################################
+  ## ------------ Create log file ----------- ##
+  MetaProViz_Init()
+
+  logger::log_info("VizUpset: Upset plot visualization")
+  ## ------------ Check Input files ----------- ##
+  #
+  palette_type <- match.arg(palette_type,
+                            c("viridis", "polychrome"))
+
+
+  ## ------------ Create Results output folder ----------- ##
+  Folder <- NULL
+  if(is.null(SaveAs_Plot)==FALSE){
+    Folder <- SavePath(FolderName= "UpsetPlots",
+                       FolderPath=FolderPath)
+  }
+  logger::log_info("VizPCA results saved at ", Folder)
+
+  ###########################################################################
+  ## ----------- Check input data frame ----------- ##
+  # If either a list of DFs (different PK resources, same IDs) or a single DF but multiple ID columns or a combination of both!
+  # currently there is also the ComparePK function, but I think we could maybe use it in here too!
+
+
+
+  ## ----------- Set the plot parameters: ------------ ##
+  ##--- Prepare colour palette
 
   # If a class column is provided, process it for fill aesthetics
   if (!is.null(class_col)) {
@@ -62,13 +107,14 @@ VizUpset <- function(df,
     if(palette_type == "viridis"){
       fill_scale <- ggplot2::scale_fill_viridis_d(option = "viridis")
     } else if(palette_type == "polychrome"){
-      if (!requireNamespace("Polychrome", quietly = TRUE)) {
-        stop("Package 'Polychrome' is required for the polychrome palette. Please install it.")
-      }
       class_levels <- levels(df[[class_col]])
       my_palette <- Polychrome::palette36.colors(n = 36)
       if(length(my_palette) < length(class_levels)) {
-        stop("Not enough colors in the Polychrome palette for the number of classes!")
+        fill_scale <- ggplot2::scale_fill_viridis_d(option = "viridis")
+        message <- paste0("Not enough colors in the Polychrome palette for the number of classes. Hence viridis palette was used instead.")
+        warning("Not enough colors in the Polychrome palette for the number of classes!")
+
+        logger::log_trace(paste("Warning ", message, sep=""))
       }
       my_palette_named <- stats::setNames(my_palette[1:length(class_levels)], class_levels)
       fill_scale <- ggplot2::scale_fill_manual(values = my_palette_named)
@@ -94,6 +140,7 @@ VizUpset <- function(df,
     )
   }
 
+  ## ----------- Make the  plot based on the choosen parameters ------------ ##
   # Create the upset plot
   p <- ComplexUpset::upset(
     data = df,
