@@ -6,7 +6,7 @@
 #' metabolomics. MetaProViz offers an interactive framework consisting of five
 #' modules: Processing, differential analysis, prior knwoledge access and
 #' refactoring, functional analysis and visualization of both intracellular and
-#' exometabolomics (=consumption-release (CoRe) data).
+#' exometabolomics (=consumption-release (core) data).
 #'
 #' @author Christina Schmidt <\email{christina.schmidt@uni-heidelberg.de}> and
 #' Denes Turei <\email{turei.denes@@gmail.com}> and Dimitrios Prymidis

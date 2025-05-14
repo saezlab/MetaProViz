@@ -26,60 +26,60 @@
 #'
 #' Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
 #'
-#' @param InputData DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the PathwayFile.
-#' @param SettingsInfo \emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if RemoveBackground=TRUE. Also pass ColumnName for PathwayFile including term and feature names. (ClusterColumn= ColumnName InputData, BackgroundColumn = ColumnName InputData, PathwayTerm= ColumnName PathwayFile, PathwayFeature= ColumnName PathwayFile) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite")}
-#' @param RemoveBackground \emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in SettingsInfo, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}
-#' @param PathwayFile DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.
-#' @param PathwayName \emph{Optional: } Name of the pathway list used \strong{default: ""}
+#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if RemoveBackground=TRUE. Also pass ColumnName for input_pathway including term and feature names. (ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite")}
+#' @param RemoveBackground \emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in metadata_info, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}
+#' @param input_pathway DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.
+#' @param pathway_name \emph{Optional: } Name of the pathway list used \strong{default: ""}
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return Saves results as individual .csv files.
 #'
 #' @importFrom logger log_info
 #' @importFrom dplyr rename select
 #' @export
-ClusterORA <- function(InputData,
-                       SettingsInfo=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+ClusterORA <- function(data,
+                       metadata_info=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                        RemoveBackground=TRUE,
-                       PathwayFile,
-                       PathwayName="",
+                       input_pathway,
+                       pathway_name="",
                        minGSSize=10,
                        maxGSSize=1000 ,
-                       SaveAs_Table= "csv",
-                       FolderPath = NULL){
+                       save_table= "csv",
+                       path = NULL){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
 
    ## ------------ Check Input files ----------- ##
-  Pathways <- CheckInput_ORA(InputData=InputData,
-                                          SettingsInfo=SettingsInfo,
+  Pathways <- CheckInput_ORA(data=data,
+                                          metadata_info=metadata_info,
                                           RemoveBackground=RemoveBackground,
-                                          PathwayFile=PathwayFile,
-                                          PathwayName=PathwayName,
+                                          input_pathway=input_pathway,
+                                          pathway_name=pathway_name,
                                           minGSSize=minGSSize,
                                           maxGSSize=maxGSSize,
-                                          SaveAs_Table=SaveAs_Table,
+                                          save_table=save_table,
                                           pCutoff=NULL,
                                           PercentageCutoff=NULL)
 
   ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
+  if(is.null(save_table)==FALSE){
     Folder <- SavePath(FolderName= "ClusterORA",
-                                    FolderPath=FolderPath)
+                                    path=path)
     }
 
   ############################################################################################################
   ## ------------ Prepare Data ----------- ##
   # open the data
   if(RemoveBackground==TRUE){
-    df <- subset(InputData, !InputData[[SettingsInfo[["BackgroundColumn"]]]] == "FALSE")%>%
+    df <- subset(data, !data[[metadata_info[["BackgroundColumn"]]]] == "FALSE")%>%
       rownames_to_column("Metabolite")
   } else{
-    df <- InputData%>%
+    df <- data%>%
       rownames_to_column("Metabolite")
   }
 
@@ -87,7 +87,7 @@ ClusterORA <- function(InputData,
   allMetabolites <- as.character(df$Metabolite)
 
   #Select clusters
-  grps_labels <- unlist(unique(df[[SettingsInfo[["ClusterColumn"]]]]))
+  grps_labels <- unlist(unique(df[[metadata_info[["ClusterColumn"]]]]))
 
   #Load Pathways
   Pathway <- Pathways
@@ -106,7 +106,7 @@ ClusterORA <- function(InputData,
   clusterGo_list = list()
   #Run ORA
   for(g in grps_labels){
-    grpMetabolites <- subset(df, df[[SettingsInfo[["ClusterColumn"]]]] == g)
+    grpMetabolites <- subset(df, df[[metadata_info[["ClusterColumn"]]]] == g)
     log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
     clusterGo <- clusterProfiler::enricher(gene=as.character(grpMetabolites$Metabolite),
@@ -133,19 +133,19 @@ ClusterORA <- function(InputData,
       g_save <- gsub("/", "-", g)
       df_list[[g_save]] <- clusterGoSummary
     }else{
-      log_info("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
+      log_info("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the input_pathway. Hence the ClusterGoSummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
     }
   }
   #Save files
   suppressMessages(suppressWarnings(
     SaveRes(InputList_DF=df_list,
                          InputList_Plot= NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=NULL,
-                         FolderPath= Folder,
-                         FileName= paste("ClusterGoSummary",PathwayName, sep="_"),
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)))
+                         save_table=save_table,
+                         save_plot=NULL,
+                         path= Folder,
+                         FileName= paste("ClusterGoSummary",pathway_name, sep="_"),
+                         core=FALSE,
+                         print_plot=FALSE)))
 
   #return <- clusterGoSummary
   ORA_Output <- list("DF"= df_list, "ClusterGo"=clusterGo_list)
@@ -160,67 +160,67 @@ ClusterORA <- function(InputData,
 
 #' Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
 #'
-#' @param InputData DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the PathwayFile.
-#' @param SettingsInfo \emph{Optional: } Pass ColumnName of the column including parameters to use for pCutoff and PercentageCutoff. Also pass ColumnName for PathwayFile including term and feature names. (pvalColumn = ColumnName InputData, PercentageColumn= ColumnName InputData, PathwayTerm= ColumnName PathwayFile, PathwayFeature= ColumnName PathwayFile) \strong{c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
+#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for pCutoff and PercentageCutoff. Also pass ColumnName for input_pathway including term and feature names. (pvalColumn = ColumnName data, PercentageColumn= ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
 #' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
 #' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that should be considered for ORA. Selects Top/Bottom % of selected PercentageColumn, usually t.val or Log2FC \strong{default: 10}
-#' @param PathwayFile DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
-#' @param PathwayName \emph{Optional: } Name of the PathwayFile used \strong{default: ""}
+#' @param input_pathway DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
+#' @param pathway_name \emph{Optional: } Name of the input_pathway used \strong{default: ""}
 #' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return Saves results as individual .csv files.
 #'
 #' @export
 #'
-StandardORA <- function(InputData,
-                        SettingsInfo=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+StandardORA <- function(data,
+                        metadata_info=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                         pCutoff=0.05,
                         PercentageCutoff=10,
-                        PathwayFile,
-                        PathwayName="",
+                        input_pathway,
+                        pathway_name="",
                         minGSSize=10,
                         maxGSSize=1000 ,
-                        SaveAs_Table="csv",
-                        FolderPath = NULL
+                        save_table="csv",
+                        path = NULL
 
 ){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
  ## ------------ Check Input files ----------- ##
-  Pathways <- CheckInput_ORA(InputData=InputData,
-                                          SettingsInfo=SettingsInfo,
+  Pathways <- CheckInput_ORA(data=data,
+                                          metadata_info=metadata_info,
                                           RemoveBackground=FALSE,
-                                          PathwayFile=PathwayFile,
-                                          PathwayName=PathwayName,
+                                          input_pathway=input_pathway,
+                                          pathway_name=pathway_name,
                                           minGSSize=minGSSize,
                                           maxGSSize=maxGSSize,
-                                          SaveAs_Table=SaveAs_Table,
+                                          save_table=save_table,
                                           pCutoff=pCutoff,
                                           PercentageCutoff=PercentageCutoff)
 
   ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
+  if(is.null(save_table)==FALSE){
     Folder <- SavePath(FolderName= "ORA",
-                                    FolderPath=FolderPath)
+                                    path=path)
   }
 
   ############################################################################################################
   ## ------------ Load the data and check ----------- ##
-  InputData<- InputData %>%
+  data<- data %>%
     rownames_to_column("Metabolite")
 
   #Select universe
-  allMetabolites <- as.character(InputData$Metabolite)
+  allMetabolites <- as.character(data$Metabolite)
 
   #select top changed metabolites (Up and down together)
   #check if the metabolites are significantly changed.
   value <- PercentageCutoff/100
 
-  allMetabolites_DF <- InputData[order(InputData[[SettingsInfo[["PercentageColumn"]]]]),]# rank by t.val
+  allMetabolites_DF <- data[order(data[[metadata_info[["PercentageColumn"]]]]),]# rank by t.val
   selectMetabolites_DF <- allMetabolites_DF[c(1:(ceiling(value * nrow(allMetabolites_DF))),(nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))),]
   selectMetabolites_DF$`Top/Bottom`<- "TRUE"
   selectMetabolites_DF <-merge(allMetabolites_DF,selectMetabolites_DF[,c("Metabolite", "Top/Bottom")], by="Metabolite", all.x=TRUE)
@@ -228,7 +228,7 @@ StandardORA <- function(InputData,
   InputSelection <- selectMetabolites_DF%>%
     mutate(`Top/Bottom_Percentage` = case_when(`Top/Bottom`==TRUE ~ 'TRUE',
                                  TRUE ~ 'FALSE'))%>%
-    mutate(Significant = case_when(get(SettingsInfo[["pvalColumn"]]) <= pCutoff ~ 'TRUE',
+    mutate(Significant = case_when(get(metadata_info[["pvalColumn"]]) <= pCutoff ~ 'TRUE',
                                   TRUE ~ 'FALSE'))%>%
     mutate(Cluster_ChangedMetabolites = case_when(Significant==TRUE & `Top/Bottom_Percentage`==TRUE ~ 'TRUE',
                                    TRUE ~ 'FALSE'))
@@ -274,7 +274,7 @@ StandardORA <- function(InputData,
       clusterGoSummary <- clusterGoSummary%>%
         dplyr::rename("Metabolites_in_pathway"="geneID")
   }else{
-    stop("None of the Input_data Metabolites were present in any terms of the PathwayFile. Hence the ClusterGoSummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
+    stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGoSummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }
 
   #Return and save list of DFs
@@ -284,12 +284,12 @@ StandardORA <- function(InputData,
   suppressMessages(suppressWarnings(
     SaveRes(InputList_DF=ORA_output_list,
                          InputList_Plot= NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=NULL,
-                         FolderPath= Folder,
-                         FileName= paste(PathwayName),
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)))
+                         save_table=save_table,
+                         save_plot=NULL,
+                         path= Folder,
+                         FileName= paste(pathway_name),
+                         core=FALSE,
+                         print_plot=FALSE)))
 
   #Return
   ORA_output_list <- c( ORA_output_list, list("ClusterGo"=clusterGo))

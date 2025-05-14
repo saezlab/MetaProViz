@@ -25,23 +25,23 @@
 
 #' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
 #'
-#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
-#' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
+#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
 #' @param Percentage \emph{Optional: } Percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}
 #' @param StatCutoff \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for the results summary and on the heatmap. \strong{Default = 0.05}
 #' @param VarianceCutoff \emph{Optional: } Cutoff for the PCs variance that should be displayed on the heatmap. \strong{Default = 1}
-#' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return List of DFs: prcomp results, loadings, Top-Bottom features, annova results, results summary
 #'
 #' @examples
 #' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-#' Res <- MetaProViz::MetaAnalysis(InputData=Tissue_Norm[,-c(1:13)],
-#'                                 SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+#' Res <- MetaProViz::MetaAnalysis(data=Tissue_Norm[,-c(1:13)],
+#'                                 metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 #'
 #' @keywords PCA, annova, metadata
 #'
@@ -55,17 +55,17 @@
 #'
 #' @export
 #'
-MetaAnalysis <- function(InputData,
-                         SettingsFile_Sample,
+MetaAnalysis <- function(data,
+                         metadata_sample,
                          Scaling = TRUE,
                          Percentage = 0.1,
                          StatCutoff= 0.05,
                          VarianceCutoff=1,
-                         SaveAs_Table = "csv",
-                         SaveAs_Plot = "svg",
-                         PrintPlot= TRUE,
-                         FolderPath = NULL
-                         #SettingInfo= c(MainSeparator = "TISSUE_TYPE), # enable this parameter in the function --> main separator: Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `SettingsInfo` and provide the column name of our main separator.
+                         save_table = "csv",
+                         save_plot = "svg",
+                         print_plot= TRUE,
+                         path = NULL
+                         #SettingInfo= c(MainSeparator = "TISSUE_TYPE), # enable this parameter in the function --> main separator: Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `metadata_info` and provide the column name of our main separator.
 
 ){
   ## ------------ Create log file ----------- ##
@@ -74,38 +74,38 @@ MetaAnalysis <- function(InputData,
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
   # HelperFunction `CheckInput`
-  CheckInput(InputData=InputData,
-                          SettingsFile_Sample=SettingsFile_Sample,
-                          SettingsFile_Metab=NULL,
-                          SettingsInfo=NULL,
-                          SaveAs_Plot=SaveAs_Plot,
-                          SaveAs_Table=SaveAs_Table,
-                          CoRe=FALSE,
-                          PrintPlot= PrintPlot)
+  CheckInput(data=data,
+                          metadata_sample=metadata_sample,
+                          metadata_feature=NULL,
+                          metadata_info=NULL,
+                          save_plot=save_plot,
+                          save_table=save_table,
+                          core=FALSE,
+                          print_plot= print_plot)
 
   # Specific checks: Check the column names of the demographics --> need to be R usable (no empty spaces, -, etc.)
-  if(is.null(SettingsFile_Sample)==FALSE){
-    if(any(grepl('[^[:alnum:]]', colnames(SettingsFile_Sample)))==TRUE){
+  if(is.null(metadata_sample)==FALSE){
+    if(any(grepl('[^[:alnum:]]', colnames(metadata_sample)))==TRUE){
       #Remove special characters in colnames
-      colnames(SettingsFile_Sample) <- make.names(colnames(SettingsFile_Sample))
+      colnames(metadata_sample) <- make.names(colnames(metadata_sample))
       #Message:
-      message <- paste("The column names of the 'SettingsFile_Sample' contain special character that where removed.")
+      message <- paste("The column names of the 'metadata_sample' contain special character that where removed.")
       logger::log_info(message)
       message(message)
     }
   }
 
   ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Plot)==FALSE |is.null(SaveAs_Table)==FALSE){
+  if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
     Folder <- SavePath(FolderName= "MetaAnalysis",
-                                    FolderPath=FolderPath)
+                                    path=path)
   }
 
   ###############################################################################################################################################################################################################
   ## ---------- Run prcomp ------------##
   #--- 1. prcomp
   #Get PCs
-  PCA.res <- prcomp(InputData, center = TRUE, scale=Scaling)
+  PCA.res <- prcomp(data, center = TRUE, scale=Scaling)
   PCA.res_Info <- as.data.frame(PCA.res$x)
 
   # Extract loadings for each PC
@@ -113,7 +113,7 @@ MetaAnalysis <- function(InputData,
     tibble::rownames_to_column("FeatureID")
 
   #--- 2. Merge with demographics
-  PCA.res_Info  <- merge(x=SettingsFile_Sample%>% tibble::rownames_to_column("UniqueID"),
+  PCA.res_Info  <- merge(x=metadata_sample%>% tibble::rownames_to_column("UniqueID"),
                          y=PCA.res_Info%>% tibble::rownames_to_column("UniqueID"),
                          by="UniqueID",
                          all.y=TRUE)%>%
@@ -128,7 +128,7 @@ MetaAnalysis <- function(InputData,
   ## ---------- STATS ------------##
   ## 1. Anova p.val
   # Iterate through each combination of meta and PC columns
-  MetaData <- names(SettingsFile_Sample)
+  MetaData <- names(metadata_sample)
 
   Stat_results <- list()
 
@@ -267,12 +267,12 @@ MetaAnalysis <- function(InputData,
    if(nrow(Data_Heat) > 2L){
 
      #Plot
-     invisible(VizHeatmap(InputData = Data_Heat,
-                          PlotName = paste0("ExplainedVariance-bigger-", VarianceCutoff , "Percent_AND_p.adj-smaller", StatCutoff, sep=""),
+     invisible(VizHeatmap(data = Data_Heat,
+                         plot_name = paste0("ExplainedVariance-bigger-", VarianceCutoff , "Percent_AND_p.adj-smaller", StatCutoff, sep=""),
                           Scale = "none",
-                          SaveAs_Plot = SaveAs_Plot,
-                          PrintPlot = PrintPlot,
-                          FolderPath = Folder))
+                          save_plot = save_plot,
+                          print_plot = print_plot,
+                          path = Folder))
 
    }else{
      message <- paste0("StatCutoff of ", StatCutoff, " and VarianceCutoff of ", VarianceCutoff, " do only return <= 2 cases, hence no heatmap is plotted.")
@@ -290,12 +290,12 @@ MetaAnalysis <- function(InputData,
     # Save the results
     SaveRes(InputList_DF=ResList,
                          InputList_Plot = NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=FALSE,
-                         FolderPath= Folder,
+                         save_table=save_table,
+                         save_plot=FALSE,
+                         path= Folder,
                          FileName= "MetaAnalysis",
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)
+                         core=FALSE,
+                         print_plot=FALSE)
 
     #Return
     invisible(return(ResList))
@@ -308,18 +308,18 @@ MetaAnalysis <- function(InputData,
 
 #' Meta prior-knowledge
 #'
-#' @param InputData DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
-#' @param SettingsFile_Sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
-#' @param SettingsInfo \emph{Optional: } NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
+#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
+#' @param metadata_info \emph{Optional: } NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @return DF with prior knowledge based on patient metadata
 #'
 #' @examples
 #' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-#' Res <- MetaProViz::MetaPK(InputData=Tissue_Norm[,-c(1:13)],
-#'                           SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+#' Res <- MetaProViz::MetaPK(data=Tissue_Norm[,-c(1:13)],
+#'                           metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 #'
 #' @keywords prior knowledge, metadata
 #'
@@ -329,11 +329,11 @@ MetaAnalysis <- function(InputData,
 #'
 #' @export
 #'
-MetaPK <- function(InputData,
-                   SettingsFile_Sample,
-                   SettingsInfo=NULL,
-                   SaveAs_Table = "csv",
-                   FolderPath = NULL){
+MetaPK <- function(data,
+                   metadata_sample,
+                   metadata_info=NULL,
+                   save_table = "csv",
+                   path = NULL){
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -353,26 +353,26 @@ MetaPK <- function(InputData,
 
 
   ## ------------ Create Results output folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
+  if(is.null(save_table)==FALSE){
     Folder <- SavePath(FolderName= "MetaAnalysis",
-                                    FolderPath=FolderPath)
+                                    path=path)
   }
 
   ###############################################################################################################################################################################################################
   ## ---------- Create Prior Knowledge file format to perform enrichment analysis ------------##
   # Use the Sample metadata for this:
-  if(is.null(SettingsInfo)==TRUE){
-    MetaData <- names(SettingsFile_Sample)
-    SettingsFile_Sample_subset <- SettingsFile_Sample%>%
+  if(is.null(metadata_info)==TRUE){
+    MetaData <- names(metadata_sample)
+    metadata_sample_subset <- metadata_sample%>%
       tibble::rownames_to_column("SampleID")
   }else{
-    MetaData <- SettingsInfo
-    SettingsFile_Sample_subset <- SettingsFile_Sample[, MetaData, drop = FALSE]%>%
+    MetaData <- metadata_info
+    metadata_sample_subset <- metadata_sample[, MetaData, drop = FALSE]%>%
       tibble::rownames_to_column("SampleID")
   }
 
   # Convert into a pathway DF
-  Metadata_df <- SettingsFile_Sample_subset %>%
+  Metadata_df <- metadata_sample_subset %>%
     tidyr::pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry")%>%
     tidyr::unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
   Metadata_df$mor <- 1

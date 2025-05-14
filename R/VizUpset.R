@@ -39,9 +39,9 @@
 #' @param max_legend_terms \emph{Optional: } Numeric value specifying the maximum number of unique terms in \code{class_col}
 #'                         for which the legend should be displayed. If the number of levels exceeds this value,
 #'                         the legend will be hidden. Ignored if \code{class_col} is \code{NULL}. \strong{Default = 20}.
-#' @param SaveAs_Plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
-#' @param PrintPlot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{Default= NULL}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default= NULL}
 
 #'
 #' @return A \code{ggplot} object representing the generated upset plot.
@@ -68,9 +68,9 @@ VizUpset <- function(df,
                      height = 8,
                      dpi = 300,
                      max_legend_terms = 20,
-                     SaveAs_Plot = "svg",
-                     PrintPlot=TRUE,
-                     FolderPath = NULL) {
+                     save_plot = "svg",
+                     print_plot=TRUE,
+                     path = NULL) {
 
   ###########################################################################
   ## ------------ Create log file ----------- ##
@@ -85,9 +85,9 @@ VizUpset <- function(df,
 
   ## ------------ Create Results output folder ----------- ##
   Folder <- NULL
-  if(is.null(SaveAs_Plot)==FALSE){
+  if(is.null(save_plot)==FALSE){
     Folder <- SavePath(FolderName= "UpsetPlots",
-                       FolderPath=FolderPath)
+                       path=path)
   }
   logger::log_info("VizPCA results saved at ", Folder)
 

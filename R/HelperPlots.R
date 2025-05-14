@@ -308,8 +308,8 @@ adjust_title <- function(gtbl, titles) {
 
         log_trace('The plot has title, adjusting layout to accommodate it.')
 
-        gtbl %<>% set_height(c('title', 'main'), '0.5cm')#controls margins --> PlotName
-        gtbl %<>% set_height(c('subtitle', 'main'), '0.5cm')#controls margins --> PlotName
+        gtbl %<>% set_height(c('title', 'main'), '0.5cm')#controls margins -->plot_name
+        gtbl %<>% set_height(c('subtitle', 'main'), '0.5cm')#controls margins -->plot_name
 
 
         # Sum up total heights:
@@ -343,11 +343,11 @@ adjust_legend <- function(
         gtbl,
         InputPlot,
         sections = FALSE,
-        SettingsInfo = NULL
+        metadata_info = NULL
     ) {
 
     if(
-        any(sections %in% names(SettingsInfo)) ||
+        any(sections %in% names(metadata_info)) ||
         identical(sections, TRUE)
     ) {
 
@@ -359,7 +359,7 @@ adjust_legend <- function(
         #------- Legend widths
         ## Legend titles:
         legend_nchar <-
-            SettingsInfo %>%
+            metadata_info %>%
             as.list %>%
             extract(sections) %>%
             unlist %>%
@@ -445,8 +445,8 @@ in_gtable <- function(name, gtbl) {
 ##############################################################
 
 #' @param InputPlot This is the ggplot object generated within the in any of the processing functions function.
-#' @param PlotName Generated within the processing functions.
-#' @param PlotType Generated within the processing functions.
+#' @param plot_name Generated within the processing functions.
+#' @param plot_type Generated within the processing functions.
 #'
 #' @keywords Plot helper function
 #' @importFrom ggplot2 annotation_custom theme
@@ -454,11 +454,11 @@ in_gtable <- function(name, gtbl) {
 #' @noRd
 #'
 
-plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
+plotGrob_Processing <- function(InputPlot,plot_name, plot_type){
 
-  if(PlotType == "Scree"){
+  if(plot_type == "Scree"){
     UNIT <- unit(12, "cm")
-  }else if(PlotType == "Hotellings"){
+  }else if(plot_type == "Hotellings"){
     UNIT <- unit(12, "cm")#0.25*Sample
   }else{#CV and Hist
     UNIT <- unit(8, "cm")
@@ -512,14 +512,14 @@ plotGrob_Processing <- function(InputPlot, PlotName, PlotType){
 #' PCA helper function: Internal Function
 #'
 #' @param InputPlot This is the ggplot object generated within the VizPCA function.
-#' @param SettingsInfo Passed to VizPCA
-#' @param PlotName Passed to VizPCA
+#' @param metadata_info Passed to VizPCA
+#' @param plot_name Passed to VizPCA
 #'
 #' @keywords PCA helper function
 #' @importFrom ggplot2 ggplotGrob
 #' @importFrom magrittr %>%
 #' @noRd
-PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
+PlotGrob_PCA <- function(InputPlot, metadata_info,plot_name){
 
   PCA_PARAM <- list(
     widths = list(
@@ -555,7 +555,7 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
     adjust_legend(
       InputPlot,
       sections = c("color", "shape"),
-      SettingsInfo = SettingsInfo
+      metadata_info = metadata_info
     )
 
   log_trace(
@@ -574,15 +574,15 @@ PlotGrob_PCA <- function(InputPlot, SettingsInfo, PlotName){
 ##############################################################
 
 #' @param InputPlot This is the ggplot object generated within the VizHeatmap function.
-#' @param SettingsInfo Passed to VizHeatmap
-#' @param SettingsFile_Sample Passed to VizHeatmap
-#' @param SettingsFile_Metab Passed to VizHeatmap
-#' @param PlotName Passed to VizHeatmap
+#' @param metadata_info Passed to VizHeatmap
+#' @param metadata_sample Passed to VizHeatmap
+#' @param metadata_feature Passed to VizHeatmap
+#' @param plot_name Passed to VizHeatmap
 #'
 #' @keywords Heatmap helper function
 #' @noRd
 
-PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample, SettingsFile_Metab, PlotName){
+PlotGrob_Heatmap <- function(InputPlot, metadata_info, metadata_sample, metadata_feature,plot_name){
 
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   HEAT_PARAM <- list(
@@ -608,30 +608,30 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample, Setti
     adjust_title(c(PlotName))
 
   #Extract legend information and adjust:
-  color_entries <- grep("^color", names(SettingsInfo), value = TRUE)
+  color_entries <- grep("^color", names(metadata_info), value = TRUE)
   if(length(color_entries)>0){#We need to adapt the plot Hights and widths
-    if(sum(grepl("color_Sample", names(SettingsInfo)))>0){
-      names <- SettingsInfo[grepl("color_Sample", names(SettingsInfo))]
+    if(sum(grepl("color_Sample", names(metadata_info)))>0){
+      names <- metadata_info[grepl("color_Sample", names(metadata_info))]
       colour_names <- NULL
       legend_names <- NULL
       for (x in 1:length(names)){
         names_sel <- names[[x]]
         legend_names[x] <- names_sel
-        colour_names[x] <- SettingsFile_Sample[names[[x]]]
+        colour_names[x] <- metadata_sample[names[[x]]]
       }
     }else{
       colour_names <- NULL
       legend_names <- NULL
     }
 
-    if(sum(grepl("color_Metab", names(SettingsInfo)))>0){
-      names <- SettingsInfo[grepl("color_Metab", names(SettingsInfo))]
+    if(sum(grepl("color_Metab", names(metadata_info)))>0){
+      names <- metadata_info[grepl("color_Metab", names(metadata_info))]
       colour_names_M <- NULL
       legend_names_M <- NULL
       for (x in 1:length(names)){
         names_sel <- names[[x]]
         legend_names_M[x] <- names_sel
-        colour_names_M[x] <- SettingsFile_Metab[names[[x]]]
+        colour_names_M[x] <- metadata_feature[names[[x]]]
       }
     }else{
       colour_names_M <- NULL
@@ -670,15 +670,15 @@ PlotGrob_Heatmap <- function(InputPlot, SettingsInfo, SettingsFile_Sample, Setti
 ##############################################################
 
 #' @param InputPlot This is the ggplot object generated within the VizVolcano function.
-#' @param SettingsInfo Passed to VizVolcano
-#' @param PlotName Passed to VizVolcano
+#' @param metadata_info Passed to VizVolcano
+#' @param plot_name Passed to VizVolcano
 #' @param Subtitle
 #'
 #' @keywords Volcano helper function
 #' @noRd
 #'
 
-plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
+plotGrob_Volcano <- function(InputPlot, metadata_info,plot_name, Subtitle){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   VOL_PARAM <- list(
     widths = list(
@@ -715,7 +715,7 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
     adjust_legend(
       InputPlot,
       sections = c("color", "shape"),
-      SettingsInfo = SettingsInfo
+      metadata_info = metadata_info
     )
 
   log_trace(
@@ -734,28 +734,28 @@ plotGrob_Volcano <- function(InputPlot, SettingsInfo, PlotName, Subtitle){
 #####################################################################
 
 #' @param InputPlot This is the ggplot object generated within the VizSuperplots function.
-#' @param SettingsInfo Passed to VizSuperplots
-#' @param SettingsFile_Sample Passed to VizSuperplots
+#' @param metadata_info Passed to VizSuperplots
+#' @param metadata_sample Passed to VizSuperplots
 #' @param Subtitle Passed to VizSuperplots
-#' @param PlotName Passed to VizSuperplots
-#' @param PlotType Passed to VizSuperplots
+#' @param plot_name Passed to VizSuperplots
+#' @param plot_type Passed to VizSuperplots
 #'
 #' @keywords PCA helper function
 #' @noRd
 
 plotGrob_Superplot <- function(InputPlot,
-                               SettingsInfo,
-                               SettingsFile_Sample,
+                               metadata_info,
+                               metadata_sample,
                                Subtitle,
-                               PlotName,
-                               PlotType){
+                              plot_name,
+                               plot_type){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
-  X_Con <- SettingsFile_Sample%>%
+  X_Con <- metadata_sample%>%
     dplyr::distinct(Conditions)
 
   X_Tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 
-  if(PlotType == "Bar"){
+  if(plot_type == "Bar"){
     UNIT <- unit(X_Con%>%nrow() * 0.5, "cm")
   }else{
     UNIT <- unit(X_Con%>%nrow() * 1, "cm")
@@ -796,7 +796,7 @@ plotGrob_Superplot <- function(InputPlot,
     adjust_legend(
       InputPlot,
       sections = c("Superplot"),#here we do not have colour and shape, but other parameters
-      SettingsInfo = SettingsInfo
+      metadata_info = metadata_info
     )
 
   #Return
