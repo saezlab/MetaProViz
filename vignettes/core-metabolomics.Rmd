@@ -90,7 +90,7 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 `1.` core experiment **(core)** \
 The raw data are available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
 ```{r}
-Media <- MetaProViz::ToyData(data="CultureMedia_Raw")
+Media <- medium_raw
 
 ```
 ```{r, echo=FALSE}
@@ -103,7 +103,7 @@ Media[6:12, 1:8]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MappingInfo <- MetaProViz::ToyData(data="Cells_MetaData")
+MappingInfo <- cellular_meta
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -499,7 +499,7 @@ Plot1<- easyalluvial::alluvial_wide(MCA_core_Compressed[,c(1:3,5)], fill_by = 'l
 Now we can load the corresponding pre-processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
 ```{r}
 # Load the Pre-processed intracellular data:
-Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(data="IntraCells_DMA")
+Intra_DMA_786M1A_vs_HK2 <- intracell_dma
 
 # Perform metabolite clustering:
 MCA_core_res <- MetaProViz::MCA_core(data_Intra =Intra_DMA_786M1A_vs_HK2%>%rownames_to_column("Metabolite") ,

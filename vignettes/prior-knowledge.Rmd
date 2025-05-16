@@ -107,7 +107,7 @@ Example datasets is publicly available on [metabolomics workbench project PR0014
 
 ```{r}
 # Load the Pre-processed intracellular data:
-FeatureMetadata_Cells <- MetaProViz::ToyData(data="Cells_MetaData")
+FeatureMetadata_Cells <- cellular_meta
 ```
 
 \
@@ -116,7 +116,7 @@ Example datasets is publicly available in the [paper](https://www.cell.com/cance
 
 ```{r}
 # Load the example data:
-FeatureMetadata_Tissue <- MetaProViz::ToyData(data="Tissue_MetaData")
+FeatureMetadata_Tissue <- tissue_meta
 
 ```
 
@@ -126,7 +126,7 @@ Here we use the Biocrates kit feature information of the ["MxP® Quant 500 XL ki
 
 ```{r}
 # Load the example data:
-FeatureMetadata_Biocrates <- MetaProViz::ToyData(data="BiocratesFeatureTable")
+FeatureMetadata_Biocrates <- biocrates_features
 ```
 
 \
@@ -208,7 +208,7 @@ to showcase the severity of this problem, we can look at the occurrence of those
 to do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 
 ```{r, echo=FALSE}
-Pathways <- suppressMessages(suppressWarnings(MetaProViz::ToyData("AlaninePathways")))[,2:6]
+Pathways <- alanine_pathways[,2:6]
 
 Count <- Pathways %>%
   tidyr::unite(Pathway, c("pathwaySource", "pathway_name"), sep = ": ")%>%
@@ -862,7 +862,7 @@ to get a better understanding of the combinations of these, let's visualise the 
 pk_list <- list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF)
 metadata_info <- list(kegg_translated = c("hmdb", "pubchem"))
 
-pk_comp_res_keggtrans <- MetaProViz:::ComparePK(data = pk_list, 
+pk_comp_res_keggtrans <- MetaProViz:::ComparePK(data = pk_list,
                                metadata_info = metadata_info,
                                plot_title = "IDs available after KEGG ID Translation")
 
@@ -1083,7 +1083,7 @@ We have performed pre-processing and differential analysis (details can be found
 
 ```{r}
 # Load the Pre-processed intracellular data:
-Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(data="IntraCells_DMA")
+Intra_DMA_786M1A_vs_HK2 <- intracell_dma
 ```
 
 `2.` Tissue experiment **(Tissue)**\
@@ -1092,9 +1092,9 @@ We have performed differential analysis (details can be found in the vignette [M
 
 ```{r}
 # Load the example data:
-Tissue_TvsN <- MetaProViz::ToyData(data="Tissue_DMA")
-Tissue_TvsN_Old <- MetaProViz::ToyData(data="Tissue_DMA_Old")
-Tissue_TvsN_Young <- MetaProViz::ToyData(data="Tissue_DMA_Young")
+Tissue_TvsN <- tissue_dma
+Tissue_TvsN_Old <- tissue_dma_old
+Tissue_TvsN_Young <- tissue_dma_young
 ```
 
 \

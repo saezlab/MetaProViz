@@ -81,11 +81,10 @@ Here we choose an example datasets, which is publicly available in the [paper](h
 
 #<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
 `1.` Tissue experiment **(Intra)** \
-We can load the `ToyData`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
+We can access the built-in dataset `tissue_norm`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
 ```{r}
 # Load the example data:
-Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-
+Tissue_Norm <- tissue_norm
 ```
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
@@ -98,7 +97,7 @@ Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
 
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
 ```{r}
-Tissue_MetaData <- MetaProViz::ToyData("Tissue_MetaData")
+Tissue_MetaData <- tissue_meta
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
