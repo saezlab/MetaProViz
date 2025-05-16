@@ -32,11 +32,11 @@
 #' @return A data frame containing the KEGG pathways for ORA.
 #'
 #' @examples
-#' KEGG_Pathways <- MetaProViz::LoadKEGG()
+#' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 #'
 #' @export
 #'
-LoadKEGG <- function(){
+metsigdb_kegg <- function(){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -96,7 +96,7 @@ LoadKEGG <- function(){
 #' @return A data frame containing the Prior Knowledge.
 #' @export
 #'
-LoadHallmarks <- function() {
+metsigdb_hallmarks <- function() {
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -118,7 +118,7 @@ LoadHallmarks <- function() {
 #' @return A data frame containing the Prior Knowledge.
 #' @export
 #'
-LoadGaude <- function() {
+metsigdb_gaude <- function() {
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -140,8 +140,8 @@ LoadGaude <- function() {
 #'
 #' @title Prior Knowledge Import
 #' @param version \emph{Optional: } Version of the RaMP database loaded from OmniPathR. \strong{default: "2.5.4"}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 
 #' @description Import and process file to create Prior Knowledge.
 #'
@@ -153,20 +153,20 @@ LoadGaude <- function() {
 #' @return A data frame containing the Prior Knowledge.
 #'
 #' @examples
-#' ChemicalClass <- MetaProViz::LoadRAMP()
+#' ChemicalClass <- MetaProViz::metsigdb_chemicalclass()
 #'
 #' @export
 #'
-LoadRAMP <- function(version = "2.5.4",
-                     SaveAs_Table="csv",
-                     FolderPath=NULL){
+metsigdb_chemicalclass <- function(version = "2.5.4",
+                     save_table="csv",
+                     path=NULL){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
   ## ------------ Folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
-                       FolderPath=FolderPath)
+  if(is.null(save_table)==FALSE){
+    Folder <- SavePath(folder_name= "PriorKnowledge",
+                       path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
@@ -212,14 +212,14 @@ LoadRAMP <- function(version = "2.5.4",
   ##-------------- Save and return
   DF_List <- list("ChemicalClass_MetabSet"=HMDB_ChemicalClass)
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
-            InputList_Plot= NULL,
-            SaveAs_Table=SaveAs_Table,
-            SaveAs_Plot=NULL,
-            FolderPath= SubFolder,
+    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+            inputlist_plot= NULL,
+            save_table=save_table,
+            save_plot=NULL,
+            path= SubFolder,
             FileName= "ChemicalClass",
-            CoRe=FALSE,
-            PrintPlot=FALSE)))
+            core=FALSE,
+            print_plot=FALSE)))
 
   # Return into environment
   assign("ChemicalClass_MetabSet", HMDB_ChemicalClass, envir=.GlobalEnv)
@@ -232,19 +232,19 @@ LoadRAMP <- function(version = "2.5.4",
 #'
 #' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
 #'
-#' @param Input_GeneSet Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
-#' @param SettingsInfo \emph{Optional: }  Column name of Target in Input_GeneSet. \strong{Default = c(Target="gene")}
-#' @param PKName \emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param FolderPath {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+#' @param input_pk dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
+#' @param metadata_info \emph{Optional: }  Column name of Target in input_pk. \strong{Default = c(Target="gene")}
+#' @param pk_name \emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
 #' @export
 
-Make_GeneMetabSet <- function(Input_GeneSet,
-                              SettingsInfo=c(Target="gene"),
-                              PKName= NULL,
-                              SaveAs_Table = "csv",
-                              FolderPath = NULL){
+Make_GeneMetabSet <- function(input_pk,
+                              metadata_info=c(Target="gene"),
+                              pk_name= NULL,
+                              save_table = "csv",
+                              path = NULL){
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -253,26 +253,26 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
-  if(is.data.frame(Input_GeneSet)==FALSE){
-    stop("`Input_GeneSet` must be of class data.frame with columns for source (=term) and Target (=gene). Please check your input")
+  if(is.data.frame(input_pk)==FALSE){
+    stop("`input_pk` must be of class data.frame with columns for source (=term) and Target (=gene). Please check your input")
   }
   # 2. Target:
-  if("Target" %in% names(SettingsInfo)){
-    if(SettingsInfo[["Target"]] %in% colnames(Input_GeneSet)== FALSE){
-      stop("The ", SettingsInfo[["Target"]], " column selected as Conditions in SettingsInfo was not found in Input_GeneSet. Please check your input.")
+  if("Target" %in% names(metadata_info)){
+    if(metadata_info[["Target"]] %in% colnames(input_pk)== FALSE){
+      stop("The ", metadata_info[["Target"]], " column selected as Conditions in metadata_info was not found in input_pk. Please check your input.")
     }
   }else{
-    stop("Please provide a column name for the Target in SettingsInfo.")
+    stop("Please provide a column name for the Target in metadata_info.")
   }
 
-  if(is.null(PKName)){
-    PKName <- "GeneMetabSet"
+  if(is.null(pk_name)){
+    pk_name <- "GeneMetabSet"
   }
 
   ## ------------ Folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
-                                    FolderPath=FolderPath)
+  if(is.null(save_table)==FALSE){
+    Folder <- SavePath(folder_name= "PriorKnowledge",
+                                    path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
@@ -301,12 +301,12 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   ##--------------metalinks transporters
   #Add metalinks transporters to Cosmos PKN
 
-  ##-------------- Combine with Input_GeneSet
+  ##-------------- Combine with input_pk
   #add pathway names --> File that can be used for metabolite pathway analysis
-  MetabSet <- merge(meta_network_metabs,Input_GeneSet, by.x="gene", by.y=SettingsInfo[["Target"]])
+  MetabSet <- merge(meta_network_metabs,input_pk, by.x="gene", by.y=metadata_info[["Target"]])
 
   #combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
-  GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=SettingsInfo[["Target"]]), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
+  GeneMetabSet <- unique(as.data.frame(rbind(input_pk%>%dplyr::rename("feature"=metadata_info[["Target"]]), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
 
 
   ##------------ Select metabolites only
@@ -318,14 +318,14 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   DF_List <- list("GeneMetabSet"=GeneMetabSet,
                   "MetabSet"=MetabSet)
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
-                         InputList_Plot= NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=NULL,
-                         FolderPath= SubFolder,
-                         FileName= PKName,
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)))
+    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+                         inputlist_plot= NULL,
+                         save_table=save_table,
+                         save_plot=NULL,
+                         path= SubFolder,
+                         FileName= pk_name,
+                         core=FALSE,
+                         print_plot=FALSE)))
 
   return(invisible(DF_List))
 }
@@ -346,15 +346,15 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 #' @param pathway Desired metabolite pathways.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
 #' @param hmdb_ids Desired HMDB IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
 #' @param uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
-#' @param SaveAs_Table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param FolderPath \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @importFrom DBI dbListTables dbDisconnect dbGetQuery
 #' @importFrom OmnipathR metalinksdb_sqlite
 #' @importFrom logger log_info
 #' @importFrom dplyr mutate
 #' @export
-LoadMetalinks <- function(types = NULL,
+metsigdb_metalinks <- function(types = NULL,
                           cell_location = NULL,
                           tissue_location = NULL,
                           biospecimen_location = NULL,
@@ -362,8 +362,8 @@ LoadMetalinks <- function(types = NULL,
                           pathway = NULL,
                           hmdb_ids = NULL,
                           uniprot_ids = NULL,
-                          SaveAs_Table="csv",
-                          FolderPath=NULL){
+                          save_table="csv",
+                          path=NULL){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
@@ -383,9 +383,9 @@ LoadMetalinks <- function(types = NULL,
   # We could provide the user the ability to point to their own path were they already dumpled/stored QA version of metalinks they like to use!
 
   ## ------------ Folder ----------- ##
-  if(is.null(SaveAs_Table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
-                                    FolderPath=FolderPath)
+  if(is.null(save_table)==FALSE){
+    Folder <- SavePath(folder_name= "PriorKnowledge",
+                                    path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
@@ -579,14 +579,14 @@ LoadMetalinks <- function(types = NULL,
   DF_List <- list("MetalinksDB"=MetalinksDB,
                   "MetalinksDB_Type"=MetalinksDB_Type)
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
-                         InputList_Plot= NULL,
-                         SaveAs_Table=SaveAs_Table,
-                         SaveAs_Plot=NULL,
-                         FolderPath= SubFolder,
+    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+                         inputlist_plot= NULL,
+                         save_table=save_table,
+                         save_plot=NULL,
+                         path= SubFolder,
                          FileName= "MetaLinksDB",
-                         CoRe=FALSE,
-                         PrintPlot=FALSE)))
+                         core=FALSE,
+                         print_plot=FALSE)))
 
   #Return into environment
   return(invisible(DF_List))
