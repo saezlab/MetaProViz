@@ -34,7 +34,6 @@ Depends:
     R (>= 4.4.1)
 Imports:
     broom,
-    clusterProfiler,
     ComplexUpset,
     DBI,
     dplyr,
@@ -54,12 +53,14 @@ Imports:
     limma,
     logger,
     magrittr,
+    methods,
     OmnipathR (>= 3.15.1),
     patchwork,
     pheatmap,
     Polychrome,
     purrr,
     qcc,
+    qvalue,
     rappdirs,
     readr,
     rlang,
