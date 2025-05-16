@@ -113,7 +113,6 @@ ToyData <- function(Dataset) {
 #'
 #' @source Sciacovelli & Dugourd et. al.,Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
-
 "IntraCells_Raw"
 
 ####################################################
@@ -266,7 +265,7 @@ ToyData <- function(Dataset) {
 ####################################################
 #' BiocratesFeatureTable
 #'
-#' Biocrates kit feature information of the "MxP® Quant 500 XL kit" that covers more than 1,000 metabolites with biochemical
+#' Biocrates kit feature information of the "MxP Quant 500 XL kit" that covers more than 1,000 metabolites with biochemical
 #' class information and the exported different metabolite IDs (HMDB, KEGG, etc.).
 #'
 #' @format Columns include metabolite trivial name, metabolite class, metabolite IDs (HMDB, KEGG, etc.), metabolite structural

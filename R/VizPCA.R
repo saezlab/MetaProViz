@@ -107,7 +107,7 @@ VizPCA <- function(InputData,
     stop(message)
   }
 
-  if(any(is.na(InputData))==TRUE){
+  if(any(is.na(InputData))) {
      InputData[is.na(InputData)] <- 0#replace NA with 0
      message <- paste("NA values are included in InputData that were set to 0 prior to performing PCA.")
      logger::log_info(message)
@@ -126,7 +126,7 @@ VizPCA <- function(InputData,
   ## ----------- Set the plot parameters: ------------ ##
   ##--- Prepare colour and shape palette
   if(is.null(ColorPalette)){
-    if((ColorScale=="discrete")==TRUE){
+    if(ColorScale=="discrete"){
       safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
     }else if(ColorScale=="continuous"){
       safe_colorblind_palette <- NULL
