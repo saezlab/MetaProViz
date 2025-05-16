@@ -2,7 +2,7 @@
 ##
 ## Script name: Visualization
 ##
-## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
+## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -34,19 +34,19 @@
 #' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
 #' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
-#' @param ComparisonName \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(data="Cond1", data2= "Cond2")}
+#' @param name_comparison \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(data="Cond1", data2= "Cond2")}
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
 #' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param yCutoff \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
+#' @param cutoff_x \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
+#' @param cutoff_y \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
-#' @param SelectLab \emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}
-#' @param Connectors \emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } \strong{Default = ""}
+#' @param select_label \emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}
+#' @param connectors \emph{Optional: } TRUE or FALSE for whether connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
+#' @param subtitle \emph{Optional: } \strong{Default = ""}
 #' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
-#' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}
 #' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } print the plots to the active graphic
 #' device.
@@ -77,19 +77,19 @@ VizVolcano <- function(plot_types="Standard",
                        x= "Log2FC",
                        xlab= NULL,#"~Log[2]~FC"
                        ylab= NULL,#"~-Log[10]~p.adj"
-                       xCutoff= 0.5,
-                       yCutoff= 0.05,
-                       Connectors=  FALSE,
-                       SelectLab= "",
-                      plot_name= "",
-                       Subtitle= "",
-                       ComparisonName= c(data="Cond1", data2= "Cond2"),
+                       cutoff_x= 0.5,
+                       cutoff_y= 0.05,
+                       connectors=  FALSE,
+                       select_label= "",
+                       plot_name= "",
+                       subtitle= "",
+                       name_comparison= c(data="Cond1", data2= "Cond2"),
                        color_palette= NULL,
                        shape_palette=NULL,
                        theme= NULL,
                        save_plot= "svg",
                        path = NULL,
-                       Features="Metabolites",
+                       feature="Metabolites",
                        print_plot=TRUE){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -98,7 +98,7 @@ VizVolcano <- function(plot_types="Standard",
   # HelperFunction `CheckInput`
   if(plot_types=="PEA"){
     #Those relationships are checked in the VizVolcano_PEA() function!
-    SettingsFile <- NULL # For PEA the metadata_feature is the prior knowledge file, and hence this will not have features as row names.
+    SettingsFile <- NULL # For PEA the metadata_feature is the prior knowledge file, and hence this will not have feature as row names.
     Info <- NULL # If SettingsFileMetab=NULL, SetingsInfo has to be NULL to, otherwise we will get an error.
   }else{
     SettingsFile <-metadata_feature
@@ -106,7 +106,7 @@ VizVolcano <- function(plot_types="Standard",
   }
 
   CheckInput(data=as.data.frame(t(data)),
-                          data_Num=FALSE,
+                          data_num=FALSE,
                           metadata_sample=NULL,
                           metadata_feature=SettingsFile,#Set above
                           metadata_info=Info,#Set above
@@ -117,13 +117,13 @@ VizVolcano <- function(plot_types="Standard",
                           plot_types="Feature")
 
   # CheckInput` Specific:
-  if(is.numeric(yCutoff)== FALSE |yCutoff > 1 | yCutoff < 0){
-    message<- paste0("Check input. The selected yCutoff value should be numeric and between 0 and 1.")
+  if(is.numeric(cutoff_y)== FALSE |cutoff_y > 1 | cutoff_y < 0){
+    message<- paste0("Check input. The selected cutoff_y value should be numeric and between 0 and 1.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
-  if(is.numeric(xCutoff)== FALSE  | xCutoff < 0){
-    message<- paste0("Check input. The selected xCutoff value should be numeric and between 0 and +oo.")
+  if(is.numeric(cutoff_x)== FALSE  | cutoff_x < 0){
+    message<- paste0("Check input. The selected cutoff_x value should be numeric and between 0 and +oo.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
@@ -133,14 +133,14 @@ VizVolcano <- function(plot_types="Standard",
     stop(message)
   }
 
-  if(is.null(SelectLab)==FALSE & is.vector(SelectLab)==FALSE){
-    message<- paste0("Check input. SelectLab must be either NULL or a vector.")
+  if(is.null(select_label)==FALSE & is.vector(select_label)==FALSE){
+    message<- paste0("Check input. select_label must be either NULL or a vector.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
-  if(is.logical(Connectors) == FALSE){
-    message<- paste0("Check input. The Connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
+  if(is.logical(connectors) == FALSE){
+    message<- paste0("Check input. The connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
@@ -160,7 +160,7 @@ VizVolcano <- function(plot_types="Standard",
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(FolderName= "VolcanoPlots",
+    Folder <- SavePath(folder_name= "VolcanoPlots",
                                     path=path)
   }
 
@@ -214,12 +214,12 @@ VizVolcano <- function(plot_types="Standard",
     }
 
     if(plot_types=="PEA"){
-      VolcanoData <- merge(x=metadata_feature ,y=data[, c(x, y)], by.x=metadata_info[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
+      Volcanodata <- merge(x=metadata_feature ,y=data[, c(x, y)], by.x=metadata_info[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
         tibble::remove_rownames()%>%
         dplyr::mutate(FeatureNames = metadata_info[["PEA_Feature"]])%>%
         dplyr::filter(!is.na(x) | !is.na(x))
     }else{
-     VolcanoData <- merge(x=metadata_feature ,y=data[, c(x, y)], by=0, all.y=TRUE)%>%
+     Volcanodata <- merge(x=metadata_feature ,y=data[, c(x, y)], by=0, all.y=TRUE)%>%
        tibble::remove_rownames()%>%
        tibble::column_to_rownames("Row.names")%>%
        dplyr::mutate(FeatureNames = rownames(data))%>%
@@ -227,7 +227,7 @@ VizVolcano <- function(plot_types="Standard",
     }
 
    }else{
-     VolcanoData <- data[, c(x, y)]%>%
+     Volcanodata <- data[, c(x, y)]%>%
        dplyr::mutate(FeatureNames = rownames(data))%>%
        dplyr::filter(!is.na(x) | !is.na(x))
   }
@@ -272,29 +272,29 @@ VizVolcano <- function(plot_types="Standard",
   ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
   if(plot_types=="Standard"){#####--- 1. Standard
-    VolcanoRes <- VizVolcano_Standard(data= VolcanoData,
+    VolcanoRes <- VizVolcano_Standard(data= Volcanodata,
                                                    metadata_feature=metadata_feature,
                                                    metadata_info=metadata_info,
                                                    y= y,
                                                    x= x,
                                                    xlab= xlab,
                                                    ylab= ylab,
-                                                   xCutoff= xCutoff,
-                                                   yCutoff= yCutoff,
-                                                   Connectors= Connectors,
-                                                   SelectLab=SelectLab,
+                                                   cutoff_x= cutoff_x,
+                                                   cutoff_y= cutoff_y,
+                                                   connectors= connectors,
+                                                   select_label=select_label,
                                                   plot_name=plot_name,
-                                                   Subtitle= Subtitle,
+                                                   subtitle= subtitle,
                                                    color_palette=safe_colorblind_palette,
                                                    shape_palette=safe_shape_palette,
                                                    theme= theme,
-                                                   Features=Features,
+                                                   feature=feature,
                                                    save_plot=save_plot,
                                                    print_plot=print_plot,
                                                    Folder=Folder)
 
   }else if(plot_types=="Compare"){#####--- 2. Compare
-    VolcanoRes <- VizVolcano_Compare(data= VolcanoData,
+    VolcanoRes <- VizVolcano_Compare(data= Volcanodata,
                                                   data2=data2,
                                                   metadata_feature=metadata_feature,
                                                   metadata_info=metadata_info,
@@ -302,40 +302,40 @@ VizVolcano <- function(plot_types="Standard",
                                                   x= x,
                                                   xlab= xlab,
                                                   ylab= ylab,
-                                                  xCutoff= xCutoff,
-                                                  yCutoff= yCutoff,
-                                                  Connectors= Connectors,
-                                                  SelectLab=SelectLab,
+                                                  cutoff_x= cutoff_x,
+                                                  cutoff_y= cutoff_y,
+                                                  connectors= connectors,
+                                                  select_label=select_label,
                                                  plot_name=plot_name,
-                                                  Subtitle= Subtitle,
+                                                  subtitle= subtitle,
                                                   color_palette=safe_colorblind_palette,
                                                   shape_palette=safe_shape_palette,
                                                   theme= theme,
-                                                  Features=Features,
-                                                  ComparisonName=ComparisonName,
+                                                  feature=feature,
+                                                  name_comparison=name_comparison,
                                                   save_plot=save_plot,
                                                   print_plot=print_plot,
                                                   Folder=Folder)
 
   } else if(plot_types=="PEA"){#####--- 3. PEA
-    VolcanoRes <- VizVolcano_PEA(data= VolcanoData,
+    VolcanoRes <- VizVolcano_PEA(data= Volcanodata,
                                               data2=data2,
-                                              metadata_feature=metadata_feature,#Problem: we need to know the column name of the features!
+                                              metadata_feature=metadata_feature,#Problem: we need to know the column name of the feature!
                                               metadata_info=metadata_info,
                                               y= y,
                                               x= x,
                                               xlab= xlab,
                                               ylab= ylab,
-                                              xCutoff= xCutoff,
-                                              yCutoff= yCutoff,
-                                              Connectors= Connectors,
-                                              SelectLab=SelectLab,
+                                              cutoff_x= cutoff_x,
+                                              cutoff_y= cutoff_y,
+                                              connectors= connectors,
+                                              select_label=select_label,
                                              plot_name=plot_name,
-                                              Subtitle= Subtitle,
+                                              subtitle= subtitle,
                                               color_palette=safe_colorblind_palette,
                                               shape_palette=safe_shape_palette,
                                               theme= theme,
-                                              Features=Features,
+                                              feature=feature,
                                               save_plot=save_plot,
                                               print_plot=print_plot,
                                               Folder=Folder)
@@ -357,15 +357,15 @@ VizVolcano <- function(plot_types="Standard",
 #' @param plot_name \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
 #' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
 #' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
-#' @param ycutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param cutoff_x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param cutoff_y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param select_label \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
 #' @param color_palette Created in VizVolcano() based on color_palette passed to main function VizVolcano()
 #' @param shape_palette Created in VizVolcano() based on shape_palette passed to main function VizVolcano()
 #' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
 #' @param save_plot Passed to main function VizVolcano()
 #' @param print_plot Passed to main function VizVolcano()
 #' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
@@ -388,16 +388,16 @@ VizVolcano_Standard <- function(data,
                                 x= "Log2FC",
                                 xlab= NULL,#"~Log[2]~FC"
                                 ylab= NULL,#"~-Log[10]~p.adj"
-                                xCutoff= 0.5,
-                                yCutoff= 0.05,
-                                Connectors=  FALSE,
-                                SelectLab= "",
+                                cutoff_x= 0.5,
+                                cutoff_y= 0.05,
+                                connectors=  FALSE,
+                                select_label= "",
                                plot_name= "",
-                                Subtitle= "",
+                                subtitle= "",
                                 color_palette,
                                 shape_palette,
                                 theme= NULL,
-                                Features="Metabolites",
+                                feature="Metabolites",
                                 save_plot,
                                 print_plot,
                                 Folder){
@@ -455,13 +455,13 @@ VizVolcano_Standard <- function(data,
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$FeatureNames,#Metabolite name
-                                                selectLab = SelectLab,
+                                                select_label = select_label,
                                                 x = paste(x),
                                                 y = paste(y),
                                                 xlab  =xlab,
                                                 ylab =ylab,
-                                                pCutoff = yCutoff,
-                                                FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
+                                                cutoff_stat = cutoff_y,
+                                                FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
                                                 axisLabSize = 10,
@@ -473,20 +473,20 @@ VizVolcano_Standard <- function(data,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
                                                 title= paste(PlotName, ": ", i, sep=""),
-                                                subtitle = Subtitle,
-                                                caption = paste0("Total = ", nrow(InputVolcano), " ", Features),
+                                                subtitle = subtitle,
+                                                caption = paste0("total = ", nrow(InputVolcano), " ", feature),
                                                 xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
-                                                legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
+                                                legendLabels=c(paste(x," < |", cutoff_x, "|"), paste(x," > |", cutoff_x, "|"), paste(y, ' < ', cutoff_y) , paste(y, ' < ', cutoff_y,' & ',x," < |", cutoff_x, "|")),
                                                 legendPosition = LegendPos,
                                                 legendLabSize = 7,
                                                 legendIconSize =4,
                                                 gridlines.major = FALSE,
                                                 gridlines.minor = FALSE,
-                                                drawConnectors = Connectors)
+                                                drawConnectors = connectors)
         #Add the theme
         if(is.null(theme)==FALSE){
           Plot <- Plot+theme
@@ -497,9 +497,9 @@ VizVolcano_Standard <- function(data,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, Subtitle = Subtitle)
-        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized <-  plotGrob_Volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
+        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -512,17 +512,17 @@ VizVolcano_Standard <- function(data,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          SaveRes(InputList_DF=NULL,
-                               InputList_Plot= SaveList,
+          SaveRes(inputlist_df=NULL,
+                               inputlist_plot= SaveList,
                                save_table=NULL,
                                save_plot=save_plot,
                                path= Folder,
                                FileName= paste("Volcano_",PlotName, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
-                               PlotHeight= PlotHeight,
-                               PlotWidth=PlotWidth,
-                               PlotUnit="cm")))
+                               plot_height= plot_height,
+                               plot_width=plot_width,
+                               plot_unit="cm")))
       }
     }
   }else if("individual" %in% names(metadata_info)==FALSE){
@@ -568,13 +568,13 @@ VizVolcano_Standard <- function(data,
       #Prepare the Plot:
       Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$FeatureNames,#Metabolite name
-                                              selectLab = SelectLab,
+                                              select_label = select_label,
                                               x = paste(x),
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              pCutoff = yCutoff,
-                                              FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
+                                              cutoff_stat = cutoff_y,
+                                              FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
                                               axisLabSize = 10,
@@ -586,20 +586,20 @@ VizVolcano_Standard <- function(data,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
                                               title= paste(PlotName),
-                                              subtitle = Subtitle,
-                                              caption = paste0("Total = ", nrow(InputVolcano), " ", Features),
+                                              subtitle = subtitle,
+                                              caption = paste0("total = ", nrow(InputVolcano), " ", feature),
                                               xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                               ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                               cutoffLineType = "dashed",
                                               cutoffLineCol = "black",
                                               cutoffLineWidth = 0.5,
-                                              legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
+                                              legendLabels=c(paste(x," < |", cutoff_x, "|"), paste(x," > |", cutoff_x, "|"), paste(y, ' < ', cutoff_y) , paste(y, ' < ', cutoff_y,' & ',x," < |", cutoff_x, "|")),
                                               legendPosition = LegendPos,
                                               legendLabSize = 9,
                                               legendIconSize =4,
                                               gridlines.major = FALSE,
                                               gridlines.minor = FALSE,
-                                              drawConnectors = Connectors)
+                                              drawConnectors = connectors)
       #Add the theme
       if(is.null(theme)==FALSE){
         Plot <- Plot+theme
@@ -609,9 +609,9 @@ VizVolcano_Standard <- function(data,
       PlotList[["Plot"]] <- Plot
 
       #Set the total heights and widths
-      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, metadata_info=metadata_info, plot_name =plot_name, Subtitle = Subtitle)
-      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      Plot_Sized <-  plotGrob_Volcano(input_plot=Plot, metadata_info=metadata_info, plot_name =plot_name, subtitle = subtitle)
+      plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
         add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -620,17 +620,17 @@ VizVolcano_Standard <- function(data,
 
       #----- Save
       suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=NULL,
-                             InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
+      SaveRes(inputlist_df=NULL,
+                             inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              save_table=NULL,
                              save_plot=save_plot,
                              path= Folder,
                              FileName= paste("Volcano_",plot_name, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
-                             PlotHeight=PlotHeight,
-                             PlotWidth=PlotWidth,
-                             PlotUnit="cm")))
+                             plot_height=plot_height,
+                             plot_width=plot_width,
+                             plot_unit="cm")))
     }
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
@@ -654,16 +654,16 @@ VizVolcano_Standard <- function(data,
 #' @param plot_name \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
 #' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
 #' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
-#' @param ycutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param cutoff_x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param cutoff_y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param select_label \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
 #' @param color_palette Created in VizVolcano() based on color_palette passed to main function VizVolcano()
 #' @param shape_palette Created in VizVolcano() based on shape_palette passed to main function VizVolcano()
 #' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
-#' @param ComparisonName Passed to main function VizVolcano()
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param name_comparison Passed to main function VizVolcano()
 #' @param save_plot Passed to main function VizVolcano()
 #' @param print_plot Passed to main function VizVolcano()
 #' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
@@ -688,17 +688,17 @@ VizVolcano_Compare <- function(data,
                                x= "Log2FC",
                                xlab= NULL,#"~Log[2]~FC"
                                ylab= NULL,#"~-Log[10]~p.adj"
-                               xCutoff= 0.5,
-                               yCutoff= 0.05,
-                               Connectors=  FALSE,
-                               SelectLab= "",
+                               cutoff_x= 0.5,
+                               cutoff_y= 0.05,
+                               connectors=  FALSE,
+                               select_label= "",
                               plot_name= "",
-                               Subtitle= "",
+                               subtitle= "",
                                color_palette,
                                shape_palette,
                                theme= NULL,
-                               Features="Metabolites",
-                               ComparisonName,
+                               feature="Metabolites",
+                               name_comparison,
                                save_plot,
                                print_plot,
                                Folder){
@@ -723,12 +723,12 @@ VizVolcano_Compare <- function(data,
   safe_colorblind_palette <- color_palette
   safe_shape_palette <- shape_palette
 
-  ##--- Prepare Input Data
+  ##--- Prepare Input data
   if(is.null(metadata_feature)==FALSE){
   data2 <- merge(x=metadata_feature%>%tibble::rownames_to_column("FeatureNames") , y=data2[, c(x, y)]%>%tibble::rownames_to_column("FeatureNames") , by="FeatureNames", all.y=TRUE)%>%
     filter(!is.na(x) | !is.na(x))
-  data[,"comparison"]  <- as.character(paste(ComparisonName[["data"]]))
-  data2[,"comparison"]  <- as.character(paste(ComparisonName[["data2"]]))
+  data[,"comparison"]  <- as.character(paste(name_comparison[["data"]]))
+  data2[,"comparison"]  <- as.character(paste(name_comparison[["data2"]]))
   InputCompare  <- rbind(data,data2)
 
   }else{
@@ -737,8 +737,8 @@ VizVolcano_Compare <- function(data,
     na.omit()
 
    #Combine DFs and add appropriate column names
-   data[,"comparison"]  <- as.character(paste(ComparisonName[["data"]]))
-   data2[,"comparison"]  <- as.character(paste(ComparisonName[["data2"]]))
+   data[,"comparison"]  <- as.character(paste(name_comparison[["data"]]))
+   data2[,"comparison"]  <- as.character(paste(name_comparison[["data2"]]))
    InputCompare  <- rbind(data[,c("FeatureNames", x, y, "comparison")],data2[,c("FeatureNames", x, y, "comparison")])
   }
 
@@ -811,13 +811,13 @@ VizVolcano_Compare <- function(data,
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$FeatureNames,#Metabolite name
-                                                selectLab = SelectLab,
+                                                select_label = select_label,
                                                 x = paste(x),
                                                 y = paste(y),
                                                 xlab  =xlab,
                                                 ylab =ylab,
-                                                pCutoff = yCutoff,
-                                                FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
+                                                cutoff_stat = cutoff_y,
+                                                FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
                                                 axisLabSize = 10,
@@ -829,20 +829,20 @@ VizVolcano_Compare <- function(data,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
                                                 title= paste(PlotName, ": ", i, sep=""),
-                                                subtitle = Subtitle,
-                                                caption = paste0("Total = ", (nrow(InputVolcano)/2), " ", Features),
+                                                subtitle = subtitle,
+                                                caption = paste0("total = ", (nrow(InputVolcano)/2), " ", feature),
                                                 xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                                 cutoffLineType = "dashed",
                                                 cutoffLineCol = "black",
                                                 cutoffLineWidth = 0.5,
-                                                legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
+                                                legendLabels=c(paste(x," < |", cutoff_x, "|"), paste(x," > |", cutoff_x, "|"), paste(y, ' < ', cutoff_y) , paste(y, ' < ', cutoff_y,' & ',x," < |", cutoff_x, "|")),
                                                 legendPosition = 'right',
                                                 legendLabSize = 7,
                                                 legendIconSize =4,
                                                 gridlines.major = FALSE,
                                                 gridlines.minor = FALSE,
-                                                drawConnectors = Connectors)
+                                                drawConnectors = connectors)
         #Add the theme
         if(is.null(theme)==FALSE){
           Plot <- Plot+theme
@@ -853,9 +853,9 @@ VizVolcano_Compare <- function(data,
 
         #Set the total heights and widths
         PlotTitle <- paste(PlotName, ": ", i, sep="")
-        Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, Subtitle = Subtitle)
-        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized <-  plotGrob_Volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
+        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -868,17 +868,17 @@ VizVolcano_Compare <- function(data,
 
         #----- Save
         suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF=NULL,
-                           InputList_Plot= SaveList,
+        SaveRes(inputlist_df=NULL,
+                           inputlist_plot= SaveList,
                            save_table=NULL,
                            save_plot=save_plot,
                            path= Folder,
                            FileName= paste("Volcano_",PlotName, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
-                           PlotHeight=PlotHeight,
-                           PlotWidth=PlotWidth,
-                           PlotUnit="cm")))
+                           plot_height=plot_height,
+                           plot_width=plot_width,
+                           plot_unit="cm")))
       }
     }
 
@@ -921,7 +921,7 @@ VizVolcano_Compare <- function(data,
         }
       } else if("shape" %in% names(metadata_info)==TRUE & "color" %in% names(metadata_info)==TRUE){
         #Here we have already used color from metadata_info and we need to use shape for the conditions
-        message("For plot_types Comparison we can only use colour or shape from metadata_feature. Hence, we ignore shape and use it to label the ComparisonName.")
+        message("For plot_types Comparison we can only use colour or shape from metadata_feature. Hence, we ignore shape and use it to label the name_comparison.")
         shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
 
         keyvalsshape <- c()
@@ -943,13 +943,13 @@ VizVolcano_Compare <- function(data,
       #Prepare the Plot:
       Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$FeatureNames,#Metabolite name
-                                              selectLab = SelectLab,
+                                              select_label = select_label,
                                               x = paste(x),
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              pCutoff = yCutoff,
-                                              FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
+                                              cutoff_stat = cutoff_y,
+                                              FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
                                               axisLabSize = 10,
@@ -961,20 +961,20 @@ VizVolcano_Compare <- function(data,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
                                               title= paste(PlotName),
-                                              subtitle = Subtitle,
-                                              caption = paste0("Total = ", (nrow(InputVolcano)/2)," ", Features),
+                                              subtitle = subtitle,
+                                              caption = paste0("total = ", (nrow(InputVolcano)/2)," ", feature),
                                               xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                               ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                               cutoffLineType = "dashed",
                                               cutoffLineCol = "black",
                                               cutoffLineWidth = 0.5,
-                                              legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
+                                              legendLabels=c(paste(x," < |", cutoff_x, "|"), paste(x," > |", cutoff_x, "|"), paste(y, ' < ', cutoff_y) , paste(y, ' < ', cutoff_y,' & ',x," < |", cutoff_x, "|")),
                                               legendPosition = 'right',
                                               legendLabSize = 7,
                                               legendIconSize =4,
                                               gridlines.major = FALSE,
                                               gridlines.minor = FALSE,
-                                              drawConnectors = Connectors)
+                                              drawConnectors = connectors)
       #Add the theme
       if(is.null(theme)==FALSE){
         Plot <- Plot+theme
@@ -983,9 +983,9 @@ VizVolcano_Compare <- function(data,
       ## Store the plot in the 'plots' list
       PlotList[["Plot"]] <- Plot
 
-      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, metadata_info=metadata_info, plot_name =plot_name, Subtitle = Subtitle)
-      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      Plot_Sized <-  plotGrob_Volcano(input_plot=Plot, metadata_info=metadata_info, plot_name =plot_name, subtitle = subtitle)
+      plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
         add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -994,17 +994,17 @@ VizVolcano_Compare <- function(data,
 
        #----- Save
       suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=NULL,
-                             InputList_Plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
+      SaveRes(inputlist_df=NULL,
+                             inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              save_table=NULL,
                              save_plot=save_plot,
                              path= Folder,
                              FileName= paste("Volcano_",plot_name, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
-                             PlotHeight=PlotHeight,
-                             PlotWidth=PlotWidth,
-                             PlotUnit="cm")))
+                             plot_height=plot_height,
+                             plot_width=plot_width,
+                             plot_unit="cm")))
 
     }
   }
@@ -1028,15 +1028,15 @@ VizVolcano_Compare <- function(data,
 #' @param plot_name \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
 #' @param xlab \emph{Optional: } Passed to main function VizVolcano()  \strong{Default = NULL}
 #' @param ylab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = NULL}
-#' @param xCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
-#' @param yCutoff \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
-#' @param SelectLab \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
-#' @param Connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
-#' @param Subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param cutoff_x \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.5}
+#' @param cutoff_y \emph{Optional: } Passed to main function VizVolcano() \strong{Default = 0.05}
+#' @param select_label \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
+#' @param connectors \emph{Optional: } Passed to main function VizVolcano() \strong{Default =  FALSE}
+#' @param subtitle \emph{Optional: } Passed to main function VizVolcano() \strong{Default = ""}
 #' @param color_palette Created in VizVolcano() based on color_palette passed to main function VizVolcano()
 #' @param shape_palette Created in VizVolcano() based on shape_palette passed to main function VizVolcano()
 #' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param Features \emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
 #' @param save_plot Passed to main function VizVolcano()
 #' @param print_plot Passed to main function VizVolcano()
 #' @param Folder Created in VizVolcano(). Path to the folder where files are saved.
@@ -1061,16 +1061,16 @@ VizVolcano_PEA <- function(data,
                            x= "Log2FC",
                            xlab= NULL,#"~Log[2]~FC"
                            ylab= NULL,#"~-Log[10]~p.adj"
-                           xCutoff= 0.5,
-                           yCutoff= 0.05,
-                           Connectors=  FALSE,
-                           SelectLab= "",
+                           cutoff_x= 0.5,
+                           cutoff_y= 0.05,
+                           connectors=  FALSE,
+                           select_label= "",
                           plot_name= "",
-                           Subtitle= "",
+                           subtitle= "",
                            color_palette,
                            shape_palette,
                            theme= NULL,
-                           Features="Metabolites",
+                           feature="Metabolites",
                            save_plot,
                            print_plot,
                            Folder){
@@ -1176,13 +1176,13 @@ VizVolcano_PEA <- function(data,
       #Prepare the Plot:
       Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$PEA_Feature,#Metabolite name
-                                              selectLab = SelectLab,
+                                              select_label = select_label,
                                               x = paste(x),
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              pCutoff = yCutoff,
-                                              FCcutoff = xCutoff,#Cut off Log2FC, automatically 2
+                                              cutoff_stat = cutoff_y,
+                                              FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
                                               axisLabSize = 10,
@@ -1195,19 +1195,19 @@ VizVolcano_PEA <- function(data,
                                               colAlpha = 1,
                                               title= paste(PlotName, ": ", i, sep=""),
                                               subtitle = paste(metadata_info[["PEA_score"]],"= ", data2_Select$PEA_score, ", ",metadata_info[["PEA_stat"]] , "= ", data2_Select$PEA_stat, sep=""),
-                                              caption = paste0("Total = ", nrow(InputVolcano), " of ", nrow(metadata_feature_Select), " ", Features, " in pathway"),
+                                              caption = paste0("total = ", nrow(InputVolcano), " of ", nrow(metadata_feature_Select), " ", feature, " in pathway"),
                                               xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                                               ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                                               cutoffLineType = "dashed",
                                               cutoffLineCol = "black",
                                               cutoffLineWidth = 0.5,
-                                              legendLabels=c(paste(x," < |", xCutoff, "|"), paste(x," > |", xCutoff, "|"), paste(y, ' < ', yCutoff) , paste(y, ' < ', yCutoff,' & ',x," < |", xCutoff, "|")),
+                                              legendLabels=c(paste(x," < |", cutoff_x, "|"), paste(x," > |", cutoff_x, "|"), paste(y, ' < ', cutoff_y) , paste(y, ' < ', cutoff_y,' & ',x," < |", cutoff_x, "|")),
                                               legendPosition = LegendPos,
                                               legendLabSize = 7,
                                               legendIconSize =4,
                                               gridlines.major = FALSE,
                                               gridlines.minor = FALSE,
-                                              drawConnectors = Connectors)
+                                              drawConnectors = connectors)
       #Add the theme
       if(is.null(theme)==FALSE){
         Plot <- Plot+theme
@@ -1218,9 +1218,9 @@ VizVolcano_PEA <- function(data,
 
       #Set the total heights and widths
       PlotTitle <- paste(PlotName, ": ", i, sep="")
-      Plot_Sized <-  plotGrob_Volcano(InputPlot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, Subtitle = Subtitle)
-      PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-      PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      Plot_Sized <-  plotGrob_Volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
+      plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 
       Plot_Sized %<>%
         {ggplot2::ggplot() + annotation_custom(.)} %>%
@@ -1234,17 +1234,17 @@ VizVolcano_PEA <- function(data,
 
       #----- Save
       suppressMessages(suppressWarnings(
-        SaveRes(InputList_DF=NULL,
-                             InputList_Plot= SaveList,
+        SaveRes(inputlist_df=NULL,
+                             inputlist_plot= SaveList,
                              save_table=NULL,
                              save_plot=save_plot,
                              path= Folder,
                              FileName= paste("Volcano_",PlotName, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
-                             PlotHeight=PlotHeight,
-                             PlotWidth=PlotWidth,
-                             PlotUnit="cm")))
+                             plot_height=plot_height,
+                             plot_width=plot_width,
+                             plot_unit="cm")))
 
     }
   }

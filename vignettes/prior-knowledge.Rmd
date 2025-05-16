@@ -48,19 +48,19 @@ knitr::opts_chunk$set(
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
 - 1.
-[To understand detected metabolite IDs in measured data.](#sect1)
+[to understand detected metabolite IDs in measured data.](#sect1)
 
 \- 2.
-[To access metabolite prior knowledge and metabolite-gene prior knowledge networks.](#sect2)
+[to access metabolite prior knowledge and metabolite-gene prior knowledge networks.](#sect2)
 
 \- 3.
-[To link experimental data to prior knowledge - the Do's and Don'ts.](#sect3)
+[to link experimental data to prior knowledge - the Do's and Don'ts.](#sect3)
 
 \- 4.
-[To deal with many-to-many mapping in your metabolite identifiers.](#sect4)
+[to deal with many-to-many mapping in your metabolite identifiers.](#sect4)
 
 \- 5.
-[To perform pathway enrichment analysis.](#sect5)\
+[to perform pathway enrichment analysis.](#sect5)\
 
 \
 First if you have not done yet, install the required dependencies and load the libraries:
@@ -107,7 +107,7 @@ Example datasets is publicly available on [metabolomics workbench project PR0014
 
 ```{r}
 # Load the Pre-processed intracellular data:
-FeatureMetadata_Cells <- MetaProViz::ToyData(Data="Cells_MetaData")
+FeatureMetadata_Cells <- MetaProViz::ToyData(data="Cells_MetaData")
 ```
 
 \
@@ -116,7 +116,7 @@ Example datasets is publicly available in the [paper](https://www.cell.com/cance
 
 ```{r}
 # Load the example data:
-FeatureMetadata_Tissue <- MetaProViz::ToyData(Data="Tissue_MetaData")
+FeatureMetadata_Tissue <- MetaProViz::ToyData(data="Tissue_MetaData")
 
 ```
 
@@ -126,7 +126,7 @@ Here we use the Biocrates kit feature information of the ["MxP® Quant 500 XL ki
 
 ```{r}
 # Load the example data:
-FeatureMetadata_Biocrates <- MetaProViz::ToyData(Data="BiocratesFeatureTable")
+FeatureMetadata_Biocrates <- MetaProViz::ToyData(data="BiocratesFeatureTable")
 ```
 
 \
@@ -188,15 +188,15 @@ Plot <- ggplot2::ggplot(AlaninePlot, ggplot2::aes(fill=TrivialName, y=`IDs in Da
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Database", y = "Number of IDs")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", Subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", subtitle = NULL, plot_type="Bar")
 
-PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
       add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-# ggplot2::ggsave(filename = "AlaninePlot.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "AlaninePlot.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
 Plot_Sized
 ```
@@ -204,8 +204,8 @@ Plot_Sized
 \
 For instance, if we want to assign a HMDB ID, we have to assign both "HMDB0001310", "HMDB0000161" to the metabolite Alanine, for ChEBI we could assign only one, "16449", but this may lead to other problems as the ChEBI ID is not specific and may not be part of certain metabolic pathways.
 The reason for this is that substrate chirality is critical to enzymatic processes and stereo selectivity of enzymes to be homochiral with predominance of one particular enantiomer (e.g. D-sugars, L-amino acids, etc.).\
-To showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases.
-To do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
+to showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases.
+to do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 
 ```{r, echo=FALSE}
 Pathways <- suppressMessages(suppressWarnings(MetaProViz::ToyData("AlaninePathways")))[,2:6]
@@ -242,15 +242,15 @@ Plot <- ggplot2::ggplot(Alanine, ggplot2::aes(fill=TrivialName, y=`PathwayCount`
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Database", y = "Number of Pathways")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", Subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", subtitle = NULL, plot_type="Bar")
 
-PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
       add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-# ggplot2::ggsave(filename = "AlaninePlot_Pathways.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "AlaninePlot_Pathways.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
 Plot_Sized
 ```
@@ -301,7 +301,7 @@ Input_HMDB <- FeatureMetadata_Cells%>%
 # Add equivalent IDs:
 FeatureMetadata_Cells_AddIDs <- MetaProViz::EquivalentIDs(data= Input_HMDB,
                                                           metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
-                                                          From = "hmdb")
+                                                          from = "hmdb")
 ```
 
 ```{r, echo=FALSE}
@@ -329,7 +329,7 @@ Specifically in metabolite PK, the many different PK databases and resources pos
 Indeed, the metabolite identifiers (e.g. KEGG, HMDB, PubChem, etc.) are not standardized across databases, and the same metabolite can have multiple identifiers in different databases.
 This is known as the many-to-many mapping problem.
 Moreover, metabolic pathways that are the basis of the PK databases also includes co-factors such as ions or other small molecules that are not only part of most reactions, but can also not be detected in experimentally acquired data (e.g. H2O, CO2, etc).\
-To address these issues and provide a standardized way to access and integrate metabolite PK, we provide access to several prior knowledge resources and removed molecules such as water.
+to address these issues and provide a standardized way to access and integrate metabolite PK, we provide access to several prior knowledge resources and removed molecules such as water.
 We terme this collection of metabolite sets MetSigDB (Metabolite signature database).
 
 ## KEGG pathway-metabolite sets
@@ -407,13 +407,13 @@ Now we can use the function `Make_GeneMetabSet` to translate the gene names to m
 
 ```{r}
 # Translate gene names to metabolite names
-Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Hallmark_Pathways,
+Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(input_pk=Hallmark_Pathways,
                                                      metadata_info=c(Target="gene"),
-                                                     PKName="Hallmarks")
+                                                     pk_name="Hallmarks")
 
-Gaude_GeneMetab <- MetaProViz::Make_GeneMetabSet(Input_GeneSet=Gaude_Pathways,
+Gaude_GeneMetab <- MetaProViz::Make_GeneMetabSet(input_pk=Gaude_Pathways,
                                                      metadata_info=c(Target="gene"),
-                                                     PKName="Gaude")
+                                                     pk_name="Gaude")
 ```
 
 \
@@ -594,7 +594,7 @@ processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$result
 print(result_bioc_hmdb_count$plot)
 ```
 
-From this plot we can make a few observations.
+from this plot we can make a few observations.
 First of all, as already pointed out in the previous section, the number of biocrates cells without any HMDB at all is very high (n=253).
 Secondly, we can see that while a number of biocrates cells have only a single HMDB ID associated with them (n=314), the majority of biocrates metabolites actually have multiple entries (n=452).
 For those with multiple, this ranges from 2-20 HMDB entries per biocrates cell!
@@ -611,7 +611,7 @@ Here we connect the experimental Biocrates table to the MetalinksDB PK using the
 ```{r}
 Biocrates_to_MetalinksDB <- MetaProViz:::CheckMatchID(data = FeatureMetadata_Biocrates,
                      PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
-                     metadata_info = c(InputID="HMDB", PriorID="hmdb", GroupingVariable=NULL))
+                     metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
 
 \
@@ -682,7 +682,7 @@ p <- MetaProViz:::VizStackedbar(
 p
 ```
 
-From the above plot we see that a few of the metabolite classes from the biocrates kit have every metabolite with a HMDB ID and a corresponding entry in MetalinksDB.
+from the above plot we see that a few of the metabolite classes from the biocrates kit have every metabolite with a HMDB ID and a corresponding entry in MetalinksDB.
 These are represented by bars that are completely green, such as the Amino Acids and Fatty Acids classes.
 
 However for a number of other classes of metabolites, we see that they will not be represented in the MetalinksDB PK at all, either because we do not have a HMDB ID associated with the Biocrates metabolite (represented by grey bars), or because MetalinksDB does not include a HMDB ID for that metabolite (represented by red bars).
@@ -693,7 +693,7 @@ In any case we will certainly need to keep this in mind for downstream analysis 
 
 Let's turn back to consider the number of HMDB IDs we have in the Biocrates data and ask ourself a question: is it helpful or detrimental to have multiple IDs?
 
-To answer this, we will take only the first HMDB of each cell with multiple HMDB IDs and test to see this has worked.
+to answer this, we will take only the first HMDB of each cell with multiple HMDB IDs and test to see this has worked.
 
 ```{r}
 extract_first_id <- function(id_col) {
@@ -728,7 +728,7 @@ Now that we can see we only have either NA or singular values for our HMDB IDs, 
 ```{r, fig.width=8, fig.height=6, echo=TRUE}
 Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::CheckMatchID(data = FeatureMetadata_Biocrates_singleHMDB,
                      PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
-                     metadata_info = c(InputID="HMDB_single", PriorID="hmdb", GroupingVariable=NULL))
+                     metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 ```
 
 ```{r, echo=FALSE}
@@ -764,7 +764,7 @@ p
 ```
 
 This doesn't appear to look that different to before, but if we look closely we can see that some classes have shifted a bit, such as Phosphatidylethanolamines for instance.
-To better visualise these differences we will zoom in on these changes by filtering only to the successful matches between the Biocrates kit and MetalinksDB, comparing which metabolites were found using only the single hits versus using both.
+to better visualise these differences we will zoom in on these changes by filtering only to the successful matches between the Biocrates kit and MetalinksDB, comparing which metabolites were found using only the single hits versus using both.
 
 ```{r, echo=FALSE, fig.width=10, fig.height=6}
 Biocrates_to_MetalinksDB_foundPKmatch <- Biocrates_to_MetalinksDB$data_Matched_NA_and_duplicates %>%
@@ -841,9 +841,9 @@ As an example we are translating the KEGG pathways we loaded with `MetaProViz::m
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 KEGG_Pathways_Translated <- MetaProViz::TranslateID(data= KEGG_Pathways,
-                                                     metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"),
-                                                     From = c("kegg"),
-                                                     To = c("hmdb", "pubchem"))
+                                                     metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
+                                                     from = c("kegg"),
+                                                     to = c("hmdb", "pubchem"))
 ```
 
 \
@@ -856,7 +856,7 @@ KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
 
 \
 Here we can immediately see that despite the ID translation, some of the translations between the KEGG MetaboliteID and the HMDB or PubChem IDs have failed, resulting in NA values.
-To get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.\
+to get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.\
 
 ```{r, echo=FALSE, fig.width=8, fig.height=6}
 pk_list <- list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF)
@@ -899,8 +899,8 @@ names(KEGG_Pathways_Translated)
 \
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
-KEGG_Pathways_Translated[["MappingSummary_hmdb"]][c(1:3, 7:9),] %>%
-  kableExtra::kbl(caption = "MappingSummary_hmdb") %>%
+KEGG_Pathways_Translated[["Mappingsummary_hmdb"]][c(1:3, 7:9),] %>%
+  kableExtra::kbl(caption = "Mappingsummary_hmdb") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
@@ -908,15 +908,15 @@ KEGG_Pathways_Translated[["MappingSummary_hmdb"]][c(1:3, 7:9),] %>%
 \
 We also have the ability to extract a long version of the DF that includes a row for each mapping occurrence, which can be useful for downstream analysis.
 Yet, this can become very large dependent on the amount of many-to-many mappings, hence by default we do not generate this summary.
-Within the `MetaProViz::TranslateID()` you can set the parameter `Summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `MetaProViz::MappingAmbiguity()` to generate this long summary as well as the mapping summary in general.\
+Within the `MetaProViz::TranslateID()` you can set the parameter `summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `MetaProViz::MappingAmbiguity()` to generate this long summary as well as the mapping summary in general.\
 
 ```{r, eval=FALSE, include=TRUE}
 # Option 1:
 KEGG_Pathways_TranslatedSum <- MetaProViz::TranslateID(data= KEGG_Pathways,
-                                                    metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"),
-                                                    From = c("kegg"),
-                                                    To = c("hmdb", "pubchem"),
-                                                    Summary =TRUE)
+                                                    metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
+                                                    from = c("kegg"),
+                                                    to = c("hmdb", "pubchem"),
+                                                    summary =TRUE)
 ```
 
 \
@@ -928,10 +928,10 @@ MappingProblems <- MetaProViz::MappingAmbiguity(
         KEGG_Pathways_Translated[["TranslatedDF"]] %>%
         dplyr::rename("KEGG"="MetaboliteID") %>%
         dplyr::select(Description, KEGG, term, Metabolite, hmdb),
-    From = "KEGG",
-    To = "hmdb",
-    GroupingVariable = "term",
-    Summary=TRUE
+    from = "KEGG",
+    to = "hmdb",
+    grouping_variable = "term",
+    summary=TRUE
 )
 
 ```
@@ -939,18 +939,18 @@ MappingProblems <- MetaProViz::MappingAmbiguity(
 \
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
-MappingProblems[["Summary"]][c(1:2, 503, 505),c(2:6, 8:9,11)] %>%
-  kableExtra::kbl(caption = "Long summary of mapping problems taking into account both directions, From-to-To and To-to-From.", row.names=FALSE) %>%
+MappingProblems[["summary"]][c(1:2, 503, 505),c(2:6, 8:9,11)] %>%
+  kableExtra::kbl(caption = "Long summary of mapping problems taking into account both directions, from-to-to and to-to-from.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
 \
 In the table it is shown that the KEGG ID C00002 maps to 3 different HMDB IDs, and it is shown that one of those HMDB IDs HMDB0000538 maps to one KEGG ID, hence this Mapping is one-to-many.
 The other two HMDB Ids are also in the table and it is checked to how many KEGG IDs they map.
-Additionally, we have passed `GroupingVariable = "term"` as we have pathways, which also means each of those mappings is checked within a pathway and across pathways (e.g. C00002 is shown twice, for two different terms).\
+Additionally, we have passed `grouping_variable = "term"` as we have pathways, which also means each of those mappings is checked within a pathway and across pathways (e.g. C00002 is shown twice, for two different terms).\
 
 ```{r,echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
-Plot <- MappingProblems[["Summary"]]%>%
+Plot <- MappingProblems[["summary"]]%>%
   filter(term == "Glycolysis / Gluconeogenesis")%>%
   filter(!KEGG=="NA")%>%
   distinct(KEGG, .keep_all = TRUE) %>%
@@ -965,15 +965,15 @@ PlotA <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.characte
         #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "One KEGG ID to n HMDB IDs", y = "Number of KEGG IDs",  fill ="Mapping")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=PlotA, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(KEGG_to_hmdb)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", Subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=PlotA, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(KEGG_to_hmdb)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", subtitle = NULL, plot_type="Bar")
 
-PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 Plot_Sized_A <- Plot_Sized
-# ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_KEGG-to-HMDB.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_KEGG-to-HMDB.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
 PlotB <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.character(`Count(hmdb_to_KEGG)`))) +
         ggplot2::geom_bar(position="stack", stat="identity")+
@@ -983,15 +983,15 @@ PlotB <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.characte
         #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "HMDB ID to n KEGG IDs", y = "Number of KEGG IDs",  fill ="Mapping")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=PlotB, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(hmdb_to_KEGG)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", Subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=PlotB, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(hmdb_to_KEGG)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", subtitle = NULL, plot_type="Bar")
 
-PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-# ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_HMDB-to-KEGG.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
+# ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_HMDB-to-KEGG.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
 Plot_Sized_B <- Plot_Sized
 
@@ -1083,7 +1083,7 @@ We have performed pre-processing and differential analysis (details can be found
 
 ```{r}
 # Load the Pre-processed intracellular data:
-Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(Data="IntraCells_DMA")
+Intra_DMA_786M1A_vs_HK2<- MetaProViz::ToyData(data="IntraCells_DMA")
 ```
 
 `2.` Tissue experiment **(Tissue)**\
@@ -1092,9 +1092,9 @@ We have performed differential analysis (details can be found in the vignette [M
 
 ```{r}
 # Load the example data:
-Tissue_TvsN <- MetaProViz::ToyData(Data="Tissue_DMA")
-Tissue_TvsN_Old <- MetaProViz::ToyData(Data="Tissue_DMA_Old")
-Tissue_TvsN_Young <- MetaProViz::ToyData(Data="Tissue_DMA_Young")
+Tissue_TvsN <- MetaProViz::ToyData(data="Tissue_DMA")
+Tissue_TvsN_Old <- MetaProViz::ToyData(data="Tissue_DMA_Old")
+Tissue_TvsN_Young <- MetaProViz::ToyData(data="Tissue_DMA_Young")
 ```
 
 \

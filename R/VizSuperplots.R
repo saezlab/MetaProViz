@@ -2,7 +2,7 @@
 ##
 ## Script name: Visualization Superplots
 ##
-## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
+## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -27,8 +27,8 @@
 #' @param metadata_info Named vector including at least information on the conditions column: c(Conditions="ColumnName_metadata_sample"). Additionally Superplots can be made by adding Superplot ="ColumnName_metadata_sample", which are usually biological replicates or patient IDs. \strong{Default = c(Conditions="Conditions", Superplot = NULL)}
 #' @param plot_type String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the plot.
-#' @param PlotConditions Vector with names of selected Conditions for the plot. Can also be used to order the Conditions in the way they should be displayed on the x-axis of the plot. \strong{Default = NULL}
-#' @param StatComparisons List of numeric vectors containing Condition pairs to compare based on the order of the PlotConditions vector. \strong{Default = NULL}
+#' @param plot_conditions Vector with names of selected Conditions for the plot. Can also be used to order the Conditions in the way they should be displayed on the x-axis of the plot. \strong{Default = NULL}
+#' @param stat_comparison List of numeric vectors containing Condition pairs to compare based on the order of the plot_conditions vector. \strong{Default = NULL}
 #' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test or wilcox.test , for one-vs-all or all-vs-all comparison choose aov (=anova) or kruskal.test \strong{Default = NULL}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = NULL}
 #' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
@@ -67,9 +67,9 @@ VizSuperplot <- function(data,
                          metadata_sample,
                          metadata_info = c(Conditions="Conditions", Superplot = NULL),
                          plot_type = "Box", # Bar, Box, Violin
-                        plot_name = "",
-                         PlotConditions = NULL,
-                         StatComparisons = NULL,
+                         plot_name = "",
+                         plot_conditions = NULL,
+                         stat_comparison = NULL,
                          pval =NULL,
                          padj=NULL,
                          xlab= NULL,
@@ -110,26 +110,26 @@ VizSuperplot <- function(data,
     stop(message)
   }
 
-  if(is.null(PlotConditions) == FALSE){
-    for (Condition in PlotConditions){
+  if(is.null(plot_conditions) == FALSE){
+    for (Condition in plot_conditions){
       if(Condition %in% metadata_sample[[metadata_info[["Conditions"]]]]==FALSE){
-        message <- paste0("Check Input. The PlotConditions ",Condition," were not found in the Conditions Column.")
+        message <- paste0("Check Input. The plot_conditions ",Condition," were not found in the Conditions Column.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
     }
   }
 
-  if(is.null(StatComparisons)==FALSE){
-    for (Comp in StatComparisons){
-      if(is.null(PlotConditions)==FALSE){
-        if(PlotConditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]] ==FALSE){
-          message <- paste0("Check Input. The StatComparisons condition ",Comp[1], " is not found in the Conditions Column of the metadata_sample.")
+  if(is.null(stat_comparison)==FALSE){
+    for (Comp in stat_comparison){
+      if(is.null(plot_conditions)==FALSE){
+        if(plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]] ==FALSE){
+          message <- paste0("Check Input. The stat_comparison condition ",Comp[1], " is not found in the Conditions Column of the metadata_sample.")
           logger::log_trace(paste("Error ", message, sep=""))
           stop(message)
         }
-        if(PlotConditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]] ==FALSE){
-          message <- paste0("Check Input. The StatComparisons condition ",Comp[2], " is not found in the Conditions Column of the metadata_sample.")
+        if(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]] ==FALSE){
+          message <- paste0("Check Input. The stat_comparison condition ",Comp[2], " is not found in the Conditions Column of the metadata_sample.")
           logger::log_trace(paste("Error ", message, sep=""))
           stop(message)
         }
@@ -142,17 +142,17 @@ VizSuperplot <- function(data,
   }
 
   ## ------------ Check Input metadata_info ----------- ##
-  #7. Check StatComparisons & PlotConditions
-  if(is.null(PlotConditions)){
+  #7. Check stat_comparison & plot_conditions
+  if(is.null(plot_conditions)){
     Number_Cond <- length(unique(tolower(metadata_sample[["Conditions"]])))
     if(Number_Cond<=2){
       MultipleComparison = FALSE
     }else{
       MultipleComparison = TRUE
     }
-  }else if(length(PlotConditions)>2){
+  }else if(length(plot_conditions)>2){
     MultipleComparison = TRUE
-  }else if(length(PlotConditions)<=2){
+  }else if(length(plot_conditions)<=2){
     Number_Cond <- length(unique(tolower(metadata_sample[["Conditions"]])))
     if(Number_Cond<=2){
       MultipleComparison = FALSE
@@ -198,7 +198,7 @@ VizSuperplot <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(FolderName=  paste(plot_type, "Plots", sep=""),
+    Folder <- SavePath(folder_name=  paste(plot_type, "Plots", sep=""),
                                     path=path)
   }
   logger::log_info("VizSuperplot results saved at ", Folder)
@@ -275,10 +275,10 @@ VizSuperplot <- function(data,
     plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
 
     # Take only selected conditions
-    if(is.null(PlotConditions) == FALSE){
-      dataMeans <- dataMeans %>% dplyr::filter(Conditions %in% PlotConditions)
-      plotdata <- plotdata %>% dplyr::filter(Conditions %in% PlotConditions)
-      plotdata$Conditions <- factor(plotdata$Conditions, levels = PlotConditions)
+    if(is.null(plot_conditions) == FALSE){
+      dataMeans <- dataMeans %>% dplyr::filter(Conditions %in% plot_conditions)
+      plotdata <- plotdata %>% dplyr::filter(Conditions %in% plot_conditions)
+      plotdata$Conditions <- factor(plotdata$Conditions, levels = plot_conditions)
     }
 
     # Make the Plot
@@ -319,8 +319,8 @@ VizSuperplot <- function(data,
     ####---- Add stats:
     if(pval=="t.test" | pval=="wilcox.test"){
       # One vs. One comparison: t-test
-      if(is.null(StatComparisons)==FALSE){
-        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = StatComparisons,
+      if(is.null(stat_comparison)==FALSE){
+        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = stat_comparison,
                                                  label = "p.format", method = pval, hide.ns = TRUE,
                                                position = ggplot2::position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
       }else{
@@ -343,12 +343,12 @@ VizSuperplot <- function(data,
         STAT_C1vC2 <- AOV(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           metadata_info=c(Conditions="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
                           metadata_sample= metadata_sample,
-                          Log2FC_table=NULL)
+                          log2fc_table=NULL)
         }else if(pval=="kruskal.test"){
           STAT_C1vC2 <-Kruskal(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                                             metadata_info=c(Conditions="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
                                             metadata_sample= metadata_sample,
-                                            Log2FC_table=NULL)
+                                            log2fc_table=NULL)
         }
 
         #Prepare df to add stats to plot
@@ -366,11 +366,11 @@ VizSuperplot <- function(data,
           dplyr::mutate(y.position = rep(position, length.out = dplyr::n()))
 
         # select stats based on comparison_table
-        if(is.null(StatComparisons)== FALSE){
+        if(is.null(stat_comparison)== FALSE){
           # Generate the comparisons
           df_select <- data.frame()
-          for(comp in StatComparisons){
-            entry <- paste0(PlotConditions[comp[1]], "_vs_", PlotConditions[comp[2]])
+          for(comp in stat_comparison){
+            entry <- paste0(plot_conditions[comp[1]], "_vs_", plot_conditions[comp[2]])
             df_select <- rbind(df_select, data.frame(entry))
           }
 
@@ -404,9 +404,9 @@ VizSuperplot <- function(data,
     PlotList[[i]] <- Plot
 
     # Make plot into nice format:
-    Plot_Sized <-  plotGrob_Superplot(InputPlot=Plot, metadata_info=metadata_info, metadata_sample=metadata_sample, plot_name =plot_name, Subtitle = i, plot_type=plot_type)
-    PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-    PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+    Plot_Sized <-  plotGrob_Superplot(input_plot=Plot, metadata_info=metadata_info, metadata_sample=metadata_sample, plot_name =plot_name, subtitle = i, plot_type=plot_type)
+    plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+    plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -420,17 +420,17 @@ VizSuperplot <- function(data,
     SaveList[[cleaned_i]] <- Plot_Sized
     #----- Save
     suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=NULL,
-                           InputList_Plot= SaveList,
+      SaveRes(inputlist_df=NULL,
+                           inputlist_plot= SaveList,
                            save_table=NULL,
                            save_plot=save_plot,
                            path= Folder,
                            FileName= paste(plot_type, "Plots_",PlotName, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
-                           PlotHeight=PlotHeight,
-                           PlotWidth=PlotWidth,
-                           PlotUnit="cm")))
+                           plot_height=plot_height,
+                           plot_width=plot_width,
+                           plot_unit="cm")))
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }

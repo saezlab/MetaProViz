@@ -2,7 +2,7 @@
 ##
 ## Script name: Visualization using Complex Upset plots
 ##
-## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
+## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Macabe Daley
 ##
@@ -86,7 +86,7 @@ VizUpset <- function(df,
   ## ------------ Create Results output folder ----------- ##
   Folder <- NULL
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(FolderName= "UpsetPlots",
+    Folder <- SavePath(folder_name= "UpsetPlots",
                        path=path)
   }
   logger::log_info("VizPCA results saved at ", Folder)

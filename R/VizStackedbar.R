@@ -2,7 +2,7 @@
 ##
 ## Script name: Visualization using Stacked Bar plots
 ##
-## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
+## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Macabe Daley
 ##

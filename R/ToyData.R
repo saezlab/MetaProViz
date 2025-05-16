@@ -19,19 +19,19 @@
 ## ---------------------------
 
 ################################################################################################
-### ### ### Example Data ### ### ###
+### ### ### Example data ### ### ###
 ################################################################################################
 
 #' Access built-in example data
 #'
-#' @param Dataset Character: name of a built-in dataset:
+#' @param dataset Character: name of a built-in dataset:
 #'     \itemize{
 #'         \item{\code{"IntraCells_Raw"}: }
 #'         \item{\code{"IntraCells_DMA"}: }
 #'         \item{\code{"CultureMedia_Raw"}: }
-#'         \item{\code{"Cells_MetaData"}: }
+#'         \item{\code{"Cells_Metadata"}: }
 #'         \item{\code{"Tissue_Norm"}: }
-#'         \item{\code{"Tissue_MetaData"}: }
+#'         \item{\code{"Tissue_Metadata"}: }
 #'         \item{\code{"Tissue_DMA"}: }
 #'         \item{\code{"Tissue_DMA_Old"}: }
 #'         \item{\code{"Tissue_DMA_Young"}: }
@@ -55,18 +55,18 @@
 #'
 #' @export
 #'
-ToyData <- function(Dataset) {
+ToyData <- function(dataset) {
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
-  #Available Datasets:
+  #Available datasets:
   datasets <- list(
-    IntraCells_Raw = "MS55_RawPeakData.csv.gz",
+    IntraCells_Raw = "MS55_RawPeakdata.csv.gz",
     IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv.gz",
-    CultureMedia_Raw = "MS51_RawPeakData.csv.gz",
-    Cells_MetaData = "MappingTable_SelectPathways.csv.gz",
-    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv.gz",
-    Tissue_MetaData = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv.gz",
+    CultureMedia_Raw = "MS51_RawPeakdata.csv.gz",
+    Cells_Metadata = "MappingTable_SelectPathways.csv.gz",
+    Tissue_Norm = "Hakimi_ccRCC-Tissue_data.csv.gz",
+    Tissue_Metadata = "Hakimi_ccRCC-Tissue_FeatureMetadata.csv.gz",
     Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv.gz",
     Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv.gz",
     Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv.gz",
@@ -80,14 +80,14 @@ ToyData <- function(Dataset) {
   rncols <- c("Code", "Metabolite")
 
   #Load dataset:
-  if (!Dataset %in% names(datasets)) {
-    message <- sprintf("No such dataset: `%s`. Available datasets: %s", Dataset, paste(names(datasets), collapse = ", "))
+  if (!dataset %in% names(datasets)) {
+    message <- sprintf("No such dataset: `%s`. Available datasets: %s", dataset, paste(names(datasets), collapse = ", "))
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   datasets %>%
-  magrittr::extract2(Dataset) %>%
+  magrittr::extract2(dataset) %>%
     system.file("extdata", ., package = "MetaProViz") %>%
     readr::read_csv(col_types = readr::cols()) %>%
     {`if`(
@@ -99,7 +99,7 @@ ToyData <- function(Dataset) {
 
 
 ################################################################################################
-### ### ### Information about the Example Data ### ### ###
+### ### ### Information about the Example data ### ### ###
 ################################################################################################
 
 ####################################################
@@ -150,7 +150,7 @@ ToyData <- function(Dataset) {
 "CultureMedia_Raw"
 
 ####################################################
-#' Cells_MetaData
+#' Cells_Metadata
 #'
 #' Metabolomics workbench project PR001418, study ST002226 and ST002224 measured metabolites were assigned
 #' HMDB and KEGG IDs as well as one main metabolic pathway.
@@ -160,7 +160,7 @@ ToyData <- function(Dataset) {
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
-"Cells_MetaData"
+"Cells_Metadata"
 
 ####################################################
 #' Tissue_Norm
@@ -176,7 +176,7 @@ ToyData <- function(Dataset) {
 "Tissue_Norm"
 
 ####################################################
-#' Tissue_MetaData
+#' Tissue_Metadata
 #'
 #' In Hakimi et. al. metabolites were assigned to metabolite IDs, pathways, platform, mass and other
 #'  fetaure metainformation.
@@ -186,7 +186,7 @@ ToyData <- function(Dataset) {
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
-"Tissue_MetaData"
+"Tissue_Metadata"
 
 ####################################################
 #' Tissue_DMA
@@ -233,7 +233,7 @@ ToyData <- function(Dataset) {
 #' Tissue_TvN_Proteomics
 #'
 #' The processed proteomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
-#' used the study from Clark et. al. under Proteomics Data Commons PDC000127.
+#' used the study from Clark et. al. under Proteomics data Commons PDC000127.
 #'
 #' @format Columns include Log2FC, stats, gene name and SiRCle cluster information that summarises genes based
 #' on their regulation
@@ -247,7 +247,7 @@ ToyData <- function(Dataset) {
 #' Tissue_TvN_RNAseq
 #'
 #' The processed transcriptomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
-#' used the study from Clark et. al. under Proteomics Data Commons PDC000127.
+#' used the study from Clark et. al. under Proteomics data Commons PDC000127.
 #'
 #' @format Columns include Log2FC, stats, gene name and SiRCle cluster information that summarises genes based
 #' on their regulation

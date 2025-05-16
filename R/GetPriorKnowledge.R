@@ -165,7 +165,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 
   ## ------------ Folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                        path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
@@ -212,8 +212,8 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
   ##-------------- Save and return
   DF_List <- list("ChemicalClass_MetabSet"=HMDB_ChemicalClass)
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
-            InputList_Plot= NULL,
+    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+            inputlist_plot= NULL,
             save_table=save_table,
             save_plot=NULL,
             path= SubFolder,
@@ -232,17 +232,17 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #'
 #' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
 #'
-#' @param Input_GeneSet Dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
-#' @param metadata_info \emph{Optional: }  Column name of Target in Input_GeneSet. \strong{Default = c(Target="gene")}
-#' @param PKName \emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}
+#' @param input_pk dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
+#' @param metadata_info \emph{Optional: }  Column name of Target in input_pk. \strong{Default = c(Target="gene")}
+#' @param pk_name \emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
 #' @export
 
-Make_GeneMetabSet <- function(Input_GeneSet,
+Make_GeneMetabSet <- function(input_pk,
                               metadata_info=c(Target="gene"),
-                              PKName= NULL,
+                              pk_name= NULL,
                               save_table = "csv",
                               path = NULL){
 
@@ -253,25 +253,25 @@ Make_GeneMetabSet <- function(Input_GeneSet,
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
-  if(is.data.frame(Input_GeneSet)==FALSE){
-    stop("`Input_GeneSet` must be of class data.frame with columns for source (=term) and Target (=gene). Please check your input")
+  if(is.data.frame(input_pk)==FALSE){
+    stop("`input_pk` must be of class data.frame with columns for source (=term) and Target (=gene). Please check your input")
   }
   # 2. Target:
   if("Target" %in% names(metadata_info)){
-    if(metadata_info[["Target"]] %in% colnames(Input_GeneSet)== FALSE){
-      stop("The ", metadata_info[["Target"]], " column selected as Conditions in metadata_info was not found in Input_GeneSet. Please check your input.")
+    if(metadata_info[["Target"]] %in% colnames(input_pk)== FALSE){
+      stop("The ", metadata_info[["Target"]], " column selected as Conditions in metadata_info was not found in input_pk. Please check your input.")
     }
   }else{
     stop("Please provide a column name for the Target in metadata_info.")
   }
 
-  if(is.null(PKName)){
-    PKName <- "GeneMetabSet"
+  if(is.null(pk_name)){
+    pk_name <- "GeneMetabSet"
   }
 
   ## ------------ Folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
@@ -301,12 +301,12 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   ##--------------metalinks transporters
   #Add metalinks transporters to Cosmos PKN
 
-  ##-------------- Combine with Input_GeneSet
+  ##-------------- Combine with input_pk
   #add pathway names --> File that can be used for metabolite pathway analysis
-  MetabSet <- merge(meta_network_metabs,Input_GeneSet, by.x="gene", by.y=metadata_info[["Target"]])
+  MetabSet <- merge(meta_network_metabs,input_pk, by.x="gene", by.y=metadata_info[["Target"]])
 
   #combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
-  GeneMetabSet <- unique(as.data.frame(rbind(Input_GeneSet%>%dplyr::rename("feature"=metadata_info[["Target"]]), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
+  GeneMetabSet <- unique(as.data.frame(rbind(input_pk%>%dplyr::rename("feature"=metadata_info[["Target"]]), MetabSet[,-1]%>%dplyr::rename("feature"=1))))
 
 
   ##------------ Select metabolites only
@@ -318,12 +318,12 @@ Make_GeneMetabSet <- function(Input_GeneSet,
   DF_List <- list("GeneMetabSet"=GeneMetabSet,
                   "MetabSet"=MetabSet)
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
-                         InputList_Plot= NULL,
+    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+                         inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
-                         FileName= PKName,
+                         FileName= pk_name,
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -384,7 +384,7 @@ metsigdb_metalinks <- function(types = NULL,
 
   ## ------------ Folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
@@ -579,8 +579,8 @@ metsigdb_metalinks <- function(types = NULL,
   DF_List <- list("MetalinksDB"=MetalinksDB,
                   "MetalinksDB_Type"=MetalinksDB_Type)
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF= DF_List,#This needs to be a list, also for single comparisons
-                         InputList_Plot= NULL,
+    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+                         inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,

@@ -2,7 +2,7 @@
 ##
 ## Script name: Visualization
 ##
-## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
+## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -43,10 +43,10 @@
 #' Input_data) and other columns with required plot_typeInfo. \strong{Default
 #' = NULL}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the plot
-#' @param Scale \emph{Optional: } String with the information for Scale row, column or none. \strong{Default = row}
+#' @param scale \emph{Optional: } String with the information for scale row, column or none. \strong{Default = row}
 #' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
-#' @param Enforce_FeatureNames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
-#' @param Enforce_SampleNames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
+#' @param enforce_featurenames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
+#' @param enforce_samplenames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
 #' @param print_plot \emph{Optional: } print the plots to the active graphic
 #'     device.
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
@@ -69,11 +69,11 @@ VizHeatmap <- function(data,
                        metadata_info= NULL,
                        metadata_sample=NULL,
                        metadata_feature= NULL,
-                      plot_name= "",
-                       Scale = "row",
+                       plot_name= "",
+                       scale = "row",
                        save_plot = "svg",
-                       Enforce_FeatureNames= FALSE,
-                       Enforce_SampleNames= FALSE,
+                       enforce_featurenames= FALSE,
+                       enforce_samplenames= FALSE,
                        print_plot=TRUE,
                        path = NULL
 ){
@@ -92,15 +92,15 @@ VizHeatmap <- function(data,
                           print_plot= print_plot)
 
   # CheckInput` Specific
-  if(is.logical(Enforce_FeatureNames) == FALSE | is.logical(Enforce_SampleNames) == FALSE){
-    message <- paste0("Check input. The Enforce_FeatureNames and Enforce_SampleNames value should be either =TRUE or = FALSE.")
+  if(is.logical(enforce_featurenames) == FALSE | is.logical(enforce_samplenames) == FALSE){
+    message <- paste0("Check input. The enforce_featurenames and enforce_samplenames value should be either =TRUE or = FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
-  Scale_options <- c("row","column", "none")
-  if(Scale %in% Scale_options == FALSE){
-    message <- paste0("Check input. The selected Scale option is not valid. Please select one of the folowwing: ",paste(Scale_options,collapse = ", "),"." )
+  scale_options <- c("row","column", "none")
+  if(scale %in% scale_options == FALSE){
+    message <- paste0("Check input. The selected scale option is not valid. Please select one of the folowwing: ",paste(scale_options,collapse = ", "),"." )
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
@@ -108,12 +108,12 @@ VizHeatmap <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(FolderName= "Heatmap",
+    Folder <- SavePath(folder_name= "Heatmap",
                                     path=path)
   }
 
   #####################################################
-  ## -------------- Load Data --------------- ##
+  ## -------------- Load data --------------- ##
   data <- data
 
   if(is.null(metadata_feature)==FALSE){#removes information about metabolites that are not included in the data
@@ -185,7 +185,7 @@ VizHeatmap <- function(data,
 
       #Check number of features:
       Features <- as.data.frame(t(data_path))
-      if(Enforce_FeatureNames==TRUE){
+      if(enforce_featurenames==TRUE){
         show_rownames <- TRUE
         cellheight_Feature <- 9
       }else if(nrow(Features)>100){
@@ -197,7 +197,7 @@ VizHeatmap <- function(data,
       }
 
       #Check number of samples
-      if(Enforce_SampleNames==TRUE){
+      if(enforce_samplenames==TRUE){
         show_colnames <- TRUE
         cellwidth_Sample <- 9
       }else if(nrow(data_path)>50){
@@ -216,7 +216,7 @@ VizHeatmap <- function(data,
                                      show_rownames = as.logical(show_rownames),
                                      show_colnames = as.logical(show_colnames),
                                      clustering_method =  "complete",
-                                     scale = Scale,
+                                     scale = scale,
                                      clustering_distance_rows = "correlation",
                                      annotation_col = col_annot,
                                      annotation_row = row_annot,
@@ -234,9 +234,9 @@ VizHeatmap <- function(data,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
-        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
+        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -245,17 +245,17 @@ VizHeatmap <- function(data,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          SaveRes(InputList_DF=NULL,
-                               InputList_Plot= PlotList_adaptedGrid,
+          SaveRes(inputlist_df=NULL,
+                               inputlist_plot= PlotList_adaptedGrid,
                                save_table=NULL,
                                save_plot=save_plot,
                                path= Folder,
                                FileName=paste("Heatmap_",PlotName, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
-                               PlotHeight=PlotHeight,
-                               PlotWidth=PlotWidth,
-                               PlotUnit="cm")))
+                               plot_height=plot_height,
+                               plot_width=plot_width,
+                               plot_unit="cm")))
 
       }else{
         message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
@@ -328,7 +328,7 @@ VizHeatmap <- function(data,
 
         #Check number of features:
         Features <- as.data.frame(t(data_path))
-        if(Enforce_FeatureNames==TRUE){
+        if(enforce_featurenames==TRUE){
           show_rownames <- TRUE
           cellheight_Feature <- 9
         }else if(nrow(Features)>100){
@@ -340,7 +340,7 @@ VizHeatmap <- function(data,
         }
 
         #Check number of samples
-        if(Enforce_SampleNames==TRUE){
+        if(enforce_samplenames==TRUE){
           show_colnames <- TRUE
           cellwidth_Sample <- 9
         }else if(nrow(data_path)>50){
@@ -359,7 +359,7 @@ VizHeatmap <- function(data,
                                       show_rownames = as.logical(show_rownames),
                                       show_colnames = as.logical(show_colnames),
                                       clustering_method =  "complete",
-                                      scale = Scale,
+                                      scale = scale,
                                       clustering_distance_rows = "correlation",
                                       annotation_col = col_annot,
                                       annotation_row = row_annot,
@@ -377,9 +377,9 @@ VizHeatmap <- function(data,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
-        PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
+        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
           {ggplot2::ggplot() + annotation_custom(.)} %>%
           add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -388,17 +388,17 @@ VizHeatmap <- function(data,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          SaveRes(InputList_DF=NULL,
-                               InputList_Plot= PlotList_adaptedGrid,
+          SaveRes(inputlist_df=NULL,
+                               inputlist_plot= PlotList_adaptedGrid,
                                save_table=NULL,
                                save_plot=save_plot,
                                path= Folder,
                                FileName= paste("Heatmap_",PlotName, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
-                               PlotHeight=PlotHeight,
-                               PlotWidth=PlotWidth,
-                               PlotUnit="cm")))
+                               plot_height=plot_height,
+                               plot_width=plot_width,
+                               plot_unit="cm")))
         }else{
           message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
           logger::log_trace(paste("Message ", message, sep=""))
@@ -494,7 +494,7 @@ VizHeatmap <- function(data,
 
             #Check number of features:
             Features <- as.data.frame(t(data_path))
-            if(Enforce_FeatureNames==TRUE){
+            if(enforce_featurenames==TRUE){
               show_rownames <- TRUE
               cellheight_Feature <- 9
             }else if(nrow(Features)>100){
@@ -506,7 +506,7 @@ VizHeatmap <- function(data,
             }
 
             #Check number of samples
-            if(Enforce_SampleNames==TRUE){
+            if(enforce_samplenames==TRUE){
               show_colnames <- TRUE
               cellwidth_Sample <- 9
             }else if(nrow(data_path)>50){
@@ -525,7 +525,7 @@ VizHeatmap <- function(data,
                                           show_rownames = as.logical(show_rownames),
                                           show_colnames = as.logical(show_colnames),
                                           clustering_method =  "complete",
-                                          scale = Scale,
+                                          scale = scale,
                                           clustering_distance_rows = "correlation",
                                           annotation_col = col_annot,
                                           annotation_row = row_annot,
@@ -546,9 +546,9 @@ VizHeatmap <- function(data,
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
            plot_name <- paste(cleaned_i,cleaned_s, sep="_")
-            Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
-            PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-            PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+            Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
+            plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+            plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
             Plot_Sized %<>%
               {ggplot2::ggplot() + annotation_custom(.)} %>%
               add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -557,17 +557,17 @@ VizHeatmap <- function(data,
 
             #----- Save
             suppressMessages(suppressWarnings(
-              SaveRes(InputList_DF=NULL,
-                                   InputList_Plot= PlotList_adaptedGrid,
+              SaveRes(inputlist_df=NULL,
+                                   inputlist_plot= PlotList_adaptedGrid,
                                    save_table=NULL,
                                    save_plot=save_plot,
                                    path= Folder,
                                    FileName=paste("Heatmap_",PlotName, sep=""),
                                    core=FALSE,
                                    print_plot=print_plot,
-                                   PlotHeight=PlotHeight,
-                                   PlotWidth= PlotWidth,
-                                   PlotUnit="cm")))
+                                   plot_height=plot_height,
+                                   plot_width= plot_width,
+                                   plot_unit="cm")))
 
 
             }
@@ -611,7 +611,7 @@ VizHeatmap <- function(data,
 
     #Check number of features:
     Features <- as.data.frame(t(data))
-    if(Enforce_FeatureNames==TRUE){
+    if(enforce_featurenames==TRUE){
       show_rownames <- TRUE
       cellheight_Feature <- 9
     }else if(nrow(Features)>100){
@@ -623,7 +623,7 @@ VizHeatmap <- function(data,
     }
 
     #Check number of samples
-    if(Enforce_SampleNames==TRUE){
+    if(enforce_samplenames==TRUE){
       show_colnames <- TRUE
       cellwidth_Sample <- 9
     }else if(nrow(data)>50){
@@ -642,7 +642,7 @@ VizHeatmap <- function(data,
                                   show_rownames = as.logical(show_rownames),
                                   show_colnames = as.logical(show_colnames),
                                   clustering_method =  "complete",
-                                  scale = Scale,
+                                  scale = scale,
                                   clustering_distance_rows = "correlation",
                                   annotation_col = col_annot,
                                   annotation_row = row_annot,
@@ -660,9 +660,9 @@ VizHeatmap <- function(data,
 
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
-    Plot_Sized <- PlotGrob_Heatmap(InputPlot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
-    PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-    PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+    Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
+    plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+    plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -671,17 +671,17 @@ VizHeatmap <- function(data,
 
     #----- Save
     suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=NULL,
-                           InputList_Plot= PlotList_adaptedGrid,
+      SaveRes(inputlist_df=NULL,
+                           inputlist_plot= PlotList_adaptedGrid,
                            save_table=NULL,
                            save_plot=save_plot,
                            path= Folder,
                            FileName= paste("Heatmap_",PlotName, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
-                           PlotHeight=PlotHeight,
-                           PlotWidth=PlotWidth,
-                           PlotUnit="cm")))
+                           plot_height=plot_height,
+                           plot_width=plot_width,
+                           plot_unit="cm")))
 
 
 

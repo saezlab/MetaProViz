@@ -28,15 +28,15 @@
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param Percentage \emph{Optional: } Percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}
-#' @param StatCutoff \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for the results summary and on the heatmap. \strong{Default = 0.05}
-#' @param VarianceCutoff \emph{Optional: } Cutoff for the PCs variance that should be displayed on the heatmap. \strong{Default = 1}
+#' @param percentage \emph{Optional: } percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}
+#' @param cutoff_stat \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for the results summary and on the heatmap. \strong{Default = 0.05}
+#' @param cutoff_variance \emph{Optional: } Cutoff for the PCs variance that should be displayed on the heatmap. \strong{Default = 1}
 #' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
-#' @return List of DFs: prcomp results, loadings, Top-Bottom features, annova results, results summary
+#' @return List of DFs: prcomp results, loadings, top-Bottom features, annova results, results summary
 #'
 #' @examples
 #' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
@@ -58,9 +58,9 @@
 MetaAnalysis <- function(data,
                          metadata_sample,
                          Scaling = TRUE,
-                         Percentage = 0.1,
-                         StatCutoff= 0.05,
-                         VarianceCutoff=1,
+                         percentage = 0.1,
+                         cutoff_stat= 0.05,
+                         cutoff_variance=1,
                          save_table = "csv",
                          save_plot = "svg",
                          print_plot= TRUE,
@@ -97,7 +97,7 @@ MetaAnalysis <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "MetaAnalysis",
+    Folder <- SavePath(folder_name= "MetaAnalysis",
                                     path=path)
   }
 
@@ -110,7 +110,7 @@ MetaAnalysis <- function(data,
 
   # Extract loadings for each PC
   PCA.res_Loadings <- as.data.frame(PCA.res$rotation)%>%
-    tibble::rownames_to_column("FeatureID")
+    tibble::rownames_to_column("feature")
 
   #--- 2. Merge with demographics
   PCA.res_Info  <- merge(x=metadata_sample%>% tibble::rownames_to_column("UniqueID"),
@@ -128,11 +128,11 @@ MetaAnalysis <- function(data,
   ## ---------- STATS ------------##
   ## 1. Anova p.val
   # Iterate through each combination of meta and PC columns
-  MetaData <- names(metadata_sample)
+  Metadata <- names(metadata_sample)
 
   Stat_results <- list()
 
-  for (meta_col in MetaData) {
+  for (meta_col in Metadata) {
     for (pc_col in colnames(PCA.res_Info)[grepl("^PC", colnames(PCA.res_Info))]) {
       Formula <- stats::as.formula(paste(pc_col, "~", meta_col, sep=""))# Create a formula for ANOVA --> When constructing the ANOVA formula, it's important to ensure that the response variable (dependent variable) is numeric.
       #pairwiseFormula <- as.formula(paste("pairwise ~" , meta_col, sep=""))
@@ -170,7 +170,7 @@ MetaAnalysis <- function(data,
   Stat_results <- dplyr::bind_rows(Stat_results)
 
   #Add explained variance into the table:
-  prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
+  prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
     tibble::rownames_to_column("PC")%>%
     dplyr::mutate(PC = paste("PC", PC, sep=""))%>%
     dplyr::rename("Explained_Variance"=2)
@@ -178,20 +178,20 @@ MetaAnalysis <- function(data,
   Stat_results <- merge(Stat_results, prop_var_ex,  by="PC",all.x=TRUE)
 
   ###############################################################################################################################################################################################################
-  ## ---------- Top/Bottom ------------##
+  ## ---------- top/Bottom ------------##
   #Add top/bottom related features to this
   ## Create a data frame for top and bottom features for each PC
-  TopBottom_Features <- lapply(2:ncol(PCA.res_Loadings), function(i){
+  topBottom_Features <- lapply(2:ncol(PCA.res_Loadings), function(i){
      #Make input
-     pc_loadings <- PCA.res_Loadings[, c("FeatureID", names(PCA.res_Loadings)[i])]
+     pc_loadings <- PCA.res_Loadings[, c("feature", names(PCA.res_Loadings)[i])]
      #get top and bottom features
      n_features <- nrow(pc_loadings)
-     n_selected <- round(Percentage * n_features)
+     n_selected <- round(percentage * n_features)
 
-     top_features <- as.data.frame(head(arrange(pc_loadings, desc(!!sym(names(pc_loadings)[2]))), n_selected)$FeatureID)%>%
-       dplyr::rename(!!paste("Features_", "(Top", Percentage, "%)", sep=""):=1)
-     bottom_features <- as.data.frame(head(arrange(pc_loadings, !!sym(names(pc_loadings)[2])), n_selected)$FeatureID) %>%
-       dplyr::rename(!!paste("Features_", "(Bottom", Percentage, "%)", sep=""):=1)
+     top_features <- as.data.frame(head(arrange(pc_loadings, desc(!!sym(names(pc_loadings)[2]))), n_selected)$feature)%>%
+       dplyr::rename(!!paste("Features_", "(top", percentage, "%)", sep=""):=1)
+     bottom_features <- as.data.frame(head(arrange(pc_loadings, !!sym(names(pc_loadings)[2])), n_selected)$feature) %>%
+       dplyr::rename(!!paste("Features_", "(Bottom", percentage, "%)", sep=""):=1)
 
      #Return
      res <- cbind(data.frame(PC=paste("PC", i, sep = "")), top_features, bottom_features)
@@ -203,7 +203,7 @@ MetaAnalysis <- function(data,
    ## ---------- Final DF 1------------##
    ## Add to results DF
    Stat_results <- merge(Stat_results,
-                         TopBottom_Features%>%
+                         topBottom_Features%>%
                            dplyr::group_by(PC) %>%
                            dplyr::summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
                            dplyr::ungroup(),
@@ -211,30 +211,30 @@ MetaAnalysis <- function(data,
                          all.x=TRUE)
 
    ## ---------- DF 2: Metabolites as row names ------------##
-   Res_Top <- Stat_results%>%
-     dplyr::filter(tukeyHSD_p.adjusted < StatCutoff)%>%
-     tidyr::separate_rows(paste("Features_", "(Top", Percentage, "%)", sep=""), sep = ", ")%>% # Separate 'Features (Top 0.1%)'
-     dplyr::rename("FeatureID":= paste("Features_", "(Top", Percentage, "%)", sep=""))%>%
-     dplyr::select(- paste("Features_", "(Bottom", Percentage, "%)", sep=""))
+   Res_top <- Stat_results%>%
+     dplyr::filter(tukeyHSD_p.adjusted < cutoff_stat)%>%
+     tidyr::separate_rows(paste("Features_", "(top", percentage, "%)", sep=""), sep = ", ")%>% # Separate 'Features (top 0.1%)'
+     dplyr::rename("feature":= paste("Features_", "(top", percentage, "%)", sep=""))%>%
+     dplyr::select(- paste("Features_", "(Bottom", percentage, "%)", sep=""))
 
    Res_Bottom <- Stat_results%>%
-     dplyr::filter(tukeyHSD_p.adjusted< StatCutoff)%>%
-     tidyr::separate_rows(paste("Features_", "(Bottom", Percentage, "%)", sep=""), sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
-     dplyr::rename("FeatureID":= paste("Features_", "(Bottom", Percentage, "%)", sep=""))%>%
-     dplyr::select(- paste("Features_", "(Top", Percentage, "%)", sep=""))
+     dplyr::filter(tukeyHSD_p.adjusted< cutoff_stat)%>%
+     tidyr::separate_rows(paste("Features_", "(Bottom", percentage, "%)", sep=""), sep = ", ")%>%    # Separate 'Features (Bottom 0.1%)'
+     dplyr::rename("feature":= paste("Features_", "(Bottom", percentage, "%)", sep=""))%>%
+     dplyr::select(- paste("Features_", "(top", percentage, "%)", sep=""))
 
-   Res <- rbind(Res_Top, Res_Bottom)%>%
-     dplyr::group_by(FeatureID, term) %>%            # Group by FeatureID and term
+   Res <- rbind(Res_top, Res_Bottom)%>%
+     dplyr::group_by(feature, term) %>%            # Group by feature and term
      dplyr::summarise(
        PC = paste(unique(PC), collapse = ", "), # Concatenate unique PC entries with commas
        `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE)) %>% # Sum Explained_Variance
      dplyr::ungroup()%>%  # Remove previous grouping
-     dplyr::group_by(FeatureID) %>%  # Group by FeatureID for MainDriver calculation
+     dplyr::group_by(feature) %>%  # Group by feature for MainDriver calculation
      dplyr::mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>% # Mark TRUE for the highest value
      dplyr::ungroup()  # Remove grouping
 
    Res_summary <- Res%>%
-     dplyr::group_by(FeatureID) %>%
+     dplyr::group_by(feature) %>%
      dplyr::summarise(
        term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
        `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
@@ -255,27 +255,27 @@ MetaAnalysis <- function(data,
    ###############################################################################################################################################################################################################
    ## ---------- Plot ------------##
    # Plot DF
-   Data_Heat <- Stat_results %>%
-     dplyr::filter(tukeyHSD_p.adjusted < StatCutoff) %>%  # Filter for significant results
-     dplyr::filter(Explained_Variance > VarianceCutoff) %>%  # Exclude Residuals row
+   data_Heat <- Stat_results %>%
+     dplyr::filter(tukeyHSD_p.adjusted < cutoff_stat) %>%  # Filter for significant results
+     dplyr::filter(Explained_Variance > cutoff_variance) %>%  # Exclude Residuals row
      dplyr::distinct(term, PC, .keep_all = TRUE) %>%  # only keep unique term~PC combinations AND STATS
      dplyr::select(term, PC, Explained_Variance) %>%
      tidyr::pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
      tibble::column_to_rownames("term") %>%
      dplyr::mutate_all(~replace(., is.na(.), 0L))
 
-   if(nrow(Data_Heat) > 2L){
+   if(nrow(data_Heat) > 2L){
 
      #Plot
-     invisible(VizHeatmap(data = Data_Heat,
-                         plot_name = paste0("ExplainedVariance-bigger-", VarianceCutoff , "Percent_AND_p.adj-smaller", StatCutoff, sep=""),
-                          Scale = "none",
+     invisible(VizHeatmap(data = data_Heat,
+                         plot_name = paste0("ExplainedVariance-bigger-", cutoff_variance , "Percent_AND_p.adj-smaller", cutoff_stat, sep=""),
+                          scale = "none",
                           save_plot = save_plot,
                           print_plot = print_plot,
                           path = Folder))
 
    }else{
-     message <- paste0("StatCutoff of ", StatCutoff, " and VarianceCutoff of ", VarianceCutoff, " do only return <= 2 cases, hence no heatmap is plotted.")
+     message <- paste0("cutoff_stat of ", cutoff_stat, " and cutoff_variance of ", cutoff_variance, " do only return <= 2 cases, hence no heatmap is plotted.")
      logger::log_info("warning: ", message)
      warning(message)
    }
@@ -284,12 +284,12 @@ MetaAnalysis <- function(data,
 
    ###############################################################################################################################################################################################################
    ## ---------- Return ------------##
-    # Make list of Output DFs: 1. prcomp results, 2. Loadings result, 3. TopBottom Features, 4. AOV
-    ResList <- list(res_prcomp = PCA.res_Info, res_loadings = PCA.res_Loadings, res_TopBottomFeatures = TopBottom_Features, res_aov=Stat_results, res_summary=Res_summary)
+    # Make list of Output DFs: 1. prcomp results, 2. Loadings result, 3. topBottom Features, 4. AOV
+    ResList <- list(res_prcomp = PCA.res_Info, res_loadings = PCA.res_Loadings, res_topBottomFeatures = topBottom_Features, res_aov=Stat_results, res_summary=Res_summary)
 
     # Save the results
-    SaveRes(InputList_DF=ResList,
-                         InputList_Plot = NULL,
+    SaveRes(inputlist_df=ResList,
+                         inputlist_plot = NULL,
                          save_table=save_table,
                          save_plot=FALSE,
                          path= Folder,
@@ -354,7 +354,7 @@ MetaPK <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "MetaAnalysis",
+    Folder <- SavePath(folder_name= "MetaAnalysis",
                                     path=path)
   }
 
@@ -362,12 +362,12 @@ MetaPK <- function(data,
   ## ---------- Create Prior Knowledge file format to perform enrichment analysis ------------##
   # Use the Sample metadata for this:
   if(is.null(metadata_info)==TRUE){
-    MetaData <- names(metadata_sample)
+    Metadata <- names(metadata_sample)
     metadata_sample_subset <- metadata_sample%>%
       tibble::rownames_to_column("SampleID")
   }else{
-    MetaData <- metadata_info
-    metadata_sample_subset <- metadata_sample[, MetaData, drop = FALSE]%>%
+    Metadata <- metadata_info
+    metadata_sample_subset <- metadata_sample[, Metadata, drop = FALSE]%>%
       tibble::rownames_to_column("SampleID")
   }
 
@@ -386,7 +386,7 @@ MetaPK <- function(data,
   #                              minsize = 5)
 
   #Add explained variance into the table:
-  #prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#To compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
+  #prop_var_ex <- as.data.frame(((PCA.res[["sdev"]])^2/sum((PCA.res[["sdev"]])^2))*100)%>%#to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
   #  rownames_to_column("PC")%>%
    # mutate(PC = paste("PC", PC, sep=""))%>%
    # dplyr::rename("Explained_Variance"=2)
@@ -396,7 +396,7 @@ MetaPK <- function(data,
   ###############################################################################################################################################################################################################
   ## ---------- Save ------------##
   # Add to results DF
-  Res <- list(MetaData_PriorKnowledge = Metadata_df)
+  Res <- list(Metadata_PriorKnowledge = Metadata_df)
 
 }
 

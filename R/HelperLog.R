@@ -74,7 +74,7 @@ MetaProViz_log <- function(){
 #' @importFrom OmnipathR set_loglevel
 #' @export
 MetaProViz_set_loglevel <- function(level, target = 'logfile'){
-  #To change log-level e.g. to see all messages being printed
+  #to change log-level e.g. to see all messages being printed
   OmnipathR::set_loglevel(level, target = target, pkg = 'MetaProViz')
 }
 

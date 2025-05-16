@@ -24,11 +24,11 @@
 
 #' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 #'
-#' @param data Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.
-#' @param metadata_info \emph{Optional: } Column name of Target in Input_GeneSet. \strong{Default = list(InputID="MetaboliteID" , GroupingVariable="term")}
-#' @param From ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
-#' @param To One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}
-#' @param Summary \emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}
+#' @param data dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.
+#' @param metadata_info \emph{Optional: } Column name of Target in input_pk. \strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}
+#' @param from ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
+#' @param to One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}
+#' @param summary \emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
@@ -36,7 +36,7 @@
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' Res <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem", "hmdb"))
+#' Res <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem", "hmdb"))
 #'
 #' @keywords Translate metabolite IDs
 #'
@@ -50,13 +50,13 @@
 #' @export
 #'
 TranslateID <- function(data,
-                        metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"),
-                        From = "kegg",
-                        To = c("pubchem","chebi","hmdb"),
-                        Summary=FALSE,
+                        metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
+                        from = "kegg",
+                        to = c("pubchem","chebi","hmdb"),
+                        summary=FALSE,
                         save_table= "csv",
                         path=NULL,
-                        ShowUpset=FALSE #TODO
+                        plot=FALSE #toDO
   ){# Add ability to also get metabolite names that are human readable from an ID type!
 
   MetaProViz_Init()
@@ -64,7 +64,7 @@ TranslateID <- function(data,
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `CheckInput`
   CheckInput(data=data,
-                          data_Num=FALSE,
+                          data_num=FALSE,
                           save_table=save_table)
 
   # Specific checks:
@@ -76,16 +76,16 @@ TranslateID <- function(data,
     }
   }
 
-  if("GroupingVariable" %in% names(metadata_info)){
-    if(metadata_info[["GroupingVariable"]] %in% colnames(data)== FALSE){
-      message <- paste0("The ", metadata_info[["GroupingVariable"]], " column selected as GroupingVariable in metadata_info was not found in data. Please check your input.")
+  if("grouping_variable" %in% names(metadata_info)){
+    if(metadata_info[["grouping_variable"]] %in% colnames(data)== FALSE){
+      message <- paste0("The ", metadata_info[["grouping_variable"]], " column selected as grouping_variable in metadata_info was not found in data. Please check your input.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }
 
-  if(is.logical(Summary) == FALSE){
-    message <- paste0("Check input. The Summary parameter should be either =TRUE or =FALSE.")
+  if(is.logical(summary) == FALSE){
+    message <- paste0("Check input. The summary parameter should be either =TRUE or =FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
@@ -95,7 +95,7 @@ TranslateID <- function(data,
     unlist %>%
     unique %>%
     str_to_lower %>%
-    setdiff(union(From, To), .)
+    setdiff(union(from, to), .)
 
   if (length(unknown_types) > 0L) {
     msg <- sprintf('The following ID types are not recognized: %s', paste(unknown_types, collapse = ', '))
@@ -106,7 +106,7 @@ TranslateID <- function(data,
   # Check that metadata_info[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
   doublons <- data %>%
     dplyr::filter(!is.na(!!sym(metadata_info[['InputID']]))) %>%
-    dplyr::group_by(!!sym(metadata_info[['InputID']]), !!sym(metadata_info[['GroupingVariable']]))%>%
+    dplyr::group_by(!!sym(metadata_info[['InputID']]), !!sym(metadata_info[['grouping_variable']]))%>%
     dplyr::filter(dplyr::n() > 1) %>%
     dplyr::summarize()
 
@@ -121,7 +121,7 @@ TranslateID <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "ID_Translation")
@@ -129,16 +129,16 @@ TranslateID <- function(data,
   }
 
   ########################################################################################################################################################
-  ## ------------------ Translate To-From for each pair ------------------- ##
+  ## ------------------ Translate to-from for each pair ------------------- ##
   TranslatedDF <- OmnipathR::translate_ids(
       data,
-      !!sym(metadata_info[['InputID']]) :=  !!sym(From),
-      !!!syms(To),#list of symbols, hence three !!!
+      !!sym(metadata_info[['InputID']]) :=  !!sym(from),
+      !!!syms(to),#list of symbols, hence three !!!
       ramp = TRUE,
       expand = FALSE,
       quantify_ambiguity = TRUE,
       qualify_ambiguity = TRUE,
-      ambiguity_groups =  metadata_info[['GroupingVariable']],#Checks within the groups, without it checks across groups
+      ambiguity_groups =  metadata_info[['grouping_variable']],#Checks within the groups, without it checks across groups
       ambiguity_summary = TRUE
     )
   #TranslatedDF %>% attributes %>% names
@@ -149,13 +149,13 @@ TranslateID <- function(data,
 
   ## Create DF for TranslatedIDs only with the original data and the translatedID columns
   DF_subset <- TranslatedDF %>%
-    dplyr::select(tidyselect::all_of(intersect(names(.), names(data))), tidyselect::all_of(To)) %>%
-    dplyr::mutate(across(all_of(To), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
-    dplyr::group_by(!!sym(metadata_info[['InputID']]), !!sym(metadata_info[['GroupingVariable']])) %>%
-    dplyr::mutate(across(tidyselect::all_of(To), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
+    dplyr::select(tidyselect::all_of(intersect(names(.), names(data))), tidyselect::all_of(to)) %>%
+    dplyr::mutate(across(all_of(to), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
+    dplyr::group_by(!!sym(metadata_info[['InputID']]), !!sym(metadata_info[['grouping_variable']])) %>%
+    dplyr::mutate(across(tidyselect::all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
     dplyr::ungroup() %>%
     dplyr::distinct() %>%
-    dplyr::mutate(dplyr::across(tidyselect::all_of(To), ~ ifelse(. == "0", NA, .)))
+    dplyr::mutate(dplyr::across(tidyselect::all_of(to), ~ ifelse(. == "0", NA, .)))
 
   ResList[["TranslatedDF"]] <- DF_subset
 
@@ -163,28 +163,28 @@ TranslateID <- function(data,
   ResList[["TranslatedDF_MappingInfo"]] <- TranslatedDF
 
   ## Also save the different mapping summaries!
-  for(item in To){
-    SummaryDF <- TranslatedDF%>% attr(paste0("ambiguity_", metadata_info[['InputID']], "_", item, sep=""))
-    ResList[[paste0("MappingSummary_", item, sep="")]] <-  SummaryDF
+  for(item in to){
+    summaryDF <- TranslatedDF%>% attr(paste0("ambiguity_", metadata_info[['InputID']], "_", item, sep=""))
+    ResList[[paste0("Mappingsummary_", item, sep="")]] <-  summaryDF
   }
 
-  ## Create the long DF summary if Summary =TRUE
-  if(Summary==TRUE){
-    for(item in To){
-      Summary <- MetaProViz::MappingAmbiguity(data= TranslatedDF,
-                                            From = metadata_info[['InputID']],
-                                            To = item,
-                                            GroupingVariable = metadata_info[['GroupingVariable']],
-                                            Summary=TRUE)[["Summary"]]
-      ResList[[paste0("MappingSummary_Long_", From, "-to-", item, sep="")]] <- Summary
+  ## Create the long DF summary if summary =TRUE
+  if(summary==TRUE){
+    for(item in to){
+      summary <- MetaProViz::MappingAmbiguity(data= TranslatedDF,
+                                            from = metadata_info[['InputID']],
+                                            to = item,
+                                            grouping_variable = metadata_info[['grouping_variable']],
+                                            summary=TRUE)[["summary"]]
+      ResList[[paste0("Mappingsummary_Long_", from, "-to-", item, sep="")]] <- summary
     }
   }
 
 
   ## ------------------ Save the results ------------------- ##
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=ResList,
-                         InputList_Plot= NULL,
+    SaveRes(inputlist_df=ResList,
+                         inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
@@ -193,12 +193,12 @@ TranslateID <- function(data,
                          print_plot=FALSE)))
 
   ## ------------------ Show Upset plot of the results ------------------- ##
-  ## TODO: current issue with Lists vs doubles
-  # if (ShowUpset==TRUE) {
+  ## toDO: current issue with Lists vs doubles
+  # if (plot==TRUE) {
   #   pk_list <- list(translated = TranslatedDF)
-  #   metadata_info <- list(translated = To)
+  #   metadata_info <- list(translated = to)
   #   print(pk_list)
-  #   print(To)
+  #   print(to)
   #   pk_comp_res <- MetaProViz:::ComparePK(data = pk_list,
   #                                         metadata_info = metadata_info,
   #                                         plot_title = "IDs available after ID Translation")
@@ -218,17 +218,17 @@ TranslateID <- function(data,
 
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
-#' @param data Dataframe with at least one column with the detected metabolite IDs (one ID per row).
+#' @param data dataframe with at least one column with the detected metabolite IDs (one ID per row).
 #' @param metadata_info \emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}
-#' @param From ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}
+#' @param from ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @return Input DF with additional column including potential additional IDs.
 #'
 #' @examples
-#' DetectedIDs <- MetaProViz::ToyData(Data="Cells_MetaData")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
-#' Res <- MetaProViz::EquivalentIDs(data= DetectedIDs, metadata_info = c(InputID="HMDB"), From = "hmdb")
+#' DetectedIDs <- MetaProViz::ToyData(data="Cells_Metadata")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
+#' Res <- MetaProViz::EquivalentIDs(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
@@ -243,7 +243,7 @@ TranslateID <- function(data,
 #' @export
 EquivalentIDs <- function(data,
                           metadata_info = c(InputID="MetaboliteID"),
-                          From = "hmdb",
+                          from = "hmdb",
                           save_table= "csv",
                           path=NULL){
   # FUTURE: Once we have the structural similarity tool available in OmniPath, we can start creating this function!
@@ -267,7 +267,7 @@ EquivalentIDs <- function(data,
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `CheckInput`
   CheckInput(data=data,
-                          data_Num=FALSE,
+                          data_num=FALSE,
                           save_table=save_table)
 
   # Specific checks:
@@ -284,7 +284,7 @@ EquivalentIDs <- function(data,
     unlist %>%
     unique %>%
     str_to_lower %>%
-    setdiff(From, .)
+    setdiff(from, .)
 
   if (length(unknown_types) > 0L) {
     msg <- sprintf('The following ID types are not recognized: %s', paste(unknown_types, collapse = ', '))
@@ -306,34 +306,34 @@ EquivalentIDs <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "EquivalentIDs")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
-  ## ------------------ Set the ID type for To ----------------- ##
-  To <- case_when(
-    From == "chebi" ~ "pubchem",  # If To is "pubchem", choose "chebi"
+  ## ------------------ Set the ID type for to ----------------- ##
+  to <- case_when(
+    from == "chebi" ~ "pubchem",  # If to is "pubchem", choose "chebi"
     TRUE ~ "chebi"              # For other cases, don't use a secondary column
   )
 
-  message <- paste0(To, " is used to find additional potential IDs for ", From, ".", sep="")
+  message <- paste0(to, " is used to find additional potential IDs for ", from, ".", sep="")
   logger::log_trace(message)
   message(message)
 
   ## ------------------ Load manual table ----------------- ##
-  if((From == "kegg") == FALSE){
+  if((from == "kegg") == FALSE){
     EquivalentFeatures <- MetaProViz:: ToyData("EquivalentFeatures")%>%
-      dplyr::select(From)
+      dplyr::select(from)
   }
 
-  ## ------------------ Translate From-to-To ------------------- ##
+  ## ------------------ Translate from-to-to ------------------- ##
   TranslatedDF <- OmnipathR::translate_ids(
     data,
-    !!sym(metadata_info[['InputID']]) :=  !!sym(From),
-    !!!syms(To),#list of symbols, hence three !!!
+    !!sym(metadata_info[['InputID']]) :=  !!sym(from),
+    !!!syms(to),#list of symbols, hence three !!!
     ramp = TRUE,
     expand = FALSE,
     quantify_ambiguity =FALSE,
@@ -341,27 +341,27 @@ EquivalentIDs <- function(data,
     ambiguity_groups =  NULL,#Checks within the groups, without it checks across groups
     ambiguity_summary =  FALSE
   )%>%
-    dplyr::select(tidyselect::all_of(intersect(names(.), names(data))), tidyselect::all_of(To)) %>%
-    dplyr::mutate(across(all_of(To), ~ purrr::map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
+    dplyr::select(tidyselect::all_of(intersect(names(.), names(data))), tidyselect::all_of(to)) %>%
+    dplyr::mutate(across(all_of(to), ~ purrr::map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
     dplyr::group_by(!!sym(metadata_info[['InputID']])) %>%
-    dplyr::mutate(across(tidyselect::all_of(To), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
+    dplyr::mutate(across(tidyselect::all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
     dplyr::ungroup() %>%
     dplyr::distinct() %>%
-    dplyr::mutate(dplyr::across(tidyselect::all_of(To), ~ ifelse(. == "0", NA, .)))
+    dplyr::mutate(dplyr::across(tidyselect::all_of(to), ~ ifelse(. == "0", NA, .)))
 
 
-  ## ------------------ Translate To-to-From ------------------- ##
+  ## ------------------ Translate to-to-from ------------------- ##
   TranslatedDF_Long <- TranslatedDF%>%
-    dplyr::select(!!sym(metadata_info[['InputID']]), !!sym(To))%>%
+    dplyr::select(!!sym(metadata_info[['InputID']]), !!sym(to))%>%
     dplyr::rename("InputID" = !!sym(metadata_info[['InputID']]))%>%
-    tidyr::separate_rows(!!sym(To), sep = ", ") %>%
-    dplyr::mutate(across(all_of(To), ~trimws(.))) %>%  # Remove extra spaces
-    dplyr::filter(!!sym(To) != "")  # Remove empty entries
+    tidyr::separate_rows(!!sym(to), sep = ", ") %>%
+    dplyr::mutate(across(all_of(to), ~trimws(.))) %>%  # Remove extra spaces
+    dplyr::filter(!!sym(to) != "")  # Remove empty entries
 
   OtherIDs <- OmnipathR::translate_ids(
     TranslatedDF_Long ,
-    !!sym(To),
-    !!sym(From),#list of symbols, hence three !!!
+    !!sym(to),
+    !!sym(from),#list of symbols, hence three !!!
     ramp = TRUE,
     expand = FALSE,
     quantify_ambiguity =FALSE,
@@ -369,17 +369,17 @@ EquivalentIDs <- function(data,
     ambiguity_groups =  NULL,#Checks within the groups, without it checks across groups
     ambiguity_summary =  FALSE
   )%>%
-    dplyr::select("InputID", !!sym(To), !!sym(From))%>%
-    dplyr::distinct(InputID, !!sym(From), .keep_all = TRUE) %>%  # Remove duplicates based on InputID and From
-    dplyr::mutate(AdditionalID = dplyr::if_else(InputID == !!sym(From), FALSE, TRUE)) %>%
-    dplyr::select("InputID",!!sym(From), "AdditionalID")%>%
+    dplyr::select("InputID", !!sym(to), !!sym(from))%>%
+    dplyr::distinct(InputID, !!sym(from), .keep_all = TRUE) %>%  # Remove duplicates based on InputID and from
+    dplyr::mutate(AdditionalID = dplyr::if_else(InputID == !!sym(from), FALSE, TRUE)) %>%
+    dplyr::select("InputID",!!sym(from), "AdditionalID")%>%
     dplyr::filter(AdditionalID == TRUE) %>%
-    dplyr::mutate(across(all_of(From), ~ purrr::map_chr(., ~ paste(unique(.), collapse = ", "))))%>%
+    dplyr::mutate(across(all_of(from), ~ purrr::map_chr(., ~ paste(unique(.), collapse = ", "))))%>%
     dplyr::rowwise() %>%
     dplyr::mutate(
-      FromList = list(stringr::str_split(!!sym(From), ",\\s*")[[1]]),  # Wrap in list
-      SameAsInput = ifelse(any(FromList == InputID), InputID, NA_character_),  # Match InputID
-      PotentialAdditionalIDs = paste(FromList[FromList != InputID], collapse = ", ")  # Combine other IDs
+      fromList = list(stringr::str_split(!!sym(from), ",\\s*")[[1]]),  # Wrap in list
+      SameAsInput = ifelse(any(fromList == InputID), InputID, NA_character_),  # Match InputID
+      PotentialAdditionalIDs = paste(fromList[fromList != InputID], collapse = ", ")  # Combine other IDs
     ) %>%
     dplyr::ungroup() %>%
     dplyr::select(InputID, PotentialAdditionalIDs, hmdb)%>%  # Final selection
@@ -391,9 +391,9 @@ EquivalentIDs <- function(data,
   ##------------------- Add additional IDs -------------- ##
 
   if (exists("EquivalentFeatures")) {
-   EquivalentFeatures$AllIDs <- EquivalentFeatures[[From]]
+   EquivalentFeatures$AllIDs <- EquivalentFeatures[[from]]
     EquivalentFeatures_Long <- EquivalentFeatures  %>%
-      separate_rows(!!sym(From), sep = ",")
+      separate_rows(!!sym(from), sep = ",")
 
     OtherIDs <- merge(OtherIDs, EquivalentFeatures_Long, by.x= metadata_info[['InputID']] , by.y= "hmdb", all.x=TRUE)%>%
       rowwise() %>%
@@ -442,8 +442,8 @@ EquivalentIDs <- function(data,
   ResList <- list("EquivalentIDs" = OutputDF)
 
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=ResList,
-                         InputList_Plot= NULL,
+    SaveRes(inputlist_df=ResList,
+                         inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
@@ -460,20 +460,20 @@ EquivalentIDs <- function(data,
 
 #' Create Mapping Ambiguities between two ID types
 #'
-#' @param data Translated DF from MetaProViz::TranslateID reults or Dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).
-#' @param To Column name of original metabolite identifier in data. Here should only have one ID per row.
-#' @param From Column name of the secondary or translated metabolite identifier in data. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.
-#' @param GroupingVariable \emph{Optional: } If NULL no groups are used. If TRUE provide column name in data containing the GroupingVariable and features are grouped. \strong{Default = NULL}
-#' @param Summary \emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}
+#' @param data Translated DF from MetaProViz::TranslateID reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).
+#' @param to Column name of original metabolite identifier in data. Here should only have one ID per row.
+#' @param from Column name of the secondary or translated metabolite identifier in data. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.
+#' @param grouping_variable \emph{Optional: } If NULL no groups are used. If TRUE provide column name in data containing the grouping_variable and features are grouped. \strong{Default = NULL}
+#' @param summary \emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
-#' @return List with at least 4 DFs: 1-3) From-to-To: 1. MappingIssues, 2. MappingIssues Summary, 3. Long summary (If Summary=TRUE) & 4-6) To-to-From: 4. MappingIssues, 5. MappingIssues Summary, 6. Long summary (If Summary=TRUE) & 7) Combined summary table (If Summary=TRUE)
+#' @return List with at least 4 DFs: 1-3) from-to-to: 1. MappingIssues, 2. MappingIssues summary, 3. Long summary (If summary=TRUE) & 4-6) to-to-from: 4. MappingIssues, 5. MappingIssues summary, 6. Long summary (If summary=TRUE) & 7) Combined summary table (If summary=TRUE)
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' InputDF <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem"))[["TranslatedDF"]]
-#' Res <- MetaProViz::MappingAmbiguity(data= InputDF, From = "MetaboliteID", To = "pubchem", GroupingVariable = "term", Summary=TRUE)
+#' InputDF <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
+#' Res <- MetaProViz::MappingAmbiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
 #'
 #' @keywords Mapping ambiguity
 #'
@@ -484,10 +484,10 @@ EquivalentIDs <- function(data,
 #' @export
 #'
 MappingAmbiguity <- function(data,
-                             From,
-                             To,
-                             GroupingVariable = NULL,
-                             Summary=FALSE,
+                             from,
+                             to,
+                             grouping_variable = NULL,
+                             summary=FALSE,
                              save_table= "csv",
                              path=NULL
 ) {
@@ -496,46 +496,46 @@ MappingAmbiguity <- function(data,
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `CheckInput`
   CheckInput(data=data,
-                          data_Num=FALSE,
+                          data_num=FALSE,
                           save_table=save_table)
 
   # Specific checks:
-  if(From %in% colnames(data)== FALSE){
-      message <- paste0(From, " column was not found in data. Please check your input.")
+  if(from %in% colnames(data)== FALSE){
+      message <- paste0(from, " column was not found in data. Please check your input.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
       }
 
-  if(To %in% colnames(data)== FALSE){
-    message <- paste0(To, " column was not found in data. Please check your input.")
+  if(to %in% colnames(data)== FALSE){
+    message <- paste0(to, " column was not found in data. Please check your input.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
-  if(is.null(GroupingVariable)==FALSE){
-    if(GroupingVariable %in% colnames(data)== FALSE){
-      message <- paste0(GroupingVariable, " column was not found in data. Please check your input.")
+  if(is.null(grouping_variable)==FALSE){
+    if(grouping_variable %in% colnames(data)== FALSE){
+      message <- paste0(grouping_variable, " column was not found in data. Please check your input.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }
 
-  if(is.logical(Summary) == FALSE){
-    message <- paste0("Check input. The Summary parameter should be either =TRUE or =FALSE.")
+  if(is.logical(summary) == FALSE){
+    message <- paste0("Check input. The summary parameter should be either =TRUE or =FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   ## ------------------  General checks of wrong occurences ------------------- ##
-  # Task 1: Check that From has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
-  # Task 2: Check that From has the same items in to across the different entries (would be in different Groupings, otherwise there should not be any duplications) --> List of Miss-Mappings across terms
+  # Task 1: Check that from has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
+  # Task 2: Check that from has the same items in to across the different entries (would be in different Groupings, otherwise there should not be any duplications) --> List of Miss-Mappings across terms
 
   # FYI: The above can not happen if our translateID function was used, but may be the case when the user has done something manually before
 
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "MappingAmbiguities")
@@ -544,32 +544,32 @@ MappingAmbiguity <- function(data,
 
   #####################################################################################################################################################################################
   ## ------------------  Prepare Input data ------------------- ##
-  #If the user provides a DF where the To column is a list of IDs, then we can use it right away
-  #If the To column is not a list of IDs, but a character column, we need to convert it into a list of IDs
-  if(is.character(data[[To]])==TRUE){
-    data[[To]] <- data[[To]]%>%
+  #If the user provides a DF where the to column is a list of IDs, then we can use it right away
+  #If the to column is not a list of IDs, but a character column, we need to convert it into a list of IDs
+  if(is.character(data[[to]])==TRUE){
+    data[[to]] <- data[[to]]%>%
       strsplit(", ")%>%
       lapply(as.character)
   }
 
   ## ------------------  Perform ambiguity mapping ------------------- ##
-  #1. From-to-To: OriginalID-to-TranslatedID
-  #2. From-to-To: TranslatedID-to-OriginalID
+  #1. from-to-to: OriginalID-to-TranslatedID
+  #2. from-to-to: TranslatedID-to-OriginalID
   Comp <- list(
-    list(From = From, To = To),
-    list(From = To, To = From)
+    list(from = from, to = to),
+    list(from = to, to = from)
   )
 
   ResList <- list()
   for(comp in seq_along(Comp)){
     #Run Omnipath ambiguity
-    ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- data %>%
-      tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
-      filter(!is.na(!!sym(Comp[[comp]]$From)))%>%#Remove NA values, otherwise they are counted as column is character
+    ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]] <- data %>%
+      tidyr::unnest(cols = all_of(Comp[[comp]]$from))%>% # unlist the columns in case they are not expaned
+      filter(!is.na(!!sym(Comp[[comp]]$from)))%>%#Remove NA values, otherwise they are counted as column is character
       OmnipathR::ambiguity(
-          from_col = !!sym(Comp[[comp]]$From),
-          to_col = !!sym(Comp[[comp]]$To),
-          groups = GroupingVariable,
+          from_col = !!sym(Comp[[comp]]$from),
+          to_col = !!sym(Comp[[comp]]$to),
+          groups = grouping_variable,
           quantify = TRUE,
           qualify = TRUE,
           global = TRUE,#across groups will be done additionally --> suffix _AcrossGroup
@@ -577,94 +577,94 @@ MappingAmbiguity <- function(data,
           expand=TRUE)
 
     #Extract summary table:
-    ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Summary", sep="")]] <-
-        ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
-        attr(paste0("ambiguity_", Comp[[comp]]$From , "_",Comp[[comp]]$To, sep=""))
+    ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to, "_summary", sep="")]] <-
+        ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]%>%
+        attr(paste0("ambiguity_", Comp[[comp]]$from , "_",Comp[[comp]]$to, sep=""))
 
     ############################################################################################################
-    if(Summary==TRUE){
-      if(is.null(GroupingVariable)==FALSE){
+    if(summary==TRUE){
+      if(is.null(grouping_variable)==FALSE){
         # Add further information we need to summarise the table and combine Original-to-Translated and Translated-to-Original
-        # If we have a GroupingVariable we need to combine it with the MetaboliteID before merging
-        ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
-          tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>%
-          mutate(!!sym(paste0("AcrossGroupMappingIssue(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")", sep="")) := case_when(
-            !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity_bygroup", sep="")) != !!sym(paste0(Comp[[comp]]$From, "_", Comp[[comp]]$To, "_ambiguity", sep=""))  ~ "TRUE",
+        # If we have a grouping_variable we need to combine it with the MetaboliteID before merging
+        ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]%>%
+          tidyr::unnest(cols = all_of(Comp[[comp]]$from))%>%
+          mutate(!!sym(paste0("AcrossGroupMappingIssue(", Comp[[comp]]$from, "_to_", Comp[[comp]]$to, ")", sep="")) := case_when(
+            !!sym(paste0(Comp[[comp]]$from, "_", Comp[[comp]]$to, "_ambiguity_bygroup", sep="")) != !!sym(paste0(Comp[[comp]]$from, "_", Comp[[comp]]$to, "_ambiguity", sep=""))  ~ "TRUE",
             TRUE ~ "FALSE" ))%>%
-          group_by(!!sym(Comp[[comp]]$From), !!sym(GroupingVariable))%>%
-          mutate(!!sym(Comp[[comp]]$To) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
-                                                  paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
+          group_by(!!sym(Comp[[comp]]$from), !!sym(grouping_variable))%>%
+          mutate(!!sym(Comp[[comp]]$to) := ifelse(!!sym(Comp[[comp]]$from) == 0, NA,  # Or another placeholder
+                                                  paste(unique(!!sym(Comp[[comp]]$to)), collapse = ", ")
           )) %>%
-          mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n()))%>%
+          mutate( !!sym(paste0("Count(", Comp[[comp]]$from, "_to_", Comp[[comp]]$to, ")")) := ifelse(all(!!sym(Comp[[comp]]$to) == 0), 0, n()))%>%
           ungroup()%>%
           distinct() %>%
-          unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To)), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)%>%
-          separate_rows(!!sym(Comp[[comp]]$To), sep = ", ") %>%
-          unite(UniqueID, c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
+          unite(!!sym(paste0(Comp[[comp]]$from, "_to_", Comp[[comp]]$to)), c(Comp[[comp]]$from, Comp[[comp]]$to), sep=" --> ", remove=FALSE)%>%
+          separate_rows(!!sym(Comp[[comp]]$to), sep = ", ") %>%
+          unite(UniqueID, c(from, to, grouping_variable), sep="_", remove=FALSE)%>%
           distinct()
         }else{
-          ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]%>%
-            tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>%
-            group_by(!!sym(Comp[[comp]]$From))%>%
-            mutate(!!sym(Comp[[comp]]$To) := ifelse(!!sym(Comp[[comp]]$From) == 0, NA,  # Or another placeholder
-                                                    paste(unique(!!sym(Comp[[comp]]$To)), collapse = ", ")
+          ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]%>%
+            tidyr::unnest(cols = all_of(Comp[[comp]]$from))%>%
+            group_by(!!sym(Comp[[comp]]$from))%>%
+            mutate(!!sym(Comp[[comp]]$to) := ifelse(!!sym(Comp[[comp]]$from) == 0, NA,  # Or another placeholder
+                                                    paste(unique(!!sym(Comp[[comp]]$to)), collapse = ", ")
             )) %>%
-            mutate( !!sym(paste0("Count(", Comp[[comp]]$From, "_to_", Comp[[comp]]$To, ")")) := ifelse(all(!!sym(Comp[[comp]]$To) == 0), 0, n()))%>%
+            mutate( !!sym(paste0("Count(", Comp[[comp]]$from, "_to_", Comp[[comp]]$to, ")")) := ifelse(all(!!sym(Comp[[comp]]$to) == 0), 0, n()))%>%
             ungroup()%>%
             distinct() %>%
-            unite(!!sym(paste0(Comp[[comp]]$From, "_to_", Comp[[comp]]$To)), c(Comp[[comp]]$From, Comp[[comp]]$To), sep=" --> ", remove=FALSE)%>%
-            separate_rows(!!sym(Comp[[comp]]$To), sep = ", ") %>%
-            unite(UniqueID, c(From, To), sep="_", remove=FALSE)%>%
+            unite(!!sym(paste0(Comp[[comp]]$from, "_to_", Comp[[comp]]$to)), c(Comp[[comp]]$from, Comp[[comp]]$to), sep=" --> ", remove=FALSE)%>%
+            separate_rows(!!sym(Comp[[comp]]$to), sep = ", ") %>%
+            unite(UniqueID, c(from, to), sep="_", remove=FALSE)%>%
             distinct()%>%
-            mutate(!!sym(paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep="")) := NA)
+            mutate(!!sym(paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep="")) := NA)
         }
     }
 
     # Add NA metabolite maps back if they do exist:
     Removed <- data %>%
-      tidyr::unnest(cols = all_of(Comp[[comp]]$From))%>% # unlist the columns in case they are not expaned
-      filter(is.na(!!sym(Comp[[comp]]$From)))
+      tidyr::unnest(cols = all_of(Comp[[comp]]$from))%>% # unlist the columns in case they are not expaned
+      filter(is.na(!!sym(Comp[[comp]]$from)))
     if(nrow(Removed)>0){
-      ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]] <- dplyr::bind_rows(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]],
+      ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]] <- dplyr::bind_rows(ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]],
                                                                                          test<- Removed%>%
-                                                                                            dplyr::bind_cols(setNames(as.list(rep(NA, length(setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))),
-                                                                                                               setdiff(names(ResList[[paste0(Comp[[comp]]$From, "-to-", Comp[[comp]]$To , sep="")]]), names(Removed))))
+                                                                                            dplyr::bind_cols(setNames(as.list(rep(NA, length(setdiff(names(ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]), names(Removed))))),
+                                                                                                               setdiff(names(ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]), names(Removed))))
       )
     }
   }
 
-  ## ------------------ Create SummaryTable ------------------- ##
-  if(Summary==TRUE){
+  ## ------------------ Create summaryTable ------------------- ##
+  if(summary==TRUE){
     # Combine the two tables
-    Summary <- merge(x= ResList[[paste0(From, "-to-", To, "_Long", sep="")]][,c("UniqueID", paste0(From, "_to_", To), paste0("Count(", From, "_to_", To, ")"), paste0("AcrossGroupMappingIssue(", From, "_to_", To, ")", sep=""))],
-                     y= ResList[[paste0(To, "-to-", From, "_Long", sep="")]][,c("UniqueID", paste0(To, "_to_", From), paste0("Count(", To, "_to_", From, ")"), paste0("AcrossGroupMappingIssue(", To, "_to_", From, ")", sep=""))],
+    summary <- merge(x= ResList[[paste0(from, "-to-", to, "_Long", sep="")]][,c("UniqueID", paste0(from, "_to_", to), paste0("Count(", from, "_to_", to, ")"), paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep=""))],
+                     y= ResList[[paste0(to, "-to-", from, "_Long", sep="")]][,c("UniqueID", paste0(to, "_to_", from), paste0("Count(", to, "_to_", from, ")"), paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep=""))],
                      by = "UniqueID",
                      all = TRUE)%>%
-      separate(UniqueID, into = c(From, To, GroupingVariable), sep="_", remove=FALSE)%>%
+      separate(UniqueID, into = c(from, to, grouping_variable), sep="_", remove=FALSE)%>%
       distinct()
 
     # Add relevant mapping information
-    Summary <- Summary %>%
+    summary <- summary %>%
       mutate(Mapping = case_when(
-        !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == 1  ~ "one-to-one",
-        !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == 1  ~ "one-to-many",
-        !!sym(paste0("Count(", From, "_to_", To, ")")) > 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-many",
-        !!sym(paste0("Count(", From, "_to_", To, ")")) == 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) > 1  ~ "many-to-one",
-        !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & !!sym(paste0("Count(", To, "_to_", From, ")")) == NA  ~ "one-to-none",
-        !!sym(paste0("Count(", From, "_to_", To, ")")) >= 1 & is.na(!!sym(paste0("Count(", To, "_to_", From, ")")))  ~ "one-to-none",
-        !!sym(paste0("Count(", From, "_to_", To, ")")) == NA & !!sym(paste0("Count(", To, "_to_", From, ")")) >= 1  ~ "none-to-one",
-        is.na(!!sym(paste0("Count(", From, "_to_", To, ")"))) & !!sym(paste0("Count(", To, "_to_", From, ")")) >= 1  ~ "none-to-one",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) == 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1  ~ "one-to-one",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) > 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1  ~ "one-to-many",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) > 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) > 1  ~ "many-to-many",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) == 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) > 1  ~ "many-to-one",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) >= 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) == NA  ~ "one-to-none",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) >= 1 & is.na(!!sym(paste0("Count(", to, "_to_", from, ")")))  ~ "one-to-none",
+        !!sym(paste0("Count(", from, "_to_", to, ")")) == NA & !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1  ~ "none-to-one",
+        is.na(!!sym(paste0("Count(", from, "_to_", to, ")"))) & !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1  ~ "none-to-one",
         TRUE ~ NA )) %>%
-      mutate( !!sym(paste0("Count(", From, "_to_", To, ")")) := replace_na( !!sym(paste0("Count(", From, "_to_", To, ")")), 0)) %>%
-      mutate( !!sym(paste0("Count(", To, "_to_", From, ")")) := replace_na( !!sym(paste0("Count(", To, "_to_", From, ")")), 0))
+      mutate( !!sym(paste0("Count(", from, "_to_", to, ")")) := replace_na( !!sym(paste0("Count(", from, "_to_", to, ")")), 0)) %>%
+      mutate( !!sym(paste0("Count(", to, "_to_", from, ")")) := replace_na( !!sym(paste0("Count(", to, "_to_", from, ")")), 0))
 
-    ResList[["Summary"]] <- Summary
+    ResList[["summary"]] <- summary
   }
 
   ## ------------------ Save the results ------------------- ##
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=ResList,
-                         InputList_Plot= NULL,
+    SaveRes(inputlist_df=ResList,
+                         inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
@@ -682,9 +682,9 @@ MappingAmbiguity <- function(data,
 
 #' Check and summarize PriorKnowledge-to-MeasuredFeatures relationship
 #'
-#' @param data Dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
-#' @param PriorKnowledge Dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
-#' @param metadata_info Colum name of Metabolite IDs in data and PriorKnowledge as well as column name of GroupingVariable in PriorKnowledge. \strong{Default = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term")}
+#' @param data dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
+#' @param PriorKnowledge dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
+#' @param metadata_info Colum name of Metabolite IDs in data and PriorKnowledge as well as column name of grouping_variable in PriorKnowledge. \strong{Default = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term")}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
@@ -692,16 +692,16 @@ MappingAmbiguity <- function(data,
 #' @importFrom rlang !!! !! := sym syms
 #'
 #' @examples
-#' DetectedIDs <-  MetaProViz::ToyData(Data="Cells_MetaData")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
-#' input_pathway <- MetaProViz::TranslateID(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz:::CheckMatchID(data= DetectedIDs, PriorKnowledge= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", GroupingVariable="term"))
+#' DetectedIDs <-  MetaProViz::ToyData(data="Cells_Metadata")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
+#' input_pathway <- MetaProViz::TranslateID(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
+#' Res <- MetaProViz:::CheckMatchID(data= DetectedIDs, PriorKnowledge= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
 #' @noRd
 #'
 
 CheckMatchID <- function(data,
                          PriorKnowledge,
-                         metadata_info = c(InputID="HMDB", PriorID="HMDB", GroupingVariable="term"),
+                         metadata_info = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term"),
                          save_table= "csv",
                          path=NULL
 ){
@@ -784,28 +784,28 @@ CheckMatchID <- function(data,
     warning(message)
   }
 
-   if("GroupingVariable" %in% names(metadata_info)){#Add GroupingVariable
-    if(metadata_info[["GroupingVariable"]] %in% colnames(PriorKnowledge)== FALSE){
-      message <- paste0("The ", metadata_info[["GroupingVariable"]], " column selected as InpuID in metadata_info was not found in PriorKnowledge. Please check your input.")
+   if("grouping_variable" %in% names(metadata_info)){#Add grouping_variable
+    if(metadata_info[["grouping_variable"]] %in% colnames(PriorKnowledge)== FALSE){
+      message <- paste0("The ", metadata_info[["grouping_variable"]], " column selected as InpuID in metadata_info was not found in PriorKnowledge. Please check your input.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }else{
-    #Add GroupingVariable
-    metadata_info["GroupingVariable"] <- "GroupingVariable"
-    PriorKnowledge["GroupingVariable"] <- "None"
+    #Add grouping_variable
+    metadata_info["grouping_variable"] <- "grouping_variable"
+    PriorKnowledge["grouping_variable"] <- "None"
 
     message <- paste0("No ", metadata_info[["PriorID"]], " provided. If this was not intentional, please check your input.")
     logger::log_trace(message)
     message(message)
   }
 
-  if(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["GroupingVariable"]]]])) >= 1){# Remove duplicate IDs
-    message <- paste0(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["GroupingVariable"]]]])) , " duplicated IDs were removed from column", metadata_info[["PriorID"]])
+  if(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1){# Remove duplicate IDs
+    message <- paste0(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from column", metadata_info[["PriorID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
     PriorKnowledge <- PriorKnowledge %>%
-      distinct(.data[[metadata_info[["PriorID"]]]], !!sym(metadata_info[["GroupingVariable"]]), .keep_all = TRUE)%>%
+      distinct(.data[[metadata_info[["PriorID"]]]], !!sym(metadata_info[["grouping_variable"]]), .keep_all = TRUE)%>%
       group_by(!!sym(metadata_info[["PriorID"]])) %>%
       mutate(across(everything(), ~ if (is.character(.)) paste(unique(.), collapse = ", ")))%>%
       ungroup()%>%
@@ -827,7 +827,7 @@ CheckMatchID <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "PriorKnowledgeChecks",
+    Folder <- SavePath(folder_name= "PriorKnowledgeChecks",
                        path=path)
     SubFolder <- file.path(Folder, "CheckMatchID_Detected-to-PK")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
@@ -858,11 +858,11 @@ CheckMatchID <- function(data,
 
   if(PK_MultipleIDs){
     PK_long <- create_long_df(PriorKnowledge, metadata_info[["PriorID"]], "PK")%>%
-      select(metadata_info[["PriorID"]], "OriginalEntry_PK", OriginalGroup_PK, metadata_info[["GroupingVariable"]])
+      select(metadata_info[["PriorID"]], "OriginalEntry_PK", OriginalGroup_PK, metadata_info[["grouping_variable"]])
   }else{
     PK_long <- PriorKnowledge %>%
       mutate(OriginalGroup_PK := paste0("PK_", dplyr::row_number()))%>%
-      select(metadata_info[["PriorID"]],OriginalGroup_PK, metadata_info[["GroupingVariable"]])
+      select(metadata_info[["PriorID"]],OriginalGroup_PK, metadata_info[["grouping_variable"]])
   }
 
   # 2. Merge DF
@@ -872,13 +872,13 @@ CheckMatchID <- function(data,
   #3. Add information to summarize and describe problems
   merged_df <- merged_df %>%
     # num_PK_entries
-    group_by(OriginalGroup_PK, !!sym(metadata_info[["GroupingVariable"]])) %>%
+    group_by(OriginalGroup_PK, !!sym(metadata_info[["grouping_variable"]])) %>%
     mutate(
       num_PK_entries = sum(!is.na(OriginalGroup_PK)),
       num_PK_entries_groups = dplyr::n_distinct(OriginalGroup_PK, na.rm = TRUE)) %>% # count the times we have the same PK_entry match with multiple data entries --> extend below!
     ungroup()%>%
     # num_Input_entries
-    group_by(OriginalGroup_data, !!sym(metadata_info[["GroupingVariable"]])) %>%
+    group_by(OriginalGroup_data, !!sym(metadata_info[["grouping_variable"]])) %>%
     mutate(
       num_Input_entries = sum(!is.na(OriginalGroup_data)),
       num_Input_entries_groups = dplyr::n_distinct(OriginalGroup_data,, na.rm = TRUE))%>%
@@ -906,7 +906,7 @@ CheckMatchID <- function(data,
       )
     )
     #  Handle "Detected-to-PK" (When PK has multiple IDs)
-    #group_by(OriginalGroup_PK, !!sym(metadata_info[["GroupingVariable"]])) %>%
+    #group_by(OriginalGroup_PK, !!sym(metadata_info[["grouping_variable"]])) %>%
     #mutate(
     #  `Detected-to-PK` = case_when(
     #    num_Input_entries == 0 & num_PK_entries == 1 ~ "none-to-one", # No match & OriginalGroup_PK appears once
@@ -922,7 +922,7 @@ CheckMatchID <- function(data,
     #) %>%
     #ungroup() %>%
     # Handle "PK-to-Detected" (When data has multiple IDs)
-    #group_by(OriginalGroup_data, !!sym(metadata_info[["GroupingVariable"]])) %>%
+    #group_by(OriginalGroup_data, !!sym(metadata_info[["grouping_variable"]])) %>%
     #mutate(
     #  `PK-to-Detected` = case_when(
     #    num_PK_entries == 0 & num_Input_entries == 1 ~ "none-from-one",
@@ -1022,8 +1022,8 @@ CheckMatchID <- function(data,
   #   (present in table_without_NA but not in table_with_NA) with NA values, and then binds these extended rows to table_without_NA.
   #
   # Parameters:
-  #   table_with_NA: Data frame containing the original data (e.g. FeatureMetadata_Biocrates).
-  #   table_without_NA: Data frame containing the processed data with extra columns (e.g. tempnew).
+  #   table_with_NA: data frame containing the original data (e.g. FeatureMetadata_Biocrates).
+  #   table_without_NA: data frame containing the processed data with extra columns (e.g. tempnew).
   #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
   #
   # Returns:
@@ -1061,8 +1061,8 @@ CheckMatchID <- function(data,
   #   This ensures that all duplicate rows receive the same extra column values as the first occurrence.
   #
   # Parameters:
-  #   table_with_duplicates: Data frame containing the original data that may include duplicate keys.
-  #   table_without_duplicates: Data frame with the processed data (first occurrence for each key and extra columns).
+  #   table_with_duplicates: data frame containing the original data that may include duplicate keys.
+  #   table_without_duplicates: data frame with the processed data (first occurrence for each key and extra columns).
   #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
   #
   # Returns:
@@ -1118,7 +1118,7 @@ CheckMatchID <- function(data,
 
   }
 
-  ## ------------------ Plot Summary ----------------------##
+  ## ------------------ Plot summary ----------------------##
   # x = "Class" and y = Frequency. Match Status can be colour of if no class provided class = Match status.
   # Check Biocrates code.
 
@@ -1130,8 +1130,8 @@ CheckMatchID <- function(data,
                   "data_Matched_only_duplicates" = summary_df_only_duplicates)
 
   suppressMessages(suppressWarnings(
-  SaveRes(InputList_DF=ResList,
-                       InputList_Plot= NULL,
+  SaveRes(inputlist_df=ResList,
+                       inputlist_plot= NULL,
                        save_table=save_table,
                        save_plot=NULL,
                        path= SubFolder,
@@ -1145,13 +1145,13 @@ CheckMatchID <- function(data,
 
 
 ##########################################################################################
-### ### ### Cluster Prior Knowledge ### ### ###
+### ### ### cluster Prior Knowledge ### ### ###
 ##########################################################################################
 
 #' Deal with pathway overlap in prior knowledge
 #'
-#' @param data Dataframe with at least one column with the target (e.g. metabolite) and a column source (e.g. term).
-#' @param metadata_info = c(InputID="MetaboliteID", GroupingVariable="term"),
+#' @param data dataframe with at least one column with the target (e.g. metabolite) and a column source (e.g. term).
+#' @param metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
@@ -1161,14 +1161,14 @@ CheckMatchID <- function(data,
 #' @importFrom igraph graph_from_adjacency_matrix components
 #' @noRd
 ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
-                      metadata_info= c(InputID="MetaboliteID", GroupingVariable="term"),
-                      Clust = "Graph", # Options: "Graph", "Hierarchical",
+                      metadata_info= c(InputID="MetaboliteID", grouping_variable="term"),
+                      clust = "Graph", # Options: "Graph", "Hierarchical",
                       matrix ="percentage", # Choose "pearson", "spearman", "kendall", or "percentage"
                       min= 2 # minimum pathways per cluster
 
 ){
 
-  # Cluster PK before running enrichment analysis --> add another column that groups the data based on the pathway overlap:
+  # cluster PK before running enrichment analysis --> add another column that groups the data based on the pathway overlap:
   # provide different options for clustering (e.g. % of overlap, semantics similarity) --> Ramp uses % of overlap, semnatics similarity: https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html
 
 
@@ -1180,18 +1180,18 @@ ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG path
 
 
   ######################################################################################################################################
-  ## ------------------ Cluster the data ------------------- ##
+  ## ------------------ cluster the data ------------------- ##
   # 1. Create a list of unique MetaboliteIDs for each term
   term_metabolites <- data %>%
-    dplyr::group_by(!!sym(metadata_info[["GroupingVariable"]])) %>%
+    dplyr::group_by(!!sym(metadata_info[["grouping_variable"]])) %>%
     dplyr::summarize(MetaboliteIDs = list(unique(!!sym(metadata_info[["InputID"]])))) %>%
     dplyr::ungroup()
 
   #2. Create the overlap matrix based on different methods:
   if (matrix == "percentage") {# Compute pairwise overlaps
-    term_overlap <- combn(term_metabolites[[metadata_info[["GroupingVariable"]]]], 2, function(terms) {
-      term1_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["GroupingVariable"]]]] == terms[1]][[1]]
-      term2_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["GroupingVariable"]]]] == terms[2]][[1]]
+    term_overlap <- combn(term_metabolites[[metadata_info[["grouping_variable"]]]], 2, function(terms) {
+      term1_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[1]][[1]]
+      term2_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[2]][[1]]
 
       overlap <- length(intersect(term1_ids, term2_ids)) / length(union(term1_ids, term2_ids))
       data.frame(Term1 = terms[1], Term2 = terms[2], Overlap = overlap)
@@ -1211,7 +1211,7 @@ ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG path
     }
   } else {
     # Create a binary matrix for correlation methods
-    terms <- term_metabolites[[metadata_info[["GroupingVariable"]]]]
+    terms <- term_metabolites[[metadata_info[["grouping_variable"]]]]
     metabolites <- unique(unlist(term_metabolites$MetaboliteIDs)) #[[metadata_info[["InputID"]]]]
 
     binary_matrix <- matrix(0, nrow = length(terms), ncol = length(metabolites), dimnames = list(terms, metabolites))
@@ -1228,14 +1228,14 @@ ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG path
     # Convert to distance matrix
     overlap_matrix <- 1 - correlation_matrix
   }
-  # 3. Cluster terms based on overlap threshold
+  # 3. cluster terms based on overlap threshold
   threshold <- 0.7 # Define similarity threshold
   term_clusters <- term_overlap %>%
     dplyr::filter(Overlap >= threshold) %>%
     dplyr::select(Term1, Term2)
 
-  # 4. Clustering
-  if (Clust == "Graph") { #Use Graph-based clustering
+  # 4. clustering
+  if (clust == "Graph") { #Use Graph-based clustering
   # Here we need the distance matrix:
   overlap_matrix <- 1 - correlation_matrix
 
@@ -1246,25 +1246,25 @@ ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG path
   # Create a graph from the adjacency matrix
   g <- igraph::graph_from_adjacency_matrix(adjacency_matrix, mode = "undirected", weighted = TRUE)
   initial_clusters <- igraph::components(g)$membership
-  term_metabolites$Cluster <- initial_clusters[match(term_metabolites[[metadata_info[["GroupingVariable"]]]], names(initial_clusters))]
-  } else if (Clust == "Hierarchical") { # Hierarchical clustering
+  term_metabolites$cluster <- initial_clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(initial_clusters))]
+  } else if (clust == "Hierarchical") { # Hierarchical clustering
     hclust_result <- hclust(as.dist(distance_matrix), method = "average") # make methods into parameters!
     num_clusters <- 4
     term_clusters_hclust <- cutree(hclust_result, k = num_clusters)
 
-    term_metabolites$Cluster <- paste0("Cluster", term_clusters_hclust[match(terms, names(term_clusters_hclust))])
-    #term_metabolites$Cluster <- clusters[match(term_metabolites[[metadata_info[["GroupingVariable"]]]], names(clusters))]
+    term_metabolites$cluster <- paste0("cluster", term_clusters_hclust[match(terms, names(term_clusters_hclust))])
+    #term_metabolites$cluster <- clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(clusters))]
   } else {
-    stop("Invalid clustering method specified in Clust parameter.")
+    stop("Invalid clustering method specified in clust parameter.")
   }
 
   # 5. Merge cluster group information back to the original data
   df <- data %>%
-    dplyr::left_join(term_metabolites %>% select(!!sym(metadata_info[["GroupingVariable"]]), Cluster), by = metadata_info[["GroupingVariable"]])%>%
-    dplyr::mutate(Cluster = ifelse(
-      is.na(Cluster),
+    dplyr::left_join(term_metabolites %>% select(!!sym(metadata_info[["grouping_variable"]]), cluster), by = metadata_info[["grouping_variable"]])%>%
+    dplyr::mutate(cluster = ifelse(
+      is.na(cluster),
         "None", # Assign "None" to NAs
-        paste0("Cluster", Cluster) # Convert numeric IDs to descriptive labels
+        paste0("cluster", cluster) # Convert numeric IDs to descriptive labels
       )
     )
 
@@ -1282,7 +1282,7 @@ ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG path
 
 #' Adds extra columns to enrichment output that inform about 1. The amount of genes associated with term in prior knowledge, 2. The amount of genes detected in input data associated with term in prior knowledge, and 3. The percentage of genes detected in input data associated with term in prior knowledge.
 #'
-#' @param mat Data matrix used as input for enrichment analysis
+#' @param mat data matrix used as input for enrichment analysis
 #' @param net Prior Knowledge used as input for enrichment analysis
 #' @param res Results returned from the enrichment analysis
 #' @param .source used as input for enrichment analysis
@@ -1346,7 +1346,7 @@ AddInfo <- function(mat,
 
   res_Add<- merge(x= res_Add, y=Detected_List, by="source", all.x=TRUE)
 
-  #add percentage of Percentage_of_Genes_detected
+  #add percentage of percentage_of_Genes_detected
   res_Add$targets_detected_percentage <-round(((res_Add$targets_detected_num/res_Add$targets_num)*100),digits=2)
 
   #sort by score
@@ -1415,7 +1415,7 @@ AddInfo <- function(mat,
 #' # Filtering to include only gene features:
 #' res_genes <- ComparePK(data = data, filter_by = "gene")
 #'
-#' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single Data Frame)
+#' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
 #'
 #' # Assume FeatureMetadata_Biocrates is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 #' # Here the "Class" column is used as the grouping variable in the UpSet plot.
@@ -1425,7 +1425,7 @@ AddInfo <- function(mat,
 #' res_single <- ComparePK(data = data_single, metadata_info = metadata_info_single,
 #'                           plot_title = "Overlap of BioCrates Columns")
 #'
-#' ## Example 3: Custom Data Frames with Custom Column Names
+#' ## Example 3: Custom data Frames with Custom Column Names
 #'
 #' # Example with preloaded data frames and custom column names:
 #' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), stringsAsFactors = FALSE)
@@ -1478,9 +1478,9 @@ ComparePK <- function(data,
       var = "Hallmark_Pathways",
       load_fun = MetaProViz::metsigdb_hallmarks,
       transform_fun = function(x) {
-        resource_object <- MetaProViz::Make_GeneMetabSet(Input_GeneSet = x,
+        resource_object <- MetaProViz::Make_GeneMetabSet(input_pk = x,
                                                          metadata_info = c(Target = "gene"),
-                                                         PKName = "Hallmarks")
+                                                         pk_name = "Hallmarks")
         if ("GeneMetabSet" %in% names(resource_object)) {
           resource_object$GeneMetabSet
         } else {
@@ -1493,9 +1493,9 @@ ComparePK <- function(data,
       var = "Gaude_Pathways",
       load_fun = MetaProViz::metsigdb_gaude,
       transform_fun = function(x) {
-        resource_object <- MetaProViz::Make_GeneMetabSet(Input_GeneSet = x,
+        resource_object <- MetaProViz::Make_GeneMetabSet(input_pk = x,
                                                          metadata_info = c(Target = "gene"),
-                                                         PKName = "Gaude")
+                                                         pk_name = "Gaude")
         if ("GeneMetabSet" %in% names(resource_object)) {
           resource_object$GeneMetabSet
         } else {
@@ -1775,7 +1775,7 @@ count_ids <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(FolderName= "PriorKnowledge",
+    Folder <- SavePath(folder_name= "PriorKnowledge",
                        path=path)
 
     SubFolder <- file.path(Folder, "Count_MetaboliteIDs")
@@ -1839,9 +1839,9 @@ count_ids <- function(data,
     )
 
   # Make the nice plot:
-  Plot_Sized <-  plotGrob_Superplot(InputPlot=plot_obj, metadata_info= c(Conditions="id_label", Superplot = TRUE), metadata_sample= processed_data%>%dplyr::rename("Conditions"="entry_count") , plot_name = plot_title, Subtitle = "", plot_type="Bar")
-  PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-  PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+  Plot_Sized <-  plotGrob_Superplot(input_plot=plot_obj, metadata_info= c(Conditions="id_label", Superplot = TRUE), metadata_sample= processed_data%>%dplyr::rename("Conditions"="entry_count") , plot_name = plot_title, subtitle = "", plot_type="Bar")
+  plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+  plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
   Plot_Sized %<>%
     {ggplot2::ggplot() + annotation_custom(.)} %>%
     add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -1849,8 +1849,8 @@ count_ids <- function(data,
 
   ## ------------------  save and return ------------------- ##
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=list("Table"=processed_data),#This needs to be a list, also for single comparisons
-            InputList_Plot=list("Plot_Sized"=Plot_Sized) ,
+    SaveRes(inputlist_df=list("Table"=processed_data),#This needs to be a list, also for single comparisons
+            inputlist_plot=list("Plot_Sized"=Plot_Sized) ,
             save_table= save_table,
             save_plot=save_plot,
             path= SubFolder,

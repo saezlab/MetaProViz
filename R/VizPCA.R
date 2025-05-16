@@ -2,7 +2,7 @@
 ##
 ## Script name: Visualization  PCA plot
 ##
-## Purpose of script: Data Visualisation of the MetaProViz analysis to aid biological interpretation
+## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
 ##
 ## Author: Dimitrios Prymidis and Christina Schmidt
 ##
@@ -31,12 +31,12 @@
 #' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
 #' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}
-#' @param ColorScale \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
+#' @param scale_color \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
 #' @param ShowLoadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
 #' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param PCx \emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}
-#' @param PCy \emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}
+#' @param pcx \emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}
+#' @param pcy \emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}
 #' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
 #' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
@@ -66,14 +66,14 @@ VizPCA <- function(data,
                    metadata_info= NULL,
                    metadata_sample = NULL,
                    color_palette= NULL,
-                   ColorScale="discrete",
+                   scale_color="discrete",
                    shape_palette=NULL,
                    ShowLoadings = FALSE,
                    Scaling = TRUE,
-                   PCx=1,
-                   PCy=2,
+                   pcx=1,
+                   pcy=2,
                    theme=NULL,#theme_classic()
-                  plot_name= '',
+                   plot_name= '',
                    save_plot = "svg",
                    print_plot=TRUE,
                    path = NULL
@@ -117,7 +117,7 @@ VizPCA <- function(data,
   ## ------------ Create Results output folder ----------- ##
   Folder <- NULL
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(FolderName= "PCAPlots",
+    Folder <- SavePath(folder_name= "PCAPlots",
                                     path=path)
   }
   logger::log_info("VizPCA results saved at ", Folder)
@@ -126,9 +126,9 @@ VizPCA <- function(data,
   ## ----------- Set the plot parameters: ------------ ##
   ##--- Prepare colour and shape palette
   if(is.null(color_palette)){
-    if((ColorScale=="discrete")==TRUE){
+    if((scale_color=="discrete")==TRUE){
       safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
-    }else if(ColorScale=="continuous"){
+    }else if(scale_color=="continuous"){
       safe_colorblind_palette <- NULL
     }
   } else{
@@ -165,7 +165,7 @@ VizPCA <- function(data,
    }
  }
 
-  ##--- Prepare Input Data:
+  ##--- Prepare Input data:
   if(is.null(metadata_sample)==FALSE){
     InputPCA  <- merge(x=metadata_sample%>%tibble::rownames_to_column("UniqueID") , y=data%>%tibble::rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
       tibble::column_to_rownames("UniqueID")
@@ -175,10 +175,10 @@ VizPCA <- function(data,
 
  ##--- Prepare the color and shape settings:
   if("color" %in% names(metadata_sample)==TRUE){
-    if(ColorScale=="discrete"){
+    if(scale_color=="discrete"){
       InputPCA$color <- as.factor(InputPCA$color)
       color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
-    }else if(ColorScale=="continuous"){
+    }else if(scale_color=="continuous"){
       if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
         InputPCA$color <- as.numeric(InputPCA$color)
         color_select <- safe_colorblind_palette
@@ -189,14 +189,14 @@ VizPCA <- function(data,
         #color that will be used for distinct
         color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
         #Overwrite color_scale
-        ColorScale <- "discrete"
-        logger::log_info("Warning: ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
-        warning("ColorScale=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
+        scale_color <- "discrete"
+        logger::log_info("Warning: scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
+        warning("scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
       }
     }
   }
 
-  logger::log_info("VizPCA ColorScale: ", ColorScale)
+  logger::log_info("VizPCA scale_color: ", scale_color)
 
   if("shape" %in% names(metadata_sample)==TRUE){
     shape_select <- safe_shape_palette[1:length(unique(InputPCA$shape))]
@@ -233,8 +233,8 @@ VizPCA <- function(data,
   #Make the plot:
   PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(data), scale. = as.logical(Scaling)),
                   data= InputPCA,
-                  x= PCx ,
-                  y= PCy,
+                  x= pcx ,
+                  y= pcy,
                   colour = Param_Col,
                   fill =  Param_Col,
                   shape = Param_Sha,
@@ -254,9 +254,9 @@ VizPCA <- function(data,
     ggplot2::geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
     ggplot2::geom_vline(xintercept=0,  color = "black", linewidth=0.1)
 
-    if(ColorScale=="discrete"){
+    if(scale_color=="discrete"){
       PCA <-PCA + ggplot2::scale_color_manual(values=color_select)
-    }else if(ColorScale=="continuous" & is.null(color_palette)){
+    }else if(scale_color=="continuous" & is.null(color_palette)){
       PCA <-PCA + color_select
     }
 
@@ -272,8 +272,8 @@ VizPCA <- function(data,
 
   #Set the total heights and widths
   PCA %<>% PlotGrob_PCA(metadata_info=metadata_info,plot_name=PlotName)
-  PlotHeight <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
-  PlotWidth <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
+  plot_height <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
+  plot_width <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
   PCA %<>%
     {ggplot2::ggplot() + annotation_custom(.)} %>%
     add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
@@ -287,17 +287,17 @@ VizPCA <- function(data,
 
   suppressMessages(suppressWarnings(
     SaveRes(
-      InputList_DF=NULL,
-      InputList_Plot= PlotList_adaptedGrid,
+      inputlist_df=NULL,
+      inputlist_plot= PlotList_adaptedGrid,
       save_table=NULL,
       save_plot=save_plot,
       path= Folder,
       FileName= FileName,
       core=FALSE,
       print_plot=print_plot,
-      PlotHeight=PlotHeight,
-      PlotWidth=PlotWidth,
-      PlotUnit="cm")
+      plot_height=plot_height,
+      plot_width=plot_width,
+      plot_unit="cm")
   ))
 
   invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))

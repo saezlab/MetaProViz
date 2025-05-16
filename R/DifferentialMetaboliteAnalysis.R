@@ -106,7 +106,7 @@ DMA <-function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    Folder <- SavePath(FolderName= "DMA",
+    Folder <- SavePath(folder_name= "DMA",
                                     path=path)
 
     if(shapiro==TRUE){
@@ -138,7 +138,7 @@ DMA <-function(data,
                                                             metadata_sample=metadata_sample,
                                                             metadata_info=metadata_info,
                                                             pval=pval,
-                                                            QQplots=FALSE))
+                                                            qqplots=FALSE))
     },
     error = function(e) {
       message("Error occurred during Shapiro that performs the Shapiro-Wilk test. Message: ", conditionMessage(e))
@@ -177,7 +177,7 @@ DMA <-function(data,
 
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  Log2FC_table <- Log2FC_fun(data=data,
+  log2fc_table <- Log2FC_fun(data=data,
                                           metadata_sample=metadata_sample,
                                           metadata_info=metadata_info,
                                           core=core,
@@ -191,7 +191,7 @@ DMA <-function(data,
                                                 metadata_sample=metadata_sample,
                                                 metadata_info=metadata_info,
                                                 padj=padj,
-                                                Log2FC_table=Log2FC_table,
+                                                log2fc_table=log2fc_table,
                                                 core=core,
                                                 transform=transform)
 
@@ -199,7 +199,7 @@ DMA <-function(data,
       STAT_C1vC2 <-DMA_Stat_single(data=data,
                                                 metadata_sample=metadata_sample,
                                                 metadata_info=metadata_info,
-                                                Log2FC_table=Log2FC_table,
+                                                log2fc_table=log2fc_table,
                                                 pval=pval,
                                                 padj=padj)
     }
@@ -220,24 +220,24 @@ DMA <-function(data,
       STAT_C1vC2 <- AOV(data=data,
                                      metadata_sample=metadata_sample,
                                      metadata_info=metadata_info,
-                                     Log2FC_table=Log2FC_table)
+                                     log2fc_table=log2fc_table)
     }else if(pval=="kruskal.test"){
       STAT_C1vC2 <-Kruskal(data=data,
                                         metadata_sample=metadata_sample,
                                         metadata_info=metadata_info,
-                                        Log2FC_table=Log2FC_table,
+                                        log2fc_table=log2fc_table,
                                         padj=padj)
     }else if(pval=="welch"){
       STAT_C1vC2 <-Welch(data=data,
                                       metadata_sample=metadata_sample,
                                       metadata_info=metadata_info,
-                                      Log2FC_table=Log2FC_table)
+                                      log2fc_table=log2fc_table)
     }else if(pval=="lmFit"){
       STAT_C1vC2 <- DMA_Stat_limma(data=data,
                                                 metadata_sample=metadata_sample,
                                                 metadata_info=metadata_info,
                                                 padj=padj,
-                                                Log2FC_table=Log2FC_table,
+                                                log2fc_table=log2fc_table,
                                                 core=core,
                                                 transform=transform)
     }
@@ -322,7 +322,7 @@ DMA <-function(data,
                                                     y= "p.adj",
                                                     x= x,
                                                    plot_name= DF,
-                                                    Subtitle=  bquote(italic("Differential Metabolite Analysis")),
+                                                    subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     save_plot= NULL))
 
     DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
@@ -337,8 +337,8 @@ DMA <-function(data,
   #Here we make a list in which we will save the outputs:
   if(shapiro==TRUE & exists("Shapiro_output")==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=Shapiro_output[["DF"]],
-                           InputList_Plot= Shapiro_output[["Plot"]][["Distributions"]],
+      SaveRes(inputlist_df=Shapiro_output[["DF"]],
+                           inputlist_plot= Shapiro_output[["Plot"]][["Distributions"]],
                            save_table=save_table,
                            save_plot=save_plot,
                            path= SubFolder_S ,
@@ -351,8 +351,8 @@ DMA <-function(data,
 
   if(bartlett==TRUE & exists("Bartlett_output")==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=Bartlett_output[["DF"]],
-                           InputList_Plot= Bartlett_output[["Plot"]],
+      SaveRes(inputlist_df=Bartlett_output[["DF"]],
+                           inputlist_plot= Bartlett_output[["Plot"]],
                            save_table=save_table,
                            save_plot=save_plot,
                            path= SubFolder_B ,
@@ -365,8 +365,8 @@ DMA <-function(data,
 
   if(vst==TRUE & exists("vst_res")==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=vst_res[["DF"]],
-                           InputList_Plot= vst_res[["Plot"]],
+      SaveRes(inputlist_df=vst_res[["DF"]],
+                           inputlist_plot= vst_res[["Plot"]],
                            save_table=save_table,
                            save_plot=save_plot,
                            path= SubFolder_V ,
@@ -379,8 +379,8 @@ DMA <-function(data,
 
   if(core==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(InputList_DF=list("Feature_Metadata"=Feature_Metadata),
-              InputList_Plot= NULL,
+      SaveRes(inputlist_df=list("Feature_Metadata"=Feature_Metadata),
+              inputlist_plot= NULL,
               save_table=save_table,
               save_plot=NULL,
               path= Folder,
@@ -392,8 +392,8 @@ DMA <-function(data,
   }
 
   suppressMessages(suppressWarnings(
-    SaveRes(InputList_DF=DMA_Output,#This needs to be a list, also for single comparisons
-            InputList_Plot= volplotList,
+    SaveRes(inputlist_df=DMA_Output,#This needs to be a list, also for single comparisons
+            inputlist_plot= volplotList,
             save_table=save_table,
             save_plot=save_plot,
             path= Folder,
@@ -509,7 +509,7 @@ Log2FC_fun <-function(data,
 
   ####################################################################################################################################
   ## ----------------- Log2FC ----------------------------
-  Log2FC_table <- list()# Create an empty list to store results data frames
+  log2fc_table <- list()# Create an empty list to store results data frames
   for(column in 1:dim(comparisons)[2]){
     C1 <- data %>% # Numerator
       dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1,column]) %>%
@@ -632,10 +632,10 @@ Log2FC_fun <-function(data,
         logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
 
         # Store the data frame in the results list, named after the contrast
-        Log2FC_table[[logname]] <- Log2FC_C1vC2
-        Log2FC_table[[logname_reverse]] <- Log2FC_C2vC1
+        log2fc_table[[logname]] <- Log2FC_C1vC2
+        log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
       }else{
-        Log2FC_table <- Log2FC_C1vC2
+        log2fc_table <- Log2FC_C1vC2
       }
     }else if(core==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
@@ -695,14 +695,14 @@ Log2FC_fun <-function(data,
         logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
 
         # Store the data frame in the results list, named after the contrast
-        Log2FC_table[[logname]] <- Log2FC_C1vC2
-        Log2FC_table[[logname_reverse]] <- Log2FC_C2vC1
+        log2fc_table[[logname]] <- Log2FC_C1vC2
+        log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
       }else{
-        Log2FC_table <- Log2FC_C1vC2
+        log2fc_table <- Log2FC_C1vC2
       }
     }
   }
-  return(invisible(Log2FC_table))
+  return(invisible(log2fc_table))
 }
 
 
@@ -718,7 +718,7 @@ Log2FC_fun <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (here one-vs-one).
-#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default = "t.test"}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
@@ -736,7 +736,7 @@ Log2FC_fun <-function(data,
 DMA_Stat_single <- function(data,
                             metadata_sample,
                             metadata_info,
-                            Log2FC_table=NULL,
+                            log2fc_table=NULL,
                             pval="t.test",
                             padj="fdr"){
   ## ------------ Create log file ----------- ##
@@ -824,8 +824,8 @@ DMA_Stat_single <- function(data,
   }
 
   #Add Log2FC
-  if(is.null(Log2FC_table)==FALSE){
-    STAT_C1vC2 <- merge(Log2FC_table,STAT_C1vC2[,c(1:2,4,3)], by="Metabolite")
+  if(is.null(log2fc_table)==FALSE){
+    STAT_C1vC2 <- merge(log2fc_table,STAT_C1vC2[,c(1:2,4,3)], by="Metabolite")
   }
 
   #order for t.value
@@ -848,7 +848,7 @@ DMA_Stat_single <- function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
 #'
@@ -864,7 +864,7 @@ DMA_Stat_single <- function(data,
 AOV <-function(data,
                metadata_sample,
                metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-               Log2FC_table=NULL){
+               log2fc_table=NULL){
 
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -944,14 +944,14 @@ AOV <-function(data,
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  if(is.null(Log2FC_table)==FALSE){
+  if(is.null(log2fc_table)==FALSE){
     list_names <-  names(results_list)
 
     merged_list <- list()
     for(name in list_names){
       # Check if the data frames exist in both lists
-      if(name %in% names(results_list) && name %in% names(Log2FC_table)){
-        merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+      if(name %in% names(results_list) && name %in% names(log2fc_table)){
+        merged_df <- merge(results_list[[name]], log2fc_table[[name]], by = "Metabolite", all = TRUE)
         merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
         merged_list[[name]] <- merged_df
       }
@@ -986,7 +986,7 @@ AOV <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
@@ -1004,7 +1004,7 @@ AOV <-function(data,
 Kruskal <-function(data,
                    metadata_sample,
                    metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-                   Log2FC_table = NULL,
+                   log2fc_table = NULL,
                    padj = "fdr"
 ){
 
@@ -1094,12 +1094,12 @@ Kruskal <-function(data,
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  if(is.null(Log2FC_table)==FALSE){
+  if(is.null(log2fc_table)==FALSE){
     merged_list <- list()
     for(name in common_col_names){
       # Check if the data frames exist in both lists
-      if(name %in% names(results_list) && name %in% names(Log2FC_table)){
-        merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+      if(name %in% names(results_list) && name %in% names(log2fc_table)){
+        merged_df <- merge(results_list[[name]], log2fc_table[[name]], by = "Metabolite", all = TRUE)
         merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
         merged_list[[name]] <- merged_df
       }
@@ -1123,7 +1123,7 @@ Kruskal <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
 #'
@@ -1139,7 +1139,7 @@ Kruskal <-function(data,
 Welch <-function(data,
                  metadata_sample,
                  metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-                 Log2FC_table=NULL
+                 log2fc_table=NULL
 ){
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
@@ -1217,14 +1217,14 @@ Welch <-function(data,
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  if(is.null(Log2FC_table)==FALSE){
+  if(is.null(log2fc_table)==FALSE){
     list_names <-  names(results_list)
 
     merged_list <- list()
     for(name in list_names){
       # Check if the data frames exist in both lists
-      if(name %in% names(results_list) && name %in% names(Log2FC_table)){
-        merged_df <- merge(results_list[[name]], Log2FC_table[[name]], by = "Metabolite", all = TRUE)
+      if(name %in% names(results_list) && name %in% names(log2fc_table)){
+        merged_df <- merge(results_list[[name]], log2fc_table[[name]], by = "Metabolite", all = TRUE)
         merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
         merged_list[[name]] <- merged_df
       }
@@ -1247,7 +1247,7 @@ Welch <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param Log2FC_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
 #' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
@@ -1267,7 +1267,7 @@ Welch <-function(data,
 DMA_Stat_limma <- function(data,
                            metadata_sample,
                            metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-                           Log2FC_table = NULL,
+                           log2fc_table = NULL,
                            padj ="fdr",
                            core=FALSE,
                            transform= TRUE){
@@ -1460,7 +1460,7 @@ DMA_Stat_limma <- function(data,
     results_list_new[[new_name]] <- results_list[[old_name]]
     }
 
-  if(is.null(Log2FC_table)==FALSE){
+  if(is.null(log2fc_table)==FALSE){
     if(core==TRUE){#If core=TRUE, we need to exchange the Log2FC with the Distance and we need to combine the lists
       # Merge the data frames in list1 and list2 based on the "Metabolite" column
       merged_list <- list()
@@ -1468,8 +1468,8 @@ DMA_Stat_limma <- function(data,
         list_dfs <- name_match_df$New[i]
 
         # Check if the data frames exist in both lists
-        if(list_dfs %in% names(results_list_new) && list_dfs %in% names(Log2FC_table)){
-          merged_df <- merge(results_list_new[[list_dfs]], Log2FC_table[[list_dfs]], by = "Metabolite", all = TRUE)
+        if(list_dfs %in% names(results_list_new) && list_dfs %in% names(log2fc_table)){
+          merged_df <- merge(results_list_new[[list_dfs]], log2fc_table[[list_dfs]], by = "Metabolite", all = TRUE)
           merged_list[[list_dfs]] <- merged_df
         }
       }
@@ -1518,7 +1518,7 @@ DMA_Stat_limma <- function(data,
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
 #' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
-#' @param QQplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be plotted  \strong{default = TRUE}
+#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be plotted  \strong{default = TRUE}
 #'
 #' @return List with tewo entries: DF (including the results DF) and Plots (including the Density and QQ plots)
 #'
@@ -1537,7 +1537,7 @@ Shapiro <-function(data,
                    metadata_sample,
                    metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                    pval= "t-test",
-                   QQplots=TRUE
+                   qqplots=TRUE
 ){
 
   ## ------------ Create log file ----------- ##
@@ -1647,14 +1647,14 @@ Shapiro <-function(data,
 
     ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
     Density_plots <- list()
-    if(QQplots==TRUE){
+    if(qqplots==TRUE){
       QQ_plots <- list()
     }
     for(x in 1:nrow(DF_shapiro_results)){
       #### Generate Results Table
       transpose <- as.data.frame(t(DF_shapiro_results[x,]))
-      Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of normally distributed metabolites across samples
-      NotNorm <- format((round(sum(transpose[[1]] < 0.05)/nrow(transpose),4))*100, nsmall = 2) # Percentage of not-normally distributed metabolites across samples
+      Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # percentage of normally distributed metabolites across samples
+      NotNorm <- format((round(sum(transpose[[1]] < 0.05)/nrow(transpose),4))*100, nsmall = 2) # percentage of not-normally distributed metabolites across samples
       if(pval =="kruskal.test" | pval =="wilcox.test"){
         message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(pval), ", which is for non parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
       }else{
@@ -1695,13 +1695,13 @@ Shapiro <-function(data,
                          ggplot2::geom_density(alpha=.2, fill="grey45") +
                          ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
                          ggplot2::theme_minimal()+
-                         ggplot2::labs(title=paste("Data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")
+                         ggplot2::labs(title=paste("data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")
       )
 
       Density_plots[[paste(colnames(transpose))]] <- sampleDist
 
       # QQ plots
-      if(QQplots==TRUE){
+      if(qqplots==TRUE){
         # Make folders
         conds <- unique(c(numerator, denominator))
 
@@ -1737,7 +1737,7 @@ Shapiro <-function(data,
     ######################################
     ##-------- Return
     #Here we make a list
-    if(QQplots==TRUE){
+    if(qqplots==TRUE){
       Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%tibble::rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
     }else{
       Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%tibble::rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots))
@@ -1823,7 +1823,7 @@ Bartlett <-function(data,
 
 #' This function performs a variance stabilizing transformation (vst) on the input data.
 #'
-#' @param data Data frame with unique sample identifiers
+#' @param data data frame with unique sample identifiers
 # not true: no need to have row names, they are not used here, and in general,
 # it is not a good practice to use row names
 #'     as row names and metabolite numerical values in columns with metabolite
@@ -1865,7 +1865,7 @@ vst <- function(data){
               ggplot2::xlab("log(mean)") +
               ggplot2::ylab("log(sd)") +
               ggplot2::geom_abline(intercept = 0, slope = 1)  +
-              ggplot2::ggtitle(" Data heteroscedasticity")  +
+              ggplot2::ggtitle(" data heteroscedasticity")  +
               ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
 
   # select data

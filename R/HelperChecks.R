@@ -26,7 +26,7 @@
 #' Check input general parameters
 #'
 #' @param data Passed to MetaProViz functions. Usually DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. But can also be differential expression results or other data.
-#' @param data_Num  \emph{Optional: } If data must be numeric \strong{Default = TRUE}
+#' @param data_num  \emph{Optional: } If data must be numeric \strong{Default = TRUE}
 #' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. If not avaliable can be set to NULL. \strong{Default = NULL}
 #' @param metadata_feature \emph{Optional: } DF which contains information about the features. If not avaliable can be set to NULL. \strong{Default = NULL}
 #' @param metadata_info \emph{Optional: } Passed to MetaProViz functions. Usually named vector containing the information about the names of the experimental parameters in metadata_sample, metadata_feature or data. \strong{Default = NULL}
@@ -46,7 +46,7 @@
 #' @noRd
 #'
 CheckInput <- function(data,
-                       data_Num=TRUE,
+                       data_num=TRUE,
                        metadata_sample=NULL,
                        metadata_feature=NULL,
                        metadata_info=NULL,
@@ -70,7 +70,7 @@ CheckInput <- function(data,
     stop(message)
   }
 
-  if(data_Num==TRUE){
+  if(data_num==TRUE){
      Test_num <- apply(data, 2, function(x) is.numeric(x))
      if((any(Test_num) ==  FALSE) ==  TRUE){
        message <- paste0("data needs to be of class numeric")
@@ -291,7 +291,7 @@ CheckInput <- function(data,
   }
   }
 
-  save_table_options <- c("txt","csv", "xlsx", "RData")#RData = SummarizedExperiment (?)
+  save_table_options <- c("txt","csv", "xlsx", "Rdata")#Rdata = SummarizedExperiment (?)
   if(is.null(save_table)==FALSE){
     if((save_table %in% save_table_options == FALSE)| (is.null(save_table)==TRUE)){
       message <- paste0("Check input. The selected save_table option is not valid. Please select one of the folowwing: ",paste(save_table_options,collapse = ", ")," or set to NULL if no tables should be saved.")
@@ -333,12 +333,12 @@ CheckInput <- function(data,
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added.
 #' @param  \emph{Optional: }core If TRUE, a consumption-release experiment has been performed and the core value will be calculated.\strong{Default = FALSE}
-#' @param FeatureFilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
-#' @param FeatureFilt_Value \emph{Optional: } Percentage of feature filtering. \strong{Default = 0.8}
-#' @param TIC \emph{Optional: } If TRUE, Total Ion Count normalization is performed. \strong{Default = TRUE}
-#' @param MVI \emph{Optional: } If TRUE, Missing Value Imputation (MVI) based on half minimum is performed \strong{Default = TRUE}
-#' @param MVI_Percentage \emph{Optional: } Percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}
-#' @param HotellinsConfidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
+#' @param featurefilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
+#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default = 0.8}
+#' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed. \strong{Default = TRUE}
+#' @param mvi \emph{Optional: } If TRUE, Missing Value Imputation (mvi) based on half minimum is performed \strong{Default = TRUE}
+#' @param mvi_percentage \emph{Optional: } percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}
+#' @param hotellins_confidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #'
 #' @return returns warnings and errors if input is not correct
 #'
@@ -351,12 +351,12 @@ CheckInput <- function(data,
 CheckInput_PreProcessing <- function(metadata_sample,
                                      metadata_info,
                                      core=FALSE,
-                                     FeatureFilt = "Modified",
-                                     FeatureFilt_Value = 0.8,
-                                     TIC = TRUE,
-                                     MVI= TRUE,
-                                     MVI_Percentage=50,
-                                     HotellinsConfidence = 0.99){
+                                     featurefilt = "Modified",
+                                     cutoff_featurefilt = 0.8,
+                                     tic = TRUE,
+                                     mvi= TRUE,
+                                     mvi_percentage=50,
+                                     hotellins_confidence = 0.99){
   if(is.vector(metadata_info)==TRUE){
     #-------------metadata_info
     #core
@@ -383,33 +383,33 @@ CheckInput_PreProcessing <- function(metadata_sample,
 
   #-------------General parameters
   Feature_Filtering_options <- c("Standard","Modified")
-  if(FeatureFilt %in% Feature_Filtering_options == FALSE & is.null(FeatureFilt)==FALSE){
-    message <- paste0("Check input. The selected FeatureFilt option is not valid. Please set to NULL or select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
+  if(featurefilt %in% Feature_Filtering_options == FALSE & is.null(featurefilt)==FALSE){
+    message <- paste0("Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",paste(Feature_Filtering_options,collapse = ", "),"." )
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
-  if(is.numeric(FeatureFilt_Value) == FALSE |FeatureFilt_Value > 1 | FeatureFilt_Value < 0){
-    message <- paste0("Check input. The selected FeatureFilt_Value should be numeric and between 0 and 1.")
+  if(is.numeric(cutoff_featurefilt) == FALSE |cutoff_featurefilt > 1 | cutoff_featurefilt < 0){
+    message <- paste0("Check input. The selected cutoff_featurefilt should be numeric and between 0 and 1.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
-  if(is.logical(TIC) == FALSE){
-    message <- paste0("Check input. The TIC value should be either `TRUE` if TIC normalization is to be performed or `FALSE` if no data normalization is to be applied.")
+  if(is.logical(tic) == FALSE){
+    message <- paste0("Check input. The tic value should be either `TRUE` if tic normalization is to be performed or `FALSE` if no data normalization is to be applied.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
-  if(is.logical(MVI) == FALSE){
-    message <- paste0("Check input. The MVI value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
+  if(is.logical(mvi) == FALSE){
+    message <- paste0("Check input. The mvi value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
-  if(is.numeric(MVI_Percentage)== FALSE |HotellinsConfidence > 100 | HotellinsConfidence < 0){
-    message <- paste0("Check input. The selected MVI_Percentage value should be numeric and between 0 and 100.")
+  if(is.numeric(mvi_percentage)== FALSE |hotellins_confidence > 100 | hotellins_confidence < 0){
+    message <- paste0("Check input. The selected mvi_percentage value should be numeric and between 0 and 100.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
-  if( is.numeric(HotellinsConfidence)== FALSE |HotellinsConfidence > 1 | HotellinsConfidence < 0){
-    message <- paste0("Check input. The selected HotellinsConfidence value should be numeric and between 0 and 1.")
+  if( is.numeric(hotellins_confidence)== FALSE |hotellins_confidence > 1 | hotellins_confidence < 0){
+    message <- paste0("Check input. The selected hotellins_confidence value should be numeric and between 0 and 1.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
@@ -621,15 +621,15 @@ CheckInput_DMA <- function(data,
 #' Check input parameters of ORA
 #'
 #' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
-#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for pCutoff and PercentageCutoff, ColumnName for input_pathway. For MetaProViz::ClusterORA also BackgroundColumn. \strong{c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
-#' @param pCutoff \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
-#' @param PercentageCutoff \emph{Optional: } Percentage cutoff of metabolites that should be considered for ORA. Selects Top/Bottom % of selected PercentageColumn, usually t.val or Log2FC \strong{default: 10}
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage, ColumnName for input_pathway. For MetaProViz::ClusterORA also BackgroundColumn. \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
+#' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
+#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom % of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}
 #' @param input_pathway DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
 #' @param pathway_name \emph{Optional: } Name of the input_pathway used \strong{default: ""}
-#' @param minGSSize \emph{Optional: } minimum group size in ORA \strong{default: 10}
-#' @param maxGSSize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
+#' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
+#' @param max_gssize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param RemoveBackground For MetaProViz::ClusterORA the Background Settings are passed, for MetaProViz::StandardORA set to FALSE.
+#' @param remove_background For MetaProViz::ClusterORA the Background Settings are passed, for MetaProViz::StandardORA set to FALSE.
 #'
 #' @return Returns: 1. warnings and errors if input is not correct, 2. Pathway file
 #'
@@ -641,15 +641,15 @@ CheckInput_DMA <- function(data,
 #' @noRd
 #'
 CheckInput_ORA <- function(data,
-                           metadata_info=c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-                           pCutoff=0.05,
-                           PercentageCutoff=10,
+                           metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+                           cutoff_stat=0.05,
+                           cutoff_percentage=10,
                            input_pathway,
                            pathway_name="",
-                           minGSSize=10,
-                           maxGSSize=1000 ,
+                           min_gssize=10,
+                           max_gssize=1000 ,
                            save_table="csv",
-                           RemoveBackground
+                           remove_background
 ){
   # 1. The input data:
   if(class(data) != "data.frame"){
@@ -698,10 +698,10 @@ CheckInput_ORA <- function(data,
       }
     }
 
-    #"PercentageColumn"
-    if("PercentageColumn" %in% names(metadata_info)){
-      if(metadata_info[["PercentageColumn"]] %in% colnames(data)== FALSE){
-        message <- paste0("The ", metadata_info[["PercentageColumn"]], " column selected as PercentageColumn in metadata_info was not found in data. Please check your input.")
+    #"percentageColumn"
+    if("percentageColumn" %in% names(metadata_info)){
+      if(metadata_info[["percentageColumn"]] %in% colnames(data)== FALSE){
+        message <- paste0("The ", metadata_info[["percentageColumn"]], " column selected as percentageColumn in metadata_info was not found in data. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
@@ -753,20 +753,20 @@ CheckInput_ORA <- function(data,
     stop(message)
   }
 
-  if(is.logical(RemoveBackground) == FALSE){
-    message <- paste0("Check input. RemoveBackground value should be either =TRUE or = FALSE.")
+  if(is.logical(remove_background) == FALSE){
+    message <- paste0("Check input. remove_background value should be either =TRUE or = FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
-  if(is.numeric(minGSSize)== FALSE){
-    message <- paste0("Check input. The selected minGSSize value should be numeric.")
+  if(is.numeric(min_gssize)== FALSE){
+    message <- paste0("Check input. The selected min_gssize value should be numeric.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
-  if(is.numeric(maxGSSize)== FALSE){
-    message <- paste0("Check input. The selected maxGSSize value should be numeric.")
+  if(is.numeric(max_gssize)== FALSE){
+    message <- paste0("Check input. The selected max_gssize value should be numeric.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
@@ -780,17 +780,17 @@ CheckInput_ORA <- function(data,
     }
   }
 
-  if(is.null(pCutoff)== FALSE){
-    if(is.numeric(pCutoff)== FALSE | pCutoff > 1 |  pCutoff < 0){
-      message <- paste0("Check input. The selected pCutoff value should be numeric and between 0 and 1.")
+  if(is.null(cutoff_stat)== FALSE){
+    if(is.numeric(cutoff_stat)== FALSE | cutoff_stat > 1 |  cutoff_stat < 0){
+      message <- paste0("Check input. The selected cutoff_stat value should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }
 
-  if(is.null(PercentageCutoff)== FALSE){
-    if( is.numeric(PercentageCutoff)== FALSE  | PercentageCutoff > 100 | PercentageCutoff < 0){
-      message <- paste0("Check input. The selected PercentageCutoff value should be numeric and between 0 and 100.")
+  if(is.null(cutoff_percentage)== FALSE){
+    if( is.numeric(cutoff_percentage)== FALSE  | cutoff_percentage > 100 | cutoff_percentage < 0){
+      message <- paste0("Check input. The selected cutoff_percentage value should be numeric and between 0 and 100.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -809,14 +809,14 @@ CheckInput_ORA <- function(data,
 #'
 #' @param data_Intra For MetaProViz::MCA_core, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
 #' @param data_core For MetaProViz::MCA_core, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
-#' @param metadata_info_Intra For MetaProViz::MCA_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, StatCutoff= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_core  For MetaProViz::MCA_core, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, StatCutoff= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_Intra For MetaProViz::MCA_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_core  For MetaProViz::MCA_core, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
 #' @param data_C1 For MetaProViz::MCA_2Cond, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
 #' @param data_C2 For MetaProViz::MCA_2Cond, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param metadata_info_C1  For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, StatCutoff= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_C2 For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, StatCutoff= NumericValue, ValueCutoff=NumericValue)
-#' @param FeatureID \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
-#' @param BackgroundMethod \emph{Optional: } Background method `Intra|core, Intra&core, core, Intra or * \strong{Default="Intra&core"}
+#' @param metadata_info_C1  For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_C2 For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param feature \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
+#' @param method_background \emph{Optional: } Background method `Intra|core, Intra&core, core, Intra or * \strong{Default="Intra&core"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #'
 #' @return Returns warnings and errors if input is not correct
@@ -835,8 +835,8 @@ CheckInput_MCA <- function(data_C1,
                            metadata_info_C2,
                            metadata_info_core,
                            metadata_info_Intra,
-                           FeatureID= "Metabolite",
-                           BackgroundMethod="Intra&core",
+                           feature= "Metabolite",
+                           method_background="Intra&core",
                            save_table = "csv"
 ){
   ## ------------ Create log file ----------- ##
@@ -849,13 +849,13 @@ CheckInput_MCA <- function(data_C1,
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_C1[duplicated(data_C1[[FeatureID]]), FeatureID]) > 0){
-      message <- paste0("Duplicated FeatureIDs of data_C1, whilst features must be unique")
+    if(length(data_C1[duplicated(data_C1[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_C1, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_C2[duplicated(data_C2[[FeatureID]]), FeatureID]) > 0){
-      message <- paste0("Duplicated FeatureIDs of data_C2, whilst features must be unique")
+    if(length(data_C2[duplicated(data_C2[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_C2, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -866,13 +866,13 @@ CheckInput_MCA <- function(data_C1,
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_Intra[duplicated(data_Intra[[FeatureID]]), FeatureID]) > 0){
-      message <- paste0("Duplicated FeatureIDs of data_Intra, whilst features must be unique")
+    if(length(data_Intra[duplicated(data_Intra[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_Intra, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_core[duplicated(data_core[[FeatureID]]), FeatureID]) > 0){
-      message <- paste0("Duplicated FeatureIDs of data_core, whilst features must be unique")
+    if(length(data_core[duplicated(data_core[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_core, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -965,14 +965,14 @@ CheckInput_MCA <- function(data_C1,
 
   #------------- metadata_info Cutoffs:
   if(is.null(metadata_info_C1)==FALSE){
-    if(is.na(as.numeric(metadata_info_C1[["StatCutoff"]])) == TRUE |as.numeric(metadata_info_C1[["StatCutoff"]]) > 1 | as.numeric(metadata_info_C1[["StatCutoff"]]) < 0){
-      message <- paste0("Check input. The selected StatCutoff in metadata_info_C1 should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_C1[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_C1[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_C1[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_C1 should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
-    if(is.na(as.numeric(metadata_info_C2[["StatCutoff"]])) == TRUE |as.numeric(metadata_info_C2[["StatCutoff"]]) > 1 | as.numeric(metadata_info_C2[["StatCutoff"]]) < 0){
-      message <- paste0("Check input. The selected StatCutoff in metadata_info_C2 should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_C2[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_C2[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_C2[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_C2 should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -990,14 +990,14 @@ CheckInput_MCA <- function(data_C1,
     }
 
   }else{
-    if(is.na(as.numeric(metadata_info_Intra[["StatCutoff"]])) == TRUE |as.numeric(metadata_info_Intra[["StatCutoff"]]) > 1 | as.numeric(metadata_info_Intra[["StatCutoff"]]) < 0){
-      message <- paste0("Check input. The selected StatCutoff in metadata_info_Intra should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_Intra[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_Intra[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_Intra[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_Intra should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
-    if(is.na(as.numeric(metadata_info_core[["StatCutoff"]])) == TRUE |as.numeric(metadata_info_core[["StatCutoff"]]) > 1 | as.numeric(metadata_info_core[["StatCutoff"]]) < 0){
-      message <- paste0("Check input. The selected StatCutoff in metadata_info_core should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_core[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_core[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_core[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_core should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -1042,18 +1042,18 @@ CheckInput_MCA <- function(data_C1,
     }
   }
 
-  #------------- BackgroundMethod
+  #------------- method_background
   if(is.null(metadata_info_C1)==FALSE){
     options <- c("C1|C2", "C1&C2", "C2", "C1" , "*")
-    if(any(options %in% BackgroundMethod) == FALSE){
-      message <- paste0("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+    if(any(options %in% method_background) == FALSE){
+      message <- paste0("Check input. The selected method_background option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }else{
     options <- c("Intra|core", "Intra&core", "core", "Intra" , "*")
-    if(any(options %in% BackgroundMethod) == FALSE){
-      message <- paste0("Check input. The selected BackgroundMethod option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
+    if(any(options %in% method_background) == FALSE){
+      message <- paste0("Check input. The selected method_background option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }

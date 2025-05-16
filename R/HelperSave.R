@@ -25,7 +25,7 @@
 
 #' SavePath is the helper function to create the folder structure and path
 #'
-#' @param FolderName Name of the folder, which can not contain any special characters. Created within  the individual MetaProViz functions and can not be changed by the user.
+#' @param folder_name Name of the folder, which can not contain any special characters. Created within  the individual MetaProViz functions and can not be changed by the user.
 #' @param path Passed to main function by the user
 #'
 #' @description Create folder and path
@@ -34,11 +34,11 @@
 #'
 #' @noRd
 #'
-SavePath<- function(FolderName, path){
-  #Check if FolderName includes special characters that are not allowed
-  cleaned_FolderName <- gsub("[^a-zA-Z0-9 ]", "", FolderName)
-  if (FolderName != cleaned_FolderName){
-    message("Special characters were removed from `FolderName`.")
+SavePath<- function(folder_name, path){
+  #Check if folder_name includes special characters that are not allowed
+  cleaned_folder_name <- gsub("[^a-zA-Z0-9 ]", "", folder_name)
+  if (folder_name != cleaned_folder_name){
+    message("Special characters were removed from `folder_name`.")
   }
 
   #Check if path exist
@@ -54,7 +54,7 @@ SavePath<- function(FolderName, path){
   }
 
   #Create the folder name
-  Results_folder <- file.path(path, cleaned_FolderName)
+  Results_folder <- file.path(path, cleaned_folder_name)
   if(!dir.exists(Results_folder)){dir.create(Results_folder)}
 
   #Return the folder path:
@@ -68,7 +68,7 @@ SavePath<- function(FolderName, path){
 #' @noRd
 ResultsDir <- function(path = 'MetaProViz_Results') {
 
-  # TODO: options?
+  # toDO: options?
   path %>% {`if`(!dir.exists(.), {dir.create(.); .}, .) }
 
 }
@@ -80,33 +80,33 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 
 #' SaveRes is the helper function to save the plots and tables
 #'
-#' @param InputList_DF \emph{Optional: } Generated within the MetaProViz function. Contains named DFs. If not avalailable can be set to NULL.\strong{Default = NULL}
-#' @param InputList_Plot \emph{Optional: } Generated within the MetaProViz function. Contains named Plots. If not avalailable can be set to NULL.\strong{Default = NULL}
+#' @param inputlist_df \emph{Optional: } Generated within the MetaProViz function. Contains named DFs. If not avalailable can be set to NULL.\strong{Default = NULL}
+#' @param inputlist_plot \emph{Optional: } Generated within the MetaProViz function. Contains named Plots. If not avalailable can be set to NULL.\strong{Default = NULL}
 #' @param save_table \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = NULL}
 #' @param save_plot \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL. \strong{Default = NULL}
 #' @param path Passed to main function by the user.
 #' @param FileName Passed to main function by the user.
 #' @param core \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = FALSE}
 #' @param print_plot \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = TRUE}
-#' @param PlotHeight \emph{Optional: } Parameter for ggsave.\strong{Default = NULL}
-#' @param PlotWidth \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
-#' @param PlotUnit \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
+#' @param plot_height \emph{Optional: } Parameter for ggsave.\strong{Default = NULL}
+#' @param plot_width \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
+#' @param plot_unit \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
 #'
 #' @keywords Save
 #' @noRd
 #'
 
-SaveRes<- function(InputList_DF= NULL,
-                   InputList_Plot= NULL,
+SaveRes<- function(inputlist_df= NULL,
+                   inputlist_plot= NULL,
                    save_table = NULL,
                    save_plot = NULL,
                    path,
                    FileName,
                    core=FALSE,
                    print_plot=TRUE,
-                   PlotHeight=NULL,
-                   PlotWidth=NULL,
-                   PlotUnit=NULL){
+                   plot_height=NULL,
+                   plot_width=NULL,
+                   plot_unit=NULL){
 
   ################ Save Tables:
   if(is.null(save_table)==FALSE){
@@ -119,9 +119,9 @@ SaveRes<- function(InputList_DF= NULL,
         FileName <- paste0(path,"/core_" , FileName,"_",Sys.Date(), sep = "")
       }
       #Save Excel
-      writexl::write_xlsx(InputList_DF, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
+      writexl::write_xlsx(inputlist_df, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
     }else{
-      for(DF in names(InputList_DF)){
+      for(DF in names(inputlist_df)){
         #Make FileName
         if(core==FALSE | is.null(core)==TRUE){
           FileName_Save <- paste0(path,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
@@ -130,7 +130,7 @@ SaveRes<- function(InputList_DF= NULL,
         }
 
         #unlist DF columns if needed
-        InputList_DF[[DF]] <- InputList_DF[[DF]]%>%
+        inputlist_df[[DF]] <- inputlist_df[[DF]]%>%
           mutate(
             across(
               where(is.list),
@@ -139,10 +139,10 @@ SaveRes<- function(InputList_DF= NULL,
           )
         #Save table
         if (save_table == "csv"){
-          InputList_DF[[DF]]%>%
+          inputlist_df[[DF]]%>%
             readr::write_csv(paste0(FileName_Save,".csv", sep = ""))
         }else if (save_table == "txt"){
-          InputList_DF[[DF]]%>%
+          inputlist_df[[DF]]%>%
             readr::write_delim(paste0(FileName_Save,".csv", sep = ""))
         }
       }
@@ -151,7 +151,7 @@ SaveRes<- function(InputList_DF= NULL,
 
   ################ Save Plots:
   if(is.null(save_plot)==FALSE){
-    for(Plot in names(InputList_Plot)){
+    for(Plot in names(inputlist_plot)){
       #Make FileName
       if(core==FALSE | is.null(core)==TRUE){
         FileName_Save <- paste0(path,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
@@ -160,20 +160,20 @@ SaveRes<- function(InputList_DF= NULL,
       }
 
       #Save
-      if(is.null(PlotHeight)){
-        PlotHeight <- 12
+      if(is.null(plot_height)){
+        plot_height <- 12
       }
-      if(is.null(PlotWidth)){
-        PlotWidth <- 16
+      if(is.null(plot_width)){
+        plot_width <- 16
       }
-      if(is.null(PlotUnit)){
-        PlotUnit <- "cm"
+      if(is.null(plot_unit)){
+        plot_unit <- "cm"
       }
 
-      ggplot2::ggsave(filename = paste0(FileName_Save, ".",save_plot, sep=""), plot = InputList_Plot[[Plot]], width = PlotWidth,  height = PlotHeight, unit=PlotUnit)
+      ggplot2::ggsave(filename = paste0(FileName_Save, ".",save_plot, sep=""), plot = inputlist_plot[[Plot]], width = plot_width,  height = plot_height, unit=plot_unit)
 
       if(print_plot==TRUE){
-        suppressMessages(suppressWarnings(plot(InputList_Plot[[Plot]])))
+        suppressMessages(suppressWarnings(plot(inputlist_plot[[Plot]])))
       }
     }
   }
