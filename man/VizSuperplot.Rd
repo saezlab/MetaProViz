@@ -6,59 +6,59 @@
 Bar, Box or Violin plot in Superplot style visualization}
 \usage{
 VizSuperplot(
-  InputData,
-  SettingsFile_Sample,
-  SettingsInfo = c(Conditions = "Conditions", Superplot = NULL),
-  PlotType = "Box",
-  PlotName = "",
-  PlotConditions = NULL,
-  StatComparisons = NULL,
-  StatPval = NULL,
-  StatPadj = NULL,
+  data,
+  metadata_sample,
+  metadata_info = c(Conditions = "Conditions", Superplot = NULL),
+  plot_type = "Box",
+  plot_name = "",
+  plot_conditions = NULL,
+  stat_comparison = NULL,
+  pval = NULL,
+  padj = NULL,
   xlab = NULL,
   ylab = NULL,
-  Theme = NULL,
-  ColorPalette = NULL,
-  ColorPalette_Dot = NULL,
-  SaveAs_Plot = "svg",
-  PrintPlot = TRUE,
-  FolderPath = NULL
+  theme = NULL,
+  color_palette = NULL,
+  color_palette_dot = NULL,
+  save_plot = "svg",
+  print_plot = TRUE,
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.}
+\item{data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.}
 
-\item{SettingsFile_Sample}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
+\item{metadata_sample}{DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".}
 
-\item{SettingsInfo}{Named vector including at least information on the conditions column: c(Conditions="ColumnName_SettingsFile_Sample"). Additionally Superplots can be made by adding Superplot ="ColumnName_SettingsFile_Sample", which are usually biological replicates or patient IDs. \strong{Default = c(Conditions="Conditions", Superplot = NULL)}}
+\item{metadata_info}{Named vector including at least information on the conditions column: c(Conditions="ColumnName_metadata_sample"). Additionally Superplots can be made by adding Superplot ="ColumnName_metadata_sample", which are usually biological replicates or patient IDs. \strong{Default = c(Conditions="Conditions", Superplot = NULL)}}
 
-\item{PlotType}{String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}}
+\item{plot_type}{String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}}
 
-\item{PlotName}{\emph{Optional: } String which is added to the output files of the plot.}
+\item{plot_name}{\emph{Optional: } String which is added to the output files of the plot.}
 
-\item{PlotConditions}{Vector with names of selected Conditions for the plot. Can also be used to order the Conditions in the way they should be displayed on the x-axis of the plot. \strong{Default = NULL}}
+\item{plot_conditions}{Vector with names of selected Conditions for the plot. Can also be used to order the Conditions in the way they should be displayed on the x-axis of the plot. \strong{Default = NULL}}
 
-\item{StatComparisons}{List of numeric vectors containing Condition pairs to compare based on the order of the PlotConditions vector. \strong{Default = NULL}}
+\item{stat_comparison}{List of numeric vectors containing Condition pairs to compare based on the order of the plot_conditions vector. \strong{Default = NULL}}
 
-\item{StatPval}{\emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test or wilcox.test , for one-vs-all or all-vs-all comparison choose aov (=anova) or kruskal.test \strong{Default = NULL}}
+\item{pval}{\emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test or wilcox.test , for one-vs-all or all-vs-all comparison choose aov (=anova) or kruskal.test \strong{Default = NULL}}
 
-\item{StatPadj}{\emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = NULL}}
+\item{padj}{\emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = NULL}}
 
 \item{xlab}{\emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}}
 
 \item{ylab}{\emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
+\item{theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
 
-\item{ColorPalette}{\emph{Optional: } Provide customized ColorPalette in vector format. \strong{Default = NULL}}
+\item{color_palette}{\emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}}
 
-\item{ColorPalette_Dot}{\emph{Optional: } Provide customized ColorPalette in vector format. \strong{Default = NULL}}
+\item{color_palette_dot}{\emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}}
 
-\item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}}
 
-\item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \value{
 List with two elements: Plot and Plot_Sized
@@ -69,7 +69,7 @@ Bar, Box or Violin plot in Superplot style visualization
 }
 \examples{
 Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
-Res <- VizSuperplot(InputData=Intra[,-c(1:3)], SettingsFile_Sample=Intra[,c(1:3)], SettingsInfo = c(Conditions="Conditions", Superplot = NULL))
+Res <- VizSuperplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)], metadata_info = c(Conditions="Conditions", Superplot = NULL))
 
 }
 \keyword{Barplot,}

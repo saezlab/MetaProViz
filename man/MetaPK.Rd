@@ -5,23 +5,23 @@
 \title{Meta prior-knowledge}
 \usage{
 MetaPK(
-  InputData,
-  SettingsFile_Sample,
-  SettingsInfo = NULL,
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  data,
+  metadata_sample,
+  metadata_info = NULL,
+  save_table = "csv",
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
+\item{data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
 
-\item{SettingsFile_Sample}{\emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}}
 
-\item{SettingsInfo}{\emph{Optional: } NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}}
+\item{metadata_info}{\emph{Optional: } NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 DF with prior knowledge based on patient metadata
@@ -31,8 +31,8 @@ Meta prior-knowledge
 }
 \examples{
 Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-Res <- MetaProViz::MetaPK(InputData=Tissue_Norm[,-c(1:13)],
-                          SettingsFile_Sample= Tissue_Norm[,c(2,4:5,12:13)])
+Res <- MetaProViz::MetaPK(data=Tissue_Norm[,-c(1:13)],
+                          metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 
 }
 \keyword{knowledge,}

@@ -6,41 +6,41 @@
 Volcano plot visualization}
 \usage{
 VizVolcano(
-  PlotSettings = "Standard",
-  InputData,
-  SettingsInfo = NULL,
-  SettingsFile_Metab = NULL,
-  InputData2 = NULL,
+  plot_types = "Standard",
+  data,
+  metadata_info = NULL,
+  metadata_feature = NULL,
+  data2 = NULL,
   y = "p.adj",
   x = "Log2FC",
   xlab = NULL,
   ylab = NULL,
-  xCutoff = 0.5,
-  yCutoff = 0.05,
-  Connectors = FALSE,
-  SelectLab = "",
-  PlotName = "",
-  Subtitle = "",
-  ComparisonName = c(InputData = "Cond1", InputData2 = "Cond2"),
-  ColorPalette = NULL,
-  ShapePalette = NULL,
-  Theme = NULL,
-  SaveAs_Plot = "svg",
-  FolderPath = NULL,
-  Features = "Metabolites",
-  PrintPlot = TRUE
+  cutoff_x = 0.5,
+  cutoff_y = 0.05,
+  connectors = FALSE,
+  select_label = "",
+  plot_name = "",
+  subtitle = "",
+  name_comparison = c(data = "Cond1", data2 = "Cond2"),
+  color_palette = NULL,
+  shape_palette = NULL,
+  theme = NULL,
+  save_plot = "svg",
+  path = NULL,
+  feature = "Metabolites",
+  print_plot = TRUE
 )
 }
 \arguments{
-\item{PlotSettings}{\emph{Optional: } Choose between "Standard" (InputData), "Compare" (plot two comparisons together InputData and InputData2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}}
+\item{plot_types}{\emph{Optional: } Choose between "Standard" (data), "Compare" (plot two comparisons together data and data2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}}
 
-\item{InputData}{DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{data}{DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.}
 
-\item{SettingsInfo}{\emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_SettingsFile_Metab", shape = "ColumnName_SettingsFile_Metab", individual="ColumnName_SettingsFile_Metab"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_InputData2"=each pathway will be plotted, PEA_score="ColumnName_InputData2", PEA_stat= "ColumnName_InputData2"= usually p.adj column, "PEA_Feature="ColumnName_InputData2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_SettingsFile_Metab", shape= "ColumnName_SettingsFile_Metab").\strong{Default = NULL}}
+\item{metadata_info}{\emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_metadata_feature", shape = "ColumnName_metadata_feature", individual="ColumnName_metadata_feature"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_data2"=each pathway will be plotted, PEA_score="ColumnName_data2", PEA_stat= "ColumnName_data2"= usually p.adj column, "PEA_Feature="ColumnName_data2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_metadata_feature", shape= "ColumnName_metadata_feature").\strong{Default = NULL}}
 
-\item{SettingsFile_Metab}{\emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of InputData) and other columns with required PlotSettingInfo. \strong{Default = NULL}}
+\item{metadata_feature}{\emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of data) and other columns with required plot_typeInfo. \strong{Default = NULL}}
 
-\item{InputData2}{\emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}}
+\item{data2}{\emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}}
 
 \item{y}{\emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}}
 
@@ -50,33 +50,33 @@ VizVolcano(
 
 \item{ylab}{\emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}}
 
-\item{xCutoff}{\emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}}
+\item{cutoff_x}{\emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}}
 
-\item{yCutoff}{\emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}}
+\item{cutoff_y}{\emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}}
 
-\item{Connectors}{\emph{Optional: } TRUE or FALSE for whether Connectors from names to points are to be added to the plot. \strong{Default =  FALSE}}
+\item{connectors}{\emph{Optional: } TRUE or FALSE for whether connectors from names to points are to be added to the plot. \strong{Default =  FALSE}}
 
-\item{SelectLab}{\emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}}
+\item{select_label}{\emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}}
 
-\item{PlotName}{\emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}}
+\item{plot_name}{\emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}}
 
-\item{Subtitle}{\emph{Optional: } \strong{Default = ""}}
+\item{subtitle}{\emph{Optional: } \strong{Default = ""}}
 
-\item{ComparisonName}{\emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(InputData="Cond1", InputData2= "Cond2")}}
+\item{name_comparison}{\emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(data="Cond1", data2= "Cond2")}}
 
-\item{ColorPalette}{\emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}}
+\item{color_palette}{\emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}}
 
-\item{ShapePalette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
+\item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
+\item{theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}}
 
-\item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
-\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 
-\item{Features}{\emph{Optional: } Name of the features that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}}
+\item{feature}{\emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}}
 
-\item{PrintPlot}{\emph{Optional: } print the plots to the active graphic
+\item{print_plot}{\emph{Optional: } print the plots to the active graphic
 device.}
 }
 \value{
@@ -88,7 +88,7 @@ Volcano plot visualization
 }
 \examples{
 Intra <- MetaProViz::ToyData("IntraCells_DMA")
-Res <- MetaProViz::VizVolcano(InputData=Intra)
+Res <- MetaProViz::VizVolcano(data=Intra)
 
 }
 \keyword{Volcano}

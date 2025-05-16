@@ -5,32 +5,32 @@
 \title{Find metabolites with high variability across total pool samples}
 \usage{
 PoolEstimation(
-  InputData,
-  SettingsFile_Sample = NULL,
-  SettingsInfo = NULL,
-  CutoffCV = 30,
-  SaveAs_Plot = "svg",
-  SaveAs_Table = "csv",
-  PrintPlot = TRUE,
-  FolderPath = NULL
+  data,
+  metadata_sample = NULL,
+  metadata_info = NULL,
+  cutoff_cv = 30,
+  save_plot = "svg",
+  save_table = "csv",
+  print_plot = TRUE,
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.}
+\item{data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.}
 
-\item{SettingsFile_Sample}{\emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}}
 
-\item{SettingsInfo}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_SettingsInfo, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
+\item{metadata_info}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_metadata_info, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
 
-\item{CutoffCV}{\emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 30}}
+\item{cutoff_cv}{\emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 30}}
 
-\item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
 
-\item{PrintPlot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 List with two elements: DF (including input and output table) and Plot (including all plots generated)
@@ -40,9 +40,9 @@ Find metabolites with high variability across total pool samples
 }
 \examples{
 Intra <- ToyData("IntraCells_Raw")
-Res <- PoolEstimation(InputData=Intra[ ,-c(1:3)],
-                                SettingsFile_Sample=Intra[ , c(1:3)],
-                                SettingsInfo = c(PoolSamples = "Pool", Conditions="Conditions"))
+Res <- PoolEstimation(data=Intra[ ,-c(1:3)],
+                                metadata_sample=Intra[ , c(1:3)],
+                                metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
 
 }
 \keyword{Coefficient}

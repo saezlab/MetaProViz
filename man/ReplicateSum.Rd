@@ -5,24 +5,24 @@
 \title{Merges the analytical replicates of an experiment}
 \usage{
 ReplicateSum(
-  InputData,
-  SettingsFile_Sample,
-  SettingsInfo = c(Conditions = "Conditions", Biological_Replicates =
+  data,
+  metadata_sample,
+  metadata_info = c(Conditions = "Conditions", Biological_Replicates =
     "Biological_Replicates", Analytical_Replicates = "Analytical_Replicates"),
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  save_table = "csv",
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
+\item{data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
 
-\item{SettingsFile_Sample}{DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.}
+\item{metadata_sample}{DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.}
 
-\item{SettingsInfo}{\emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_SettingsFile_Sample", Analytical_Replicates="ColumnName_SettingsFile_Sample").\strong{Default = NULL}}
+\item{metadata_info}{\emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_metadata_sample", Analytical_Replicates="ColumnName_metadata_sample").\strong{Default = NULL}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 DF with the merged analytical replicates
@@ -32,9 +32,9 @@ Merges the analytical replicates of an experiment
 }
 \examples{
 Intra <- ToyData("IntraCells_Raw")
-Res <- ReplicateSum(InputData=Intra[-c(49:58) ,-c(1:3)],
-                                SettingsFile_Sample=Intra[-c(49:58) , c(1:3)],
-                                SettingsInfo = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+Res <- ReplicateSum(data=Intra[-c(49:58) ,-c(1:3)],
+                                metadata_sample=Intra[-c(49:58) , c(1:3)],
+                                metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
 
 }
 \keyword{Analytical}

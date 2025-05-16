@@ -5,40 +5,40 @@
 \title{Create Mapping Ambiguities between two ID types}
 \usage{
 MappingAmbiguity(
-  InputData,
-  From,
-  To,
-  GroupingVariable = NULL,
-  Summary = FALSE,
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  data,
+  from,
+  to,
+  grouping_variable = NULL,
+  summary = FALSE,
+  save_table = "csv",
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{Translated DF from MetaProViz::TranslateID reults or Dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).}
+\item{data}{Translated DF from MetaProViz::TranslateID reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).}
 
-\item{From}{Column name of the secondary or translated metabolite identifier in InputData. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.}
+\item{from}{Column name of the secondary or translated metabolite identifier in data. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.}
 
-\item{To}{Column name of original metabolite identifier in InputData. Here should only have one ID per row.}
+\item{to}{Column name of original metabolite identifier in data. Here should only have one ID per row.}
 
-\item{GroupingVariable}{\emph{Optional: } If NULL no groups are used. If TRUE provide column name in InputData containing the GroupingVariable and features are grouped. \strong{Default = NULL}}
+\item{grouping_variable}{\emph{Optional: } If NULL no groups are used. If TRUE provide column name in data containing the grouping_variable and features are grouped. \strong{Default = NULL}}
 
-\item{Summary}{\emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}}
+\item{summary}{\emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \value{
-List with at least 4 DFs: 1-3) From-to-To: 1. MappingIssues, 2. MappingIssues Summary, 3. Long summary (If Summary=TRUE) & 4-6) To-to-From: 4. MappingIssues, 5. MappingIssues Summary, 6. Long summary (If Summary=TRUE) & 7) Combined summary table (If Summary=TRUE)
+List with at least 4 DFs: 1-3) from-to-to: 1. MappingIssues, 2. MappingIssues summary, 3. Long summary (If summary=TRUE) & 4-6) to-to-from: 4. MappingIssues, 5. MappingIssues summary, 6. Long summary (If summary=TRUE) & 7) Combined summary table (If summary=TRUE)
 }
 \description{
 Create Mapping Ambiguities between two ID types
 }
 \examples{
-KEGG_Pathways <- MetaProViz::LoadKEGG()
-InputDF <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem"))[["TranslatedDF"]]
-Res <- MetaProViz::MappingAmbiguity(InputData= InputDF, From = "MetaboliteID", To = "pubchem", GroupingVariable = "term", Summary=TRUE)
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+InputDF <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
+Res <- MetaProViz::MappingAmbiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
 
 }
 \keyword{Mapping}

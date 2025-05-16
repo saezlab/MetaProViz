@@ -5,39 +5,39 @@
 \title{Uses enricher to run ORA on the differential metabolites (DM) using a pathway list}
 \usage{
 StandardORA(
-  InputData,
-  SettingsInfo = c(pvalColumn = "p.adj", PercentageColumn = "t.val", PathwayTerm =
+  data,
+  metadata_info = c(pvalColumn = "p.adj", percentageColumn = "t.val", PathwayTerm =
     "term", PathwayFeature = "Metabolite"),
-  pCutoff = 0.05,
-  PercentageCutoff = 10,
-  PathwayFile,
-  PathwayName = "",
-  minGSSize = 10,
-  maxGSSize = 1000,
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  cutoff_stat = 0.05,
+  cutoff_percentage = 10,
+  input_pathway,
+  pathway_name = "",
+  min_gssize = 10,
+  max_gssize = 1000,
+  save_table = "csv",
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the PathwayFile.}
+\item{data}{DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.}
 
-\item{SettingsInfo}{\emph{Optional: } Pass ColumnName of the column including parameters to use for pCutoff and PercentageCutoff. Also pass ColumnName for PathwayFile including term and feature names. (pvalColumn = ColumnName InputData, PercentageColumn= ColumnName InputData, PathwayTerm= ColumnName PathwayFile, PathwayFeature= ColumnName PathwayFile) \strong{c(pvalColumn="p.adj", PercentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}}
+\item{metadata_info}{\emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage. Also pass ColumnName for input_pathway including term and feature names. (pvalColumn = ColumnName data, percentageColumn= ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}}
 
-\item{pCutoff}{\emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}}
+\item{cutoff_stat}{\emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}}
 
-\item{PercentageCutoff}{\emph{Optional: } Percentage cutoff of metabolites that should be considered for ORA. Selects Top/Bottom \% of selected PercentageColumn, usually t.val or Log2FC \strong{default: 10}}
+\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom \% of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}}
 
-\item{PathwayFile}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
+\item{input_pathway}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
 
-\item{PathwayName}{\emph{Optional: } Name of the PathwayFile used \strong{default: ""}}
+\item{pathway_name}{\emph{Optional: } Name of the input_pathway used \strong{default: ""}}
 
-\item{minGSSize}{\emph{Optional: } minimum group size in ORA \strong{default: 10}}
+\item{min_gssize}{\emph{Optional: } minimum group size in ORA \strong{default: 10}}
 
-\item{maxGSSize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
+\item{max_gssize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 Saves results as individual .csv files.

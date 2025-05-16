@@ -5,23 +5,23 @@
 \title{Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"}
 \usage{
 EquivalentIDs(
-  InputData,
-  SettingsInfo = c(InputID = "MetaboliteID"),
-  From = "hmdb",
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  data,
+  metadata_info = c(InputID = "MetaboliteID"),
+  from = "hmdb",
+  save_table = "csv",
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{Dataframe with at least one column with the detected metabolite IDs (one ID per row).}
+\item{data}{dataframe with at least one column with the detected metabolite IDs (one ID per row).}
 
-\item{SettingsInfo}{\emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}}
+\item{metadata_info}{\emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}}
 
-\item{From}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}}
+\item{from}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \value{
 Input DF with additional column including potential additional IDs.
@@ -30,8 +30,8 @@ Input DF with additional column including potential additional IDs.
 Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 }
 \examples{
-DetectedIDs <- MetaProViz::ToyData(Data="Cells_MetaData")\%>\% tibble::rownames_to_column("TrivialName")\%>\%tidyr::drop_na()
-Res <- MetaProViz::EquivalentIDs(InputData= DetectedIDs, SettingsInfo = c(InputID="HMDB"), From = "hmdb")
+DetectedIDs <- MetaProViz::ToyData(data="Cells_Metadata")\%>\% tibble::rownames_to_column("TrivialName")\%>\%tidyr::drop_na()
+Res <- MetaProViz::EquivalentIDs(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 
 }
 \keyword{Find}

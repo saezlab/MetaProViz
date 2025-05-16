@@ -5,29 +5,30 @@
 \title{Translate IDs to/from KEGG, PubChem, Chebi, HMDB}
 \usage{
 TranslateID(
-  InputData,
-  SettingsInfo = c(InputID = "MetaboliteID", GroupingVariable = "term"),
-  From = "kegg",
-  To = c("pubchem", "chebi", "hmdb"),
-  Summary = FALSE,
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  data,
+  metadata_info = c(InputID = "MetaboliteID", grouping_variable = "term"),
+  from = "kegg",
+  to = c("pubchem", "chebi", "hmdb"),
+  summary = FALSE,
+  save_table = "csv",
+  path = NULL,
+  plot = FALSE
 )
 }
 \arguments{
-\item{InputData}{Dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.}
+\item{data}{dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.}
 
-\item{SettingsInfo}{\emph{Optional: } Column name of Target in Input_GeneSet. \strong{Default = list(InputID="MetaboliteID" , GroupingVariable="term")}}
+\item{metadata_info}{\emph{Optional: } Column name of Target in input_pk. \strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}}
 
-\item{From}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}}
+\item{from}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}}
 
-\item{To}{One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}}
+\item{to}{One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}}
 
-\item{Summary}{\emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}}
+\item{summary}{\emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{FolderPath}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
 \value{
 List with at least three DFs: 1) Original data and the new column of translated ids spearated by comma. 2) Mapping information between Original ID to Translated ID. 3) Mapping summary between Original ID to Translated ID.
@@ -36,8 +37,8 @@ List with at least three DFs: 1) Original data and the new column of translated 
 Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
-KEGG_Pathways <- MetaProViz::LoadKEGG()
-Res <- MetaProViz::TranslateID(InputData= KEGG_Pathways, SettingsInfo = c(InputID="MetaboliteID", GroupingVariable="term"), From = c("kegg"), To = c("pubchem", "hmdb"))
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+Res <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem", "hmdb"))
 
 }
 \keyword{IDs}

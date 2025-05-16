@@ -12,7 +12,7 @@ metabolomics data by integrating prior knowledge from literature with
 metabolomics. MetaProViz offers an interactive framework consisting of five
 modules: Processing, differential analysis, prior knwoledge access and
 refactoring, functional analysis and visualization of both intracellular and
-exometabolomics (=consumption-release (CoRe) data).
+exometabolomics (=consumption-release (core) data).
 }
 \seealso{
 Useful links:

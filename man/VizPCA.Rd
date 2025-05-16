@@ -6,53 +6,53 @@
 PCA plot visualization}
 \usage{
 VizPCA(
-  InputData,
-  SettingsInfo = NULL,
-  SettingsFile_Sample = NULL,
-  ColorPalette = NULL,
-  ColorScale = "discrete",
-  ShapePalette = NULL,
+  data,
+  metadata_info = NULL,
+  metadata_sample = NULL,
+  color_palette = NULL,
+  scale_color = "discrete",
+  shape_palette = NULL,
   ShowLoadings = FALSE,
   Scaling = TRUE,
-  PCx = 1,
-  PCy = 2,
-  Theme = NULL,
-  PlotName = "",
-  SaveAs_Plot = "svg",
-  PrintPlot = TRUE,
-  FolderPath = NULL
+  pcx = 1,
+  pcy = 2,
+  theme = NULL,
+  plot_name = "",
+  save_plot = "svg",
+  print_plot = TRUE,
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
+\item{data}{DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.}
 
-\item{SettingsInfo}{\emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}}
+\item{metadata_info}{\emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}}
 
-\item{SettingsFile_Sample}{\emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}}
 
-\item{ColorPalette}{\emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}}
+\item{color_palette}{\emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}}
 
-\item{ColorScale}{\emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}}
+\item{scale_color}{\emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}}
 
-\item{ShapePalette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
+\item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 
 \item{ShowLoadings}{\emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}}
 
 \item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
-\item{PCx}{\emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}}
+\item{pcx}{\emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}}
 
-\item{PCy}{\emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}}
+\item{pcy}{\emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}}
 
-\item{Theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}}
+\item{theme}{\emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}}
 
-\item{PlotName}{\emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}}
+\item{plot_name}{\emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}}
 
-\item{SaveAs_Plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
 
-\item{PrintPlot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 List with two elements: Plot and Plot_Sized

@@ -8,36 +8,36 @@ ClusterORA
 }}
 \usage{
 ClusterORA(
-  InputData,
-  SettingsInfo = c(ClusterColumn = "RG2_Significant", BackgroundColumn = "BG_Method",
+  data,
+  metadata_info = c(ClusterColumn = "RG2_Significant", BackgroundColumn = "BG_method",
     PathwayTerm = "term", PathwayFeature = "Metabolite"),
-  RemoveBackground = TRUE,
-  PathwayFile,
-  PathwayName = "",
-  minGSSize = 10,
-  maxGSSize = 1000,
-  SaveAs_Table = "csv",
-  FolderPath = NULL
+  remove_background = TRUE,
+  input_pathway,
+  pathway_name = "",
+  min_gssize = 10,
+  max_gssize = 1000,
+  save_table = "csv",
+  path = NULL
 )
 }
 \arguments{
-\item{InputData}{DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the PathwayFile.}
+\item{data}{DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.}
 
-\item{SettingsInfo}{\emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if RemoveBackground=TRUE. Also pass ColumnName for PathwayFile including term and feature names. (ClusterColumn= ColumnName InputData, BackgroundColumn = ColumnName InputData, PathwayTerm= ColumnName PathwayFile, PathwayFeature= ColumnName PathwayFile) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_Method", PathwayTerm= "term", PathwayFeature= "Metabolite")}}
+\item{metadata_info}{\emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if remove_background=TRUE. Also pass ColumnName for input_pathway including term and feature names. (ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite")}}
 
-\item{RemoveBackground}{\emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in SettingsInfo, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}}
+\item{remove_background}{\emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in metadata_info, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}}
 
-\item{PathwayFile}{DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.}
+\item{input_pathway}{DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.}
 
-\item{PathwayName}{\emph{Optional: } Name of the pathway list used \strong{default: ""}}
+\item{pathway_name}{\emph{Optional: } Name of the pathway list used \strong{default: ""}}
 
-\item{minGSSize}{\emph{Optional: } minimum group size in ORA \strong{default: 10}}
+\item{min_gssize}{\emph{Optional: } minimum group size in ORA \strong{default: 10}}
 
-\item{maxGSSize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
+\item{max_gssize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{SaveAs_Table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
 
-\item{FolderPath}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \value{
 Saves results as individual .csv files.

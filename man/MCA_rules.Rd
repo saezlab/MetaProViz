@@ -4,10 +4,10 @@
 \alias{MCA_rules}
 \title{MCA regulatory rules Import}
 \usage{
-MCA_rules(Method)
+MCA_rules(method)
 }
 \arguments{
-\item{Method}{Either "2Cond" or "CoRe" depending which regulatory rules you would like to load}
+\item{method}{Either "2Cond" or "core" depending which regulatory rules you would like to load}
 }
 \value{
 A data frame containing the toy data.
@@ -16,5 +16,5 @@ A data frame containing the toy data.
 Import and process .csv file to create toy data.
 }
 \details{
-Imports MCA regulatory rules into environment
+Access built-in MCA regulatory rules
 }
