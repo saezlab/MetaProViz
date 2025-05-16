@@ -61,12 +61,12 @@ ToyData <- function(dataset) {
 
   #Available datasets:
   datasets <- list(
-    IntraCells_Raw = "MS55_RawPeakdata.csv.gz",
+    IntraCells_Raw = "MS55_RawPeakData.csv.gz",
     IntraCells_DMA = "MS55_DMA_786M1A_vs_HK2.csv.gz",
-    CultureMedia_Raw = "MS51_RawPeakdata.csv.gz",
+    CultureMedia_Raw = "MS51_RawPeakData.csv.gz",
     Cells_Metadata = "MappingTable_SelectPathways.csv.gz",
-    Tissue_Norm = "Hakimi_ccRCC-Tissue_data.csv.gz",
-    Tissue_Metadata = "Hakimi_ccRCC-Tissue_FeatureMetadata.csv.gz",
+    Tissue_Norm = "Hakimi_ccRCC-Tissue_Data.csv.gz",
+    Tissue_Metadata = "Hakimi_ccRCC-Tissue_FeatureMetaData.csv.gz",
     Tissue_DMA = "Hakimi_ccRCC-Tissue_DMA_TvsN.csv.gz",
     Tissue_DMA_Old ="Hakimi_ccRCC-Tissue_DMA_TvsN-Old.csv.gz",
     Tissue_DMA_Young ="Hakimi_ccRCC-Tissue_DMA_TvsN-Young.csv.gz",
@@ -76,6 +76,32 @@ ToyData <- function(dataset) {
     EquivalentFeatures = "EquivalentFeatureTable.csv.gz",
     BiocratesFeatureTable = "BiocratesFeatureTable.csv.gz"
   )
+  newnames <- list(
+    IntraCells_Raw = "intracell_raw",
+    IntraCells_DMA = "intracell_dma",
+    CultureMedia_Raw = "medium_raw",
+    Cells_Metadata = "cellular_meta",
+    Tissue_Norm = "tissue_norm",
+    Tissue_Metadata = "tissue_meta",
+    Tissue_DMA = "tissue_dma",
+    Tissue_DMA_Old ="tissue_dma_old",
+    Tissue_DMA_Young ="tissue_dma_young",
+    Tissue_TvN_Proteomics ="tissue_tvn_proteomics",
+    Tissue_TvN_RNAseq = "tissue_tvn_rnaseq",
+    AlaninePathways = "alanine_pathways",
+    EquivalentFeatures = "equivalent_features",
+    BiocratesFeatureTable = "biocrates_freatures"
+  )
+  for (key in names(datasets)) {
+    newname <- newnames[[key]]
+    path <- sprintf('inst/extdata/%s', datasets[key])
+    rda_path <- sprintf('data/%s.rda', newname)
+    the_data <- read_csv(path, col_types = cols())
+    assign(newname, the_data, envir = .GlobalEnv)
+    print(newname)
+    print(is.symbol(sym(newname)))
+    save(newname, file = rda_path)
+  }
 
   rncols <- c("Code", "Metabolite")
 
