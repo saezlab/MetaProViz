@@ -85,55 +85,6 @@ metsigdb_kegg <- function(){
 }
 
 
-
-##########################################################################################
-### ### ### Load Hallmark prior knowledge ### ### ###
-##########################################################################################
-#'
-#' @title Prior Knowledge Import
-#' @description Import and process .csv file to create Prior Knowledge.
-#' @importFrom readr read_csv cols
-#' @return A data frame containing the Prior Knowledge.
-#' @export
-#'
-metsigdb_hallmarks <- function() {
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
-
-  # Read the .csv files
-  Hallmark <- system.file("extdata", "Hallmarks.csv.gz", package = "MetaProViz")
-  Hallmark <- readr::read_csv(Hallmark, col_types = readr::cols())
-
-  # Return into environment
-  assign("Hallmark_Pathways", Hallmark, envir=.GlobalEnv)
-}
-
-##########################################################################################
-### ### ### Load Gaude Metabolic Signature prior knowledge ### ### ###
-##########################################################################################
-#'
-#' @title Prior Knowledge Import
-#' @description Import and process .csv file to create Prior Knowledge.
-#' @importFrom readr read_csv cols
-#' @return A data frame containing the Prior Knowledge.
-#' @export
-#'
-metsigdb_gaude <- function() {
-  ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
-
-  # Read the .csv files
-  MetabolicSig <- system.file(
-      "extdata",
-      "Compilled_MetabolicSig_2025-01-07.csv.gz",
-      package = "MetaProViz"
-  )
-  MetabolicSig <- readr::read_csv(MetabolicSig, col_types = readr::cols())
-
-  # Return into environment
-  assign("Gaude_Pathways", MetabolicSig, envir=.GlobalEnv)
-}
-
 ##########################################################################################
 ### ### ### Load RaMP prior knowledge ### ### ###
 ##########################################################################################
@@ -142,7 +93,7 @@ metsigdb_gaude <- function() {
 #' @param version \emph{Optional: } Version of the RaMP database loaded from OmniPathR. \strong{default: "2.5.4"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
-
+#'
 #' @description Import and process file to create Prior Knowledge.
 #'
 #' @importFrom  OmnipathR ramp_table
@@ -156,7 +107,6 @@ metsigdb_gaude <- function() {
 #' ChemicalClass <- MetaProViz::metsigdb_chemicalclass()
 #'
 #' @export
-#'
 metsigdb_chemicalclass <- function(version = "2.5.4",
                      save_table="csv",
                      path=NULL){

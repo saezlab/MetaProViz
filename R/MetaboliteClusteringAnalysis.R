@@ -1044,32 +1044,33 @@ MCA_core <- function(data_Intra,
 ### ### ### Import MCA rules ### ### ###
 ########################################
 
-#' Imports MCA regulatory rules into environment
+#' Access built-in MCA regulatory rules
 #'
 #' @param method Either "2Cond" or "core" depending which regulatory rules you would like to load
 #' @title MCA regulatory rules Import
 #' @description Import and process .csv file to create toy data.
-#' @importFrom readr read_csv cols
 #' @return A data frame containing the toy data.
-#' @export
 #'
-MCA_rules <- function(method){
+#' @importFrom magrittr %>%
+#' @importFrom stringr str_to_lower
+#' @export
+MCA_rules <- function(method) {
+
   ## ------------ Create log file ----------- ##
   MetaProViz_Init()
 
-  # Read the .csv files
-  Cond <- system.file("extdata", "MCA_2Cond.csv.gz", package = "MetaProViz")
-  Cond <- readr::read_csv( Cond, col_types = readr::cols())
+  err <-
+    method %>%
+    sprintf("Available MCA regulatory rules are `2Cond` or `core`, not `%s`.", .)
 
-  core <- system.file("extdata", "MCA_core.csv.gz", package = "MetaProViz")
-  core <- readr::read_csv(core, col_types = readr::cols())
+  data_label <-
+    method %>%
+    str_to_lower() %>%
+    {`if`(. %in% c("2cond", "core"), ., stop(err))} %>%
+    sprintf("mca_%s", .)
 
-  # Return the toy data into environment
-  if(method=="2Cond"){
-    assign("MCA_2Cond", Cond, envir=.GlobalEnv)
-  } else if(method=="core"){
-    assign("MCA_core", core, envir=.GlobalEnv)
-  } else{
-    warning("Please choose the MCA regulatory rules you would like to load: 2Cond, core")
-  }
+  data(data_label)
+
+  return(get(data_label))
+
 }
