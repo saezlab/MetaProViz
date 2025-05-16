@@ -129,7 +129,7 @@ ToyData <- function(dataset) {
 ################################################################################################
 
 ####################################################
-#' IntraCells_Raw
+#' intracell_raw
 #'
 #' Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
 #' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
@@ -144,10 +144,10 @@ ToyData <- function(dataset) {
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
-"IntraCells_Raw"
+"intracell_raw"
 
 ####################################################
-#' IntraCells_DMA
+#' intracell_dma
 #'
 #' Metabolomics workbench project PR001418, study ST002224 where we performed differential metabolite
 #' analysis comparing intracellular metabolomics of 786-M1A versus HK2 cells.
@@ -157,11 +157,11 @@ ToyData <- function(dataset) {
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
-"IntraCells_DMA"
+"intracell_dma"
 
 
 ####################################################
-#' CultureMedia_Raw
+#' medium_raw
 #'
 #' Metabolomics workbench project PR001418, study ST002226 where we exported integrated raw
 #' peak values of intracellular metabolomics of HK2 and cccRCC cell lines 786-O, 786-M1A,
@@ -172,10 +172,10 @@ ToyData <- function(dataset) {
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
-"CultureMedia_Raw"
+"medium_raw"
 
 ####################################################
-#' Cells_Metadata
+#' cellular_meta
 #'
 #' Metabolomics workbench project PR001418, study ST002226 and ST002224 measured metabolites were assigned
 #' HMDB and KEGG IDs as well as one main metabolic pathway.
@@ -185,10 +185,10 @@ ToyData <- function(dataset) {
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
-"Cells_Metadata"
+"cellular_meta"
 
 ####################################################
-#' Tissue_Norm
+#' tissue_norm
 #'
 #' This is median normalised data from the supplementary table 2 of Hakimi et al with metabolomic
 #' profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
@@ -198,7 +198,7 @@ ToyData <- function(dataset) {
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
-"Tissue_Norm"
+"tissue_norm"
 
 ####################################################
 #' Tissue_Metadata
@@ -211,10 +211,10 @@ ToyData <- function(dataset) {
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
-"Tissue_Metadata"
+"tissue_meta"
 
 ####################################################
-#' Tissue_DMA
+#' tissue_dma
 #'
 #' We performed differential metabolite analysis comparing ccRCC tissue versus adjacent normal tissue using
 #' median normalised data from the supplementary table 2 of Hakimi et. al.(="Tissue_Norm").
@@ -224,10 +224,10 @@ ToyData <- function(dataset) {
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
-"Tissue_DMA"
+"tissue_dma"
 
 ####################################################
-#' Tissue_DMA_Old
+#' tissue_dma_old
 #'
 #' We performed differential metabolite analysis comparing ccRCC tissue versus adjacent normal tissue of
 #' the patient's subset of old patient's (age > 58 years) using median normalised data from the supplementary
@@ -238,10 +238,10 @@ ToyData <- function(dataset) {
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
-"Tissue_DMA_Old"
+"tissue_dma_old"
 
 ####################################################
-#' Tissue_DMA_Young
+#' tissue_dma_young
 #'
 #' We performed differential metabolite analysis comparing ccRCC tissue versus adjacent normal tissue of
 #' the patient's subset of young patient's (age <42 years) using median normalised data from the supplementary
@@ -252,10 +252,10 @@ ToyData <- function(dataset) {
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
-"Tissue_DMA_Young"
+"tissue_dma_young"
 
 ####################################################
-#' Tissue_TvN_Proteomics
+#' tissue_tvn_proteomics
 #'
 #' The processed proteomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
 #' used the study from Clark et. al. under Proteomics data Commons PDC000127.
@@ -266,10 +266,10 @@ ToyData <- function(dataset) {
 #' @source Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
 #' regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
 #' proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
-"Tissue_TvN_Proteomics"
+"tissue_tvn_proteomics"
 
 ####################################################
-#' Tissue_TvN_RNAseq
+#' tissue_tvn_rnaseq
 #'
 #' The processed transcriptomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
 #' used the study from Clark et. al. under Proteomics data Commons PDC000127.
@@ -280,10 +280,10 @@ ToyData <- function(dataset) {
 #' @source Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
 #' regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
 #' proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
-"Tissue_TvN_RNAseq"
+"tissue_tvn_rnaseq"
 
 ####################################################
-#' EquivalentFeatures
+#' equivalent_features
 #'
 #' Manually curated list of aminoacids and aminoacid-related metabolites with corresponding metabolite
 #' identifiers (HMDB, KEGG, etc.) irrespective of chirality.
@@ -291,10 +291,10 @@ ToyData <- function(dataset) {
 #' @format Columns include metabolite trivial names, metabolite IDs (HMDB, KEGG, etc.), metabolite structural information (=INCHI).
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-"EquivalentFeatures"
+"equivalent_features"
 
 ####################################################
-#' BiocratesFeatureTable
+#' biocrates_features
 #'
 #' Biocrates kit feature information of the "MxP Quant 500 XL kit" that covers more than 1,000 metabolites with biochemical
 #' class information and the exported different metabolite IDs (HMDB, KEGG, etc.).
@@ -303,10 +303,10 @@ ToyData <- function(dataset) {
 #' information (INCHI, Key, etc.).
 #'
 #' @source Biocrates MxP® Quant 500 XL kit, https://biocrates.com/mxp-quant-500-xl/
-"BiocratesFeatureTable"
+"biocrates_features"
 
 ####################################################
-#' MCA_2Cond
+#' mca_2cond
 #'
 #' Manually curated table defining the flow of information of the two condition biological regulatory clusters Regulatory labels
 #'from the different grouping methods.
@@ -315,10 +315,10 @@ ToyData <- function(dataset) {
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-"MCA_2Cond"
+"mca_2cond"
 
 ####################################################
-#' MCA_core
+#' mca_core
 #'
 #' Manually curated table defining the flow of information of the Conusuption-Release and Intracellular metabolomics biological
 #' regulatory clusters Regulatory labels from the different grouping methods.
@@ -327,10 +327,10 @@ ToyData <- function(dataset) {
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-"MCA_core"
+"mca_core"
 
 ####################################################
-#' AlaninePathways
+#' alanine_pathways
 #'
 #' Manually curated table for the amino acid alanine toshowcase pathways (wiki, reactome, etc.) and alanine IDs (chebi, hmdb, etc.)
 #' included in those pathways
@@ -338,4 +338,4 @@ ToyData <- function(dataset) {
 #' @format Columns include pathway_name, pathwayId and pathwaySource as well as inputID  and commonName.
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-"AlaninePathways"
+"alanine_pathways"
