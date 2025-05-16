@@ -109,15 +109,17 @@ ClusterORA <- function(data,
     grpMetabolites <- subset(df, df[[metadata_info[["ClusterColumn"]]]] == g)
     log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
-    clusterGo <- clusterProfiler::enricher(gene=as.character(grpMetabolites$Metabolite),
-                                           pvalueCutoff = 1,
-                                           pAdjustmethod = "BH",
-                                           universe = allMetabolites,
-                                           minGSSize=min_gssize,
-                                           maxGSSize=max_gssize,
-                                           qvalueCutoff = 1,
-                                           TERM2GENE=Term2gene ,
-                                           TERM2NAME = term2name)
+    clusterGo <- enricher_internal(
+        gene=as.character(grpMetabolites$Metabolite),
+        pvalueCutoff = 1L,
+        pAdjustmethod = "BH",
+        universe = allMetabolites,
+        minGSSize=min_gssize,
+        maxGSSize=max_gssize,
+        qvalueCutoff = 1L,
+        TERM2GENE=Term2gene ,
+        TERM2NAME = term2name
+    )
     clusterGosummary <- data.frame(clusterGo)
     clusterGo_list[[g]]<- clusterGo
     if(!(dim(clusterGosummary)[1] == 0)){
@@ -252,15 +254,17 @@ StandardORA <- function(data,
 
   ## ------------ Run ----------- ##
   #Run ORA
-  clusterGo <- clusterProfiler::enricher(gene=selectMetabolites,
-                                           pvalueCutoff = 1,
-                                           pAdjustmethod = "BH",
-                                           universe = allMetabolites,
-                                           minGSSize=min_gssize,
-                                           maxGSSize=max_gssize,
-                                           qvalueCutoff = 1,
-                                           TERM2GENE=Term2gene ,
-                                           TERM2NAME = term2name)
+  clusterGo <- enricher_internal(
+      gene=selectMetabolites,
+      pvalueCutoff = 1L,
+      pAdjustmethod = "BH",
+      universe = allMetabolites,
+      minGSSize=min_gssize,
+      maxGSSize=max_gssize,
+      qvalueCutoff = 1L,
+      TERM2GENE=Term2gene ,
+      TERM2NAME = term2name
+  )
   clusterGosummary <- data.frame(clusterGo)
 
   #Make DF:
