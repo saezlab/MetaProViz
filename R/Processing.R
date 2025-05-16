@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: PreProcessing
+## Script name: pre_processing
 ##
 ## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalization, outlier detection and QC plots
 ##
@@ -45,12 +45,12 @@
 #'
 #' @examples
 #' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' ResI <- MetaProViz::PreProcessing(data=Intra[-c(49:58) ,-c(1:3)],
+#' ResI <- MetaProViz::pre_processing(data=Intra[-c(49:58) ,-c(1:3)],
 #'                                  metadata_sample=Intra[-c(49:58) , c(1:3)],
 #'                                  metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' Media <- MetaProViz::ToyData("CultureMedia_Raw")
-#' ResM <- MetaProViz::PreProcessing(data = Media[-c(40:45) ,-c(1:3)],
+#' ResM <- MetaProViz::pre_processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                   core=TRUE)
@@ -63,7 +63,7 @@
 #'
 #' @export
 #'
-PreProcessing <- function(data,
+pre_processing <- function(data,
                           metadata_sample,
                           metadata_info,
                           featurefilt = "Modified",
@@ -79,11 +79,11 @@ PreProcessing <- function(data,
                           path = NULL
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------------ Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=NULL,
                           metadata_info= metadata_info,
@@ -92,8 +92,8 @@ PreProcessing <- function(data,
                           core=core,
                           print_plot= print_plot)
 
-  # HelperFunction `CheckInput` Specific
-  CheckInput_PreProcessing(metadata_sample=metadata_sample,
+  # HelperFunction `check_param` Specific
+  check_param_preproc(metadata_sample=metadata_sample,
                            metadata_info=metadata_info,
                            core=core,
                            featurefilt=featurefilt,
@@ -105,10 +105,10 @@ PreProcessing <- function(data,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "Processing",
+    Folder <- save_path(folder_name= "Processing",
                                     path=path)
 
-    SubFolder_P <- file.path(Folder, "PreProcessing")
+    SubFolder_P <- file.path(Folder, "pre_processing")
     if (!dir.exists(SubFolder_P)) {dir.create(SubFolder_P)}
   }
 
@@ -122,7 +122,7 @@ PreProcessing <- function(data,
   ###################################################################################################################################
   ## ------------------ 1. Feature filtering ------------------- ##
   if(is.null(featurefilt)==FALSE){
-    data_Filtered <- featurefiltering(data=data,
+    data_Filtered <- feature_filtering(data=data,
                                                     featurefilt=featurefilt,
                                                     cutoff_featurefilt=cutoff_featurefilt,
                                                     metadata_sample=metadata_sample,
@@ -136,7 +136,7 @@ PreProcessing <- function(data,
 
   ## ------------------ 2. Missing value Imputation ------------------- ##
   if(mvi==TRUE){
-    mviRes<- mvimputation(data=data_Filt,
+    mviRes<- mvi_imputation(data=data_Filt,
                                        metadata_sample=metadata_sample,
                                        metadata_info=metadata_info,
                                        core=core,
@@ -148,7 +148,7 @@ PreProcessing <- function(data,
   ## ------------------  3. total Ion Current Normalization ------------------- ##
   if(tic==TRUE){
     #Perform tic
-    ticRes_List <- ticNorm(data=mviRes,
+    ticRes_List <- tic_norm(data=mviRes,
                                         metadata_sample=metadata_sample,
                                         metadata_info=metadata_info,
                                         tic=tic)
@@ -163,7 +163,7 @@ PreProcessing <- function(data,
     ticRes <- mviRes
 
     #Add plots to PlotList
-    RLAPlot_List <- ticNorm(data=mviRes,
+    RLAPlot_List <- tic_norm(data=mviRes,
                                          metadata_sample=metadata_sample,
                                          metadata_info=metadata_info,
                                          tic=tic)
@@ -173,7 +173,7 @@ PreProcessing <- function(data,
 
   ## ------------------ 4. core media QC (blank) and normalization ------------------- ##
   if(core ==TRUE){
-   data_coreNorm <- coreNorm(data= ticRes,
+   data_coreNorm <- core_norm(data= ticRes,
                                           metadata_sample=metadata_sample,
                                           metadata_info=metadata_info)
 
@@ -185,7 +185,7 @@ PreProcessing <- function(data,
 
   ###################################################################################################################################
   ## ------------------ Sample outlier identification ------------------- ##
-  OutlierRes <-  OutlierDetection(data= data_norm,
+  OutlierRes <-  outlier_detection(data= data_norm,
                                                metadata_sample=metadata_sample,
                                                metadata_info=metadata_info,
                                                core=core,
@@ -197,13 +197,13 @@ PreProcessing <- function(data,
   if(is.null(featurefilt)==FALSE){#Add metabolites that where removed as part of the feature filtering
     if(length(data_Filtered[["RemovedMetabolites"]])==0){
       DFList <- list("data_Rawdata"= merge(as.data.frame(metadata_sample), as.data.frame(data), by="row.names")%>% tibble::column_to_rownames("Row.names"),
-                     "Filtered_metabolites"= as.data.frame(list(featurefiltering = c(featurefilt),
+                     "Filtered_metabolites"= as.data.frame(list(feature_filtering = c(featurefilt),
                                                             cutoff_featurefilt = c(cutoff_featurefilt),
                                                             RemovedMetabolites = c("None"))),
                      "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
     }else{
       DFList <- list("data_Rawdata"= merge(as.data.frame(metadata_sample), as.data.frame(data), by="row.names")%>% tibble::column_to_rownames("Row.names"),
-                     "Filtered_metabolites"= as.data.frame(list(featurefiltering = rep(featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
+                     "Filtered_metabolites"= as.data.frame(list(feature_filtering = rep(featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
                                                            cutoff_featurefilt = rep(cutoff_featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
                                                            RemovedMetabolites = data_Filtered[["RemovedMetabolites"]])),
                      "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
@@ -240,12 +240,12 @@ PreProcessing <- function(data,
   DFList[["Preprocessing_output"]] <- DFList[["Preprocessing_output"]]%>%tibble::rownames_to_column("Code")
 
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=DFList,
+    save_res(inputlist_df=DFList,
                          inputlist_plot= PlotList,
                          save_table=save_table,
                          save_plot=save_plot,
                          path= SubFolder_P,
-                         FileName= "PreProcessing",
+                         FileName= "pre_processing",
                          core=core,
                          print_plot=print_plot)))
 
@@ -273,7 +273,7 @@ PreProcessing <- function(data,
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- ReplicateSum(data=Intra[-c(49:58) ,-c(1:3)],
+#' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
 #'                                 metadata_sample=Intra[-c(49:58) , c(1:3)],
 #'                                 metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
 #'
@@ -287,17 +287,17 @@ PreProcessing <- function(data,
 #'
 #' @export
 #'
-ReplicateSum <- function(data,
+replicate_sum <- function(data,
                          metadata_sample,
                          metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
                          save_table = "csv",
                          path = NULL){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------------ Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=NULL,
                           metadata_info = metadata_info,
@@ -306,7 +306,7 @@ ReplicateSum <- function(data,
                           core=FALSE,
                           print_plot=FALSE)
 
-  # `CheckInput` Specific
+  # `check_param` Specific
   if(metadata_info[["Conditions"]] %in% colnames(metadata_sample)){
    # Conditions <- data[[metadata_info[["Conditions"]] ]]
   }else{
@@ -325,9 +325,9 @@ ReplicateSum <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "Processing",
+    Folder <- save_path(folder_name= "Processing",
                                     path=path)
-    SubFolder <- file.path(Folder, "ReplicateSum")
+    SubFolder <- file.path(Folder, "replicate_sum")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
@@ -358,7 +358,7 @@ ReplicateSum <- function(data,
     tibble::column_to_rownames("UniqueID")# set UniqueID to rownames
 
   #--------------- return ------------------##
-  SaveRes(inputlist_df=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed%>%tibble::rownames_to_column("Code")),
+  save_res(inputlist_df=list("Sum_AnalyticalReplicates"=Input_data_numeric_summed%>%tibble::rownames_to_column("Code")),
                        inputlist_plot = NULL,
                        save_table=save_table,
                        save_plot=NULL,
@@ -393,7 +393,7 @@ ReplicateSum <- function(data,
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- PoolEstimation(data=Intra[ ,-c(1:3)],
+#' Res <- pool_estimation(data=Intra[ ,-c(1:3)],
 #'                                 metadata_sample=Intra[ , c(1:3)],
 #'                                 metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
 #'
@@ -407,7 +407,7 @@ ReplicateSum <- function(data,
 #'
 #' @export
 #'
-PoolEstimation <- function(data,
+pool_estimation <- function(data,
                            metadata_sample = NULL,
                            metadata_info = NULL,
                            cutoff_cv = 30,
@@ -417,12 +417,12 @@ PoolEstimation <- function(data,
                            path = NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   logger::log_info('Starting pool estimation.')
   ## ------------------ Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=NULL,
                           metadata_info=metadata_info,
@@ -431,7 +431,7 @@ PoolEstimation <- function(data,
                           core=FALSE,
                           print_plot = print_plot)
 
-  # `CheckInput` Specific
+  # `check_param` Specific
   if(is.null(metadata_sample)==FALSE){
     if("Conditions" %in% names(metadata_info)==TRUE){
       if(metadata_info[["Conditions"]] %in% colnames(metadata_sample)== FALSE ){
@@ -451,10 +451,10 @@ PoolEstimation <- function(data,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "Processing",
+    Folder <- save_path(folder_name= "Processing",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "PoolEstimation")
+    SubFolder <- file.path(Folder, "pool_estimation")
     logger::log_info('Selected output directory: `%s`.', SubFolder)
     if (!dir.exists(SubFolder)) {
       logger::log_trace('Creating directory: `%s`.', SubFolder)
@@ -513,7 +513,7 @@ PoolEstimation <- function(data,
   dev.new()
   if(is.null(metadata_sample)==TRUE){
     pca_data <- Pooldata
-    pca_QC_pool <-invisible(VizPCA(data=pca_data,
+    pca_QC_pool <-invisible(viz_pca(data=pca_data,
                                               plot_name = "QC Pool samples",
                                                save_plot =  NULL))
   }else{
@@ -522,7 +522,7 @@ PoolEstimation <- function(data,
       dplyr::mutate(Sample_type = dplyr::case_when(.data[[metadata_info[["Conditions"]]]] == metadata_info[["PoolSamples"]] ~ "Pool",
                                      TRUE ~ "Sample"))
 
-    pca_QC_pool <-invisible(VizPCA(data=pca_data %>%dplyr::select(-all_of(metadata_info[["Conditions"]]), -Sample_type),
+    pca_QC_pool <-invisible(viz_pca(data=pca_data %>%dplyr::select(-all_of(metadata_info[["Conditions"]]), -Sample_type),
                                                metadata_info= c(color="Sample_type"),
                                                metadata_sample= pca_data,
                                               plot_name = "QC Pool samples",
@@ -587,12 +587,12 @@ PoolEstimation <- function(data,
     save_plot,
     SubFolder
   )
-  SaveRes(inputlist_df=DF_list,
+  save_res(inputlist_df=DF_list,
                       inputlist_plot = PlotList,
                       save_table=save_table,
                       save_plot=save_plot,
                       path= SubFolder,
-                      FileName= "PoolEstimation",
+                      FileName= "pool_estimation",
                       core=FALSE,
                       print_plot=print_plot)
 
@@ -603,10 +603,10 @@ PoolEstimation <- function(data,
 
 
 ################################################################################################
-### ### ### PreProcessing helper function: featurefiltering ### ### ###
+### ### ### pre_processing helper function: feature_filtering ### ### ###
 ################################################################################################
 
-#' featurefiltering
+#' feature_filtering
 #'
 #' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
@@ -619,7 +619,7 @@ PoolEstimation <- function(data,
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- featurefiltering(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Res <- feature_filtering(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                                      metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                                      metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -631,14 +631,14 @@ PoolEstimation <- function(data,
 #'
 #' @noRd
 #'
-featurefiltering <-function(data,
+feature_filtering <-function(data,
                             metadata_sample,
                             metadata_info,
                             core=FALSE,
                             featurefilt="Modified",
                             cutoff_featurefilt=0.8){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------------ Prepare the data ------------------- ##
   feat_filt_data <- as.data.frame(data)%>%
@@ -651,7 +651,7 @@ featurefiltering <-function(data,
 
   ## ------------------ Perform filtering ------------------ ##
   if(featurefilt ==  "Modified"){
-    message <- paste0("featurefiltering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). ", "Filtering value selected: ", cutoff_featurefilt, sep="")
+    message <- paste0("feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). ", "Filtering value selected: ", cutoff_featurefilt, sep="")
     logger::log_info(message)
     message(message)
     if(core== TRUE){
@@ -691,7 +691,7 @@ featurefiltering <-function(data,
       filtered_matrix <- data[,-miss]
     }
   }else if(featurefilt ==  "Standard"){
-    message <- paste0 ("featurefiltering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). ","Filtering value selected:", cutoff_featurefilt)
+    message <- paste0 ("feature_filtering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). ","Filtering value selected:", cutoff_featurefilt)
     logger::log_info(message)
     message(message)
 
@@ -704,7 +704,7 @@ featurefiltering <-function(data,
     }
 
     if(length(miss) ==  0){ #remove metabolites if any are found
-      message <- paste0("featurefiltering: There where no metabolites exluded")
+      message <- paste0("feature_filtering: There where no metabolites exluded")
       logger::log_info(message)
       message(message)
 
@@ -730,7 +730,7 @@ featurefiltering <-function(data,
 
 
 ################################################################################################
-### ### ### PreProcessing helper function: Missing Value imputation ### ### ###
+### ### ### pre_processing helper function: Missing Value imputation ### ### ###
 ################################################################################################
 
 #' Missing Value Imputation using half minimum value
@@ -745,7 +745,7 @@ featurefiltering <-function(data,
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- mvimputation(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Res <- mvi_imputation(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                                  metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                                  metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -758,7 +758,7 @@ featurefiltering <-function(data,
 #'
 #' @noRd
 #'
-mvimputation <-function(data,
+mvi_imputation <-function(data,
                         metadata_sample,
                         metadata_info,
                         core=FALSE,
@@ -848,7 +848,7 @@ mvimputation <-function(data,
 
 
 ################################################################################################
-### ### ### PreProcessing helper function: total ion Count Normalization ### ### ###
+### ### ### pre_processing helper function: total ion Count Normalization ### ### ###
 ################################################################################################
 
 #' total ion count normalisazion
@@ -862,7 +862,7 @@ mvimputation <-function(data,
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- ticNorm(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Res <- tic_norm(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                             metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                             metadata_info = c(Conditions = "Conditions"))
 #'
@@ -877,7 +877,7 @@ mvimputation <-function(data,
 #'
 #' @noRd
 #'
-ticNorm <-function(data,
+tic_norm <-function(data,
                    metadata_sample,
                    metadata_info,
                    tic=TRUE){
@@ -970,7 +970,7 @@ ticNorm <-function(data,
 }
 
 ################################################################################################
-### ### ### PreProcessing helper function: core nomalisation ### ### ###
+### ### ### pre_processing helper function: core nomalisation ### ### ###
 ################################################################################################
 
 #' Consumption Release Normalisation
@@ -983,7 +983,7 @@ ticNorm <-function(data,
 #'
 #' @examples
 #' Media <- ToyData("CultureMedia_Raw")%>% subset(!Conditions=="Pool")%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
-#' Res <- coreNorm(data= Media[, -c(1:3)],
+#' Res <- core_norm(data= Media[, -c(1:3)],
 #'                             metadata_sample= Media[, c(1:3)],
 #'                             metadata_info = c(Conditions = "Conditions", core_norm_factor = "GrowthFactor", core_media = "blank"))
 #'
@@ -1000,7 +1000,7 @@ ticNorm <-function(data,
 #' @noRd
 #'
 #'
-coreNorm <-function(data,
+core_norm <-function(data,
                     metadata_sample,
                     metadata_info){
   ## ------------------ Prepare the data ------------------- ##
@@ -1031,7 +1031,7 @@ coreNorm <-function(data,
     media_pca_data[is.na( media_pca_data)] <- 0
 
     dev.new()
-    pca_QC_media <-invisible(VizPCA(data=media_pca_data %>%dplyr::select(-metadata_info[["Conditions"]], -Sample_type),
+    pca_QC_media <-invisible(viz_pca(data=media_pca_data %>%dplyr::select(-metadata_info[["Conditions"]], -Sample_type),
                                                 metadata_info= c(color="Sample_type"),
                                                 metadata_sample= media_pca_data,
                                                plot_name = "QC Media_samples",
@@ -1240,10 +1240,10 @@ coreNorm <-function(data,
 
 
 ################################################################################################
-### ### ### PreProcessing helper function: Outlier detection ### ### ###
+### ### ### pre_processing helper function: Outlier detection ### ### ###
 ################################################################################################
 
-#' OutlierDetection
+#' outlier_detection
 #'
 #' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
@@ -1255,7 +1255,7 @@ coreNorm <-function(data,
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- OutlierDetection(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' Res <- outlier_detection(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
 #'                                      metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                                      metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
@@ -1273,7 +1273,7 @@ coreNorm <-function(data,
 #'
 #' @noRd
 #'
-OutlierDetection <-function(data,
+outlier_detection <-function(data,
                             metadata_sample,
                             metadata_info,
                             core=FALSE,
@@ -1329,7 +1329,7 @@ OutlierDetection <-function(data,
     outlier_PCA_data$Conditions <- Conditions
 
     dev.new()
-    pca_outlier <-invisible(VizPCA(data=data_norm,
+    pca_outlier <-invisible(viz_pca(data=data_norm,
                                                metadata_info= c(color=metadata_info[["Conditions"]]),
                                                metadata_sample= outlier_PCA_data,
                                               plot_name = paste("PCA outlier test filtering round ",loop),
@@ -1520,7 +1520,7 @@ OutlierDetection <-function(data,
   # 1. Shape Outliers
   if(length(sample_outliers)>0){
     dev.new()
-    pca_QC <-invisible(VizPCA(data=as.data.frame(data)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
+    pca_QC <-invisible(viz_pca(data=as.data.frame(data)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
                                           metadata_info= c(color=metadata_info[["Conditions"]], shape = "Outliers"),
                                           metadata_sample= Metadata_Sample ,
                                          plot_name = "Quality Control PCA Condition clustering and outlier check",
@@ -1532,7 +1532,7 @@ OutlierDetection <-function(data,
   # 2. Shape Biological replicates
   if("Biological_Replicates" %in% names(metadata_info)){
     dev.new()
-    pca_QC_repl <-invisible(VizPCA(data=as.data.frame(data)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
+    pca_QC_repl <-invisible(viz_pca(data=as.data.frame(data)%>%dplyr::select(-zero_var_metab_export_df$Metabolite),
                                                metadata_info= c(color=metadata_info[["Conditions"]], shape = metadata_info[["Biological_Replicates"]]),
                                                metadata_sample= Metadata_Sample,
                                               plot_name =  "Quality Control PCA replicate spread check",

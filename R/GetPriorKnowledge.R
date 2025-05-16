@@ -38,7 +38,7 @@
 #'
 metsigdb_kegg <- function(){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   logger::log_info("Load KEGG.")
 
@@ -111,11 +111,11 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
                      save_table="csv",
                      path=NULL){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                        path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
@@ -162,7 +162,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
   ##-------------- Save and return
   DF_List <- list("ChemicalClass_MetabSet"=HMDB_ChemicalClass)
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+    save_res(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
             inputlist_plot= NULL,
             save_table=save_table,
             save_plot=NULL,
@@ -190,16 +190,16 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #'
 #' @export
 
-Make_GeneMetabSet <- function(input_pk,
+make_gene_metab_set <- function(input_pk,
                               metadata_info=c(Target="gene"),
                               pk_name= NULL,
                               save_table = "csv",
                               path = NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
-  logger::log_info("Make_GeneMetabSet.")
+  logger::log_info("make_gene_metab_set.")
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
@@ -221,7 +221,7 @@ Make_GeneMetabSet <- function(input_pk,
 
   ## ------------ Folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
@@ -268,7 +268,7 @@ Make_GeneMetabSet <- function(input_pk,
   DF_List <- list("GeneMetabSet"=GeneMetabSet,
                   "MetabSet"=MetabSet)
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+    save_res(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
@@ -315,7 +315,7 @@ metsigdb_metalinks <- function(types = NULL,
                           save_table="csv",
                           path=NULL){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   logger::log_info("MetaLinksDB.")
 
@@ -334,7 +334,7 @@ metsigdb_metalinks <- function(types = NULL,
 
   ## ------------ Folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "MetaboliteSet")
@@ -529,7 +529,7 @@ metsigdb_metalinks <- function(types = NULL,
   DF_List <- list("MetalinksDB"=MetalinksDB,
                   "MetalinksDB_Type"=MetalinksDB_Type)
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+    save_res(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,

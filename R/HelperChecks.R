@@ -45,7 +45,7 @@
 #'
 #' @noRd
 #'
-CheckInput <- function(data,
+check_param <- function(data,
                        data_num=TRUE,
                        metadata_sample=NULL,
                        metadata_feature=NULL,
@@ -325,10 +325,10 @@ CheckInput <- function(data,
 }
 
 ################################################################################################
-### ### ### PreProcessing helper function: Internal Function to check function input ### ### ###
+### ### ### pre_processing helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check specific input parameters for PreProcessing()
+#' Check specific input parameters for pre_processing()
 #'
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added.
@@ -342,13 +342,13 @@ CheckInput <- function(data,
 #'
 #' @return returns warnings and errors if input is not correct
 #'
-#' @keywords Input check for MetaProViz::PreProcessing
+#' @keywords Input check for MetaProViz::pre_processing
 #'
 #' @importFrom logger log_trace
 #'
 #' @noRd
 #'
-CheckInput_PreProcessing <- function(metadata_sample,
+check_param_preproc <- function(metadata_sample,
                                      metadata_info,
                                      core=FALSE,
                                      featurefilt = "Modified",
@@ -416,10 +416,10 @@ CheckInput_PreProcessing <- function(metadata_sample,
 }
 
 ################################################################################################
-### ### ### DMA helper function: Internal Function to check function input ### ### ###
+### ### ### dma helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check input parameters of DMA
+#' Check input parameters of dma
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -433,7 +433,7 @@ CheckInput_PreProcessing <- function(metadata_sample,
 #'
 #' @return Returns: 1. warnings and errors if input is not correct, 2. Settings
 #'
-#' @keywords Input check for MetaProViz::DMA
+#' @keywords Input check for MetaProViz::dma
 #'
 #' @importFrom logger log_trace
 #' @importFrom dplyr filter select_if
@@ -442,7 +442,7 @@ CheckInput_PreProcessing <- function(metadata_sample,
 #'
 #' @noRd
 #'
-CheckInput_DMA <- function(data,
+check_param_dma <- function(data,
                            metadata_sample,
                            metadata_info= c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                            pval ="lmFit",
@@ -595,12 +595,12 @@ CheckInput_DMA <- function(data,
   }
 
   if(is.logical(shapiro) == FALSE){
-    message <- paste0("Check input. The Shapiro value should be either =TRUE or =FALSE.")
+    message <- paste0("Check input. The shapiro value should be either =TRUE or =FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
   if(is.logical(bartlett) == FALSE){
-    message <- paste0("Check input. The Bartlett value should be either =TRUE or =FALSE.")
+    message <- paste0("Check input. The bartlett value should be either =TRUE or =FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
@@ -621,7 +621,7 @@ CheckInput_DMA <- function(data,
 #' Check input parameters of ORA
 #'
 #' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
-#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage, ColumnName for input_pathway. For MetaProViz::ClusterORA also BackgroundColumn. \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage, ColumnName for input_pathway. For MetaProViz::cluster_ora also BackgroundColumn. \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
 #' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
 #' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom % of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}
 #' @param input_pathway DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
@@ -629,18 +629,18 @@ CheckInput_DMA <- function(data,
 #' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param max_gssize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param remove_background For MetaProViz::ClusterORA the Background Settings are passed, for MetaProViz::StandardORA set to FALSE.
+#' @param remove_background For MetaProViz::cluster_ora the Background Settings are passed, for MetaProViz::standard_ora set to FALSE.
 #'
 #' @return Returns: 1. warnings and errors if input is not correct, 2. Pathway file
 #'
-#' @keywords Input check MetaProViz::StandardORA and MetaProViz::ClusterORA
+#' @keywords Input check MetaProViz::standard_ora and MetaProViz::cluster_ora
 #'
 #' @importFrom logger log_trace
 #' @importFrom dplyr rename
 #'
 #' @noRd
 #'
-CheckInput_ORA <- function(data,
+check_param_ora <- function(data,
                            metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                            cutoff_stat=0.05,
                            cutoff_percentage=10,
@@ -807,27 +807,27 @@ CheckInput_ORA <- function(data,
 
 #' Check input parameters of MCA
 #'
-#' @param data_Intra For MetaProViz::MCA_core, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_core For MetaProViz::MCA_core, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
-#' @param metadata_info_Intra For MetaProViz::MCA_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_core  For MetaProViz::MCA_core, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param data_C1 For MetaProViz::MCA_2Cond, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_C2 For MetaProViz::MCA_2Cond, otherwise NULL. DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param metadata_info_C1  For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_C2 For MetaProViz::MCA_2Cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param data_Intra For MetaProViz::mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_core For MetaProViz::mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
+#' @param metadata_info_Intra For MetaProViz::mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_core  For MetaProViz::mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param data_C1 For MetaProViz::mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_C2 For MetaProViz::mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param metadata_info_C1  For MetaProViz::mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_C2 For MetaProViz::mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
 #' @param feature \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
 #' @param method_background \emph{Optional: } Background method `Intra|core, Intra&core, core, Intra or * \strong{Default="Intra&core"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #'
 #' @return Returns warnings and errors if input is not correct
 #'
-#' @keywords Input check MetaProViz::MCA_2Cond and MetaProViz::MCA_core
+#' @keywords Input check MetaProViz::mca_2cond and MetaProViz::mca_core
 #'
 #' @importFrom logger log_trace
 #'
 #' @noRd
 #'
-CheckInput_MCA <- function(data_C1,
+check_param_mca <- function(data_C1,
                            data_C2,
                            data_core,
                            data_Intra,
@@ -840,7 +840,7 @@ CheckInput_MCA <- function(data_C1,
                            save_table = "csv"
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   #------------- data
   if(is.null(data_C1)==FALSE){

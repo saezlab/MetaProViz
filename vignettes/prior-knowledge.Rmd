@@ -188,7 +188,7 @@ Plot <- ggplot2::ggplot(AlaninePlot, ggplot2::aes(fill=TrivialName, y=`IDs in Da
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Database", y = "Number of IDs")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", subtitle = NULL, plot_type="Bar")
 
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -242,7 +242,7 @@ Plot <- ggplot2::ggplot(Alanine, ggplot2::aes(fill=TrivialName, y=`PathwayCount`
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Database", y = "Number of Pathways")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=AlaninePlot, plot_name = "Alanine IDs in in different databases", subtitle = NULL, plot_type="Bar")
 
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -299,7 +299,7 @@ Input_HMDB <- FeatureMetadata_Cells%>%
   dplyr::select("HMDB", "Pathway") # only keep relevant columns
 
 # Add equivalent IDs:
-FeatureMetadata_Cells_AddIDs <- MetaProViz::EquivalentIDs(data= Input_HMDB,
+FeatureMetadata_Cells_AddIDs <- MetaProViz::equivalent_ids(data= Input_HMDB,
                                                           metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
                                                           from = "hmdb")
 ```
@@ -307,7 +307,7 @@ FeatureMetadata_Cells_AddIDs <- MetaProViz::EquivalentIDs(data= Input_HMDB,
 ```{r, echo=FALSE}
 # Check how our data looks like:
 FeatureMetadata_Cells_AddIDs [2:8, 1:3]%>%
-  kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using MetaProViz::EquivalentIDs() function.") %>%
+  kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using MetaProViz::equivalent_ids() function.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
@@ -372,7 +372,7 @@ ChemicalClass_MetabSet[c(1:5,80:83, 500:503),]%>%
 
 ## Create pathway-metabolite sets
 
-The function `Make_GeneMetabSet` can be used to convert gene names to metabolite names by using a PK network of metabolic reactions calls CosmosR [@Dugourd2021].
+The function `make_gene_metab_set` can be used to convert gene names to metabolite names by using a PK network of metabolic reactions calls CosmosR [@Dugourd2021].
 This function is useful if you want to perform pathway enrichment analysis on available gene-sets such as the Hallmarks gene-sets from MSigDB [@Castanza2022].
 Moreover, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
 The Hallmarks [@Liberzon2015] gene-set and Gaude [@Gaude2016] gene-set is available in the package `MetaProViz` and can be loaded using the function `metsigdb_hallmarks()` and `metsigdb_gaude` respectively.\
@@ -403,15 +403,15 @@ Gaude_Pathways[c(486:490, 1504, 1507, 1531, 49:50, 779),]%>%
 ```
 
 \
-Now we can use the function `Make_GeneMetabSet` to translate the gene names to metabolite names.
+Now we can use the function `make_gene_metab_set` to translate the gene names to metabolite names.
 
 ```{r}
 # Translate gene names to metabolite names
-Hallmarks_GeneMetab <- MetaProViz::Make_GeneMetabSet(input_pk=Hallmark_Pathways,
+Hallmarks_GeneMetab <- MetaProViz::make_gene_metab_set(input_pk=Hallmark_Pathways,
                                                      metadata_info=c(Target="gene"),
                                                      pk_name="Hallmarks")
 
-Gaude_GeneMetab <- MetaProViz::Make_GeneMetabSet(input_pk=Gaude_Pathways,
+Gaude_GeneMetab <- MetaProViz::make_gene_metab_set(input_pk=Gaude_Pathways,
                                                      metadata_info=c(Target="gene"),
                                                      pk_name="Gaude")
 ```
@@ -465,10 +465,10 @@ MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
 ## Comparison of PK coverage
 
 We have now loaded a number of different PK sources (details above) and aim to compare the overlap in coverage between these PK sources to understand if there are certain genes or metabolites covered by one PK resource but not the others.
-As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `MetaProViz::ComparePK()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
+As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `MetaProViz::compare_pk()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
 ```{r}
 # Compare the PK resources
-pk_comp_res <- MetaProViz:::ComparePK(data = list(Hallmarks = "Hallmarks",
+pk_comp_res <- MetaProViz:::compare_pk(data = list(Hallmarks = "Hallmarks",
                                                       Gaude = "Gaude",
                                                       MetalinksDB = "MetalinksDB")
                                      )
@@ -488,7 +488,7 @@ pk_comp_res$upset_plot
 \
 The upset plot shows that MetalinksDB has unique genes and metabolites not present in the other resources. This is to be expected, since MetalinksDB focuses on receptors, transporters and metabolic enzymes, whilst Gaude and Hallmakrs focus on pathways.\
 Since Gaude only focuses on metabolic enzymes of pathways, it contains a low number of genes and hence has a small amount of unique genes and metabolites. In this regard it makes sense that Hallmarks includes many unique genes, since Hallmarks also includes other genes and pathways not related to metabolism.
-Between Hallmarks and Gaude we observe a high overlap with metabolites, which can be explained since both gene sets are assigned metabolites by using the same metabolic pathways in the backend of `MetaProViz::Make_GeneMetabSet` and it is important to keep in mind that this dictates the gene-metabolite associations added.
+Between Hallmarks and Gaude we observe a high overlap with metabolites, which can be explained since both gene sets are assigned metabolites by using the same metabolic pathways in the backend of `MetaProViz::make_gene_metab_set` and it is important to keep in mind that this dictates the gene-metabolite associations added.
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
@@ -529,7 +529,7 @@ This helps us to understand what to expect, when linking the data to prior knowl
 ```{r}
 pk_list <- list(Biocft = FeatureMetadata_Biocrates)
 metadata_info <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
-pk_comp_res_biocft <- MetaProViz:::ComparePK(data = pk_list, metadata_info = metadata_info,
+pk_comp_res_biocft <- MetaProViz:::compare_pk(data = pk_list, metadata_info = metadata_info,
                            plot_title = "Overlap of BioCrates Columns")
 
 ```
@@ -602,14 +602,14 @@ For those with multiple, this ranges from 2-20 HMDB entries per biocrates cell!
 With so many biocrates cells linked to multiple HMDB IDs, how should we deal w0.ith this?
 Should we only select a single HMDB ID in cases where we have multiple?
 We discuss the pros and cons of this later in section: [Bonus: Are multiple metabolite IDs helpful or a hindrance?](#sect4_bonus).
-But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `CheckMatchID()` has been designed to handle.
+But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `check_match_id()` has been designed to handle.
 
 ## 3. Make connection to PK and assess overlap
 
-Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::CheckMatchID()` function.\
+Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::check_match_id()` function.\
 
 ```{r}
-Biocrates_to_MetalinksDB <- MetaProViz:::CheckMatchID(data = FeatureMetadata_Biocrates,
+Biocrates_to_MetalinksDB <- MetaProViz:::check_match_id(data = FeatureMetadata_Biocrates,
                      PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
                      metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
@@ -632,7 +632,7 @@ This returns some warning messages and 4 tables:\
 
 In some cases we will expect to have only input ID linked to one entry in the PK.
 But this won't always be the case, and as already discussed in the last section above, in many cases here we will have multiple HMDB IDs per single biocrates metabolite cell.
-The `MetaProViz::CheckMatchID()` has been designed with this in mind, by default splitting any comma separated values in the InputID (or PriorID) into separate entities, counting the number of links between these, and reporting this to the user.
+The `MetaProViz::check_match_id()` has been designed with this in mind, by default splitting any comma separated values in the InputID (or PriorID) into separate entities, counting the number of links between these, and reporting this to the user.
 
 Let's take a look at the data_Matched data:
 
@@ -667,7 +667,7 @@ fill_vals <- c("FALSE" = "red", "TRUE" = "#009E73")
 fill_lbls <- c("No Match", "Found Match")
 
 # Call the function with desired parameters
-p <- MetaProViz:::VizStackedbar(
+p <- MetaProViz:::viz_stackedbar(
   data = Biocrates_to_MetalinksDB$data_Matched_NA_and_duplicates,
   group_col = "Class",
   fill_col = "found_match_in_PK",
@@ -726,7 +726,7 @@ print(result_bioc_hmdb_count_single$plot)
 Now that we can see we only have either NA or singular values for our HMDB IDs, let's map this table to MetalinksDB using the same function as we did earlier, but this time using the `HMDB_single` column.
 
 ```{r, fig.width=8, fig.height=6, echo=TRUE}
-Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::CheckMatchID(data = FeatureMetadata_Biocrates_singleHMDB,
+Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::check_match_id(data = FeatureMetadata_Biocrates_singleHMDB,
                      PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
                      metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 ```
@@ -748,7 +748,7 @@ Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::CheckMatchID(data = FeatureM
 # p
 
 # Call the function with desired parameters
-p <- MetaProViz:::VizStackedbar(
+p <- MetaProViz:::viz_stackedbar(
   data = Biocrates_to_MetalinksDB_singleHMDB$data_Matched_NA_and_duplicates,
   group_col = "Class",
   fill_col = "found_match_in_PK",
@@ -780,7 +780,7 @@ fill_vals <- c("TRUE" = "#009E73", "FALSE" = "#004A13")
 fill_lbls <- c("Biocrates metabolite <---> MetalinksDB: using only multi HMDB","Biocrates metabolite <---> MetalinksDB: using single or multi HMDB")
 
 # Call the function with desired parameters
-p <- MetaProViz:::VizStackedbar(
+p <- MetaProViz:::viz_stackedbar(
   data = Biocrates_to_MetalinksDB_foundPKmatch,
   group_col = "Class",
   fill_col = "found_with_singleHMDB",
@@ -830,7 +830,7 @@ We discuss the implications throughout this vignette and leave it to user discre
 <br>
 
 Across the different prior knowledge resources (see also tables above) specific metabolite IDs are used and hence depending on the prior knowledge resource a specific metabolite ID is required.\
-If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::TranslateID()` function.
+If we want to convert or 'translate' those IDs to another commonly used form of ID, for instance because our measured data uses another type of ID, we can make use of the `MetaProViz::translate_id()` function.
 This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/html/OmnipathR.html) and RaMP-DB [@Braisted2023] on the backend of our function and currently supports ID translation of metabolites to and from the following formats:\
 - KEGG\
 - HMDB\
@@ -840,7 +840,7 @@ This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/
 As an example we are translating the KEGG pathways we loaded with `MetaProViz::metsigdb_kegg` into HMDB ids:\
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
-KEGG_Pathways_Translated <- MetaProViz::TranslateID(data= KEGG_Pathways,
+KEGG_Pathways_Translated <- MetaProViz::translate_id(data= KEGG_Pathways,
                                                      metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
                                                      from = c("kegg"),
                                                      to = c("hmdb", "pubchem"))
@@ -862,7 +862,7 @@ to get a better understanding of the combinations of these, let's visualise the 
 pk_list <- list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF)
 metadata_info <- list(kegg_translated = c("hmdb", "pubchem"))
 
-pk_comp_res_keggtrans <- MetaProViz:::ComparePK(data = pk_list,
+pk_comp_res_keggtrans <- MetaProViz:::compare_pk(data = pk_list,
                                metadata_info = metadata_info,
                                plot_title = "IDs available after KEGG ID Translation")
 
@@ -888,7 +888,7 @@ For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the 
 
 <br>
 
-Because of this complexity the output of `MetaProViz::TranslateID()` includes not only the Translation table showcased above, but additionally information about the mapping ambiguity as well as a summary of the relationships between the Original and Translated IDs.\
+Because of this complexity the output of `MetaProViz::translate_id()` includes not only the Translation table showcased above, but additionally information about the mapping ambiguity as well as a summary of the relationships between the Original and Translated IDs.\
 Indeed, the translation of e.g.
 KEGG to hmdb and pubchem includes multiple data frames including a summary of the mapping occurrences:\
 
@@ -908,11 +908,11 @@ KEGG_Pathways_Translated[["Mappingsummary_hmdb"]][c(1:3, 7:9),] %>%
 \
 We also have the ability to extract a long version of the DF that includes a row for each mapping occurrence, which can be useful for downstream analysis.
 Yet, this can become very large dependent on the amount of many-to-many mappings, hence by default we do not generate this summary.
-Within the `MetaProViz::TranslateID()` you can set the parameter `summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `MetaProViz::MappingAmbiguity()` to generate this long summary as well as the mapping summary in general.\
+Within the `MetaProViz::translate_id()` you can set the parameter `summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `MetaProViz::mapping_ambiguity()` to generate this long summary as well as the mapping summary in general.\
 
 ```{r, eval=FALSE, include=TRUE}
 # Option 1:
-KEGG_Pathways_TranslatedSum <- MetaProViz::TranslateID(data= KEGG_Pathways,
+KEGG_Pathways_TranslatedSum <- MetaProViz::translate_id(data= KEGG_Pathways,
                                                     metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
                                                     from = c("kegg"),
                                                     to = c("hmdb", "pubchem"),
@@ -923,7 +923,7 @@ KEGG_Pathways_TranslatedSum <- MetaProViz::TranslateID(data= KEGG_Pathways,
 
 ```{r}
 # Option 2:
-MappingProblems <- MetaProViz::MappingAmbiguity(
+MappingProblems <- MetaProViz::mapping_ambiguity(
     data =
         KEGG_Pathways_Translated[["TranslatedDF"]] %>%
         dplyr::rename("KEGG"="MetaboliteID") %>%
@@ -965,7 +965,7 @@ PlotA <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.characte
         #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "One KEGG ID to n HMDB IDs", y = "Number of KEGG IDs",  fill ="Mapping")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=PlotA, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(KEGG_to_hmdb)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=PlotA, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(KEGG_to_hmdb)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", subtitle = NULL, plot_type="Bar")
 
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -983,7 +983,7 @@ PlotB <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.characte
         #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "HMDB ID to n KEGG IDs", y = "Number of KEGG IDs",  fill ="Mapping")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(input_plot=PlotB, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(hmdb_to_KEGG)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=PlotB, metadata_info=c(Conditions="Conditions", Superplot="Mapping"), metadata_sample=Plot%>%dplyr::rename("Conditions"="Count(hmdb_to_KEGG)"), plot_name = "KEGG_Glycolysis-Gluconeogenesis", subtitle = NULL, plot_type="Bar")
 
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -1034,14 +1034,14 @@ This is something we are currently working on and hope to provide within the nex
 \
 There are two options:\
 1.
-Over Representation Analysis (ORA) that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test `MetaProViz::ClusterORA`.
-This can be applied to clusters of metabolites as for example the results from `MetaProViz::MCA_2Cond()` or `MetaProViz::core()` function.
+Over Representation Analysis (ORA) that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test `MetaProViz::cluster_ora`.
+This can be applied to clusters of metabolites as for example the results from `MetaProViz::mca_2cond()` or `MetaProViz::core()` function.
 If you want to have more details on these clustering methods please visit the vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html) or [core Metabolomics](https://saezlab.github.io/MetaProViz/articles/core%20Metabolomics.html).\
 
 \
 2.
 Enrichment analysis on standard differential analysis results.
-We offer ORA `MetaProViz::StandardORA`, but there are many other statistical tests that can be used for enrichment analysis.
+We offer ORA `MetaProViz::standard_ora`, but there are many other statistical tests that can be used for enrichment analysis.
 The full scope of different methods is beyond the scope of MetaProViz, but are available in decoupleR [@Badia-I-Mompel2022] packages from our group.
 
 ```{r, echo=FALSE, eval=FALSE}

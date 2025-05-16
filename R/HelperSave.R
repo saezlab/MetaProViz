@@ -23,7 +23,7 @@
 ### ### ### General helper function: Save folder path ### ### ###
 ################################################################################################
 
-#' SavePath is the helper function to create the folder structure and path
+#' save_path is the helper function to create the folder structure and path
 #'
 #' @param folder_name Name of the folder, which can not contain any special characters. Created within  the individual MetaProViz functions and can not be changed by the user.
 #' @param path Passed to main function by the user
@@ -34,7 +34,7 @@
 #'
 #' @noRd
 #'
-SavePath<- function(folder_name, path){
+save_path<- function(folder_name, path){
   #Check if folder_name includes special characters that are not allowed
   cleaned_folder_name <- gsub("[^a-zA-Z0-9 ]", "", folder_name)
   if (folder_name != cleaned_folder_name){
@@ -66,7 +66,7 @@ SavePath<- function(folder_name, path){
 #'
 #' @importFrom magrittr %>%
 #' @noRd
-ResultsDir <- function(path = 'MetaProViz_Results') {
+results_dir <- function(path = 'MetaProViz_Results') {
 
   # toDO: options?
   path %>% {`if`(!dir.exists(.), {dir.create(.); .}, .) }
@@ -78,7 +78,7 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 ### ### ### General helper function: Save tables and plot ### ### ###
 ################################################################################################
 
-#' SaveRes is the helper function to save the plots and tables
+#' save_res is the helper function to save the plots and tables
 #'
 #' @param inputlist_df \emph{Optional: } Generated within the MetaProViz function. Contains named DFs. If not avalailable can be set to NULL.\strong{Default = NULL}
 #' @param inputlist_plot \emph{Optional: } Generated within the MetaProViz function. Contains named Plots. If not avalailable can be set to NULL.\strong{Default = NULL}
@@ -96,7 +96,7 @@ ResultsDir <- function(path = 'MetaProViz_Results') {
 #' @noRd
 #'
 
-SaveRes<- function(inputlist_df= NULL,
+save_res<- function(inputlist_df= NULL,
                    inputlist_plot= NULL,
                    save_table = NULL,
                    save_plot = NULL,

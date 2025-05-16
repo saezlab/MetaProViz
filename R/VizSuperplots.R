@@ -44,7 +44,7 @@
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
-#' Res <- VizSuperplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)], metadata_info = c(Conditions="Conditions", Superplot = NULL))
+#' Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)], metadata_info = c(Conditions="Conditions", Superplot = NULL))
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
@@ -63,7 +63,7 @@
 #'
 #' @export
 #'
-VizSuperplot <- function(data,
+viz_superplot <- function(data,
                          metadata_sample,
                          metadata_info = c(Conditions="Conditions", Superplot = NULL),
                          plot_type = "Box", # Bar, Box, Violin
@@ -82,13 +82,13 @@ VizSuperplot <- function(data,
                          path = NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
-  logger::log_info("VizSuperplot: Superplot visualization")
+  logger::log_info("viz_superplot: Superplot visualization")
 
   ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=NULL,
                           metadata_info=metadata_info,
@@ -97,7 +97,7 @@ VizSuperplot <- function(data,
                           core=FALSE,
                           print_plot= print_plot)
 
-  # CheckInput` Specific
+  # check_param` Specific
   if(is.null(metadata_info)==TRUE){
     message <- paste0("You must provide the column name for Conditions via metadata_info=c(Conditions=ColumnName) in order to plot the x-axis conditions.")
     logger::log_trace(paste("Error ", message, sep=""))
@@ -198,10 +198,10 @@ VizSuperplot <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(folder_name=  paste(plot_type, "Plots", sep=""),
+    Folder <- save_path(folder_name=  paste(plot_type, "Plots", sep=""),
                                     path=path)
   }
-  logger::log_info("VizSuperplot results saved at ", Folder)
+  logger::log_info("viz_superplot results saved at ", Folder)
 
   ###############################################################################################################################################################################################################
   ## ------------ Prepare Input ----------- ##
@@ -338,14 +338,14 @@ VizSuperplot <- function(data,
         numerator <-unique(metadata_sample$Conditions)
         comparisons <- combn(unique(conditions), 2) %>% as.matrix()
 
-        #Prepare Stat results using DMA STAT helper functions
+        #Prepare Stat results using dma STAT helper functions
         if(pval=="aov"){
-        STAT_C1vC2 <- AOV(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+        STAT_C1vC2 <- aov(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                           metadata_info=c(Conditions="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
                           metadata_sample= metadata_sample,
                           log2fc_table=NULL)
         }else if(pval=="kruskal.test"){
-          STAT_C1vC2 <-Kruskal(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+          STAT_C1vC2 <-kruskal(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                                             metadata_info=c(Conditions="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
                                             metadata_sample= metadata_sample,
                                             log2fc_table=NULL)
@@ -404,7 +404,7 @@ VizSuperplot <- function(data,
     PlotList[[i]] <- Plot
 
     # Make plot into nice format:
-    Plot_Sized <-  plotGrob_Superplot(input_plot=Plot, metadata_info=metadata_info, metadata_sample=metadata_sample, plot_name =plot_name, subtitle = i, plot_type=plot_type)
+    Plot_Sized <-  plot_grob_superplot(input_plot=Plot, metadata_info=metadata_info, metadata_sample=metadata_sample, plot_name =plot_name, subtitle = i, plot_type=plot_type)
     plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
     plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
@@ -420,7 +420,7 @@ VizSuperplot <- function(data,
     SaveList[[cleaned_i]] <- Plot_Sized
     #----- Save
     suppressMessages(suppressWarnings(
-      SaveRes(inputlist_df=NULL,
+      save_res(inputlist_df=NULL,
                            inputlist_plot= SaveList,
                            save_table=NULL,
                            save_plot=save_plot,

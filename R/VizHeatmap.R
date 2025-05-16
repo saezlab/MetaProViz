@@ -55,7 +55,7 @@
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")
-#' Res <- MetaProViz::VizHeatmap(data=Intra[,-c(1:3)])
+#' Res <- MetaProViz::viz_heatmap(data=Intra[,-c(1:3)])
 #'
 #' @keywords Heatmap
 #'
@@ -65,7 +65,7 @@
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_trace
 #' @export
-VizHeatmap <- function(data,
+viz_heatmap <- function(data,
                        metadata_info= NULL,
                        metadata_sample=NULL,
                        metadata_feature= NULL,
@@ -78,11 +78,11 @@ VizHeatmap <- function(data,
                        path = NULL
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=metadata_feature,
                           metadata_info=metadata_info,
@@ -91,7 +91,7 @@ VizHeatmap <- function(data,
                           core=FALSE,
                           print_plot= print_plot)
 
-  # CheckInput` Specific
+  # check_param` Specific
   if(is.logical(enforce_featurenames) == FALSE | is.logical(enforce_samplenames) == FALSE){
     message <- paste0("Check input. The enforce_featurenames and enforce_samplenames value should be either =TRUE or = FALSE.")
     logger::log_trace(paste("Error ", message, sep=""))
@@ -108,7 +108,7 @@ VizHeatmap <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(folder_name= "Heatmap",
+    Folder <- save_path(folder_name= "Heatmap",
                                     path=path)
   }
 
@@ -234,7 +234,7 @@ VizHeatmap <- function(data,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
+        Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
         plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
@@ -245,7 +245,7 @@ VizHeatmap <- function(data,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          SaveRes(inputlist_df=NULL,
+          save_res(inputlist_df=NULL,
                                inputlist_plot= PlotList_adaptedGrid,
                                save_table=NULL,
                                save_plot=save_plot,
@@ -377,7 +377,7 @@ VizHeatmap <- function(data,
         PlotList[[cleaned_i]] <- heatmap
 
         #Width and height according to Sample and metabolite number
-        Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
+        Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
         plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
@@ -388,7 +388,7 @@ VizHeatmap <- function(data,
 
         #----- Save
         suppressMessages(suppressWarnings(
-          SaveRes(inputlist_df=NULL,
+          save_res(inputlist_df=NULL,
                                inputlist_plot= PlotList_adaptedGrid,
                                save_table=NULL,
                                save_plot=save_plot,
@@ -546,7 +546,7 @@ VizHeatmap <- function(data,
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
            plot_name <- paste(cleaned_i,cleaned_s, sep="_")
-            Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
+            Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
             plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
             plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
             Plot_Sized %<>%
@@ -557,7 +557,7 @@ VizHeatmap <- function(data,
 
             #----- Save
             suppressMessages(suppressWarnings(
-              SaveRes(inputlist_df=NULL,
+              save_res(inputlist_df=NULL,
                                    inputlist_plot= PlotList_adaptedGrid,
                                    save_table=NULL,
                                    save_plot=save_plot,
@@ -660,7 +660,7 @@ VizHeatmap <- function(data,
 
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
-    Plot_Sized <- PlotGrob_Heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
+    Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
     plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
     plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
@@ -671,7 +671,7 @@ VizHeatmap <- function(data,
 
     #----- Save
     suppressMessages(suppressWarnings(
-      SaveRes(inputlist_df=NULL,
+      save_res(inputlist_df=NULL,
                            inputlist_plot= PlotList_adaptedGrid,
                            save_table=NULL,
                            save_plot=save_plot,

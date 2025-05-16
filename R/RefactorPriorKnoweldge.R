@@ -36,7 +36,7 @@
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' Res <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem", "hmdb"))
+#' Res <- MetaProViz::translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem", "hmdb"))
 #'
 #' @keywords Translate metabolite IDs
 #'
@@ -49,7 +49,7 @@
 #'
 #' @export
 #'
-TranslateID <- function(data,
+translate_id <- function(data,
                         metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
                         from = "kegg",
                         to = c("pubchem","chebi","hmdb"),
@@ -59,11 +59,11 @@ TranslateID <- function(data,
                         plot=FALSE #toDO
   ){# Add ability to also get metabolite names that are human readable from an ID type!
 
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------------  Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           data_num=FALSE,
                           save_table=save_table)
 
@@ -121,7 +121,7 @@ TranslateID <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "ID_Translation")
@@ -171,7 +171,7 @@ TranslateID <- function(data,
   ## Create the long DF summary if summary =TRUE
   if(summary==TRUE){
     for(item in to){
-      summary <- MetaProViz::MappingAmbiguity(data= TranslatedDF,
+      summary <- MetaProViz::mapping_ambiguity(data= TranslatedDF,
                                             from = metadata_info[['InputID']],
                                             to = item,
                                             grouping_variable = metadata_info[['grouping_variable']],
@@ -183,12 +183,12 @@ TranslateID <- function(data,
 
   ## ------------------ Save the results ------------------- ##
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=ResList,
+    save_res(inputlist_df=ResList,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
-                         FileName= "TranslateID",
+                         FileName= "translate_id",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -199,7 +199,7 @@ TranslateID <- function(data,
   #   metadata_info <- list(translated = to)
   #   print(pk_list)
   #   print(to)
-  #   pk_comp_res <- MetaProViz:::ComparePK(data = pk_list,
+  #   pk_comp_res <- MetaProViz:::compare_pk(data = pk_list,
   #                                         metadata_info = metadata_info,
   #                                         plot_title = "IDs available after ID Translation")
   #   ## Add Upset plot
@@ -228,7 +228,7 @@ TranslateID <- function(data,
 #'
 #' @examples
 #' DetectedIDs <- MetaProViz::ToyData(data="Cells_Metadata")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
-#' Res <- MetaProViz::EquivalentIDs(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
+#' Res <- MetaProViz::equivalent_ids(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
@@ -241,7 +241,7 @@ TranslateID <- function(data,
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
 #' @export
-EquivalentIDs <- function(data,
+equivalent_ids <- function(data,
                           metadata_info = c(InputID="MetaboliteID"),
                           from = "hmdb",
                           save_table= "csv",
@@ -262,11 +262,11 @@ EquivalentIDs <- function(data,
 
   #Is it possible to do this at the moment without structures, but by using other pior knowledge?
 
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------------  Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           data_num=FALSE,
                           save_table=save_table)
 
@@ -306,10 +306,10 @@ EquivalentIDs <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "EquivalentIDs")
+    SubFolder <- file.path(Folder, "equivalent_ids")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
   }
 
@@ -439,15 +439,15 @@ EquivalentIDs <- function(data,
   OutputDF <- OtherIDs
 
   ## ------------------ Save the results ------------------- ##
-  ResList <- list("EquivalentIDs" = OutputDF)
+  ResList <- list("equivalent_ids" = OutputDF)
 
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=ResList,
+    save_res(inputlist_df=ResList,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
-                         FileName= "EquivalentIDs",
+                         FileName= "equivalent_ids",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -460,7 +460,7 @@ EquivalentIDs <- function(data,
 
 #' Create Mapping Ambiguities between two ID types
 #'
-#' @param data Translated DF from MetaProViz::TranslateID reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).
+#' @param data Translated DF from MetaProViz::translate_id reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).
 #' @param to Column name of original metabolite identifier in data. Here should only have one ID per row.
 #' @param from Column name of the secondary or translated metabolite identifier in data. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.
 #' @param grouping_variable \emph{Optional: } If NULL no groups are used. If TRUE provide column name in data containing the grouping_variable and features are grouped. \strong{Default = NULL}
@@ -472,8 +472,8 @@ EquivalentIDs <- function(data,
 #'
 #' @examples
 #' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' InputDF <- MetaProViz::TranslateID(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
-#' Res <- MetaProViz::MappingAmbiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
+#' InputDF <- MetaProViz::translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
+#' Res <- MetaProViz::mapping_ambiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
 #'
 #' @keywords Mapping ambiguity
 #'
@@ -483,7 +483,7 @@ EquivalentIDs <- function(data,
 #'
 #' @export
 #'
-MappingAmbiguity <- function(data,
+mapping_ambiguity <- function(data,
                              from,
                              to,
                              grouping_variable = NULL,
@@ -492,10 +492,10 @@ MappingAmbiguity <- function(data,
                              path=NULL
 ) {
 
-  MetaProViz_Init()
+  metaproviz_init()
   ## ------------------  Check Input ------------------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           data_num=FALSE,
                           save_table=save_table)
 
@@ -535,7 +535,7 @@ MappingAmbiguity <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                                     path=path)
 
     SubFolder <- file.path(Folder, "MappingAmbiguities")
@@ -663,12 +663,12 @@ MappingAmbiguity <- function(data,
 
   ## ------------------ Save the results ------------------- ##
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=ResList,
+    save_res(inputlist_df=ResList,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= SubFolder,
-                         FileName= "MappingAmbiguity",
+                         FileName= "mapping_ambiguity",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -693,13 +693,13 @@ MappingAmbiguity <- function(data,
 #'
 #' @examples
 #' DetectedIDs <-  MetaProViz::ToyData(data="Cells_Metadata")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
-#' input_pathway <- MetaProViz::TranslateID(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz:::CheckMatchID(data= DetectedIDs, PriorKnowledge= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+#' input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
+#' Res <- MetaProViz:::check_match_id(data= DetectedIDs, PriorKnowledge= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
 #' @noRd
 #'
 
-CheckMatchID <- function(data,
+check_match_id <- function(data,
                          PriorKnowledge,
                          metadata_info = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term"),
                          save_table= "csv",
@@ -707,7 +707,7 @@ CheckMatchID <- function(data,
 ){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Check Input files ----------- ##
 
@@ -827,7 +827,7 @@ CheckMatchID <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "PriorKnowledgeChecks",
+    Folder <- save_path(folder_name= "PriorKnowledgeChecks",
                        path=path)
     SubFolder <- file.path(Folder, "CheckMatchID_Detected-to-PK")
     if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
@@ -1130,7 +1130,7 @@ CheckMatchID <- function(data,
                   "data_Matched_only_duplicates" = summary_df_only_duplicates)
 
   suppressMessages(suppressWarnings(
-  SaveRes(inputlist_df=ResList,
+  save_res(inputlist_df=ResList,
                        inputlist_plot= NULL,
                        save_table=save_table,
                        save_plot=NULL,
@@ -1160,7 +1160,7 @@ CheckMatchID <- function(data,
 #'
 #' @importFrom igraph graph_from_adjacency_matrix components
 #' @noRd
-ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
+cluster_pk <- function(data, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
                       metadata_info= c(InputID="MetaboliteID", grouping_variable="term"),
                       clust = "Graph", # Options: "Graph", "Hierarchical",
                       matrix ="percentage", # Choose "pearson", "spearman", "kendall", or "percentage"
@@ -1294,7 +1294,7 @@ ClusterPK <- function(data, # This can be either the original PK (e.g. KEGG path
 # Better function Name and parameter names needed
 # Use in ORA functions and showcase in vignette with decoupleR output
 
-AddInfo <- function(mat,
+add_info <- function(mat,
                     net,
                     res,
                     .source,
@@ -1410,10 +1410,10 @@ AddInfo <- function(mat,
 #' # Using automatic data loading for multiple resources.
 #' data <- list(Hallmarks = "Hallmarks", Gaude = "Gaude",
 #'                 MetalinksDB = "MetalinksDB", RAMP = "metsigdb_chemicalclass")
-#' res <- ComparePK(data = data)
+#' res <- compare_pk(data = data)
 #'
 #' # Filtering to include only gene features:
-#' res_genes <- ComparePK(data = data, filter_by = "gene")
+#' res_genes <- compare_pk(data = data, filter_by = "gene")
 #'
 #' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
 #'
@@ -1422,7 +1422,7 @@ AddInfo <- function(mat,
 #' data_single <- list(Biocft = FeatureMetadata_Biocrates)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
-#' res_single <- ComparePK(data = data_single, metadata_info = metadata_info_single,
+#' res_single <- compare_pk(data = data_single, metadata_info = metadata_info_single,
 #'                           plot_title = "Overlap of BioCrates Columns")
 #'
 #' ## Example 3: Custom data Frames with Custom Column Names
@@ -1437,13 +1437,13 @@ AddInfo <- function(mat,
 #'                 MetalinksDB = metalinks_df, RAMP = ramp_df)
 #' metadata_info <- list(Hallmarks = "feature", Gaude = "feature",
 #'                      MetalinksDB = c("hmdb", "gene_symbol"), RAMP = "class_source_id")
-#' res <- ComparePK(data = data, metadata_info = metadata_info, filter_by = "metabolite")
+#' res <- compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
 #'
 #' @importFrom dplyr mutate select
 #' @importFrom utils write.csv
 #'
 #' @export
-ComparePK <- function(data,
+compare_pk <- function(data,
                       metadata_info = NULL,
                       filter_by = c("both", "gene", "metabolite"),
                       plot_title = "Overlap of Prior Knowledge Resources",
@@ -1452,7 +1452,7 @@ ComparePK <- function(data,
                       output_file = NULL) {
   ###########################################################################
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Check Input files ----------- ##
   # Match filter argument
@@ -1478,13 +1478,13 @@ ComparePK <- function(data,
       var = "Hallmark_Pathways",
       load_fun = MetaProViz::metsigdb_hallmarks,
       transform_fun = function(x) {
-        resource_object <- MetaProViz::Make_GeneMetabSet(input_pk = x,
+        resource_object <- MetaProViz::make_gene_metab_set(input_pk = x,
                                                          metadata_info = c(Target = "gene"),
                                                          pk_name = "Hallmarks")
         if ("GeneMetabSet" %in% names(resource_object)) {
           resource_object$GeneMetabSet
         } else {
-          stop("Make_GeneMetabSet for Hallmarks did not return 'GeneMetabSet'.")
+          stop("make_gene_metab_set for Hallmarks did not return 'GeneMetabSet'.")
         }
       },
       default_col = "feature"
@@ -1493,13 +1493,13 @@ ComparePK <- function(data,
       var = "Gaude_Pathways",
       load_fun = MetaProViz::metsigdb_gaude,
       transform_fun = function(x) {
-        resource_object <- MetaProViz::Make_GeneMetabSet(input_pk = x,
+        resource_object <- MetaProViz::make_gene_metab_set(input_pk = x,
                                                          metadata_info = c(Target = "gene"),
                                                          pk_name = "Gaude")
         if ("GeneMetabSet" %in% names(resource_object)) {
           resource_object$GeneMetabSet
         } else {
-          stop("Make_GeneMetabSet for Gaude did not return 'GeneMetabSet'.")
+          stop("make_gene_metab_set for Gaude did not return 'GeneMetabSet'.")
         }
       },
       default_col = "feature"
@@ -1614,7 +1614,7 @@ ComparePK <- function(data,
     names(df_summary)[bin_cols_idx] <- sub("_bin$", "", names(df_summary)[bin_cols_idx])
 
     # Generate the UpSet plot.
-    upset_plot <- MetaProViz:::VizUpset(
+    upset_plot <- MetaProViz:::viz_upset(
       df = df_summary,
       class_col = class_col,
       intersect_cols = c(intersect_cols, "None"),
@@ -1699,7 +1699,7 @@ ComparePK <- function(data,
     }
 
     # Generate the UpSet plot.
-    upset_plot <- MetaProViz:::VizUpset(
+    upset_plot <- MetaProViz:::viz_upset(
       df = df_binary,
       class_col = "Type",
       intersect_cols = resource_cols,
@@ -1775,7 +1775,7 @@ count_ids <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- SavePath(folder_name= "PriorKnowledge",
+    Folder <- save_path(folder_name= "PriorKnowledge",
                        path=path)
 
     SubFolder <- file.path(Folder, "Count_MetaboliteIDs")
@@ -1839,7 +1839,7 @@ count_ids <- function(data,
     )
 
   # Make the nice plot:
-  Plot_Sized <-  plotGrob_Superplot(input_plot=plot_obj, metadata_info= c(Conditions="id_label", Superplot = TRUE), metadata_sample= processed_data%>%dplyr::rename("Conditions"="entry_count") , plot_name = plot_title, subtitle = "", plot_type="Bar")
+  Plot_Sized <-  plot_grob_superplot(input_plot=plot_obj, metadata_info= c(Conditions="id_label", Superplot = TRUE), metadata_sample= processed_data%>%dplyr::rename("Conditions"="entry_count") , plot_name = plot_title, subtitle = "", plot_type="Bar")
   plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
   plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
   Plot_Sized %<>%
@@ -1849,7 +1849,7 @@ count_ids <- function(data,
 
   ## ------------------  save and return ------------------- ##
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=list("Table"=processed_data),#This needs to be a list, also for single comparisons
+    save_res(inputlist_df=list("Table"=processed_data),#This needs to be a list, also for single comparisons
             inputlist_plot=list("Plot_Sized"=Plot_Sized) ,
             save_table= save_table,
             save_plot=save_plot,

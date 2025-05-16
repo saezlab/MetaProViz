@@ -2,7 +2,7 @@
 ##
 ## Script name: Over representation Analysis (ORA)
 ##
-## Purpose of script: Run ORA on MetaProViz metabolite clusters from MCA or diffeential results from DMA
+## Purpose of script: Run ORA on MetaProViz metabolite clusters from MCA or diffeential results from dma
 ##
 ## Author: Christina Schmidt
 ##
@@ -20,15 +20,15 @@
 
 
 #################################
-### ### ### ClusterORA ### ### ###
+### ### ### cluster_ora ### ### ###
 #################################
-#' ClusterORA
+#' cluster_ora
 #'
 #' Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
 #'
 #' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
 #' @param metadata_info \emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if remove_background=TRUE. Also pass ColumnName for input_pathway including term and feature names. (ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite")}
-#' @param remove_background \emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in metadata_info, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. MCA_2Cond are removed from the universe. \strong{default: TRUE}
+#' @param remove_background \emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in metadata_info, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. mca_2cond are removed from the universe. \strong{default: TRUE}
 #' @param input_pathway DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.
 #' @param pathway_name \emph{Optional: } Name of the pathway list used \strong{default: ""}
 #' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
@@ -41,7 +41,7 @@
 #' @importFrom logger log_info
 #' @importFrom dplyr rename select
 #' @export
-ClusterORA <- function(data,
+cluster_ora <- function(data,
                        metadata_info=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                        remove_background=TRUE,
                        input_pathway,
@@ -51,11 +51,11 @@ ClusterORA <- function(data,
                        save_table= "csv",
                        path = NULL){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
 
    ## ------------ Check Input files ----------- ##
-  Pathways <- CheckInput_ORA(data=data,
+  Pathways <- check_param_ora(data=data,
                                           metadata_info=metadata_info,
                                           remove_background=remove_background,
                                           input_pathway=input_pathway,
@@ -68,7 +68,7 @@ ClusterORA <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "ClusterORA",
+    Folder <- save_path(folder_name= "cluster_ora",
                                     path=path)
     }
 
@@ -140,7 +140,7 @@ ClusterORA <- function(data,
   }
   #Save files
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=df_list,
+    save_res(inputlist_df=df_list,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
@@ -157,7 +157,7 @@ ClusterORA <- function(data,
 
 
 ###################################
-### ### ### StandardORA ### ### ###
+### ### ### standard_ora ### ### ###
 ###################################
 
 #' Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
@@ -177,7 +177,7 @@ ClusterORA <- function(data,
 #'
 #' @export
 #'
-StandardORA <- function(data,
+standard_ora <- function(data,
                         metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                         cutoff_stat=0.05,
                         cutoff_percentage=10,
@@ -190,10 +190,10 @@ StandardORA <- function(data,
 
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
  ## ------------ Check Input files ----------- ##
-  Pathways <- CheckInput_ORA(data=data,
+  Pathways <- check_param_ora(data=data,
                                           metadata_info=metadata_info,
                                           remove_background=FALSE,
                                           input_pathway=input_pathway,
@@ -206,7 +206,7 @@ StandardORA <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "ORA",
+    Folder <- save_path(folder_name= "ORA",
                                     path=path)
   }
 
@@ -286,7 +286,7 @@ StandardORA <- function(data,
 
   #save:
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=ORA_output_list,
+    save_res(inputlist_df=ORA_output_list,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,

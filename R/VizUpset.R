@@ -58,7 +58,7 @@
 #' @importFrom stats setNames
 #'
 #' @export
-VizUpset <- function(df,
+viz_upset <- function(df,
                      class_col = NULL,
                      intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
                      plot_title = "Metabolite IDs",
@@ -74,9 +74,9 @@ VizUpset <- function(df,
 
   ###########################################################################
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
-  logger::log_info("VizUpset: Upset plot visualization")
+  logger::log_info("viz_upset: Upset plot visualization")
   ## ------------ Check Input files ----------- ##
   #
   palette_type <- match.arg(palette_type,
@@ -86,15 +86,15 @@ VizUpset <- function(df,
   ## ------------ Create Results output folder ----------- ##
   Folder <- NULL
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(folder_name= "UpsetPlots",
+    Folder <- save_path(folder_name= "UpsetPlots",
                        path=path)
   }
-  logger::log_info("VizPCA results saved at ", Folder)
+  logger::log_info("viz_pca results saved at ", Folder)
 
   ###########################################################################
   ## ----------- Check input data frame ----------- ##
   # If either a list of DFs (different PK resources, same IDs) or a single DF but multiple ID columns or a combination of both!
-  # currently there is also the ComparePK function, but I think we could maybe use it in here too!
+  # currently there is also the compare_pk function, but I think we could maybe use it in here too!
 
 
 

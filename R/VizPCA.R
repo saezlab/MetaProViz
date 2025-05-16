@@ -47,7 +47,7 @@
 #'
 #' @examples
 #' Intra <- ToyData("IntraCells_Raw")[,-c(1:3)]
-#' Res <- VizPCA(Intra)
+#' Res <- viz_pca(Intra)
 #'
 #' @keywords PCA
 #'
@@ -62,7 +62,7 @@
 #'
 #' @export
 #'
-VizPCA <- function(data,
+viz_pca <- function(data,
                    metadata_info= NULL,
                    metadata_sample = NULL,
                    color_palette= NULL,
@@ -81,12 +81,12 @@ VizPCA <- function(data,
 
   ###########################################################################
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
-  logger::log_info("VizPCA: PCA plot visualization")
+  logger::log_info("viz_pca: PCA plot visualization")
   ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=NULL,
                           metadata_info=metadata_info,
@@ -95,7 +95,7 @@ VizPCA <- function(data,
                           core=FALSE,
                           print_plot= print_plot)
 
-  # CheckInput` Specific
+  # check_param` Specific
   if(is.logical(ShowLoadings) == FALSE){
     message <- paste("The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
     logger::log_trace(paste("Error ", message, sep=""))
@@ -117,10 +117,10 @@ VizPCA <- function(data,
   ## ------------ Create Results output folder ----------- ##
   Folder <- NULL
   if(is.null(save_plot)==FALSE){
-    Folder <- SavePath(folder_name= "PCAPlots",
+    Folder <- save_path(folder_name= "PCAPlots",
                                     path=path)
   }
-  logger::log_info("VizPCA results saved at ", Folder)
+  logger::log_info("viz_pca results saved at ", Folder)
 
   ###########################################################################
   ## ----------- Set the plot parameters: ------------ ##
@@ -140,8 +140,8 @@ VizPCA <- function(data,
     safe_shape_palette <-shape_palette
   }
 
-  logger::log_info(paste("VizPCA colour:", paste(safe_colorblind_palette, collapse = ", ")))
-  logger::log_info(paste("VizPCA shape:", paste(safe_shape_palette, collapse = ", ")))
+  logger::log_info(paste("viz_pca colour:", paste(safe_colorblind_palette, collapse = ", ")))
+  logger::log_info(paste("viz_pca shape:", paste(safe_shape_palette, collapse = ", ")))
 
   ##--- Prepare the color scheme:
   if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==TRUE){
@@ -196,7 +196,7 @@ VizPCA <- function(data,
     }
   }
 
-  logger::log_info("VizPCA scale_color: ", scale_color)
+  logger::log_info("viz_pca scale_color: ", scale_color)
 
   if("shape" %in% names(metadata_sample)==TRUE){
     shape_select <- safe_shape_palette[1:length(unique(InputPCA$shape))]
@@ -271,7 +271,7 @@ VizPCA <- function(data,
   PlotList[["Plot"]] <- PCA
 
   #Set the total heights and widths
-  PCA %<>% PlotGrob_PCA(metadata_info=metadata_info,plot_name=PlotName)
+  PCA %<>% plot_grob_pca(metadata_info=metadata_info,plot_name=PlotName)
   plot_height <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
   plot_width <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
   PCA %<>%
@@ -286,7 +286,7 @@ VizPCA <- function(data,
   FileName <-plot_name %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
 
   suppressMessages(suppressWarnings(
-    SaveRes(
+    save_res(
       inputlist_df=NULL,
       inputlist_plot= PlotList_adaptedGrid,
       save_table=NULL,

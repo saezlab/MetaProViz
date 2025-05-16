@@ -35,7 +35,7 @@
 #' @return A \code{ggplot} object representing the stacked bar plot.
 #'
 #' @export
-VizStackedbar <- function(data,
+viz_stackedbar <- function(data,
                           group_col,
                           fill_col,
                           fill_values,

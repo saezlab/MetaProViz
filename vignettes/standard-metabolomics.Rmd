@@ -46,7 +46,7 @@ A standard metabolomics experiment refers to intracellular extracts (e.g. cell o
 <span style="text-decoration:underline">In this tutorial we showcase how to use **MetaProViz**</span>:\
 
 * to process raw peak data and identify outliers.\
-* to perform differential metabolite analysis (DMA) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
+* to perform differential metabolite analysis (dma) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
 * to do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors and perform pathway analysis using ORA on each cluster.\
 * to use specific visualizations to aid biological interpretation of the results.\
 \
@@ -153,7 +153,7 @@ PoolData <- intracell_raw %>%
   subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
 
 # Check the metabolite variability
-Pool_Estimation_result<- MetaProViz::PoolEstimation(data = PoolData,
+Pool_Estimation_result<- MetaProViz::pool_estimation(data = PoolData,
                                                      metadata_sample = NULL,
                                                      metadata_info = NULL,
                                                      cutoff_cv = 30)
@@ -167,7 +167,7 @@ PoolData <- intracell_raw %>%
   subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
 
 # Check the metabolite variability
-Pool_Estimation_result<- MetaProViz::PoolEstimation(data = PoolData,
+Pool_Estimation_result<- MetaProViz::pool_estimation(data = PoolData,
                                                      metadata_sample = NULL,
                                                      metadata_info = NULL,
                                                      cutoff_cv = 30)
@@ -178,7 +178,7 @@ Pool_Estimation_result<- MetaProViz::PoolEstimation(data = PoolData,
 \
 ```{r, eval=FALSE}
 #### Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_metadata_info
-Pool_Estimation_result<- MetaProViz::PoolEstimation(data = Intra[,-c(1:3)],
+Pool_Estimation_result<- MetaProViz::pool_estimation(data = Intra[,-c(1:3)],
                                                      metadata_sample = Intra[,1:3],
                                                      metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"),
                                                      cutoff_cv = 30)
@@ -190,7 +190,7 @@ Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 ```{r, echo=FALSE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
 #--------------------------------------------------------------------
 #### Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_metadata_info
-Pool_Estimation_result<- MetaProViz::PoolEstimation(data = Intra[,-c(1:3)],
+Pool_Estimation_result<- MetaProViz::pool_estimation(data = Intra[,-c(1:3)],
                                                      metadata_sample = Intra[,1:3],
                                                      metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"),
                                                      cutoff_cv = 30)
@@ -212,7 +212,7 @@ The results from the `Pool_Estimation()` is a table that has the CVs. If there i
 \
 Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned and can be easily viewed.\
 ```{r, eval=FALSE}
-PreprocessingResults <- MetaProViz::PreProcessing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
+PreprocessingResults <- MetaProViz::pre_processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
                                                   metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
                                                   metadata_info = c(Conditions = "Conditions",
                                                                     Biological_Replicates = "Biological_Replicates"),
@@ -234,7 +234,7 @@ Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE,   fig.width=6, fig.height=4.5, fig.align="left"}
-PreprocessingResults <- MetaProViz::PreProcessing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
+PreprocessingResults <- MetaProViz::pre_processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
                                                   metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
                                                   metadata_info = c(Conditions = "Conditions",
                                                                     Biological_Replicates = "Biological_Replicates"),
@@ -267,7 +267,7 @@ Intra_Preprocessed[29:32, 1:9]%>%
 In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an outlier in the first round of filtering.\
 As part of the `Preprocessing()` function several plots are generated  and saved. Additionally, the ggplots are returned into the list to enable further modifiaction using the ggplot syntax. These plots include plots showing the outliers for each filtering round and other QC plots.\
 \
-As part of the **MetaProViz** visualization module one can easily further customize the PCA plot and adapt color and shape for the information of interest. You can see more below for the `VizPCA()` function.
+As part of the **MetaProViz** visualization module one can easily further customize the PCA plot and adapt color and shape for the information of interest. You can see more below for the `viz_pca()` function.
 \
 Before we proceed, we will remove the outlier:\
 ```{r}
@@ -275,25 +275,25 @@ Intra_Preprocessed <- Intra_Preprocessed%>%
   filter(Outliers=="no")#remove MS55_29
 ```
 \
-As you may have noticed, in this example dataset we have several biological replicates that where injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `ReplicateSum()`, which will do this task and save the results:\
+As you may have noticed, in this example dataset we have several biological replicates that where injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `replicate_sum()`, which will do this task and save the results:\
 ```{r}
-Intra_Preprocessed <- MetaProViz::ReplicateSum(data=Intra_Preprocessed[,-c(1:4)],
+Intra_Preprocessed <- MetaProViz::replicate_sum(data=Intra_Preprocessed[,-c(1:4)],
                                                metadata_sample=Intra_Preprocessed[,c(1:4)],
                                                metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
 ```
 \
-Using the pre-processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `VizHeatmap()` or PCA plots `VizPCA()`. You can see some examples below.
+Using the pre-processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `viz_heatmap()` or PCA plots `viz_pca()`. You can see some examples below.
 
-## DMA
-Differential Metabolite Analysis (`DMA`) is used to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value. With the different parameters `STAT_pval` and `STAT_padj` one can choose the statistical tests such as t.test, wilcoxon test, limma, annova, kruskal walles, etc. (see function reference for more information).\
-As input one can use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values, even though we recommend to normalize the data and remove outliers prior to DMA. Moreover, we require the `Input_metadata_sample` including the sample metadata with information which condition a sample corresponds to. Additionally, we enable the user to provide a `Plot_metadata_feature` containing the metadata for the features (metabolites), such as KEGG ID, pathway, retention time, etc.\
+## dma
+Differential Metabolite Analysis (`dma`) is used to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value. With the different parameters `STAT_pval` and `STAT_padj` one can choose the statistical tests such as t.test, wilcoxon test, limma, annova, kruskal walles, etc. (see function reference for more information).\
+As input one can use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values, even though we recommend to normalize the data and remove outliers prior to dma. Moreover, we require the `Input_metadata_sample` including the sample metadata with information which condition a sample corresponds to. Additionally, we enable the user to provide a `Plot_metadata_feature` containing the metadata for the features (metabolites), such as KEGG ID, pathway, retention time, etc.\
 \
 By defining the numerator and denominator as part of the `Input_metadata_info` parameter, it is defined which comparisons are performed:\
 1. **one_vs_one** (single comparison): numerator="Condition1", denominator ="Condition2"\
 2. **all_vs_one** (multiple comparison): numerator=NULL, denominator ="Condition"\
 3. **all_vs_all** (multiple comparison): numerator=NULL, denominator =NULL (=default)\
 \
-Noteworthy, if you have not performed missing value imputation and hence your data includes NAs or 0 values for some features, this is how we deal with this in the `DMA()` function:\
+Noteworthy, if you have not performed missing value imputation and hence your data includes NAs or 0 values for some features, this is how we deal with this in the `dma()` function:\
 1. If you use the parameter `STAT_pval="lmFit"`, limma is performed. Limma does a baesian fit of the data and substracts Mean(Condition1 fit) - Mean(Condition2 fit). As such, unless all values of a feature are NA, Limma can deal with NAs.
 2. Standard Log2FC: log2(Mean(Condition1)) - log2(Mean(Condition2))
     a. If all values of the replicates of one condition are NA/0 for a feature (=metabolite): Log2FC= Inf/-Inf and the statistics will be NA\
@@ -304,31 +304,31 @@ It is important to mention that in case of `STAT_pval="lmFit"`, we perform log2 
 Here, the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O), hence we can perform multiple different comparisons. The results can be automatically saved and all the results are returned in a list with the different data frames. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
 ```{r, eval=FALSE}
 # Perform multiple comparison All_vs_One using annova:
-DMA_Annova <- MetaProViz::DMA(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
+DMA_Annova <- MetaProViz::dma(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
                               metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
                               metadata_info = c(Conditions="Conditions", Numerator=NULL , Denominator = "HK2"),# we compare all_vs_HK2
                               metadata_feature = MappingInfo,# Adds metadata for the metabolites such as KEGG_ID, Pathway, retention time,...
                               pval ="aov",
                               padj="fdr")
 
-# Inspect the DMA results tables:
-DMA_786M1A_vs_HK2 <- DMA_Annova[["DMA"]][["786-M1A_vs_HK2"]]
-Shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
+# Inspect the dma results tables:
+DMA_786M1A_vs_HK2 <- DMA_Annova[["dma"]][["786-M1A_vs_HK2"]]
+shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 ```
 
 <div class="vscroll-plot">
 ```{r, warning=FALSE, echo=FALSE, fig.width=7, fig.height=5, fig.align="left"}
 # Perform multiple comparison All_vs_One using annova:
-DMA_Annova <- MetaProViz::DMA(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
+DMA_Annova <- MetaProViz::dma(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
                               metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
                               metadata_info = c(Conditions="Conditions", Numerator=NULL , Denominator = "HK2"),# we compare all_vs_HK2
                               metadata_feature = MappingInfo,# Adds metadata for the metabolites such as KEGG_ID, Pathway, retention time,...
                               pval ="aov",
                               padj="fdr")
 
-# Inspect the DMA results tables:
-DMA_786M1A_vs_HK2 <- DMA_Annova[["DMA"]][["786-M1A_vs_HK2"]]
-Shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
+# Inspect the dma results tables:
+DMA_786M1A_vs_HK2 <- DMA_Annova[["dma"]][["786-M1A_vs_HK2"]]
+shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 ```
 </div>
 \
@@ -336,35 +336,35 @@ Shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 \
 ```{r, echo=FALSE}
 # Check how our data looks like:
-Shapiro[,c(1:6)]%>%
+shapiro[,c(1:6)]%>%
   kableExtra::kbl(caption = "1. Preview of the Shaprio results for the different conditions.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
 DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
-  kableExtra::kbl(caption = "2. Preview of the DMA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
+  kableExtra::kbl(caption = "2. Preview of the dma results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-Using the DMA results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `VizVolcano()`. You can see some examples below.
+Using the dma results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `viz_volcano()`. You can see some examples below.
 
-### ORA using the DMA results
+### ORA using the dma results
 Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method that determines if a set of features (=metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values.\
 Of course, there are many other PEA methods such as the well known GSEA. Here we do not aim to provide an extensive tool for different methods to perform pathway enrichment analysis and only focus on ORA since we can apply this to perform standard pathway enrichment as well as pathway enrichment on clusters of metabolites (see MCA below). If you are interested in using different pathway enrichment methods please check out specialized tools such as [decopupleR](https://saezlab.github.io/decoupleR/) [@Badia-I-Mompel2022].\
 \
-Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the DMA results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `input_pathway` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
+Here we will use the KEGG pathways [@Kanehisa2000]. Before we can perform ORA on the dma results, we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. In general, the `input_pathway` requirements are column "term", "Metabolite" and "Description", and the `Input_data` requirements are column "t.val" and column "Metabolite".\
 ```{r}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-comparisons <- names(DMA_Annova[["DMA"]])
+comparisons <- names(DMA_Annova[["dma"]])
 for(comparison in comparisons){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
-  DMA <- DMA_Annova[["DMA"]][[comparison]]
-  DMA <- DMA[complete.cases(DMA),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
+  dma <- DMA_Annova[["dma"]][[comparison]]
+  dma <- dma[complete.cases(dma),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
   dplyr::rename("Metabolite"="KEGGCompound")#We use the KEGG trivial names to match with the KEGG pathways
 
   #Perform ORA
-  DM_ORA_res[[comparison]] <- MetaProViz::StandardORA(data= DMA%>%remove_rownames()%>%tibble::column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
+  DM_ORA_res[[comparison]] <- MetaProViz::standard_ora(data= dma%>%remove_rownames()%>%tibble::column_to_rownames("Metabolite"), #Input data requirements: column `t.val` and column `Metabolite`
                                                        metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                                                        input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
                                                        pathway_name="KEGG",
@@ -416,23 +416,23 @@ Lastly, we will get clusters of metabolites that are defined by the metabolite c
 \
 ```{r}
 # Example of all possible flows:
-MCA_2Cond <- MetaProViz::MCA_rules(method="2Cond")
+mca_2cond <- MetaProViz::mca_rules(method="2Cond")
 ```
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-MCA_2Cond%>%
+mca_2cond%>%
   kableExtra::kbl(caption ="Metabolite Clustering Analysis: 2 Conditions.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
-# easyalluvial::alluvial_wide(MCA_2Cond[,c(1:2,4)], fill_by = 'last_variable' )
-# easyalluvial::alluvial_wide(MCA_2Cond[,c(1:2,5)], fill_by = 'last_variable' )
+# easyalluvial::alluvial_wide(mca_2cond[,c(1:2,4)], fill_by = 'last_variable' )
+# easyalluvial::alluvial_wide(mca_2cond[,c(1:2,5)], fill_by = 'last_variable' )
 ```
 \
 Now let's use the data and do clustering:
 ```{r}
-MCAres <-  MetaProViz::MCA_2Cond(data_C1=DMA_Annova[["DMA"]][["786-O_vs_HK2"]],
-                                 data_C2=DMA_Annova[["DMA"]][["786-M1A_vs_HK2"]],
+MCAres <-  MetaProViz::mca_2cond(data_C1=DMA_Annova[["dma"]][["786-O_vs_HK2"]],
+                                 data_C2=DMA_Annova[["dma"]][["786-M1A_vs_HK2"]],
                                  metadata_info_C1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                                  metadata_info_C2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                                  feature = "Metabolite",
@@ -462,7 +462,7 @@ MappingInfo[1:6,]%>%
 ```
 
 ```{r, include=FALSE, warning=FALSE}
-MC_ORA_result <- MetaProViz::ClusterORA(data=MCAres[["MCA_2Cond_Results"]]%>%tibble::column_to_rownames("Metabolite"),
+MC_ORA_result <- MetaProViz::cluster_ora(data=MCAres[["MCA_2Cond_Results"]]%>%tibble::column_to_rownames("Metabolite"),
                                          metadata_info=c(ClusterColumn="RG2_Significant",
                                                         BackgroundColumn="BG_method",
                                                         PathwayTerm= "Pathway", #This is the column name including the pathways names
@@ -522,39 +522,39 @@ Input_PCA <- Intra_Preprocessed[,-c(1:5)]#remove columns that include Metadata s
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Input_PCA[,1:7]%>%
-  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizPCA()`, with samples as rownames and metabolites as column names.") %>%
+  kableExtra::kbl(caption = "Input_data for `MetaProViz::viz_pca()`, with samples as rownames and metabolites as column names.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
 Now lets check out the standard plot:
 ```{r, warning=FALSE, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Standard Settings."}
-MetaProViz::VizPCA(data=Input_PCA,
+MetaProViz::viz_pca(data=Input_PCA,
                    )
 ```
 Next, we can interactively choose shape and color using the additional information of interest from our Metadata. Especially for complex data, such as patient data, it can be valuable to use different demographics (e.g. age, gender, medication,...) for this. First lets check if we have any batch effect by colour coding for the biological replicates, which would be the case if the replicates cluster together.\
 ```{r, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Do we have a batch effect?"}
-MetaProViz::VizPCA(metadata_info= c(color="Biological_Replicates"),
+MetaProViz::viz_pca(metadata_info= c(color="Biological_Replicates"),
                    metadata_sample = MetaData_Sample ,
                    data=Input_PCA,
                   plot_name = "Batch Effect")
 ```
 Next, we can colour code for condition and use the biological replicates in the shape parameter:\
 ```{r, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Do the samples cluster for the conditions?"}
-MetaProViz::VizPCA(metadata_info= c(color="Conditions", shape="Biological_Replicates"),
+MetaProViz::viz_pca(metadata_info= c(color="Conditions", shape="Biological_Replicates"),
                    metadata_sample= MetaData_Sample,
                    data=Input_PCA,
                   plot_name = "Sample Conditions")
 ```
 The different cell lines we have are either control or cancerous, so we can display this too. Here is becomes apparent that the cell status is responsible for 64% of the variance (x-axis). \
 ```{r, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Do the samples cluster for the Cell status?"}
-MetaProViz::VizPCA(metadata_info= c(color="Status"),
+MetaProViz::viz_pca(metadata_info= c(color="Status"),
                    metadata_sample= MetaData_Sample,
                    data=Input_PCA,
                   plot_name = "Sample Status")
 ```
 We can separate the cancerous cell lines further into metastatic or primary. This shows us that this is separated on the y-axis and accounts for 30%of the variance.\
 ```{r, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Do the samples cluster for the Cell type?"}
-MetaProViz::VizPCA(metadata_info= c(color="Celltype", shape="Status"),
+MetaProViz::viz_pca(metadata_info= c(color="Celltype", shape="Status"),
                    metadata_sample= MetaData_Sample,
                    data=Input_PCA,
                   plot_name = "Cell type")
@@ -570,19 +570,19 @@ Input_Heatmap <-  Intra_Preprocessed[,-c(1:4)]#remove columns that include Metad
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Input_Heatmap[,1:7]%>%
-  kableExtra::kbl(caption = "Input for `MetaProViz::VizHeatmap()`, with samples as rownames and metabolites as column names.") %>%
+  kableExtra::kbl(caption = "Input for `MetaProViz::viz_heatmap()`, with samples as rownames and metabolites as column names.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
 Now we can generate an overview heatmap. Since we plot all metabolites the metabolite names are not plotted since this would get too crowded (You can enforce this by changing the parameter `enforce_featurenames = TRUE`).
 ```{r, fig.align="left", fig.cap="Overview heatmap."}
-MetaProViz::VizHeatmap(data = Input_Heatmap,
+MetaProViz::viz_heatmap(data = Input_Heatmap,
                       plot_name = "Overview")
 ```
 \
 Here we can add as many sample metadata information as needed at the same time:\
 ```{r, fig.align="left", fig.cap="Colour for sample metadata."}
-MetaProViz::VizHeatmap(data = Input_Heatmap,
+MetaProViz::viz_heatmap(data = Input_Heatmap,
                        metadata_sample = MetaData_Sample,
                        metadata_info = c(color_Sample = list("Conditions","Biological_Replicates", "Celltype", "Status")),
                       plot_name = "Colour Samples")
@@ -591,7 +591,7 @@ MetaProViz::VizHeatmap(data = Input_Heatmap,
 Moreover, we can also add metabolite metadata information:\
 ```{r, fig.align="left", fig.cap="Colour for metabolite metadata."}
 # row annotation: Color for Metabolites
-MetaProViz::VizHeatmap(data = Input_Heatmap,
+MetaProViz::viz_heatmap(data = Input_Heatmap,
                        metadata_sample = MetaData_Sample,
                        metadata_info = c(color_Metab = list("Pathway")),
                        metadata_feature =  MappingInfo,
@@ -601,7 +601,7 @@ MetaProViz::VizHeatmap(data = Input_Heatmap,
 Lastly, by generate individual plot for e.g. each pathway or the metabolite clusters by adding individual (`individual_Sample` or `individual_Metab`) to `Plot_metadata_info`. At the same time we can still maintain the metadata information for both, the samples and the metabolites. together this can help us to draw biological conclusions about the different pathways: Indeed, we can observe for the `D-Amino acid metabolism` many metabolites fall into the MCA-Cluster `core_DOWN`, meaning in comparison to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.
 ```{r, eval=FALSE}
 # individual: One individual plot for each pathway, col annotation: Colour for samples
-MetaProViz::VizHeatmap(data = Input_Heatmap,
+MetaProViz::viz_heatmap(data = Input_Heatmap,
                        metadata_sample = MetaData_Sample,
                        metadata_info = c(individual_Metab = "Pathway",
                                         color_Sample = list("Conditions","Biological_Replicates"),
@@ -611,7 +611,7 @@ MetaProViz::VizHeatmap(data = Input_Heatmap,
 ```
 <div class="vscroll-plot">
 ```{r, echo=FALSE, fig.width=9, fig.height=7.5, warning=FALSE, fig.align="left"}
-MetaProViz::VizHeatmap(data = Input_Heatmap,
+MetaProViz::viz_heatmap(data = Input_Heatmap,
                        metadata_sample = MetaData_Sample,
                        metadata_info = c(individual_Metab = "Pathway",
                                         color_Sample = list("Conditions","Biological_Replicates"),
@@ -633,13 +633,13 @@ Input_Superplot <-  Intra_Preprocessed[,-c(1:4)]#remove columns that include Met
 ```{r, echo=FALSE}
 # Check how our data looks like:
 Input_Superplot[,1:7]%>%
-  kableExtra::kbl(caption = "Input for `MetaProViz::VizSuperplot()`, with samples as rownames and metabolites as column names.") %>%
+  kableExtra::kbl(caption = "Input for `MetaProViz::viz_superplot()`, with samples as rownames and metabolites as column names.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 We also need the Metadata as we will need to know which conditions to plot for together. If you have further information such as replicates or patient ID, we can use this for the colour of the plotted samples per condition as in the superplots style as described in by Lord et al [@Lord2020]. \
 \
 ```{r, eval=FALSE}
-MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+MetaProViz::viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Bar", #Bar, Box, Violin
@@ -650,7 +650,7 @@ MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabo
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+MetaProViz::viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Bar", #Bar, Box, Violin
@@ -669,7 +669,7 @@ Input_Plot <-   Intra_Preprocessed%>%
 
 Metabolite_list <- c("acetylcholine", "alanine", "methionine", "N-acetylaspartate", "N-acetylglutamate", "ornithine", "phenylalanine", "serine", "threonine", "tryptophan")
 
-MetaProViz::VizSuperplot(data =Input_Plot%>%select(all_of(Metabolite_list)),#We just plot selected metabolites
+MetaProViz::viz_superplot(data =Input_Plot%>%select(all_of(Metabolite_list)),#We just plot selected metabolites
                                            metadata_sample =MetaData_Sample%>% dplyr::filter(Conditions %in% c("HK2", "786-O", "786-M1A")),
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Bar", #Bar, Box, Violin
@@ -679,7 +679,7 @@ MetaProViz::VizSuperplot(data =Input_Plot%>%select(all_of(Metabolite_list)),#We 
 \
 Now, if we for instance prefer boxplots over bargraphs we can simply change the parameter `plot_type`:
 ```{r, eval=FALSE}
-MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+MetaProViz::viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Box", #Bar, Box, Violin
@@ -689,7 +689,7 @@ MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabo
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+MetaProViz::viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Box", #Bar, Box, Violin
@@ -702,7 +702,7 @@ MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabo
 \
 We can also change it to violin plots:
 ```{r, eval=FALSE}
-MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+MetaProViz::viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Violin", #Bar, Box, Violin
@@ -712,7 +712,7 @@ MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabo
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-MetaProViz::VizSuperplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+MetaProViz::viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Violin", #Bar, Box, Violin
@@ -730,13 +730,13 @@ In general,we have three different `Plot_Settings`, which will also be used for 
 `2.` `"Conditions"` here two or more datasets will be plotted together. How datasets can be plotted together depends on the plot type.\
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the results of an GSE analysis should be plotted as here the figure legends will be adapted.\
 \
-Here we will look at all the different options we have to display our results from the different analysis (DMA, PEA), which will help us to interpret our results as this can be sometimes difficult to do from the many data tables.\
+Here we will look at all the different options we have to display our results from the different analysis (dma, PEA), which will help us to interpret our results as this can be sometimes difficult to do from the many data tables.\
 Just a quick reminder, how the input data look like:\
-1. Results of Differential Metabolite Analysis (DMA): Log2FC and stats:\
+1. Results of Differential Metabolite Analysis (dma): Log2FC and stats:\
 ```{r, echo=FALSE}
 # Check how our data looks like:
 DMA_786M1A_vs_HK2[1:7,]%>%
-  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizVolcano()` are for example differential analysis results from `MetaProViz::DMA()`.") %>%
+  kableExtra::kbl(caption = "Input_data for `MetaProViz::viz_volcano()` are for example differential analysis results from `MetaProViz::dma()`.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
@@ -744,90 +744,90 @@ DMA_786M1A_vs_HK2[1:7,]%>%
 ```{r, echo=FALSE}
 # Check how our data looks like:
 DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGosummary"]][1:4,-c(1,7)]%>%
-  kableExtra::kbl(caption = "Input_data for `MetaProViz::VizVolcano()` are for example pathway enrichment results from `MetaProViz::DM_ORA()`.", row.names = FALSE) %>%
+  kableExtra::kbl(caption = "Input_data for `MetaProViz::viz_volcano()` are for example pathway enrichment results from `MetaProViz::DM_ORA()`.", row.names = FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
 #### **Standard**
-Here we will first look into the results from the differential analysis (see section `DMA` above) for the comparison of `786-M1A_vs_HK2`:
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
+Here we will first look into the results from the differential analysis (see section `dma` above) for the comparison of `786-M1A_vs_HK2`:
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"))
+MetaProViz::viz_volcano(data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"))
 ```
 \
 If you seek to plot the metabolite names you can change the paramter `select_label` from its default (`select_label=""`) to NULL and the metabolite names will be plotted randomly.
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
+MetaProViz::viz_volcano(data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        select_label = NULL)
 ```
 \
 With the parameter `select_label` you can also pass a vector with Metabolite names that should be labeled:
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results."}
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-MetaProViz::VizVolcano(data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
+MetaProViz::viz_volcano(data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                        select_label = c("N-acetylaspartylglutamate", "cystathionine", "orotidine"))
 ```
 \
 Next we may be interested to understand which metabolite clusters based on our MCA the metabolites of the plot correspond to. In order to do this we can provide a Plot_SettingsFile with this additional information and use this information to color code and/or to shape the dots on the volcano plot. In order to choose the right column we need to provide a vector Plot_metadata_info with this information.\
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results colour coded/shaped for metabolic clusters from MCA results."}
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results colour coded/shaped for metabolic clusters from MCA results."}
 
 # Now we need to add our Plot_SettingsFile and the Plot_metadata_info:
-MetaProViz::VizVolcano(plot_types="Standard",
+MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(color="RG2_Significant"),
                        metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A versus HK2",
-                       subtitle= "Results of DMA. Colour coded for metabolic clusters" )
+                       subtitle= "Results of dma. Colour coded for metabolic clusters" )
 
 # If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_metadata_info
-MetaProViz::VizVolcano(plot_types="Standard",
+MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(shape="RG2_Significant"),
                        SettingsFile= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A versus HK2",
-                       subtitle= "Results of DMA. Shape for metabolic clusters, color for significance." )
+                       subtitle= "Results of dma. Shape for metabolic clusters, color for significance." )
 
 # Of course, we can also adapt both, color and shape for the same parameter:
-MetaProViz::VizVolcano(plot_types="Standard",
+MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(shape="RG2_Significant", color="RG2_Significant"),
                        SettingsFile= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A versus HK2",
-                       subtitle= "Results of DMA. Shape and color for metabolic clusters." )
+                       subtitle= "Results of dma. Shape and color for metabolic clusters." )
 ```
 \
 Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot. This is also a good example to showcase the flexibility of the visualisation function: Either you use the parameter `Plot_SettingsFile= MetaData_Metab` as above, but as we have the column "Pathway" also in our Input_data you can also pass `Plot_SettingsFile= DMA_786-M1A_vs_HK2` or simply use the default `Plot_SettingsFile=NULL`, in which case the `Plot_metadata_info` information (here `color`) will be used from Input_data. \
-```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying DMA results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results."}
+```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results colour coded for metabolic pathways and shaped for metabolic clusters from MCA results."}
 # Now we can use color for the pathways and shape for the metabolite clusters:
-MetaProViz::VizVolcano(plot_types="Standard",
+MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(color="Pathway"),
                        metadata_feature= MappingInfo,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
-                      plot_name= "786M1A versus HK2 Results of DMA. Colour for metabolic pathways.",
-                       subtitle= "Results of DMA. Colour for metabolic pathways." )
+                      plot_name= "786M1A versus HK2 Results of dma. Colour for metabolic pathways.",
+                       subtitle= "Results of dma. Colour for metabolic pathways." )
 ```
 \
 We immediately see that there are many pathways displayed on the plot, which can make it difficult to interpret. Hence, we will change our plot settings in order to get individual plots for each of the pathways:
 ```{r Display_Not_Run, eval=FALSE}
 # Now we can generate a plot for each pathway and color for the metabolite clusters:
-MetaProViz::VizVolcano(plot_types="Standard",
+MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(color="RG2_Significant", individual="Pathway"),
                        metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A versus HK2",
-                       subtitle= "Results of DMA. Colour for metabolic pathways." )
+                       subtitle= "Results of dma. Colour for metabolic pathways." )
 ```
 
 <div class="vscroll-plot">
 ```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Now we can generate a plot for each pathway and color for the metabolite clusters:
-MetaProViz::VizVolcano(plot_types="Standard",
+MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(color="RG2_Significant", individual="Pathway"),
                        metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A versus HK2",
-                       subtitle= "Results of DMA. Colour for metabolic pathways." )
+                       subtitle= "Results of dma. Colour for metabolic pathways." )
 
 ```
 </div>
@@ -837,34 +837,34 @@ MetaProViz::VizVolcano(plot_types="Standard",
 
 #### **Comparison**
 ```{r, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Comparison."}
-MetaProViz::VizVolcano(plot_types="Compare",
+MetaProViz::viz_volcano(plot_types="Compare",
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
-                       data2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
+                       data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
-                       subtitle= "Results of DMA" )
+                       subtitle= "Results of dma" )
 ```
 
 Now we do individual plots again:
 ```{r, eval=FALSE}
-MetaProViz::VizVolcano(plot_types="Compare",
+MetaProViz::viz_volcano(plot_types="Compare",
                        metadata_info= c(individual="Pathway"),
                        metadata_feature= MappingInfo,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
-                       data2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
+                       data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
-                       subtitle= "Results of DMA" )
+                       subtitle= "Results of dma" )
 ```
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, fig.align="left", fig.width=7, fig.height=5}
-MetaProViz::VizVolcano(plot_types="Compare",
+MetaProViz::viz_volcano(plot_types="Compare",
                        metadata_info= c(individual="Pathway"),
                        metadata_feature= MappingInfo,
                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
-                       data2= DMA_Annova[["DMA"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
+                       data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
-                       subtitle= "Results of DMA" )
+                       subtitle= "Results of dma" )
 
 ```
 </div>
@@ -891,7 +891,7 @@ InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
 \
 Now we can produce the plots:
 ```{r, eval=FALSE}
-MetaProViz::VizVolcano(plot_types="PEA",
+MetaProViz::viz_volcano(plot_types="PEA",
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
                                        PEA_stat="p.adjust",#Column data2
                                        PEA_score="GeneRatio",#Column data2
@@ -906,7 +906,7 @@ MetaProViz::VizVolcano(plot_types="PEA",
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-MetaProViz::VizVolcano(plot_types="PEA",
+MetaProViz::viz_volcano(plot_types="PEA",
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
                                        PEA_stat="p.adjust",#Column data2
                                        PEA_score="GeneRatio",#Column data2

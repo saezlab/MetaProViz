@@ -24,8 +24,8 @@
 
 #' This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between conditions.
 #'
-#' @param data_C1 DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_C2 DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_C1 DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_C2 DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
 #' @param metadata_info_C1  \emph{Optional: } Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, cutoff_stat= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}
 #' @param metadata_info_C2  \emph{Optional: } Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}
 #' @param feature \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
@@ -37,10 +37,10 @@
 #'
 #' @examples
 #' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' Input <- MetaProViz::DMA(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+#' Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
-#' Res <- MetaProViz::MCA_2Cond(data_C1 = Input[["DMA"]][["786-O_vs_HK2"]],
-#'                              data_C2 = Input[["DMA"]][["786-M1A_vs_HK2"]])
+#' Res <- MetaProViz::mca_2cond(data_C1 = Input[["dma"]][["786-O_vs_HK2"]],
+#'                              data_C2 = Input[["dma"]][["786-M1A_vs_HK2"]])
 #'
 #' @keywords biological clustering
 #'
@@ -51,7 +51,7 @@
 
 #' @export
 #'
-MCA_2Cond <- function(data_C1,
+mca_2cond <- function(data_C1,
                       data_C2,
                       metadata_info_C1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                       metadata_info_C2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
@@ -63,7 +63,7 @@ MCA_2Cond <- function(data_C1,
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  CheckInput_MCA(data_C1=data_C1,
+  check_param_mca(data_C1=data_C1,
                               data_C2=data_C2,
                               data_core=NULL,
                               data_Intra=NULL,
@@ -77,7 +77,7 @@ MCA_2Cond <- function(data_C1,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "MCA2Cond",
+    Folder <- save_path(folder_name= "MCA2Cond",
                                     path=path)
   }
 
@@ -396,12 +396,12 @@ MCA_2Cond <- function(data_C1,
   DF_List <- list("MCA_2Cond_summary"=Clustersummary, "MCA_2Cond_Results"=MergeDF_Rearrange)
 
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=DF_List,
+    save_res(inputlist_df=DF_List,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= Folder,
-                         FileName= "MCA_2Cond",
+                         FileName= "mca_2cond",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -416,8 +416,8 @@ MCA_2Cond <- function(data_C1,
 
 #' This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (core experiment).
 #'
-#' @param data_Intra DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_core DF for your data (results from e.g. DMA) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
+#' @param data_Intra DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_core DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
 #' @param metadata_info_Intra  \emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}
 #' @param metadata_info_core  \emph{Optional: } Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}
 #' @param feature \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
@@ -430,12 +430,12 @@ MCA_2Cond <- function(data_C1,
 #' @examples
 #'
 #' Media <- MetaProViz::ToyData("CultureMedia_Raw")
-#' ResM <- MetaProViz::PreProcessing(data = Media[-c(40:45) ,-c(1:3)],
+#' ResM <- MetaProViz::pre_processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                   core=TRUE)
 #'
-#' MediaDMA <- MetaProViz::DMA(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
+#' MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
 #'                             metadata_sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)],
 #'                             metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"),
 #'                             pval ="aov",
@@ -443,8 +443,8 @@ MCA_2Cond <- function(data_C1,
 #'
 #' IntraDMA <- MetaProViz::ToyData(data="IntraCells_DMA")
 #'
-#' Res <- MetaProViz::MCA_core(data_Intra = IntraDMA%>%tibble::rownames_to_column("Metabolite"),
-#'                             data_core = MediaDMA[["DMA"]][["786-M1A_vs_HK2"]])
+#' Res <- MetaProViz::mca_core(data_Intra = IntraDMA%>%tibble::rownames_to_column("Metabolite"),
+#'                             data_core = MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
 #'
 #' @keywords biological clustering
 #'
@@ -455,7 +455,7 @@ MCA_2Cond <- function(data_C1,
 #'
 #' @export
 #'
-MCA_core <- function(data_Intra,
+mca_core <- function(data_Intra,
                      data_core,
                      metadata_info_Intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                      metadata_info_core=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
@@ -466,11 +466,11 @@ MCA_core <- function(data_Intra,
                      ){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  CheckInput_MCA(data_C1=NULL,
+  check_param_mca(data_C1=NULL,
                               data_C2=NULL,
                               data_core= data_core,
                               data_Intra=data_Intra,
@@ -485,7 +485,7 @@ MCA_core <- function(data_Intra,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "MCAcore",
+    Folder <- save_path(folder_name= "MCAcore",
                                     path=path)
   }
 
@@ -1028,12 +1028,12 @@ MCA_core <- function(data_Intra,
   DF_List <- list("MCA_core_summary"=Clustersummary, "MCA_core_Results"=MergeDF_Rearrange)
 
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=DF_List,
+    save_res(inputlist_df=DF_List,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
                          path= Folder,
-                         FileName= "MCA_2Cond",
+                         FileName= "mca_2cond",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -1054,10 +1054,10 @@ MCA_core <- function(data_Intra,
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_to_lower
 #' @export
-MCA_rules <- function(method) {
+mca_rules <- function(method) {
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   err <-
     method %>%

@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: DMA
+## Script name: dma
 ##
 ## Purpose of script: Differential Metabolomics Analysis
 ##
@@ -42,11 +42,11 @@
 #' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
-#' @return Dependent on parameter settings, list of lists will be returned for DMA (DF of each comparison), Shapiro (Includes DF and Plot), Bartlett (Includes DF and Histogram), vst (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
+#' @return Dependent on parameter settings, list of lists will be returned for dma (DF of each comparison), shapiro (Includes DF and Plot), bartlett (Includes DF and Histogram), vst (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
 #' Intra <- MetaProViz::ToyData("IntraCells_Raw")[-c(49:58) ,]
-#' ResI <- MetaProViz::DMA(data=Intra[ ,-c(1:3)],
+#' ResI <- MetaProViz::dma(data=Intra[ ,-c(1:3)],
 #'                        metadata_sample=Intra[ , c(1:3)],
 #'                        metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
@@ -60,7 +60,7 @@
 #'
 #' @export
 #'
-DMA <-function(data,
+dma <-function(data,
                metadata_sample,
                metadata_info = c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                pval ="lmFit",
@@ -78,13 +78,13 @@ DMA <-function(data,
 ){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
-  logger::log_info("DMA: Differential metabolite analysis.")
+  logger::log_info("dma: Differential metabolite analysis.")
 
   ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=metadata_feature,
                           metadata_info=metadata_info,
@@ -93,8 +93,8 @@ DMA <-function(data,
                           core=core,
                           print_plot= print_plot)
 
-  # HelperFunction `CheckInput` Specific
-  Settings <- CheckInput_DMA(data=data,
+  # HelperFunction `check_param` Specific
+  Settings <- check_param_dma(data=data,
                  metadata_sample=metadata_sample,
                  metadata_info=metadata_info,
                  pval=pval,
@@ -106,16 +106,16 @@ DMA <-function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "DMA",
+    Folder <- save_path(folder_name= "dma",
                                     path=path)
 
     if(shapiro==TRUE){
-      SubFolder_S <- file.path(Folder, "Shapiro")
+      SubFolder_S <- file.path(Folder, "shapiro")
       if (!dir.exists(SubFolder_S)) {dir.create(SubFolder_S)}
     }
 
     if(bartlett==TRUE){
-      SubFolder_B <- file.path(Folder, "Bartlett")
+      SubFolder_B <- file.path(Folder, "bartlett")
       if (!dir.exists(SubFolder_B)) {dir.create(SubFolder_B)}
     }
 
@@ -134,14 +134,14 @@ DMA <-function(data,
       }
     tryCatch(
     {
-     Shapiro_output <-suppressWarnings(Shapiro(data=data,
+     Shapiro_output <-suppressWarnings(shapiro(data=data,
                                                             metadata_sample=metadata_sample,
                                                             metadata_info=metadata_info,
                                                             pval=pval,
                                                             qqplots=FALSE))
     },
     error = function(e) {
-      message("Error occurred during Shapiro that performs the Shapiro-Wilk test. Message: ", conditionMessage(e))
+      message("Error occurred during shapiro that performs the shapiro-Wilk test. Message: ", conditionMessage(e))
     }
   )
   }
@@ -156,12 +156,12 @@ DMA <-function(data,
     if(length(UniqueConditions)>2){
       tryCatch(
         {
-          Bartlett_output<-suppressWarnings(Bartlett(data=data,
+          Bartlett_output<-suppressWarnings(bartlett(data=data,
                                                                   metadata_sample=metadata_sample,
                                                                   metadata_info=metadata_info))
         },
         error = function(e) {
-          message("Error occurred during Bartlett that performs the Bartlett test. Message: ", conditionMessage(e))
+          message("Error occurred during bartlett that performs the bartlett test. Message: ", conditionMessage(e))
         }
       )
     }
@@ -177,7 +177,7 @@ DMA <-function(data,
 
   ################################################################################################################################################################################################
   ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  log2fc_table <- Log2FC_fun(data=data,
+  log2fc_table <- log2fc(data=data,
                                           metadata_sample=metadata_sample,
                                           metadata_info=metadata_info,
                                           core=core,
@@ -187,7 +187,7 @@ DMA <-function(data,
   ############### Perform Hypothesis testing ###############
   if(Settings[["MultipleComparison"]] == FALSE){
     if(pval=="lmFit"){
-      STAT_C1vC2 <- DMA_Stat_limma(data=data,
+      STAT_C1vC2 <- dma_stat_limma(data=data,
                                                 metadata_sample=metadata_sample,
                                                 metadata_info=metadata_info,
                                                 padj=padj,
@@ -196,7 +196,7 @@ DMA <-function(data,
                                                 transform=transform)
 
     }else{
-      STAT_C1vC2 <-DMA_Stat_single(data=data,
+      STAT_C1vC2 <-dma_stat_single(data=data,
                                                 metadata_sample=metadata_sample,
                                                 metadata_info=metadata_info,
                                                 log2fc_table=log2fc_table,
@@ -217,23 +217,23 @@ DMA <-function(data,
     }
 
     if(pval=="aov"){
-      STAT_C1vC2 <- AOV(data=data,
+      STAT_C1vC2 <- aov(data=data,
                                      metadata_sample=metadata_sample,
                                      metadata_info=metadata_info,
                                      log2fc_table=log2fc_table)
     }else if(pval=="kruskal.test"){
-      STAT_C1vC2 <-Kruskal(data=data,
+      STAT_C1vC2 <-kruskal(data=data,
                                         metadata_sample=metadata_sample,
                                         metadata_info=metadata_info,
                                         log2fc_table=log2fc_table,
                                         padj=padj)
     }else if(pval=="welch"){
-      STAT_C1vC2 <-Welch(data=data,
+      STAT_C1vC2 <-welch(data=data,
                                       metadata_sample=metadata_sample,
                                       metadata_info=metadata_info,
                                       log2fc_table=log2fc_table)
     }else if(pval=="lmFit"){
-      STAT_C1vC2 <- DMA_Stat_limma(data=data,
+      STAT_C1vC2 <- dma_stat_limma(data=data,
                                                 metadata_sample=metadata_sample,
                                                 metadata_info=metadata_info,
                                                 padj=padj,
@@ -315,7 +315,7 @@ DMA <-function(data,
     }
 
     dev.new()
-    VolcanoPlot <- invisible(VizVolcano(plot_types="Standard",
+    VolcanoPlot <- invisible(viz_volcano(plot_types="Standard",
                                                     data=Volplotdata%>%tibble::column_to_rownames("Metabolite"),
                                                     metadata_info=VolPlot_metadata_info,
                                                     metadata_feature=VolPlot_SettingsFile,
@@ -337,7 +337,7 @@ DMA <-function(data,
   #Here we make a list in which we will save the outputs:
   if(shapiro==TRUE & exists("Shapiro_output")==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(inputlist_df=Shapiro_output[["DF"]],
+      save_res(inputlist_df=Shapiro_output[["DF"]],
                            inputlist_plot= Shapiro_output[["Plot"]][["Distributions"]],
                            save_table=save_table,
                            save_plot=save_plot,
@@ -351,7 +351,7 @@ DMA <-function(data,
 
   if(bartlett==TRUE & exists("Bartlett_output")==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(inputlist_df=Bartlett_output[["DF"]],
+      save_res(inputlist_df=Bartlett_output[["DF"]],
                            inputlist_plot= Bartlett_output[["Plot"]],
                            save_table=save_table,
                            save_plot=save_plot,
@@ -365,7 +365,7 @@ DMA <-function(data,
 
   if(vst==TRUE & exists("vst_res")==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(inputlist_df=vst_res[["DF"]],
+      save_res(inputlist_df=vst_res[["DF"]],
                            inputlist_plot= vst_res[["Plot"]],
                            save_table=save_table,
                            save_plot=save_plot,
@@ -379,12 +379,12 @@ DMA <-function(data,
 
   if(core==TRUE){
     suppressMessages(suppressWarnings(
-      SaveRes(inputlist_df=list("Feature_Metadata"=Feature_Metadata),
+      save_res(inputlist_df=list("Feature_Metadata"=Feature_Metadata),
               inputlist_plot= NULL,
               save_table=save_table,
               save_plot=NULL,
               path= Folder,
-              FileName= "DMA",
+              FileName= "dma",
               core=core,
               print_plot=print_plot)))
 
@@ -392,16 +392,16 @@ DMA <-function(data,
   }
 
   suppressMessages(suppressWarnings(
-    SaveRes(inputlist_df=DMA_Output,#This needs to be a list, also for single comparisons
+    save_res(inputlist_df=DMA_Output,#This needs to be a list, also for single comparisons
             inputlist_plot= volplotList,
             save_table=save_table,
             save_plot=save_plot,
             path= Folder,
-            FileName= "DMA",
+            FileName= "dma",
             core=core,
             print_plot=print_plot)))
 
-  DMA_Output_List <- c(DMA_Output_List, list("DMA"=DMA_Output, "VolcanoPlot"=volplotList))
+  DMA_Output_List <- c(DMA_Output_List, list("dma"=DMA_Output, "VolcanoPlot"=volplotList))
 
 
   return(invisible(DMA_Output_List))
@@ -431,14 +431,14 @@ DMA <-function(data,
 #'
 #' @noRd
 #'
-Log2FC_fun <-function(data,
+log2fc <-function(data,
                       metadata_sample,
                       metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                       core=FALSE,
                       transform=TRUE
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   # ------------ Assignments ----------- ##
   if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
@@ -710,7 +710,7 @@ Log2FC_fun <-function(data,
 
 
 ##########################################################################################
-### ### ### DMA helper function: Internal Function to perform single comparison ### ### ###
+### ### ### dma helper function: Internal Function to perform single comparison ### ### ###
 ##########################################################################################
 
 #' This helper function to calculate One-vs-One comparison statistics
@@ -718,7 +718,7 @@ Log2FC_fun <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (here one-vs-one).
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default = "t.test"}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
@@ -733,14 +733,14 @@ Log2FC_fun <-function(data,
 #'
 #' @noRd
 #'
-DMA_Stat_single <- function(data,
+dma_stat_single <- function(data,
                             metadata_sample,
                             metadata_info,
                             log2fc_table=NULL,
                             pval="t.test",
                             padj="fdr"){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Check Missingness ------------- ##
   Num <- data %>%#Are sample numbers enough?
@@ -840,7 +840,7 @@ DMA_Stat_single <- function(data,
 
 
 ################################################################
-### ### ### AOV: Internal Function to perform Anova  ### ### ###
+### ### ### aov: Internal Function to perform Anova  ### ### ###
 ################################################################
 
 #' This helper function to calculate One-vs-All or All-vs-All comparison statistics
@@ -848,7 +848,7 @@ DMA_Stat_single <- function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
 #'
@@ -861,13 +861,13 @@ DMA_Stat_single <- function(data,
 #'
 #' @noRd
 #'
-AOV <-function(data,
+aov <-function(data,
                metadata_sample,
                metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                log2fc_table=NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -978,7 +978,7 @@ AOV <-function(data,
 }
 
 ###########################################################################
-### ### ### Kruskal: Internal Function to perform Kruskal test  ### ### ###
+### ### ### kruskal: Internal Function to perform kruskal test  ### ### ###
 ###########################################################################
 
 #' This helper function to calculate One-vs-All or All-vs-All comparison statistics
@@ -986,7 +986,7 @@ AOV <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
@@ -1001,7 +1001,7 @@ AOV <-function(data,
 #'
 #' @noRd
 #'
-Kruskal <-function(data,
+kruskal <-function(data,
                    metadata_sample,
                    metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                    log2fc_table = NULL,
@@ -1009,7 +1009,7 @@ Kruskal <-function(data,
 ){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -1036,7 +1036,7 @@ Kruskal <-function(data,
   }
 
   #############################################################################################
-  # Kruskal test (p.val)
+  # kruskal test (p.val)
   aov.res= apply(data,2,function(x) stats::kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
   anova_res <- as.matrix(dplyr::mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
@@ -1115,7 +1115,7 @@ Kruskal <-function(data,
 
 
 #############################################################################################
-### ### ### Welch: Internal Function to perform anova for unequal variance groups ### ### ###
+### ### ### welch: Internal Function to perform anova for unequal variance groups ### ### ###
 #############################################################################################
 
 #' This helper function to calculate One-vs-All or All-vs-All comparison statistics
@@ -1123,7 +1123,7 @@ Kruskal <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
 #'
@@ -1136,13 +1136,13 @@ Kruskal <-function(data,
 #'
 #' @noRd
 #'
-Welch <-function(data,
+welch <-function(data,
                  metadata_sample,
                  metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                  log2fc_table=NULL
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -1169,7 +1169,7 @@ Welch <-function(data,
   }
 
   ###############################################################################################################
-  ## 1. Welch's ANOVA using oneway.test is not used by the Games post.hoc function
+  ## 1. welch's ANOVA using oneway.test is not used by the Games post.hoc function
   #aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
   games_data <- merge(metadata_sample, data, by=0)%>%
     dplyr::rename("conditions"=metadata_info[["Conditions"]])
@@ -1239,7 +1239,7 @@ Welch <-function(data,
 
 
 ##########################################################################################
-### ### ### DMA helper function: Internal Function to perform limma ### ### ###
+### ### ### dma helper function: Internal Function to perform limma ### ### ###
 ##########################################################################################
 
 #' This helper function to calculate One-vs-One, One-vs-All or All-vs-All comparison statistics
@@ -1247,7 +1247,7 @@ Welch <-function(data,
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::Log2FC_fun. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
 #' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
@@ -1264,7 +1264,7 @@ Welch <-function(data,
 #'
 #' @noRd
 #'
-DMA_Stat_limma <- function(data,
+dma_stat_limma <- function(data,
                            metadata_sample,
                            metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                            log2fc_table = NULL,
@@ -1273,7 +1273,7 @@ DMA_Stat_limma <- function(data,
                            transform= TRUE){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -1509,10 +1509,10 @@ DMA_Stat_limma <- function(data,
 
 
 #############################################################################################
-### ### ### Shapiro function: Internal Function to perform Shapiro test and plots ### ### ###
+### ### ### shapiro function: Internal Function to perform shapiro test and plots ### ### ###
 #############################################################################################
 
-#' This helper function to perform Shapiro test and plots
+#' This helper function to perform shapiro test and plots
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -1522,7 +1522,7 @@ DMA_Stat_limma <- function(data,
 #'
 #' @return List with tewo entries: DF (including the results DF) and Plots (including the Density and QQ plots)
 #'
-#' @keywords Shapiro test,Normality testing, Density plot, QQplot
+#' @keywords shapiro test,Normality testing, Density plot, QQplot
 #'
 #' @importFrom stats shapiro.test
 #' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous
@@ -1533,7 +1533,7 @@ DMA_Stat_limma <- function(data,
 #'
 #' @noRd
 #'
-Shapiro <-function(data,
+shapiro <-function(data,
                    metadata_sample,
                    metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                    pval= "t-test",
@@ -1541,7 +1541,7 @@ Shapiro <-function(data,
 ){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ## ------------- Checks --------------##
   if(grepl("[[:space:]()-./\\\\]", metadata_info[["Conditions"]])==TRUE){
@@ -1587,10 +1587,10 @@ Shapiro <-function(data,
 
   ################################################################################################################################################################################################
   ## ------------ Check data normality and statistical test chosen and generate Output DF----------- ##
-  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. We can test the data normality using the Shapiro test.
+  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. We can test the data normality using the shapiro test.
   ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
   #Prepare the input:
-  Input_shaptest <- replace(data, is.na(data), 0)%>% #Shapiro test can not handle NAs!
+  Input_shaptest <- replace(data, is.na(data), 0)%>% #shapiro test can not handle NAs!
     dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator)%>%
     dplyr::select_if(is.numeric)
   temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0#  we have to remove features with zero variance if there are any.
@@ -1628,7 +1628,7 @@ Shapiro <-function(data,
     }else if(nrow(subset_data)>5000){
       warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
     }else{
-      # Apply Shapiro-Wilk test to each feature in the subset
+      # Apply shapiro-Wilk test to each feature in the subset
      shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) stats::shapiro.test(x)))
     }
   }
@@ -1643,7 +1643,7 @@ Shapiro <-function(data,
         DF_shapiro_results[k, l] <- shapiro_results[[UniqueConditions[k]]][[l]]$p.value
       }
     }
-    colnames(DF_shapiro_results) <- paste("Shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
+    colnames(DF_shapiro_results) <- paste("shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
 
     ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
     Density_plots <- list()
@@ -1695,7 +1695,7 @@ Shapiro <-function(data,
                          ggplot2::geom_density(alpha=.2, fill="grey45") +
                          ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
                          ggplot2::theme_minimal()+
-                         ggplot2::labs(title=paste("data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on Shapiro test"),x="Abundance", y = "Density")
+                         ggplot2::labs(title=paste("data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on shapiro test"),x="Abundance", y = "Density")
       )
 
       Density_plots[[paste(colnames(transpose))]] <- sampleDist
@@ -1750,10 +1750,10 @@ Shapiro <-function(data,
 
 
 ###########################################################################################
-### ### ### Bartlett function: Internal Function to perform Bartlett test and plots ### ###
+### ### ### bartlett function: Internal Function to perform bartlett test and plots ### ###
 ###########################################################################################
 
-#' This helper function perform the Bartlett test to check the homogeneity of variances across groups
+#' This helper function perform the bartlett test to check the homogeneity of variances across groups
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -1761,7 +1761,7 @@ Shapiro <-function(data,
 #'
 #' @return List with two entries: DF (including the results DF) and Plots (including the  histogramm plot)
 #'
-#' @keywords Bartlett test,Normality testing, Density plot, QQplot
+#' @keywords bartlett test,Normality testing, Density plot, QQplot
 #'
 #' @importFrom stats bartlett.test
 #' @importFrom ggplot2 ggplot geom_histogram geom_density ggtitle xlab geom_vline
@@ -1771,12 +1771,12 @@ Shapiro <-function(data,
 #'
 #' @noRd
 #'
-Bartlett <-function(data,
+bartlett <-function(data,
                     metadata_sample,
                     metadata_info){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ################################################################################################################################################################################################
 
@@ -1788,13 +1788,13 @@ Bartlett <-function(data,
   #Make the output DF
   DF_bartlett_results <- as.data.frame(matrix(NA, nrow = ncol(data)), ncol = 1)
   rownames(DF_bartlett_results) <- colnames(data)
-  colnames(DF_bartlett_results) <- "Bartlett p.val"
+  colnames(DF_bartlett_results) <- "bartlett p.val"
 
   for(l in 1:length(bartlett_res)){
     DF_bartlett_results[l, 1] <-bartlett_res[[l]]$p.value
   }
-  DF_bartlett_results <- DF_bartlett_results %>% dplyr::mutate(`Var homogeneity`= case_when(`Bartlett p.val`< 0.05~ FALSE,
-                                                                                     `Bartlett p.val`>=0.05 ~ TRUE))
+  DF_bartlett_results <- DF_bartlett_results %>% dplyr::mutate(`Var homogeneity`= case_when(`bartlett p.val`< 0.05~ FALSE,
+                                                                                     `bartlett p.val`>=0.05 ~ TRUE))
   # if p<0.05 then unequal variances
   message("For ",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
 
@@ -1803,10 +1803,10 @@ Bartlett <-function(data,
 
   #### Plots:
   #Make density plots
-  Bartlettplot <- ggplot2::ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`Bartlett p.val`)) +
+  Bartlettplot <- ggplot2::ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`bartlett p.val`)) +
     ggplot2::geom_histogram(aes(y=..density..), colour="black", fill="white")  +
     ggplot2::geom_density(alpha = 0.2, fill = "grey45")+
-    ggplot2::ggtitle("Bartlett's test p.value distribution") +
+    ggplot2::ggtitle("bartlett's test p.value distribution") +
     ggplot2::xlab("p.value")+
     ggplot2::geom_vline(aes(xintercept = 0.05, color="darkred"))
 
@@ -1846,7 +1846,7 @@ Bartlett <-function(data,
 vst <- function(data){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   # model the mean and variance relationship on the data
   het.data <-

@@ -69,12 +69,12 @@ MetaAnalysis <- function(data,
 
 ){
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
-  CheckInput(data=data,
+  # HelperFunction `check_param`
+  check_param(data=data,
                           metadata_sample=metadata_sample,
                           metadata_feature=NULL,
                           metadata_info=NULL,
@@ -97,7 +97,7 @@ MetaAnalysis <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "MetaAnalysis",
+    Folder <- save_path(folder_name= "MetaAnalysis",
                                     path=path)
   }
 
@@ -267,7 +267,7 @@ MetaAnalysis <- function(data,
    if(nrow(data_Heat) > 2L){
 
      #Plot
-     invisible(VizHeatmap(data = data_Heat,
+     invisible(viz_heatmap(data = data_Heat,
                          plot_name = paste0("ExplainedVariance-bigger-", cutoff_variance , "Percent_AND_p.adj-smaller", cutoff_stat, sep=""),
                           scale = "none",
                           save_plot = save_plot,
@@ -284,11 +284,11 @@ MetaAnalysis <- function(data,
 
    ###############################################################################################################################################################################################################
    ## ---------- Return ------------##
-    # Make list of Output DFs: 1. prcomp results, 2. Loadings result, 3. topBottom Features, 4. AOV
+    # Make list of Output DFs: 1. prcomp results, 2. Loadings result, 3. topBottom Features, 4. aov
     ResList <- list(res_prcomp = PCA.res_Info, res_loadings = PCA.res_Loadings, res_topBottomFeatures = topBottom_Features, res_aov=Stat_results, res_summary=Res_summary)
 
     # Save the results
-    SaveRes(inputlist_df=ResList,
+    save_res(inputlist_df=ResList,
                          inputlist_plot = NULL,
                          save_table=save_table,
                          save_plot=FALSE,
@@ -318,7 +318,7 @@ MetaAnalysis <- function(data,
 #'
 #' @examples
 #' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-#' Res <- MetaProViz::MetaPK(data=Tissue_Norm[,-c(1:13)],
+#' Res <- MetaProViz::meta_pk(data=Tissue_Norm[,-c(1:13)],
 #'                           metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 #'
 #' @keywords prior knowledge, metadata
@@ -329,14 +329,14 @@ MetaAnalysis <- function(data,
 #'
 #' @export
 #'
-MetaPK <- function(data,
+meta_pk <- function(data,
                    metadata_sample,
                    metadata_info=NULL,
                    save_table = "csv",
                    path = NULL){
 
   ## ------------ Create log file ----------- ##
-  MetaProViz_Init()
+  metaproviz_init()
 
   ### Enrichment analysis-based
   #*we can make pathway file from metadata and use this to run enrichment analysis.
@@ -346,7 +346,7 @@ MetaPK <- function(data,
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  # HelperFunction `CheckInput`
+  # HelperFunction `check_param`
 
 
 
@@ -354,7 +354,7 @@ MetaPK <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- SavePath(folder_name= "MetaAnalysis",
+    Folder <- save_path(folder_name= "MetaAnalysis",
                                     path=path)
   }
 

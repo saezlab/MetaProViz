@@ -65,7 +65,7 @@ cm <- function(value) {
 #'     arguments, and its value will override the new value. By default it is
 #'     ``partial(switch, TRUE)``, which ignores the original value.
 #' @param grow Logical or numeric: if the total width or height is stored in
-#'     the plottable in the slots added by ``withCanvasSize``, increase the
+#'     the plottable in the slots added by ``with_canvas_size``, increase the
 #'     relevant dimension. By default, the increment is identical to the
 #'     increase of the size adjusted here; if a number is provided, it will be
 #'     added to the existing value.
@@ -244,9 +244,9 @@ parse_unit <- function(u) {
 #'
 #' @importFrom magrittr %>%
 #' @noRd
-withCanvasSize <- function(gtable, width = NULL, height = NULL) {
+with_canvas_size <- function(gtable, width = NULL, height = NULL) {
 
-    cls <- class(gtable) %>% c('withCanvasSize')
+    cls <- class(gtable) %>% c('with_canvas_size')
 
     gtable %>%
     c(
@@ -493,7 +493,7 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
   suppressWarnings(suppressMessages(
     Plot_Sized <- input_plot %>%
       ggplotGrob %>%
-      withCanvasSize(width = 12, height = 11) %>%
+      with_canvas_size(width = 12, height = 11) %>%
       adjust_layout(SUPER_PARAM) %>%
       adjust_title(c(PlotName))
   ))
@@ -511,15 +511,15 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
 
 #' PCA helper function: Internal Function
 #'
-#' @param input_plot This is the ggplot object generated within the VizPCA function.
-#' @param metadata_info Passed to VizPCA
-#' @param plot_name Passed to VizPCA
+#' @param input_plot This is the ggplot object generated within the viz_pca function.
+#' @param metadata_info Passed to viz_pca
+#' @param plot_name Passed to viz_pca
 #'
 #' @keywords PCA helper function
 #' @importFrom ggplot2 ggplotGrob
 #' @importFrom magrittr %>%
 #' @noRd
-PlotGrob_PCA <- function(input_plot, metadata_info,plot_name){
+plot_grob_pca <- function(input_plot, metadata_info,plot_name){
 
   PCA_PARAM <- list(
     widths = list(
@@ -549,7 +549,7 @@ PlotGrob_PCA <- function(input_plot, metadata_info,plot_name){
 
   Plot_Sized <- input_plot %>%
     ggplotGrob %>%
-    withCanvasSize(width = 12, height = 11) %>%
+    with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(PCA_PARAM) %>%
     adjust_title(PlotName) %>%
     adjust_legend(
@@ -573,16 +573,16 @@ PlotGrob_PCA <- function(input_plot, metadata_info,plot_name){
 ### ### ### Plot helper function: Heatmap ### ### ###
 ##############################################################
 
-#' @param input_plot This is the ggplot object generated within the VizHeatmap function.
-#' @param metadata_info Passed to VizHeatmap
-#' @param metadata_sample Passed to VizHeatmap
-#' @param metadata_feature Passed to VizHeatmap
-#' @param plot_name Passed to VizHeatmap
+#' @param input_plot This is the ggplot object generated within the viz_heatmap function.
+#' @param metadata_info Passed to viz_heatmap
+#' @param metadata_sample Passed to viz_heatmap
+#' @param metadata_feature Passed to viz_heatmap
+#' @param plot_name Passed to viz_heatmap
 #'
 #' @keywords Heatmap helper function
 #' @noRd
 
-PlotGrob_Heatmap <- function(input_plot, metadata_info, metadata_sample, metadata_feature,plot_name){
+plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metadata_feature,plot_name){
 
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   HEAT_PARAM <- list(
@@ -603,7 +603,7 @@ PlotGrob_Heatmap <- function(input_plot, metadata_info, metadata_sample, metadat
   Input <- input_plot$gtable
 
   Plot_Sized <- Input  %>%
-    withCanvasSize(width = 12, height = 11) %>%
+    with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(HEAT_PARAM) %>%
     adjust_title(c(PlotName))
 
@@ -669,16 +669,16 @@ PlotGrob_Heatmap <- function(input_plot, metadata_info, metadata_sample, metadat
 ### ### ### Plot helper function: Volcano   ### ### ###
 ##############################################################
 
-#' @param input_plot This is the ggplot object generated within the VizVolcano function.
-#' @param metadata_info Passed to VizVolcano
-#' @param plot_name Passed to VizVolcano
+#' @param input_plot This is the ggplot object generated within the viz_volcano function.
+#' @param metadata_info Passed to viz_volcano
+#' @param plot_name Passed to viz_volcano
 #' @param subtitle
 #'
 #' @keywords Volcano helper function
 #' @noRd
 #'
 
-plotGrob_Volcano <- function(input_plot, metadata_info,plot_name, subtitle){
+plot_grob_volcano <- function(input_plot, metadata_info,plot_name, subtitle){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   VOL_PARAM <- list(
     widths = list(
@@ -709,7 +709,7 @@ plotGrob_Volcano <- function(input_plot, metadata_info,plot_name, subtitle){
   #Adjust the parameters:
   Plot_Sized <- input_plot %>%
     ggplotGrob %>%
-    withCanvasSize(width = 12, height = 11) %>%
+    with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(VOL_PARAM) %>%
     adjust_title(c(PlotName, subtitle)) %>%#Fix this (if there is no subtitle!)
     adjust_legend(
@@ -743,7 +743,7 @@ plotGrob_Volcano <- function(input_plot, metadata_info,plot_name, subtitle){
 #' @keywords PCA helper function
 #' @noRd
 
-plotGrob_Superplot <- function(input_plot,
+plot_grob_superplot <- function(input_plot,
                                metadata_info,
                                metadata_sample,
                                subtitle,
@@ -790,7 +790,7 @@ plotGrob_Superplot <- function(input_plot,
   #Adjust the parameters:
   Plot_Sized <- input_plot %>%
     ggplotGrob %>%
-    withCanvasSize(width = 12, height = 11) %>%
+    with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(SUPER_PARAM) %>%
     adjust_title(c(PlotName, subtitle)) %>%
     adjust_legend(
