@@ -22,6 +22,21 @@
 ### ### ### Built-in example data (docs) ### ### ###
 ################################################################################################
 
+###################################################
+#' intracell_dma
+#'
+#' Metabolomics workbench project PR001418, study ST002224 where we performed differential metabolite
+#' analysis comparing intracellular metabolomics of 786-M1A versus HK2 cells.
+#'
+#' @format Columns include Log2FC, stats, metabolite identifiers, metabolite pathways and normalised
+#' metabolite values used as input with row names being metabolitetrivial names.
+#'
+#' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
+#' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+#' @export
+"intracell_dma"
+
+
 ####################################################
 #' intracell_raw
 #'
@@ -38,21 +53,8 @@
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
+#' @export
 "intracell_raw"
-
-####################################################
-#' intracell_dma
-#'
-#' Metabolomics workbench project PR001418, study ST002224 where we performed differential metabolite
-#' analysis comparing intracellular metabolomics of 786-M1A versus HK2 cells.
-#'
-#' @format Columns include Log2FC, stats, metabolite identifiers, metabolite pathways and normalised
-#' metabolite values used as input with row names being metabolitetrivial names.
-#'
-#' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
-#' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
-"intracell_dma"
-
 
 ####################################################
 #' medium_raw
@@ -66,6 +68,7 @@
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+#' @export
 "medium_raw"
 
 ####################################################
@@ -79,6 +82,7 @@
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+#' @export
 "cellular_meta"
 
 ####################################################
@@ -92,6 +96,7 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @export
 "tissue_norm"
 
 ####################################################
@@ -105,6 +110,7 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @export
 "tissue_meta"
 
 ####################################################
@@ -118,6 +124,7 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @export
 "tissue_dma"
 
 ####################################################
@@ -132,6 +139,7 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @export
 "tissue_dma_old"
 
 ####################################################
@@ -146,6 +154,7 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @export
 "tissue_dma_young"
 
 ####################################################
@@ -160,6 +169,7 @@
 #' @source Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
 #' regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
 #' proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
+#' @export
 "tissue_tvn_proteomics"
 
 ####################################################
@@ -174,6 +184,7 @@
 #' @source Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
 #' regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
 #' proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
+#' @export
 "tissue_tvn_rnaseq"
 
 ####################################################
@@ -185,6 +196,7 @@
 #' @format Columns include metabolite trivial names, metabolite IDs (HMDB, KEGG, etc.), metabolite structural information (=INCHI).
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+#' @export
 "equivalent_features"
 
 ####################################################
@@ -197,6 +209,7 @@
 #' information (INCHI, Key, etc.).
 #'
 #' @source Biocrates MxP® Quant 500 XL kit, https://biocrates.com/mxp-quant-500-xl/
+#' @export
 "biocrates_features"
 
 ####################################################
@@ -209,6 +222,7 @@
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+#' @export
 "mca_2cond"
 
 ####################################################
@@ -221,6 +235,7 @@
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+#' @export
 "mca_core"
 
 ####################################################
@@ -232,4 +247,5 @@
 #' @format Columns include pathway_name, pathwayId and pathwaySource as well as inputID  and commonName.
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+#' @export
 "alanine_pathways"
