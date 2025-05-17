@@ -126,7 +126,7 @@ viz_pca <- function(data,
   ## ----------- Set the plot parameters: ------------ ##
   ##--- Prepare colour and shape palette
   if(is.null(color_palette)){
-    if(ColorScale=="discrete"){
+    if(scale_color=="discrete"){
       safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
     }else if(scale_color=="continuous"){
       safe_colorblind_palette <- NULL
@@ -250,7 +250,7 @@ viz_pca <- function(data,
                   loadings.colour="grey10",
                   loadings.label.colour="grey10" ) +
     ggplot2::scale_shape_manual(values=shape_select)+
-    ggplot2::ggtitle(paste(PlotName)) +
+    ggplot2::ggtitle(paste(plot_name)) +
     ggplot2::geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
     ggplot2::geom_vline(xintercept=0,  color = "black", linewidth=0.1)
 
@@ -271,7 +271,7 @@ viz_pca <- function(data,
   PlotList[["Plot"]] <- PCA
 
   #Set the total heights and widths
-  PCA %<>% plot_grob_pca(metadata_info=metadata_info,plot_name=PlotName)
+  PCA %<>% plot_grob_pca(metadata_info=metadata_info,plot_name=plot_name)
   plot_height <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
   plot_width <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
   PCA %<>%

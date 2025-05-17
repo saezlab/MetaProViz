@@ -851,7 +851,7 @@ mvi_imputation <-function(data,
 ### ### ### pre_processing helper function: total ion Count Normalization ### ### ###
 ################################################################################################
 
-#' total ion count normalisazion
+#' Total ion count normalization
 #'
 #' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
@@ -901,6 +901,8 @@ tic_norm <-function(data,
   RLA_data_long <- tidyr::pivot_longer(RLA_data_raw, cols = everything(), names_to = "Group")
   names(RLA_data_long)<- c("Samples", "Intensity")
   RLA_data_long <- as.data.frame(RLA_data_long)
+  RLA_data_long <<- RLA_data_long
+  metadata_sample <<- metadata_sample
   for (row in 1:nrow(RLA_data_long)){ # add conditions
     RLA_data_long[row, metadata_info[["Conditions"]]] <- metadata_sample[rownames(metadata_sample) %in%RLA_data_long[row,1],metadata_info[["Conditions"]]]
   }

@@ -145,7 +145,7 @@ viz_volcano <- function(plot_types="Standard",
     stop(message)
   }
 
-  if(is.null(PlotName)==FALSE & is.vector(PlotName)==FALSE){
+  if(is.null(plot_name)==FALSE & is.vector(plot_name)==FALSE){
     message<- paste0("Check input.plot_name must be either NULL or a vector.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
@@ -472,7 +472,7 @@ viz_volcano_standard <- function(data,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
-                                                title= paste(PlotName, ": ", i, sep=""),
+                                                title= paste(plot_name, ": ", i, sep=""),
                                                 subtitle = subtitle,
                                                 caption = paste0("total = ", nrow(InputVolcano), " ", feature),
                                                 xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
@@ -496,7 +496,7 @@ viz_volcano_standard <- function(data,
         PlotList[[i]] <- Plot
 
         #Set the total heights and widths
-        PlotTitle <- paste(PlotName, ": ", i, sep="")
+        PlotTitle <- paste(plot_name, ": ", i, sep="")
         Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
         plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -517,7 +517,7 @@ viz_volcano_standard <- function(data,
                                save_table=NULL,
                                save_plot=save_plot,
                                path= folder,
-                               file_name= paste("Volcano_",PlotName, sep=""),
+                               file_name= paste("Volcano_",plot_name, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
                                plot_height= plot_height,
@@ -585,7 +585,7 @@ viz_volcano_standard <- function(data,
                                               colCustom = keyvals,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
-                                              title= paste(PlotName),
+                                              title= paste(plot_name),
                                               subtitle = subtitle,
                                               caption = paste0("total = ", nrow(InputVolcano), " ", feature),
                                               xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
@@ -828,7 +828,7 @@ viz_volcano_compare <- function(data,
                                                 colCustom = keyvals,
                                                 shapeCustom = keyvalsshape,
                                                 colAlpha = 1,
-                                                title= paste(PlotName, ": ", i, sep=""),
+                                                title= paste(plot_name, ": ", i, sep=""),
                                                 subtitle = subtitle,
                                                 caption = paste0("total = ", (nrow(InputVolcano)/2), " ", feature),
                                                 xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
@@ -852,7 +852,7 @@ viz_volcano_compare <- function(data,
         PlotList[[i]] <- Plot
 
         #Set the total heights and widths
-        PlotTitle <- paste(PlotName, ": ", i, sep="")
+        PlotTitle <- paste(plot_name, ": ", i, sep="")
         Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
         plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -873,7 +873,7 @@ viz_volcano_compare <- function(data,
                            save_table=NULL,
                            save_plot=save_plot,
                            path= folder,
-                           file_name= paste("Volcano_",PlotName, sep=""),
+                           file_name= paste("Volcano_",plot_name, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
                            plot_height=plot_height,
@@ -960,7 +960,7 @@ viz_volcano_compare <- function(data,
                                               colCustom = keyvals,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
-                                              title= paste(PlotName),
+                                              title= paste(plot_name),
                                               subtitle = subtitle,
                                               caption = paste0("total = ", (nrow(InputVolcano)/2)," ", feature),
                                               xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
@@ -1193,7 +1193,7 @@ viz_volcano_pea <- function(data,
                                               colCustom = keyvals,
                                               shapeCustom = keyvalsshape,
                                               colAlpha = 1,
-                                              title= paste(PlotName, ": ", i, sep=""),
+                                              title= paste(plot_name, ": ", i, sep=""),
                                               subtitle = paste(metadata_info[["PEA_score"]],"= ", data2_Select$PEA_score, ", ",metadata_info[["PEA_stat"]] , "= ", data2_Select$PEA_stat, sep=""),
                                               caption = paste0("total = ", nrow(InputVolcano), " of ", nrow(metadata_feature_Select), " ", feature, " in pathway"),
                                               xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
@@ -1217,7 +1217,7 @@ viz_volcano_pea <- function(data,
       PlotList[[i]] <- Plot
 
       #Set the total heights and widths
-      PlotTitle <- paste(PlotName, ": ", i, sep="")
+      PlotTitle <- paste(plot_name, ": ", i, sep="")
       Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
       plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
       plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -1239,7 +1239,7 @@ viz_volcano_pea <- function(data,
                              save_table=NULL,
                              save_plot=save_plot,
                              path= folder,
-                             file_name= paste("Volcano_",PlotName, sep=""),
+                             file_name= paste("Volcano_",plot_name, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
                              plot_height=plot_height,

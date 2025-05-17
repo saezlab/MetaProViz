@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: MetaAnalysis
+## Script name: meta_analysis
 ##
 ## Purpose of script:
 ##
@@ -20,7 +20,7 @@
 #'
 
 ###############################################
-### ### ### MetaAnalysis ### ### ###
+### ### ### meta_analysis ### ### ###
 ###############################################
 
 #' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
@@ -40,7 +40,7 @@
 #'
 #' @examples
 #' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-#' Res <- MetaProViz::MetaAnalysis(data=Tissue_Norm[,-c(1:13)],
+#' Res <- MetaProViz::meta_analysis(data=Tissue_Norm[,-c(1:13)],
 #'                                 metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 #'
 #' @keywords PCA, annova, metadata
@@ -55,7 +55,7 @@
 #'
 #' @export
 #'
-MetaAnalysis <- function(data,
+meta_analysis <- function(data,
                          metadata_sample,
                          scaling = TRUE,
                          percentage = 0.1,
@@ -97,7 +97,7 @@ MetaAnalysis <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "MetaAnalysis",
+    folder <- save_path(folder_name= "meta_analysis",
                                     path=path)
   }
 
@@ -293,7 +293,7 @@ MetaAnalysis <- function(data,
                          save_table=save_table,
                          save_plot=FALSE,
                          path= folder,
-                         file_name= "MetaAnalysis",
+                         file_name= "meta_analysis",
                          core=FALSE,
                          print_plot=FALSE)
 
@@ -354,7 +354,7 @@ meta_pk <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "MetaAnalysis",
+    folder <- save_path(folder_name= "meta_analysis",
                                     path=path)
   }
 

@@ -101,7 +101,7 @@ Tissue_MetaData <- tissue_meta
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
-Tissue_MetaData[1:5,c(1:2, 7:10)]%>%
+Tissue_MetaData[1:5,c(1:2, 7:10)] %>%
   kableExtra::kbl(caption = "Preview of the DF `Tissue_MetaData` including the trivial metabolite identifiers used in the experiment as well as IDs and pathway information.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
@@ -128,11 +128,11 @@ This has been done by the authors of the paper and we will use the median normal
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
 \
 Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
-The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
+The `MetaProViz::meta_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
 ```{r}
-MetaRes <- MetaProViz::MetaAnalysis(data=Tissue_Norm[,-c(1:13)],
-                                     metadata_sample= Tissue_Norm[,c(2,4:5,12:13)],
+MetaRes <- MetaProViz::meta_analysis(data=tissue_norm[,-c(1:13)],
+                                     metadata_sample= tissue_norm[,c(2,4:5,12:13)],
                                      scaling = TRUE,
                                      percentage = 0.1,
                                      cutoff_stat= 0.05,
@@ -170,12 +170,12 @@ TissueTypeList <- MetaRes[["res_summary"]]%>%
   select(feature)%>%
   pull()
 
-# select columns Tissue_norm that are in TissueTypeList if they exist
-Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
+# select columns tissue_norm that are in TissueTypeList if they exist
+Input_Heatmap <- tissue_norm[ , names(tissue_norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
 
 # Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
 MetaProViz:::viz_heatmap(data = Input_Heatmap,
-                       metadata_sample = Tissue_Norm[,c(1:13)],
+                       metadata_sample = tissue_norm[,c(1:13)],
                        metadata_info = c(color_Sample = list("TISSUE_TYPE")),
                        scale ="column",
                       plot_name = "MainDrivers")
@@ -196,16 +196,16 @@ We will perform multiple comparisons based on the different patient demographics
 \
 ```{r Display_Not_Run, eval=FALSE}
 # Prepare the different selections
-EarlyStage <- Tissue_Norm%>%
+EarlyStage <- tissue_norm %>%
   filter(STAGE== "EARLY-STAGE")
-LateStage <- Tissue_Norm%>%
+LateStage <- tissue_norm %>%
   filter(STAGE=="LATE-STAGE")
-Old <- Tissue_Norm%>%
+Old <- tissue_norm %>%
   filter(AGE=="Old")
-Young <- Tissue_Norm%>%
+Young <- tissue_norm%>%
   filter(AGE=="Young")
 
-DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+DFs <- list("TissueType"= tissue_norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
 
 # Run dma
 ResList <- list()
@@ -233,16 +233,22 @@ for(item in names(DFs)){
 <div class="vscroll-plot">
 ```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Prepare the different selections
-EarlyStage <- Tissue_Norm%>%
+EarlyStage <- tissue_norm %>%
   filter(STAGE== "EARLY-STAGE")
-LateStage <- Tissue_Norm%>%
+LateStage <- tissue_norm %>%
   filter(STAGE=="LATE-STAGE")
-Old <- Tissue_Norm%>%
+Old <- tissue_norm %>%
   filter(AGE=="Old")
-Young <- Tissue_Norm%>%
+Young <- tissue_norm %>%
   filter(AGE=="Young")
 
-DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+DFs <- list(
+  "TissueType" = tissue_norm,
+  "EarlyStage" = EarlyStage,
+  "LateStage" = LateStage,
+  "Old" = Old,
+  "Young" = Young
+)
 
 # Run dma
 ResList <- list()
@@ -313,7 +319,7 @@ ggVennDiagram::ggVennDiagram(list(top = top_entries,
   ggplot2::scale_fill_gradient(low = "blue", high = "red")
 
 
-MetaData_Metab <- merge(x=Tissue_MetaData,
+MetaData_Metab <- merge(x=tissue_meta,
                    y= MetaRes[["res_summary"]][, c(1,5:6) ]%>%tibble::column_to_rownames("feature"),
                    by=0,
                    all.y=TRUE)%>%

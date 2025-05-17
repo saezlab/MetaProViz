@@ -226,7 +226,7 @@ viz_heatmap <- function(data,
                                      fontsize_row= 10,
                                      fontsize_col = 10,
                                      fontsize=9,
-                                     main = paste(PlotName, " Metabolites: ", i, sep=" " ),
+                                     main = paste(plot_name, " Metabolites: ", i, sep=" " ),
                                      silent = TRUE)
 
         ## Store the plot in the 'plots' list
@@ -250,7 +250,7 @@ viz_heatmap <- function(data,
                                save_table=NULL,
                                save_plot=save_plot,
                                path= folder,
-                               file_name=paste("Heatmap_",PlotName, sep=""),
+                               file_name=paste("Heatmap_",plot_name, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
                                plot_height=plot_height,
@@ -369,7 +369,7 @@ viz_heatmap <- function(data,
                                       fontsize_row= 10,
                                       fontsize_col = 10,
                                       fontsize=9,
-                                      main = paste(PlotName," Samples: ", i, sep=" " ),
+                                      main = paste(plot_name," Samples: ", i, sep=" " ),
                                       silent = TRUE)
 
         #----- Save
@@ -393,7 +393,7 @@ viz_heatmap <- function(data,
                                save_table=NULL,
                                save_plot=save_plot,
                                path= folder,
-                               file_name= paste("Heatmap_",PlotName, sep=""),
+                               file_name= paste("Heatmap_",plot_name, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
                                plot_height=plot_height,
@@ -535,7 +535,7 @@ viz_heatmap <- function(data,
                                           fontsize_row= 10,
                                           fontsize_col = 10,
                                           fontsize=9,
-                                          main = paste(PlotName," Metabolites: ", i, " Sample:", s, sep="" ),
+                                          main = paste(plot_name," Metabolites: ", i, " Sample:", s, sep="" ),
                                           silent = TRUE)
 
             ## Store the plot in the 'plots' list
@@ -562,7 +562,7 @@ viz_heatmap <- function(data,
                                    save_table=NULL,
                                    save_plot=save_plot,
                                    path= folder,
-                                   file_name=paste("Heatmap_",PlotName, sep=""),
+                                   file_name=paste("Heatmap_",plot_name, sep=""),
                                    core=FALSE,
                                    print_plot=print_plot,
                                    plot_height=plot_height,
@@ -656,7 +656,7 @@ viz_heatmap <- function(data,
                                   silent = TRUE)
 
     ## Store the plot in the 'plots' list
-    PlotList[[PlotName]] <- heatmap
+    PlotList[[plot_name]] <- heatmap
 
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
@@ -667,7 +667,7 @@ viz_heatmap <- function(data,
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-    PlotList_adaptedGrid[[paste("Heatmap_",PlotName, sep="")]] <- Plot_Sized
+    PlotList_adaptedGrid[[paste("Heatmap_",plot_name, sep="")]] <- Plot_Sized
 
     #----- Save
     suppressMessages(suppressWarnings(
@@ -676,7 +676,7 @@ viz_heatmap <- function(data,
                            save_table=NULL,
                            save_plot=save_plot,
                            path= folder,
-                           file_name= paste("Heatmap_",PlotName, sep=""),
+                           file_name= paste("Heatmap_",plot_name, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
                            plot_height=plot_height,
@@ -686,7 +686,7 @@ viz_heatmap <- function(data,
 
 
     }else{
-      message <- paste0(PlotName , " includes <= 2 objects and is hence not plotted.")
+      message <- paste0(plot_name , " includes <= 2 objects and is hence not plotted.")
       logger::log_trace(paste("Message ", message, sep=""))
       message(message)
     }

@@ -495,7 +495,7 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
       ggplotGrob %>%
       with_canvas_size(width = 12, height = 11) %>%
       adjust_layout(SUPER_PARAM) %>%
-      adjust_title(c(PlotName))
+      adjust_title(c(plot_name))
   ))
 
   Plot_Sized %<>%
@@ -551,7 +551,7 @@ plot_grob_pca <- function(input_plot, metadata_info,plot_name){
     ggplotGrob %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(PCA_PARAM) %>%
-    adjust_title(PlotName) %>%
+    adjust_title(plot_name) %>%
     adjust_legend(
       input_plot,
       sections = c("color", "shape"),
@@ -605,7 +605,7 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
   Plot_Sized <- Input  %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(HEAT_PARAM) %>%
-    adjust_title(c(PlotName))
+    adjust_title(c(plot_name))
 
   #Extract legend information and adjust:
   color_entries <- grep("^color", names(metadata_info), value = TRUE)
@@ -711,7 +711,7 @@ plot_grob_volcano <- function(input_plot, metadata_info,plot_name, subtitle){
     ggplotGrob %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(VOL_PARAM) %>%
-    adjust_title(c(PlotName, subtitle)) %>%#Fix this (if there is no subtitle!)
+    adjust_title(c(plot_name, subtitle)) %>%#Fix this (if there is no subtitle!)
     adjust_legend(
       input_plot,
       sections = c("color", "shape"),
@@ -792,7 +792,7 @@ plot_grob_superplot <- function(input_plot,
     ggplotGrob %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(SUPER_PARAM) %>%
-    adjust_title(c(PlotName, subtitle)) %>%
+    adjust_title(c(plot_name, subtitle)) %>%
     adjust_legend(
       input_plot,
       sections = c("Superplot"),#here we do not have colour and shape, but other parameters
