@@ -16,11 +16,11 @@ Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and 
 }
 \usage{
 mca_2cond(
-  data_C1,
-  data_C2,
-  metadata_info_C1 = c(ValueCol = "Log2FC", StatCol = "p.adj", cutoff_stat = 0.05,
+  data_c1,
+  data_c2,
+  metadata_info_c1 = c(ValueCol = "Log2FC", StatCol = "p.adj", cutoff_stat = 0.05,
     ValueCutoff = 1),
-  metadata_info_C2 = c(ValueCol = "Log2FC", StatCol = "p.adj", cutoff_stat = 0.05,
+  metadata_info_c2 = c(ValueCol = "Log2FC", StatCol = "p.adj", cutoff_stat = 0.05,
     ValueCutoff = 1),
   feature = "Metabolite",
   save_table = "csv",
@@ -31,13 +31,13 @@ mca_2cond(
 mca_2cond
 }
 \arguments{
-\item{data_C1}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{data_c1}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
 
-\item{data_C2}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{data_c2}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
 
-\item{metadata_info_C1}{\emph{Optional: } Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, cutoff_stat= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
+\item{metadata_info_c1}{\emph{Optional: } Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_c1,StatCol=ColumnName_data_c1, cutoff_stat= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
 
-\item{metadata_info_C2}{\emph{Optional: } Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
+\item{metadata_info_c2}{\emph{Optional: } Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_c2,StatCol=ColumnName_data_c2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
 
 \item{feature}{\emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}}
 
@@ -58,8 +58,8 @@ from the different grouping methods.
 Intra <- MetaProViz::ToyData("IntraCells_Raw")
 Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 
-Res <- MetaProViz::mca_2cond(data_C1 = Input[["dma"]][["786-O_vs_HK2"]],
-                             data_C2 = Input[["dma"]][["786-M1A_vs_HK2"]])
+Res <- MetaProViz::mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],
+                             data_c2 = Input[["dma"]][["786-M1A_vs_HK2"]])
 
 }
 \keyword{biological}

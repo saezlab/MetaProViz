@@ -13,9 +13,9 @@ Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and 
 }
 \usage{
 mca_core(
-  data_Intra,
+  data_intra,
   data_core,
-  metadata_info_Intra = c(ValueCol = "Log2FC", StatCol = "p.adj", cutoff_stat = 0.05,
+  metadata_info_intra = c(ValueCol = "Log2FC", StatCol = "p.adj", cutoff_stat = 0.05,
     ValueCutoff = 1),
   metadata_info_core = c(DirectionCol = "core", ValueCol = "Log2(Distance)", StatCol =
     "p.adj", cutoff_stat = 0.05, ValueCutoff = 1),
@@ -28,11 +28,11 @@ mca_core(
 mca_core
 }
 \arguments{
-\item{data_Intra}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
+\item{data_intra}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.}
 
 \item{data_core}{DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require}
 
-\item{metadata_info_Intra}{\emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
+\item{metadata_info_intra}{\emph{Optional: } Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_intra,StatCol=ColumnName_data_intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue) \strong{Default=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
 
 \item{metadata_info_core}{\emph{Optional: } Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)\strong{Default=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1)}}
 
@@ -67,7 +67,7 @@ MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4
 
 IntraDMA <- MetaProViz::ToyData(data="IntraCells_DMA")
 
-Res <- MetaProViz::mca_core(data_Intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
+Res <- MetaProViz::mca_core(data_intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
                             data_core = MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
 
 }

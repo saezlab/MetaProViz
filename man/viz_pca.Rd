@@ -12,8 +12,8 @@ viz_pca(
   color_palette = NULL,
   scale_color = "discrete",
   shape_palette = NULL,
-  ShowLoadings = FALSE,
-  Scaling = TRUE,
+  show_loadings = FALSE,
+  scaling = TRUE,
   pcx = 1,
   pcy = 2,
   theme = NULL,
@@ -36,9 +36,9 @@ viz_pca(
 
 \item{shape_palette}{\emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}}
 
-\item{ShowLoadings}{\emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}}
+\item{show_loadings}{\emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}}
 
-\item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
+\item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
 \item{pcx}{\emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}}
 

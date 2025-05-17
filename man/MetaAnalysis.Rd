@@ -7,7 +7,7 @@
 MetaAnalysis(
   data,
   metadata_sample,
-  Scaling = TRUE,
+  scaling = TRUE,
   percentage = 0.1,
   cutoff_stat = 0.05,
   cutoff_variance = 1,
@@ -22,7 +22,7 @@ MetaAnalysis(
 
 \item{metadata_sample}{\emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}}
 
-\item{Scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
+\item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}}
 
 \item{percentage}{\emph{Optional: } percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}}
 
