@@ -25,38 +25,64 @@
 
 #' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
-#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
-#' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param percentage \emph{Optional: } percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}
-#' @param cutoff_stat \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for the results summary and on the heatmap. \strong{Default = 0.05}
-#' @param cutoff_variance \emph{Optional: } Cutoff for the PCs variance that should be displayed on the heatmap. \strong{Default = 1}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param data DF where rows are unique samples and columns are features, with
+#'     numerical values in columns, and metabolite identifiers as column names. Use
+#'     NA for metabolites that were not detected. Includes experimental design and
+#'     outlier column.
+#' @param metadata_sample \emph{Optional: } DF which contains information about
+#'     the samples, which will be combined with your input data based on the
+#'     join specification in `by`. Column "Conditions" with information
+#'     about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can
+#'     be used for feature filtering and colour coding in the PCA. Column
+#'     "AnalyticalReplicate" including numerical values, defines technical
+#'     repetitions of measurements, which will be summarised. Column
+#'     "BiologicalReplicates" including numerical values. Please use the following
+#'     names: "Conditions", "Biological_Replicates",
+#'     "Analytical_Replicates".\strong{Default = NULL}
+#' @param by \emph{Optional: } Join specification between `data` and
+#'     `metadata_sample`. See the docs of \code{dplyr::left_join} for details. \strong{Default = NULL}
+#' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is
+#' used \strong{Default = TRUE}
+#' @param percentage \emph{Optional: } percentage of top and bottom features to
+#' be displayed in the results summary. \strong{Default = 0.1}
+#' @param cutoff_stat \emph{Optional: } Cutoff for the adjusted p-value of the
+#' ANOVA test for the results summary and on the heatmap. \strong{Default =
+#' 0.05}
+#' @param cutoff_variance \emph{Optional: } Cutoff for the PCs variance that
+#' should be displayed on the heatmap. \strong{Default = 1}
+#' @param save_plot \emph{Optional: } Select the file type of output plots.
+#' Options are svg, png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
+#' saved as an overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved
+#' at. \strong{default: NULL}
 #'
-#' @return List of DFs: prcomp results, loadings, top-Bottom features, annova results, results summary
+#' @return List of DFs: prcomp results, loadings, top-Bottom features, annova
+#' results, results summary
 #'
 #' @examples
-#' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
-#' Res <- MetaProViz::meta_analysis(data=Tissue_Norm[,-c(1:13)],
-#'                                 metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
+#' Res <- meta_analysis(
+#'     data = tissue_norm[,-c(1:13)],
+#'     metadata_sample = tissue_norm[,c(2,4:5,12:13)]
+#' )
 #'
 #' @keywords PCA, annova, metadata
 #'
-#' @importFrom dplyr filter bind_rows rename mutate ungroup group_by summarise select arrange rowwise mutate_all distinct
-#' @importFrom magrittr %>%
+#' @importFrom dplyr filter bind_rows rename mutate ungroup group_by summarise
+#' @importFrom dplyr select arrange rowwise mutate_all distinct left_join
+#' @importFrom magrittr %>% %<>%
 #' @importFrom stats as.formula aov TukeyHSD
 #' @importFrom broom tidy
 #' @importFrom tidyr separate_rows pivot_wider
-#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom tibble rownames_to_column
 #' @importFrom logger log_info
 #'
 #' @export
-#'
 meta_analysis <- function(data,
                          metadata_sample,
+                         by = NULL,
                          scaling = TRUE,
                          percentage = 0.1,
                          cutoff_stat= 0.05,
@@ -65,7 +91,14 @@ meta_analysis <- function(data,
                          save_plot = "svg",
                          print_plot= TRUE,
                          path = NULL
-                         #SettingInfo= c(MainSeparator = "TISSUE_TYPE), # enable this parameter in the function --> main separator: Often a combination of demographics is is of paricular interest, e.g. comparing "Tumour versus Normal" for early stage patients and for late stage patients independently. If this is the case, we can use the parameter `metadata_info` and provide the column name of our main separator.
+                         #SettingInfo= c(MainSeparator = "TISSUE_TYPE), #
+                         #enable this parameter in the function --> main
+                         #separator: Often a combination of demographics is is
+                         #of paricular interest, e.g. comparing "Tumour versus
+                         #Normal" for early stage patients and for late stage
+                         #patients independently. If this is the case, we can
+                         #use the parameter `metadata_info` and provide the
+                         #column name of our main separator.
 
 ){
   ## ------------ Create log file ----------- ##
@@ -84,8 +117,8 @@ meta_analysis <- function(data,
                           print_plot= print_plot)
 
   # Specific checks: Check the column names of the demographics --> need to be R usable (no empty spaces, -, etc.)
-  if(is.null(metadata_sample)==FALSE){
-    if(any(grepl('[^[:alnum:]]', colnames(metadata_sample)))==TRUE){
+  if(!is.null(metadata_sample)){
+    if(any(grepl('[^[:alnum:]]', colnames(metadata_sample)))){
       #Remove special characters in colnames
       colnames(metadata_sample) <- make.names(colnames(metadata_sample))
       #Message:
@@ -109,15 +142,12 @@ meta_analysis <- function(data,
   PCA.res_Info <- as.data.frame(PCA.res$x)
 
   # Extract loadings for each PC
-  PCA.res_Loadings <- as.data.frame(PCA.res$rotation)%>%
+  PCA.res_Loadings <-
+    as.data.frame(PCA.res$rotation) %>%
     tibble::rownames_to_column("feature")
 
   #--- 2. Merge with demographics
-  PCA.res_Info  <- merge(x=metadata_sample%>% tibble::rownames_to_column("UniqueID"),
-                         y=PCA.res_Info%>% tibble::rownames_to_column("UniqueID"),
-                         by="UniqueID",
-                         all.y=TRUE)%>%
-    tibble::column_to_rownames("UniqueID")
+  PCA.res_Info %<>% left_join(metadata_sample, by = by)
 
   #--- 3. convert columns that are not numeric to factor:
   ## Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
