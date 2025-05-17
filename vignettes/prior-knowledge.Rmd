@@ -610,7 +610,7 @@ Here we connect the experimental Biocrates table to the MetalinksDB PK using the
 
 ```{r}
 Biocrates_to_MetalinksDB <- MetaProViz:::check_match_id(data = FeatureMetadata_Biocrates,
-                     PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
+                     prior_knowledge = MetaLinksDB_Res$MetalinksDB,
                      metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
 
@@ -727,7 +727,7 @@ Now that we can see we only have either NA or singular values for our HMDB IDs, 
 
 ```{r, fig.width=8, fig.height=6, echo=TRUE}
 Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::check_match_id(data = FeatureMetadata_Biocrates_singleHMDB,
-                     PriorKnowledge = MetaLinksDB_Res$MetalinksDB,
+                     prior_knowledge = MetaLinksDB_Res$MetalinksDB,
                      metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 ```
 

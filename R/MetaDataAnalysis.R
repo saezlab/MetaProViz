@@ -27,7 +27,7 @@
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
 #' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
-#' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
+#' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
 #' @param percentage \emph{Optional: } percentage of top and bottom features to be displayed in the results summary. \strong{Default = 0.1}
 #' @param cutoff_stat \emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for the results summary and on the heatmap. \strong{Default = 0.05}
 #' @param cutoff_variance \emph{Optional: } Cutoff for the PCs variance that should be displayed on the heatmap. \strong{Default = 1}
@@ -57,7 +57,7 @@
 #'
 MetaAnalysis <- function(data,
                          metadata_sample,
-                         Scaling = TRUE,
+                         scaling = TRUE,
                          percentage = 0.1,
                          cutoff_stat= 0.05,
                          cutoff_variance=1,
@@ -97,7 +97,7 @@ MetaAnalysis <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "MetaAnalysis",
+    folder <- save_path(folder_name= "MetaAnalysis",
                                     path=path)
   }
 
@@ -105,7 +105,7 @@ MetaAnalysis <- function(data,
   ## ---------- Run prcomp ------------##
   #--- 1. prcomp
   #Get PCs
-  PCA.res <- prcomp(data, center = TRUE, scale=Scaling)
+  PCA.res <- prcomp(data, center = TRUE, scale=scaling)
   PCA.res_Info <- as.data.frame(PCA.res$x)
 
   # Extract loadings for each PC
@@ -272,7 +272,7 @@ MetaAnalysis <- function(data,
                           scale = "none",
                           save_plot = save_plot,
                           print_plot = print_plot,
-                          path = Folder))
+                          path = folder))
 
    }else{
      message <- paste0("cutoff_stat of ", cutoff_stat, " and cutoff_variance of ", cutoff_variance, " do only return <= 2 cases, hence no heatmap is plotted.")
@@ -292,8 +292,8 @@ MetaAnalysis <- function(data,
                          inputlist_plot = NULL,
                          save_table=save_table,
                          save_plot=FALSE,
-                         path= Folder,
-                         FileName= "MetaAnalysis",
+                         path= folder,
+                         file_name= "MetaAnalysis",
                          core=FALSE,
                          print_plot=FALSE)
 
@@ -354,7 +354,7 @@ meta_pk <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "MetaAnalysis",
+    folder <- save_path(folder_name= "MetaAnalysis",
                                     path=path)
   }
 
@@ -396,7 +396,7 @@ meta_pk <- function(data,
   ###############################################################################################################################################################################################################
   ## ---------- Save ------------##
   # Add to results DF
-  Res <- list(Metadata_PriorKnowledge = Metadata_df)
+  Res <- list(Metadata_prior_knowledge = Metadata_df)
 
 }
 

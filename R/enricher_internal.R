@@ -17,8 +17,8 @@
 ##' @param pAdjustMethod one of "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
 ##' @param universe background genes, default is the intersection of the 'universe' with genes that have annotations.
 ##' Users can set `options(enrichment_force_universe = TRUE)` to force the 'universe' untouched.
-##' @param minGSSize minimal size of genes annotated by Ontology term for testing.
-##' @param maxGSSize maximal size of each geneSet for analyzing
+##' @param min_gs_size minimal size of genes annotated by Ontology term for testing.
+##' @param max_gs_size maximal size of each geneSet for analyzing
 ##' @param qvalueCutoff cutoff of qvalue
 ##' @param USER_DATA ontology information
 ##' @return  A \code{enrichResult} instance.
@@ -34,8 +34,8 @@ enricher_internal <- function(gene,
                               pvalueCutoff,
                               pAdjustMethod="BH",
                               universe = NULL,
-                              minGSSize=10,
-                              maxGSSize=500,
+                              min_gs_size=10,
+                              max_gs_size=500,
                               qvalueCutoff=0.2,
                               USER_DATA){
 
@@ -93,12 +93,12 @@ enricher_internal <- function(gene,
     termID2ExtID <- TERMID2EXTID(qTermID, USER_DATA)
     termID2ExtID <- lapply(termID2ExtID, intersect, extID)
 
-    geneSets <- termID2ExtID
+    gene_sets <- termID2ExtID
 
-    idx <- get_geneSet_index(termID2ExtID, minGSSize, maxGSSize)
+    idx <- get_geneSet_index(termID2ExtID, min_gs_size, max_gs_size)
 
     if (sum(idx) == 0) {
-        msg <- paste("No gene sets have size between", minGSSize, "and", maxGSSize, "...")
+        msg <- paste("No gene sets have size between", min_gs_size, "and", max_gs_size, "...")
         message(msg)
         message("--> return NULL...")
         return (NULL)
@@ -200,7 +200,7 @@ enricher_internal <- function(gene,
              qvalueCutoff   = qvalueCutoff,
              gene           = as.character(gene),
              universe       = extID,
-             geneSets       = geneSets,
+             gene_sets       = gene_sets,
              organism       = "UNKNOWN",
              keytype        = "UNKNOWN",
              ontology       = "UNKNOWN",
@@ -321,15 +321,15 @@ TERM2NAME <- function(term, USER_DATA) {
     return(res)
 }
 
-get_geneSet_index <- function(geneSets, minGSSize, maxGSSize) {
-    if (is.na(minGSSize) || is.null(minGSSize))
-        minGSSize <- 1
-    if (is.na(maxGSSize) || is.null(maxGSSize))
-        maxGSSize <- Inf #.Machine$integer.max
+get_geneSet_index <- function(gene_sets, min_gs_size, max_gs_size) {
+    if (is.na(min_gs_size) || is.null(min_gs_size))
+        min_gs_size <- 1
+    if (is.na(max_gs_size) || is.null(max_gs_size))
+        max_gs_size <- Inf #.Machine$integer.max
 
-    ## index of geneSets in used.
+    ## index of gene_sets in used.
     ## logical
-    geneSet_size <- sapply(geneSets, length)
-    idx <-  minGSSize <= geneSet_size & geneSet_size <= maxGSSize
+    geneSet_size <- sapply(gene_sets, length)
+    idx <-  min_gs_size <= geneSet_size & geneSet_size <= max_gs_size
     return(idx)
 }

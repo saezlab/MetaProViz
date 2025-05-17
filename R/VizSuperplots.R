@@ -198,10 +198,10 @@ viz_superplot <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- save_path(folder_name=  paste(plot_type, "Plots", sep=""),
+    folder <- save_path(folder_name=  paste(plot_type, "Plots", sep=""),
                                     path=path)
   }
-  logger::log_info("viz_superplot results saved at ", Folder)
+  logger::log_info("viz_superplot results saved at ", folder)
 
   ###############################################################################################################################################################################################################
   ## ------------ Prepare Input ----------- ##
@@ -424,8 +424,8 @@ viz_superplot <- function(data,
                            inputlist_plot= SaveList,
                            save_table=NULL,
                            save_plot=save_plot,
-                           path= Folder,
-                           FileName= paste(plot_type, "Plots_",PlotName, sep=""),
+                           path= folder,
+                           file_name= paste(plot_type, "Plots_",PlotName, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
                            plot_height=plot_height,

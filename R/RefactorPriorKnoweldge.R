@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: GetPriorKnowledge
+## Script name: Getprior_knowledge
 ##
 ## Purpose of script: Create gene-metabolite sets for pathway enrichment analysis.
 ##
@@ -121,11 +121,11 @@ translate_id <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "ID_Translation")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "ID_Translation")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   ########################################################################################################################################################
@@ -187,8 +187,8 @@ translate_id <- function(data,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= SubFolder,
-                         FileName= "translate_id",
+                         path= Subfolder,
+                         file_name= "translate_id",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -306,11 +306,11 @@ equivalent_ids <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "equivalent_ids")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "equivalent_ids")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   ## ------------------ Set the ID type for to ----------------- ##
@@ -446,8 +446,8 @@ equivalent_ids <- function(data,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= SubFolder,
-                         FileName= "equivalent_ids",
+                         path= Subfolder,
+                         file_name= "equivalent_ids",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -535,11 +535,11 @@ mapping_ambiguity <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "MappingAmbiguities")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "MappingAmbiguities")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   #####################################################################################################################################################################################
@@ -667,8 +667,8 @@ mapping_ambiguity <- function(data,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= SubFolder,
-                         FileName= "mapping_ambiguity",
+                         path= Subfolder,
+                         file_name= "mapping_ambiguity",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -680,11 +680,11 @@ mapping_ambiguity <- function(data,
 ### ### ### Check Measured ID's in prior knowledge ### ### ###
 ##########################################################################################
 
-#' Check and summarize PriorKnowledge-to-MeasuredFeatures relationship
+#' Check and summarize prior_knowledge-to-MeasuredFeatures relationship
 #'
 #' @param data dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
-#' @param PriorKnowledge dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
-#' @param metadata_info Colum name of Metabolite IDs in data and PriorKnowledge as well as column name of grouping_variable in PriorKnowledge. \strong{Default = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term")}
+#' @param prior_knowledge dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
+#' @param metadata_info Colum name of Metabolite IDs in data and prior_knowledge as well as column name of grouping_variable in prior_knowledge. \strong{Default = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term")}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
@@ -694,13 +694,13 @@ mapping_ambiguity <- function(data,
 #' @examples
 #' DetectedIDs <-  MetaProViz::ToyData(data="Cells_Metadata")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz:::check_match_id(data= DetectedIDs, PriorKnowledge= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+#' Res <- MetaProViz:::check_match_id(data= DetectedIDs, prior_knowledge= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
 #' @noRd
 #'
 
 check_match_id <- function(data,
-                         PriorKnowledge,
+                         prior_knowledge,
                          metadata_info = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term"),
                          save_table= "csv",
                          path=NULL
@@ -758,10 +758,10 @@ check_match_id <- function(data,
        })
    )
 
-  ## PriorKnowledge:
+  ## prior_knowledge:
   if("PriorID" %in% names(metadata_info)){
-    if(metadata_info[["PriorID"]] %in% colnames(PriorKnowledge)== FALSE){
-      message <- paste0("The ", metadata_info[["PriorID"]], " column selected as InpuID in metadata_info was not found in PriorKnowledge. Please check your input.")
+    if(metadata_info[["PriorID"]] %in% colnames(prior_knowledge)== FALSE){
+      message <- paste0("The ", metadata_info[["PriorID"]], " column selected as InpuID in metadata_info was not found in prior_knowledge. Please check your input.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -772,39 +772,39 @@ check_match_id <- function(data,
   }
 
   ### This is after the main input checks (before NA removal), so we will save original df here for later merging to get the Null and duplicates back.
-  PriorKnowledge_Original <- PriorKnowledge
+  prior_knowledge_Original <- prior_knowledge
 
-  if(sum(is.na(PriorKnowledge[[metadata_info[["PriorID"]]]])) >=1){#remove NAs:
-    message <- paste0(sum(is.na(PriorKnowledge[[metadata_info[["PriorID"]]]])), " NA values were removed from column", metadata_info[["PriorID"]])
+  if(sum(is.na(prior_knowledge[[metadata_info[["PriorID"]]]])) >=1){#remove NAs:
+    message <- paste0(sum(is.na(prior_knowledge[[metadata_info[["PriorID"]]]])), " NA values were removed from column", metadata_info[["PriorID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
-    PriorKnowledge <- PriorKnowledge %>%
+    prior_knowledge <- prior_knowledge %>%
       filter(!is.na(.data[[metadata_info[["PriorID"]]]]))
 
     warning(message)
   }
 
    if("grouping_variable" %in% names(metadata_info)){#Add grouping_variable
-    if(metadata_info[["grouping_variable"]] %in% colnames(PriorKnowledge)== FALSE){
-      message <- paste0("The ", metadata_info[["grouping_variable"]], " column selected as InpuID in metadata_info was not found in PriorKnowledge. Please check your input.")
+    if(metadata_info[["grouping_variable"]] %in% colnames(prior_knowledge)== FALSE){
+      message <- paste0("The ", metadata_info[["grouping_variable"]], " column selected as InpuID in metadata_info was not found in prior_knowledge. Please check your input.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }else{
     #Add grouping_variable
     metadata_info["grouping_variable"] <- "grouping_variable"
-    PriorKnowledge["grouping_variable"] <- "None"
+    prior_knowledge["grouping_variable"] <- "None"
 
     message <- paste0("No ", metadata_info[["PriorID"]], " provided. If this was not intentional, please check your input.")
     logger::log_trace(message)
     message(message)
   }
 
-  if(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1){# Remove duplicate IDs
-    message <- paste0(nrow(PriorKnowledge) - nrow(distinct(PriorKnowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from column", metadata_info[["PriorID"]])
+  if(nrow(prior_knowledge) - nrow(distinct(prior_knowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1){# Remove duplicate IDs
+    message <- paste0(nrow(prior_knowledge) - nrow(distinct(prior_knowledge, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from column", metadata_info[["PriorID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
-    PriorKnowledge <- PriorKnowledge %>%
+    prior_knowledge <- prior_knowledge %>%
       distinct(.data[[metadata_info[["PriorID"]]]], !!sym(metadata_info[["grouping_variable"]]), .keep_all = TRUE)%>%
       group_by(!!sym(metadata_info[["PriorID"]])) %>%
       mutate(across(everything(), ~ if (is.character(.)) paste(unique(.), collapse = ", ")))%>%
@@ -815,8 +815,8 @@ check_match_id <- function(data,
   }
 
   PK_MultipleIDs <- any(# Check if multiple IDs are present:
-    grepl(",\\s*", PriorKnowledge[[metadata_info[["PriorID"]]]]) |  # Comma-separated
-      sapply(PriorKnowledge[[metadata_info[["PriorID"]]]] , function(x) {
+    grepl(",\\s*", prior_knowledge[[metadata_info[["PriorID"]]]]) |  # Comma-separated
+      sapply(prior_knowledge[[metadata_info[["PriorID"]]]] , function(x) {
         if (grepl("^c\\(|^list\\(", x)) {
           parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
           return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
@@ -827,10 +827,10 @@ check_match_id <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "PriorKnowledgeChecks",
+    folder <- save_path(folder_name= "prior_knowledgeChecks",
                        path=path)
-    SubFolder <- file.path(Folder, "CheckMatchID_Detected-to-PK")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "CheckMatchID_Detected-to-PK")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   ######################################################################################################################################
@@ -857,10 +857,10 @@ check_match_id <- function(data,
   }
 
   if(PK_MultipleIDs){
-    PK_long <- create_long_df(PriorKnowledge, metadata_info[["PriorID"]], "PK")%>%
+    PK_long <- create_long_df(prior_knowledge, metadata_info[["PriorID"]], "PK")%>%
       select(metadata_info[["PriorID"]], "OriginalEntry_PK", OriginalGroup_PK, metadata_info[["grouping_variable"]])
   }else{
-    PK_long <- PriorKnowledge %>%
+    PK_long <- prior_knowledge %>%
       mutate(OriginalGroup_PK := paste0("PK_", dplyr::row_number()))%>%
       select(metadata_info[["PriorID"]],OriginalGroup_PK, metadata_info[["grouping_variable"]])
   }
@@ -1109,9 +1109,9 @@ check_match_id <- function(data,
     dplyr::ungroup()
 
   # 6. Messages and summarise
-  message <- paste0("data has multiple IDs per measurement = ", data_MultipleIDs, ". PriorKnowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
+  message <- paste0("data has multiple IDs per measurement = ", data_MultipleIDs, ". prior_knowledge has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
   message1 <- paste0("data has ", dplyr::n_distinct(unique(data[[metadata_info[["InputID"]]]])), " unique entries with " ,dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])) ," unique ", metadata_info[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " match, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])))*100, "%." , sep="")
-  message2 <- paste0("PriorKnowledge has ", dplyr::n_distinct(PriorKnowledge[[metadata_info[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]) ," unique ", metadata_info[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " are detected in the data, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]))*100, "%.")
+  message2 <- paste0("prior_knowledge has ", dplyr::n_distinct(prior_knowledge[[metadata_info[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]) ," unique ", metadata_info[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " are detected in the data, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]))*100, "%.")
 
   if(nrow(summary_df%>% dplyr::filter(ActionRequired == "Check"))>=1){
     #warning <- paste0("There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category") # "Check"
@@ -1134,8 +1134,8 @@ check_match_id <- function(data,
                        inputlist_plot= NULL,
                        save_table=save_table,
                        save_plot=NULL,
-                       path= SubFolder,
-                       FileName= "CheckMatchID_Detected-to-PK",
+                       path= Subfolder,
+                       file_name= "CheckMatchID_Detected-to-PK",
                        core=FALSE,
                        print_plot=FALSE)))
 
@@ -1775,11 +1775,11 @@ count_ids <- function(data,
 
   ## ------------------  Create output folders and path ------------------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                        path=path)
 
-    SubFolder <- file.path(Folder, "Count_MetaboliteIDs")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "Count_MetaboliteIDs")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   ## ------------------  data table ------------------- ##
@@ -1853,8 +1853,8 @@ count_ids <- function(data,
             inputlist_plot=list("Plot_Sized"=Plot_Sized) ,
             save_table= save_table,
             save_plot=save_plot,
-            path= SubFolder,
-            FileName= "Count_MetaboliteIDs",
+            path= Subfolder,
+            file_name= "Count_MetaboliteIDs",
             core=FALSE,
             print_plot=print_plot)))
 

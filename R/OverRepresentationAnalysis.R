@@ -68,7 +68,7 @@ cluster_ora <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "cluster_ora",
+    folder <- save_path(folder_name= "cluster_ora",
                                     path=path)
     }
 
@@ -114,8 +114,8 @@ cluster_ora <- function(data,
         pvalueCutoff = 1L,
         pAdjustmethod = "BH",
         universe = allMetabolites,
-        minGSSize=min_gssize,
-        maxGSSize=max_gssize,
+        min_gs_size=min_gssize,
+        max_gs_size=max_gssize,
         qvalueCutoff = 1L,
         TERM2GENE=Term2gene ,
         TERM2NAME = term2name
@@ -144,8 +144,8 @@ cluster_ora <- function(data,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= Folder,
-                         FileName= paste("ClusterGosummary",pathway_name, sep="_"),
+                         path= folder,
+                         file_name= paste("ClusterGosummary",pathway_name, sep="_"),
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -206,7 +206,7 @@ standard_ora <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "ORA",
+    folder <- save_path(folder_name= "ORA",
                                     path=path)
   }
 
@@ -259,8 +259,8 @@ standard_ora <- function(data,
       pvalueCutoff = 1L,
       pAdjustmethod = "BH",
       universe = allMetabolites,
-      minGSSize=min_gssize,
-      maxGSSize=max_gssize,
+      min_gs_size=min_gssize,
+      max_gs_size=max_gssize,
       qvalueCutoff = 1L,
       TERM2GENE=Term2gene ,
       TERM2NAME = term2name
@@ -290,8 +290,8 @@ standard_ora <- function(data,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= Folder,
-                         FileName= paste(pathway_name),
+                         path= folder,
+                         file_name= paste(pathway_name),
                          core=FALSE,
                          print_plot=FALSE)))
 

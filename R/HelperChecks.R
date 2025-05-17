@@ -807,14 +807,14 @@ check_param_ora <- function(data,
 
 #' Check input parameters of MCA
 #'
-#' @param data_Intra For MetaProViz::mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_intra For MetaProViz::mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
 #' @param data_core For MetaProViz::mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
-#' @param metadata_info_Intra For MetaProViz::mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_Intra,StatCol=ColumnName_data_Intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_intra For MetaProViz::mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_intra,StatCol=ColumnName_data_intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
 #' @param metadata_info_core  For MetaProViz::mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param data_C1 For MetaProViz::mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_C2 For MetaProViz::mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param metadata_info_C1  For MetaProViz::mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C1,StatCol=ColumnName_data_C1, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_C2 For MetaProViz::mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_C2,StatCol=ColumnName_data_C2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param data_c1 For MetaProViz::mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param data_c2 For MetaProViz::mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
+#' @param metadata_info_c1  For MetaProViz::mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_c1,StatCol=ColumnName_data_c1, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_c2 For MetaProViz::mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_c2,StatCol=ColumnName_data_c2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
 #' @param feature \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
 #' @param method_background \emph{Optional: } Background method `Intra|core, Intra&core, core, Intra or * \strong{Default="Intra&core"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
@@ -827,14 +827,14 @@ check_param_ora <- function(data,
 #'
 #' @noRd
 #'
-check_param_mca <- function(data_C1,
-                           data_C2,
+check_param_mca <- function(data_c1,
+                           data_c2,
                            data_core,
-                           data_Intra,
-                           metadata_info_C1,
-                           metadata_info_C2,
+                           data_intra,
+                           metadata_info_c1,
+                           metadata_info_c2,
                            metadata_info_core,
-                           metadata_info_Intra,
+                           metadata_info_intra,
                            feature= "Metabolite",
                            method_background="Intra&core",
                            save_table = "csv"
@@ -843,31 +843,31 @@ check_param_mca <- function(data_C1,
   metaproviz_init()
 
   #------------- data
-  if(is.null(data_C1)==FALSE){
-    if(class(data_C1) != "data.frame"| class(data_C2) != "data.frame"){
-      message <- paste0("data_C1 and data_C2 should be a data.frame. It's currently a ", paste(class(data_C1)), paste(class(data_C2)), ".",sep = "")
+  if(is.null(data_c1)==FALSE){
+    if(class(data_c1) != "data.frame"| class(data_c2) != "data.frame"){
+      message <- paste0("data_c1 and data_c2 should be a data.frame. It's currently a ", paste(class(data_c1)), paste(class(data_c2)), ".",sep = "")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_C1[duplicated(data_C1[[feature]]), feature]) > 0){
-      message <- paste0("Duplicated features of data_C1, whilst features must be unique")
+    if(length(data_c1[duplicated(data_c1[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_c1, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_C2[duplicated(data_C2[[feature]]), feature]) > 0){
-      message <- paste0("Duplicated features of data_C2, whilst features must be unique")
+    if(length(data_c2[duplicated(data_c2[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_c2, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
   }else{
-    if(class(data_Intra) != "data.frame"| class(data_core) != "data.frame"){
-      message <- paste0("data_Intra and data_core should be a data.frame. It's currently a ", paste(class(data_Intra)), paste(class(data_core)), ".",sep = "")
+    if(class(data_intra) != "data.frame"| class(data_core) != "data.frame"){
+      message <- paste0("data_intra and data_core should be a data.frame. It's currently a ", paste(class(data_intra)), paste(class(data_core)), ".",sep = "")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
-    if(length(data_Intra[duplicated(data_Intra[[feature]]), feature]) > 0){
-      message <- paste0("Duplicated features of data_Intra, whilst features must be unique")
+    if(length(data_intra[duplicated(data_intra[[feature]]), feature]) > 0){
+      message <- paste0("Duplicated features of data_intra, whilst features must be unique")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -879,20 +879,20 @@ check_param_mca <- function(data_C1,
   }
 
   #------------- metadata_info
-  if(is.null(metadata_info_C1)==FALSE){
+  if(is.null(metadata_info_c1)==FALSE){
     ## C1
     #ValueCol
-    if("ValueCol" %in% names(metadata_info_C1)){
-      if(metadata_info_C1[["ValueCol"]] %in% colnames(data_C1)== FALSE){
-        message <- paste0("The ", metadata_info_C1[["ValueCol"]], " column selected as ValueCol in metadata_info_C1 was not found in data_C1. Please check your input.")
+    if("ValueCol" %in% names(metadata_info_c1)){
+      if(metadata_info_c1[["ValueCol"]] %in% colnames(data_c1)== FALSE){
+        message <- paste0("The ", metadata_info_c1[["ValueCol"]], " column selected as ValueCol in metadata_info_c1 was not found in data_c1. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
     }
     #StatCol
-    if("StatCol" %in% names(metadata_info_C1)){
-      if(metadata_info_C1[["StatCol"]] %in% colnames(data_C1)== FALSE){
-        message <- paste0("The ", metadata_info_C1[["StatCol"]], " column selected as StatCol in metadata_info_C1 was not found in data_C1. Please check your input.")
+    if("StatCol" %in% names(metadata_info_c1)){
+      if(metadata_info_c1[["StatCol"]] %in% colnames(data_c1)== FALSE){
+        message <- paste0("The ", metadata_info_c1[["StatCol"]], " column selected as StatCol in metadata_info_c1 was not found in data_c1. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
@@ -900,17 +900,17 @@ check_param_mca <- function(data_C1,
 
     ## C2
     #ValueCol
-    if("ValueCol" %in% names(metadata_info_C2)){
-      if(metadata_info_C2[["ValueCol"]] %in% colnames(data_C2)== FALSE){
-        message <- paste0("The ", metadata_info_C2[["ValueCol"]], " column selected as ValueCol in metadata_info_C2 was not found in data_C2. Please check your input.")
+    if("ValueCol" %in% names(metadata_info_c2)){
+      if(metadata_info_c2[["ValueCol"]] %in% colnames(data_c2)== FALSE){
+        message <- paste0("The ", metadata_info_c2[["ValueCol"]], " column selected as ValueCol in metadata_info_c2 was not found in data_c2. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
     }
     #StatCol
-    if("StatCol" %in% names(metadata_info_C2)){
-      if(metadata_info_C2[["StatCol"]] %in% colnames(data_C2)== FALSE){
-        message <- paste0("The ", metadata_info_C2[["StatCol"]], " column selected as StatCol in metadata_info_C2 was not found in data_C2. Please check your input.")
+    if("StatCol" %in% names(metadata_info_c2)){
+      if(metadata_info_c2[["StatCol"]] %in% colnames(data_c2)== FALSE){
+        message <- paste0("The ", metadata_info_c2[["StatCol"]], " column selected as StatCol in metadata_info_c2 was not found in data_c2. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
@@ -918,17 +918,17 @@ check_param_mca <- function(data_C1,
   }else{
     ## Intra
     #ValueCol
-    if("ValueCol" %in% names(metadata_info_Intra)){
-      if(metadata_info_Intra[["ValueCol"]] %in% colnames(data_Intra)== FALSE){
-        message <- paste0("The ", metadata_info_Intra[["ValueCol"]], " column selected as ValueCol in metadata_info_Intra was not found in data_Intra. Please check your input.")
+    if("ValueCol" %in% names(metadata_info_intra)){
+      if(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra)== FALSE){
+        message <- paste0("The ", metadata_info_intra[["ValueCol"]], " column selected as ValueCol in metadata_info_intra was not found in data_intra. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
     }
     #StatCol
-    if("StatCol" %in% names(metadata_info_Intra)){
-      if(metadata_info_Intra[["StatCol"]] %in% colnames(data_Intra)== FALSE){
-        message <- paste0("The ", metadata_info_Intra[["StatCol"]], " column selected as StatCol in metadata_info_Intra was not found in data_Intra. Please check your input.")
+    if("StatCol" %in% names(metadata_info_intra)){
+      if(metadata_info_intra[["StatCol"]] %in% colnames(data_intra)== FALSE){
+        message <- paste0("The ", metadata_info_intra[["StatCol"]], " column selected as StatCol in metadata_info_intra was not found in data_intra. Please check your input.")
         logger::log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
@@ -964,34 +964,34 @@ check_param_mca <- function(data_C1,
   }
 
   #------------- metadata_info Cutoffs:
-  if(is.null(metadata_info_C1)==FALSE){
-    if(is.na(as.numeric(metadata_info_C1[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_C1[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_C1[["cutoff_stat"]]) < 0){
-      message <- paste0("Check input. The selected cutoff_stat in metadata_info_C1 should be numeric and between 0 and 1.")
+  if(is.null(metadata_info_c1)==FALSE){
+    if(is.na(as.numeric(metadata_info_c1[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_c1[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c1[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_c1 should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
-    if(is.na(as.numeric(metadata_info_C2[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_C2[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_C2[["cutoff_stat"]]) < 0){
-      message <- paste0("Check input. The selected cutoff_stat in metadata_info_C2 should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_c2[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_c2[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c2[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_c2 should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
-    if(is.na(as.numeric(metadata_info_C1[["ValueCutoff"]])) == TRUE){
-      message <- paste0("Check input. The selected ValueCutoff in metadata_info_C1 should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_c1[["ValueCutoff"]])) == TRUE){
+      message <- paste0("Check input. The selected ValueCutoff in metadata_info_c1 should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
-    if(is.na(as.numeric(metadata_info_C2[["ValueCutoff"]])) == TRUE){
-      message <- paste0("Check input. The selected ValueCutoff in metadata_info_C2 should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_c2[["ValueCutoff"]])) == TRUE){
+      message <- paste0("Check input. The selected ValueCutoff in metadata_info_c2 should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
 
   }else{
-    if(is.na(as.numeric(metadata_info_Intra[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_Intra[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_Intra[["cutoff_stat"]]) < 0){
-      message <- paste0("Check input. The selected cutoff_stat in metadata_info_Intra should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_intra[["cutoff_stat"]])) == TRUE |as.numeric(metadata_info_intra[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_intra[["cutoff_stat"]]) < 0){
+      message <- paste0("Check input. The selected cutoff_stat in metadata_info_intra should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -1002,8 +1002,8 @@ check_param_mca <- function(data_C1,
       stop(message)
     }
 
-    if(is.na(as.numeric(metadata_info_Intra[["ValueCutoff"]])) == TRUE){
-      message <- paste0("Check input. The selected ValueCutoff in metadata_info_Intra should be numeric and between 0 and 1.")
+    if(is.na(as.numeric(metadata_info_intra[["ValueCutoff"]])) == TRUE){
+      message <- paste0("Check input. The selected ValueCutoff in metadata_info_intra should be numeric and between 0 and 1.")
       logger::log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
@@ -1016,21 +1016,21 @@ check_param_mca <- function(data_C1,
   }
 
   #------------ NAs in data
-  if(is.null(data_C1)==FALSE){
-    if(nrow(data_C1[complete.cases(data_C1[[metadata_info_C1[["ValueCol"]]]], data_C1[[metadata_info_C1[["StatCol"]]]]), ]) < nrow(data_C1)){
-      message <- paste0("data_C1 includes NAs in ", metadata_info_C1[["ValueCol"]], " and/or in ", metadata_info_C1[["StatCol"]], ". ", nrow(data_C1)- nrow(data_C1[complete.cases(data_C1[[metadata_info_C1[["ValueCol"]]]], data_C1[[metadata_info_C1[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+  if(is.null(data_c1)==FALSE){
+    if(nrow(data_c1[complete.cases(data_c1[[metadata_info_c1[["ValueCol"]]]], data_c1[[metadata_info_c1[["StatCol"]]]]), ]) < nrow(data_c1)){
+      message <- paste0("data_c1 includes NAs in ", metadata_info_c1[["ValueCol"]], " and/or in ", metadata_info_c1[["StatCol"]], ". ", nrow(data_c1)- nrow(data_c1[complete.cases(data_c1[[metadata_info_c1[["ValueCol"]]]], data_c1[[metadata_info_c1[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
       logger::log_trace(paste("Warning ", message, sep=""))
       warning(message)
     }
 
-    if(nrow(data_C2[complete.cases(data_C2[[metadata_info_C2[["ValueCol"]]]], data_C2[[metadata_info_C2[["StatCol"]]]]), ]) < nrow(data_C2)){
-      message <- paste0("data_C2 includes NAs in ", metadata_info_C2[["ValueCol"]], " and/or in", metadata_info_C2[["StatCol"]], ". ", nrow(data_C2)- nrow(data_C2[complete.cases(data_C2[[metadata_info_C2[["ValueCol"]]]], data_C2[[metadata_info_C2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    if(nrow(data_c2[complete.cases(data_c2[[metadata_info_c2[["ValueCol"]]]], data_c2[[metadata_info_c2[["StatCol"]]]]), ]) < nrow(data_c2)){
+      message <- paste0("data_c2 includes NAs in ", metadata_info_c2[["ValueCol"]], " and/or in", metadata_info_c2[["StatCol"]], ". ", nrow(data_c2)- nrow(data_c2[complete.cases(data_c2[[metadata_info_c2[["ValueCol"]]]], data_c2[[metadata_info_c2[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
       logger::log_trace(paste("Warning ", message, sep=""))
       warning(message)
     }
   }else{
-    if(nrow(data_Intra[complete.cases(data_Intra[[metadata_info_Intra[["ValueCol"]]]], data_Intra[[metadata_info_Intra[["StatCol"]]]]), ]) < nrow(data_Intra)){
-      message <- paste0("data_Intra includes NAs in ", metadata_info_Intra[["ValueCol"]], " and/or in ", metadata_info_Intra[["StatCol"]], ". ", nrow(data_Intra)- nrow(data_Intra[complete.cases(data_Intra[[metadata_info_Intra[["ValueCol"]]]], data_Intra[[metadata_info_Intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
+    if(nrow(data_intra[complete.cases(data_intra[[metadata_info_intra[["ValueCol"]]]], data_intra[[metadata_info_intra[["StatCol"]]]]), ]) < nrow(data_intra)){
+      message <- paste0("data_intra includes NAs in ", metadata_info_intra[["ValueCol"]], " and/or in ", metadata_info_intra[["StatCol"]], ". ", nrow(data_intra)- nrow(data_intra[complete.cases(data_intra[[metadata_info_intra[["ValueCol"]]]], data_intra[[metadata_info_intra[["StatCol"]]]]), ]) ," metabolites containing NAs are removed.")
       logger::log_trace(paste("Warning ", message, sep=""))
       warning(message)
     }
@@ -1043,7 +1043,7 @@ check_param_mca <- function(data_C1,
   }
 
   #------------- method_background
-  if(is.null(metadata_info_C1)==FALSE){
+  if(is.null(metadata_info_c1)==FALSE){
     options <- c("C1|C2", "C1&C2", "C2", "C1" , "*")
     if(any(options %in% method_background) == FALSE){
       message <- paste0("Check input. The selected method_background option is not valid. Please select one of the folowwing: ",paste(options,collapse = ", "),"." )

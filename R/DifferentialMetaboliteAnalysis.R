@@ -106,22 +106,22 @@ dma <-function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "dma",
+    folder <- save_path(folder_name= "dma",
                                     path=path)
 
     if(shapiro==TRUE){
-      SubFolder_S <- file.path(Folder, "shapiro")
-      if (!dir.exists(SubFolder_S)) {dir.create(SubFolder_S)}
+      Subfolder_S <- file.path(folder, "shapiro")
+      if (!dir.exists(Subfolder_S)) {dir.create(Subfolder_S)}
     }
 
     if(bartlett==TRUE){
-      SubFolder_B <- file.path(Folder, "bartlett")
-      if (!dir.exists(SubFolder_B)) {dir.create(SubFolder_B)}
+      Subfolder_B <- file.path(folder, "bartlett")
+      if (!dir.exists(Subfolder_B)) {dir.create(Subfolder_B)}
     }
 
     if(vst==TRUE){
-      SubFolder_V <- file.path(Folder, "vst")
-      if (!dir.exists(SubFolder_V)) {dir.create(SubFolder_V)}
+      Subfolder_V <- file.path(folder, "vst")
+      if (!dir.exists(Subfolder_V)) {dir.create(Subfolder_V)}
     }
   }
 
@@ -341,8 +341,8 @@ dma <-function(data,
                            inputlist_plot= Shapiro_output[["Plot"]][["Distributions"]],
                            save_table=save_table,
                            save_plot=save_plot,
-                           path= SubFolder_S ,
-                           FileName= "ShapiroTest",
+                           path= Subfolder_S ,
+                           file_name= "ShapiroTest",
                            core=core,
                            print_plot=print_plot)))
 
@@ -355,8 +355,8 @@ dma <-function(data,
                            inputlist_plot= Bartlett_output[["Plot"]],
                            save_table=save_table,
                            save_plot=save_plot,
-                           path= SubFolder_B ,
-                           FileName= "BartlettTest",
+                           path= Subfolder_B ,
+                           file_name= "BartlettTest",
                            core=core,
                            print_plot=print_plot)))
 
@@ -369,8 +369,8 @@ dma <-function(data,
                            inputlist_plot= vst_res[["Plot"]],
                            save_table=save_table,
                            save_plot=save_plot,
-                           path= SubFolder_V ,
-                           FileName= "vst_res",
+                           path= Subfolder_V ,
+                           file_name= "vst_res",
                            core=core,
                            print_plot=print_plot)))
 
@@ -383,8 +383,8 @@ dma <-function(data,
               inputlist_plot= NULL,
               save_table=save_table,
               save_plot=NULL,
-              path= Folder,
-              FileName= "dma",
+              path= folder,
+              file_name= "dma",
               core=core,
               print_plot=print_plot)))
 
@@ -396,8 +396,8 @@ dma <-function(data,
             inputlist_plot= volplotList,
             save_table=save_table,
             save_plot=save_plot,
-            path= Folder,
-            FileName= "dma",
+            path= folder,
+            file_name= "dma",
             core=core,
             print_plot=print_plot)))
 

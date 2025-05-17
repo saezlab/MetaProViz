@@ -84,12 +84,12 @@ viz_upset <- function(df,
 
 
   ## ------------ Create Results output folder ----------- ##
-  Folder <- NULL
+  folder <- NULL
   if(is.null(save_plot)==FALSE){
-    Folder <- save_path(folder_name= "UpsetPlots",
+    folder <- save_path(folder_name= "UpsetPlots",
                        path=path)
   }
-  logger::log_info("viz_pca results saved at ", Folder)
+  logger::log_info("viz_pca results saved at ", folder)
 
   ###########################################################################
   ## ----------- Check input data frame ----------- ##

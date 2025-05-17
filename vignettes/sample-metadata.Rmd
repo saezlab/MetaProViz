@@ -133,7 +133,7 @@ The `MetaProViz::MetaAnalysis()` function will perform PCA to extract the differ
 ```{r}
 MetaRes <- MetaProViz::MetaAnalysis(data=Tissue_Norm[,-c(1:13)],
                                      metadata_sample= Tissue_Norm[,c(2,4:5,12:13)],
-                                     Scaling = TRUE,
+                                     scaling = TRUE,
                                      percentage = 0.1,
                                      cutoff_stat= 0.05,
                                      cutoff_variance = 1,
@@ -214,7 +214,7 @@ for(item in names(DFs)){
   data <- DFs[[item]]
 
   message(paste("Running dma for", item))
-  #Create Folder for saving each comparison
+  #Create folder for saving each comparison
   dir.create(paste(getwd(),"/MetaProViz_Results/dma/", sep=""), showWarnings = FALSE)
   dir.create(paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""), showWarnings = FALSE)
 
@@ -251,7 +251,7 @@ for(item in names(DFs)){
   data <- DFs[[item]]
 
   message(paste("Running dma for", item))
-  #Create Folder for saving each comparison
+  #Create folder for saving each comparison
   dir.create(paste(getwd(),"/MetaProViz_Results/dma/", sep=""), showWarnings = FALSE)
   dir.create(paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""), showWarnings = FALSE)
 
@@ -454,10 +454,10 @@ Thereby “No Change” is further subdivided into four states:\
 \
 For more information you can also check out the other vignettes.
 ```{r}
-MCAres <-  MetaProViz::mca_2cond(data_C1=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]],
-                                 data_C2=ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]],
-                                 metadata_info_C1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
-                                 metadata_info_C2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
+MCAres <-  MetaProViz::mca_2cond(data_c1=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]],
+                                 data_c2=ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]],
+                                 metadata_info_c1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
+                                 metadata_info_c2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                                  feature = "Metabolite",
                                  save_table = "csv",
                                  method_background="C1&C2"#Most stringend background setting, only includes metabolites detected in both comparisons

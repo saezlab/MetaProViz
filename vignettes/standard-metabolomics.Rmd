@@ -431,10 +431,10 @@ mca_2cond%>%
 \
 Now let's use the data and do clustering:
 ```{r}
-MCAres <-  MetaProViz::mca_2cond(data_C1=DMA_Annova[["dma"]][["786-O_vs_HK2"]],
-                                 data_C2=DMA_Annova[["dma"]][["786-M1A_vs_HK2"]],
-                                 metadata_info_C1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
-                                 metadata_info_C2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
+MCAres <-  MetaProViz::mca_2cond(data_c1=DMA_Annova[["dma"]][["786-O_vs_HK2"]],
+                                 data_c2=DMA_Annova[["dma"]][["786-M1A_vs_HK2"]],
+                                 metadata_info_c1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
+                                 metadata_info_c2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                                  feature = "Metabolite",
                                  save_table = "csv",
                                  method_background="C1&C2",

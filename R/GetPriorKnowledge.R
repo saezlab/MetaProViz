@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: GetPriorKnowledge
+## Script name: Getprior_knowledge
 ##
 ## Purpose of script: Create gene-metabolite sets for pathway enrichment analysis.
 ##
@@ -113,13 +113,13 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  ## ------------ Folder ----------- ##
+  ## ------------ folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                        path=path)
 
-    SubFolder <- file.path(Folder, "MetaboliteSet")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "MetaboliteSet")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
 
@@ -166,8 +166,8 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
             inputlist_plot= NULL,
             save_table=save_table,
             save_plot=NULL,
-            path= SubFolder,
-            FileName= "ChemicalClass",
+            path= Subfolder,
+            file_name= "ChemicalClass",
             core=FALSE,
             print_plot=FALSE)))
 
@@ -219,13 +219,13 @@ make_gene_metab_set <- function(input_pk,
     pk_name <- "GeneMetabSet"
   }
 
-  ## ------------ Folder ----------- ##
+  ## ------------ folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "MetaboliteSet")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "MetaboliteSet")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
 
@@ -272,8 +272,8 @@ make_gene_metab_set <- function(input_pk,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= SubFolder,
-                         FileName= pk_name,
+                         path= Subfolder,
+                         file_name= pk_name,
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -332,13 +332,13 @@ metsigdb_metalinks <- function(types = NULL,
   # --> At the moment arbitrary!
   # We could provide the user the ability to point to their own path were they already dumpled/stored QA version of metalinks they like to use!
 
-  ## ------------ Folder ----------- ##
+  ## ------------ folder ----------- ##
   if(is.null(save_table)==FALSE){
-    Folder <- save_path(folder_name= "PriorKnowledge",
+    folder <- save_path(folder_name= "prior_knowledge",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "MetaboliteSet")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "MetaboliteSet")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   con <- OmnipathR::metalinksdb_sqlite()
@@ -533,8 +533,8 @@ metsigdb_metalinks <- function(types = NULL,
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
-                         path= SubFolder,
-                         FileName= "MetaLinksDB",
+                         path= Subfolder,
+                         file_name= "MetaLinksDB",
                          core=FALSE,
                          print_plot=FALSE)))
 

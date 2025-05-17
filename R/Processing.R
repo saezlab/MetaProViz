@@ -105,11 +105,11 @@ pre_processing <- function(data,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "Processing",
+    folder <- save_path(folder_name= "Processing",
                                     path=path)
 
-    SubFolder_P <- file.path(Folder, "pre_processing")
-    if (!dir.exists(SubFolder_P)) {dir.create(SubFolder_P)}
+    Subfolder_P <- file.path(folder, "pre_processing")
+    if (!dir.exists(Subfolder_P)) {dir.create(Subfolder_P)}
   }
 
   ## ------------------ Prepare the data ------------------- ##
@@ -244,8 +244,8 @@ pre_processing <- function(data,
                          inputlist_plot= PlotList,
                          save_table=save_table,
                          save_plot=save_plot,
-                         path= SubFolder_P,
-                         FileName= "pre_processing",
+                         path= Subfolder_P,
+                         file_name= "pre_processing",
                          core=core,
                          print_plot=print_plot)))
 
@@ -325,10 +325,10 @@ replicate_sum <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "Processing",
+    folder <- save_path(folder_name= "Processing",
                                     path=path)
-    SubFolder <- file.path(Folder, "replicate_sum")
-    if (!dir.exists(SubFolder)) {dir.create(SubFolder)}
+    Subfolder <- file.path(folder, "replicate_sum")
+    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
   ## ------------  Load data and process  ----------- ##
@@ -362,8 +362,8 @@ replicate_sum <- function(data,
                        inputlist_plot = NULL,
                        save_table=save_table,
                        save_plot=NULL,
-                       path= SubFolder,
-                       FileName= "Sum_AnalyticalReplicates",
+                       path= Subfolder,
+                       file_name= "Sum_AnalyticalReplicates",
                        core=FALSE,
                        print_plot=FALSE)
 
@@ -451,14 +451,14 @@ pool_estimation <- function(data,
 
   ## ------------------  Create output folders  and path ------------------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE ){
-    Folder <- save_path(folder_name= "Processing",
+    folder <- save_path(folder_name= "Processing",
                                     path=path)
 
-    SubFolder <- file.path(Folder, "pool_estimation")
-    logger::log_info('Selected output directory: `%s`.', SubFolder)
-    if (!dir.exists(SubFolder)) {
-      logger::log_trace('Creating directory: `%s`.', SubFolder)
-      dir.create(SubFolder)
+    Subfolder <- file.path(folder, "pool_estimation")
+    logger::log_info('Selected output directory: `%s`.', Subfolder)
+    if (!dir.exists(Subfolder)) {
+      logger::log_trace('Creating directory: `%s`.', Subfolder)
+      dir.create(Subfolder)
     }
   }
 
@@ -585,14 +585,14 @@ pool_estimation <- function(data,
     'Saving results: [save_table=%s, save_plot=%s, path=%s].',
     save_table,
     save_plot,
-    SubFolder
+    Subfolder
   )
   save_res(inputlist_df=DF_list,
                       inputlist_plot = PlotList,
                       save_table=save_table,
                       save_plot=save_plot,
-                      path= SubFolder,
-                      FileName= "pool_estimation",
+                      path= Subfolder,
+                      file_name= "pool_estimation",
                       core=FALSE,
                       print_plot=print_plot)
 

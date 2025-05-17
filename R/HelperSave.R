@@ -85,7 +85,7 @@ results_dir <- function(path = 'MetaProViz_Results') {
 #' @param save_table \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = NULL}
 #' @param save_plot \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL. \strong{Default = NULL}
 #' @param path Passed to main function by the user.
-#' @param FileName Passed to main function by the user.
+#' @param file_name Passed to main function by the user.
 #' @param core \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = FALSE}
 #' @param print_plot \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = TRUE}
 #' @param plot_height \emph{Optional: } Parameter for ggsave.\strong{Default = NULL}
@@ -101,7 +101,7 @@ save_res<- function(inputlist_df= NULL,
                    save_table = NULL,
                    save_plot = NULL,
                    path,
-                   FileName,
+                   file_name,
                    core=FALSE,
                    print_plot=TRUE,
                    plot_height=NULL,
@@ -112,21 +112,21 @@ save_res<- function(inputlist_df= NULL,
   if(is.null(save_table)==FALSE){
     # Excel File: One file with multiple sheets:
     if(save_table == "xlsx"){
-      #Make FileName
+      #Make file_name
       if(core==FALSE | is.null(core)==TRUE){
-        FileName <- paste0(path,"/" , FileName, "_",Sys.Date(), sep = "")
+        file_name <- paste0(path,"/" , file_name, "_",Sys.Date(), sep = "")
       }else{
-        FileName <- paste0(path,"/core_" , FileName,"_",Sys.Date(), sep = "")
+        file_name <- paste0(path,"/core_" , file_name,"_",Sys.Date(), sep = "")
       }
       #Save Excel
-      writexl::write_xlsx(inputlist_df, paste0(FileName,".xlsx", sep = "") , col_names = TRUE)
+      writexl::write_xlsx(inputlist_df, paste0(file_name,".xlsx", sep = "") , col_names = TRUE)
     }else{
       for(DF in names(inputlist_df)){
-        #Make FileName
+        #Make file_name
         if(core==FALSE | is.null(core)==TRUE){
-          FileName_Save <- paste0(path,"/" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+          file_name_Save <- paste0(path,"/" , file_name, "_", DF ,"_",Sys.Date(), sep = "")
         }else{
-          FileName_Save <- paste0(path,"/core_" , FileName, "_", DF ,"_",Sys.Date(), sep = "")
+          file_name_Save <- paste0(path,"/core_" , file_name, "_", DF ,"_",Sys.Date(), sep = "")
         }
 
         #unlist DF columns if needed
@@ -140,10 +140,10 @@ save_res<- function(inputlist_df= NULL,
         #Save table
         if (save_table == "csv"){
           inputlist_df[[DF]]%>%
-            readr::write_csv(paste0(FileName_Save,".csv", sep = ""))
+            readr::write_csv(paste0(file_name_Save,".csv", sep = ""))
         }else if (save_table == "txt"){
           inputlist_df[[DF]]%>%
-            readr::write_delim(paste0(FileName_Save,".csv", sep = ""))
+            readr::write_delim(paste0(file_name_Save,".csv", sep = ""))
         }
       }
     }
@@ -152,11 +152,11 @@ save_res<- function(inputlist_df= NULL,
   ################ Save Plots:
   if(is.null(save_plot)==FALSE){
     for(Plot in names(inputlist_plot)){
-      #Make FileName
+      #Make file_name
       if(core==FALSE | is.null(core)==TRUE){
-        FileName_Save <- paste0(path,"/" , FileName,"_", Plot , "_",Sys.Date(), sep = "")
+        file_name_Save <- paste0(path,"/" , file_name,"_", Plot , "_",Sys.Date(), sep = "")
       }else{
-        FileName_Save <- paste0(path,"/core_" , FileName,"_", Plot ,"_",Sys.Date(), sep = "")
+        file_name_Save <- paste0(path,"/core_" , file_name,"_", Plot ,"_",Sys.Date(), sep = "")
       }
 
       #Save
@@ -170,7 +170,7 @@ save_res<- function(inputlist_df= NULL,
         plot_unit <- "cm"
       }
 
-      ggplot2::ggsave(filename = paste0(FileName_Save, ".",save_plot, sep=""), plot = inputlist_plot[[Plot]], width = plot_width,  height = plot_height, unit=plot_unit)
+      ggplot2::ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = inputlist_plot[[Plot]], width = plot_width,  height = plot_height, unit=plot_unit)
 
       if(print_plot==TRUE){
         suppressMessages(suppressWarnings(plot(inputlist_plot[[Plot]])))

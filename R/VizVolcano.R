@@ -160,7 +160,7 @@ viz_volcano <- function(plot_types="Standard",
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE){
-    Folder <- save_path(folder_name= "VolcanoPlots",
+    folder <- save_path(folder_name= "VolcanoPlots",
                                     path=path)
   }
 
@@ -291,7 +291,7 @@ viz_volcano <- function(plot_types="Standard",
                                                    feature=feature,
                                                    save_plot=save_plot,
                                                    print_plot=print_plot,
-                                                   Folder=Folder)
+                                                   folder=folder)
 
   }else if(plot_types=="Compare"){#####--- 2. Compare
     VolcanoRes <- viz_volcano_compare(data= Volcanodata,
@@ -315,7 +315,7 @@ viz_volcano <- function(plot_types="Standard",
                                                   name_comparison=name_comparison,
                                                   save_plot=save_plot,
                                                   print_plot=print_plot,
-                                                  Folder=Folder)
+                                                  folder=folder)
 
   } else if(plot_types=="PEA"){#####--- 3. PEA
     VolcanoRes <- viz_volcano_pea(data= Volcanodata,
@@ -338,7 +338,7 @@ viz_volcano <- function(plot_types="Standard",
                                               feature=feature,
                                               save_plot=save_plot,
                                               print_plot=print_plot,
-                                              Folder=Folder)
+                                              folder=folder)
   }
   return(invisible(VolcanoRes))
 }
@@ -368,7 +368,7 @@ viz_volcano <- function(plot_types="Standard",
 #' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
 #' @param save_plot Passed to main function viz_volcano()
 #' @param print_plot Passed to main function viz_volcano()
-#' @param Folder Created in viz_volcano(). Path to the folder where files are saved.
+#' @param folder Created in viz_volcano(). Path to the folder where files are saved.
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -400,7 +400,7 @@ viz_volcano_standard <- function(data,
                                 feature="Metabolites",
                                 save_plot,
                                 print_plot,
-                                Folder){
+                                folder){
 
   #Pass colours/shapes
   safe_colorblind_palette <- color_palette
@@ -516,8 +516,8 @@ viz_volcano_standard <- function(data,
                                inputlist_plot= SaveList,
                                save_table=NULL,
                                save_plot=save_plot,
-                               path= Folder,
-                               FileName= paste("Volcano_",PlotName, sep=""),
+                               path= folder,
+                               file_name= paste("Volcano_",PlotName, sep=""),
                                core=FALSE,
                                print_plot=print_plot,
                                plot_height= plot_height,
@@ -624,8 +624,8 @@ viz_volcano_standard <- function(data,
                              inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              save_table=NULL,
                              save_plot=save_plot,
-                             path= Folder,
-                             FileName= paste("Volcano_",plot_name, sep=""),
+                             path= folder,
+                             file_name= paste("Volcano_",plot_name, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
                              plot_height=plot_height,
@@ -666,7 +666,7 @@ viz_volcano_standard <- function(data,
 #' @param name_comparison Passed to main function viz_volcano()
 #' @param save_plot Passed to main function viz_volcano()
 #' @param print_plot Passed to main function viz_volcano()
-#' @param Folder Created in viz_volcano(). Path to the folder where files are saved.
+#' @param folder Created in viz_volcano(). Path to the folder where files are saved.
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -701,7 +701,7 @@ viz_volcano_compare <- function(data,
                                name_comparison,
                                save_plot,
                                print_plot,
-                               Folder){
+                               folder){
 
   #####################
   ##--- Check data
@@ -872,8 +872,8 @@ viz_volcano_compare <- function(data,
                            inputlist_plot= SaveList,
                            save_table=NULL,
                            save_plot=save_plot,
-                           path= Folder,
-                           FileName= paste("Volcano_",PlotName, sep=""),
+                           path= folder,
+                           file_name= paste("Volcano_",PlotName, sep=""),
                            core=FALSE,
                            print_plot=print_plot,
                            plot_height=plot_height,
@@ -998,8 +998,8 @@ viz_volcano_compare <- function(data,
                              inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              save_table=NULL,
                              save_plot=save_plot,
-                             path= Folder,
-                             FileName= paste("Volcano_",plot_name, sep=""),
+                             path= folder,
+                             file_name= paste("Volcano_",plot_name, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
                              plot_height=plot_height,
@@ -1039,7 +1039,7 @@ viz_volcano_compare <- function(data,
 #' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
 #' @param save_plot Passed to main function viz_volcano()
 #' @param print_plot Passed to main function viz_volcano()
-#' @param Folder Created in viz_volcano(). Path to the folder where files are saved.
+#' @param folder Created in viz_volcano(). Path to the folder where files are saved.
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -1073,7 +1073,7 @@ viz_volcano_pea <- function(data,
                            feature="Metabolites",
                            save_plot,
                            print_plot,
-                           Folder){
+                           folder){
   #####################
   ##--- Check PEA settings
   if(is.vector(metadata_info)==FALSE){
@@ -1238,8 +1238,8 @@ viz_volcano_pea <- function(data,
                              inputlist_plot= SaveList,
                              save_table=NULL,
                              save_plot=save_plot,
-                             path= Folder,
-                             FileName= paste("Volcano_",PlotName, sep=""),
+                             path= folder,
+                             file_name= paste("Volcano_",PlotName, sep=""),
                              core=FALSE,
                              print_plot=print_plot,
                              plot_height=plot_height,

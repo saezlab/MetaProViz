@@ -502,9 +502,9 @@ Now we can load the corresponding pre-processed intracellular example data for t
 Intra_DMA_786M1A_vs_HK2 <- intracell_dma
 
 # Perform metabolite clustering:
-MCA_core_res <- MetaProViz::mca_core(data_Intra =Intra_DMA_786M1A_vs_HK2%>%rownames_to_column("Metabolite") ,
+MCA_core_res <- MetaProViz::mca_core(data_intra =Intra_DMA_786M1A_vs_HK2%>%rownames_to_column("Metabolite") ,
                                      data_core = DMA_786M1A_vs_HK2,
-                                     metadata_info_Intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=0.8),
+                                     metadata_info_intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=0.8),
                                      metadata_info_core=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=28),
                                      feature= "Metabolite",
                                      method_background="Intra&core",

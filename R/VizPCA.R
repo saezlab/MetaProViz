@@ -33,8 +33,8 @@
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}
 #' @param scale_color \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
-#' @param ShowLoadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
-#' @param Scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
+#' @param show_loadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
+#' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
 #' @param pcx \emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}
 #' @param pcy \emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}
 #' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}
@@ -68,8 +68,8 @@ viz_pca <- function(data,
                    color_palette= NULL,
                    scale_color="discrete",
                    shape_palette=NULL,
-                   ShowLoadings = FALSE,
-                   Scaling = TRUE,
+                   show_loadings = FALSE,
+                   scaling = TRUE,
                    pcx=1,
                    pcy=2,
                    theme=NULL,#theme_classic()
@@ -96,13 +96,13 @@ viz_pca <- function(data,
                           print_plot= print_plot)
 
   # check_param` Specific
-  if(is.logical(ShowLoadings) == FALSE){
+  if(is.logical(show_loadings) == FALSE){
     message <- paste("The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
-  if(is.logical(Scaling) == FALSE){
-    message <- paste("The Scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
+  if(is.logical(scaling) == FALSE){
+    message <- paste("The scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
     logger::log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
@@ -115,12 +115,12 @@ viz_pca <- function(data,
   }
 
   ## ------------ Create Results output folder ----------- ##
-  Folder <- NULL
+  folder <- NULL
   if(is.null(save_plot)==FALSE){
-    Folder <- save_path(folder_name= "PCAPlots",
+    folder <- save_path(folder_name= "PCAPlots",
                                     path=path)
   }
-  logger::log_info("viz_pca results saved at ", Folder)
+  logger::log_info("viz_pca results saved at ", folder)
 
   ###########################################################################
   ## ----------- Set the plot parameters: ------------ ##
@@ -231,7 +231,7 @@ viz_pca <- function(data,
   PlotList_adaptedGrid <- list()
 
   #Make the plot:
-  PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(data), scale. = as.logical(Scaling)),
+  PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(data), scale. = as.logical(scaling)),
                   data= InputPCA,
                   x= pcx ,
                   y= pcy,
@@ -243,8 +243,8 @@ viz_pca <- function(data,
                   label=T,
                   label.size=2.5,
                   label.repel = TRUE,
-                  loadings= as.logical(ShowLoadings), #draws Eigenvectors
-                  loadings.label = as.logical(ShowLoadings),
+                  loadings= as.logical(show_loadings), #draws Eigenvectors
+                  loadings.label = as.logical(show_loadings),
                   loadings.label.vjust = 1.2,
                   loadings.label.size=2.5,
                   loadings.colour="grey10",
@@ -283,7 +283,7 @@ viz_pca <- function(data,
   ###########################################################################
   ##----- Save and Return
   #Here we make a list in which we will save the outputs:
-  FileName <-plot_name %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
+  file_name <-plot_name %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
 
   suppressMessages(suppressWarnings(
     save_res(
@@ -291,8 +291,8 @@ viz_pca <- function(data,
       inputlist_plot= PlotList_adaptedGrid,
       save_table=NULL,
       save_plot=save_plot,
-      path= Folder,
-      FileName= FileName,
+      path= folder,
+      file_name= file_name,
       core=FALSE,
       print_plot=print_plot,
       plot_height=plot_height,
