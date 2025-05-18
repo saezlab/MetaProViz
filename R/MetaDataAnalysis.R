@@ -65,7 +65,8 @@
 #' @examples
 #' Res <- meta_analysis(
 #'     data = tissue_norm[,-c(1:13)],
-#'     metadata_sample = tissue_norm[,c(2,4:5,12:13)]
+#'     metadata_sample = tissue_norm[,c(2,4:5,12:13)],
+#'     by = "SampleID",
 #' )
 #'
 #' @keywords PCA, annova, metadata
