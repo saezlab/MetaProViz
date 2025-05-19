@@ -333,3 +333,62 @@ get_geneSet_index <- function(gene_sets, min_gs_size, max_gs_size) {
     idx <-  min_gs_size <= geneSet_size & geneSet_size <= max_gs_size
     return(idx)
 }
+
+
+#
+# From DOSE:::enricher_internal
+# https://github.com/YuLab-SMU/DOSE/blob/
+# 34a63655d1c24c4e855a669e61880187a28a7a1a/R/build_Anno.R#L4
+#
+# Author: Guangchuang Yu
+# Updated: 2024-06-13
+# License: Artistic 2.0 (GPL compatible)
+#
+
+##' interal method for enrichment analysis
+##'
+##' @param path2gene Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
+##' @param path2name Pathway[,c("term", "Description")]# term and description
+##' @return  A \code{enrichResult} instance.
+##' @author Guangchuang Yu \url{https://yulab-smu.top}
+##' @noRd
+build_Anno <- function(path2gene, path2name) {
+  if (!exists(".Anno_clusterProfiler_Env", envir = .GlobalEnv)) {
+    pos <- 1
+    envir <- as.environment(pos)
+    assign(".Anno_clusterProfiler_Env", new.env(), envir = envir)
+  }
+  Anno_clusterProfiler_Env <- get(".Anno_clusterProfiler_Env", envir= .GlobalEnv)
+
+  # if(class(path2gene[[2]]) == 'list') {
+  if (inherits(path2gene[[2]], "list")){
+    ## to compatible with tibble
+    path2gene <- cbind(rep(path2gene[[1]],
+                           times = vapply(path2gene[[2]], length, numeric(1))),
+                       unlist(path2gene[[2]]))
+  }
+
+  path2gene <- as.data.frame(path2gene)
+  path2gene <- path2gene[!is.na(path2gene[,1]), ]
+  path2gene <- path2gene[!is.na(path2gene[,2]), ]
+  path2gene <- unique(path2gene)
+
+  PATHID2EXTID <- split(as.character(path2gene[,2]), as.character(path2gene[,1]))
+  EXTID2PATHID <- split(as.character(path2gene[,1]), as.character(path2gene[,2]))
+
+  assign("PATHID2EXTID", PATHID2EXTID, envir = Anno_clusterProfiler_Env)
+  assign("EXTID2PATHID", EXTID2PATHID, envir = Anno_clusterProfiler_Env)
+
+  if ( missing(path2name) || is.null(path2name) || all(is.na(path2name))) {
+    assign("PATHID2NAME", NULL, envir = Anno_clusterProfiler_Env)
+  } else {
+    path2name <- as.data.frame(path2name)
+    path2name <- path2name[!is.na(path2name[,1]), ]
+    path2name <- path2name[!is.na(path2name[,2]), ]
+    path2name <- unique(path2name)
+    PATH2NAME <- as.character(path2name[,2])
+    names(PATH2NAME) <- as.character(path2name[,1])
+    assign("PATHID2NAME", PATH2NAME, envir = Anno_clusterProfiler_Env)
+  }
+  return(Anno_clusterProfiler_Env)
+}

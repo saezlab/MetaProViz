@@ -109,7 +109,7 @@ cluster_ora <- function(data,
     grpMetabolites <- subset(df, df[[metadata_info[["ClusterColumn"]]]] == g)
     log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
-    clusterGo <- DOSE:::enricher_internal(
+    clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
       gene=as.character(grpMetabolites$Metabolite),
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
@@ -117,7 +117,7 @@ cluster_ora <- function(data,
       minGSSize=min_gssize,
       maxGSSize=max_gssize,
       qvalueCutoff = 1L,
-      USER_DATA= DOSE:::build_Anno(Term2gene, Term2name)
+      USER_DATA= build_Anno(Term2gene, Term2name)
     )
 
     clusterGosummary <- data.frame(clusterGo)
@@ -254,7 +254,7 @@ standard_ora <- function(data,
 
   ## ------------ Run ----------- ##
   #Run ORA
-  clusterGo <- DOSE:::enricher_internal(
+  clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
       gene=selectMetabolites,
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
@@ -262,7 +262,7 @@ standard_ora <- function(data,
       minGSSize=min_gssize,
       maxGSSize=max_gssize,
       qvalueCutoff = 1L,
-      USER_DATA= DOSE:::build_Anno(Term2gene, Term2name)
+      USER_DATA= build_Anno(Term2gene, Term2name)
   )
   clusterGosummary <- data.frame(clusterGo)
 
