@@ -212,11 +212,11 @@ viz_superplot <- function(data,
     metadata_sample<- metadata_sample%>%
       dplyr::rename("Superplot"= paste(metadata_info[["Superplot"]]) )
 
-    data <- merge(metadata_sample[c("Conditions","Superplot")] ,data, by=0)
-    data <- tibble::column_to_rownames(data, "Row.names")
+    data_merge <- merge(metadata_sample[c("Conditions","Superplot")] , data, by=0)
+    data_merge <- tibble::column_to_rownames(data_merge, "Row.names")
   }else{
-    data <- merge(metadata_sample[c("Conditions")] ,data, by=0)
-    data <- tibble::column_to_rownames(data, "Row.names")
+    data_merge <- merge(metadata_sample[c("Conditions")] ,data, by=0)
+    data_merge <- tibble::column_to_rownames(data_merge, "Row.names")
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -246,7 +246,7 @@ viz_superplot <- function(data,
     #Prepare the dfs:
     suppressWarnings(
       dataMeans <-
-        data %>%
+        data_merge %>%
         dplyr::select(i, Conditions) %>%
         dplyr::group_by(Conditions) %>%
         dplyr::summarise(
@@ -261,12 +261,12 @@ viz_superplot <- function(data,
     names(dataMeans)[2] <- "Intensity"
 
     if("Superplot" %in% names(metadata_info)){
-      suppressWarnings(plotdata <- data %>%
+      suppressWarnings(plotdata <- data_merge %>%
                          dplyr::select(i,Conditions, Superplot)
                      %>%  dplyr::group_by(Conditions)
                      %>% as.data.frame() )
     }else{
-      suppressWarnings(plotdata <- data %>%
+      suppressWarnings(plotdata <- data_merge %>%
                          dplyr::select(i,Conditions)
                        %>%  dplyr::group_by(Conditions)
                        %>% as.data.frame() )
