@@ -325,7 +325,7 @@ equivalent_ids <- function(data,
 
   ## ------------------ Load manual table ----------------- ##
   if((from == "kegg") == FALSE){
-    EquivalentFeatures <- MetaProViz:: ToyData("EquivalentFeatures")%>%
+    EquivalentFeatures <- equivalent_features%>%
       dplyr::select(from)
   }
 
@@ -1448,12 +1448,12 @@ add_info <- function(mat,
 #'
 #' @export
 compare_pk <- function(data,
-                      metadata_info = NULL,
-                      filter_by = c("both", "gene", "metabolite"),
-                      plot_title = "Overlap of Prior Knowledge Resources",
-                      name_col = "TrivialName",
-                      palette_type = "polychrome",
-                      output_file = NULL) {
+                       metadata_info = NULL,
+                       filter_by = c("both", "gene", "metabolite"),
+                       plot_title = "Overlap of Prior Knowledge Resources",
+                       name_col = "TrivialName",
+                       palette_type = "polychrome",
+                       output_file = NULL) {
   ###########################################################################
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -1480,7 +1480,7 @@ compare_pk <- function(data,
   resource_definitions <- list(
     hallmarks = list(
       var = "Hallmark_Pathways",
-      load_fun = MetaProViz::metsigdb_hallmarks,
+      load_fun = hallmarks,
       transform_fun = function(x) {
         resource_object <- MetaProViz::make_gene_metab_set(input_pk = x,
                                                          metadata_info = c(Target = "gene"),
@@ -1495,7 +1495,7 @@ compare_pk <- function(data,
     ),
     gaude = list(
       var = "Gaude_Pathways",
-      load_fun = MetaProViz::metsigdb_gaude,
+      load_fun = gaude_pathways,
       transform_fun = function(x) {
         resource_object <- MetaProViz::make_gene_metab_set(input_pk = x,
                                                          metadata_info = c(Target = "gene"),

@@ -72,6 +72,7 @@ First if you have not done yet, install the required dependencies and load the l
 
 #library(MetaProViz)
 devtools::load_all()
+
 library(magrittr)
 library(rlang)
 library(purrr)
@@ -107,7 +108,8 @@ Example datasets is publicly available on [metabolomics workbench project PR0014
 
 ```{r}
 # Load the Pre-processed intracellular data:
-FeatureMetadata_Cells <- cellular_meta
+FeatureMetadata_Cells <- cellular_meta%>%
+  column_to_rownames("Metabolite")
 ```
 
 \
@@ -116,7 +118,8 @@ Example datasets is publicly available in the [paper](https://www.cell.com/cance
 
 ```{r}
 # Load the example data:
-FeatureMetadata_Tissue <- tissue_meta
+FeatureMetadata_Tissue <- tissue_meta%>%
+  column_to_rownames("Metabolite")
 
 ```
 
@@ -208,10 +211,10 @@ to showcase the severity of this problem, we can look at the occurrence of those
 to do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 
 ```{r, echo=FALSE}
-Pathways <- alanine_pathways[,2:6]
+Pathways <- alanine_pathways
 
 Count <- Pathways %>%
-  tidyr::unite(Pathway, c("pathwaySource", "pathway_name"), sep = ": ")%>%
+  tidyr::unite(Pathway, c("pathwaySource", "pathwayName"), sep = ": ")%>%
   dplyr::group_by(inputId) %>%
   dplyr::summarise(PathwayCount = dplyr::n_distinct(Pathway), .groups = 'drop')%>%
   tidyr::separate(inputId, into = c("Database", "ID"), sep = ":", remove = TRUE)
@@ -263,7 +266,7 @@ Alanine_Path <- Pathways%>%
   tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",A", remove = FALSE)%>%
   tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",D", remove = FALSE)%>%
   dplyr::group_by(pathwaySource, commonName) %>%
-  dplyr::summarise(PathwayCount = dplyr::n_distinct(pathway_name),
+  dplyr::summarise(PathwayCount = dplyr::n_distinct(pathwayName),
                    commonNames = paste(unique(commonName), collapse = ", "),
                    .groups = 'drop')
 
@@ -379,16 +382,16 @@ The Hallmarks [@Liberzon2015] gene-set and Gaude [@Gaude2016] gene-set is availa
 
 ```{r}
 # Load the example gene-sets:
-MetaProViz::metsigdb_hallmarks()
+Hallmark_Pathways <- hallmarks
 
-MetaProViz::metsigdb_gaude()
+Gaude_Pathways <- gaude_pathways
 ```
 
 \
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-ChemicalClass_MetabSet[c(997:998,2916:2917, 2916:2918),]%>%
+Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
@@ -468,9 +471,9 @@ We have now loaded a number of different PK sources (details above) and aim to c
 As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `MetaProViz::compare_pk()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
 ```{r}
 # Compare the PK resources
-pk_comp_res <- MetaProViz:::compare_pk(data = list(Hallmarks = "Hallmarks",
-                                                      Gaude = "Gaude",
-                                                      MetalinksDB = "MetalinksDB")
+pk_comp_res <- MetaProViz::compare_pk(data = list(Hallmarks = "Hallmarks",
+                                                   Gaude = "Gaude",
+                                                   MetalinksDB = "MetalinksDB")
                                      )
 ```
 \
@@ -716,7 +719,7 @@ FeatureMetadata_Biocrates_singleHMDB$HMDB_single <- extract_first_id(FeatureMeta
 
 # Visually check that the single ID function has worked
 # Count entries and record NA information
-result_bioc_hmdb_count_single <- MetaProViz:::CountEntries(FeatureMetadata_Biocrates_singleHMDB, "HMDB_single")
+result_bioc_hmdb_count_single <- MetaProViz::count_ids(FeatureMetadata_Biocrates_singleHMDB, "HMDB_single")
 # Access the processed data:
 processed_df_bioc_hmdb_count_single <- result_bioc_hmdb_count_single$result
 # Display the plot:

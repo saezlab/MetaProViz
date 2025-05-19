@@ -84,7 +84,8 @@ Here we choose an example datasets, which is publicly available in the [paper](h
 We can access the built-in dataset `tissue_norm`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
 ```{r}
 # Load the example data:
-Tissue_Norm <- tissue_norm
+Tissue_Norm <- tissue_norm%>%
+  column_to_rownames("Code")
 ```
 ```{r, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
@@ -97,7 +98,8 @@ Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
 
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
 ```{r}
-Tissue_MetaData <- tissue_meta
+Tissue_MetaData <- tissue_meta%>%
+  column_to_rownames("Metabolite")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -131,17 +133,12 @@ Here the metadata analysis is based on principal component analysis (PCA), which
 The `MetaProViz::meta_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
 ```{r}
-MetaRes <- MetaProViz::meta_analysis(data=tissue_norm[,-c(1:13)],
-                                     metadata_sample= tissue_norm[,c(2,4:5,12:13)],
+MetaRes <- MetaProViz::meta_analysis(data=Tissue_Norm[,-c(1:13)],
+                                     metadata_sample= Tissue_Norm[,c(2,4:5,12:13)],
                                      scaling = TRUE,
                                      percentage = 0.1,
                                      cutoff_stat= 0.05,
-                                     cutoff_variance = 1,
-                                     save_table = "csv",
-                                     save_plot = "svg",
-                                     print_plot= TRUE,
-                                     path = NULL)
-
+                                     cutoff_variance = 1)
 ```
 \
 Ultimately, this is leading to clusters of metabolites that are driving the separation of the different demographics.\
@@ -171,11 +168,11 @@ TissueTypeList <- MetaRes[["res_summary"]]%>%
   pull()
 
 # select columns tissue_norm that are in TissueTypeList if they exist
-Input_Heatmap <- tissue_norm[ , names(tissue_norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
+Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
 
 # Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
 MetaProViz:::viz_heatmap(data = Input_Heatmap,
-                       metadata_sample = tissue_norm[,c(1:13)],
+                       metadata_sample = Tissue_Norm[,c(1:13)],
                        metadata_info = c(color_Sample = list("TISSUE_TYPE")),
                        scale ="column",
                       plot_name = "MainDrivers")
@@ -196,16 +193,16 @@ We will perform multiple comparisons based on the different patient demographics
 \
 ```{r Display_Not_Run, eval=FALSE}
 # Prepare the different selections
-EarlyStage <- tissue_norm %>%
+EarlyStage <- Tissue_Norm %>%
   filter(STAGE== "EARLY-STAGE")
-LateStage <- tissue_norm %>%
+LateStage <- Tissue_Norm %>%
   filter(STAGE=="LATE-STAGE")
-Old <- tissue_norm %>%
+Old <- Tissue_Norm %>%
   filter(AGE=="Old")
-Young <- tissue_norm%>%
+Young <- Tissue_Norm%>%
   filter(AGE=="Young")
 
-DFs <- list("TissueType"= tissue_norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
+DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
 
 # Run dma
 ResList <- list()
@@ -233,17 +230,17 @@ for(item in names(DFs)){
 <div class="vscroll-plot">
 ```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Prepare the different selections
-EarlyStage <- tissue_norm %>%
+EarlyStage <- Tissue_Norm %>%
   filter(STAGE== "EARLY-STAGE")
-LateStage <- tissue_norm %>%
+LateStage <- Tissue_Norm %>%
   filter(STAGE=="LATE-STAGE")
-Old <- tissue_norm %>%
+Old <- Tissue_Norm %>%
   filter(AGE=="Old")
-Young <- tissue_norm %>%
+Young <- Tissue_Norm %>%
   filter(AGE=="Young")
 
 DFs <- list(
-  "TissueType" = tissue_norm,
+  "TissueType" = Tissue_Norm,
   "EarlyStage" = EarlyStage,
   "LateStage" = LateStage,
   "Old" = Old,
@@ -285,7 +282,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        data=ResList[["EarlyStage"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["LateStage"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="EarlyStage", data2= "LateStage"),
-                      plot_name= "EarlyStage-TUMOR_vs_NORMAL compared to LateStage-TUMOR_vs_NORMAL",
+                       plot_name= "EarlyStage-TUMOR_vs_NORMAL compared to LateStage-TUMOR_vs_NORMAL",
                        subtitle= "Results of dma" )
 
 # Young versus Old
@@ -293,7 +290,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="Young", data2= "Old"),
-                      plot_name= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
+                       plot_name= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
                        subtitle= "Results of dma" )
 ```
 \
@@ -540,7 +537,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
 
 ## Pathway enrichment
 Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
-```{r}
+```{r, eval=FALSE}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
@@ -587,6 +584,59 @@ for(comparison in names(ResList)){
   }
 }
 ```
+\
+<div class="vscroll-plot">
+```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+DM_ORA_res<- list()
+
+MetaProViz::metsigdb_kegg()
+
+for(comparison in names(ResList)){
+  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
+  dma <- merge(Tissue_MetaData%>%tibble::rownames_to_column("Metabolite") ,ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]], by="Metabolite", all.y=TRUE)
+  dma <- dma[,c(1,10,12:17)]
+  dma <- dma[complete.cases(dma),-1]#we remove metabolites that do not have a KEGG ID/KEGG pathway
+
+  #remove dublons
+  DMA_Select <- dma%>%distinct(KEGG, .keep_all = TRUE)%>%remove_rownames()%>%tibble::column_to_rownames("KEGG")
+
+  #Perform ORA
+  Res <- MetaProViz::standard_ora(data= DMA_Select, #Input data requirements: column `t.val` and column `Metabolite`
+                                 metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
+                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                 pathway_name=paste0("KEGG_", comparison, sep=""),
+                                 min_gssize=3,
+                                 max_gssize=1000,
+                                 cutoff_stat=0.01,
+                                 cutoff_percentage=10)
+
+  DM_ORA_res[[comparison]] <- Res
+
+  #Select to plot:
+  Res_Select <- Res[["ClusterGosummary"]]%>%
+    filter(p.adjust<0.1)%>%
+    #filter(pvalue<0.05)%>%
+    filter(percentage_of_Pathway_detected>10)
+
+  if(is.null(Res_Select)==FALSE){
+     MetaProViz::viz_volcano(plot_types="PEA",
+                       data= DMA_Select, #Must be the data you have used as an input for the pathway analysis
+                       data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
+                       metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
+                                       PEA_stat="p.adjust",#Column data2
+                                       PEA_score="GeneRatio",#Column data2
+                                       PEA_Feature="MetaboliteID"),# Column metadata_feature (needs to be the same as row names in data)
+                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
+                      plot_name= paste("KEGG_", comparison, sep=""),
+                       subtitle= "PEA" )
+  }
+}
+```
+</div>
+\
+\
+\
 
 
 

@@ -90,7 +90,8 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 `1.` core experiment **(core)** \
 The raw data are available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1) were exometabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.\
 ```{r}
-Media <- medium_raw
+Media <- medium_raw%>%
+  column_to_rownames("Code")
 
 ```
 ```{r, echo=FALSE}
@@ -103,7 +104,8 @@ Media[6:12, 1:8]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MappingInfo <- cellular_meta
+MappingInfo <- cellular_meta%>%
+  column_to_rownames("Metabolite")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -382,13 +384,13 @@ DM_ORA_res<- list()
 comparisons <- names(DMA_Annova[["dma"]])
 for(comparison in comparisons){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
-  dma <- DMA_Annova[["dma"]][[comparison]]
-  dma <- dma[complete.cases(dma),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
+  dma_res <- DMA_Annova[["dma"]][[comparison]]
+  dma_res <- dma_res[complete.cases(dma_res),-1]%>%#we remove metabolites that do not have a KEGG ID/KEGG pathway
     tibble::remove_rownames()%>%
     column_to_rownames("KEGGCompound")#We use the KEGG trivial names to match with the KEGG pathways
 
   #Perform ORA: Here we use
-  DM_ORA_res[[comparison]] <- MetaProViz::cluster_ora(data=dma,
+  DM_ORA_res[[comparison]] <- MetaProViz::cluster_ora(data=dma_res,
                                                      metadata_info=c(ClusterColumn="core_specific", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                                                      remove_background=FALSE,#we do not have any background
                                                      input_pathway=KEGG_Pathways,
@@ -447,17 +449,17 @@ Regulatory rules:\
 \
 ```{r}
 # Example of all possible flows:
-mca_core <- MetaProViz::mca_rules(method="core")
+MCA_CoRe_Rule <- mca_core_rules
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
-mca_core[,1:6]%>%
+MCA_CoRe_Rule[,1:6]%>%
   kableExtra::kbl(caption ="Metabolite Clustering Analysis: core.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 ```{r, eval=FALSE, include=FALSE}
 # Alluvial plot of the rules:
-Plot<- easyalluvial::alluvial_wide(mca_core[,c(1:3,5,6)], fill_by = 'last_variable' )+
+Plot<- easyalluvial::alluvial_wide(MCA_CoRe_Rule[,c(1:3,5,6)], fill_by = 'last_variable' )+
       ggplot2::ggtitle("Regulatory rules resulting in the regulatory clusters that are based on signifcant change") +
       ggplot2::theme_classic() +
       ggplot2::theme(axis.text.y=ggplot2::element_blank(),  #remove y axis labels
@@ -470,7 +472,7 @@ Plot<- easyalluvial::alluvial_wide(mca_core[,c(1:3,5,6)], fill_by = 'last_variab
 #######################
 # Summarize "Not Detected", "Significant Negative", "Significant Positive", "Not Significant" into "No Change
 
-MCA_core_Compressed <- mca_core %>%
+MCA_core_Compressed <- MCA_CoRe_Rule %>%
   mutate(Intra = case_when(
     Intra %in% c("UP", "DOWN") ~ Intra,  # Keep "UP" and "DOWN" as they are
     Intra %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
@@ -499,10 +501,11 @@ Plot1<- easyalluvial::alluvial_wide(MCA_core_Compressed[,c(1:3,5)], fill_by = 'l
 Now we can load the corresponding pre-processed intracellular example data for the comparison of 786M-1A versus HK2 (For the detailed pre-processing please see the vignette "Standard Metabolomics").
 ```{r}
 # Load the Pre-processed intracellular data:
-Intra_DMA_786M1A_vs_HK2 <- intracell_dma
+Intra_DMA_786M1A_vs_HK2 <- intracell_dma%>%
+  as.data.frame()
 
 # Perform metabolite clustering:
-MCA_core_res <- MetaProViz::mca_core(data_intra =Intra_DMA_786M1A_vs_HK2%>%rownames_to_column("Metabolite") ,
+MCA_core_res <- MetaProViz::mca_core(data_intra =Intra_DMA_786M1A_vs_HK2,
                                      data_core = DMA_786M1A_vs_HK2,
                                      metadata_info_intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=0.8),
                                      metadata_info_core=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=28),
@@ -1006,25 +1009,25 @@ MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A versus HK2",
+                       plot_name= "786M1A versus HK2",
                        subtitle= "Results of dma. Colour coded for consumption/release" )
 
 # If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_metadata_info
 MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(shape="core_specific"),
-                       SettingsFile= MetaData_Metab,
+                       metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A versus HK2",
+                       plot_name= "786M1A versus HK2",
                        subtitle= "Results of dma. Shape for consumption/release, color for significance." )
 
 # Of course, we can also adapt both, color and shape for the same parameter:
 MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(shape="core_specific", color="core_specific"),
-                       SettingsFile= MetaData_Metab,
+                       metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A versus HK2",
+                       plot_name= "786M1A versus HK2",
                        subtitle= "Results of dma. Shape and color for consumption/release." )
 
 ```
@@ -1034,10 +1037,10 @@ Of course, here we may also want an individual plot for each of the consumption/
 # individual plot for each metabolite behaviour:
 MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(individual="core", shape="core_specific"),
-                       SettingsFile= MetaData_Metab,
+                       metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A versus HK2",
+                       plot_name= "786M1A versus HK2",
                        subtitle= "Results of dma." )
 
 ```
@@ -1047,10 +1050,10 @@ Given that we also know, which metabolic pathway the metabolites correspond to, 
 # Now we can use color for the pathways and shape for the metabolite clusters:
 MetaProViz::viz_volcano(plot_types="Standard",
                        metadata_info= c(individual="core", shape="core_specific", color="Pathway"),
-                       SettingsFile= MetaData_Metab,
+                       metadata_feature= MetaData_Metab,
                        data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A versus HK2",
+                       plot_name= "786M1A versus HK2",
                        subtitle= "Results of dma." )
 ```
 
@@ -1064,7 +1067,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
                        name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
+                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
                        subtitle= "Results of dma" )
 ```
 \
@@ -1078,7 +1081,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
                        name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
+                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
                        subtitle= "Results of dma" )
 ```
 
@@ -1091,7 +1094,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
                        name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
+                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
                        subtitle= "Results of dma" )
 ```
 
@@ -1104,7 +1107,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
                        name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
                        x= "Log2(Distance)",
-                      plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
+                       plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
                        subtitle= "Results of dma" )
 ```
 </div>
@@ -1139,7 +1142,7 @@ MetaProViz::viz_volcano(plot_types="PEA",
                        data= InputPEA, #Must be the data you have used as an input for the pathway analysis
                        data2= InputPEA2, #Must be the results of the pathway analysis
                        x= "Log2(Distance)",
-                      plot_name= "KEGG",
+                       plot_name= "KEGG",
                        subtitle= "PEA" ,
                        select_label = NULL)
 ```
@@ -1155,7 +1158,7 @@ MetaProViz::viz_volcano(plot_types="PEA",
                        data= InputPEA, #Must be the data you have used as an input for the pathway analysis
                        data2= InputPEA2, #Must be the results of the pathway analysis
                        x= "Log2(Distance)",
-                      plot_name= "KEGG",
+                       plot_name= "KEGG",
                        subtitle= "PEA" ,
                        select_label = NULL)
 ```

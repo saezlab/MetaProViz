@@ -39,8 +39,6 @@
 #'     "BiologicalReplicates" including numerical values. Please use the following
 #'     names: "Conditions", "Biological_Replicates",
 #'     "Analytical_Replicates".\strong{Default = NULL}
-#' @param by \emph{Optional: } Join specification between `data` and
-#'     `metadata_sample`. See the docs of \code{dplyr::left_join} for details. \strong{Default = NULL}
 #' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is
 #' used \strong{Default = TRUE}
 #' @param percentage \emph{Optional: } percentage of top and bottom features to
@@ -83,7 +81,7 @@
 #' @export
 meta_analysis <- function(data,
                          metadata_sample,
-                         by = NULL,
+                         #by = NULL,#Join specification between `data` and `metadata_sample`. See the docs of \code{dplyr::left_join} for details. \strong{Default = NULL}
                          scaling = TRUE,
                          percentage = 0.1,
                          cutoff_stat= 0.05,
@@ -131,7 +129,7 @@ meta_analysis <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "meta_analysis",
+    folder <- save_path(folder_name= "MetadataAnalysis",
                                     path=path)
   }
 
@@ -143,12 +141,16 @@ meta_analysis <- function(data,
   PCA.res_Info <- as.data.frame(PCA.res$x)
 
   # Extract loadings for each PC
-  PCA.res_Loadings <-
-    as.data.frame(PCA.res$rotation) %>%
+  PCA.res_Loadings <- as.data.frame(PCA.res$rotation) %>%
     tibble::rownames_to_column("feature")
 
   #--- 2. Merge with demographics
-  PCA.res_Info %<>% left_join(metadata_sample, by = by)
+  #PCA.res_Info %<>% left_join(metadata_sample, by = by)
+  PCA.res_Info  <- merge(x=metadata_sample%>% tibble::rownames_to_column("UniqueID"),
+                         y=PCA.res_Info%>% tibble::rownames_to_column("UniqueID"),
+                         by="UniqueID",
+                         all.y=TRUE)%>%
+    tibble::column_to_rownames("UniqueID")
 
   #--- 3. convert columns that are not numeric to factor:
   ## Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
