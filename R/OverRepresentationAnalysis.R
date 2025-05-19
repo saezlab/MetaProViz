@@ -110,7 +110,7 @@ cluster_ora <- function(data,
     log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
     clusterGo <- DOSE:::enricher_internal(
-      gene=selectMetabolites,
+      gene=as.character(grpMetabolites$Metabolite),
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
       universe = allMetabolites,

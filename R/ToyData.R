@@ -200,7 +200,7 @@
 "biocrates_features"
 
 ####################################################
-#' mca_2cond
+#' mca_twocond_rules
 #'
 #' Manually curated table defining the flow of information of the two condition biological regulatory clusters Regulatory labels
 #'from the different grouping methods.
@@ -209,10 +209,11 @@
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-"mca_2cond"
+#'
+"mca_twocond_rules"
 
 ####################################################
-#' mca_core
+#' mca_core_rules
 #'
 #' Manually curated table defining the flow of information of the Conusuption-Release and Intracellular metabolomics biological
 #' regulatory clusters Regulatory labels from the different grouping methods.
@@ -221,7 +222,8 @@
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-"mca_core"
+#'
+"mca_core_rules"
 
 ####################################################
 #' alanine_pathways
