@@ -1039,38 +1039,3 @@ mca_core <- function(data_intra,
 
   invisible(return(DF_List))
 }
-
-########################################
-### ### ### Import MCA rules ### ### ###
-########################################
-
-#' Access built-in MCA regulatory rules
-#'
-#' @param method Either "2Cond" or "core" depending which regulatory rules you would like to load
-#' @title MCA regulatory rules Import
-#' @description Import and process .csv file to create toy data.
-#' @return A data frame containing the toy data.
-#'
-#' @importFrom magrittr %>%
-#' @importFrom stringr str_to_lower
-#' @export
-mca_rules <- function(method) {
-
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
-
-  err <-
-    method %>%
-    sprintf("Available MCA regulatory rules are `2Cond` or `core`, not `%s`.", .)
-
-  data_label <-
-    method %>%
-    str_to_lower() %>%
-    {`if`(. %in% c("2cond", "core"), ., stop(err))} %>%
-    sprintf("mca_%s", .)
-
-  data(data_label)
-
-  return(get(data_label))
-
-}
