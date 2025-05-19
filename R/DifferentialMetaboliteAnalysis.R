@@ -321,7 +321,7 @@ dma <-function(data,
                                                     metadata_feature=VolPlot_SettingsFile,
                                                     y= "p.adj",
                                                     x= x,
-                                                   plot_name= DF,
+                                                    plot_name= DF,
                                                     subtitle=  bquote(italic("Differential Metabolite Analysis")),
                                                     save_plot= NULL))
 
