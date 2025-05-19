@@ -92,7 +92,7 @@ cluster_ora <- function(data,
   #Load Pathways
   Pathway <- Pathways
   Term2gene <- Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
-  term2name <- Pathway[,c("term", "Description")]# term and description
+  Term2name <- Pathway[,c("term", "Description")]# term and description
 
   #Add the number of genes present in each pathway
   Pathway$Count <- 1
@@ -109,17 +109,17 @@ cluster_ora <- function(data,
     grpMetabolites <- subset(df, df[[metadata_info[["ClusterColumn"]]]] == g)
     log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
-    clusterGo <- enricher_internal(
-        gene=as.character(grpMetabolites$Metabolite),
-        pvalueCutoff = 1L,
-        pAdjustmethod = "BH",
-        universe = allMetabolites,
-        min_gs_size=min_gssize,
-        max_gs_size=max_gssize,
-        qvalueCutoff = 1L,
-        TERM2GENE=Term2gene ,
-        TERM2NAME = term2name
+    clusterGo <- DOSE:::enricher_internal(
+      gene=selectMetabolites,
+      pvalueCutoff = 1L,
+      pAdjustMethod = "BH",
+      universe = allMetabolites,
+      minGSSize=min_gssize,
+      maxGSSize=max_gssize,
+      qvalueCutoff = 1L,
+      USER_DATA= DOSE:::build_Anno(Term2gene, Term2name)
     )
+
     clusterGosummary <- data.frame(clusterGo)
     clusterGo_list[[g]]<- clusterGo
     if(!(dim(clusterGosummary)[1] == 0)){
@@ -243,7 +243,7 @@ standard_ora <- function(data,
   #Load Pathways
   Pathway <- Pathways
   Term2gene <- Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
-  term2name <- Pathway[,c("term", "Description")]# term and description
+  Term2name <- Pathway[,c("term", "Description")]# term and description
 
   #Add the number of genes present in each pathway
   Pathway$Count <- 1
@@ -254,16 +254,15 @@ standard_ora <- function(data,
 
   ## ------------ Run ----------- ##
   #Run ORA
-  clusterGo <- enricher_internal(
+  clusterGo <- DOSE:::enricher_internal(
       gene=selectMetabolites,
       pvalueCutoff = 1L,
-      pAdjustmethod = "BH",
+      pAdjustMethod = "BH",
       universe = allMetabolites,
-      min_gs_size=min_gssize,
-      max_gs_size=max_gssize,
+      minGSSize=min_gssize,
+      maxGSSize=max_gssize,
       qvalueCutoff = 1L,
-      TERM2GENE=Term2gene ,
-      TERM2NAME = term2name
+      USER_DATA= DOSE:::build_Anno(Term2gene, Term2name)
   )
   clusterGosummary <- data.frame(clusterGo)
 
