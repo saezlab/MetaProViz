@@ -455,12 +455,12 @@ viz_volcano_standard <- function(data,
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$FeatureNames,#Metabolite name
-                                                select_label = select_label,
+                                                selectLab = select_label,
                                                 x = paste(x),
                                                 y = paste(y),
                                                 xlab  =xlab,
                                                 ylab =ylab,
-                                                cutoff_stat = cutoff_y,
+                                                pCutoff = cutoff_y,
                                                 FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
@@ -568,12 +568,12 @@ viz_volcano_standard <- function(data,
       #Prepare the Plot:
       Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$FeatureNames,#Metabolite name
-                                              select_label = select_label,
+                                              selectLab = select_label,
                                               x = paste(x),
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              cutoff_stat = cutoff_y,
+                                              pCutoff = cutoff_y,
                                               FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
@@ -811,12 +811,12 @@ viz_volcano_compare <- function(data,
         #Prepare the Plot:
         Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$FeatureNames,#Metabolite name
-                                                select_label = select_label,
+                                                selectLab = select_label,
                                                 x = paste(x),
                                                 y = paste(y),
                                                 xlab  =xlab,
                                                 ylab =ylab,
-                                                cutoff_stat = cutoff_y,
+                                                pCutoff = cutoff_y,
                                                 FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                                 pointSize = 3,
                                                 labSize = 3,
@@ -943,12 +943,12 @@ viz_volcano_compare <- function(data,
       #Prepare the Plot:
       Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$FeatureNames,#Metabolite name
-                                              select_label = select_label,
+                                              selectLab = select_label,
                                               x = paste(x),
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              cutoff_stat = cutoff_y,
+                                              pCutoff = cutoff_y,
                                               FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
@@ -1176,12 +1176,12 @@ viz_volcano_pea <- function(data,
       #Prepare the Plot:
       Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$PEA_Feature,#Metabolite name
-                                              select_label = select_label,
+                                              selectLab = select_label,
                                               x = paste(x),
                                               y = paste(y),
                                               xlab  =xlab,
                                               ylab =ylab,
-                                              cutoff_stat = cutoff_y,
+                                              pCutoff = cutoff_y,
                                               FCcutoff = cutoff_x,#Cut off Log2FC, automatically 2
                                               pointSize = 3,
                                               labSize = 3,
