@@ -68,7 +68,7 @@ cluster_ora <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "cluster_ora",
+    folder <- save_path(folder_name= "ClusterOra",
                                     path=path)
     }
 
@@ -109,7 +109,7 @@ cluster_ora <- function(data,
     grpMetabolites <- subset(df, df[[metadata_info[["ClusterColumn"]]]] == g)
     log_info("Number of metabolites in cluster `", g, "`: ", nrow(grpMetabolites), sep="")
 
-    clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
+    clusterGo <- DOSE:::enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
       gene=as.character(grpMetabolites$Metabolite),
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
@@ -254,7 +254,7 @@ standard_ora <- function(data,
 
   ## ------------ Run ----------- ##
   #Run ORA
-  clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
+  clusterGo <- DOSE:::enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
       gene=selectMetabolites,
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
