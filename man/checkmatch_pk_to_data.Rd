@@ -27,8 +27,8 @@ checkmatch_pk_to_data(
 Check and summarize prior_knowledge-to-MeasuredFeatures relationship
 }
 \examples{
-DetectedIDs <-  MetaProViz::ToyData(data="Cells_Metadata")\%>\% rownames_to_column("Metabolite") \%>\%dplyr::select("Metabolite", "HMDB")\%>\%tidyr::drop_na()
+DetectedIDs <-  cellular_meta \%>\%dplyr::select("Metabolite", "HMDB")\%>\%tidyr::drop_na()
 input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]\%>\%tidyr::drop_na()
-Res <- MetaProViz:::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+Res <- MetaProViz::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 
 }

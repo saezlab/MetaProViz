@@ -68,9 +68,8 @@ This function performs a PCA analysis on the input data and combines it with the
 }
 \examples{
 Res <- metadata_analysis(
-    data = tissue_norm[,-c(1:13)],
-    metadata_sample = tissue_norm[,c(2,4:5,12:13)],
-    by = "SampleID",
+    data = tissue_norm[,-c(2:14)]\%>\%tibble::column_to_rownames("Code"),
+    metadata_sample = tissue_norm[,c(1,3,5:6,13:14)]\%>\%tibble::column_to_rownames("Code")
 )
 
 }

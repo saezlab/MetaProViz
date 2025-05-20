@@ -30,7 +30,7 @@ DF with prior knowledge based on patient metadata
 Meta prior-knowledge
 }
 \examples{
-Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
+Tissue_Norm <- tissue_norm \%>\%tibble::column_to_rownames("Code")
 Res <- MetaProViz::meta_pk(data=Tissue_Norm[,-c(1:13)],
                           metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 

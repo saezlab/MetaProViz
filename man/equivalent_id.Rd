@@ -30,7 +30,7 @@ Input DF with additional column including potential additional IDs.
 Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 }
 \examples{
-DetectedIDs <- MetaProViz::ToyData(data="Cells_Metadata")\%>\% tibble::rownames_to_column("TrivialName")\%>\%tidyr::drop_na()
+DetectedIDs <- cellular_meta\%>\%tidyr::drop_na()
 Res <- MetaProViz::equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 
 }

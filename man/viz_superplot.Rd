@@ -68,7 +68,7 @@ This script allows you to perform different visualizations (bar, box, violin plo
 Bar, Box or Violin plot in Superplot style visualization
 }
 \examples{
-Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
+Intra <- intracell_raw[,c(1:6)]\%>\%tibble::column_to_rownames("Code")
 Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)], metadata_info = c(Conditions="Conditions", Superplot = NULL))
 
 }

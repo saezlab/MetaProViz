@@ -47,7 +47,7 @@ This script performs metabolite clustering analysis and computes clusters of met
 }
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")
+Intra <- intracell_raw\%>\%tibble::column_to_rownames("Code")
 Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 
 Res <- MetaProViz::mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],

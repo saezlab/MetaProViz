@@ -63,7 +63,7 @@ List with two elements: Plot and Plot_Sized
 Heatmap visualization
 }
 \examples{
-Intra <- ToyData("IntraCells_Raw")
+Intra <- intracell_raw\%>\%tibble::column_to_rownames("Code")
 Res <- MetaProViz::viz_heatmap(data=Intra[,-c(1:3)])
 
 }

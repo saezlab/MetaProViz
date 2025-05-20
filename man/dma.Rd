@@ -60,7 +60,7 @@ Dependent on parameter settings, list of lists will be returned for dma (DF of e
 This function allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")[-c(49:58) ,]
+Intra <- intracell_raw[-c(49:58) ,]\%>\%tibble::column_to_rownames("Code")
 ResI <- MetaProViz::dma(data=Intra[ ,-c(1:3)],
                        metadata_sample=Intra[ , c(1:3)],
                        metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))

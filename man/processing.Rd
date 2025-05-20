@@ -57,12 +57,12 @@ List with two elements: DF (including all output tables generated) and Plot (inc
 Modularised Normalization: 80\%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
 }
 \examples{
-Intra <- MetaProViz::ToyData("IntraCells_Raw")
+Intra <- intracell_raw \%>\%tibble::column_to_rownames("Code")
 ResI <- MetaProViz::processing(data=Intra[-c(49:58) ,-c(1:3)],
                                  metadata_sample=Intra[-c(49:58) , c(1:3)],
                                  metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 
-Media <- MetaProViz::ToyData("CultureMedia_Raw")
+Media <- medium_raw \%>\%tibble::column_to_rownames("Code")
 ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
