@@ -1,7 +1,7 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 2.1.7
+Version: 3.0.0
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
