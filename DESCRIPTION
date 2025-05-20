@@ -50,6 +50,7 @@ Imports:
     hash,
     igraph,
     inflection,
+    kableExtra,
     limma,
     logger,
     magrittr,
