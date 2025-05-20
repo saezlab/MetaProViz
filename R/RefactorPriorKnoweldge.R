@@ -1415,10 +1415,9 @@ add_info <- function(mat,
 #' # Using automatic data loading for multiple resources.
 #' data <- list(Hallmarks = "Hallmarks", Gaude = "Gaude",
 #'                 MetalinksDB = "MetalinksDB", RAMP = "metsigdb_chemicalclass")
-#' res <- compare_pk(data = data)
 #'
 #' # Filtering to include only gene features:
-#' res_genes <- compare_pk(data = data, filter_by = "gene")
+#' res_genes <- MetaProViz::compare_pk(data = data, filter_by = "gene")
 #'
 #' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
 #'
@@ -1427,7 +1426,7 @@ add_info <- function(mat,
 #' data_single <- list(Biocft = FeatureMetadata_Biocrates)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
-#' res_single <- compare_pk(data = data_single, metadata_info = metadata_info_single,
+#' res_single <- MetaProViz::compare_pk(data = data_single, metadata_info = metadata_info_single,
 #'                           plot_name = "Overlap of BioCrates Columns")
 #'
 #' ## Example 3: Custom data Frames with Custom Column Names
@@ -1442,7 +1441,7 @@ add_info <- function(mat,
 #'                 MetalinksDB = metalinks_df, RAMP = ramp_df)
 #' metadata_info <- list(Hallmarks = "feature", Gaude = "feature",
 #'                      MetalinksDB = c("hmdb", "gene_symbol"), RAMP = "class_source_id")
-#' res <- compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
+#' res <- MetaProViz::compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
 #'
 #' @importFrom dplyr mutate select
 #' @importFrom utils write.csv
