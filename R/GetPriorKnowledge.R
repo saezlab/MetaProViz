@@ -115,10 +115,13 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 
   ## ------------ folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "prior_knowledge",
+    folder <- save_path(folder_name= "PK",
                        path=path)
 
-    Subfolder <- file.path(folder, "MetaboliteSet")
+    SubfolderPK <- file.path(folder, "LoadedPK")
+    if (!dir.exists(SubfolderPK)) {dir.create(SubfolderPK)}
+
+    Subfolder <- file.path(SubfolderPK, "MetaboliteSet")
     if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
@@ -221,10 +224,13 @@ make_gene_metab_set <- function(input_pk,
 
   ## ------------ folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "prior_knowledge",
+    folder <- save_path(folder_name= "PK",
                                     path=path)
 
-    Subfolder <- file.path(folder, "MetaboliteSet")
+    SubfolderPK <- file.path(folder, "LoadedPK")
+    if (!dir.exists(SubfolderPK)) {dir.create(SubfolderPK)}
+
+    Subfolder <- file.path(SubfolderPK, "MetaboliteSet")
     if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
@@ -334,10 +340,13 @@ metsigdb_metalinks <- function(types = NULL,
 
   ## ------------ folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "prior_knowledge",
+    folder <- save_path(folder_name= "PK",
                                     path=path)
 
-    Subfolder <- file.path(folder, "MetaboliteSet")
+    SubfolderPK <- file.path(folder, "LoadedPK")
+    if (!dir.exists(SubfolderPK)) {dir.create(SubfolderPK)}
+
+    Subfolder <- file.path(SubfolderPK, "MetaboliteSet")
     if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
