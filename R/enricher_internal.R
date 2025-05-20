@@ -37,10 +37,12 @@ enricher_internal <- function(gene,
                               min_gs_size=10,
                               max_gs_size=500,
                               qvalueCutoff=0.2,
-                              USER_DATA){
+                              TERM2GENE,
+                              TERM2NAME){
 
     ## query external ID to Term ID
     gene <- as.character(unique(gene))
+    USER_DATA <- build_Anno(TERM2GENE, TERM2NAME)
     qExtID2TermID <- EXTID2TERMID(gene, USER_DATA)
     qTermID <- unlist(qExtID2TermID)
     if (is.null(qTermID)) {
@@ -193,31 +195,8 @@ enricher_internal <- function(gene,
 
     row.names(Over) <- as.character(Over$ID)
 
-    x <- new("enrichResult",
-             result         = Over,
-             pvalueCutoff   = pvalueCutoff,
-             pAdjustMethod  = pAdjustMethod,
-             qvalueCutoff   = qvalueCutoff,
-             gene           = as.character(gene),
-             universe       = extID,
-             gene_sets       = gene_sets,
-             organism       = "UNKNOWN",
-             keytype        = "UNKNOWN",
-             ontology       = "UNKNOWN",
-             readable       = FALSE
-             )
-    if (inherits(USER_DATA, "GSON")) {
-        if (!is.null(USER_DATA@keytype)) {
-            x@keytype <- USER_DATA@keytype
-        }
-        if (!is.null(USER_DATA@species)) {
-            x@organism <- USER_DATA@species
-        }
-        if (!is.null(USER_DATA@gsname)) {
-            x@ontology <- gsub(".*;", "", USER_DATA@gsname)
-        }
-    }
-    return (x)
+    return(Over)
+
 }
 
 
