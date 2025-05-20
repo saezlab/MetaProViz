@@ -25,15 +25,15 @@
 #'     logfile is available.
 #'
 #' @examples
-#' MetaProViz_logfile()
+#' metaproviz_logfile()
 #' # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 #'
 #' @importFrom OmnipathR logfile
 #'
 #' @export
 #'
-#' @seealso \code{\link{MetaProViz_log}}
-MetaProViz_logfile <- function(){
+#' @seealso \code{\link{metaproviz_log}}
+metaproviz_logfile <- function(){
   #Creates the path for the log file
   OmnipathR::logfile('MetaProViz')
 }
@@ -45,7 +45,7 @@ MetaProViz_logfile <- function(){
 #'
 #' @examples
 #' \dontrun{
-#' MetaProViz_log()
+#' metaproviz_log()
 #' # then you can browse the log file, and exit with `q`
 #' }
 #'
@@ -53,9 +53,9 @@ MetaProViz_logfile <- function(){
 #'
 #' @export
 #'
-#' @seealso \code{\link{MetaProViz_logfile}}
+#' @seealso \code{\link{metaproviz_logfile}}
 #'
-MetaProViz_log <- function(){
+metaproviz_log <- function(){
   #Opens log file for browsing
   OmnipathR::read_log('MetaProViz')
 }
@@ -69,12 +69,12 @@ MetaProViz_log <- function(){
 #' @return Returns `NULL`.
 #'
 #' @examples
-#' MetaProViz_set_loglevel(logger::FATAL, target = 'console')
+#' metaproviz_set_loglevel(logger::FATAL, target = 'console')
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @export
-MetaProViz_set_loglevel <- function(level, target = 'logfile'){
-  #To change log-level e.g. to see all messages being printed
+metaproviz_set_loglevel <- function(level, target = 'logfile'){
+  #to change log-level e.g. to see all messages being printed
   OmnipathR::set_loglevel(level, target = target, pkg = 'MetaProViz')
 }
 
@@ -82,9 +82,9 @@ MetaProViz_set_loglevel <- function(level, target = 'logfile'){
 #' Set the console log level to "trace"
 #'
 #' @noRd
-MPV_trace <- function() {#MPV=MetaProViz
+mpv_trace <- function() {#MPV=MetaProViz
   # Useful for debugging
-  MetaProViz_set_loglevel('trace', target = 'console')
+  metaproviz_set_loglevel('trace', target = 'console')
 }
 
 #' Set the console log level to "trace"
@@ -95,7 +95,7 @@ MPV_trace <- function() {#MPV=MetaProViz
 #'
 #' @noRd
 #'
-MetaProViz_Init <- function(){
+metaproviz_init <- function(){
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
   if(is.null(metaproviz.env$init)){
     # Initial log

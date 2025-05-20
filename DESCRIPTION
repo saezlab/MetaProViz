@@ -1,7 +1,7 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 2.1.7
+Version: 3.0.0
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
@@ -29,11 +29,11 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
+LazyData: true
 Depends:
     R (>= 4.4.1)
 Imports:
     broom,
-    clusterProfiler,
     ComplexUpset,
     DBI,
     dplyr,
@@ -53,12 +53,14 @@ Imports:
     limma,
     logger,
     magrittr,
+    methods,
     OmnipathR (>= 3.15.1),
     patchwork,
     pheatmap,
     Polychrome,
     purrr,
     qcc,
+    qvalue,
     rappdirs,
     readr,
     rlang,
@@ -78,6 +80,6 @@ Suggests:
     pkgdown,
     svglite,
     testthat (>= 3.0.0)
-Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, ctlab/fgsea, git::https://git.bioconductor.org/packages/limma.git
+Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
