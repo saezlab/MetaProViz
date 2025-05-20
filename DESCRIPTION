@@ -80,6 +80,6 @@ Suggests:
     pkgdown,
     svglite,
     testthat (>= 3.0.0)
-Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, ctlab/fgsea, git::https://git.bioconductor.org/packages/limma.git
+Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
