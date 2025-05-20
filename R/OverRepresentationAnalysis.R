@@ -114,10 +114,11 @@ cluster_ora <- function(data,
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
       universe = allMetabolites,
-      minGSSize=min_gssize,
-      maxGSSize=max_gssize,
+      min_gs_size=min_gssize,
+      max_gs_size=max_gssize,
       qvalueCutoff = 1L,
-      USER_DATA= build_Anno(Term2gene, Term2name)
+      TERM2GENE = Term2gene,
+      TERM2NAME = Term2name
     )
 
     clusterGosummary <- data.frame(clusterGo)
@@ -259,10 +260,11 @@ standard_ora <- function(data,
       pvalueCutoff = 1L,
       pAdjustMethod = "BH",
       universe = allMetabolites,
-      minGSSize=min_gssize,
-      maxGSSize=max_gssize,
+      min_gs_size=min_gssize,
+      max_gs_size=max_gssize,
       qvalueCutoff = 1L,
-      USER_DATA= build_Anno(Term2gene, Term2name)
+      TERM2GENE = Term2gene,
+      TERM2NAME = Term2name
   )
   clusterGosummary <- data.frame(clusterGo)
 
