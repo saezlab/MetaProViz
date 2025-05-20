@@ -103,7 +103,8 @@ Intra[1:5, c(1:4,21,44)]%>%
 \
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs and selected pathways **(MappingInfo)** \
 ```{r}
-MappingInfo <- cellular_meta
+MappingInfo <- cellular_meta%>%
+  column_to_rownames("Metabolite")
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -282,7 +283,7 @@ Intra_Preprocessed <- MetaProViz::replicate_sum(data=Intra_Preprocessed[,-c(1:4)
 \
 Using the pre-processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `viz_heatmap()` or PCA plots `viz_pca()`. You can see some examples below.
 
-## dma
+## DMA
 Differential Metabolite Analysis (`dma`) is used to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value. With the different parameters `STAT_pval` and `STAT_padj` one can choose the statistical tests such as t.test, wilcoxon test, limma, annova, kruskal walles, etc. (see function reference for more information).\
 As input one can use the  pre-processed data we have generated using the `Preprocessing` module, but here one can of course use any DF including metabolite values, even though we recommend to normalize the data and remove outliers prior to dma. Moreover, we require the `Input_metadata_sample` including the sample metadata with information which condition a sample corresponds to. Additionally, we enable the user to provide a `Plot_metadata_feature` containing the metadata for the features (metabolites), such as KEGG ID, pathway, retention time, etc.\
 \
