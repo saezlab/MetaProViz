@@ -471,9 +471,9 @@ We have now loaded a number of different PK sources (details above) and aim to c
 As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `MetaProViz::compare_pk()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
 ```{r}
 # Compare the PK resources
-pk_comp_res <- MetaProViz::compare_pk(data = list(Hallmarks = "Hallmarks",
-                                                   Gaude = "Gaude",
-                                                   MetalinksDB = "MetalinksDB")
+pk_comp_res <- MetaProViz::compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMetab[["GeneMetabSet"]]),
+                                                  Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
+                                                  MetalinksDB = as.data.frame(MetaLinksDB_Res[["MetalinksDB"]]))
                                      )
 ```
 \
@@ -529,11 +529,10 @@ In the Biocrates data the available metabolite identifiers are mostly CHEBI, HMD
 Now we select these metabolite identifier columns to count the coverage and look at the combinations of the coverage grouped by the class of metabolite.
 This helps us to understand what to expect, when linking the data to prior knowledge.\
 
-```{r}
-pk_list <- list(Biocft = FeatureMetadata_Biocrates)
-metadata_info <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
-pk_comp_res_biocft <- MetaProViz:::compare_pk(data = pk_list, metadata_info = metadata_info,
-                           plot_title = "Overlap of BioCrates Columns")
+```{r, fig.width=12, fig.height=9}
+pk_comp_res_biocft <- MetaProViz::compare_pk(data = list(Biocft = FeatureMetadata_Biocrates), 
+                                             metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
+                                             plot_name = "Overlap of BioCrates Columns")
 
 ```
 
@@ -544,12 +543,6 @@ pk_comp_res_biocft <- MetaProViz:::compare_pk(data = pk_list, metadata_info = me
 pk_comp_res_biocft$summary_table[c(1:8),]%>%
   kableExtra::kbl(caption = "Preview of the DF `pk_comp_res_biocft$summary_table` showing coverage of identifiers.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
-```
-
-\
-
-```{r, fig.width=12, fig.height=9}
-pk_comp_res_biocft$upset_plot
 ```
 
 \
@@ -590,21 +583,18 @@ Noteworthy, in some cases the Biocrates metabolites have multiple HMDB IDs liste
 
 ```{r, fig.width=8, fig.height=6}
 # Count entries and record NA information
-result_bioc_hmdb_count <- MetaProViz:::count_ids(FeatureMetadata_Biocrates, "HMDB")
+result_bioc_hmdb_count <- MetaProViz::count_ids(FeatureMetadata_Biocrates, "HMDB")
 # Access the processed data:
 processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$result
-# Display the plot:
-print(result_bioc_hmdb_count$plot)
+
 ```
 
-from this plot we can make a few observations.
-First of all, as already pointed out in the previous section, the number of biocrates cells without any HMDB at all is very high (n=253).
-Secondly, we can see that while a number of biocrates cells have only a single HMDB ID associated with them (n=314), the majority of biocrates metabolites actually have multiple entries (n=452).
-For those with multiple, this ranges from 2-20 HMDB entries per biocrates cell!
+From this plot we can make a few observations:
+1. The number of biocrates cells without any HMDB at all is very high (n=253).
+2. Whilst a number of biocrates cells have only a single HMDB ID associated with them (n=314), the majority of biocrates metabolites actually have multiple entries (n=452).
+3. For those with multiple, this ranges from 2-20 HMDB entries per biocrates cell!
 
-With so many biocrates cells linked to multiple HMDB IDs, how should we deal w0.ith this?
-Should we only select a single HMDB ID in cases where we have multiple?
-We discuss the pros and cons of this later in section: [Bonus: Are multiple metabolite IDs helpful or a hindrance?](#sect4_bonus).
+With so many biocrates cells linked to multiple HMDB IDs there are different ways to deal with this (e.g. select a single HMDB ID in cases where we have multiple). We discuss the pros and cons of this later in section: [Bonus: Are multiple metabolite IDs helpful or a hindrance?](#sect4_bonus).
 But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `check_match_id()` has been designed to handle.
 
 ## 3. Make connection to PK and assess overlap
@@ -612,9 +602,9 @@ But for now, we will proceed with making the connections to the PK using all HMD
 Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::check_match_id()` function.\
 
 ```{r}
-Biocrates_to_MetalinksDB <- MetaProViz:::check_match_id(data = FeatureMetadata_Biocrates,
-                     prior_knowledge = MetaLinksDB_Res$MetalinksDB,
-                     metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
+Biocrates_to_MetalinksDB <- MetaProViz::check_match_id(data = FeatureMetadata_Biocrates,
+                                                       input_pk = MetaLinksDB_Res$MetalinksDB,
+                                                       metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
 
 \
@@ -676,7 +666,7 @@ p <- MetaProViz:::viz_stackedbar(
   fill_col = "found_match_in_PK",
   fill_values = fill_vals,
   fill_labels = fill_lbls,
-  plot_title = "Mapping status between Biocrates and MetalinksDB \nusing HMDB, grouped by metabolite class",
+  plot_name = "Mapping status between Biocrates and MetalinksDB \nusing HMDB, grouped by metabolite class",
   x_label = "Frequency",
   y_label = "Class",
   legend_position = c(0.95, 0.05)
@@ -729,9 +719,9 @@ print(result_bioc_hmdb_count_single$plot)
 Now that we can see we only have either NA or singular values for our HMDB IDs, let's map this table to MetalinksDB using the same function as we did earlier, but this time using the `HMDB_single` column.
 
 ```{r, fig.width=8, fig.height=6, echo=TRUE}
-Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::check_match_id(data = FeatureMetadata_Biocrates_singleHMDB,
-                     prior_knowledge = MetaLinksDB_Res$MetalinksDB,
-                     metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
+Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz::check_match_id(data = FeatureMetadata_Biocrates_singleHMDB,
+                                                                  input_pk = MetaLinksDB_Res$MetalinksDB,
+                                                                  metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 ```
 
 ```{r, echo=FALSE}
@@ -742,7 +732,7 @@ Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz:::check_match_id(data = Featur
 #   fill_col = "found_match_in_PK",
 #   fill_values = fill_vals,
 #   fill_labels = fill_lbls,
-#   plot_title = "Mapping status between Biocrates and MetalinksDB \nusing ALL HMDB, grouped by metabolite class",
+#   plot_name = "Mapping status between Biocrates and MetalinksDB \nusing ALL HMDB, grouped by metabolite class",
 #   x_label = "Frequency",
 #   y_label = "Class",
 #   legend_position = c(0.95, 0.05)
@@ -757,7 +747,7 @@ p <- MetaProViz:::viz_stackedbar(
   fill_col = "found_match_in_PK",
   fill_values = fill_vals,
   fill_labels = fill_lbls,
-  plot_title = "Mapping status between Biocrates and MetalinksDB \nusing only FIRST (single) HMDB, grouped by metabolite class",
+  plot_name = "Mapping status between Biocrates and MetalinksDB \nusing only FIRST (single) HMDB, grouped by metabolite class",
   x_label = "Frequency",
   y_label = "Class",
   legend_position = c(0.95, 0.05)
@@ -789,7 +779,7 @@ p <- MetaProViz:::viz_stackedbar(
   fill_col = "found_with_singleHMDB",
   fill_values = fill_vals,
   fill_labels = fill_lbls,
-  plot_title = "Comparison of successful mapping status between Biocrates and MetalinksDB \nusing either single or multi HMDB, grouped by metabolite class",
+  plot_name = "Comparison of successful mapping status between Biocrates and MetalinksDB \nusing either single or multi HMDB, grouped by metabolite class",
   x_label = "Frequency",
   y_label = "Class",
   legend_position = c(0.95, 0.05)
@@ -862,14 +852,9 @@ Here we can immediately see that despite the ID translation, some of the transla
 to get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.\
 
 ```{r, echo=FALSE, fig.width=8, fig.height=6}
-pk_list <- list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF)
-metadata_info <- list(kegg_translated = c("hmdb", "pubchem"))
-
-pk_comp_res_keggtrans <- MetaProViz:::compare_pk(data = pk_list,
-                               metadata_info = metadata_info,
-                               plot_title = "IDs available after KEGG ID Translation")
-
-pk_comp_res_keggtrans$upset_plot
+pk_comp_res_keggtrans <- MetaProViz::compare_pk(data = list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF),
+                                                metadata_info = list(kegg_translated = c("hmdb", "pubchem")),
+                                                plot_name = "IDs available after KEGG ID Translation")
 ```
 
 \
