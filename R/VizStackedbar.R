@@ -26,7 +26,7 @@
 #' @param fill_col A string specifying the name of the column to use for fill aesthetics.
 #' @param fill_values A vector of color values to be used for the fill aesthetic.
 #' @param fill_labels A vector of labels corresponding to the fill levels for the legend.
-#' @param plot_title A string specifying the title of the plot.
+#' @param plot_name A string specifying the title of the plot.
 #' @param x_label A string for the x-axis label. Defaults to "Frequency".
 #' @param y_label A string for the y-axis label. If \code{NULL}, the value of \code{group_col} is used.
 #' @param legend_position A numeric vector of length 2 specifying the (x, y) position of the legend.
@@ -34,13 +34,13 @@
 #'
 #' @return A \code{ggplot} object representing the stacked bar plot.
 #'
-#' @export
+#' @noRd
 viz_stackedbar <- function(data,
                           group_col,
                           fill_col,
                           fill_values,
                           fill_labels,
-                          plot_title,
+                          plot_name,
                           x_label = "Frequency",
                           y_label = NULL,
                           legend_position = c(0.95, 0.05)) {
@@ -67,14 +67,14 @@ viz_stackedbar <- function(data,
   }
 
   # Create the plot
-  ggplot2::ggplot(summary_data, ggplot2::aes_string(y = group_col,
+  plot <- ggplot2::ggplot(summary_data, ggplot2::aes_string(y = group_col,
                                                     x = "count",
                                                     fill = paste0("as.factor(", fill_col, ")"))) +
     ggplot2::geom_bar(stat = "identity") +
     ggplot2::scale_fill_manual(values = fill_values,
                                labels = fill_labels,
                                name = "Match Status") +
-    ggplot2::labs(title = plot_title,
+    ggplot2::labs(title = plot_name,
                   x = x_label,
                   y = y_label) +
     ggplot2::theme_minimal() +
@@ -82,4 +82,10 @@ viz_stackedbar <- function(data,
                    legend.position = legend_position,
                    legend.justification = c("right", "bottom"),
                    plot.title = ggplot2::element_text(hjust = 0.4))
+
+  ## ----------- Save and return -------------#
+  # Only needed if exported!
+
+
+  return(plot)
 }

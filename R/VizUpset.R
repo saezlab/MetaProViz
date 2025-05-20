@@ -29,13 +29,9 @@
 #'                  of each observation. This column is coerced to a factor if provided. \strong{Default = NULL}
 #' @param intersect_cols \emph{Optional: } A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
 #'                       \strong{Default = c("LIMID", "HMDB", "CHEBI", "None")}.
-#' @param plot_title \emph{Optional: } A string specifying the title of the plot. \strong{Default = "Metabolite IDs"}.
+#' @param plot_name \emph{Optional: } String which is added to the output files of the Upsetplot\strong{Default = ""}
 #' @param palette_type \emph{Optional: } A string specifying the color palette to use for the fill aesthetic when \code{class_col} is provided.
 #'                     Options are \code{"viridis"} and \code{"polychrome"}. \strong{Default = c("viridis", "polychrome")}
-#' @param output_file \emph{Optional: } An optional string specifying the file path to save the plot. If \code{NULL}, the plot is not saved. \strong{Default = NULL}
-#' @param width \emph{Optional: } Numeric value specifying the width of the saved plot (if \code{output_file} is provided). \strong{Default = 14}.
-#' @param height \emph{Optional: } Numeric value specifying the height of the saved plot (if \code{output_file} is provided). \strong{Default = 8}.
-#' @param dpi \emph{Optional: } Numeric value specifying the resolution (dots per inch) of the saved plot (if \code{output_file} is provided). \strong{Default = 300}.
 #' @param max_legend_terms \emph{Optional: } Numeric value specifying the maximum number of unique terms in \code{class_col}
 #'                         for which the legend should be displayed. If the number of levels exceeds this value,
 #'                         the legend will be hidden. Ignored if \code{class_col} is \code{NULL}. \strong{Default = 20}.
@@ -57,16 +53,12 @@
 #' @importFrom logger log_info log_trace
 #' @importFrom stats setNames
 #'
-#' @export
+#' @noRd
 viz_upset <- function(df,
                      class_col = NULL,
                      intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
-                     plot_title = "Metabolite IDs",
+                     plot_name = "Metabolite IDs",
                      palette_type = c("viridis", "polychrome"),
-                     output_file = NULL,
-                     width = 14,
-                     height = 8,
-                     dpi = 300,
                      max_legend_terms = 20,
                      save_plot = "svg",
                      print_plot=TRUE,
@@ -84,12 +76,12 @@ viz_upset <- function(df,
 
 
   ## ------------ Create Results output folder ----------- ##
-  folder <- NULL
   if(is.null(save_plot)==FALSE){
     folder <- save_path(folder_name= "UpsetPlots",
                        path=path)
+    logger::log_info("viz_upset results saved at ", folder)
   }
-  logger::log_info("viz_pca results saved at ", folder)
+
 
   ###########################################################################
   ## ----------- Check input data frame ----------- ##
@@ -145,7 +137,7 @@ viz_upset <- function(df,
   p <- ComplexUpset::upset(
     data = df,
     intersect = intersect_cols,
-    name = plot_title,
+    name = plot_name,
     base_annotations = base_annotation,
     set_sizes = (
       ComplexUpset::upset_set_size() +
@@ -162,10 +154,17 @@ viz_upset <- function(df,
     p <- p + ggplot2::theme(legend.position = "none")
   }
 
-  # Save the plot if output_file is provided
-  if (!is.null(output_file)) {
-    ggplot2::ggsave(filename = output_file, plot = p, width = width, height = height, dpi = dpi)
-  }
+
+  ## ----------- Save and return -------------#
+  suppressMessages(suppressWarnings(
+    save_res(inputlist_df=NULL,
+             inputlist_plot= list(upset_plot = upset_plot),
+             save_table=NULL,
+             save_plot=save_plot,
+             path= folder,
+             file_name= "UpsetPlot",
+             core=FALSE,
+             print_plot=print_plot)))
 
   return(p)
 }
