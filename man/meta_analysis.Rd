@@ -7,7 +7,6 @@
 meta_analysis(
   data,
   metadata_sample,
-  by = NULL,
   scaling = TRUE,
   percentage = 0.1,
   cutoff_stat = 0.05,
@@ -34,9 +33,6 @@ repetitions of measurements, which will be summarised. Column
 "BiologicalReplicates" including numerical values. Please use the following
 names: "Conditions", "Biological_Replicates",
 "Analytical_Replicates".\strong{Default = NULL}}
-
-\item{by}{\emph{Optional: } Join specification between \code{data} and
-\code{metadata_sample}. See the docs of \code{dplyr::left_join} for details. \strong{Default = NULL}}
 
 \item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is
 used \strong{Default = TRUE}}

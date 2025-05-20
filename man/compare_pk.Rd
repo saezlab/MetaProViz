@@ -8,10 +8,13 @@ compare_pk(
   data,
   metadata_info = NULL,
   filter_by = c("both", "gene", "metabolite"),
-  plot_title = "Overlap of Prior Knowledge Resources",
+  plot_name = "Overlap of Prior Knowledge Resources",
   name_col = "TrivialName",
   palette_type = "polychrome",
-  output_file = NULL
+  save_plot = "svg",
+  save_table = "csv",
+  print_plot = TRUE,
+  path = NULL
 )
 }
 \arguments{
@@ -32,9 +35,17 @@ In within-resource mode, the input data frame is expected to contain a column na
 \item{filter_by}{Character. Optional filter for the resulting features when comparing multiple resources.
 Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. This parameter is ignored in within-resource mode.}
 
-\item{plot_title}{Character. Title for the UpSet plot. Default is \code{"Overlap of Prior Knowledge Resources"}.}
+\item{plot_name}{\emph{Optional: } String which is added to the output files of the Upsetplot \strong{Default = ""}}
 
 \item{palette_type}{Character. Color palette to be used in the plot. Default is \code{"polychrome"}.}
+
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
+
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+
+\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
+
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 
 \item{output_file}{Character. Optional file path to save the generated plot; if \code{NULL}, the plot is not saved.}
 }
@@ -83,7 +94,7 @@ data_single <- list(Biocft = FeatureMetadata_Biocrates)
 metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 
 res_single <- compare_pk(data = data_single, metadata_info = metadata_info_single,
-                          plot_title = "Overlap of BioCrates Columns")
+                          plot_name = "Overlap of BioCrates Columns")
 
 ## Example 3: Custom data Frames with Custom Column Names
 
