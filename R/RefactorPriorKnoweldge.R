@@ -228,7 +228,7 @@ translate_id <- function(data,
 #'
 #' @examples
 #' DetectedIDs <- MetaProViz::ToyData(data="Cells_Metadata")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
-#' Res <- MetaProViz::equivalent_ids(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
+#' Res <- MetaProViz::equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
@@ -241,7 +241,7 @@ translate_id <- function(data,
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
 #' @export
-equivalent_ids <- function(data,
+equivalent_id <- function(data,
                           metadata_info = c(InputID="MetaboliteID"),
                           from = "hmdb",
                           save_table= "csv",
@@ -418,16 +418,16 @@ equivalent_ids <- function(data,
     mutate(PotentialAdditionalIDs = ifelse(PotentialAdditionalIDs == "", NA, PotentialAdditionalIDs))%>%
     mutate(AllIDs = ifelse(AllIDs == "", !!sym(metadata_info[['InputID']]), AllIDs))
 
-  ## ------------------ Create count_ids plot ------------------- ##
+  ## ------------------ Create count_id plot ------------------- ##
   #QC plot of before and after
-  Before <-MetaProViz:::count_ids(data=data,
+  Before <-MetaProViz:::count_id(data=data,
                                  column=metadata_info[["InputID"]],
                                  save_plot = NULL,
                                  save_table = NULL,
                                  print_plot = FALSE,
                                  path = NULL)
 
-  After <-MetaProViz:::count_ids(data=OtherIDs,
+  After <-MetaProViz:::count_id(data=OtherIDs,
                                   column="AllIDs",
                                   save_plot = NULL,
                                   save_table = NULL,
@@ -439,7 +439,7 @@ equivalent_ids <- function(data,
   OutputDF <- OtherIDs
 
   ## ------------------ Save the results ------------------- ##
-  ResList <- list("equivalent_ids" = OutputDF)
+  ResList <- list("equivalent_id" = OutputDF)
 
   suppressMessages(suppressWarnings(
     save_res(inputlist_df=ResList,
@@ -447,7 +447,7 @@ equivalent_ids <- function(data,
                          save_table=save_table,
                          save_plot=NULL,
                          path= Subfolder,
-                         file_name= "equivalent_ids",
+                         file_name= "equivalent_id",
                          core=FALSE,
                          print_plot=FALSE)))
 
@@ -694,12 +694,12 @@ mapping_ambiguity <- function(data,
 #' @examples
 #' DetectedIDs <-  MetaProViz::ToyData(data="Cells_Metadata")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz:::check_match_id(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+#' Res <- MetaProViz:::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
 #' @export
 #'
 
-check_match_id <- function(data,
+checkmatch_pk_to_data <- function(data,
                            input_pk,
                            metadata_info = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term"),
                            save_table= "csv",
@@ -1778,7 +1778,7 @@ compare_pk <- function(data,
 #'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
 #'
 #' @export
-count_ids <- function(data,
+count_id <- function(data,
                       column,
                       delimiter = ",",
                       fill_colors = c("No ID" = "#FB8072",
@@ -1795,7 +1795,7 @@ count_ids <- function(data,
   #we need to specify that NA is counted as none
   #we need to check for duplications (i.e. is the trivialname duplicated in the data frame, remove this and give a warning)
   #give the user the change to pass multiple columns to analyse, which would mean we create a plot for each column and label the plot with the column name
-  #add count_ids function into Equivalent IDs: make a plot before and after equivalent IDs and put them side by side to return as the QC plot of the function
+  #add count_id function into Equivalent IDs: make a plot before and after equivalent IDs and put them side by side to return as the QC plot of the function
   #add save_plot and save_table
   #return both standard plot and Plot_Sized (=nice version of the plot which is saved. the other plot is still returned, since this is the ggplot version and can be changed further)
   #create subtitle and not title prefix

@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: pre_processing
+## Script name: processing
 ##
 ## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalization, outlier detection and QC plots
 ##
@@ -45,12 +45,12 @@
 #'
 #' @examples
 #' Intra <- MetaProViz::ToyData("IntraCells_Raw")
-#' ResI <- MetaProViz::pre_processing(data=Intra[-c(49:58) ,-c(1:3)],
+#' ResI <- MetaProViz::processing(data=Intra[-c(49:58) ,-c(1:3)],
 #'                                  metadata_sample=Intra[-c(49:58) , c(1:3)],
 #'                                  metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' Media <- MetaProViz::ToyData("CultureMedia_Raw")
-#' ResM <- MetaProViz::pre_processing(data = Media[-c(40:45) ,-c(1:3)],
+#' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                   core=TRUE)
@@ -63,7 +63,7 @@
 #'
 #' @export
 #'
-pre_processing <- function(data,
+processing <- function(data,
                           metadata_sample,
                           metadata_info,
                           featurefilt = "Modified",
@@ -93,7 +93,7 @@ pre_processing <- function(data,
                           print_plot= print_plot)
 
   # HelperFunction `check_param` Specific
-  check_param_preproc(metadata_sample=metadata_sample,
+  check_param_processing(metadata_sample=metadata_sample,
                            metadata_info=metadata_info,
                            core=core,
                            featurefilt=featurefilt,
@@ -108,7 +108,7 @@ pre_processing <- function(data,
     folder <- save_path(folder_name= "Processing",
                                     path=path)
 
-    Subfolder_P <- file.path(folder, "pre_processing")
+    Subfolder_P <- file.path(folder, "processing")
     if (!dir.exists(Subfolder_P)) {dir.create(Subfolder_P)}
   }
 
@@ -245,7 +245,7 @@ pre_processing <- function(data,
                          save_table=save_table,
                          save_plot=save_plot,
                          path= Subfolder_P,
-                         file_name= "pre_processing",
+                         file_name= "processing",
                          core=core,
                          print_plot=print_plot)))
 
@@ -603,7 +603,7 @@ pool_estimation <- function(data,
 
 
 ################################################################################################
-### ### ### pre_processing helper function: feature_filtering ### ### ###
+### ### ### processing helper function: feature_filtering ### ### ###
 ################################################################################################
 
 #' feature_filtering
@@ -730,7 +730,7 @@ feature_filtering <-function(data,
 
 
 ################################################################################################
-### ### ### pre_processing helper function: Missing Value imputation ### ### ###
+### ### ### processing helper function: Missing Value imputation ### ### ###
 ################################################################################################
 
 #' Missing Value Imputation using half minimum value
@@ -848,7 +848,7 @@ mvi_imputation <-function(data,
 
 
 ################################################################################################
-### ### ### pre_processing helper function: total ion Count Normalization ### ### ###
+### ### ### processing helper function: total ion Count Normalization ### ### ###
 ################################################################################################
 
 #' Total ion count normalization
@@ -972,7 +972,7 @@ tic_norm <-function(data,
 }
 
 ################################################################################################
-### ### ### pre_processing helper function: core nomalisation ### ### ###
+### ### ### processing helper function: core nomalisation ### ### ###
 ################################################################################################
 
 #' Consumption Release Normalisation
@@ -1242,7 +1242,7 @@ core_norm <-function(data,
 
 
 ################################################################################################
-### ### ### pre_processing helper function: Outlier detection ### ### ###
+### ### ### processing helper function: Outlier detection ### ### ###
 ################################################################################################
 
 #' outlier_detection

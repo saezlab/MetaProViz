@@ -130,10 +130,10 @@ This has been done by the authors of the paper and we will use the median normal
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
 \
 Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
-The `MetaProViz::meta_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
+The `MetaProViz::metadata_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
 ```{r}
-MetaRes <- MetaProViz::meta_analysis(data=Tissue_Norm[,-c(1:13)],
+MetaRes <- MetaProViz::metadata_analysis(data=Tissue_Norm[,-c(1:13)],
                                      metadata_sample= Tissue_Norm[,c(2,4:5,12:13)],
                                      scaling = TRUE,
                                      percentage = 0.1,

@@ -302,7 +302,7 @@ Input_HMDB <- FeatureMetadata_Cells%>%
   dplyr::select("HMDB", "Pathway") # only keep relevant columns
 
 # Add equivalent IDs:
-FeatureMetadata_Cells_AddIDs <- MetaProViz::equivalent_ids(data= Input_HMDB,
+FeatureMetadata_Cells_AddIDs <- MetaProViz::equivalent_id(data= Input_HMDB,
                                                           metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
                                                           from = "hmdb")
 ```
@@ -310,7 +310,7 @@ FeatureMetadata_Cells_AddIDs <- MetaProViz::equivalent_ids(data= Input_HMDB,
 ```{r, echo=FALSE}
 # Check how our data looks like:
 FeatureMetadata_Cells_AddIDs [2:8, 1:3]%>%
-  kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using MetaProViz::equivalent_ids() function.") %>%
+  kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using MetaProViz::equivalent_id() function.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
@@ -583,7 +583,7 @@ Noteworthy, in some cases the Biocrates metabolites have multiple HMDB IDs liste
 
 ```{r, fig.width=8, fig.height=6}
 # Count entries and record NA information
-result_bioc_hmdb_count <- MetaProViz::count_ids(FeatureMetadata_Biocrates, "HMDB")
+result_bioc_hmdb_count <- MetaProViz::count_id(FeatureMetadata_Biocrates, "HMDB")
 # Access the processed data:
 processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$result
 
@@ -595,14 +595,14 @@ From this plot we can make a few observations:
 3. For those with multiple, this ranges from 2-20 HMDB entries per biocrates cell!
 
 With so many biocrates cells linked to multiple HMDB IDs there are different ways to deal with this (e.g. select a single HMDB ID in cases where we have multiple). We discuss the pros and cons of this later in section: [Bonus: Are multiple metabolite IDs helpful or a hindrance?](#sect4_bonus).
-But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `check_match_id()` has been designed to handle.
+But for now, we will proceed with making the connections to the PK using all HMDBs, which the MetaProViz function `checkmatch_pk_to_data()` has been designed to handle.
 
 ## 3. Make connection to PK and assess overlap
 
-Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::check_match_id()` function.\
+Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `MetaProViz::checkmatch_pk_to_data()` function.\
 
 ```{r}
-Biocrates_to_MetalinksDB <- MetaProViz::check_match_id(data = FeatureMetadata_Biocrates,
+Biocrates_to_MetalinksDB <- MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,
                                                        input_pk = MetaLinksDB_Res$MetalinksDB,
                                                        metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
@@ -625,7 +625,7 @@ This returns some warning messages and 4 tables:\
 
 In some cases we will expect to have only input ID linked to one entry in the PK.
 But this won't always be the case, and as already discussed in the last section above, in many cases here we will have multiple HMDB IDs per single biocrates metabolite cell.
-The `MetaProViz::check_match_id()` has been designed with this in mind, by default splitting any comma separated values in the InputID (or PriorID) into separate entities, counting the number of links between these, and reporting this to the user.
+The `MetaProViz::checkmatch_pk_to_data()` has been designed with this in mind, by default splitting any comma separated values in the InputID (or PriorID) into separate entities, counting the number of links between these, and reporting this to the user.
 
 Let's take a look at the data_Matched data:
 
@@ -709,7 +709,7 @@ FeatureMetadata_Biocrates_singleHMDB$HMDB_single <- extract_first_id(FeatureMeta
 
 # Visually check that the single ID function has worked
 # Count entries and record NA information
-result_bioc_hmdb_count_single <- MetaProViz::count_ids(FeatureMetadata_Biocrates_singleHMDB, "HMDB_single")
+result_bioc_hmdb_count_single <- MetaProViz::count_id(FeatureMetadata_Biocrates_singleHMDB, "HMDB_single")
 # Access the processed data:
 processed_df_bioc_hmdb_count_single <- result_bioc_hmdb_count_single$result
 # Display the plot:
@@ -719,7 +719,7 @@ print(result_bioc_hmdb_count_single$plot)
 Now that we can see we only have either NA or singular values for our HMDB IDs, let's map this table to MetalinksDB using the same function as we did earlier, but this time using the `HMDB_single` column.
 
 ```{r, fig.width=8, fig.height=6, echo=TRUE}
-Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz::check_match_id(data = FeatureMetadata_Biocrates_singleHMDB,
+Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates_singleHMDB,
                                                                   input_pk = MetaLinksDB_Res$MetalinksDB,
                                                                   metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 ```

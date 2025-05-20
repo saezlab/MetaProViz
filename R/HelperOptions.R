@@ -25,7 +25,7 @@
 #' metaproviz_save_config()
 #' }
 #'
-#' @importFrom OmnipathR save_config
+#' @importFrom OmnipathR metaproviz_save_config
 #' @export
 metaproviz_save_config <- function(
         path = NULL,
@@ -33,7 +33,7 @@ metaproviz_save_config <- function(
         local = FALSE
     ){
 
-    save_config(path = path, title = title, local = local, pkg = 'MetaProViz')
+    metaproviz_save_config(path = path, title = title, local = local, pkg = 'MetaProViz')
 
 }
 
@@ -58,7 +58,7 @@ metaproviz_save_config <- function(
 #' metaproviz_load_config(path = 'my_custom_metaproviz_config.yml')
 #' }
 #'
-#' @importFrom OmnipathR load_config
+#' @importFrom OmnipathR metaproviz_load_config
 #' @export
 metaproviz_load_config <- function(
         path = NULL,
@@ -67,7 +67,7 @@ metaproviz_load_config <- function(
         ...
     ){
 
-    load_config(
+    metaproviz_load_config(
         path = path,
         title = title,
         user = user,

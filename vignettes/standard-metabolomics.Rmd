@@ -209,7 +209,7 @@ The results from the `Pool_Estimation()` is a table that has the CVs. If there i
 \
 Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned and can be easily viewed.\
 ```{r, eval=FALSE}
-PreprocessingResults <- MetaProViz::pre_processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
+PreprocessingResults <- MetaProViz::processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
                                                    metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
                                                    metadata_info = c(Conditions = "Conditions",
                                                                      Biological_Replicates = "Biological_Replicates"),
@@ -231,7 +231,7 @@ Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE,   fig.width=6, fig.height=4.5, fig.align="left"}
-PreprocessingResults <- MetaProViz::pre_processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
+PreprocessingResults <- MetaProViz::processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
                                                   metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
                                                   metadata_info = c(Conditions = "Conditions",
                                                                     Biological_Replicates = "Biological_Replicates"),

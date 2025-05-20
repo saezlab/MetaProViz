@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: meta_analysis
+## Script name: metadata_analysis
 ##
 ## Purpose of script:
 ##
@@ -20,7 +20,7 @@
 #'
 
 ###############################################
-### ### ### meta_analysis ### ### ###
+### ### ### metadata_analysis ### ### ###
 ###############################################
 
 #' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
@@ -61,7 +61,7 @@
 #' results, results summary
 #'
 #' @examples
-#' Res <- meta_analysis(
+#' Res <- metadata_analysis(
 #'     data = tissue_norm[,-c(1:13)],
 #'     metadata_sample = tissue_norm[,c(2,4:5,12:13)],
 #'     by = "SampleID",
@@ -79,7 +79,7 @@
 #' @importFrom logger log_info
 #'
 #' @export
-meta_analysis <- function(data,
+metadata_analysis <- function(data,
                          metadata_sample,
                          #by = NULL,#Join specification between `data` and `metadata_sample`. See the docs of \code{dplyr::left_join} for details. \strong{Default = NULL}
                          scaling = TRUE,
@@ -326,7 +326,7 @@ meta_analysis <- function(data,
                          save_table=save_table,
                          save_plot=FALSE,
                          path= folder,
-                         file_name= "meta_analysis",
+                         file_name= "metadata_analysis",
                          core=FALSE,
                          print_plot=FALSE)
 
@@ -387,7 +387,7 @@ meta_pk <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "meta_analysis",
+    folder <- save_path(folder_name= "metadata_analysis",
                                     path=path)
   }
 

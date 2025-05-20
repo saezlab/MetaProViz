@@ -430,7 +430,7 @@ mca_2cond <- function(data_c1,
 #' @examples
 #'
 #' Media <- MetaProViz::ToyData("CultureMedia_Raw")
-#' ResM <- MetaProViz::pre_processing(data = Media[-c(40:45) ,-c(1:3)],
+#' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                   core=TRUE)

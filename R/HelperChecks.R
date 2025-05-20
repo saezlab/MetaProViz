@@ -325,10 +325,10 @@ check_param <- function(data,
 }
 
 ################################################################################################
-### ### ### pre_processing helper function: Internal Function to check function input ### ### ###
+### ### ### processing helper function: Internal Function to check function input ### ### ###
 ################################################################################################
 
-#' Check specific input parameters for pre_processing()
+#' Check specific input parameters for processing()
 #'
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
 #' @param metadata_info Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added.
@@ -342,13 +342,13 @@ check_param <- function(data,
 #'
 #' @return returns warnings and errors if input is not correct
 #'
-#' @keywords Input check for MetaProViz::pre_processing
+#' @keywords Input check for MetaProViz::processing
 #'
 #' @importFrom logger log_trace
 #'
 #' @noRd
 #'
-check_param_preproc <- function(metadata_sample,
+check_param_processing <- function(metadata_sample,
                                      metadata_info,
                                      core=FALSE,
                                      featurefilt = "Modified",
