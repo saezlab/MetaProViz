@@ -43,7 +43,7 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- ToyData("IntraCells_Raw")[,c(1:6)]
+#' Intra <- intracell_raw[,c(1:6)]%>%tibble::column_to_rownames("Code")
 #' Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)], metadata_info = c(Conditions="Conditions", Superplot = NULL))
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot

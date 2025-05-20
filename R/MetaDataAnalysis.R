@@ -62,9 +62,8 @@
 #'
 #' @examples
 #' Res <- metadata_analysis(
-#'     data = tissue_norm[,-c(1:13)],
-#'     metadata_sample = tissue_norm[,c(2,4:5,12:13)],
-#'     by = "SampleID",
+#'     data = tissue_norm[,-c(2:14)]%>%tibble::column_to_rownames("Code"),
+#'     metadata_sample = tissue_norm[,c(1,3,5:6,13:14)]%>%tibble::column_to_rownames("Code")
 #' )
 #'
 #' @keywords PCA, annova, metadata
@@ -350,7 +349,7 @@ metadata_analysis <- function(data,
 #' @return DF with prior knowledge based on patient metadata
 #'
 #' @examples
-#' Tissue_Norm <- MetaProViz::ToyData("Tissue_Norm")
+#' Tissue_Norm <- tissue_norm %>%tibble::column_to_rownames("Code")
 #' Res <- MetaProViz::meta_pk(data=Tissue_Norm[,-c(1:13)],
 #'                           metadata_sample= Tissue_Norm[,c(2,4:5,12:13)])
 #'
@@ -387,7 +386,7 @@ meta_pk <- function(data,
 
   ## ------------ Create Results output folder ----------- ##
   if(is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "metadata_analysis",
+    folder <- save_path(folder_name= "MetadataAnalysis",
                                     path=path)
   }
 

@@ -227,7 +227,7 @@ translate_id <- function(data,
 #' @return Input DF with additional column including potential additional IDs.
 #'
 #' @examples
-#' DetectedIDs <- MetaProViz::ToyData(data="Cells_Metadata")%>% tibble::rownames_to_column("TrivialName")%>%tidyr::drop_na()
+#' DetectedIDs <- cellular_meta%>%tidyr::drop_na()
 #' Res <- MetaProViz::equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
@@ -692,9 +692,9 @@ mapping_ambiguity <- function(data,
 #' @importFrom rlang !!! !! := sym syms
 #'
 #' @examples
-#' DetectedIDs <-  MetaProViz::ToyData(data="Cells_Metadata")%>% rownames_to_column("Metabolite") %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
+#' DetectedIDs <-  cellular_meta %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
-#' Res <- MetaProViz:::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+#' Res <- MetaProViz::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
 #' @export
 #'
@@ -1043,7 +1043,7 @@ checkmatch_pk_to_data <- function(data,
     na_rows_extended <- dplyr::select(na_rows_extended, dplyr::all_of(names(table_without_NA)))
 
     # Combine the processed table with the extended NA rows
-    combined_table <- dplyr::bind_rows(table_without_NA, na_rows_extended)
+    combined_table <- merge(table_without_NA, na_rows_extended, by=key)
 
     return(combined_table)
   }

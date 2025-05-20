@@ -42,8 +42,6 @@
 #'
 #' @return A \code{ggplot} object representing the generated upset plot.
 #'
-#' @examples
-#' # example code
 #'
 #' @keywords upset plot, complex upset
 #'

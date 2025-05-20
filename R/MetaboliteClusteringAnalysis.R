@@ -36,7 +36,7 @@
 #' @return List of two DFs: 1. summary of the cluster count and 2. the detailed information of each metabolites in the clusters.
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")
+#' Intra <- intracell_raw%>%tibble::column_to_rownames("Code")
 #' Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
 #' Res <- MetaProViz::mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],
@@ -429,7 +429,7 @@ mca_2cond <- function(data_c1,
 #'
 #' @examples
 #'
-#' Media <- MetaProViz::ToyData("CultureMedia_Raw")
+#' Media <- medium_raw %>%tibble::column_to_rownames("Code")
 #' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
@@ -441,7 +441,7 @@ mca_2cond <- function(data_c1,
 #'                             pval ="aov",
 #'                             core=TRUE)
 #'
-#' IntraDMA <- MetaProViz::ToyData(data="IntraCells_DMA")
+#' IntraDMA <- intracell_raw %>%tibble::column_to_rownames("Code")
 #'
 #' Res <- MetaProViz::mca_core(data_intra = IntraDMA%>%tibble::rownames_to_column("Metabolite"),
 #'                             data_core = MediaDMA[["dma"]][["786-M1A_vs_HK2"]])

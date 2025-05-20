@@ -54,7 +54,7 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_DMA")
+#' Intra <- intracell_dma%>%tibble::column_to_rownames("Metabolite")
 #' Res <- MetaProViz::viz_volcano(data=Intra)
 #'
 #' @keywords Volcano plot, pathways

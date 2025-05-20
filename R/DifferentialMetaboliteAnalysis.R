@@ -45,7 +45,7 @@
 #' @return Dependent on parameter settings, list of lists will be returned for dma (DF of each comparison), shapiro (Includes DF and Plot), bartlett (Includes DF and Histogram), vst (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
-#' Intra <- MetaProViz::ToyData("IntraCells_Raw")[-c(49:58) ,]
+#' Intra <- intracell_raw[-c(49:58) ,]%>%tibble::column_to_rownames("Code")
 #' ResI <- MetaProViz::dma(data=Intra[ ,-c(1:3)],
 #'                        metadata_sample=Intra[ , c(1:3)],
 #'                        metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
