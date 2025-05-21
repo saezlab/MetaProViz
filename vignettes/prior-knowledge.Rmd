@@ -342,7 +342,7 @@ KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can 
 
 ```{r}
 # This will use KEGGREST to query the KEGG API to load the pathways:
-MetaProViz::metsigdb_kegg()
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 ```
 
 \

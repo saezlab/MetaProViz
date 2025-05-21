@@ -344,7 +344,7 @@ For results with p.adjusted value < 0.1 and a minimum of 10% of the pathway dete
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-metsigdb_kegg()
+KEGG_Pathways <- metsigdb_kegg()
 
 for(comparison in names(ResList)){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
@@ -393,7 +393,7 @@ for(comparison in names(ResList)){
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-metsigdb_kegg()
+KEGG_Pathways <- metsigdb_kegg()
 
 for(comparison in names(ResList)){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
@@ -541,7 +541,7 @@ Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for ea
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-MetaProViz::metsigdb_kegg()
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 
 for(comparison in names(ResList)){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
@@ -590,7 +590,7 @@ for(comparison in names(ResList)){
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-MetaProViz::metsigdb_kegg()
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 
 for(comparison in names(ResList)){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.

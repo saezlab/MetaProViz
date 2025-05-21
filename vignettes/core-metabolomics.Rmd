@@ -119,7 +119,7 @@ MappingInfo[1:5,]%>%
 `3.` KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis. **(KEGG_Pathways)**\
 ```{r}
 # This will use KEGGREST to query the KEGG API to load the pathways:
-MetaProViz::metsigdb_kegg()
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 ```
 ```{r, echo=FALSE}
 # Check how our data looks like:
@@ -632,35 +632,35 @@ The MetaLinks database is a manually curated database of metabolite-receptor and
 to remove potential false positives and decrease the number of putative metabolite-receptor interactions, we filter the MetalinksDB resource to metabolites that are annotated as present in the kidney, blood, or urine in HMDB and known to be extracellular.\
 ```{r}
 # Selection as described in ST2 of Farr_Dimitrov2024:
-MetaLinksDB_Res <- MetaProViz::metsigdb_metalinks(cell_location =c("Extracellular"),
+MetaLinksDB <- MetaProViz::metsigdb_metalinks(cell_location =c("Extracellular"),
                                              tissue_location = c("Kidney", "All Tissues"),
                                              biospecimen_location = c("Blood",  "Urine"))
 
 # Here we add a UniquePair column combining hmdb-protein connection, removing duplications originating from different PK resources
-MetaLinksDB_Res[["MetalinksDB_Select"]] <- MetaLinksDB_Res[["MetalinksDB"]]%>%
+MetaLinksDB_Select <- MetaLinksDB %>%
                                            tidyr::unite("UniquePair", c("hmdb", "gene_symbol"), sep = "_", remove=FALSE)%>%
                                            distinct(UniquePair, .keep_all = TRUE)
 ```
 \
 Now we can use this information to understand if the metabolites that are consumed in the 786-M1A cells and Released in the HK2 cells are connected to specific receptors or transporters and are in the bioRCM cluster "Both_DOWN (Released/Consumed)\
 ```{r, echo=FALSE}
-MetaLinksDB_Res[["MetalinksDB_BothDOWN"]] <-merge(x=MetaLinksDB_Res[["MetalinksDB_Select"]],
+MetaLinksDB_BothDOWN <-merge(x=MetaLinksDB_Select,
                                                   y=MCA_res[,c(1,14,48)]%>% dplyr::filter(RG2_Significant=="Both_DOWN (Released/Consumed)") ,
                                                   by.x="hmdb",
                                                   by.y="core_DF_HMDB",
                                                   all.y=TRUE)
 
-# write.csv(MetaLinksDB_Res[["MetalinksDB_BothDOWN"]], "MetalinksDB_BothDOWN.csv")
+# write.csv(MetaLinksDB_BothDOWN, "MetalinksDB_BothDOWN.csv")
 
 # Lets summarise the findings:
 message("The following metabolites are not connected to any receptor or transporter in the MetalinksDB: ",
-        MetaLinksDB_Res[["MetalinksDB_BothDOWN"]] %>%
+        MetaLinksDB_BothDOWN %>%
           filter(is.na(UniquePair)) %>%
           pull(Metabolite) %>%
           paste(collapse = ", "))
 
 message("The following metabolites are connected to at least one receptor or transporter in the MetalinksDB: ",
-        MetaLinksDB_Res[["MetalinksDB_BothDOWN"]] %>%
+        MetaLinksDB_BothDOWN %>%
           filter(!is.na(UniquePair)) %>%
           pull(Metabolite) %>%
           unique() %>%
