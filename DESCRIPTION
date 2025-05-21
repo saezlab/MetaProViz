@@ -71,12 +71,11 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    writexl
+    writexl,
+    ggVennDiagram,
 Suggests:
     BiocStyle,
     ggupset,
-    ggVennDiagram,
-    kableExtra,
     knitr,
     pkgdown,
     svglite,
