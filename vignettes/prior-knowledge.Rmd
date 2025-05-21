@@ -449,19 +449,19 @@ Yet, it is important to keep in mind that generally we detect less metabolites t
 The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters [@Farr_Dimitrov2024].\
 
 ```{r}
-MetaLinksDB_Res <- MetaProViz::metsigdb_metalinks()
+MetaLinksDB <- MetaProViz::metsigdb_metalinks()
 ```
 
 \
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-MetaLinksDB_Res[["MetalinksDB"]][c(12:13,17:18,432,466),c(1:2,6:8, 12:15)]%>%
+MetaLinksDB[c(12:13,17:18,432,466),c(1:2,6:8, 12:15)]%>%
   kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB` including metabolite-receptor sets.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
-MetaLinksDB_Res[["MetalinksDB_Type"]][c(1,50, 90, 101),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB_Type` including metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
+dplyr::filter(MetaLinksDB, !is.na(term_specific))[c(1,50, 90, 101),]
+  kableExtra::kbl(caption = "Preview of the metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 
@@ -473,7 +473,7 @@ As an example, we will compare the resources containing gene-metabolite sets (Ha
 # Compare the PK resources
 pk_comp_res <- MetaProViz::compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMetab[["GeneMetabSet"]]),
                                                   Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
-                                                  MetalinksDB = as.data.frame(MetaLinksDB_Res[["MetalinksDB"]]))
+                                                  MetalinksDB = as.data.frame(MetaLinksDB))
                                      )
 ```
 \
@@ -603,7 +603,7 @@ Here we connect the experimental Biocrates table to the MetalinksDB PK using the
 
 ```{r}
 Biocrates_to_MetalinksDB <- MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,
-                                                       input_pk = MetaLinksDB_Res$MetalinksDB,
+                                                       input_pk = MetaLinksDB,
                                                        metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
 
@@ -720,7 +720,7 @@ Now that we can see we only have either NA or singular values for our HMDB IDs, 
 
 ```{r, fig.width=8, fig.height=6, echo=TRUE}
 Biocrates_to_MetalinksDB_singleHMDB <- MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates_singleHMDB,
-                                                                  input_pk = MetaLinksDB_Res$MetalinksDB,
+                                                                  input_pk = MetaLinksDB,
                                                                   metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 ```
 
