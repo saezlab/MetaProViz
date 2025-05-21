@@ -1413,17 +1413,17 @@ add_info <- function(mat,
 #' ## Example 1: Multi-Resource Comparison
 #'
 #' # Using automatic data loading for multiple resources.
-#' data <- list(Hallmarks = "Hallmarks", Gaude = "Gaude",
-#'                 MetalinksDB = "MetalinksDB", RAMP = "metsigdb_chemicalclass")
+#' data <- list(hallmarks = hallmarks, gaude = gaude_pathways, 
+#'                 metalinksdb = metsigdb_metalinksdb(), ramp = metsigdb_chemicalclass())
 #'
 #' # Filtering to include only gene features:
 #' res_genes <- MetaProViz::compare_pk(data = data, filter_by = "gene")
 #'
 #' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
 #'
-#' # Assume FeatureMetadata_Biocrates is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
+#' # biocrates_features is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 #' # Here the "Class" column is used as the grouping variable in the UpSet plot.
-#' data_single <- list(Biocft = FeatureMetadata_Biocrates)
+#' data_single <- list(Biocft = biocrates_features)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
 #' res_single <- MetaProViz::compare_pk(data = data_single, metadata_info = metadata_info_single,
