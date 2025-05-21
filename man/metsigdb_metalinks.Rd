@@ -2,7 +2,7 @@
 % Please edit documentation in R/GetPriorKnowledge.R
 \name{metsigdb_metalinks}
 \alias{metsigdb_metalinks}
-\title{Function to}
+\title{Annotated metabolite-protein interactions from MetalinksDB}
 \usage{
 metsigdb_metalinks(
   types = NULL,
@@ -39,5 +39,5 @@ metsigdb_metalinks(
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
 \description{
-Function to
+Annotated metabolite-protein interactions from MetalinksDB
 }
