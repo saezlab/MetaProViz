@@ -456,11 +456,14 @@ MetaLinksDB <- MetaProViz::metsigdb_metalinks()
 
 ```{r, echo=FALSE}
 # Check how our data looks like:
-MetaLinksDB[c(12:13,17:18,432,466),c(1:2,6:8, 12:15)]%>%
+MetaLinksDB[
+    c(12:13,17:18,432,466),
+    c(1:2,6:8, 12:15)
+  ] %>%
   kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB` including metabolite-receptor sets.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 
-dplyr::filter(MetaLinksDB, !is.na(term_specific))[c(1,50, 90, 101),]
+dplyr::filter(MetaLinksDB, !is.na(term_specific))[c(1,50, 90, 101),] %>%
   kableExtra::kbl(caption = "Preview of the metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
@@ -530,7 +533,7 @@ Now we select these metabolite identifier columns to count the coverage and look
 This helps us to understand what to expect, when linking the data to prior knowledge.\
 
 ```{r, fig.width=12, fig.height=9}
-pk_comp_res_biocft <- MetaProViz::compare_pk(data = list(Biocft = FeatureMetadata_Biocrates), 
+pk_comp_res_biocft <- MetaProViz::compare_pk(data = list(Biocft = FeatureMetadata_Biocrates),
                                              metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
                                              plot_name = "Overlap of BioCrates Columns")
 
