@@ -531,7 +531,7 @@ metsigdb_metalinks <- function(types = NULL,
 			term_specific = ifelse(
 			  is.na(protein_type), 
 				NA,
-				sprinft(
+				sprintf(
 					'%s_%s',
   				str_replace_all(protein_type, '"', ''),
 					type
