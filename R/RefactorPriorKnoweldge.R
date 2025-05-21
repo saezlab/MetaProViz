@@ -1414,7 +1414,7 @@ add_info <- function(mat,
 #'
 #' # Using automatic data loading for multiple resources.
 #' data <- list(hallmarks = hallmarks, gaude = gaude_pathways, 
-#'                 metalinksdb = metsigdb_metalinksdb(), ramp = metsigdb_chemicalclass())
+#'                 metalinksdb = metsigdb_metalinks(), ramp = metsigdb_chemicalclass())
 #'
 #' # Filtering to include only gene features:
 #' res_genes <- MetaProViz::compare_pk(data = data, filter_by = "gene")
