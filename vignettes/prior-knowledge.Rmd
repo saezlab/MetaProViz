@@ -361,7 +361,7 @@ The chemical class-metabolite sets were curated by RaMP-DB, which used ClassyFir
 Here we access them via OmnipathR.\
 
 ```{r}
-MetaProViz::metsigdb_chemicalclass()
+ChemicalClass_MetabSet <- MetaProViz::metsigdb_chemicalclass()
 ```
 
 \
