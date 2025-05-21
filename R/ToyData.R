@@ -235,3 +235,18 @@
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
 "alanine_pathways"
+
+
+#' hallmarks
+#'
+#' @format Data frame with columns: term, gene
+#'
+#' @source ?
+"hallmarks"
+
+#' gaude_pathways
+#'
+#' @format ?
+#'
+#' @source ?
+"gaude_pathways"
