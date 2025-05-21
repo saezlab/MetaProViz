@@ -80,8 +80,8 @@ metsigdb_kegg <- function(){
 
 
   #Return into environment
-  assign("KEGG_Pathways", KEGG_H, envir=.GlobalEnv)
-  #return(KEGG_H) change all of this to return
+	return(KEGG_H)
+
 }
 
 
@@ -174,8 +174,8 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
             core=FALSE,
             print_plot=FALSE)))
 
-  # Return into environment
-  assign("ChemicalClass_MetabSet", HMDB_ChemicalClass, envir=.GlobalEnv)
+	return(HMDB_ChemicalClass)
+
 }
 
 
@@ -292,7 +292,7 @@ make_gene_metab_set <- function(input_pk,
 ### ### ### Load MetaLinksDB prior knowledge ### ### ###
 ##########################################################################################
 #'
-#' Function to
+#' Annotated metabolite-protein interactions from MetalinksDB
 #'
 #' @param types Desired edge types. Options are: "lr", "pd", where 'lr' stands for 'ligand-receptor' and 'pd' stands for 'production-degradation'.\strong{default: NULL}
 #' @param cell_location Desired metabolite cell locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Cytoplasm", "Endoplasmic reticulum", "Extracellular", "Lysosome" , "Mitochondria", "Peroxisome", "Membrane", "Nucleus", "Golgi apparatus" , "Inner mitochondrial membrane". \strong{default: NULL}
@@ -526,19 +526,24 @@ metsigdb_metalinks <- function(types = NULL,
   #Decide on useful selections term-metabolite for MetaProViz.
   #MetalinksDB_Pathways <- merge(MetalinksDB[, c(1:3)], TablesList[["pathway"]], by="hmdb", all.x=TRUE)
 
-  MetalinksDB_Type <-MetalinksDB[, c(1:3, 5:7,13, 15)]%>%
-    subset(!is.na(protein_type))%>%
-    dplyr::mutate(term = gsub('\"', '', protein_type))%>%
-    unite(term_specific, c("term", "type"), sep = "_", remove = FALSE)%>%
-    dplyr::select(-"type", -"protein_type")
+	MetalinksDB %<>%
+		mutate(
+			term_specific = ifelse(
+			  is.na(protein_type), 
+				NA,
+				sprinft(
+					'%s_%s',
+  				str_replace_all(protein_type, '"', ''),
+					type
+				)
+			)
+		)
 
   #------------------------------------------------------------------
   #Save results in folder
   ##-------------- Save and return
-  DF_List <- list("MetalinksDB"=MetalinksDB,
-                  "MetalinksDB_Type"=MetalinksDB_Type)
   suppressMessages(suppressWarnings(
-    save_res(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
+    save_res(inputlist_df= list(MetalinksDB),#This needs to be a list, also for single comparisons
                          inputlist_plot= NULL,
                          save_table=save_table,
                          save_plot=NULL,
@@ -547,8 +552,7 @@ metsigdb_metalinks <- function(types = NULL,
                          core=FALSE,
                          print_plot=FALSE)))
 
-  #Return into environment
-  return(invisible(DF_List))
+  return(MetalinksDB)
 
 }
 
