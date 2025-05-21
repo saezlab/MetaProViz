@@ -309,6 +309,7 @@ make_gene_metab_set <- function(input_pk,
 #' @importFrom OmnipathR metalinksdb_sqlite
 #' @importFrom logger log_info
 #' @importFrom dplyr mutate
+#' @importFrom stringr str_replace_all
 #' @export
 metsigdb_metalinks <- function(types = NULL,
                           cell_location = NULL,
