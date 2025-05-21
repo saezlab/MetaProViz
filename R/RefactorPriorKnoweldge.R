@@ -1413,7 +1413,7 @@ add_info <- function(mat,
 #' ## Example 1: Multi-Resource Comparison
 #'
 #' # Using automatic data loading for multiple resources.
-#' data <- list(hallmarks = hallmarks, gaude = gaude_pathways, 
+#' data <- list(hallmarks = hallmarks, gaude = gaude_pathways,
 #'                 metalinksdb = metsigdb_metalinks(), ramp = metsigdb_chemicalclass())
 #'
 #' # Filtering to include only gene features:
@@ -1492,11 +1492,11 @@ compare_pk <- function(data,
   ## ----------- Input ----------- ##
   # Define resource lookup table with information on how to retrieve and transform each resource.
   default_cols <- list(
-    hallmarks = "feature",
-		gaude = "feature",
-		metalinksdb = c("hmdb", "gene_symbol"), 
-		ramp = "class_source_id"
-	)
+    hallmarks = "gene",
+    gaude = "gene",
+    metalinksdb = c("hmdb", "gene_symbol"),
+    ramp = "class_source_id"
+  )
 
   # Initialize metadata_info if not provided.
   if (is.null(metadata_info)) {

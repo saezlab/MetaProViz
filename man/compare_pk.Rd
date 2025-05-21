@@ -79,7 +79,7 @@ that is used for grouping in the UpSet plot.
 ## Example 1: Multi-Resource Comparison
 
 # Using automatic data loading for multiple resources.
-data <- list(hallmarks = hallmarks, gaude = gaude_pathways, 
+data <- list(hallmarks = hallmarks, gaude = gaude_pathways,
                 metalinksdb = metsigdb_metalinks(), ramp = metsigdb_chemicalclass())
 
 # Filtering to include only gene features:
