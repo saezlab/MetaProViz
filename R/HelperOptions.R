@@ -33,7 +33,7 @@ metaproviz_save_config <- function(
         local = FALSE
     ){
 
-    metaproviz_save_config(path = path, title = title, local = local, pkg = 'MetaProViz')
+    save_config(path = path, title = title, local = local, pkg = 'MetaProViz')
 
 }
 
