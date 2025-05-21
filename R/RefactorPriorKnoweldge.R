@@ -1491,77 +1491,12 @@ compare_pk <- function(data,
   ###########################################################################
   ## ----------- Input ----------- ##
   # Define resource lookup table with information on how to retrieve and transform each resource.
-  resource_definitions <- list(
-    hallmarks = list(
-      var = "Hallmark_Pathways",
-      load_fun = hallmarks,
-      transform_fun = function(x) {
-        resource_object <- MetaProViz::make_gene_metab_set(input_pk = x,
-                                                         metadata_info = c(Target = "gene"),
-                                                         pk_name = "Hallmarks")
-        if ("GeneMetabSet" %in% names(resource_object)) {
-          resource_object$GeneMetabSet
-        } else {
-          stop("make_gene_metab_set for Hallmarks did not return 'GeneMetabSet'.")
-        }
-      },
-      default_col = "feature"
-    ),
-    gaude = list(
-      var = "Gaude_Pathways",
-      load_fun = gaude_pathways,
-      transform_fun = function(x) {
-        resource_object <- MetaProViz::make_gene_metab_set(input_pk = x,
-                                                         metadata_info = c(Target = "gene"),
-                                                         pk_name = "Gaude")
-        if ("GeneMetabSet" %in% names(resource_object)) {
-          resource_object$GeneMetabSet
-        } else {
-          stop("make_gene_metab_set for Gaude did not return 'GeneMetabSet'.")
-        }
-      },
-      default_col = "feature"
-    ),
-    metalinksdb = list(
-      var = "MetalinksDB",
-      load_fun = MetaProViz::metsigdb_metalinks,
-      transform_fun = function(x) {
-        if ("MetalinksDB" %in% names(x)) {
-          x$MetalinksDB
-        } else {
-          stop("Loaded MetalinksDB does not contain a 'MetalinksDB' element.")
-        }
-      },
-      default_col = c("hmdb", "gene_symbol")
-    ),
-    ramp = list(
-      var = "ChemicalClass_MetabSet",
-      load_fun = MetaProViz::metsigdb_chemicalclass,
-      transform_fun = function(x) {
-        x  # for RAMP, assume the global variable itself is the data frame.
-      },
-      default_col = "class_source_id"
-    )
-  )
-
-  # Preprocess data: auto‑load resources if they are provided as strings.
-  for (res in names(data)) {
-    if (!inherits(data[[res]], "data.frame") && is.character(data[[res]])) {
-      resource_id <- tolower(data[[res]])
-      if (resource_id %in% names(resource_definitions)) {
-        res_def <- resource_definitions[[resource_id]]
-        if (exists(res_def$var, envir = .GlobalEnv)) {
-          resource_object <- get(res_def$var, envir = .GlobalEnv)
-        } else {
-          resource_object <- res_def$load_fun()
-        }
-        data[[res]] <- res_def$transform_fun(resource_object)
-        if (is.null(metadata_info[[res]])) {
-          metadata_info[[res]] <- res_def$default_col
-        }
-      }
-    }
-  }
+  default_cols <- list(
+    hallmarks = "feature",
+		gaude = "feature",
+		metalinksdb = c("hmdb", "gene_symbol"), 
+		ramp = "class_source_id"
+	)
 
   # Initialize metadata_info if not provided.
   if (is.null(metadata_info)) {
@@ -1648,36 +1583,12 @@ compare_pk <- function(data,
     # Process each resource in data.
     for (res in names(data)) {
       resource_val <- data[[res]]
-      if (!inherits(resource_val, "data.frame")) {
-        if (!is.character(resource_val)) {
-          stop("Each element in data must be either a data frame or a character string indicating a resource name.")
-        }
-        resource_id <- tolower(resource_val)
-        if (resource_id %in% c("metsigdb_chemicalclass")) {
-          resource_id <- "ramp"
-        }
-        if (!resource_id %in% names(resource_definitions)) {
-          stop("Unknown resource identifier: ", resource_val,
-               ". Please provide a data frame or a valid resource name.")
-        }
-        res_def <- resource_definitions[[resource_id]]
-        if (exists(res_def$var, envir = .GlobalEnv)) {
-          resource_object <- get(res_def$var, envir = .GlobalEnv)
-        } else {
-          resource_object <- res_def$load_fun()
-        }
-        data[[res]] <- res_def$transform_fun(resource_object)
-        if (is.null(metadata_info[[res]])) {
-          metadata_info[[res]] <- res_def$default_col
-        }
-      } else {
-        resource_id <- tolower(res)
-        if (is.null(metadata_info[[res]]) && resource_id %in% names(resource_definitions)) {
-          metadata_info[[res]] <- resource_definitions[[resource_id]]$default_col
-        } else if (is.null(metadata_info[[res]])) {
-          stop("metadata_info must be provided for resource: ", res)
-        }
-      }
+			resource_id <- tolower(res)
+			if (is.null(metadata_info[[res]]) && resource_id %in% names(default_cols)) {
+				metadata_info[[res]] <- default_cols[[resource_id]]
+			} else if (is.null(metadata_info[[res]])) {
+				stop("metadata_info must be provided for resource: ", res)
+			}
     }
 
     # Extract features from each resource based on metadata_info.
