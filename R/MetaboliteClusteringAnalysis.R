@@ -441,10 +441,12 @@ mca_2cond <- function(data_c1,
 #'                             pval ="aov",
 #'                             core=TRUE)
 #'
-#' IntraDMA <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' IntraDMA <- intracell_dma
 #'
-#' Res <- MetaProViz::mca_core(data_intra = IntraDMA%>%tibble::rownames_to_column("Metabolite"),
-#'                             data_core = MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+#' Res <- MetaProViz::mca_core(
+#'     data_intra = as.data.frame(IntraDMA),
+#'     data_core = as.data.frame(MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+#'   )
 #'
 #' @keywords biological clustering
 #'
@@ -470,17 +472,19 @@ mca_core <- function(data_intra,
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
-  check_param_mca(data_c1=NULL,
-                              data_c2=NULL,
-                              data_core= data_core,
-                              data_intra= data_intra,
-                              metadata_info_c1=NULL,
-                              metadata_info_c2=NULL,
-                              metadata_info_core=metadata_info_core,
-                              metadata_info_intra=metadata_info_intra,
-                              method_background=method_background,
-                              feature=feature,
-                              save_table=save_table)
+  check_param_mca(
+      data_c1=NULL,
+      data_c2=NULL,
+      data_core= data_core,
+      data_intra= data_intra,
+      metadata_info_c1=NULL,
+      metadata_info_c2=NULL,
+      metadata_info_core=metadata_info_core,
+      metadata_info_intra=metadata_info_intra,
+      method_background=method_background,
+      feature=feature,
+      save_table=save_table
+  )
 
 
   ## ------------ Create Results output folder ----------- ##
