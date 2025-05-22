@@ -1,0 +1,71 @@
+Metabolite,core_786-M1A,core_HK2,core_786-M2A,core_786-O,core_OSLM1B,core_OSRC2,core_RFX631
+valine-d8,Released,Released,Released,Released,Released,Released,Released
+alanine,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+arginine,Released,Consumed,Released,Released,Released,Released,Released
+asparagine,Released,Released,Released,Released,Released,Released,Consumed
+aspartate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+betaine,Released,Released,Released,Released,Released,Released,Released
+butyryl-carnitine,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+carbamoyl phosphate,Released,Consumed,Released,Released,Consumed,Consumed,Consumed
+carnitine,Consumed,Consumed,Consumed,Released,Released,Released,Consumed
+citrulline,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+creatine,Released,Consumed,Released,Released,Released,Released,Released
+hipppuric acid-d5,Released,Released,Released,Released,Consumed,Released,Released
+creatinine,Released,Released,Released,Released,Released,Consumed,Released
+cystine,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+dihydroorotate,Released,Released,Consumed,Released,Consumed,Consumed,Released
+fumarate,Released,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+gluconate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+glucose,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+glutamate,Released,Released,Released,Released,Consumed,Consumed,Consumed
+glutamine,Released,Consumed,Released,Released,Released,Released,Released
+glycerylphosphorylcholine,Consumed,Consumed,Released,Released,Consumed,Consumed,Consumed
+glycine,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+2-hydroxyglutarate,Released,Released,Released,Released,Released,Released,Released
+histidine,Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+hydroxyphenyllactic acid,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+hydroxyphenylpyruvate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+hydroxyproline,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+hypoxanthine,Consumed,Released,Consumed,Released,Released,Consumed,Released
+isovalerylcarnitine,Consumed,Consumed,Released,Consumed,Consumed,Consumed,Consumed
+KMV+KIC,Consumed,Consumed,Released,Released,Consumed,Consumed,Consumed
+lactate,Released,Consumed,Consumed,Consumed,Consumed,Consumed,Released
+leucine+isoleucine,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+linoleic acid,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Released
+2-ketoglutarate,Released,Released,Released,Released,Consumed,Consumed,Consumed
+lysine,Released,Consumed,Released,Consumed,Released,Released,Released
+malate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+methionine,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+methylarginine,Released,Released,Released,Released,Released,Released,Released
+methylaspartate,Released,Released,Released,Released,Consumed,Consumed,Consumed
+myo-inositol,Released,Consumed,Released,Released,Released,Released,Released
+N-acetylaspartate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+N-acetylglutamate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+N-acetylneuramic acid,Consumed,Released,Consumed,Released,Released,Released,Released
+oleic acid,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+3-Dehydro-L-threonate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+ornithine,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+orotate,Released,Released,Released,Released,Consumed,Consumed,Consumed
+palmitate,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+pantothenate,Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+phenylalanine,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+phosphocholine,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Released
+proline,Released,Released,Released,Released,Consumed,Consumed,Consumed
+propionylcarnitine,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+pyroglutamic-acid,Consumed,Consumed,Consumed,Released,Released,Released,Released
+pyruvate,Released,Consumed,Released,Released,Released,Consumed,Consumed
+acetylcarnitine,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Released
+serine,Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+stearic acid,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+succinate,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+succinyladenosine,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+taurine,Consumed,Consumed,Consumed,Released,Released,Released,Consumed
+threonine,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+tryptophan,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+tyrosine,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+uric acid,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+valine,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+acetylcholine,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+xanthine,Released,Released,Released,Released,Released,Released,Released
+acetylornithine,Released,Released,Released,Released,Released,Released,Released
+aconitate,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed

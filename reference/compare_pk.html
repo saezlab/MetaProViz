@@ -9,7 +9,7 @@ if a single resource is provided with a vector of column names in metadata_info,
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -142,26 +142,23 @@ that is used for grouping in the UpSet plot.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Example 1: Multi-Resource Comparison</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using automatic data loading for multiple resources.</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Hallmarks <span class="op">=</span> <span class="st">"Hallmarks"</span>, Gaude <span class="op">=</span> <span class="st">"Gaude"</span>,</span></span>
-<span class="r-in"><span>                MetalinksDB <span class="op">=</span> <span class="st">"MetalinksDB"</span>, RAMP <span class="op">=</span> <span class="st">"metsigdb_chemicalclass"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in res_def$load_fun():</span> attempt to apply non-function</span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hallmarks <span class="op">=</span> <span class="va">hallmarks</span>, gaude <span class="op">=</span> <span class="va">gaude_pathways</span>,</span></span>
+<span class="r-in"><span>                metalinksdb <span class="op">=</span> <span class="fu"><a href="metsigdb_metalinks.html">metsigdb_metalinks</a></span><span class="op">(</span><span class="op">)</span>, ramp <span class="op">=</span> <span class="fu"><a href="metsigdb_chemicalclass.html">metsigdb_chemicalclass</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filtering to include only gene features:</span></span></span>
-<span class="r-in"><span><span class="va">res_genes</span> <span class="op">&lt;-</span> <span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, filter_by <span class="op">=</span> <span class="st">"gene"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in res_def$load_fun():</span> attempt to apply non-function</span>
+<span class="r-in"><span><span class="va">res_genes</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, filter_by <span class="op">=</span> <span class="st">"gene"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in MetaProViz::compare_pk(data = data, filter_by = "gene"):</span> Column(s) feature not found in resource hallmarks</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Assume FeatureMetadata_Biocrates is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".</span></span></span>
+<span class="r-in"><span><span class="co"># biocrates_features is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".</span></span></span>
 <span class="r-in"><span><span class="co"># Here the "Class" column is used as the grouping variable in the UpSet plot.</span></span></span>
-<span class="r-in"><span><span class="va">data_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Biocft <span class="op">=</span> <span class="va">FeatureMetadata_Biocrates</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'FeatureMetadata_Biocrates' not found</span>
+<span class="r-in"><span><span class="va">data_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Biocft <span class="op">=</span> <span class="va">biocrates_features</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">metadata_info_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Biocft <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CHEBI"</span>, <span class="st">"HMDB"</span>, <span class="st">"LIMID"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">res_single</span> <span class="op">&lt;-</span> <span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_single</span>, metadata_info <span class="op">=</span> <span class="va">metadata_info_single</span>,</span></span>
+<span class="r-in"><span><span class="va">res_single</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_single</span>, metadata_info <span class="op">=</span> <span class="va">metadata_info_single</span>,</span></span>
 <span class="r-in"><span>                          plot_name <span class="op">=</span> <span class="st">"Overlap of BioCrates Columns"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'data_single' not found</span>
+<span class="r-plt img"><img src="compare_pk-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Example 3: Custom data Frames with Custom Column Names</span></span></span>
 <span class="r-in"><span></span></span>
@@ -175,8 +172,8 @@ that is used for grouping in the UpSet plot.</p>
 <span class="r-in"><span>                MetalinksDB <span class="op">=</span> <span class="va">metalinks_df</span>, RAMP <span class="op">=</span> <span class="va">ramp_df</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">metadata_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Hallmarks <span class="op">=</span> <span class="st">"feature"</span>, Gaude <span class="op">=</span> <span class="st">"feature"</span>,</span></span>
 <span class="r-in"><span>                     MetalinksDB <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hmdb"</span>, <span class="st">"gene_symbol"</span><span class="op">)</span>, RAMP <span class="op">=</span> <span class="st">"class_source_id"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, metadata_info <span class="op">=</span> <span class="va">metadata_info</span>, filter_by <span class="op">=</span> <span class="st">"metabolite"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="compare_pk-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu">compare_pk</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, metadata_info <span class="op">=</span> <span class="va">metadata_info</span>, filter_by <span class="op">=</span> <span class="st">"metabolite"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="compare_pk-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

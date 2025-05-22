@@ -1,0 +1,416 @@
+term,many_to_many,many_to_one,one_to_one,total,to_many,to_one,to_total,from_many,from_one,from_total,one_to_many,scope
+NA,421,1856,2237,4518,208,4093,4301,693,2241,2934,4,global
+Glycolysis / Gluconeogenesis,6,40,9,55,3,49,52,17,9,26,0,group
+Citrate cycle (TCA cycle),0,29,6,35,0,35,35,11,6,17,0,group
+Pentose phosphate pathway,16,33,11,60,8,44,52,17,11,28,0,group
+Pentose and glucuronate interconversions,0,44,21,65,0,65,65,15,21,36,0,group
+Fructose and mannose metabolism,6,35,16,57,3,51,54,15,16,31,0,group
+Galactose metabolism,12,29,17,58,6,46,52,13,17,30,0,group
+Ascorbate and aldarate metabolism,8,33,18,59,4,51,55,13,18,31,0,group
+Fatty acid biosynthesis,0,15,5,20,0,20,20,7,5,12,0,group
+Fatty acid elongation,10,56,2,68,5,58,63,26,2,28,0,group
+Fatty acid degradation,18,68,7,93,9,75,84,33,7,40,0,group
+"Cutin, suberine and wax biosynthesis",4,11,5,20,2,16,18,7,5,12,0,group
+Mycolic acid biosynthesis,0,5,2,7,0,7,7,2,2,4,0,group
+Steroid biosynthesis,0,49,33,82,0,82,82,12,33,45,0,group
+Primary bile acid biosynthesis,16,64,17,97,8,81,89,26,17,43,0,group
+Secondary bile acid biosynthesis,14,21,15,50,7,36,43,13,15,28,0,group
+Ubiquinone and other terpenoid-quinone biosynthesis,8,20,25,53,4,45,49,13,25,38,0,group
+Steroid hormone biosynthesis,0,50,72,122,0,122,122,23,72,95,0,group
+Oxidative phosphorylation,0,16,1,17,0,17,17,6,1,7,0,group
+Photosynthesis,0,11,2,13,0,13,13,4,2,6,0,group
+Arginine biosynthesis,0,24,7,31,0,31,31,10,7,17,0,group
+Purine metabolism,0,88,38,126,0,126,126,39,38,77,0,group
+Caffeine metabolism,0,2,18,20,0,20,20,1,18,19,0,group
+Pyrimidine metabolism,0,46,29,75,0,75,75,22,29,51,0,group
+"Alanine, aspartate and glutamate metabolism",0,45,5,50,0,50,50,20,5,25,0,group
+Tetracycline biosynthesis,0,2,4,6,0,6,6,1,4,5,0,group
+Aflatoxin biosynthesis,0,12,4,16,0,16,16,6,4,10,0,group
+"Glycine, serine and threonine metabolism",0,47,21,68,0,68,68,18,21,39,0,group
+Monobactam biosynthesis,0,12,7,19,0,19,19,6,7,13,0,group
+Cysteine and methionine metabolism,6,48,29,83,3,77,80,24,29,53,0,group
+"Valine, leucine and isoleucine degradation",14,50,11,75,7,61,68,24,11,35,0,group
+"Valine, leucine and isoleucine biosynthesis",0,13,15,28,0,28,28,6,15,21,0,group
+Lysine biosynthesis,0,15,11,26,0,26,26,7,11,18,0,group
+Lysine degradation,0,44,23,67,0,67,67,20,23,43,0,group
+Penicillin and cephalosporin biosynthesis,0,3,5,8,0,8,8,1,5,6,0,group
+Arginine and proline metabolism,0,30,40,70,0,70,70,14,40,54,0,group
+Clavulanic acid biosynthesis,0,6,1,7,0,7,7,2,1,3,0,group
+Carbapenem biosynthesis,0,9,6,15,0,15,15,4,6,10,0,group
+Prodigiosin biosynthesis,0,0,3,3,0,3,3,0,3,3,0,group
+Histidine metabolism,0,25,25,50,0,50,50,12,25,37,0,group
+Tyrosine metabolism,12,31,45,88,6,76,82,16,45,61,0,group
+Phenylalanine metabolism,0,19,26,45,0,45,45,8,26,34,0,group
+Chlorocyclohexane and chlorobenzene degradation,0,2,29,31,0,31,31,1,29,30,0,group
+Benzoate degradation,0,33,25,58,0,58,58,15,25,40,0,group
+Bisphenol degradation,0,2,8,10,0,10,10,1,8,9,0,group
+Fluorobenzoate degradation,0,2,3,5,0,5,5,1,3,4,0,group
+Furfural degradation,0,2,6,8,0,8,8,1,6,7,0,group
+Tryptophan metabolism,0,34,45,79,0,79,79,15,45,60,0,group
+"Phenylalanine, tyrosine and tryptophan biosynthesis",0,15,16,31,0,31,31,7,16,23,0,group
+Novobiocin biosynthesis,0,2,4,6,0,6,6,1,4,5,0,group
+Benzoxazinoid biosynthesis,0,0,6,6,0,6,6,0,6,6,0,group
+Indole diterpene alkaloid biosynthesis,0,2,2,4,0,4,4,1,2,3,0,group
+Staurosporine biosynthesis,0,2,2,4,0,4,4,1,2,3,0,group
+Phenazine biosynthesis,0,4,1,5,0,5,5,2,1,3,0,group
+beta-Alanine metabolism,0,30,17,47,0,47,47,14,17,31,0,group
+Taurine and hypotaurine metabolism,0,23,11,34,0,34,34,9,11,20,0,group
+Phosphonate and phosphinate metabolism,0,14,11,25,0,25,25,5,11,16,0,group
+Selenocompound metabolism,0,4,15,19,0,19,19,2,15,17,0,group
+Cyanoamino acid metabolism,0,9,24,33,0,33,33,4,24,28,0,group
+D-Amino acid metabolism,0,35,32,67,0,67,67,16,32,48,0,group
+Glutathione metabolism,0,20,14,34,0,34,34,8,14,22,0,group
+Starch and sucrose metabolism,0,30,8,38,0,38,38,9,8,17,0,group
+N-Glycan biosynthesis,0,11,3,14,0,14,14,4,3,7,0,group
+Mannose type O-glycan biosynthesis,0,2,0,2,0,2,2,1,0,1,0,group
+Amino sugar and nucleotide sugar metabolism,42,36,18,96,21,54,75,24,18,42,0,group
+Streptomycin biosynthesis,4,13,2,19,2,15,17,7,2,9,0,group
+"Biosynthesis of 12-, 14- and 16-membered macrolides",0,18,28,46,0,46,46,6,28,34,0,group
+Polyketide sugar unit biosynthesis,4,5,2,11,2,7,9,4,2,6,0,group
+"Neomycin, kanamycin and gentamicin biosynthesis",0,23,2,25,0,25,25,7,2,9,0,group
+Acarbose and validamycin biosynthesis,0,9,1,10,0,10,10,4,1,5,0,group
+Glycosaminoglycan degradation,0,0,4,4,0,4,4,0,4,4,0,group
+Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate,0,5,1,6,0,6,6,2,1,3,0,group
+Glycosaminoglycan biosynthesis - heparan sulfate / heparin,0,7,0,7,0,7,7,3,0,3,0,group
+Lipopolysaccharide biosynthesis,0,5,2,7,0,7,7,1,2,3,0,group
+Biosynthesis of various nucleotide sugars,28,41,9,78,14,50,64,22,9,31,0,group
+Peptidoglycan biosynthesis,0,8,4,12,0,12,12,2,4,6,0,group
+Teichoic acid biosynthesis,0,10,5,15,0,15,15,3,5,8,0,group
+Glycerolipid metabolism,0,149,5,154,0,154,154,9,5,14,0,group
+Inositol phosphate metabolism,4,24,4,32,2,28,30,11,4,15,0,group
+Glycosylphosphatidylinositol (GPI)-anchor biosynthesis,0,55,2,57,0,57,57,3,2,5,0,group
+Glycerophospholipid metabolism,0,248,19,267,0,267,267,10,19,29,0,group
+Ether lipid metabolism,0,0,9,9,0,9,9,0,9,9,0,group
+Arabinogalactan biosynthesis - Mycobacterium,0,2,1,3,0,3,3,1,1,2,0,group
+Arachidonic acid metabolism,10,221,45,276,5,266,271,34,45,79,0,group
+Linoleic acid metabolism,0,164,16,180,0,180,180,8,16,24,0,group
+alpha-Linolenic acid metabolism,0,155,28,183,0,183,183,8,28,36,0,group
+Sphingolipid metabolism,94,128,5,227,47,133,180,22,5,27,0,group
+Pyruvate metabolism,6,29,14,49,3,43,46,14,14,28,0,group
+Dioxin degradation,0,6,29,35,0,35,35,3,29,32,0,group
+Xylene degradation,0,6,19,25,0,25,25,3,19,22,0,group
+Toluene degradation,0,4,21,25,0,25,25,2,21,23,0,group
+Polycyclic aromatic hydrocarbon degradation,0,0,23,23,0,23,23,0,23,23,0,group
+Chloroalkane and chloroalkene degradation,0,12,24,36,0,36,36,6,24,30,0,group
+Naphthalene degradation,0,0,18,18,0,18,18,0,18,18,0,group
+Aminobenzoate degradation,0,18,34,52,0,52,52,8,34,42,0,group
+Glyoxylate and dicarboxylate metabolism,20,70,13,103,10,83,93,35,13,48,0,group
+Nitrotoluene degradation,0,2,9,11,0,11,11,1,9,10,0,group
+Propanoate metabolism,14,40,15,69,7,55,62,20,15,35,0,group
+Ethylbenzene degradation,0,6,3,9,0,9,9,3,3,6,0,group
+Styrene degradation,12,9,11,32,6,20,26,6,11,17,0,group
+Butanoate metabolism,8,38,15,61,4,53,57,19,15,34,0,group
+C5-Branched dibasic acid metabolism,0,20,11,31,0,31,31,10,11,21,0,group
+One carbon pool by folate,8,36,9,53,4,45,49,17,9,26,0,group
+Methane metabolism,0,68,20,88,0,88,88,25,20,45,0,group
+Carbon fixation by Calvin cycle,10,36,2,48,5,38,43,15,2,17,0,group
+Other carbon fixation pathways,22,65,8,95,11,73,84,30,8,38,0,group
+Thiamine metabolism,0,14,9,23,0,23,23,5,9,14,0,group
+Riboflavin metabolism,0,11,13,24,0,24,24,4,13,17,0,group
+Vitamin B6 metabolism,0,21,12,33,0,33,33,8,12,20,0,group
+Nicotinate and nicotinamide metabolism,0,34,19,53,0,53,53,15,19,34,0,group
+Pantothenate and CoA biosynthesis,0,24,13,37,0,37,37,11,13,24,0,group
+Biotin metabolism,0,4,9,13,0,13,13,2,9,11,0,group
+Lipoic acid metabolism,0,35,14,49,0,49,49,14,14,28,0,group
+Folate biosynthesis,0,32,17,49,0,49,49,15,17,32,0,group
+Atrazine degradation,0,0,12,12,0,12,12,0,12,12,0,group
+Retinol metabolism,6,15,11,32,3,26,29,8,11,19,0,group
+Porphyrin metabolism,0,20,22,42,0,42,42,9,22,31,0,group
+Terpenoid backbone biosynthesis,0,37,15,54,1,52,53,16,17,33,2,group
+Indole alkaloid biosynthesis,0,7,10,17,0,17,17,3,10,13,0,group
+Monoterpenoid biosynthesis,4,10,37,51,2,47,49,7,37,44,0,group
+Limonene degradation,4,4,26,34,2,30,32,4,26,30,0,group
+Diterpenoid biosynthesis,0,12,69,81,0,81,81,5,69,74,0,group
+Brassinosteroid biosynthesis,0,4,6,10,0,10,10,2,6,8,0,group
+Carotenoid biosynthesis,69,41,68,178,32,109,141,28,68,96,0,group
+"Pinene, camphor and geraniol degradation",8,10,27,45,4,37,41,7,27,34,0,group
+Zeatin biosynthesis,0,23,7,30,0,30,30,9,7,16,0,group
+Sesquiterpenoid and triterpenoid biosynthesis,0,11,33,44,0,44,44,5,33,38,0,group
+Nitrogen metabolism,0,8,7,15,0,15,15,4,7,11,0,group
+Sulfur metabolism,0,23,18,41,0,41,41,10,18,28,0,group
+Caprolactam degradation,0,6,16,22,0,22,22,2,16,18,0,group
+Phenylpropanoid biosynthesis,0,3,26,29,0,29,29,1,26,27,0,group
+Flavonoid biosynthesis,0,7,52,59,0,59,59,3,52,55,0,group
+Anthocyanin biosynthesis,0,10,40,50,0,50,50,5,40,45,0,group
+Isoflavonoid biosynthesis,0,18,39,57,0,57,57,9,39,48,0,group
+Flavone and flavonol biosynthesis,0,16,36,52,0,52,52,8,36,44,0,group
+"Stilbenoid, diarylheptanoid and gingerol biosynthesis",0,5,8,13,0,13,13,2,8,10,0,group
+Degradation of flavonoids,0,5,24,29,0,29,29,2,24,26,0,group
+Isoquinoline alkaloid biosynthesis,0,11,25,36,0,36,36,5,25,30,0,group
+"Tropane, piperidine and pyridine alkaloid biosynthesis",0,16,26,42,0,42,42,8,26,34,0,group
+Betalain biosynthesis,0,3,11,14,0,14,14,1,11,12,0,group
+Glucosinolate biosynthesis,0,9,13,22,0,22,22,4,13,17,0,group
+Aminoacyl-tRNA biosynthesis,0,24,13,37,0,37,37,10,13,23,0,group
+Metabolism of xenobiotics by cytochrome P450,0,6,95,101,0,101,101,3,95,98,0,group
+Insect hormone biosynthesis,0,5,11,16,0,16,16,2,11,13,0,group
+Drug metabolism - cytochrome P450,0,0,81,81,0,81,81,0,81,81,0,group
+Drug metabolism - other enzymes,0,6,38,44,0,44,44,2,38,40,0,group
+Steroid degradation,0,12,12,24,0,24,24,6,12,18,0,group
+Biosynthesis of various alkaloids,0,21,30,51,0,51,51,10,30,40,0,group
+Biosynthesis of various other secondary metabolites,0,37,11,48,0,48,48,16,11,27,0,group
+Biosynthesis of various antibiotics,0,50,14,64,0,64,64,21,14,35,0,group
+Biosynthesis of various plant secondary metabolites,0,36,52,88,0,88,88,14,52,66,0,group
+Biosynthesis of unsaturated fatty acids,0,53,17,70,0,70,70,22,17,39,0,group
+Biosynthesis of ansamycins,0,6,9,15,0,15,15,1,9,10,0,group
+Type I polyketide structures,0,11,10,21,0,21,21,5,10,15,0,group
+Biosynthesis of siderophore group nonribosomal peptides,0,2,7,9,0,9,9,1,7,8,0,group
+Nonribosomal peptide structures,0,4,3,7,0,7,7,2,3,5,0,group
+Biosynthesis of vancomycin group antibiotics,0,9,2,11,0,11,11,4,2,6,0,group
+Biosynthesis of type II polyketide backbone,0,6,1,7,0,7,7,3,1,4,0,group
+Biosynthesis of type II polyketide products,0,6,10,16,0,16,16,3,10,13,0,group
+Biosynthesis of enediyne antibiotics,0,3,4,7,0,7,7,1,4,5,0,group
+Biosynthesis of plant secondary metabolites,0,172,60,232,0,232,232,71,60,131,0,group
+Biosynthesis of phenylpropanoids,0,57,65,122,0,122,122,22,65,87,0,group
+Biosynthesis of terpenoids and steroids,4,115,53,172,2,168,170,40,53,93,0,group
+Biosynthesis of alkaloids derived from shikimate pathway,0,66,49,115,0,115,115,26,49,75,0,group
+"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",0,60,20,80,0,80,80,25,20,45,0,group
+Biosynthesis of alkaloids derived from histidine and purine,0,53,12,65,0,65,65,22,12,34,0,group
+Biosynthesis of alkaloids derived from terpenoid and polyketide,0,56,14,70,0,70,70,22,14,36,0,group
+Biosynthesis of plant hormones,0,99,28,127,0,127,127,37,28,65,0,group
+Metabolic pathways,274,1431,1061,2766,135,2492,2627,510,1061,1571,0,group
+Biosynthesis of secondary metabolites,100,665,665,1432,51,1330,1381,224,667,891,2,group
+Microbial metabolism in diverse environments,62,230,399,691,31,629,660,115,399,514,0,group
+Carbon metabolism,46,122,33,201,23,155,178,60,33,93,0,group
+2-Oxocarboxylic acid metabolism,0,53,40,93,0,93,93,23,40,63,0,group
+Fatty acid metabolism,10,112,10,132,5,122,127,48,10,58,0,group
+Degradation of aromatic compounds,0,38,99,137,0,137,137,18,99,117,0,group
+Biosynthesis of amino acids,10,104,56,170,5,160,165,45,56,101,0,group
+Nucleotide metabolism,0,62,28,90,0,90,90,29,28,57,0,group
+Biosynthesis of cofactors,34,218,87,339,17,305,322,99,87,186,0,group
+Biosynthesis of nucleotide sugars,52,44,21,117,26,65,91,31,21,52,0,group
+Nitrogen cycle,0,0,4,4,0,4,4,0,4,4,0,group
+Sulfur cycle,0,10,10,20,0,20,20,4,10,14,0,group
+Vancomycin resistance,0,11,6,17,0,17,17,4,6,10,0,group
+Cationic antimicrobial peptide (CAMP) resistance,0,0,4,4,0,4,4,0,4,4,0,group
+EGFR tyrosine kinase inhibitor resistance,0,19,0,19,0,19,19,1,0,1,0,group
+Endocrine resistance,0,4,3,7,0,7,7,2,3,5,0,group
+Antifolate resistance,0,34,1,35,0,35,35,13,1,14,0,group
+ABC transporters,0,46,60,106,0,106,106,20,60,80,0,group
+Two-component system,0,44,10,54,0,54,54,17,10,27,0,group
+Quorum sensing,0,12,7,19,0,19,19,5,7,12,0,group
+Biofilm formation - Pseudomonas aeruginosa,0,4,1,5,0,5,5,2,1,3,0,group
+Biofilm formation - Escherichia coli,0,2,3,5,0,5,5,1,3,4,0,group
+Bacterial chemotaxis,0,4,2,6,0,6,6,2,2,4,0,group
+Phosphotransferase system (PTS),0,20,21,41,0,41,41,8,21,29,0,group
+Bacterial secretion system,0,2,0,2,0,2,2,1,0,1,0,group
+Virion - Human immunodeficiency virus,0,0,1,1,0,1,1,0,1,1,0,group
+Virion - Flavivirus and Alphavirus,0,0,2,2,0,2,2,0,2,2,0,group
+Virion - Orthopoxvirus,0,0,2,2,0,2,2,0,2,2,0,group
+Virion - Hepatitis viruses,0,0,1,1,0,1,1,0,1,1,0,group
+PPAR signaling pathway,0,19,0,19,0,19,19,5,0,5,0,group
+MAPK signaling pathway,0,23,1,24,0,24,24,3,1,4,0,group
+ErbB signaling pathway,0,21,0,21,0,21,21,2,0,2,0,group
+Ras signaling pathway,0,27,0,27,0,27,27,5,0,5,0,group
+Rap1 signaling pathway,0,25,0,25,0,25,25,4,0,4,0,group
+Calcium signaling pathway,0,25,2,27,0,27,27,4,2,6,0,group
+cGMP-PKG signaling pathway,0,8,2,10,0,10,10,4,2,6,0,group
+cAMP signaling pathway,0,58,4,62,0,62,62,13,4,17,0,group
+Chemokine signaling pathway,0,23,0,23,0,23,23,3,0,3,0,group
+NF-kappa B signaling pathway,0,21,0,21,0,21,21,2,0,2,0,group
+HIF-1 signaling pathway,0,34,1,35,0,35,35,8,1,9,0,group
+FoxO signaling pathway,0,9,0,9,0,9,9,4,0,4,0,group
+Phosphatidylinositol signaling system,0,26,3,29,0,29,29,6,3,9,0,group
+Sphingolipid signaling pathway,0,60,4,64,0,64,64,9,4,13,0,group
+Phospholipase D signaling pathway,0,41,1,42,0,42,42,6,1,7,0,group
+Plant hormone signal transduction,0,2,10,12,0,12,12,1,10,11,0,group
+Neuroactive ligand-receptor interaction,0,50,26,76,0,76,76,21,26,47,0,group
+Hormone signaling,0,11,3,14,0,14,14,5,3,8,0,group
+Neuroactive ligand signaling,0,48,5,53,0,53,53,13,5,18,0,group
+Cell cycle - yeast,0,6,0,6,0,6,6,2,0,2,0,group
+Meiosis - yeast,0,5,0,5,0,5,5,2,0,2,0,group
+Oocyte meiosis,0,4,1,5,0,5,5,2,1,3,0,group
+Sulfur relay system,0,4,5,9,0,9,9,2,5,7,0,group
+Autophagy - other,0,51,0,51,0,51,51,1,0,1,0,group
+Mitophagy - animal,0,4,0,4,0,4,4,2,0,2,0,group
+Autophagy - yeast,0,51,0,51,0,51,51,1,0,1,0,group
+Autophagy - animal,0,55,0,55,0,55,55,3,0,3,0,group
+Lysosome,0,7,0,7,0,7,7,3,0,3,0,group
+Endocytosis,0,4,0,4,0,4,4,2,0,2,0,group
+Efferocytosis,0,92,4,96,0,96,96,16,4,20,0,group
+mTOR signaling pathway,0,4,1,5,0,5,5,2,1,3,0,group
+PI3K-Akt signaling pathway,0,2,0,2,0,2,2,1,0,1,0,group
+AMPK signaling pathway,0,22,7,29,0,29,29,9,7,16,0,group
+Apoptosis,0,2,0,2,0,2,2,1,0,1,0,group
+Longevity regulating pathway,0,7,3,10,0,10,10,3,3,6,0,group
+Longevity regulating pathway - worm,0,6,4,10,0,10,10,2,4,6,0,group
+Longevity regulating pathway - multiple species,0,2,0,2,0,2,2,1,0,1,0,group
+Apoptosis - fly,0,0,1,1,0,1,1,0,1,1,0,group
+Ferroptosis,0,26,6,32,0,32,32,11,6,17,0,group
+Necroptosis,0,35,0,35,0,35,35,5,0,5,0,group
+Cellular senescence,0,0,1,1,0,1,1,0,1,1,0,group
+Adrenergic signaling in cardiomyocytes,0,25,2,27,0,27,27,4,2,6,0,group
+Vascular smooth muscle contraction,0,38,4,42,0,42,42,9,4,13,0,group
+Hedgehog signaling pathway,0,2,0,2,0,2,2,1,0,1,0,group
+Axon regeneration,0,23,3,26,0,26,26,3,3,6,0,group
+VEGF signaling pathway,0,21,1,22,0,22,22,2,1,3,0,group
+Apelin signaling pathway,0,23,2,25,0,25,25,3,2,5,0,group
+Osteoclast differentiation,0,2,0,2,0,2,2,1,0,1,0,group
+Gap junction,0,32,1,33,0,33,33,7,1,8,0,group
+Complement and coagulation cascades,0,2,2,4,0,4,4,1,2,3,0,group
+Platelet activation,0,29,5,34,0,34,34,6,5,11,0,group
+Neutrophil extracellular trap formation,0,26,2,28,0,28,28,4,2,6,0,group
+Renin-angiotensin system,0,4,4,8,0,8,8,2,4,6,0,group
+NOD-like receptor signaling pathway,0,7,0,7,0,7,7,3,0,3,0,group
+C-type lectin receptor signaling pathway,0,26,0,26,0,26,26,4,0,4,0,group
+Natural killer cell mediated cytotoxicity,0,21,0,21,0,21,21,2,0,2,0,group
+Th1 and Th2 cell differentiation,0,21,0,21,0,21,21,2,0,2,0,group
+Th17 cell differentiation,0,24,0,24,0,24,24,3,0,3,0,group
+T cell receptor signaling pathway,0,21,0,21,0,21,21,2,0,2,0,group
+B cell receptor signaling pathway,0,21,0,21,0,21,21,2,0,2,0,group
+Fc epsilon RI signaling pathway,0,32,2,34,0,34,34,7,2,9,0,group
+Fc gamma R-mediated phagocytosis,0,36,1,37,0,37,37,4,1,5,0,group
+Leukocyte transendothelial migration,0,2,0,2,0,2,2,1,0,1,0,group
+Intestinal immune network for IgA production,0,5,0,5,0,5,5,2,0,2,0,group
+Circadian rhythm,0,2,0,2,0,2,2,1,0,1,0,group
+Circadian entrainment,0,23,2,25,0,25,25,3,2,5,0,group
+Thermogenesis,0,150,9,159,0,159,159,9,9,18,0,group
+Long-term potentiation,0,25,0,25,0,25,25,4,0,4,0,group
+Synaptic vesicle cycle,0,15,2,17,0,17,17,7,2,9,0,group
+Neurotrophin signaling pathway,0,31,0,31,0,31,31,3,0,3,0,group
+Retrograde endocannabinoid signaling,0,221,6,227,0,227,227,8,6,14,0,group
+Glutamatergic synapse,0,27,0,27,0,27,27,5,0,5,0,group
+Cholinergic synapse,0,27,3,30,0,30,30,5,3,8,0,group
+Serotonergic synapse,4,63,19,86,2,82,84,20,19,39,0,group
+GABAergic synapse,0,12,0,12,0,12,12,6,0,6,0,group
+Dopaminergic synapse,0,26,5,31,0,31,31,4,5,9,0,group
+Long-term depression,0,25,1,26,0,26,26,4,1,5,0,group
+Olfactory transduction,0,6,1,7,0,7,7,3,1,4,0,group
+Taste transduction,0,34,9,43,0,43,43,15,9,24,0,group
+Phototransduction,0,5,2,7,0,7,7,2,2,4,0,group
+Phototransduction - fly,0,23,2,25,0,25,25,3,2,5,0,group
+Inflammatory mediator regulation of TRP channels,0,48,15,63,0,63,63,12,15,27,0,group
+Regulation of actin cytoskeleton,0,0,1,1,0,1,1,0,1,1,0,group
+Insulin signaling pathway,0,5,0,5,0,5,5,2,0,2,0,group
+Insulin secretion,0,33,1,34,0,34,34,7,1,8,0,group
+GnRH signaling pathway,0,38,0,38,0,38,38,5,0,5,0,group
+Ovarian steroidogenesis,0,53,13,66,0,66,66,11,13,24,0,group
+Progesterone-mediated oocyte maturation,0,2,1,3,0,3,3,1,1,2,0,group
+Estrogen signaling pathway,0,25,1,26,0,26,26,4,1,5,0,group
+Melanogenesis,0,23,2,25,0,25,25,3,2,5,0,group
+Prolactin signaling pathway,0,11,6,17,0,17,17,4,6,10,0,group
+Thyroid hormone synthesis,0,48,3,51,0,51,51,12,3,15,0,group
+Thyroid hormone signaling pathway,0,27,0,27,0,27,27,5,0,5,0,group
+Adipocytokine signaling pathway,0,31,1,32,0,32,32,3,1,4,0,group
+Oxytocin signaling pathway,0,31,2,33,0,33,33,6,2,8,0,group
+Glucagon signaling pathway,0,49,4,53,0,53,53,19,4,23,0,group
+Regulation of lipolysis in adipocytes,0,146,5,151,0,151,151,7,5,12,0,group
+Renin secretion,0,17,4,21,0,21,21,8,4,12,0,group
+Aldosterone synthesis and secretion,0,41,10,51,0,51,51,9,10,19,0,group
+Relaxin signaling pathway,0,23,0,23,0,23,23,3,0,3,0,group
+Cortisol synthesis and secretion,0,8,6,14,0,14,14,4,6,10,0,group
+"Parathyroid hormone synthesis, secretion and action",0,29,2,31,0,31,31,5,2,7,0,group
+GnRH secretion,0,25,1,26,0,26,26,4,1,5,0,group
+Type II diabetes mellitus,0,7,0,7,0,7,7,3,0,3,0,group
+Insulin resistance,0,167,2,169,0,169,169,10,2,12,0,group
+Non-alcoholic fatty liver disease,0,3,0,3,0,3,3,1,0,1,0,group
+AGE-RAGE signaling pathway in diabetic complications,0,34,0,34,0,34,34,4,0,4,0,group
+Cushing syndrome,0,8,7,15,0,15,15,4,7,11,0,group
+"Growth hormone synthesis, secretion and action",0,23,0,23,0,23,23,3,0,3,0,group
+Alcoholic liver disease,0,10,4,14,0,14,14,4,4,8,0,group
+Aldosterone-regulated sodium reabsorption,0,2,3,5,0,5,5,1,3,4,0,group
+Endocrine and other factor-regulated calcium reabsorption,0,23,2,25,0,25,25,3,2,5,0,group
+Vasopressin-regulated water reabsorption,0,2,0,2,0,2,2,1,0,1,0,group
+Proximal tubule bicarbonate reclamation,0,19,1,20,0,20,20,7,1,8,0,group
+Collecting duct acid secretion,0,3,0,3,0,3,3,1,0,1,0,group
+Salivary secretion,0,28,2,30,0,30,30,5,2,7,0,group
+Gastric acid secretion,0,28,1,29,0,29,29,5,1,6,0,group
+Pancreatic secretion,0,26,1,27,0,27,27,4,1,5,0,group
+Carbohydrate digestion and absorption,0,34,6,40,0,40,40,7,6,13,0,group
+Protein digestion and absorption,0,27,24,51,0,51,51,13,24,37,0,group
+Fat digestion and absorption,0,176,1,177,0,177,177,5,1,6,0,group
+Bile secretion,0,119,40,159,0,159,159,36,40,76,0,group
+Vitamin digestion and absorption,0,173,15,188,0,188,188,15,15,30,0,group
+Mineral absorption,0,11,13,24,0,24,24,4,13,17,0,group
+Cholesterol metabolism,0,158,0,158,0,158,158,8,0,8,0,group
+Cobalamin transport and metabolism,0,22,3,25,0,25,25,6,3,9,0,group
+Folate transport and metabolism,8,168,5,181,4,173,177,14,5,19,0,group
+Alzheimer disease,0,4,1,5,0,5,5,2,1,3,0,group
+Parkinson disease,0,36,8,44,0,44,44,8,8,16,0,group
+Amyotrophic lateral sclerosis,0,8,0,8,0,8,8,4,0,4,0,group
+Huntington disease,0,4,0,4,0,4,4,2,0,2,0,group
+Spinocerebellar ataxia,0,23,0,23,0,23,23,3,0,3,0,group
+Prion disease,0,2,1,3,0,3,3,1,1,2,0,group
+Pathways of neurodegeneration - multiple diseases,0,37,4,41,0,41,41,9,4,13,0,group
+Cocaine addiction,0,7,3,10,0,10,10,3,3,6,0,group
+Amphetamine addiction,0,7,3,10,0,10,10,3,3,6,0,group
+Morphine addiction,0,9,1,10,0,10,10,4,1,5,0,group
+Nicotine addiction,0,4,2,6,0,6,6,2,2,4,0,group
+Alcoholism,0,7,5,12,0,12,12,3,5,8,0,group
+Vibrio cholerae infection,0,38,0,38,0,38,38,4,0,4,0,group
+Biofilm formation - Vibrio cholerae,0,10,0,10,0,10,10,4,0,4,0,group
+Epithelial cell signaling in Helicobacter pylori infection,0,0,1,1,0,1,1,0,1,1,0,group
+Pathogenic Escherichia coli infection,0,51,1,52,0,52,52,1,1,2,0,group
+Shigellosis,0,28,3,31,0,31,31,3,3,6,0,group
+Salmonella infection,0,0,1,1,0,1,1,0,1,1,0,group
+Pertussis,0,8,2,10,0,10,10,4,2,6,0,group
+Legionellosis,0,0,1,1,0,1,1,0,1,1,0,group
+Yersinia infection,0,2,1,3,0,3,3,1,1,2,0,group
+Leishmaniasis,0,21,0,21,0,21,21,4,0,4,0,group
+Chagas disease,0,6,0,6,0,6,6,3,0,3,0,group
+African trypanosomiasis,0,26,2,28,0,28,28,4,2,6,0,group
+Malaria,0,0,1,1,0,1,1,0,1,1,0,group
+Toxoplasmosis,0,0,1,1,0,1,1,0,1,1,0,group
+Amoebiasis,0,36,1,37,0,37,37,7,1,8,0,group
+Tuberculosis,0,0,4,4,0,4,4,0,4,4,0,group
+Human cytomegalovirus infection,0,24,0,24,0,24,24,3,0,3,0,group
+Human papillomavirus infection,0,5,0,5,0,5,5,2,0,2,0,group
+Human T-cell leukemia virus 1 infection,0,2,0,2,0,2,2,1,0,1,0,group
+Kaposi sarcoma-associated herpesvirus infection,0,72,0,72,0,72,72,3,0,3,0,group
+Epstein-Barr virus infection,0,2,0,2,0,2,2,1,0,1,0,group
+Human immunodeficiency virus 1 infection,0,21,0,21,0,21,21,2,0,2,0,group
+Coronavirus disease - COVID-19,0,21,2,23,0,23,23,2,2,4,0,group
+Pathways in cancer,0,55,10,65,0,65,65,11,10,21,0,group
+Chemical carcinogenesis - DNA adducts,0,2,49,51,0,51,51,1,49,50,0,group
+Proteoglycans in cancer,0,0,4,4,0,4,4,0,4,4,0,group
+Chemical carcinogenesis - receptor activation,0,6,19,25,0,25,25,3,19,22,0,group
+Chemical carcinogenesis - reactive oxygen species,0,18,26,44,0,44,44,7,26,33,0,group
+Renal cell carcinoma,0,7,0,7,0,7,7,2,0,2,0,group
+Pancreatic cancer,0,13,0,13,0,13,13,1,0,1,0,group
+Glioma,0,21,0,21,0,21,21,2,0,2,0,group
+Prostate cancer,0,2,9,11,0,11,11,1,9,10,0,group
+Basal cell carcinoma,0,2,0,2,0,2,2,1,0,1,0,group
+Small cell lung cancer,0,5,0,5,0,5,5,2,0,2,0,group
+Non-small cell lung cancer,0,26,0,26,0,26,26,4,0,4,0,group
+Breast cancer,0,0,2,2,0,2,2,0,2,2,0,group
+Hepatocellular carcinoma,0,23,1,24,0,24,24,3,1,4,0,group
+Gastric cancer,0,5,0,5,0,5,5,2,0,2,0,group
+Central carbon metabolism in cancer,0,56,13,69,0,69,69,22,13,35,0,group
+Choline metabolism in cancer,0,206,2,208,0,208,208,7,2,9,0,group
+PD-L1 expression and PD-1 checkpoint pathway in cancer,0,21,0,21,0,21,21,2,0,2,0,group
+Asthma,0,7,2,9,0,9,9,3,2,5,0,group
+Autoimmune thyroid disease,0,4,1,5,0,5,5,2,1,3,0,group
+Systemic lupus erythematosus,0,6,0,6,0,6,6,1,0,1,0,group
+Rheumatoid arthritis,0,3,1,4,0,4,4,1,1,2,0,group
+Graft-versus-host disease,0,0,1,1,0,1,1,0,1,1,0,group
+Hypertrophic cardiomyopathy,0,2,0,2,0,2,2,1,0,1,0,group
+Dilated cardiomyopathy,0,2,0,2,0,2,2,1,0,1,0,group
+Diabetic cardiomyopathy,0,71,5,76,0,76,76,16,5,21,0,group
+Lipid and atherosclerosis,0,146,1,147,0,147,147,4,1,5,0,group
+Fluid shear stress and atherosclerosis,0,4,3,7,0,7,7,2,3,5,0,group
+Penicillins,0,0,2,2,0,2,2,0,2,2,0,group
+Cephalosporins - parenteral agents,0,0,2,2,0,2,2,0,2,2,0,group
+Cephalosporins - oral agents,0,0,1,1,0,1,1,0,1,1,0,group
+Local analgesics,0,0,1,1,0,1,1,0,1,1,0,group
+HMG-CoA reductase inhibitors,0,3,1,4,0,4,4,1,1,2,0,group
+Antifungal agents,0,0,1,1,0,1,1,0,1,1,0,group
+Hypnotics,0,0,1,1,0,1,1,0,1,1,0,group
+Anticonvulsants,0,0,3,3,0,3,3,0,3,3,0,group
+Eicosanoids,0,8,4,12,0,12,12,3,4,7,0,group
+Prostaglandins,0,0,1,1,0,1,1,0,1,1,0,group
+Antiarrhythmic drugs,0,0,1,1,0,1,1,0,1,1,0,group
+Antineoplastics - alkylating agents,0,0,1,1,0,1,1,0,1,1,0,group
+Benzoic acid family,0,4,0,4,0,4,4,2,0,2,0,group
+"1,2-Diphenyl substitution family",0,0,1,1,0,1,1,0,1,1,0,group
+Naphthalene family,0,0,4,4,0,4,4,0,4,4,0,group
+Benzodiazepine family,0,0,1,1,0,1,1,0,1,1,0,group
+Serotonin receptor agonists/antagonists,0,2,0,2,0,2,2,1,0,1,0,group
+Catecholamine transferase inhibitors,0,0,2,2,0,2,2,0,2,2,0,group
+HIV protease inhibitors,0,0,1,1,0,1,1,0,1,1,0,group
+Cholinergic and anticholinergic drugs,0,0,1,1,0,1,1,0,1,1,0,group
+Nicotinic cholinergic receptor antagonists,0,2,4,6,0,6,6,1,4,5,0,group
+Glucocorticoid and mineralocorticoid receptor agonists/antagonists,0,0,4,4,0,4,4,0,4,4,0,group
+"Progesterone, androgen and estrogen receptor agonists/antagonists",0,2,4,6,0,6,6,1,4,5,0,group
+Histamine H2/H3 receptor agonists/antagonists,0,2,5,7,0,7,7,1,5,6,0,group
+Angiotensin receptor and endothelin receptor antagonists,0,2,1,3,0,3,3,1,1,2,0,group
+GABA-A receptor agonists/antagonists,0,0,2,2,0,2,2,0,2,2,0,group
+Potassium channel blocking and opening drugs,0,0,2,2,0,2,2,0,2,2,0,group
