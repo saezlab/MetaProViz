@@ -1410,16 +1410,7 @@ add_info <- function(mat,
 #' }
 #'
 #' @examples
-#' ## Example 1: Multi-Resource Comparison
-#'
-#' # Using automatic data loading for multiple resources.
-#' data <- list(hallmarks = hallmarks, gaude = gaude_pathways,
-#'                 metalinksdb = metsigdb_metalinks(), ramp = metsigdb_chemicalclass())
-#'
-#' # Filtering to include only gene features:
-#' res_genes <- MetaProViz::compare_pk(data = data, filter_by = "gene")
-#'
-#' ## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
+#' ## Example 1: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
 #'
 #' # biocrates_features is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 #' # Here the "Class" column is used as the grouping variable in the UpSet plot.
@@ -1429,7 +1420,7 @@ add_info <- function(mat,
 #' res_single <- MetaProViz::compare_pk(data = data_single, metadata_info = metadata_info_single,
 #'                           plot_name = "Overlap of BioCrates Columns")
 #'
-#' ## Example 3: Custom data Frames with Custom Column Names
+#' ## Example 2: Custom data Frames with Custom Column Names
 #'
 #' # Example with preloaded data frames and custom column names:
 #' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), stringsAsFactors = FALSE)
@@ -1492,8 +1483,8 @@ compare_pk <- function(data,
   ## ----------- Input ----------- ##
   # Define resource lookup table with information on how to retrieve and transform each resource.
   default_cols <- list(
-    hallmarks = "gene",
-    gaude = "gene",
+    hallmarks = "feature",
+    gaude = "feature",
     metalinksdb = c("hmdb", "gene_symbol"),
     ramp = "class_source_id"
   )
