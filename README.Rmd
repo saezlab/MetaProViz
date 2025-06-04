@@ -53,10 +53,12 @@ Here you will find a brief overview and information about the installation of th
 ## Example Data
 clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs [@Hakimi2016]. Cell-lines data from intra- and extracellular metabolomics data from cell culture media from [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
 ```{r, echo=FALSE,  fig.width=10, fig.height=5.5, fig.align="left"}
-suppressMessages(suppressWarnings( library(tidyverse)))
+suppressMessages(suppressWarnings(library(tidyverse)))
+suppressMessages(suppressWarnings(library(MetaProViz)))
 
 # Create an overview of the example data
-TissuePlot <- MetaProViz::ToyData("Tissue_Norm")%>%
+TissuePlot <- tissue_norm%>%
+  column_to_rownames("Code")%>%
   filter(TISSUE_TYPE != "NORMAL")%>%
   separate(`TYPE-STAGE`, into=c("Type", "Stage"), sep="-", remove=FALSE)
 TissuePlot$Count <- 1
@@ -72,7 +74,7 @@ Plot <- ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFacto
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(subtitle="Age at surgery <42 = Young,  >58 = Old, else = Middle", x = "Age", y = "Number of Patients")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=TissuePlot%>%dplyr::rename("Conditions"="AGE"),  PlotName = "ccRCC patients metadata", Subtitle = "Age at surgery <42 = Young,  >58 = Old, else = Middle", PlotType="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=TissuePlot%>%dplyr::rename("Conditions"="AGE"), plot_name = "ccRCC patients metadata", subtitle = "Age at surgery <42 = Young,  >58 = Old, else = Middle", plot_type="Bar")
  
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -86,7 +88,8 @@ Plot_Sized_Tissue <- Plot_Sized
 
 ###################################################################################################################################################
 # Create an overview of the example data
-CellPlot_Intra <- MetaProViz::ToyData(Data="IntraCells_Raw")%>%
+CellPlot_Intra <- intracell_raw%>%
+  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
                                Conditions=="786-O" ~ 'PrimaryTumour',
@@ -95,7 +98,8 @@ CellPlot_Intra <- MetaProViz::ToyData(Data="IntraCells_Raw")%>%
 CellPlot_Intra$Count <- 1
 CellPlot_Intra$CelltypeFactor <- factor(CellPlot_Intra$Celltype, levels = c("Healthy","PrimaryTumour", "MetastaticTumour"))
 
-CellPlot_Media <- MetaProViz::ToyData(Data="CultureMedia_Raw")%>%
+CellPlot_Media <- medium_raw%>%
+  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
   filter(Conditions != "blank")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',#https://www.mdpi.com/1422-0067/24/7/6447
@@ -114,7 +118,7 @@ Plot <- ggplot2::ggplot(CellPlot_Intra, ggplot2::aes(fill=Conditions, y=Count, x
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Celltype", y = "Number of Samples",  fill ="Cellline")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=CellPlot_Intra%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"),  PlotName = "Intracellular metabolomics", Subtitle = NULL, PlotType="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=CellPlot_Intra%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"), plot_name = "Intracellular metabolomics", subtitle = NULL, plot_type="Bar")
  
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -128,7 +132,8 @@ Plot_Sized_Intra <- Plot_Sized
 
 ###################################################################################################################################################
 # Create an overview of the example data
-CellPlot_Media <- MetaProViz::ToyData(Data="CultureMedia_Raw")%>%
+CellPlot_Media <- medium_raw%>%
+  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
   filter(Conditions != "blank")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',#https://www.mdpi.com/1422-0067/24/7/6447
@@ -151,7 +156,7 @@ Plot <- ggplot2::ggplot(CellPlot_Media, ggplot2::aes(fill=Conditions, y=Count, x
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Celltype", y = "Number of Samples",  fill ="Cellline")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=CellPlot_Media%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"),  PlotName = "Media metabolomics", Subtitle = NULL, PlotType="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=CellPlot_Media%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"), plot_name = "Media metabolomics", subtitle = NULL, plot_type="Bar")
  
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -159,7 +164,7 @@ Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-#ggplot2::ggsave(filename = "Cellline_Plot.svg", plot = combined_plot, width = PlotWidth,  height = PlotHeight, unit="cm")
+#ggplot2::ggsave(filename = "Cellline_Media_Plot.svg", plot = Plot, width = PlotWidth,  height = PlotHeight, unit="cm")
 
 Plot_Sized_Media <- Plot_Sized
 
