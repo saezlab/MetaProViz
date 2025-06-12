@@ -792,16 +792,16 @@ checkmatch_pk_to_data <- function(data,
     }
   }else{
     #Add grouping_variable
-    metadata_info["grouping_variable"] <- "grouping_variable"
-    input_pk["grouping_variable"] <- "None"
+    metadata_info["grouping_variable"] <- "GroupingVariable"
+    input_pk["GroupingVariable"] <- "OneGroup"
 
-    message <- paste0("No ", metadata_info[["PriorID"]], " provided. If this was not intentional, please check your input.")
+    message <- paste0("No metadata_info grouping_variable provided. If this was not intentional, please check your input.")
     logger::log_trace(message)
     message(message)
   }
 
   if(nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1){# Remove duplicate IDs
-    message <- paste0(nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from column", metadata_info[["PriorID"]])
+    message <- paste0(nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from PK column ", metadata_info[["PriorID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
     input_pk <- input_pk %>%
@@ -854,6 +854,7 @@ checkmatch_pk_to_data <- function(data,
     data_long <- data %>%
       mutate(OriginalGroup_data := paste0("data_", dplyr::row_number()))%>%
       select(metadata_info[["InputID"]], OriginalGroup_data)
+    data_long$`OriginalEntry_data` <- data_long[[metadata_info[["InputID"]]]]
   }
 
   if(PK_MultipleIDs){
@@ -863,6 +864,7 @@ checkmatch_pk_to_data <- function(data,
     PK_long <- input_pk %>%
       mutate(OriginalGroup_PK := paste0("PK_", dplyr::row_number()))%>%
       select(metadata_info[["PriorID"]],OriginalGroup_PK, metadata_info[["grouping_variable"]])
+    #PK_long$`OriginalEntry_PK` <- PK_long[[metadata_info[["PriorID"]]]]
   }
 
   # 2. Merge DF
@@ -927,7 +929,7 @@ checkmatch_pk_to_data <- function(data,
     mutate(
       Count_FeatureIDs_to_GroupingVariable = case_when(
       is.na(!!sym(metadata_info[["grouping_variable"]])) ~ NA_integer_,
-      TRUE ~ n_distinct(MetaboliteID, na.rm = TRUE)
+      TRUE ~ n_distinct(!!sym(metadata_info[["PriorID"]]), na.rm = TRUE)
     )
     )%>% mutate(
       Group_Conflict_Notes = case_when(
@@ -939,11 +941,14 @@ checkmatch_pk_to_data <- function(data,
         TRUE ~ "None"
       )
     ) %>%
-    ungroup()
+    ungroup()%>%
+    dplyr::mutate(
+      matches = ifelse(matches == "", NA, matches)
+    )
 
   summary_df_short <- summary_df%>%
     group_by(!!sym(metadata_info[["InputID"]]))%>%
-    mutate(
+    dplyr::mutate(
       Unique_GroupingVariable_count = n_distinct(!!sym(metadata_info["grouping_variable"]), na.rm = TRUE),
       !!sym(metadata_info[["grouping_variable"]]) := list(!!sym(metadata_info[["grouping_variable"]])),
       Count_FeatureIDs_to_GroupingVariable = list(Count_FeatureIDs_to_GroupingVariable),
@@ -955,7 +960,7 @@ checkmatch_pk_to_data <- function(data,
       !!sym(metadata_info[["grouping_variable"]]),
       .keep_all = TRUE
     )%>%
-    mutate(
+    dplyr::mutate(
       ActionRequired = case_when(
         original_count >=1 & matches_count == 1 & Unique_GroupingVariable_count >= 1 ~ "None",
         original_count >=1 & matches_count == 0 & Unique_GroupingVariable_count >= 0 ~ "None",
@@ -964,10 +969,23 @@ checkmatch_pk_to_data <- function(data,
         TRUE ~ NA_character_
       )
     )%>%
-    select(- MetaboliteID)%>%
-    mutate(
+    select(- !!sym(metadata_info[["PriorID"]]))%>%
+    dplyr::mutate(
       matches = ifelse(matches == "", NA, matches),
       !!sym(metadata_info[["grouping_variable"]]) := ifelse(!!sym(metadata_info[["grouping_variable"]]) == "", NA, !!sym(metadata_info[["grouping_variable"]]))
+    )%>%
+    dplyr::mutate(
+      InputID_select = case_when(
+        original_count ==1 & matches_count <= 1 ~ !!sym(metadata_info[["InputID"]]),
+        original_count >=2 & matches_count == 0 ~ str_split(!!sym(metadata_info[["InputID"]]), ",\\s*") %>% sapply(`[`, 1),
+        original_count >=2 & matches_count == 1 ~ matches,
+        TRUE ~ NA_character_
+      ),
+      Action_Specific = case_when(
+        matches_count >= 2 & Group_Conflict_Notes == "None" ~ "KeepEachID",
+        matches_count >= 2 & Group_Conflict_Notes != "None" ~ "KeepOneID",
+        TRUE ~ "None"
+      )
     )
 
 
