@@ -2446,34 +2446,34 @@ PK using the HMDB IDs using the
 <code><a href="../reference/checkmatch_pk_to_data.html">MetaProViz::checkmatch_pk_to_data()</a></code> function.<br></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Biocrates_to_MetalinksDB</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/checkmatch_pk_to_data.html">checkmatch_pk_to_data</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">FeatureMetadata_Biocrates</span>,</span>
-<span>                                                       input_pk <span class="op">=</span> <span class="va">MetaLinksDB</span>,</span>
-<span>                                                       metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID<span class="op">=</span><span class="st">"HMDB"</span>, PriorID<span class="op">=</span><span class="st">"hmdb"</span>, grouping_variable<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                                              input_pk <span class="op">=</span> <span class="va">MetaLinksDB</span>,</span>
+<span>                                                              metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID<span class="op">=</span><span class="st">"HMDB"</span>, PriorID<span class="op">=</span><span class="st">"hmdb"</span>, grouping_variable<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,</span></span>
-<span><span class="co">#&gt; : 253 NA values were removed from columnHMDB</span></span>
+<span><span class="co">#&gt; : 253 NA values were removed from column HMDB</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,</span></span>
-<span><span class="co">#&gt; : 4 duplicated IDs were removed from columnHMDB</span></span>
-<span><span class="co">#&gt; No hmdb provided. If this was not intentional, please check your input.</span></span>
+<span><span class="co">#&gt; : 4 duplicated IDs were removed from column HMDB</span></span>
+<span><span class="co">#&gt; No metadata_info grouping_variable provided. If this was not intentional, please check your input.</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,</span></span>
-<span><span class="co">#&gt; : 40766 duplicated IDs were removed from columnhmdb</span></span></code></pre></div>
+<span><span class="co">#&gt; : 40766 duplicated IDs were removed from PK column hmdb</span></span>
+<span><span class="co">#&gt; data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.</span></span>
+<span><span class="co">#&gt; data has 762 unique entries with 2027 unique HMDB IDs. Of those IDs, 151 match, which is 7.44943265910212%.</span></span>
+<span><span class="co">#&gt; input_pk has 1128 unique entries with 1128 unique hmdb IDs. Of those IDs, 151 are detected in the data, which is 13.386524822695%.</span></span>
+<span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,</span></span>
+<span><span class="co">#&gt; : There are cases where multiple detected IDs match to multiple prior knowledge</span></span>
+<span><span class="co">#&gt; IDs of the same category</span></span></code></pre></div>
 <p><br>
 This returns some warning messages and 4 tables:<br></p>
 <ul>
-<li><p><code>data_Matched</code>: a summary table with links to the
-prior knowledge. This is however with any NA values or duplicates of the
-InputID (e.g. ‘HMDB’) removed from the table.</p></li>
-<li><p><code>data_Matched_NA_and_duplicates</code>: the same kind of
-summary table but with all NA and duplicates included. Helpful for
-plotting.</p></li>
-<li><p><code>data_Matched_only_NA</code>: the same kind of summary table
-but with only rows where the InputID was NA. Helpful for inspecting
-which rows were NA.</p></li>
-</ul>
-<!-- --><ul>
-<li>
-<code>data_Matched_only_duplicates</code>: the same kind of summary
-table but with only rows where the InputID was duplicated (or
-triplicated, etc). Helpful for inspecting which IDs on the input side
-were duplicated.</li>
+<li><p><code>data_summary</code>: a summary table with links to the
+prior knowledge. Includes pointers if any action is required This is
+however with any NA values or duplicates of the InputID (e.g. ‘HMDB’)
+removed from the table.</p></li>
+<li><p><code>GroupingVariable_summary</code>: This is an extended
+version of the summary, where GroupingVariable is extended. e.g. for
+pathway-metabolite sets this would include duplicated InputIDs as they
+are in multiple pathways</p></li>
+<li><p><code>data_long</code>: all versus all commparison to enable
+checking in a case-by-case basis.</p></li>
 </ul>
 <p>In some cases we will expect to have only input ID linked to one
 entry in the PK. But this won’t always be the case, and as already
@@ -2483,7 +2483,7 @@ multiple HMDB IDs per single biocrates metabolite cell. The
 this in mind, by default splitting any comma separated values in the
 InputID (or PriorID) into separate entities, counting the number of
 links between these, and reporting this to the user.</p>
-<p>Let’s take a look at the data_Matched data:</p>
+<p>Let’s take a look at the results:</p>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Preview of the DF <code>data_Matched</code> showing coverage of
@@ -2494,13 +2494,7 @@ identifiers (some columns hidden)
 HMDB
 </th>
 <th style="text-align:left;">
-found_match_in_PK
-</th>
-<th style="text-align:left;">
 matches
-</th>
-<th style="text-align:right;">
-match_overlap_percentage
 </th>
 <th style="text-align:right;">
 original_count
@@ -2509,40 +2503,25 @@ original_count
 matches_count
 </th>
 <th style="text-align:left;">
-grouping_variable
+GroupingVariable
 </th>
 <th style="text-align:left;">
-OriginalEntry_data
+Count_FeatureIDs_to_GroupingVariable
+</th>
+<th style="text-align:left;">
+Group_Conflict_Notes
 </th>
 <th style="text-align:right;">
-num_PK_entries
-</th>
-<th style="text-align:right;">
-num_PK_entries_groups
-</th>
-<th style="text-align:right;">
-num_Input_entries
-</th>
-<th style="text-align:right;">
-num_Input_entries_groups
+Unique_GroupingVariable_count
 </th>
 <th style="text-align:left;">
 ActionRequired
 </th>
 <th style="text-align:left;">
-TrivialName
+InputID_select
 </th>
 <th style="text-align:left;">
-Class
-</th>
-<th style="text-align:left;">
-CAS
-</th>
-<th style="text-align:left;">
-CHEBI
-</th>
-<th style="text-align:left;">
-LIMID
+Action_Specific
 </th>
 </tr></thead>
 <tbody>
@@ -2551,12 +2530,7 @@ LIMID
 HMDB0000001
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0
+NA
 </td>
 <td style="text-align:right;">
 1
@@ -2566,39 +2540,24 @@ FALSE
 </td>
 <td style="text-align:left;">
 NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+None
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:left;">
 HMDB0000001
 </td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-1-Met-His
-</td>
-<td style="text-align:left;">
-Aminoacids Related
-</td>
-<td style="text-align:left;">
-332-80-9
-</td>
-<td style="text-align:left;">
-50599
-</td>
-<td style="text-align:left;">
-NA
+None
 </td>
 </tr>
 <tr>
@@ -2606,12 +2565,7 @@ NA
 HMDB0000033
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0
+NA
 </td>
 <td style="text-align:right;">
 1
@@ -2621,62 +2575,29 @@ FALSE
 </td>
 <td style="text-align:left;">
 NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+None
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:left;">
 HMDB0000033
 </td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Carnosine
-</td>
-<td style="text-align:left;">
-Aminoacids Related
-</td>
-<td style="text-align:left;">
-305-84-0
-</td>
-<td style="text-align:left;">
-15727
-</td>
-<td style="text-align:left;">
-NA
+None
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 HMDB0000036
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-HMDB0000036
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-None
 </td>
 <td style="text-align:left;">
 HMDB0000036
@@ -2687,8 +2608,14 @@ HMDB0000036
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+OneGroup
+</td>
+<td style="text-align:left;">
 1
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:right;">
 1
@@ -2697,42 +2624,15 @@ HMDB0000036
 None
 </td>
 <td style="text-align:left;">
-TCA
+HMDB0000036
 </td>
 <td style="text-align:left;">
-Bile Acids
-</td>
-<td style="text-align:left;">
-81-24-3
-</td>
-<td style="text-align:left;">
-28865
-</td>
-<td style="text-align:left;">
-LMST05040001
+None
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 HMDB0000043
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-HMDB0000043
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-None
 </td>
 <td style="text-align:left;">
 HMDB0000043
@@ -2743,8 +2643,14 @@ HMDB0000043
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+OneGroup
+</td>
+<td style="text-align:left;">
 1
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:right;">
 1
@@ -2753,42 +2659,15 @@ HMDB0000043
 None
 </td>
 <td style="text-align:left;">
-Betaine
+HMDB0000043
 </td>
 <td style="text-align:left;">
-Aminoacids Related
-</td>
-<td style="text-align:left;">
-107-43-7
-</td>
-<td style="text-align:left;">
-17750
-</td>
-<td style="text-align:left;">
-NA
+None
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 HMDB0000056
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-HMDB0000056
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-None
 </td>
 <td style="text-align:left;">
 HMDB0000056
@@ -2799,8 +2678,14 @@ HMDB0000056
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+OneGroup
+</td>
+<td style="text-align:left;">
 1
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:right;">
 1
@@ -2809,19 +2694,10 @@ HMDB0000056
 None
 </td>
 <td style="text-align:left;">
-beta-Ala
+HMDB0000056
 </td>
 <td style="text-align:left;">
-Biogenic Amines
-</td>
-<td style="text-align:left;">
-107-95-9
-</td>
-<td style="text-align:left;">
-16958
-</td>
-<td style="text-align:left;">
-NA
+None
 </td>
 </tr>
 <tr>
@@ -2829,16 +2705,22 @@ NA
 HMDB0000062
 </td>
 <td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
 HMDB0000062
 </td>
 <td style="text-align:right;">
-100
+1
 </td>
 <td style="text-align:right;">
 1
+</td>
+<td style="text-align:left;">
+OneGroup
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:right;">
 1
@@ -2849,35 +2731,8 @@ None
 <td style="text-align:left;">
 HMDB0000062
 </td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 None
-</td>
-<td style="text-align:left;">
-C0
-</td>
-<td style="text-align:left;">
-Acylcarnitines
-</td>
-<td style="text-align:left;">
-461-06-3, 541-14-0, 541-15-1
-</td>
-<td style="text-align:left;">
-11060, 16347, 17126
-</td>
-<td style="text-align:left;">
-NA
 </td>
 </tr>
 <tr>
@@ -2885,16 +2740,22 @@ NA
 HMDB0000063
 </td>
 <td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
 HMDB0000063
 </td>
 <td style="text-align:right;">
-100
+1
 </td>
 <td style="text-align:right;">
 1
+</td>
+<td style="text-align:left;">
+OneGroup
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:right;">
 1
@@ -2905,35 +2766,8 @@ None
 <td style="text-align:left;">
 HMDB0000063
 </td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;">
 None
-</td>
-<td style="text-align:left;">
-Cortisol
-</td>
-<td style="text-align:left;">
-Hormones
-</td>
-<td style="text-align:left;">
-50-23-7
-</td>
-<td style="text-align:left;">
-17650
-</td>
-<td style="text-align:left;">
-LMST02030001
 </td>
 </tr>
 <tr>
@@ -2941,12 +2775,7 @@ LMST02030001
 HMDB0000072, HMDB0000958
 </td>
 <td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-</td>
-<td style="text-align:right;">
-0
+NA
 </td>
 <td style="text-align:right;">
 2
@@ -2955,512 +2784,36 @@ FALSE
 0
 </td>
 <td style="text-align:left;">
-NA
+NA, NA
 </td>
 <td style="text-align:left;">
-NA
+NA, NA
+</td>
+<td style="text-align:left;">
+None
 </td>
 <td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
+0
 </td>
 <td style="text-align:left;">
-NA
+None
 </td>
 <td style="text-align:left;">
-AconAcid
+HMDB0000072
 </td>
 <td style="text-align:left;">
-Carboxylic Acids
-</td>
-<td style="text-align:left;">
-499-12-7, 585-84-2, 4023-65-8
-</td>
-<td style="text-align:left;">
-22211, 32805, 32806
-</td>
-<td style="text-align:left;">
-NA
+None
 </td>
 </tr>
 </tbody>
 </table>
-<p>Now let’s take a look here at the duplicated IDs:</p>
-<table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
-<caption style="font-size: initial !important;">
-Preview of the DF <code>data_Matched_only_duplicates</code> showing
-coverage of identifiers (some columns hidden)
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-HMDB
-</th>
-<th style="text-align:left;">
-found_match_in_PK.x
-</th>
-<th style="text-align:left;">
-matches.x
-</th>
-<th style="text-align:right;">
-match_overlap_percentage.x
-</th>
-<th style="text-align:right;">
-original_count.x
-</th>
-<th style="text-align:right;">
-matches_count.x
-</th>
-<th style="text-align:left;">
-grouping_variable.x
-</th>
-<th style="text-align:left;">
-OriginalEntry_data.x
-</th>
-<th style="text-align:right;">
-num_PK_entries.x
-</th>
-<th style="text-align:right;">
-num_PK_entries_groups.x
-</th>
-<th style="text-align:right;">
-num_Input_entries.x
-</th>
-<th style="text-align:right;">
-num_Input_entries_groups.x
-</th>
-<th style="text-align:left;">
-ActionRequired.x
-</th>
-<th style="text-align:left;">
-Detection.x
-</th>
-<th style="text-align:left;">
-TrivialName.x
-</th>
-<th style="text-align:left;">
-TrivialName_Prior2023.x
-</th>
-<th style="text-align:left;">
-Class.x
-</th>
-<th style="text-align:left;">
-CAS.x
-</th>
-<th style="text-align:left;">
-CHEBI.x
-</th>
-<th style="text-align:left;">
-CID.x
-</th>
-<th style="text-align:left;">
-INCHI.x
-</th>
-<th style="text-align:left;">
-Key.x
-</th>
-<th style="text-align:left;">
-IUPAC.x
-</th>
-<th style="text-align:left;">
-LIMID.x
-</th>
-<th style="text-align:left;">
-MESH.x
-</th>
-<th style="text-align:left;">
-Molecule.x
-</th>
-<th style="text-align:left;">
-SMILES.x
-</th>
-<th style="text-align:left;">
-found_match_in_PK.y
-</th>
-<th style="text-align:left;">
-matches.y
-</th>
-<th style="text-align:left;">
-match_overlap_percentage.y
-</th>
-<th style="text-align:left;">
-original_count.y
-</th>
-<th style="text-align:left;">
-matches_count.y
-</th>
-<th style="text-align:left;">
-grouping_variable.y
-</th>
-<th style="text-align:left;">
-OriginalEntry_data.y
-</th>
-<th style="text-align:left;">
-num_PK_entries.y
-</th>
-<th style="text-align:left;">
-num_PK_entries_groups.y
-</th>
-<th style="text-align:left;">
-num_Input_entries.y
-</th>
-<th style="text-align:left;">
-num_Input_entries_groups.y
-</th>
-<th style="text-align:left;">
-ActionRequired.y
-</th>
-<th style="text-align:left;">
-Detection.y
-</th>
-<th style="text-align:left;">
-TrivialName.y
-</th>
-<th style="text-align:left;">
-TrivialName_Prior2023.y
-</th>
-<th style="text-align:left;">
-Class.y
-</th>
-<th style="text-align:left;">
-CAS.y
-</th>
-<th style="text-align:left;">
-CHEBI.y
-</th>
-<th style="text-align:left;">
-CID.y
-</th>
-<th style="text-align:left;">
-INCHI.y
-</th>
-<th style="text-align:left;">
-Key.y
-</th>
-<th style="text-align:left;">
-IUPAC.y
-</th>
-<th style="text-align:left;">
-LIMID.y
-</th>
-<th style="text-align:left;">
-MESH.y
-</th>
-<th style="text-align:left;">
-Molecule.y
-</th>
-<th style="text-align:left;">
-SMILES.y
-</th>
-<th style="text-align:left;">
-found_match_in_PK
-</th>
-<th style="text-align:left;">
-matches
-</th>
-<th style="text-align:right;">
-match_overlap_percentage
-</th>
-<th style="text-align:right;">
-original_count
-</th>
-<th style="text-align:right;">
-matches_count
-</th>
-<th style="text-align:left;">
-grouping_variable
-</th>
-<th style="text-align:left;">
-OriginalEntry_data
-</th>
-<th style="text-align:right;">
-num_PK_entries
-</th>
-<th style="text-align:right;">
-num_PK_entries_groups
-</th>
-<th style="text-align:right;">
-num_Input_entries
-</th>
-<th style="text-align:right;">
-num_Input_entries_groups
-</th>
-<th style="text-align:left;">
-ActionRequired
-</th>
-<th style="text-align:left;">
-TrivialName
-</th>
-<th style="text-align:left;">
-Class
-</th>
-<th style="text-align:left;">
-CAS
-</th>
-<th style="text-align:left;">
-CHEBI
-</th>
-<th style="text-align:left;">
-LIMID
-</th>
-</tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr></tbody>
-</table>
-<p>Now it would be nice to visualise the linkages to get an idea of how
-well the experimental data (Biocrates in this case) matches to the PK
-(MetalinksDB in this case). Note again that we also want to take into
-account the multiple IDs for each metabolite when assessing coverage. In
-the plot below we do this by counting a link to the PK for any of the
-HMDB IDs for an individual metabolite only once.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define your color scheme and labels</span></span>
-<span><span class="va">fill_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#009E73"</span><span class="op">)</span></span>
-<span><span class="va">fill_lbls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"No Match"</span>, <span class="st">"Found Match"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Call the function with desired parameters</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">:::</span><span class="fu">viz_stackedbar</span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">Biocrates_to_MetalinksDB</span><span class="op">$</span><span class="va">data_Matched_NA_and_duplicates</span>,</span>
-<span>  group_col <span class="op">=</span> <span class="st">"Class"</span>,</span>
-<span>  fill_col <span class="op">=</span> <span class="st">"found_match_in_PK"</span>,</span>
-<span>  fill_values <span class="op">=</span> <span class="va">fill_vals</span>,</span>
-<span>  fill_labels <span class="op">=</span> <span class="va">fill_lbls</span>,</span>
-<span>  plot_name <span class="op">=</span> <span class="st">"Mapping status between Biocrates and MetalinksDB \nusing HMDB, grouped by metabolite class"</span>,</span>
-<span>  x_label <span class="op">=</span> <span class="st">"Frequency"</span>,</span>
-<span>  y_label <span class="op">=</span> <span class="st">"Class"</span>,</span>
-<span>  legend_position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.05</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p</span></span></code></pre></div>
-<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-33-1.png" width="960"></p>
-<p>from the above plot we see that a few of the metabolite classes from
-the biocrates kit have every metabolite with a HMDB ID and a
-corresponding entry in MetalinksDB. These are represented by bars that
-are completely green, such as the Amino Acids and Fatty Acids
-classes.</p>
-<p>However for a number of other classes of metabolites, we see that
-they will not be represented in the MetalinksDB PK at all, either
-because we do not have a HMDB ID associated with the Biocrates
-metabolite (represented by grey bars), or because MetalinksDB does not
-include a HMDB ID for that metabolite (represented by red bars). This
-poor coverage of course could be a concern for our analysis if we are
+<p>For a few metabolite classes from the biocrates kit every metabolite
+has a HMDB ID and a corresponding entry in MetalinksDB. Whilst for a
+number of classes of metabolites, we see that they will not be
+represented in the MetalinksDB PK at all, either because we do not have
+a HMDB ID associated with the Biocrates metabolite, or because
+MetalinksDB does not include a HMDB ID for that metabolite.<br>
+This poor coverage could be a concern for the analysis if we are
 interested in analysing many of these classes, since it will mean in
 this case that our experimental results for Phosphatidylglycerols for
 instance will not be linked to PK. In any case we will certainly need to
@@ -3468,17 +2821,20 @@ keep this in mind for downstream analysis and the interpretation of
 results, so that we don’t overinterpret results that for instance have a
 large number of Amino Acids, or falsely assume that the absence of
 Phosphatidylinositols in our PK integration results means that they are
-not present or important in our data.</p>
-<div class="section level4">
-<h4 id="sect4_bonus">Bonus: Are multiple metabolite IDs helpful or a hindrance?<a class="anchor" aria-label="anchor" href="#sect4_bonus"></a>
-</h4>
-<p>Let’s turn back to consider the number of HMDB IDs we have in the
+not present or important in our data.<br><br>
+Let’s turn back to consider the number of HMDB IDs we have in the
 Biocrates data and ask ourself a question: is it helpful or detrimental
-to have multiple IDs?</p>
-<p>to answer this, we will take only the first HMDB of each cell with
-multiple HMDB IDs and test to see this has worked.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">extract_first_id</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id_col</span><span class="op">)</span> <span class="op">{</span></span>
+to have multiple IDs? To answer this, we will take only the first HMDB
+of each cell with multiple HMDB IDs and test to see this has worked.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Number of matches:</span></span>
+<span><span class="va">MultipleIDs</span> <span class="op">&lt;-</span> <span class="va">Biocrates_to_MetalinksDB</span><span class="op">$</span><span class="va">data_summary</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>total_matches_count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">matches_count</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Name <span class="op">=</span> <span class="st">"MultipleIDs"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">######################################</span></span>
+<span><span class="co"># Extract first ID:</span></span>
+<span><span class="va">extract_first_id</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id_col</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">id_col</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="co"># Check for NA or empty string</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">||</span> <span class="va">x</span> <span class="op">==</span> <span class="st">""</span><span class="op">)</span> <span class="op">{</span></span>
@@ -3499,59 +2855,79 @@ multiple HMDB IDs and test to see this has worked.</p>
 <span><span class="co"># Visually check that the single ID function has worked</span></span>
 <span><span class="co"># Count entries and record NA information</span></span>
 <span><span class="va">result_bioc_hmdb_count_single</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">FeatureMetadata_Biocrates_singleHMDB</span>, <span class="st">"HMDB_single"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-34-1.png" width="700"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Access the processed data:</span></span>
-<span><span class="va">processed_df_bioc_hmdb_count_single</span> <span class="op">&lt;-</span> <span class="va">result_bioc_hmdb_count_single</span><span class="op">$</span><span class="va">result</span></span>
-<span><span class="co"># Display the plot:</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result_bioc_hmdb_count_single</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
-<p>Now that we can see we only have either NA or singular values for our
-HMDB IDs, let’s map this table to MetalinksDB using the same function as
-we did earlier, but this time using the <code>HMDB_single</code>
-column.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Biocrates_to_MetalinksDB_singleHMDB</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/checkmatch_pk_to_data.html">checkmatch_pk_to_data</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">FeatureMetadata_Biocrates_singleHMDB</span>,</span>
-<span>                                                                  input_pk <span class="op">=</span> <span class="va">MetaLinksDB</span>,</span>
-<span>                                                                  metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID<span class="op">=</span><span class="st">"HMDB_single"</span>, PriorID<span class="op">=</span><span class="st">"hmdb"</span>, grouping_variable<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span></span>
+<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-32-1.png" width="700"></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Check the macthes:</span></span>
+<span><span class="va">Biocrates_to_MetalinksDB_singleHMDB</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/checkmatch_pk_to_data.html">checkmatch_pk_to_data</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">FeatureMetadata_Biocrates_singleHMDB</span>,</span>
+<span>                                                                         input_pk <span class="op">=</span> <span class="va">MetaLinksDB</span>,</span>
+<span>                                                                         metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID<span class="op">=</span><span class="st">"HMDB_single"</span>, PriorID<span class="op">=</span><span class="st">"hmdb"</span>, grouping_variable<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data =</span></span>
-<span><span class="co">#&gt; FeatureMetadata_Biocrates_singleHMDB, : 253 NA values were removed from</span></span>
-<span><span class="co">#&gt; columnHMDB_single</span></span>
+<span><span class="co">#&gt; FeatureMetadata_Biocrates_singleHMDB, : 253 NA values were removed from column</span></span>
+<span><span class="co">#&gt; HMDB_single</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data =</span></span>
 <span><span class="co">#&gt; FeatureMetadata_Biocrates_singleHMDB, : 49 duplicated IDs were removed from</span></span>
-<span><span class="co">#&gt; columnHMDB_single</span></span>
-<span><span class="co">#&gt; No hmdb provided. If this was not intentional, please check your input.</span></span>
+<span><span class="co">#&gt; column HMDB_single</span></span>
+<span><span class="co">#&gt; No metadata_info grouping_variable provided. If this was not intentional, please check your input.</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data =</span></span>
 <span><span class="co">#&gt; FeatureMetadata_Biocrates_singleHMDB, : 40766 duplicated IDs were removed from</span></span>
-<span><span class="co">#&gt; columnhmdb</span></span></code></pre></div>
-<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-36-1.png" width="700"></p>
-<p>This doesn’t appear to look that different to before, but if we look
-closely we can see that some classes have shifted a bit, such as
-Phosphatidylethanolamines for instance. to better visualise these
-differences we will zoom in on these changes by filtering only to the
-successful matches between the Biocrates kit and MetalinksDB, comparing
-which metabolites were found using only the single hits versus using
-both.</p>
-<pre><code><span><span class="co">#&gt; Warning: No shared levels found between `names(values)` of the manual scale and the</span></span>
-<span><span class="co">#&gt; data's <span style="color: #00BB00;">fill</span> values.</span></span></code></pre>
-<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-37-1.png" width="960"></p>
-<pre><code><span><span class="co">#&gt; [1] "Counts of linkages made using only a Single HMDB"</span></span>
-<span><span class="co">#&gt; &lt; table of extent 0 &gt;</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Using Multi HMDBs increased coverage over Single HMDBs by: NA %</span></span></code></pre>
-<p>This has shown that in this case, although the results were
-overshadowed by the poor overall linkage of the experimental data to the
-PK, using Multi HMDBs has resulted in nearly 20% (n=29) more metabolites
-from Biocrates being able to be linked to MetalinksDB than what would
-have been possible if we only used the first HMDB available to us. Hence
-while having multiple IDs for a single metabolite may add to confusion
-as a user, we would recommend against prematurely dropping any IDs until
-you map to the PK or have thoroughly assessed what impact the removal
-may have.</p>
+<span><span class="co">#&gt; PK column hmdb</span></span>
+<span><span class="co">#&gt; data has multiple IDs per measurement = FALSE. input_pk has multiple IDs per entry = FALSE.</span></span>
+<span><span class="co">#&gt; data has 717 unique entries with 717 unique HMDB_single IDs. Of those IDs, 147 match, which is 20.5020920502092%.</span></span>
+<span><span class="co">#&gt; input_pk has 1128 unique entries with 1128 unique hmdb IDs. Of those IDs, 147 are detected in the data, which is 13.031914893617%.</span></span>
+<span></span>
+<span></span>
+<span><span class="co">#Number of matches:</span></span>
+<span><span class="va">SingleIDs</span> <span class="op">&lt;-</span> <span class="va">Biocrates_to_MetalinksDB_singleHMDB</span><span class="op">$</span><span class="va">data_summary</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>total_matches_count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">matches_count</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Name <span class="op">=</span> <span class="st">"SingleID"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##############################</span></span>
+<span><span class="co">#Compare:</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">MultipleIDs</span>, <span class="va">SingleIDs</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kbl.html" class="external-link">kbl</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Comparison of IDs found in MetalinksDB PK when having multiple versus a random single HMDB ID in the measured data."</span>, row.names<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_classic</a></span><span class="op">(</span>full_width <span class="op">=</span> <span class="cn">F</span>, html_font <span class="op">=</span> <span class="st">"Cambria"</span>, font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">
+Comparison of IDs found in MetalinksDB PK when having multiple versus a
+random single HMDB ID in the measured data.
+</caption>
+<thead><tr>
+<th style="text-align:right;">
+total_matches_count
+</th>
+<th style="text-align:left;">
+Name
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+208
+</td>
+<td style="text-align:left;">
+MultipleIDs
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+147
+</td>
+<td style="text-align:left;">
+SingleID
+</td>
+</tr>
+</tbody>
+</table>
+<p>This shows using Multi HMDBs has resulted in more metabolites from
+Biocrates being able to be linked to MetalinksDB than what would have
+been possible if we only used the first HMDB available to us. Hence
+while having multiple IDs for a single detected peak may add complexity,
+we would recommend against prematurely dropping any IDs until you map to
+the PK or have thoroughly assessed what impact the removal may have.</p>
 <div class="progress progress-striped active">
 <div class="progress-bar progress-bar-success" style="width: 100%">
 
-</div>
 </div>
 </div>
 </div>
@@ -3590,7 +2966,7 @@ metabolites to and from the following formats:<br>
 - PubChem<br><br>
 As an example we are translating the KEGG pathways we loaded with
 <code><a href="../reference/metsigdb_kegg.html">MetaProViz::metsigdb_kegg</a></code> into HMDB ids:<br></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">KEGG_Pathways_Translated</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/translate_id.html">translate_id</a></span><span class="op">(</span>data<span class="op">=</span> <span class="va">KEGG_Pathways</span>,</span>
 <span>                                                     metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID<span class="op">=</span><span class="st">"MetaboliteID"</span>, grouping_variable<span class="op">=</span><span class="st">"term"</span><span class="op">)</span>,</span>
 <span>                                                     from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kegg"</span><span class="op">)</span>,</span>
@@ -3818,7 +3194,7 @@ translations between the KEGG MetaboliteID and the HMDB or PubChem IDs
 have failed, resulting in NA values. to get a better understanding of
 the combinations of these, let’s visualise the translation for each of
 the ID types.<br></p>
-<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-41-1.png" width="768"></p>
+<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-35-1.png" width="768"></p>
 <p><br>
 We can also note from the previous table that it becomes apparent that
 the translation of IDs is not a one-to-one mapping, but rather a
@@ -3865,7 +3241,7 @@ the Original and Translated IDs.<br>
 Indeed, the translation of e.g. KEGG to hmdb and pubchem includes
 multiple data frames including a summary of the mapping
 occurrences:<br></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">KEGG_Pathways_Translated</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "TranslatedDF"             "TranslatedDF_MappingInfo"</span></span>
 <span><span class="co">#&gt; [3] "Mappingsummary_hmdb"      "Mappingsummary_pubchem"</span></span></code></pre></div>
@@ -4216,7 +3592,7 @@ set the parameter <code>summary =TRUE</code> or in case you have a
 dataframe that includes both, original and translated ID, you can use
 the function <code><a href="../reference/mapping_ambiguity.html">MetaProViz::mapping_ambiguity()</a></code> to generate
 this long summary as well as the mapping summary in general.<br></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Option 1:</span></span>
 <span><span class="va">KEGG_Pathways_TranslatedSum</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/translate_id.html">translate_id</a></span><span class="op">(</span>data<span class="op">=</span> <span class="va">KEGG_Pathways</span>,</span>
 <span>                                                    metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID<span class="op">=</span><span class="st">"MetaboliteID"</span>, grouping_variable<span class="op">=</span><span class="st">"term"</span><span class="op">)</span>,</span>
@@ -4224,7 +3600,7 @@ this long summary as well as the mapping summary in general.<br></p>
 <span>                                                    to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hmdb"</span>, <span class="st">"pubchem"</span><span class="op">)</span>,</span>
 <span>                                                    summary <span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><br></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Option 2:</span></span>
 <span><span class="va">MappingProblems</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu"><a href="../reference/mapping_ambiguity.html">mapping_ambiguity</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span></span>
@@ -4384,7 +3760,7 @@ Additionally, we have passed <code>grouping_variable = "term"</code> as
 we have pathways, which also means each of those mappings is checked
 within a pathway and across pathways (e.g. C00002 is shown twice, for
 two different terms).<br></p>
-<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-47-1.png" width="700"></p>
+<p><img src="prior-knowledge_files/figure-html/unnamed-chunk-41-1.png" width="700"></p>
 <p><br>
 In fact, to perform enrichment analysis we need a column source
 (=e.g. term) and we would want to keep the metabolite IDs across
@@ -4462,7 +3838,7 @@ We have performed pre-processing and differential analysis (details can
 be found in the vignette vignette <a href="https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html" class="external-link">Standard
 Metabolomics</a>) and and here we load the differential metabolite
 analysis results for the comparison of 786M-1A versus HK2.<br></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the Pre-processed intracellular data:</span></span>
 <span><span class="va">Intra_DMA_786M1A_vs_HK2</span> <span class="op">&lt;-</span> <span class="va">intracell_dma</span></span></code></pre></div>
 <p><code>2.</code> Tissue experiment <strong>(Tissue)</strong><br>
@@ -4474,7 +3850,7 @@ We have performed differential analysis (details can be found in the
 vignette <a href="https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html" class="external-link">Metadata
 Analysis</a>) and and here we load the differential metabolite analysis
 results for the comparison of Tumour versus Normal.<br></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the example data:</span></span>
 <span><span class="va">Tissue_TvsN</span> <span class="op">&lt;-</span> <span class="va">tissue_dma</span></span>
 <span><span class="va">Tissue_TvsN_Old</span> <span class="op">&lt;-</span> <span class="va">tissue_dma_old</span></span>
@@ -4509,22 +3885,22 @@ results for the comparison of Tumour versus Normal.<br></p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] tibble_3.2.1     stringr_1.5.1    dplyr_1.1.4      purrr_1.0.4      rlang_1.1.6      magrittr_2.0.3  </span></span>
-<span><span class="co">#&gt; [7] MetaProViz_3.0.1</span></span>
+<span><span class="co">#&gt; [1] tibble_3.3.0     stringr_1.5.1    dplyr_1.1.4      purrr_1.0.4      rlang_1.1.6      magrittr_2.0.3  </span></span>
+<span><span class="co">#&gt; [7] MetaProViz_3.0.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] DBI_1.2.3            gridExtra_2.3        httr2_1.1.2          tcltk_4.4.3          logger_0.4.0        </span></span>
-<span><span class="co">#&gt;   [6] readxl_1.4.5         compiler_4.4.3       RSQLite_2.3.11       systemfonts_1.2.3    vctrs_0.6.5         </span></span>
+<span><span class="co">#&gt;   [6] readxl_1.4.5         compiler_4.4.3       RSQLite_2.4.1        systemfonts_1.2.3    vctrs_0.6.5         </span></span>
 <span><span class="co">#&gt;  [11] reshape2_1.4.4       rvest_1.0.4          pkgconfig_2.0.3      crayon_1.5.3         fastmap_1.2.0       </span></span>
 <span><span class="co">#&gt;  [16] backports_1.5.0      labeling_0.4.3       rmarkdown_2.29       sessioninfo_1.2.3    tzdb_0.5.0          </span></span>
 <span><span class="co">#&gt;  [21] ggbeeswarm_0.7.2     ragg_1.4.0           ggfortify_0.4.17     bit_4.6.0            xfun_0.52           </span></span>
 <span><span class="co">#&gt;  [26] cachem_1.1.0         jsonlite_2.0.0       progress_1.2.3       blob_1.2.4           later_1.4.2         </span></span>
 <span><span class="co">#&gt;  [31] broom_1.0.8          parallel_4.4.3       prettyunits_1.2.0    R6_2.6.1             bslib_0.9.0         </span></span>
-<span><span class="co">#&gt;  [36] stringi_1.8.7        RColorBrewer_1.1-3   ComplexUpset_1.3.3   limma_3.65.1         car_3.1-3           </span></span>
+<span><span class="co">#&gt;  [36] stringi_1.8.7        RColorBrewer_1.1-3   ComplexUpset_1.3.3   limma_3.62.2         car_3.1-3           </span></span>
 <span><span class="co">#&gt;  [41] lubridate_1.9.4      jquerylib_0.1.4      cellranger_1.1.0     Rcpp_1.0.14          knitr_1.50          </span></span>
 <span><span class="co">#&gt;  [46] R.utils_2.13.0       readr_2.1.5          splines_4.4.3        igraph_2.1.4         timechange_0.3.0    </span></span>
 <span><span class="co">#&gt;  [51] tidyselect_1.2.1     rstudioapi_0.17.1    qvalue_2.38.0        abind_1.4-8          yaml_2.3.10         </span></span>
-<span><span class="co">#&gt;  [56] curl_6.2.2           plyr_1.8.9           withr_3.0.2          inflection_1.3.6     evaluate_1.0.3      </span></span>
+<span><span class="co">#&gt;  [56] curl_6.3.0           plyr_1.8.9           withr_3.0.2          inflection_1.3.6     evaluate_1.0.3      </span></span>
 <span><span class="co">#&gt;  [61] desc_1.4.3           zip_2.3.3            xml2_1.3.8           pillar_1.10.2        ggpubr_0.6.0        </span></span>
 <span><span class="co">#&gt;  [66] carData_3.0-5        checkmate_2.3.2      generics_0.1.4       vroom_1.6.5          hms_1.1.3           </span></span>
 <span><span class="co">#&gt;  [71] ggplot2_3.5.2        scales_1.4.0         gtools_3.9.5         OmnipathR_3.15.99    glue_1.8.0          </span></span>
@@ -4534,7 +3910,7 @@ results for the comparison of Tumour versus Normal.<br></p>
 <span><span class="co">#&gt;  [91] kableExtra_1.4.0     textshaping_1.0.1    Polychrome_1.5.4     viridisLite_0.4.2    svglite_2.2.1       </span></span>
 <span><span class="co">#&gt;  [96] gtable_0.3.6         R.methodsS3_1.8.2    rstatix_0.7.2        hash_2.2.6.3         selectr_0.4-2       </span></span>
 <span><span class="co">#&gt; [101] sass_0.4.10          digest_0.6.37        ggrepel_0.9.6        htmlwidgets_1.6.4    farver_2.1.2        </span></span>
-<span><span class="co">#&gt; [106] memoise_2.0.1        htmltools_0.5.8.1    pkgdown_2.1.2        R.oo_1.27.1          factoextra_1.0.7    </span></span>
+<span><span class="co">#&gt; [106] memoise_2.0.1        htmltools_0.5.8.1    pkgdown_2.1.3        R.oo_1.27.1          factoextra_1.0.7    </span></span>
 <span><span class="co">#&gt; [111] lifecycle_1.0.4      httr_1.4.7           statmod_1.5.0        bit64_4.6.0-1        MASS_7.3-64</span></span></code></pre>
 </div>
 <div class="section level2">
@@ -4611,7 +3987,7 @@ Communications</em> 13 (1): 7830. <a href="https://doi.org/10.1038/s41467-022-35
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

@@ -1,9 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   core-metabolomics: core-metabolomics.html
   prior-knowledge: prior-knowledge.html
   sample-metadata: sample-metadata.html
   standard-metabolomics: standard-metabolomics.html
-last_built: 2025-05-22T08:39Z
+last_built: 2025-06-12T13:52Z
