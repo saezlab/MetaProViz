@@ -60,6 +60,7 @@ library(dplyr)
 library(rlang)
 library(tidyr)
 library(tibble)
+library(stringr)
 
 # Please install the Biocmanager Dependencies:
 # BiocManager::install("clusterProfiler")
@@ -411,7 +412,7 @@ Tissue_MetaData_HMDB <-
     by = 'COMP_ID'
   ) |>
   rowwise() |>
-  mutate(hmdb_combined = list(unique(na.omit(unlist(str_split(across(starts_with("hmdb_from")), ",")))))) |>
+  mutate(hmdb_combined = list(unique(na.omit(unlist(stringr::str_split(across(starts_with("hmdb_from")), ",")))))) |>
   mutate(hmdb_combined = paste0(hmdb_combined, collapse = ',')) |>  # we concatenate by "," only for the sake of printing in notebook
   ungroup()
 
@@ -464,7 +465,7 @@ Tissue_MetaData_KEGG <-
     by = 'COMP_ID'
   ) |>
   rowwise() |>
-  mutate(KEGG= list(unique(na.omit(unlist(str_split(across(starts_with("kegg_from")), ",")))))) |>
+  mutate(KEGG= list(unique(na.omit(unlist(stringr::str_split(across(starts_with("kegg_from")), ",")))))) |>
   mutate(KEGG = paste0(KEGG, collapse = ',')) |>  # we concatenate by "," only for the sake of printing in notebook
   ungroup()
 
