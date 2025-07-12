@@ -260,7 +260,7 @@ equivalent_id <- function(data,
   # Do this by using structural information via  accessing the structural DB in OmniPath!
   # Output is DF with the original ID column and a new column with additional possible IDs based on structure
 
-  #Is it possible to do this at the moment without structures, but by using other pior knowledge?
+  #Is it possible to do this at the moment without structures, but by using other prior knowledge?
 
   metaproviz_init()
 
@@ -382,8 +382,8 @@ equivalent_id <- function(data,
       PotentialAdditionalIDs = paste(fromList[fromList != InputID], collapse = ", ")  # Combine other IDs
     ) %>%
     dplyr::ungroup() %>%
-    dplyr::select(InputID, PotentialAdditionalIDs, hmdb)%>%  # Final selection
-    dplyr::rename("AllIDs"= "hmdb")
+    dplyr::select(InputID, PotentialAdditionalIDs, !!sym(from))%>%  # Final selection
+    dplyr::rename("AllIDs"= from)
 
   ## ------------------ Merge to Input ------------------- ##
   OtherIDs <- merge(data, OtherIDs, by.x= metadata_info[['InputID']] , by.y= "InputID", all.x=TRUE)
@@ -415,8 +415,8 @@ equivalent_id <- function(data,
 
   ##------------------- Fill empty cells -------------- ##
   OtherIDs <- OtherIDs%>%
-    mutate(PotentialAdditionalIDs = ifelse(PotentialAdditionalIDs == "", NA, PotentialAdditionalIDs))%>%
-    mutate(AllIDs = ifelse(AllIDs == "", !!sym(metadata_info[['InputID']]), AllIDs))
+    mutate(PotentialAdditionalIDs = ifelse(is.na(PotentialAdditionalIDs) | PotentialAdditionalIDs == "", NA, PotentialAdditionalIDs))%>%
+    mutate(AllIDs = ifelse(is.na(AllIDs) | AllIDs == "", !!sym(metadata_info[['InputID']]), AllIDs))
 
   ## ------------------ Create count_id plot ------------------- ##
   #QC plot of before and after
@@ -728,7 +728,7 @@ checkmatch_pk_to_data <- function(data,
   data_Original <- data
 
   if(sum(is.na(data[[metadata_info[["InputID"]]]])) >=1){#remove NAs:
-     message <- paste0(sum(is.na(data[[metadata_info[["InputID"]]]])), " NA values were removed from column", metadata_info[["InputID"]])
+     message <- paste0(sum(is.na(data[[metadata_info[["InputID"]]]])), " NA values were removed from column ", metadata_info[["InputID"]])
      logger::log_trace(paste("Warning: ", message, sep=""))
 
      data <- data %>%
@@ -738,7 +738,7 @@ checkmatch_pk_to_data <- function(data,
   }
 
   if(nrow(data) - nrow(distinct(data, .data[[metadata_info[["InputID"]]]])) >= 1){# Remove duplicate IDs
-    message <- paste0(nrow(data) - nrow(distinct(data, .data[[metadata_info[["InputID"]]]])), " duplicated IDs were removed from column", metadata_info[["InputID"]])
+    message <- paste0(nrow(data) - nrow(distinct(data, .data[[metadata_info[["InputID"]]]])), " duplicated IDs were removed from column ", metadata_info[["InputID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
     data <- data %>%
@@ -775,7 +775,7 @@ checkmatch_pk_to_data <- function(data,
   prior_knowledge_Original <- input_pk
 
   if(sum(is.na(input_pk[[metadata_info[["PriorID"]]]])) >=1){#remove NAs:
-    message <- paste0(sum(is.na(input_pk[[metadata_info[["PriorID"]]]])), " NA values were removed from column", metadata_info[["PriorID"]])
+    message <- paste0(sum(is.na(input_pk[[metadata_info[["PriorID"]]]])), " NA values were removed from column ", metadata_info[["PriorID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
     input_pk <- input_pk %>%
@@ -792,16 +792,16 @@ checkmatch_pk_to_data <- function(data,
     }
   }else{
     #Add grouping_variable
-    metadata_info["grouping_variable"] <- "grouping_variable"
-    input_pk["grouping_variable"] <- "None"
+    metadata_info["grouping_variable"] <- "GroupingVariable"
+    input_pk["GroupingVariable"] <- "OneGroup"
 
-    message <- paste0("No ", metadata_info[["PriorID"]], " provided. If this was not intentional, please check your input.")
+    message <- paste0("No metadata_info grouping_variable provided. If this was not intentional, please check your input.")
     logger::log_trace(message)
     message(message)
   }
 
   if(nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1){# Remove duplicate IDs
-    message <- paste0(nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from column", metadata_info[["PriorID"]])
+    message <- paste0(nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) , " duplicated IDs were removed from PK column ", metadata_info[["PriorID"]])
     logger::log_trace(paste("Warning: ", message, sep=""))
 
     input_pk <- input_pk %>%
@@ -854,6 +854,7 @@ checkmatch_pk_to_data <- function(data,
     data_long <- data %>%
       mutate(OriginalGroup_data := paste0("data_", dplyr::row_number()))%>%
       select(metadata_info[["InputID"]], OriginalGroup_data)
+    data_long$`OriginalEntry_data` <- data_long[[metadata_info[["InputID"]]]]
   }
 
   if(PK_MultipleIDs){
@@ -863,89 +864,14 @@ checkmatch_pk_to_data <- function(data,
     PK_long <- input_pk %>%
       mutate(OriginalGroup_PK := paste0("PK_", dplyr::row_number()))%>%
       select(metadata_info[["PriorID"]],OriginalGroup_PK, metadata_info[["grouping_variable"]])
+    #PK_long$`OriginalEntry_PK` <- PK_long[[metadata_info[["PriorID"]]]]
   }
 
   # 2. Merge DF
   merged_df <- merge(PK_long, data_long, by.x= metadata_info[["PriorID"]],  by.y= metadata_info[["InputID"]], all=TRUE)%>%
-    distinct(!!sym(metadata_info[["PriorID"]]), OriginalGroup_data, .keep_all = TRUE)
+    distinct(!!sym(metadata_info[["PriorID"]]), OriginalGroup_data,!!sym(metadata_info[["grouping_variable"]]), .keep_all = TRUE)
 
-  #3. Add information to summarize and describe problems
-  merged_df <- merged_df %>%
-    # num_PK_entries
-    group_by(OriginalGroup_PK, !!sym(metadata_info[["grouping_variable"]])) %>%
-    mutate(
-      num_PK_entries = sum(!is.na(OriginalGroup_PK)),
-      num_PK_entries_groups = dplyr::n_distinct(OriginalGroup_PK, na.rm = TRUE)) %>% # count the times we have the same PK_entry match with multiple data entries --> extend below!
-    ungroup()%>%
-    # num_Input_entries
-    group_by(OriginalGroup_data, !!sym(metadata_info[["grouping_variable"]])) %>%
-    mutate(
-      num_Input_entries = sum(!is.na(OriginalGroup_data)),
-      num_Input_entries_groups = dplyr::n_distinct(OriginalGroup_data,, na.rm = TRUE))%>%
-    ungroup()%>%
-    mutate(
-      ActionRequired = case_when(
-        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups == 1 ~ "None",
-        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2  ~ "Check",
-        num_Input_entries ==1 & num_Input_entries_groups >= 2 & num_PK_entries_groups == 1  ~ "Check",
-        num_Input_entries > 1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2 ~ "Check",
-        num_Input_entries > 1 & num_Input_entries_groups >= 2 & num_PK_entries_groups >= 2 ~ "Check",
-        num_Input_entries == 0 ~ "None", # ID(s) of PK not measured
-        TRUE ~ NA_character_
-      )
-    )%>%
-    mutate(
-      Detection = case_when(
-        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups == 1 ~ "One input ID of the same group maps to at least ONE PK ID of ONE group",
-        num_Input_entries ==1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2  ~ "One input ID of the same group maps to at least ONE PK ID of MANY groups",
-        num_Input_entries ==1 & num_Input_entries_groups >= 2 & num_PK_entries_groups == 1  ~ "One input ID of MANY groups maps to at least ONE PK ID of ONE groups",
-        num_Input_entries > 1 & num_Input_entries_groups == 1 & num_PK_entries_groups >= 2 ~ "MANY input IDs of the same group map to at least ONE PK ID of MANY PK groups",
-        num_Input_entries > 1 & num_Input_entries_groups >= 2 & num_PK_entries_groups >= 2 ~ "MANY input IDs of the MANY groups map to at least ONE PK ID of MANY PK groups",
-        num_Input_entries == 0 ~ "Not Detected", # ID(s) of PK not measured
-        TRUE ~ NA_character_
-      )
-    )
-    #  Handle "Detected-to-PK" (When PK has multiple IDs)
-    #group_by(OriginalGroup_PK, !!sym(metadata_info[["grouping_variable"]])) %>%
-    #mutate(
-    #  `Detected-to-PK` = case_when(
-    #    num_Input_entries == 0 & num_PK_entries == 1 ~ "none-to-one", # No match & OriginalGroup_PK appears once
-    #    num_Input_entries == 0 & num_PK_entries > 1 ~ "none-to-many", # No match & OriginalGroup_PK appears multiple times
-    #    num_Input_entries == 1 & num_PK_entries == 1 ~ "one-to-one", # One unique match in data, one PK
-    #    num_Input_entries == 1 & num_PK_entries > 1 ~ "one-to-many", # One unique match in data, multiple PKs
-    #    num_Input_entries > 1 & num_PK_entries == 1 ~ "many-to-one", # Multiple matches in data, one PK
-    #    num_Input_entries > 1 & num_PK_entries > 1 ~ "many-to-many", # Multiple matches in data, multiple PKs
-    #    num_Input_entries == 1 & num_PK_entries == 0 ~ "one-to-none",
-    #    num_Input_entries > 1 & num_PK_entries == 0 ~ "many-to-none",
-    #    TRUE ~ NA_character_
-    #  )
-    #) %>%
-    #ungroup() %>%
-    # Handle "PK-to-Detected" (When data has multiple IDs)
-    #group_by(OriginalGroup_data, !!sym(metadata_info[["grouping_variable"]])) %>%
-    #mutate(
-    #  `PK-to-Detected` = case_when(
-    #    num_PK_entries == 0 & num_Input_entries == 1 ~ "none-from-one",
-    #    num_PK_entries == 0 & num_Input_entries > 1 ~ "none-from-many",
-    #    num_PK_entries  == 1 & num_Input_entries == 1 ~ "one-from-one",
-    #    num_PK_entries  == 1 & num_Input_entries > 1 ~ "one-from-many",
-    #    num_PK_entries  > 1 & num_Input_entries == 1 ~ "many-from-one",
-    #    num_PK_entries  > 1 & num_Input_entries > 1 ~ "many-from-many",
-    #    num_PK_entries > 1 & num_Input_entries == 0 ~ "many-from-none",
-    #    num_PK_entries == 1 & num_Input_entries == 0 ~ "one-from-none",
-    #    TRUE ~ NA_character_
-    #  )
-    #) %>%
-    #ungroup() %>%
-    # Assign ActionRequired (If many-to-many in either case)
-    #mutate(
-    #  ActionRequired = case_when(
-    #    `Detected-to-PK` == "many-to-many" | `PK-to-Detected` == "many-from-many" ~ "Check",
-    #    TRUE ~ "None"
-     # )
-    #)
-
-  # 4. Create summary table
+  # 3. Create summary table
   Values_data <- unique(data[[metadata_info[["InputID"]]]])
   Values_PK <- unique(PK_long[[metadata_info[["PriorID"]]]])
 
@@ -995,127 +921,86 @@ checkmatch_pk_to_data <- function(data,
 
   summary_df <- merge(x= summary_df,
                       y= merged_df%>%
-                        dplyr::select(-c(OriginalGroup_PK, OriginalGroup_data))%>%
-                        distinct(!!sym(metadata_info[["PriorID"]]), .keep_all = TRUE),
+                        dplyr::select(-c(OriginalGroup_PK, OriginalGroup_data)),
                       by.x= metadata_info[["InputID"]] ,
-                      by.y= metadata_info[["PriorID"]],
-                      all.x=TRUE)
-
-  if(PK_MultipleIDs){
-    summary_df <- merge(x= summary_df, y= data, by=metadata_info[["InputID"]], all.x=TRUE)%>%
-      distinct(!!sym(metadata_info[["InputID"]]), OriginalEntry_PK, .keep_all = TRUE)
-  }else{
-    summary_df <- merge(x= summary_df, y= data, by=metadata_info[["InputID"]], all.x=TRUE)%>%
-      distinct(!!sym(metadata_info[["InputID"]]), .keep_all = TRUE)
-  }
-
-  # 5. Merge back on input data to retain Nulls and duplications in case the user wants this (e.g. for plotting or inspecting further)
-
-  # Function: add_NA_to_table
-  #
-  # Description:
-  #   This function takes two data frames:
-  #     - table_with_NA: the original table that may contain rows where the key column is NA.
-  #     - table_without_NA: a processed table (e.g. from a join) that contains extra columns and excludes rows where the key is NA.
-  #
-  #   The function extracts rows from table_with_NA where the key is NA, extends these rows by adding any extra columns
-  #   (present in table_without_NA but not in table_with_NA) with NA values, and then binds these extended rows to table_without_NA.
-  #
-  # Parameters:
-  #   table_with_NA: data frame containing the original data (e.g. FeatureMetadata_Biocrates).
-  #   table_without_NA: data frame containing the processed data with extra columns (e.g. tempnew).
-  #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
-  #
-  # Returns:
-  #   A combined data frame that includes the rows from table_without_NA along with the extended NA rows from table_with_NA.
-  add_NA_to_table <- function(table_with_NA, table_without_NA, key) {
-
-    # Subset rows from the original table where the key column is NA
-    na_rows <- dplyr::filter(table_with_NA, is.na(.data[[key]]))
-
-    # Identify extra columns present in table_without_NA that are not in the original table
-    extra_cols <- setdiff(names(table_without_NA), names(table_with_NA))
-
-    # Extend the NA rows by adding the extra columns, setting their values to NA
-    na_rows_extended <- dplyr::mutate(na_rows, !!!setNames(rep(list(NA), length(extra_cols)), extra_cols))
-
-    # Reorder columns to match the structure of table_without_NA
-    na_rows_extended <- dplyr::select(na_rows_extended, dplyr::all_of(names(table_without_NA)))
-
-    # Combine the processed table with the extended NA rows
-    combined_table <- merge(table_without_NA, na_rows_extended, by=key)
-
-    return(combined_table)
-  }
-
-
-  # Function: create_duplicates_table
-  #
-  # Description:
-  #   This function takes two data frames:
-  #     - table_with_duplicates: the original table that may contain duplicate rows based on the key.
-  #     - table_without_duplicates: a deduplicated table (e.g. from a join) that includes extra columns.
-  #
-  #   The function identifies duplicate rows (non-NA keys that appear more than once, excluding the first occurrence)
-  #   in table_with_duplicates, then left joins these duplicate rows with the extra columns from table_without_duplicates.
-  #   This ensures that all duplicate rows receive the same extra column values as the first occurrence.
-  #
-  # Parameters:
-  #   table_with_duplicates: data frame containing the original data that may include duplicate keys.
-  #   table_without_duplicates: data frame with the processed data (first occurrence for each key and extra columns).
-  #   key: The column name (as a string) used as the key for matching (e.g. "HMDB").
-  #
-  # Returns:
-  #   A data frame containing the duplicate rows, extended with the extra columns from table_without_duplicates.
-  create_duplicates_table <- function(table_with_duplicates, table_without_duplicates, key) {
-
-    # Identify extra columns present in table_without_duplicates that are not in the original table
-    extra_cols <- setdiff(names(table_without_duplicates), names(table_with_duplicates))
-
-    # Extract duplicate rows: for each non-NA key, keep rows beyond the first occurrence
-    dup_rows <- table_with_duplicates %>%
-      dplyr::filter(!is.na(.data[[key]])) %>%
-      dplyr::group_by(.data[[key]]) %>%
-      dplyr::filter(dplyr::row_number() > 1) %>%
-      dplyr::ungroup()
-
-    # For each duplicate row, join the extra columns from table_without_duplicates so that all duplicates
-    # receive the same extra values as the first occurrence
-    dup_rows_extended <- dplyr::left_join(
-      dup_rows,
-      dplyr::select(table_without_duplicates, dplyr::all_of(c(key, extra_cols))),
-      by = key
+                      by.y= "OriginalEntry_data",
+                      all.x=TRUE)%>%
+    group_by(!!sym(metadata_info[["InputID"]]), !!sym(metadata_info[["grouping_variable"]]))%>%
+    mutate(
+      Count_FeatureIDs_to_GroupingVariable = case_when(
+      is.na(!!sym(metadata_info[["grouping_variable"]])) ~ NA_integer_,
+      TRUE ~ n_distinct(!!sym(metadata_info[["PriorID"]]), na.rm = TRUE)
+    )
+    )%>% mutate(
+      Group_Conflict_Notes = case_when(
+        any(Count_FeatureIDs_to_GroupingVariable > 1, na.rm = TRUE) ~
+          ifelse(
+            all(is.na(!!sym(metadata_info[["grouping_variable"]]))), "None",
+            paste(na.omit(unique(!!sym(metadata_info[["grouping_variable"]]))), collapse = " || ")
+          ),
+        TRUE ~ "None"
+      )
     ) %>%
-      dplyr::select(dplyr::all_of(names(table_without_duplicates)))
+    ungroup()%>%
+    dplyr::mutate(
+      matches = ifelse(matches == "", NA, matches)
+    )
 
-    return(dup_rows_extended)
-  }
+  summary_df_short <- summary_df%>%
+    group_by(!!sym(metadata_info[["InputID"]]))%>%
+    dplyr::mutate(
+      Unique_GroupingVariable_count = n_distinct(!!sym(metadata_info["grouping_variable"]), na.rm = TRUE),
+      !!sym(metadata_info[["grouping_variable"]]) := list(!!sym(metadata_info[["grouping_variable"]])),
+      Count_FeatureIDs_to_GroupingVariable = list(Count_FeatureIDs_to_GroupingVariable),
+      Group_Conflict_Notes =  paste(unique(Group_Conflict_Notes), collapse = " || ")
+    )%>%
+    ungroup()%>%
+    distinct(
+      !!sym(metadata_info[["InputID"]]),
+      !!sym(metadata_info[["grouping_variable"]]),
+      .keep_all = TRUE
+    )%>%
+    dplyr::mutate(
+      ActionRequired = case_when(
+        original_count >=1 & matches_count == 1 & Unique_GroupingVariable_count >= 1 ~ "None",
+        original_count >=1 & matches_count == 0 & Unique_GroupingVariable_count >= 0 ~ "None",
+        original_count >1 & matches_count > 1 & Unique_GroupingVariable_count == 1 ~ "Check",
+        original_count >1 & matches_count > 1 & Unique_GroupingVariable_count > 1 ~ "Check",
+        TRUE ~ NA_character_
+      )
+    )%>%
+    select(- !!sym(metadata_info[["PriorID"]]))%>%
+    dplyr::mutate(
+      matches = ifelse(matches == "", NA, matches),
+      !!sym(metadata_info[["grouping_variable"]]) := ifelse(!!sym(metadata_info[["grouping_variable"]]) == "", NA, !!sym(metadata_info[["grouping_variable"]]))
+    )%>%
+    dplyr::mutate(
+      InputID_select = case_when(
+        original_count ==1 & matches_count <= 1 ~ !!sym(metadata_info[["InputID"]]),
+        original_count >=2 & matches_count == 0 ~ str_split(!!sym(metadata_info[["InputID"]]), ",\\s*") %>% sapply(`[`, 1),
+        original_count >=2 & matches_count == 1 ~ matches,
+        TRUE ~ NA_character_
+      ),
+      Action_Specific = case_when(
+        matches_count >= 2 & Group_Conflict_Notes == "None" ~ "KeepEachID",
+        matches_count >= 2 & Group_Conflict_Notes != "None" ~ "KeepOneID",
+        TRUE ~ "None"
+      )
+    )
 
-  # Create the table with NA rows added
-  temp_results_NAs_added <- add_NA_to_table(data_Original, summary_df, metadata_info[["InputID"]])
-  # Create the table with duplicate key (metadata_info[["InputID"]]) rows extended
-  temp_results_of_duplicates <- create_duplicates_table(data_Original, summary_df, metadata_info[["InputID"]])
-  # Combine these to get a summary table that includes both NA and duplicate rows
-  summary_df_with_NA_and_duplicates <- dplyr::bind_rows(temp_results_NAs_added, temp_results_of_duplicates)
 
-  # Now for the user let's also create separate dfs with just the NA values and just the duplicates, in case they want to inspect this easier
-  summary_df_only_NA <- summary_df_with_NA_and_duplicates %>%
-    dplyr::filter(is.na(.data[[metadata_info[["InputID"]]]]))
+  # 4. Messages and summarise
+  message0 <- paste0("data has multiple IDs per measurement = ", data_MultipleIDs, ". input_pk has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
+  message1 <- paste0("data has ", dplyr::n_distinct(unique(data[[metadata_info[["InputID"]]]])), " unique entries with " ,dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])) ," unique ", metadata_info[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df_short%>% dplyr::filter(matches_count == 1)), " match, which is ", (nrow(summary_df_short%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])))*100, "%." , sep="")
+  message2 <- paste0("input_pk has ", dplyr::n_distinct(input_pk[[metadata_info[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]) ," unique ", metadata_info[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df_short%>% dplyr::filter(matches_count == 1)), " are detected in the data, which is ", (nrow(summary_df_short%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]))*100, "%.")
 
-  summary_df_only_duplicates <- summary_df_with_NA_and_duplicates %>%
-    dplyr::filter(!is.na(.data[[metadata_info[["InputID"]]]])) %>%  # Exclude NA values
-    dplyr::group_by(.data[[metadata_info[["InputID"]]]]) %>%
-    dplyr::filter(dplyr::n() > 1) %>%             # Keep groups with duplicates
-    dplyr::ungroup()
+  message(message0)
+  message(message1)
+  message(message2)
 
-  # 6. Messages and summarise
-  message <- paste0("data has multiple IDs per measurement = ", data_MultipleIDs, ". input_pk has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
-  message1 <- paste0("data has ", dplyr::n_distinct(unique(data[[metadata_info[["InputID"]]]])), " unique entries with " ,dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])) ," unique ", metadata_info[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " match, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])))*100, "%." , sep="")
-  message2 <- paste0("input_pk has ", dplyr::n_distinct(input_pk[[metadata_info[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]) ," unique ", metadata_info[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df%>% dplyr::filter(matches_count == 1)), " are detected in the data, which is ", (nrow(summary_df%>% dplyr::filter(matches_count == 1)) / dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]))*100, "%.")
-
-  if(nrow(summary_df%>% dplyr::filter(ActionRequired == "Check"))>=1){
-    #warning <- paste0("There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category") # "Check"
-
+  if(nrow(summary_df_short%>% dplyr::filter(ActionRequired == "Check"))>=1){
+    warning1 <- paste0("There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category") # "Check"
+    warning(warning1)
   }
 
   ## ------------------ Plot summary ----------------------##
@@ -1124,10 +1009,9 @@ checkmatch_pk_to_data <- function(data,
 
 
   ## ------------------ Save Results ----------------------##
-  ResList <- list("data_Matched" = summary_df,
-                  "data_Matched_NA_and_duplicates" = summary_df_with_NA_and_duplicates,
-                  "data_Matched_only_NA" = summary_df_only_NA,
-                  "data_Matched_only_duplicates" = summary_df_only_duplicates)
+  ResList <- list("data_summary" = summary_df_short,
+                  "GroupingVariable_summary" = summary_df,
+                  "data_long" = merged_df)
 
   suppressMessages(suppressWarnings(
   save_res(inputlist_df=ResList,
