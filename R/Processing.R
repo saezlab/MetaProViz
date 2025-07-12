@@ -803,24 +803,44 @@ mvi_imputation <-function(data,
     NA_removed_matrix <- filtered_matrix %>% as.data.frame()
   }
 
-  for (feature  in colnames(NA_removed_matrix)){
-    feature_data <- merge(NA_removed_matrix[feature] , metadata_sample %>% dplyr::select(Conditions), by= 0)
-    feature_data <- tibble::column_to_rownames(feature_data, "Row.names")
+  NA_removed_matrix %<>%
+    mutate(Conditions = metadata_sample$Conditions) %>%
+    group_by(Conditions) %>%
+    mutate(
+      across(
+        .cols = everything(),
+        .fns = ~ ifelse(is.na(.x), min(.x, na.rm = TRUE) * mvi_percentage / 100, .x),
+        .names = "{.col}"
+      )
+    ) %>%
+    ungroup() %>%
+    select(-Conditions) %>%
+    as.data.frame() %>%
+    `rownames<-`(rownames(NA_removed_matrix))
 
-    imputed_feature_data <- feature_data %>%
-      dplyr::group_by(Conditions) %>%
-      dplyr::mutate(across(all_of(feature), ~{
-        if(all(is.na(.))) {
-          message <- paste0("For some conditions all measured samples are NA for " , feature, ". Hence we can not perform half-minimum value imputation per condition for this metabolite and will assume it is a true biological 0 in those cases.")
-          logger::log_info(message)
-          message(message)
-          return(0)  # Return NA if all values are missing
-        } else {
-          return(replace(., is.na(.), min(., na.rm = TRUE)*(mvi_percentage/100)))
-        }
-      }))
+  # Check for groups with only NAs
+  nan_check <-
+    NA_removed_matrix %>%
+    summarise(across(
+      .cols = where(is.numeric),
+      .fns = ~ any(is.nan(.x)),
+      .names = "has_nan_{.col}"
+    )) %>%
+    select(where(~ any(. == TRUE)))
 
-    NA_removed_matrix[[feature]] <- imputed_feature_data[[feature]]
+  if (ncol(nan_check) > 0L) {
+
+    msg <- sprintf(
+      paste0(
+        "Some features had all NA values in all samples of certain ",
+        "conditions - NaN introduced in columns: %s"
+      ),
+      paste(names(nan_check), collapse = ", ")
+    )
+
+    logger::log_info(msg)
+    message(msg)
+
   }
 
   if(core==TRUE){
