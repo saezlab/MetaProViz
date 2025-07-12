@@ -194,23 +194,46 @@ processing <- function(data,
   ###################################################################################################################################
   ## ------------------ Return ------------------- ##
   ## ---- DFs
-  if(is.null(featurefilt)==FALSE){#Add metabolites that where removed as part of the feature filtering
-    if(length(data_Filtered[["RemovedMetabolites"]])==0){
-      DFList <- list("data_Rawdata"= merge(as.data.frame(metadata_sample), as.data.frame(data), by="row.names")%>% tibble::column_to_rownames("Row.names"),
-                     "Filtered_metabolites"= as.data.frame(list(feature_filtering = c(featurefilt),
-                                                            cutoff_featurefilt = c(cutoff_featurefilt),
-                                                            RemovedMetabolites = c("None"))),
-                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
-    }else{
-      DFList <- list("data_Rawdata"= merge(as.data.frame(metadata_sample), as.data.frame(data), by="row.names")%>% tibble::column_to_rownames("Row.names"),
-                     "Filtered_metabolites"= as.data.frame(list(feature_filtering = rep(featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
-                                                           cutoff_featurefilt = rep(cutoff_featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
-                                                           RemovedMetabolites = data_Filtered[["RemovedMetabolites"]])),
-                     "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
+  DFList <-
+    data %>%
+    rownames_to_column('Sample') %>%
+    dplyr::full_join(
+      metadata_sample %>% rownames_to_column('Sample'),
+      by = 'Sample'
+    ) %>%
+    relocate(Conditions, .before = 1L) %>%
+    list(data_Rawdata = .)
+
+  if(!is.null(featurefilt)) {  # Add metabolites that where removed as part of the feature filtering
+
+    if(length(data_Filtered[["RemovedMetabolites"]])==0) {
+
+      DFList$Filtered_metabolites <-
+        as.data.frame(
+          list(
+            feature_filtering = c(featurefilt),
+            cutoff_featurefilt = c(cutoff_featurefilt),
+            RemovedMetabolites = c("None")
+          )
+        )
+
+    } else {
+
+      DFList$Filtered_metabolites <-
+        as.data.frame(
+          list(
+            feature_filtering = rep(featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
+            cutoff_featurefilt = rep(cutoff_featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
+            RemovedMetabolites = data_Filtered[["RemovedMetabolites"]]
+          )
+        )
+
     }
-  }else{
-    DFList <- list("data_Rawdata"= merge(as.data.frame(metadata_sample), as.data.frame(data), by="row.names")%>% tibble::column_to_rownames("Row.names"), "Preprocessing_output"=OutlierRes[["DF"]][["data_outliers"]])
+
   }
+
+  DFList$Preprocessing_output <- OutlierRes[["DF"]][["data_outliers"]]
+  DFList$data_Rawdata %<>% column_to_rownames('Sample')
 
   if(core ==TRUE){
     if(is.null(data_coreNorm[["DF"]][["Contigency_table_core_blank"]])){
