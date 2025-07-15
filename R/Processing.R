@@ -4,11 +4,11 @@
 ##
 ## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalization, outlier detection and QC plots
 ##
-## Author: Dimitrios Prymidis and Christina Schmidt
+## Author: Dimitrios Prymidis, Denes Turei and Christina Schmidt
 ##
 ## Date Created: 2022-10-28
 ##
-## Copyright (c) Dimitrios Prymidis and Christina Schmidt
+## Copyright (c) Dimitrios Prymidis,Denes Turei and Christina Schmidt
 ## Email:
 ##
 ## ---------------------------
@@ -27,8 +27,8 @@
 #' Modularised Normalization: 80%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
 #'
 #' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added. Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions.
+#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition.
+#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" (mandatory) with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" (optional) including numerical values. For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added. Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions.
 #' @param featurefilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
 #' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default = 0.8}
 #' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed. \strong{Default = TRUE}
@@ -46,14 +46,14 @@
 #' @examples
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' ResI <- MetaProViz::processing(data=Intra[-c(49:58) ,-c(1:3)],
-#'                                  metadata_sample=Intra[-c(49:58) , c(1:3)],
-#'                                  metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#'                                metadata_sample=Intra[-c(49:58) , c(1:3)],
+#'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' Media <- medium_raw %>%tibble::column_to_rownames("Code")
 #' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
-#'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
-#'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
-#'                                   core=TRUE)
+#'                                metadata_sample = Media[-c(40:45) ,c(1:3)] ,
+#'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
+#'                                core=TRUE)
 #'
 #' @keywords 80  percent filtering rule, Missing Value Imputation, total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts
 #'
@@ -64,19 +64,19 @@
 #' @export
 #'
 processing <- function(data,
-                          metadata_sample,
-                          metadata_info,
-                          featurefilt = "Modified",
-                          cutoff_featurefilt = 0.8,
-                          tic = TRUE,
-                          mvi= TRUE,
-                          mvi_percentage=50,
-                          hotellins_confidence = 0.99,
-                          core = FALSE,
-                          save_plot = "svg",
-                          save_table = "csv",
-                          print_plot = TRUE,
-                          path = NULL
+                       metadata_sample,
+                       metadata_info,
+                       featurefilt = "Modified",
+                       cutoff_featurefilt = 0.8,
+                       tic = TRUE,
+                       mvi= TRUE,
+                       mvi_percentage=50,
+                       hotellins_confidence = 0.99,
+                       core = FALSE,
+                       save_plot = "svg",
+                       save_table = "csv",
+                       print_plot = TRUE,
+                       path = NULL
 ){
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -84,13 +84,13 @@ processing <- function(data,
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `check_param`
   check_param(data=data,
-                          metadata_sample=metadata_sample,
-                          metadata_feature=NULL,
-                          metadata_info= metadata_info,
-                          save_plot=save_plot,
-                          save_table=save_table,
-                          core=core,
-                          print_plot= print_plot)
+              metadata_sample=metadata_sample,
+              metadata_feature=NULL,
+              metadata_info= metadata_info,
+              save_plot=save_plot,
+              save_table=save_table,
+              core=core,
+              print_plot= print_plot)
 
   # HelperFunction `check_param` Specific
   check_param_processing(metadata_sample=metadata_sample,
@@ -123,11 +123,11 @@ processing <- function(data,
   ## ------------------ 1. Feature filtering ------------------- ##
   if(is.null(featurefilt)==FALSE){
     data_Filtered <- feature_filtering(data=data,
-                                                    featurefilt=featurefilt,
-                                                    cutoff_featurefilt=cutoff_featurefilt,
-                                                    metadata_sample=metadata_sample,
-                                                    metadata_info=metadata_info,
-                                                    core=core)
+                                       featurefilt=featurefilt,
+                                       cutoff_featurefilt=cutoff_featurefilt,
+                                       metadata_sample=metadata_sample,
+                                       metadata_info=metadata_info,
+                                       core=core)
 
     data_Filt <- data_Filtered[["DF"]]
   }else{
@@ -137,10 +137,10 @@ processing <- function(data,
   ## ------------------ 2. Missing value Imputation ------------------- ##
   if(mvi==TRUE){
     mviRes<- mvi_imputation(data=data_Filt,
-                                       metadata_sample=metadata_sample,
-                                       metadata_info=metadata_info,
-                                       core=core,
-                                       mvi_percentage=mvi_percentage)
+                            metadata_sample=metadata_sample,
+                            metadata_info=metadata_info,
+                            core=core,
+                            mvi_percentage=mvi_percentage)
   }else{
     mviRes<- data_Filt
   }
@@ -149,9 +149,9 @@ processing <- function(data,
   if(tic==TRUE){
     #Perform tic
     ticRes_List <- tic_norm(data=mviRes,
-                                        metadata_sample=metadata_sample,
-                                        metadata_info=metadata_info,
-                                        tic=tic)
+                            metadata_sample=metadata_sample,
+                            metadata_info=metadata_info,
+                            tic=tic)
     ticRes <- ticRes_List[["DF"]][["data_tic"]]
 
     #Add plots to PlotList
@@ -186,10 +186,10 @@ processing <- function(data,
   ###################################################################################################################################
   ## ------------------ Sample outlier identification ------------------- ##
   OutlierRes <-  outlier_detection(data= data_norm,
-                                               metadata_sample=metadata_sample,
-                                               metadata_info=metadata_info,
-                                               core=core,
-                                               hotellins_confidence=hotellins_confidence)
+                                   metadata_sample=metadata_sample,
+                                   metadata_info=metadata_info,
+                                   core=core,
+                                   hotellins_confidence=hotellins_confidence)
 
   ###################################################################################################################################
   ## ------------------ Return ------------------- ##
@@ -201,7 +201,7 @@ processing <- function(data,
       metadata_sample %>% rownames_to_column('Sample'),
       by = 'Sample'
     ) %>%
-    relocate(Conditions, .before = 1L) %>%
+    relocate(!!sym(metadata_info[["Conditions"]]), .before = 1L) %>%
     list(data_Rawdata = .)
 
   if(!is.null(featurefilt)) {  # Add metabolites that where removed as part of the feature filtering
@@ -769,8 +769,8 @@ feature_filtering <-function(data,
 #' @examples
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- mvi_imputation(data=Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                                  metadata_sample=Intra[-c(49:58), c(1:3)],
-#'                                  metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#'                       metadata_sample=Intra[-c(49:58), c(1:3)],
+#'                       metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' @keywords Half minimum missing value imputation
 #'
@@ -782,10 +782,10 @@ feature_filtering <-function(data,
 #' @noRd
 #'
 mvi_imputation <-function(data,
-                        metadata_sample,
-                        metadata_info,
-                        core=FALSE,
-                        mvi_percentage=50){
+                          metadata_sample,
+                          metadata_info,
+                          core=FALSE,
+                          mvi_percentage=50){
   ## ------------------ Prepare the data ------------------- ##
   filtered_matrix <- data%>%
     dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
@@ -799,17 +799,29 @@ mvi_imputation <-function(data,
   if(core==TRUE){#remove blank samples
     NA_removed_matrix <- filtered_matrix%>% dplyr::filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
 
-  }else{
+    }else{
     NA_removed_matrix <- filtered_matrix %>% as.data.frame()
   }
 
   NA_removed_matrix %<>%
-    mutate(Conditions = metadata_sample$Conditions) %>%
+    mutate(Conditions = if(core==TRUE){#If we have a CoRe experiment we need to remove the sample metainformation of the media blank samples!
+      metadata_sample%>%
+        dplyr::filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])%>%
+        dplyr::select(!!sym(metadata_info[["Conditions"]]))
+  }else{
+      metadata_sample[[metadata_info[["Conditions"]]]]# If we have a standard experiments no samples need to be removed
+    }) %>%
     group_by(Conditions) %>%
     mutate(
       across(
         .cols = everything(),
-        .fns = ~ ifelse(is.na(.x), min(.x, na.rm = TRUE) * mvi_percentage / 100, .x),
+        .fns = ~ {
+          if (all(is.na(.x))) {
+            .x  # leaves as-is (here keep NAs)
+          } else {
+            ifelse(is.na(.x), min(.x, na.rm = TRUE) * mvi_percentage / 100, .x)
+          }
+        },
         .names = "{.col}"
       )
     ) %>%
@@ -819,23 +831,23 @@ mvi_imputation <-function(data,
     `rownames<-`(rownames(NA_removed_matrix))
 
   # Check for groups with only NAs
-  nan_check <-
+  na_check <-
     NA_removed_matrix %>%
     summarise(across(
       .cols = where(is.numeric),
-      .fns = ~ any(is.nan(.x)),
-      .names = "has_nan_{.col}"
+      .fns = ~ any(is.na(.x)),
+      .names = "{.col}"
     )) %>%
     select(where(~ any(. == TRUE)))
 
-  if (ncol(nan_check) > 0L) {
+  if (ncol(na_check) > 0L) {
 
     msg <- sprintf(
       paste0(
         "Some features had all NA values in all samples of certain ",
-        "conditions - NaN introduced in columns: %s"
+        "conditions - hence no imputation was done and NA remains for: %s"
       ),
-      paste(names(nan_check), collapse = ", ")
+      paste(names(na_check), collapse = ", ")
     )
 
     logger::log_info(msg)
@@ -1371,7 +1383,7 @@ outlier_detection <-function(data,
     ##---  PCA
     PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
     outlier_PCA_data <- data_norm
-    outlier_PCA_data$Conditions <- Conditions
+    outlier_PCA_data[[metadata_info[["Conditions"]]]] <- Conditions
 
     dev.new()
     pca_outlier <-invisible(viz_pca(data=data_norm,
