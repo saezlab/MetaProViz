@@ -1,7 +1,7 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 3.0.2
+Version: 3.0.3
 Authors@R: c(
     person("Christina", "Schmidt", , "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
@@ -79,7 +79,7 @@ Suggests:
     knitr,
     pkgdown,
     svglite,
-    testthat (>= 3.0.2)
+    testthat (>= 3.0.3)
 Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
