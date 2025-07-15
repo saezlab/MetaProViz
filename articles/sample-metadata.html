@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1328,8 +1328,8 @@ entries in the KEGG pathway-metabolite sets:</p>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data = Tissue_MetaData_Extended, :</span></span>
 <span><span class="co">#&gt; 8 duplicated IDs were removed from column KEGG</span></span>
 <span><span class="co">#&gt; data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.</span></span>
-<span><span class="co">#&gt; data has 318 unique entries with 334 unique KEGG IDs. Of those IDs, 245 match, which is 73.3532934131736%.</span></span>
-<span><span class="co">#&gt; input_pk has 6502 unique entries with 6502 unique MetaboliteID IDs. Of those IDs, 245 are detected in the data, which is 3.76807136265764%.</span></span>
+<span><span class="co">#&gt; data has 318 unique entries with 334 unique KEGG IDs. Of those IDs, 250 match, which is 74.8502994011976%.</span></span>
+<span><span class="co">#&gt; input_pk has 6511 unique entries with 6511 unique MetaboliteID IDs. Of those IDs, 250 are detected in the data, which is 3.83965596682537%.</span></span>
 <span><span class="co">#&gt; Warning in MetaProViz::checkmatch_pk_to_data(data = Tissue_MetaData_Extended, :</span></span>
 <span><span class="co">#&gt; There are cases where multiple detected IDs match to multiple prior knowledge</span></span>
 <span><span class="co">#&gt; IDs of the same category</span></span>
@@ -1370,10 +1370,10 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00031
+C00221
 </td>
 <td style="text-align:left;">
-Glycolysis / Gluconeogenesis
+Metabolic pathways
 </td>
 </tr>
 <tr>
@@ -1421,7 +1421,7 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00221
+C00031
 </td>
 <td style="text-align:left;">
 Glycolysis / Gluconeogenesis
@@ -1441,7 +1441,7 @@ C00221, C00031
 C00031
 </td>
 <td style="text-align:left;">
-Metabolic pathways
+Pentose phosphate pathway
 </td>
 </tr>
 <tr>
@@ -1455,7 +1455,7 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00221
+C00031
 </td>
 <td style="text-align:left;">
 Metabolic pathways
@@ -1489,10 +1489,10 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00031
+C00221
 </td>
 <td style="text-align:left;">
-Pentose phosphate pathway
+Glycolysis / Gluconeogenesis
 </td>
 </tr>
 <tr>
@@ -1540,7 +1540,7 @@ C17737, C00695
 2
 </td>
 <td style="text-align:left;">
-C00695
+C17737
 </td>
 <td style="text-align:left;">
 Secondary bile acid biosynthesis
@@ -1557,7 +1557,7 @@ C17737, C00695
 2
 </td>
 <td style="text-align:left;">
-C17737
+C00695
 </td>
 <td style="text-align:left;">
 Secondary bile acid biosynthesis
@@ -1679,8 +1679,8 @@ NA
 C00221, C00031
 </td>
 <td style="text-align:left;">
-None || Glycolysis / Gluconeogenesis || Pentose phosphate pathway ||
-Biosynthesis of secondary metabolites || Metabolic pathways
+None || Metabolic pathways || Pentose phosphate pathway || Biosynthesis
+of secondary metabolites || Glycolysis / Gluconeogenesis
 </td>
 <td style="text-align:left;">
 Check
@@ -1810,7 +1810,7 @@ NA
 C03460, C03722
 </td>
 <td style="text-align:left;">
-Metabolic pathways || None
+None || Metabolic pathways
 </td>
 <td style="text-align:left;">
 Check
@@ -2248,27 +2248,27 @@ using KEGG pathways for each comparison.<br></p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
 <span><span class="co">#&gt; [1] stringr_1.5.1    tibble_3.3.0     tidyr_1.3.1      rlang_1.1.6      dplyr_1.1.4      magrittr_2.0.3  </span></span>
-<span><span class="co">#&gt; [7] MetaProViz_3.0.2</span></span>
+<span><span class="co">#&gt; [7] MetaProViz_3.0.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] DBI_1.2.3              gridExtra_2.3          httr2_1.1.2            tcltk_4.4.3            logger_0.4.0          </span></span>
+<span><span class="co">#&gt;   [1] DBI_1.2.3              gridExtra_2.3          httr2_1.2.0            tcltk_4.4.3            logger_0.4.0          </span></span>
 <span><span class="co">#&gt;   [6] readxl_1.4.5           compiler_4.4.3         RSQLite_2.4.1          systemfonts_1.2.3      vctrs_0.6.5           </span></span>
 <span><span class="co">#&gt;  [11] reshape2_1.4.4         rvest_1.0.4            pkgconfig_2.0.3        crayon_1.5.3           fastmap_1.2.0         </span></span>
 <span><span class="co">#&gt;  [16] backports_1.5.0        labeling_0.4.3         rmarkdown_2.29         sessioninfo_1.2.3      tzdb_0.5.0            </span></span>
-<span><span class="co">#&gt;  [21] ggbeeswarm_0.7.2       ragg_1.4.0             ggfortify_0.4.17       purrr_1.0.4            bit_4.6.0             </span></span>
+<span><span class="co">#&gt;  [21] ggbeeswarm_0.7.2       ragg_1.4.0             ggfortify_0.4.18       purrr_1.1.0            bit_4.6.0             </span></span>
 <span><span class="co">#&gt;  [26] xfun_0.52              cachem_1.1.0           jsonlite_2.0.0         progress_1.2.3         blob_1.2.4            </span></span>
 <span><span class="co">#&gt;  [31] later_1.4.2            broom_1.0.8            parallel_4.4.3         prettyunits_1.2.0      R6_2.6.1              </span></span>
 <span><span class="co">#&gt;  [36] bslib_0.9.0            stringi_1.8.7          RColorBrewer_1.1-3     ComplexUpset_1.3.3     limma_3.62.2          </span></span>
-<span><span class="co">#&gt;  [41] car_3.1-3              lubridate_1.9.4        jquerylib_0.1.4        cellranger_1.1.0       Rcpp_1.0.14           </span></span>
+<span><span class="co">#&gt;  [41] car_3.1-3              lubridate_1.9.4        jquerylib_0.1.4        cellranger_1.1.0       Rcpp_1.1.0            </span></span>
 <span><span class="co">#&gt;  [46] knitr_1.50             R.utils_2.13.0         readr_2.1.5            splines_4.4.3          igraph_2.1.4          </span></span>
 <span><span class="co">#&gt;  [51] timechange_0.3.0       tidyselect_1.2.1       rstudioapi_0.17.1      qvalue_2.38.0          abind_1.4-8           </span></span>
-<span><span class="co">#&gt;  [56] yaml_2.3.10            ggVennDiagram_1.5.2    curl_6.3.0             plyr_1.8.9             withr_3.0.2           </span></span>
-<span><span class="co">#&gt;  [61] inflection_1.3.6       evaluate_1.0.3         desc_1.4.3             zip_2.3.3              xml2_1.3.8            </span></span>
-<span><span class="co">#&gt;  [66] pillar_1.10.2          ggpubr_0.6.0           carData_3.0-5          checkmate_2.3.2        generics_0.1.4        </span></span>
+<span><span class="co">#&gt;  [56] yaml_2.3.10            ggVennDiagram_1.5.4    curl_6.4.0             plyr_1.8.9             withr_3.0.2           </span></span>
+<span><span class="co">#&gt;  [61] inflection_1.3.6       evaluate_1.0.4         desc_1.4.3             zip_2.3.3              xml2_1.3.8            </span></span>
+<span><span class="co">#&gt;  [66] pillar_1.11.0          ggpubr_0.6.1           carData_3.0-5          checkmate_2.3.2        generics_0.1.4        </span></span>
 <span><span class="co">#&gt;  [71] vroom_1.6.5            hms_1.1.3              ggplot2_3.5.2          scales_1.4.0           gtools_3.9.5          </span></span>
-<span><span class="co">#&gt;  [76] OmnipathR_3.15.99      glue_1.8.0             pheatmap_1.0.13        scatterplot3d_0.3-44   tools_4.4.3           </span></span>
+<span><span class="co">#&gt;  [76] OmnipathR_3.17.2       glue_1.8.0             pheatmap_1.0.13        scatterplot3d_0.3-44   tools_4.4.3           </span></span>
 <span><span class="co">#&gt;  [81] ggsignif_0.6.4         fs_1.6.6               XML_3.99-0.18          grid_4.4.3             qcc_2.7               </span></span>
-<span><span class="co">#&gt;  [86] colorspace_2.1-1       patchwork_1.3.0        beeswarm_0.4.0         vipor_0.4.7            Formula_1.2-5         </span></span>
+<span><span class="co">#&gt;  [86] colorspace_2.1-1       patchwork_1.3.1        beeswarm_0.4.0         vipor_0.4.7            Formula_1.2-5         </span></span>
 <span><span class="co">#&gt;  [91] cli_3.6.5              rappdirs_0.3.3         kableExtra_1.4.0       textshaping_1.0.1      Polychrome_1.5.4      </span></span>
 <span><span class="co">#&gt;  [96] viridisLite_0.4.2      svglite_2.2.1          gtable_0.3.6           R.methodsS3_1.8.2      rstatix_0.7.2         </span></span>
 <span><span class="co">#&gt; [101] hash_2.2.6.3           selectr_0.4-2          EnhancedVolcano_1.24.0 sass_0.4.10            digest_0.6.37         </span></span>

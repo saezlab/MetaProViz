@@ -1,0 +1,4 @@
+feature_filtering,cutoff_featurefilt,RemovedMetabolites
+Modified,0.8,AICAR
+Modified,0.8,FAICAR
+Modified,0.8,SAICAR
