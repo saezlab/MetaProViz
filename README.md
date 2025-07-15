@@ -141,7 +141,6 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
       author = {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez and Christian Frezza},
       year = {2024},
       note = {R package version 3.0.3},
-
     }
 
 ## References
