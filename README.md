@@ -82,13 +82,13 @@ those tutorial on the top under the “Tutorials” button, where you can
 follow specific user case examples for different analysis. Otherwise,
 you can also follow the links below:  
 - [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)  
+data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html)  
 - [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)  
+media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html)  
 - [Prior Knowledge Access &
-Integration](https://saezlab.github.io/MetaProViz/articles/Prior%20Knowledge%20-%20Access%20&%20Integration.html)  
+Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html)  
 - [Sample Metadata
-Analysis](https://saezlab.github.io/MetaProViz/articles/Sample%20Metadata%20Analysis.html)  
+Analysis](https://saezlab.github.io/MetaProViz/articles/sample-metadata.html)  
   
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
@@ -141,6 +141,7 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
       author = {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez and Christian Frezza},
       year = {2024},
       note = {R package version 3.0.3},
+
     }
 
 ## References
