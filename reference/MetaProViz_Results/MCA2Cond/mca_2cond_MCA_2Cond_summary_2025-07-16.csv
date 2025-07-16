@@ -1,0 +1,30 @@
+Regulation Grouping,SiRCle cluster Name,Number of Features
+RG1_All,Cond1 DOWN + Cond2 DOWN,40
+RG1_All,Cond1 DOWN + Cond2 Not Significant,2
+RG1_All,Cond1 DOWN + Cond2 Significant Negative,7
+RG1_All,Cond1 Not Significant + Cond2 DOWN,1
+RG1_All,Cond1 Not Significant + Cond2 Not Significant,26
+RG1_All,Cond1 Not Significant + Cond2 Significant Negative,15
+RG1_All,Cond1 Not Significant + Cond2 Significant Positive,2
+RG1_All,Cond1 Significant Negative + Cond2 DOWN,9
+RG1_All,Cond1 Significant Negative + Cond2 Not Significant,2
+RG1_All,Cond1 Significant Negative + Cond2 Significant Negative,42
+RG1_All,Cond1 Significant Negative + Cond2 Significant Positive,1
+RG1_All,Cond1 Significant Positive + Cond2 Not Significant,6
+RG1_All,Cond1 Significant Positive + Cond2 Significant Negative,2
+RG1_All,Cond1 Significant Positive + Cond2 Significant Positive,16
+RG1_All,Cond1 UP + Cond2 Not Significant,1
+RG1_All,Cond1 UP + Cond2 Significant Positive,2
+RG1_All,Cond1 UP + Cond2 UP,7
+RG2_Significant,Cond1_DOWN,2
+RG2_Significant,Cond1_UP,1
+RG2_Significant,Cond2_DOWN,1
+RG2_Significant,None,112
+RG2_Significant,core_DOWN,56
+RG2_Significant,core_UP,9
+RG3_SignificantChange,Cond1_DOWN,9
+RG3_SignificantChange,Cond1_UP,3
+RG3_SignificantChange,Cond2_DOWN,10
+RG3_SignificantChange,None,112
+RG3_SignificantChange,core_DOWN,40
+RG3_SignificantChange,core_UP,7
