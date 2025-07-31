@@ -1,0 +1,318 @@
+---
+title: "SupplementaryTables"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+
+First if you not done yet, install the required dependencies and load the libraries:
+```{r message=FALSE, warning=FALSE}
+#dependencies that need to be loaded:
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(MetaProViz)
+
+# Convert All Text to UTF-8
+sanitize_df <- function(df) {
+  df[] <- lapply(df, function(col) {
+    if (is.character(col)) {
+      col <- ifelse(is.na(col), NA, col)  # Ensure NAs remain NAs
+      col <- iconv(col, from = "UTF-8", to = "UTF-8", sub = "")  # Remove non-UTF-8 characters
+      col <- gsub("[[:cntrl:]]", "", col)  # Remove control characters (but not NA)
+      col <- substr(col, 1, 30000)  # Truncate long cells
+    }
+    return(col)
+  })
+  return(df)
+}
+
+#Make lists
+convert_to_df <- function(path) {
+  df <- as.data.frame(
+    suppressMessages(
+    readr::read_csv(path)
+    )
+  )
+}
+```
+
+# Compile supplementary tables for manuscript
+
+## Table 1
+`Extended Data Table 1__PatientsTissue_Metabolomics.xlsx`:\
+- Sheet 1: ccRCC patients feature metadata.\
+- Sheet 2: Normalised data.\
+- Sheet 3: Metadata Analysis Anova.\
+- Sheet 4: Metadata Analysis Features.\
+- Sheet 5: Metadata Analysis Top/Bottom Features~PC.\
+- Sheet 6: Differential analysis TUMOR vs NORMAL.\
+- Sheet 7: Differential analysis TUMOR vs NORMAL of patient subset Old.\
+- Sheet 8: Differential analysis TUMOR vs NORMAL of patient subset Young.\
+- Sheet 9: MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.\
+- Sheet 10: Summary of MCA2Cond biological regulated clustering.\
+- Sheet 11: Pathway enrichment analysis using KEGG on Old patient subset.\
+- Sheet 12: Pathway enrichment analysis using KEGG on Young patient subset.\
+
+```{r}
+#Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:12),
+  Content = c(
+    "ccRCC patients feature metadata.",
+    "Normalised data.",
+    "Metadata Analysis Anova.",
+    "Metadata Analysis Features.",
+    "Metadata Analysis Top/Bottom Features~PC.",
+    "Differential analysis TUMOR vs NORMAL.",
+    "Differential analysis TUMOR vs NORMAL of patient subset Old.",
+    "Differential analysis TUMOR vs NORMAL of patient subset Young.",
+    "MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.",
+    "Summary of MCA2Cond biological regulated clustering.",
+    "Pathway enrichment analysis using KEGG on Old patient subset.",
+    "Pathway enrichment analysis using KEGG on Young patient subset."
+  ),
+  stringsAsFactors = FALSE
+)
+
+#Make lists
+Patients_Metadata <- list(
+  "SheetOverview" = df,
+  "Feature metadata" = convert_to_df("Patients_Metadata/MetaProViz_Results/PK/Adapted/Adapted_Tissue_MetaData.csv"),
+  "NormalisedData" = tissue_norm%>% column_to_rownames("Code"),
+  "MetaAnalysis_AOV" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_aov_2025-07-10.csv"),
+  "MetaAnalysis_Features" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_summary_2025-07-10.csv"),
+  "MetaAnalysis_TopBottom" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_TopBottomFeatures_2025-07-10.csv"),
+  "DMA_TUMOR_vs_NORMAL" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/TissueType/DMA/DMA_TUMOR_vs_NORMAL_2025-07-10.csv"),
+  "DMA_TUMOR_vs_NORMAL_Old" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/Old/DMA/DMA_TUMOR_vs_NORMAL_2025-07-10.csv"),
+  "DMA_TUMOR_vs_NORMAL_Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/Young/DMA/DMA_TUMOR_vs_NORMAL_2025-07-10.csv"),
+  "MCA2Cond_Old-Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Results_2025-07-10.csv"),
+  "MCA2Cond_Summary" = convert_to_df("Patients_Metadata/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Summary_2025-07-10.csv"),
+  "KEGG_PathwayEnrichment_Old" = convert_to_df("Patients_Metadata/MetaProViz_Results/ORA/KEGG_Old_ClusterGosummary_2025-07-10.csv"),
+  "KEGG_PathwayEnrichment_Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/ORA/KEGG_Young_ClusterGosummary_2025-07-10.csv")
+)
+  
+# Convert All Text to UTF-8
+Patients_Metadata <- lapply(Patients_Metadata, sanitize_df)
+
+# Save:
+writexl::write_xlsx(Patients_Metadata, "Extended Data Table 1_PatientsTissue_Metabolomics.xlsx" , col_names = TRUE)
+```
+
+## Table 2
+`Extended Data Table 2_AlanineMetaboliteIDs.xlsx`:\
+- Sheet 1: ccRCC patients feature metadata.\
+- Sheet 2: Normalised data.\
+
+```{r}
+#Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:2),
+  Content = c(
+    "Alanine IDs mapped to pathways from wiki, KEGG and Reactome.",
+    "Mapping ambiguities for `KEGG Glycolysis/Gluconeogenesis` translating from KEGG to HMDB IDs."
+  ),
+  stringsAsFactors = FALSE
+)
+
+#Make lists
+Alanine <- list(
+  "SheetOverview" = df,
+  "AlanineIDs" = convert_to_df("PriorKnowledge/Alanine IDs mapped to pathways from wiki, KEGG and Reactome.csv"),
+  "MappingAmbiguities" = convert_to_df("PriorKnowledge/MappingAmbiguity_KEGG-Glycolysis-Gluconeogenesis.csv")
+)
+  
+# Convert All Text to UTF-8
+Patients_Metadata <- lapply(Alanine, sanitize_df)
+
+# Save:
+writexl::write_xlsx(Patients_Metadata, "Extended Data Table 2_AlanineMetaboliteIDs.xlsx" , col_names = TRUE)
+```
+
+## Table 3
+`Extended Data Table 3_Cells-Exometabolomics.xlsx`:\
+- Sheet 1: Raw data.\
+- Sheet 2: Pool estimation.\
+- Sheet 3: Media blank samples CV.\
+- Sheet 4: Processed data.\
+- Sheet 5: Differential Results 786-M1A versus HK2.\
+- Sheet 6: Differential Results 786-M2A versus HK2.\
+- Sheet 7: Differential Results 786-O versus HK2.\
+- Sheet 8: Differential Results OSLM1B versus HK2.\
+- Sheet 9: Differential Results OSRC2 versus HK2.\
+- Sheet 10: Differential Results RFX631 versus HK2.\
+- Sheet 11: Consumption-Release feature metadata.\
+
+*We need to add metalinks information here!
+```{r}
+#Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:11),
+  Content = c(
+    "Raw data.",
+    "Pool estimation.",
+    "Media blank samples CV.",
+    "Processed data.",
+    "Differential Results 786-M1A versus HK2.",
+    "Differential Results 786-M2A versus HK2.",
+    "Differential Results 786-O versus HK2.",
+    "Differential Results OSLM1B versus HK2.",
+    "Differential Results OSRC2 versus HK2.",
+    "Differential Results RFX631 versus HK2.",
+    "Consumption-Release feature metadata."
+  ),
+  stringsAsFactors = FALSE
+)
+
+#Make lists
+Cells_CoRe <- list(
+  "SheetOverview" = df,
+  "RawData" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_data_RawData_2025-07-10.csv"),
+  "PoolEstimationCV" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/pool_estimation/pool_estimation_CV_2025-07-10.csv"),
+  "MediaBlankCV" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_CV_core_blank_2025-07-10.csv"),
+  "ProcessedData" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_Preprocessing_output_2025-07-10.csv"),
+  "DMA_786-M1A_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-M1A_vs_HK2_2025-07-10.csv"),
+  "DMA_786-M2A_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-M2A_vs_HK2_2025-07-10.csv"),
+  "DMA_786-O_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-O_vs_HK2_2025-07-10.csv"),
+  "DMA_OSLM1B_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_OSLM1B_vs_HK2_2025-07-10.csv"),
+  "DMA_OSRC2_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_OSRC2_vs_HK2_2025-07-10.csv"),
+  "DMA_RFX631_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_RFX631_vs_HK2_2025-07-10.csv"),
+  "DMA_FeatureMetadata" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_Feature_Metadata_2025-07-10.csv")#Add links to MetaLinksDB
+)
+
+# Convert All Text to UTF-8
+Cells_CoRe <- lapply(Cells_CoRe, sanitize_df)
+
+# Save:
+writexl::write_xlsx(Cells_CoRe, "Extended Data Table 3_Cells-Exometabolomics.xlsx" , col_names = TRUE)
+```
+
+
+## Table 4
+`Extended Data Table 4_Cells_Intracellular.xlsx`:\
+- Sheet 1: Raw data.\
+- Sheet 2: Pool estimation.\
+- Sheet 3: Processed data.\
+- Sheet 4: Sum of analytical replicates of processed data.\
+- Sheet 5: Differential Results 786-M1A versus HK2.\
+- Sheet 6: Differential Results 786-M2A versus HK2.\
+- Sheet 7: Differential Results 786-O versus HK2.\
+- Sheet 8: MCA2Cond Rules.\
+- Sheet 9: MCA2Cond biological regulated clustering 786-OvsHK2 versus versus 786-M1AvsHK2.\
+- Sheet 10: Summary of MCA2Cond biological regulated clustering.\
+
+```{r}
+#Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:10),
+  Content = c(
+    "Raw data.",
+    "Pool estimation.",
+    "Processed data.",
+    "Sum of analytical replicates of processed data.",
+    "Differential Results 786-M1A versus HK2.",
+    "Differential Results 786-M2A versus HK2.",
+    "Differential Results 786-O versus HK2.",
+    "MCA2Cond Clustering rules.",
+    "MCA2Cond biological regulated clustering 786-OvsHK2 versus versus 786-M1AvsHK2.",
+    "Summary of MCA2Cond biological regulated clustering."
+  ),
+  stringsAsFactors = FALSE
+)
+
+Cells_Intracellular <- list(
+  "SheetOverview" = df,
+  "RawData" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/processing/processing_data_RawData_2025-07-10.csv"),
+  "PoolEstimationCV" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/pool_estimation/pool_estimation_CV_2025-07-10.csv"),
+  "ProcessedData" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/processing/processing_Preprocessing_output_2025-07-10.csv"),
+  "ProcessedData_Sum" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/replicate_sum/Sum_AnalyticalReplicates_Sum_AnalyticalReplicates_2025-07-10.csv"),
+  "DMA_786-M1A_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-M1A_vs_HK2_2025-07-10.csv"),
+  "DMA_786-M2A_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-M2A_vs_HK2_2025-07-10.csv"),
+  "DMA_786-O_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-O_vs_HK2_2025-07-10.csv"),
+  "Rules_MCA2Cond"= mca_twocond_rules,
+  "MCA2Cond_786-O_786-M1A" = convert_to_df("Cells_Intracellular/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Results_2025-07-10.csv"),
+  "MCA2Cond_Summary" = convert_to_df("Cells_Intracellular/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Summary_2025-07-10.csv")
+)
+
+# ORA results are not named for comparison, so consider updating the vignette for it!
+# ClusterORA not included here as we dont discuss them in manuscript
+
+# Apply this fix before writing to Excel
+Cells_Intracellular <- lapply(Cells_Intracellular, sanitize_df)
+
+# Save:
+writexl::write_xlsx(Cells_Intracellular, "Extended Data Table 4_Cells_Intracellular.xlsx" , col_names = TRUE)
+#Problem with the output. It seems there are some issues with excel
+```
+
+
+# Table 5
+`Extended Data Table 5_Integration-extracellular-and-media.xlsx`:\
+- Sheet 1: Rules Consumption-Release_bioRCM
+- Sheet 2: Results Consumption-Release_bioRCM.\
+- Sheet 3: MetaLinksDB selection.\
+- Sheet 4: MetaLinksDB selection for bioRCM cluster BothDOWN.\
+
+```{r}
+#Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:4),
+  Content = c(
+    "Rules of Consumption-Release bioRCM.",
+    "Results of Consumption-Release bioRCM.",
+    "MetalinksDB PK selection.",
+    "MetalinksDB PK selection BothDOWN."
+  ),
+  stringsAsFactors = FALSE
+)
+
+#Make lists
+Integration <- list(
+  "SheetOverview" = df,
+  "Rules_CoRe_bioRCM" = mca_core_rules,
+  "Res_CoRe_bioRCM" = convert_to_df("Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-07-10.csv"),
+  "MetalinksDB" = convert_to_df("Cells_CoRe/MetaLinksDB.csv"),
+  "MetalinksDB_Cluster-BothDOWN"= convert_to_df("Cells_CoRe/MetalinksDB_BothDOWN.csv")
+)
+  
+# Convert All Text to UTF-8
+Clust <- lapply(Integration, sanitize_df)
+
+# Save:
+writexl::write_xlsx(Clust, "Extended Data Table 5_Integration-extracellular-and-media.xlsx" , col_names = TRUE)
+```
+
+# Session information
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
+
