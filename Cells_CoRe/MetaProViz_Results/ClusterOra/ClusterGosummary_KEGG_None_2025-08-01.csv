@@ -1,0 +1,18 @@
+ID,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,Metabolites_in_pathway,Count,Metabolites_in_Pathway,percentage_of_Pathway_detected
+Fatty acyl carnitines,3/22,4/48,0.75,1.6363636363636365,1.209992302939272,0.24337033610854156,0.8517961763798955,0.8517961763798955,acetylcarnitine/carnitine/isovalerylcarnitine,3,11,27.27
+Not assigned,3/22,4/48,0.75,1.6363636363636365,1.209992302939272,0.24337033610854156,0.8517961763798955,0.8517961763798955,myo-inositol/N-acetylneuramic acid/taurine,3,38,7.89
+Amino acid metabolism,6/22,18/48,0.3333333333333333,0.7272727272727273,-1.332225647112821,0.951061689144919,0.951061689144919,0.951061689144919,arginine/glutamate/glycine/histidine/lysine/proline,6,35,17.14
+Arginine and proline metabolism,1/22,3/48,0.3333333333333333,0.7272727272727273,-0.4440752157042737,0.8496762257169289,0.951061689144919,0.951061689144919,creatinine,1,7,14.29
+Citrate cycle (TCA cycle),3/22,6/48,0.5,1.0909090909090908,0.21668651770021813,0.5818901533894116,0.951061689144919,0.951061689144919,2-hydroxyglutarate/fumarate/malate,3,10,30
+Glycolysis / Gluconeogenesis,1/22,3/48,0.3333333333333333,0.7272727272727273,-0.4440752157042737,0.8496762257169289,0.951061689144919,0.951061689144919,lactate,1,9,11.11
+Purine metabolism,2/22,3/48,0.6666666666666666,1.4545454545454546,0.7401253595071229,0.4362858464384832,0.951061689144919,0.951061689144919,uric acid/xanthine,2,23,8.7
+"Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Fatty acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,18,0
+"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0

@@ -108,16 +108,16 @@ Patients_Metadata <- list(
   "SheetOverview" = df,
   "Feature metadata" = convert_to_df("Patients_Metadata/MetaProViz_Results/PK/Adapted/Adapted_Tissue_MetaData.csv"),
   "NormalisedData" = tissue_norm%>% column_to_rownames("Code"),
-  "MetaAnalysis_AOV" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_aov_2025-07-10.csv"),
-  "MetaAnalysis_Features" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_summary_2025-07-10.csv"),
-  "MetaAnalysis_TopBottom" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_TopBottomFeatures_2025-07-10.csv"),
-  "DMA_TUMOR_vs_NORMAL" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/TissueType/DMA/DMA_TUMOR_vs_NORMAL_2025-07-10.csv"),
-  "DMA_TUMOR_vs_NORMAL_Old" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/Old/DMA/DMA_TUMOR_vs_NORMAL_2025-07-10.csv"),
-  "DMA_TUMOR_vs_NORMAL_Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/Young/DMA/DMA_TUMOR_vs_NORMAL_2025-07-10.csv"),
-  "MCA2Cond_Old-Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Results_2025-07-10.csv"),
-  "MCA2Cond_Summary" = convert_to_df("Patients_Metadata/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Summary_2025-07-10.csv"),
-  "KEGG_PathwayEnrichment_Old" = convert_to_df("Patients_Metadata/MetaProViz_Results/ORA/KEGG_Old_ClusterGosummary_2025-07-10.csv"),
-  "KEGG_PathwayEnrichment_Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/ORA/KEGG_Young_ClusterGosummary_2025-07-10.csv")
+  "MetaAnalysis_AOV" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_aov_2025-08-01.csv"),
+  "MetaAnalysis_Features" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_summary_2025-08-01.csv"),
+  "MetaAnalysis_TopBottom" = convert_to_df("Patients_Metadata/MetaProViz_Results/MetadataAnalysis/metadata_analysis_res_TopBottomFeatures_2025-08-01.csv"),
+  "DMA_TUMOR_vs_NORMAL" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/TissueType/DMA/DMA_TUMOR_vs_NORMAL_2025-08-01.csv"),
+  "DMA_TUMOR_vs_NORMAL_Old" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/Old/DMA/DMA_TUMOR_vs_NORMAL_2025-08-01.csv"),
+  "DMA_TUMOR_vs_NORMAL_Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/DMA/Young/DMA/DMA_TUMOR_vs_NORMAL_2025-08-01.csv"),
+  "MCA2Cond_Old-Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Results_2025-08-01.csv"),
+  "MCA2Cond_Summary" = convert_to_df("Patients_Metadata/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Summary_2025-08-01.csv"),
+  "KEGG_PathwayEnrichment_Old" = convert_to_df("Patients_Metadata/MetaProViz_Results/ORA/KEGG_Old_ClusterGosummary_2025-08-01.csv"),
+  "KEGG_PathwayEnrichment_Young" = convert_to_df("Patients_Metadata/MetaProViz_Results/ORA/KEGG_Young_ClusterGosummary_2025-08-01.csv")
 )
   
 # Convert All Text to UTF-8
@@ -195,17 +195,17 @@ df <- data.frame(
 #Make lists
 Cells_CoRe <- list(
   "SheetOverview" = df,
-  "RawData" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_data_RawData_2025-07-10.csv"),
-  "PoolEstimationCV" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/pool_estimation/pool_estimation_CV_2025-07-10.csv"),
-  "MediaBlankCV" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_CV_core_blank_2025-07-10.csv"),
-  "ProcessedData" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_Preprocessing_output_2025-07-10.csv"),
-  "DMA_786-M1A_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-M1A_vs_HK2_2025-07-10.csv"),
-  "DMA_786-M2A_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-M2A_vs_HK2_2025-07-10.csv"),
-  "DMA_786-O_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-O_vs_HK2_2025-07-10.csv"),
-  "DMA_OSLM1B_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_OSLM1B_vs_HK2_2025-07-10.csv"),
-  "DMA_OSRC2_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_OSRC2_vs_HK2_2025-07-10.csv"),
-  "DMA_RFX631_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_RFX631_vs_HK2_2025-07-10.csv"),
-  "DMA_FeatureMetadata" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_Feature_Metadata_2025-07-10.csv")#Add links to MetaLinksDB
+  "RawData" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_data_RawData_2025-08-01.csv"),
+  "PoolEstimationCV" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/pool_estimation/pool_estimation_CV_2025-08-01.csv"),
+  "MediaBlankCV" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_CV_core_blank_2025-08-01.csv"),
+  "ProcessedData" = convert_to_df("Cells_CoRe/MetaProViz_Results/Processing/processing/core_processing_Preprocessing_output_2025-08-01.csv"),
+  "DMA_786-M1A_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-M1A_vs_HK2_2025-08-01.csv"),
+  "DMA_786-M2A_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-M2A_vs_HK2_2025-08-01.csv"),
+  "DMA_786-O_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_786-O_vs_HK2_2025-08-01.csv"),
+  "DMA_OSLM1B_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_OSLM1B_vs_HK2_2025-08-01.csv"),
+  "DMA_OSRC2_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_OSRC2_vs_HK2_2025-08-01.csv"),
+  "DMA_RFX631_vs_HK2" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_RFX631_vs_HK2_2025-08-01.csv"),
+  "DMA_FeatureMetadata" = convert_to_df("Cells_CoRe/MetaProViz_Results/dma/core_dma_Feature_Metadata_2025-08-01.csv")#Add links to MetaLinksDB
 )
 
 # Convert All Text to UTF-8
@@ -250,16 +250,16 @@ df <- data.frame(
 
 Cells_Intracellular <- list(
   "SheetOverview" = df,
-  "RawData" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/processing/processing_data_RawData_2025-07-10.csv"),
-  "PoolEstimationCV" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/pool_estimation/pool_estimation_CV_2025-07-10.csv"),
-  "ProcessedData" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/processing/processing_Preprocessing_output_2025-07-10.csv"),
-  "ProcessedData_Sum" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/replicate_sum/Sum_AnalyticalReplicates_Sum_AnalyticalReplicates_2025-07-10.csv"),
-  "DMA_786-M1A_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-M1A_vs_HK2_2025-07-10.csv"),
-  "DMA_786-M2A_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-M2A_vs_HK2_2025-07-10.csv"),
-  "DMA_786-O_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-O_vs_HK2_2025-07-10.csv"),
+  "RawData" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/processing/processing_data_RawData_2025-08-01.csv"),
+  "PoolEstimationCV" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/pool_estimation/pool_estimation_CV_2025-08-01.csv"),
+  "ProcessedData" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/processing/processing_Preprocessing_output_2025-08-01.csv"),
+  "ProcessedData_Sum" = convert_to_df("Cells_Intracellular/MetaProViz_Results/Processing/replicate_sum/Sum_AnalyticalReplicates_Sum_AnalyticalReplicates_2025-08-01.csv"),
+  "DMA_786-M1A_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-M1A_vs_HK2_2025-08-01.csv"),
+  "DMA_786-M2A_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-M2A_vs_HK2_2025-08-01.csv"),
+  "DMA_786-O_vs_HK2" = convert_to_df("Cells_Intracellular/MetaProViz_Results/dma/dma_786-O_vs_HK2_2025-08-01.csv"),
   "Rules_MCA2Cond"= mca_twocond_rules,
-  "MCA2Cond_786-O_786-M1A" = convert_to_df("Cells_Intracellular/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Results_2025-07-10.csv"),
-  "MCA2Cond_Summary" = convert_to_df("Cells_Intracellular/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Summary_2025-07-10.csv")
+  "MCA2Cond_786-O_786-M1A" = convert_to_df("Cells_Intracellular/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Results_2025-08-01.csv"),
+  "MCA2Cond_Summary" = convert_to_df("Cells_Intracellular/MetaProViz_Results/MCA2Cond/MCA_2Cond_MCA_2Cond_Summary_2025-08-01.csv")
 )
 
 # ORA results are not named for comparison, so consider updating the vignette for it!
@@ -298,7 +298,7 @@ df <- data.frame(
 Integration <- list(
   "SheetOverview" = df,
   "Rules_CoRe_bioRCM" = mca_core_rules,
-  "Res_CoRe_bioRCM" = convert_to_df("Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-07-10.csv"),
+  "Res_CoRe_bioRCM" = convert_to_df("Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-08-01.csv"),
   "MetalinksDB" = convert_to_df("Cells_CoRe/MetaLinksDB.csv"),
   "MetalinksDB_Cluster-BothDOWN"= convert_to_df("Cells_CoRe/MetalinksDB_BothDOWN.csv")
 )

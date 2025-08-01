@@ -1,0 +1,161 @@
+Metabolite,SUPER_PATHWAY,SUB_PATHWAY,COMP_ID,PLATFORM,RI,MASS,CAS,PUBCHEM,KEGG,HMDB,hmdb,PUBCHEM_hmdb_from_ambiguity_bygroup,PUBCHEM_hmdb_to_ambiguity_bygroup,PUBCHEM_hmdb_ambiguity_bygroup
+10-heptadecenoate (17:1n7),Lipid,Long chain fatty acid,33971,LC/MS Neg,5558,267.3,29743-97-3;,5312435,NA,NA,HMDB0060038; HMDB0062542,1,2,one-to-many
+10-nonadecenoate (19:1n9),Lipid,Long chain fatty acid,33972,LC/MS Neg,5775,295.4,73033-09-7;,5312513,NA,NA,HMDB0013622; HMDB0062543; HMDB0062658,1,3,one-to-many
+16-hydroxypalmitate,Lipid,"Fatty acid, monohydroxy",39609,LC/MS Neg,5232,271.3,506-13-8;,10466,C18218,NA,HMDB0006294; HMDB0155887,1,2,one-to-many
+1-arachidonoylglycerophosphocholine*,Lipid,Lysolipid,33228,LC/MS Pos,5554,544.3,NA,NA,C05208,NA,,1,0,one-to-none
+1-linoleoylglycerol (1-monolinolein),Lipid,Monoacylglycerol,27447,GC/MS,2181,395.3,2277-28-3;,5283469,NA,NA,HMDB0242115,1,1,one-to-one
+1-linoleoylglycerophosphocholine,Lipid,Lysolipid,34419,LC/MS Pos,5574,520.4,NA,11988421,C04100,NA,,1,0,one-to-none
+1-oleoylglycerophosphocholine,Lipid,Lysolipid,33960,LC/MS Pos,5700,522.4,19420-56-5;,16081932,NA,NA,HMDB0002815,1,1,one-to-one
+1-oleoylglycerophosphoserine,Lipid,Lysolipid,19260,LC/MS Neg,5690,522.3,NA,9547099,NA,NA,HMDB0061694; HMDB0240603,1,2,one-to-many
+1-palmitoylglycerol (1-monopalmitin),Lipid,Monoacylglycerol,21127,GC/MS,2119.5,371.3,542-44-9;,14900,NA,NA,HMDB0245964,1,1,one-to-one
+1-palmitoylglycerophosphocholine,Lipid,Lysolipid,33955,LC/MS Pos,5671,496.4,17364-16-8;,86554,NA,NA,HMDB0256091,1,1,one-to-one
+1-stearoylglycerol (1-monostearin),Lipid,Monoacylglycerol,21188,GC/MS,2186.6,399.4,123-94-4;,24699,D01947,NA,,1,0,one-to-none
+1-stearoylglycerophosphocholine,Lipid,Lysolipid,33961,LC/MS Pos,5844,524.4,19420-57-6;,497299,NA,NA,HMDB0010380; HMDB0010381; HMDB0010382; HMDB0010383; HMDB0010384; HMDB0010385; HMDB0010387; HMDB0010390; HMDB0010391; HMDB0010392; HMDB0010393; HMDB0010395; HMDB0010396; HMDB0010397; HMDB0010398; HMDB0010399; HMDB0010400; HMDB0010401; HMDB0010402; HMDB0010403; HMDB0010404; HMDB0010405; HMDB0010406; HMDB0010408; HMDB0012108; HMDB0013122; HMDB0062541; HMDB0094688; HMDB0258493,1,29,one-to-many
+2'-deoxyadenosine 3'-monophosphate,Nucleotide,"Purine metabolism, adenine containing",40663,LC/MS Pos,1383.5,332.1,102832-10-0;,1467,NA,NA,HMDB0245534,1,1,one-to-one
+2'-deoxycytidine 3'-monophosphate,Nucleotide,"Pyrimidine metabolism, cytidine containing",40453,LC/MS Pos,1048,308,6220-63-9;,3274948,NA,NA,HMDB0062545,1,1,one-to-one
+2-ethylhexanoate,Xenobiotics,Chemical,1554,GC/MS,1210.5,201.2,149-57-5;,8697,NA,NA,HMDB0031230; HMDB0062546,1,2,one-to-many
+2-hydroxypalmitate,Lipid,"Fatty acid, monohydroxy",35675,LC/MS Neg,5508,271.3,764-67-0;,92836,NA,NA,,1,0,one-to-none
+2-oleoylglycerol (2-monoolein),Lipid,Monoacylglycerol,35848,GC/MS,2170,410.1,3443-84-3;,5319879,NA,NA,HMDB0011537,1,1,one-to-one
+2-palmitoylglycerol (2-monopalmitin),Lipid,Monoacylglycerol,33419,GC/MS,2108,129,23470-00-0;,123409,NA,NA,HMDB0011533,1,1,one-to-one
+2-stearoylglycerophosphocholine*,Lipid,Lysolipid,35255,LC/MS Pos,5780,524.4,NA,10208382,NA,NA,,1,0,one-to-none
+3-(cystein-S-yl)acetaminophen*,Xenobiotics,Drug,34365,LC/MS Pos,1960,271.2,NA,5233914,NA,NA,HMDB0242116,1,1,one-to-one
+3-(N-acetyl-L-cystein-S-yl) acetaminophen*,Xenobiotics,Drug,18299,LC/MS Pos,2622,313.1,52372-86-8;,83967,NA,NA,HMDB0242140,1,1,one-to-one
+3-carboxy-4-methyl-5-propyl-2-furanpropanoate (CMPF),Lipid,"Fatty acid, dicarboxylate",31787,LC/MS Neg,2815,239.1,86879-39-2;,123979,NA,NA,HMDB0061112; HMDB0062776,1,2,one-to-many
+3-dehydrocarnitine*,Lipid,Carnitine metabolism,32654,LC/MS Pos,1020,160.2,10457-99-5;,6991982,NA,NA,HMDB0012154,1,1,one-to-one
+4-hydroxyhippurate,Xenobiotics,Benzoate metabolism,35527,LC/MS Neg,1439,194,2482-25-9;,151012,NA,NA,HMDB0013678,1,1,one-to-one
+5-HETE,Lipid,Eicosanoid,37372,LC/MS Neg,5372,319.2,73307-52-5;,9862886,NA,NA,HMDB0002218; HMDB0011134,1,2,one-to-many
+Ac-Ser-Asp-Lys-Pro-OH,Peptide,Polypeptide,40707,LC/MS Pos,1767,488.2,127103-11-1;,4409396,NA,NA,HMDB0247929,1,1,one-to-one
+alanylglutamate,Peptide,Dipeptide,37064,LC/MS Pos,766,219,NA,656476,NA,NA,,1,0,one-to-none
+alanylisoleucine,Peptide,Dipeptide,37118,LC/MS Pos,2011,203.1,NA,4.17359e+12,NA,NA,,1,0,one-to-none
+alanylleucine,Peptide,Dipeptide,37093,LC/MS Pos,2150,203,NA,259583,NA,NA,,1,0,one-to-none
+alanylmethionine,Peptide,Dipeptide,37065,LC/MS Pos,1596,221,NA,9.85095e+11,NA,NA,,1,0,one-to-none
+alanylphenylalanine,Peptide,Dipeptide,38679,LC/MS Pos,2422,237.2,3061-90-3;,2080,NA,NA,,1,0,one-to-none
+alanylthreonine,Peptide,Dipeptide,37085,LC/MS Pos,708,191,NA,426318,NA,NA,,1,0,one-to-none
+alanyltryptophan,Peptide,Dipeptide,42073,LC/MS Pos,2630,276.2,16305-75-2;,1.55028e+11,NA,NA,,1,0,one-to-none
+alanyltyrosine,Peptide,Dipeptide,37098,LC/MS Pos,1713,253,NA,5.72319e+12,NA,NA,,1,0,one-to-none
+alanylvaline,Peptide,Dipeptide,37084,LC/MS Pos,1513,189,NA,137276,NA,NA,,1,0,one-to-none
+alpha-glutamylglutamate,Peptide,Dipeptide,22166,LC/MS Pos,857,277.1,3929-61-1;,439500,C01425,NA,HMDB0028818,1,1,one-to-one
+alpha-glutamyltryptophan,Peptide,Dipeptide,40664,LC/MS Pos,2660,334.1,38101-59-6;,333386,NA,NA,,1,0,one-to-none
+alpha-glutamyltyrosine,Peptide,Dipeptide,40033,LC/MS Pos,1810,311.1,NA,351830,NA,NA,,1,0,one-to-none
+arginylleucine,Peptide,Dipeptide,39995,LC/MS Pos,1620,288.3,1188-24-5;,333445,NA,NA,,1,0,one-to-none
+arginylmethionine,Peptide,Dipeptide,41458,LC/MS Pos,1151,306.2,NA,9815009,NA,NA,,1,0,one-to-none
+arginylphenylalanine,Peptide,Dipeptide,41485,LC/MS Pos,1795,322.2,2047-13-4;,4441256,NA,NA,,1,0,one-to-none
+arginylvaline,Peptide,Dipeptide,41395,LC/MS Pos,944.9,274.2,2896-20-0;,335257,NA,NA,,1,0,one-to-none
+aspartate-glutamate,Peptide,Dipeptide,37461,LC/MS Pos,819,263.2,6157-06-8;,4130574,NA,NA,HMDB0028752,1,1,one-to-one
+aspartylleucine,Peptide,Dipeptide,40068,LC/MS Pos,2310,247.2,3062-14-4;,332962,NA,NA,HMDB0028757,1,1,one-to-one
+aspartyltryptophan,Peptide,Dipeptide,41481,LC/MS Pos,2717,320.2,71835-79-5;,9948926,NA,NA,HMDB0028764,1,1,one-to-one
+aspartylvaline,Peptide,Dipeptide,41373,LC/MS Neg,749.4,231.1,13433-04-0;,4991131,NA,NA,HMDB0028766,1,1,one-to-one
+"bilirubin (E,E)*",Cofactors and vitamins,Hemoglobin and porphyrin metabolism,32586,LC/MS Neg,4242,583.2,NA,5315454,NA,NA,HMDB0000054; HMDB0000488; HMDB0240584,1,3,one-to-many
+butyrylcarnitine,Lipid,Fatty acid metabolism (also BCAA metabolism),32412,LC/MS Pos,2007,232.2,25576-40-3;,213144,NA,NA,HMDB0002013; HMDB0062510,1,2,one-to-many
+carnitine,Lipid,Carnitine metabolism,15500,LC/MS Pos,702,162.2,461-05-2;,10917,NA,NA,HMDB0000062; HMDB0001467,1,2,one-to-many
+catechol sulfate,Xenobiotics,Benzoate metabolism,35320,LC/MS Neg,1928,188.9,NA,3083879,C00090,NA,HMDB0059724; HMDB0061713,1,2,one-to-many
+choline,Lipid,Glycerolipid metabolism,15506,LC/MS Pos,674,104.2,67-48-1;,170746,NA,NA,,1,0,one-to-none
+choline phosphate,Lipid,Glycerolipid metabolism,34396,LC/MS Pos,695,184.1,72556-74-2;,135437,NA,NA,,1,0,one-to-none
+cinnamoylglycine,Xenobiotics,Food component/Plant,38637,LC/MS Neg,3139,204.1,NA,709625,NA,NA,HMDB0011621,1,1,one-to-one
+cis-vaccenate (18:1n7),Lipid,Long chain fatty acid,33970,GC/MS,1987,339.3,693-72-1;,5282761,C08367,NA,HMDB0003231; HMDB0010377; HMDB0240219,1,3,one-to-many
+cytidine-3'-monophosphate (3'-CMP),Nucleotide,"Pyrimidine metabolism, cytidine containing",2959,LC/MS Pos,1181,323.9,84-52-6;,256622,C05822,NA,,1,0,one-to-none
+dihomo-linoleate (20:2n6),Lipid,Long chain fatty acid,17805,LC/MS Neg,5722,307.3,2091-39-6;,6439848,C16525,NA,HMDB0005060,1,1,one-to-one
+docosadienoate (22:2n6),Lipid,Long chain fatty acid,32415,LC/MS Neg,6017,335.4,7370-49-2 ;,5282807,C16533,NA,,1,0,one-to-none
+gamma-glutamylglutamate,Peptide,gamma-glutamyl,36738,LC/MS Pos,1036,277.1,1116-22-9;,92865,NA,NA,HMDB0011737; HMDB0029148,1,2,one-to-many
+"glutamate, gamma-methyl ester",Amino acid,Glutamate metabolism,33487,LC/MS Pos,1062,162.1,1499-55-4 ;,73913,NA,NA,,1,0,one-to-none
+glycyllysine,Peptide,Dipeptide,41529,GC/MS,2088.3,174.1,31461-63-9;,306144,NA,NA,HMDB0028846,1,1,one-to-one
+glycylmethionine,Peptide,Dipeptide,42012,LC/MS Pos,1593,207.1,554-94-9;,96757,NA,NA,HMDB0028847,1,1,one-to-one
+glycylphenylalanine,Peptide,Dipeptide,33954,LC/MS Neg,2193,221.2,3321-03-7;,1.54934e+11,NA,NA,,1,0,one-to-none
+glycylthreonine,Peptide,Dipeptide,42050,GC/MS,1911.1,174.1,7093-70-1;,351980,NA,NA,HMDB0028851,1,1,one-to-one
+glycyltryptophan,Peptide,Dipeptide,38151,LC/MS Pos,2542,262.4,NA,1.55134e+11,NA,NA,,1,0,one-to-none
+glycyltyrosine,Peptide,Dipeptide,33958,LC/MS Pos,1728,239.1,658-79-7;,9.28297e+11,NA,NA,,1,0,one-to-none
+glycylvaline,Peptide,Dipeptide,18357,LC/MS Pos,1572,175.1,1963-21-9;,2.72481e+13,NA,NA,,1,0,one-to-none
+guanosine 5'- monophosphate (5'-GMP),Nucleotide,"Purine metabolism, guanine containing",2849,LC/MS Pos,1300,364,5550-12-9;,761,NA,NA,,1,0,one-to-none
+histidylleucine,Peptide,Dipeptide,40061,LC/MS Pos,1482,269.2,7763-65-7;,1.89009e+12,NA,NA,,1,0,one-to-none
+histidylphenylalanine,Peptide,Dipeptide,42084,LC/MS Pos,1730,303.2,16874-81-0;,4466133,NA,NA,,1,0,one-to-none
+histidyltryptophan,Peptide,Dipeptide,41912,LC/MS Pos,1961,342.2,23403-90-9;,6539217,NA,NA,HMDB0304782,1,1,one-to-one
+histidyltyrosine,Peptide,Dipeptide,41899,LC/MS Pos,1253,319.2,35979-00-1;,435685,NA,NA,,1,0,one-to-none
+homostachydrine*,Xenobiotics,Food component/Plant,33009,LC/MS Pos,1199,158.2,1195-94-4;,441447,C08283,NA,HMDB0033433; HMDB0304552,1,2,one-to-many
+isoleucylalanine,Peptide,Dipeptide,40046,LC/MS Pos,1686,203.2,24787-73-3;,5.24601e+13,NA,NA,,1,0,one-to-none
+isoleucylarginine,Peptide,Dipeptide,40071,LC/MS Pos,1245,288.2,55715-01-0;,9900561,NA,NA,HMDB0028901,1,1,one-to-one
+isoleucylglycine,Peptide,Dipeptide,40008,LC/MS Pos,1732,189.2,868-28-0;,342532,NA,NA,HMDB0028907,1,1,one-to-one
+isoleucylphenylalanine,Peptide,Dipeptide,40067,LC/MS Pos,3155,279.2,22951-98-0;,435728,NA,NA,HMDB0028914,1,1,one-to-one
+isoleucyltryptophan,Peptide,Dipeptide,40079,LC/MS Pos,3080,318.2,13589-06-5;,9797038,NA,NA,HMDB0028918,1,1,one-to-one
+isoleucyltyrosine,Peptide,Dipeptide,40073,LC/MS Pos,2300,295.2,38579-21-4;,342468,NA,NA,HMDB0028919,1,1,one-to-one
+isoleucylvaline,Peptide,Dipeptide,40049,LC/MS Pos,2202,231.2,41017-96-3;,5.24601e+12,NA,NA,,1,0,one-to-none
+leucylalanine,Peptide,Dipeptide,40010,LC/MS Pos,1760,203.2,7298-84-2;,259321,NA,NA,,1,0,one-to-none
+leucylarginine,Peptide,Dipeptide,40028,LC/MS Pos,1300,288.2,26607-15-8;,3800205,NA,NA,HMDB0028923,1,1,one-to-one
+leucylasparagine,Peptide,Dipeptide,40052,LC/MS Pos,1418,246.2,14608-81-2;,4128305,NA,NA,HMDB0028924,1,1,one-to-one
+leucylglutamate,Peptide,Dipeptide,40021,LC/MS Pos,1716,261.2,NA,5.25959e+13,NA,NA,,1,0,one-to-none
+leucylglycine,Peptide,Dipeptide,40045,LC/MS Pos,1800,189.2,686-50-0;,79070,NA,NA,HMDB0028929,1,1,one-to-one
+leucylhistidine,Peptide,Dipeptide,40077,LC/MS Pos,1056,269.2,38062-72-5;,341684,NA,NA,HMDB0028931,1,1,one-to-one
+leucylleucine,Peptide,Dipeptide,36756,LC/MS Pos,3012,245.1,3303-31-9;,7.68077e+11,C11332,NA,,1,0,one-to-none
+leucylmethionine,Peptide,Dipeptide,40022,LC/MS Pos,2504,263.2,36077-39-1;,118276,NA,NA,HMDB0028935,1,1,one-to-one
+leucylphenylalanine,Peptide,Dipeptide,40026,LC/MS Pos,3308,279.2,3063-05-6;,259325,NA,NA,HMDB0302841,1,1,one-to-one
+leucylserine,Peptide,Dipeptide,40048,LC/MS Pos,1519.7,219.2,6209-12-7;,3621685,NA,NA,HMDB0028938,1,1,one-to-one
+leucyltryptophan,Peptide,Dipeptide,40034,LC/MS Pos,3216,318.2,5156-22-9;,329275,NA,NA,HMDB0028940,1,1,one-to-one
+leucyltyrosine,Peptide,Dipeptide,40030,LC/MS Pos,2413,295.2,968-21-8;,273262,NA,NA,HMDB0028941,1,1,one-to-one
+lidocaine,Xenobiotics,Drug,35661,LC/MS Pos,2761,235.2,137-58-6;,3676,D00358,NA,HMDB0014426,1,1,one-to-one
+lysylleucine,Peptide,Dipeptide,40020,LC/MS Pos,1546,260.2,7369-79-1;,4682588,NA,NA,,1,0,one-to-none
+lysyllysine,NA,NA,42090,LC/MS Pos,533,138.2,13184-13-9;,4293571,NA,NA,HMDB0304785,1,1,one-to-one
+methionylasparagine,Peptide,Dipeptide,40686,LC/MS Pos,1060.3,264.1,36261-61-7;,333467,NA,NA,HMDB0028968,1,1,one-to-one
+methionylglycine,Peptide,Dipeptide,40717,LC/MS Pos,1478,207.1,14486-03-4;,259185,NA,NA,HMDB0028973,1,1,one-to-one
+methionylleucine,Peptide,Dipeptide,40023,LC/MS Pos,2698,263.2,14486-16-9;,3425788,NA,NA,HMDB0028977,1,1,one-to-one
+methionylphenylalanine,Peptide,Dipeptide,41441,LC/MS Pos,3042,297.2,14492-14-9;,100048,NA,NA,HMDB0028980,1,1,one-to-one
+methyl-alpha-glucopyranoside,Xenobiotics,Chemical,20714,LC/MS Pos,1087,212.1,97-30-3;,64947,C02603,NA,,1,0,one-to-none
+methylphosphate,Nucleotide,Purine and pyrimidine metabolism,37070,GC/MS,1221,240.9,7023-27-0;,13130,NA,NA,HMDB0061711,1,1,one-to-one
+metoprolol acid metabolite*,Xenobiotics,Drug,34109,LC/MS Pos,2535,268.2,NA,62936,NA,NA,HMDB0254682,1,1,one-to-one
+myristoylcarnitine,Lipid,Carnitine metabolism,33952,LC/MS Pos,5113,372.4,18822-89-4;,6426854,NA,NA,HMDB0254979,1,1,one-to-one
+N-acetylisoleucine,Amino acid,"Valine, leucine and isoleucine metabolism",33967,LC/MS Pos,3370,174.1,NA,2802421,NA,NA,,1,0,one-to-none
+N-acetylthreonine,Amino acid,"Glycine, serine and threonine metabolism",33939,LC/MS Neg,846,160.1,NA,4651717,C01118,NA,,1,0,one-to-none
+N-acetyltryptophan,Amino acid,Tryptophan metabolism,33959,LC/MS Neg,2650,245.2,1218-34-4;,700653,C03137,NA,HMDB0013713,1,1,one-to-one
+N-methylglutamate,Amino acid,Glutamate metabolism,31532,GC/MS,1665,260.2,35989-16-3;,439377,C01046,NA,HMDB0062660,1,1,one-to-one
+octanoylcarnitine,Lipid,Carnitine metabolism,33936,LC/MS Pos,4100,288.3,3671-77-0;,123701,NA,NA,,1,0,one-to-none
+palmitoyl sphingomyelin,Lipid,Sphingolipid,37506,GC/MS,2524,311.3,NA,9939941,NA,NA,HMDB0010169; HMDB0012098; HMDB0061712,1,3,one-to-many
+palmitoylcarnitine,Lipid,Carnitine metabolism,22189,LC/MS Pos,5179,400.4,6865-14-1;,461,NA,NA,HMDB0240783,1,1,one-to-one
+paroxetine,Xenobiotics,Drug,40461,LC/MS Pos,4222,330.2,110429-49-8;,43815,"D02362,C07415",NA,HMDB0014853,1,1,one-to-one
+p-cresol sulfate,Amino acid,Phenylalanine & tyrosine metabolism,36103,LC/MS Neg,2896,187.1,3233-57-7;,4615422,C01468,NA,,1,0,one-to-none
+penicillin G,Xenobiotics,Drug,37468,LC/MS Pos,3314,335.2,69-57-8;,2349,C05551,NA,,1,0,one-to-none
+phenol red,Xenobiotics,Chemical,36817,LC/MS Neg,3650,353.1,143-74-8;,4766,C12600,NA,,1,0,one-to-none
+phenol sulfate,Amino acid,Phenylalanine & tyrosine metabolism,32553,LC/MS Neg,2150,173.1,937-34-8;,74426,C02180,NA,HMDB0060015,1,1,one-to-one
+phenylalanylalanine,Peptide,Dipeptide,41374,LC/MS Pos,2047.6,237.1,3918-87-4;,6.99312e+13,NA,NA,,1,0,one-to-none
+phenylalanylarginine,Peptide,Dipeptide,41487,LC/MS Pos,1553,322.2,1238-09-1;,10268029,NA,NA,HMDB0028989,1,1,one-to-one
+phenylalanylaspartate,Peptide,Dipeptide,41419,LC/MS Pos,1901,281.1,22828-05-3;,335051,NA,NA,,1,0,one-to-none
+phenylalanylglutamate,Peptide,Dipeptide,41432,LC/MS Pos,2005,295.2,3617-45-6;,4422358,NA,NA,,1,0,one-to-none
+phenylalanylglycine,Peptide,Dipeptide,41370,LC/MS Neg,2460.8,221.1,721-90-4;,98207,NA,NA,HMDB0304788,1,1,one-to-one
+phenylalanylleucine,Peptide,Dipeptide,40192,LC/MS Pos,3252,279.2,3303-55-7;,4078229,NA,NA,HMDB0253025,1,1,one-to-one
+phenylalanylphenylalanine,Peptide,Dipeptide,38150,LC/MS Pos,3317,313.2,2577-40-4;,6.99309e+13,NA,NA,,1,0,one-to-none
+phenylalanylproline,Peptide,Dipeptide,41392,LC/MS Neg,3170,261.2,7669-65-0;,4069131,NA,NA,,1,0,one-to-none
+phenylalanylserine,Peptide,Dipeptide,40016,LC/MS Pos,1808,253.1,16053-39-7;,9859812,NA,NA,,1,0,one-to-none
+phenylalanylvaline,Peptide,Dipeptide,41393,LC/MS Pos,2570,265.1,3918-90-9;,4096934,NA,NA,,1,0,one-to-none
+piperine,Xenobiotics,Food component/Plant,33935,LC/MS Pos,5136,286.2,94-62-2;,638024,C03882,NA,HMDB0029377,1,1,one-to-one
+pivaloylcarnitine,Xenobiotics,Drug,35432,LC/MS Pos,2370,246.2,NA,126894,NA,NA,HMDB0041993,1,1,one-to-one
+pregnanediol-3-glucuronide,Lipid,Sterol/Steroid,40708,LC/MS Neg,5136.9,495.4,1852-49-9;,123796,NA,NA,HMDB0010318,1,1,one-to-one
+prolylglycine,Peptide,Dipeptide,40703,LC/MS Pos,875,173.1,2578-57-6;,7.40808e+13,NA,NA,,1,0,one-to-none
+prolylmethionine,NA,NA,41386,LC/MS Pos,1736.8,247.1,52899-08-8;,5.25007e+13,NA,NA,,1,0,one-to-none
+pyroglutamine*,Amino acid,Glutamate metabolism,32672,LC/MS Pos,764,129.2,NA,134508,NA,NA,HMDB0242134,1,1,one-to-one
+quinidine,Xenobiotics,Drug,39766,LC/MS Pos,2712.6,325.3,56-54-2;,3036746,NA,NA,,1,0,one-to-none
+streptomycin,Xenobiotics,Drug,39872,LC/MS Pos,543.3,300.8,3810-74-0;,5999,NA,NA,,1,0,one-to-none
+threonylleucine,Peptide,Dipeptide,40051,LC/MS Pos,2204,233.2,50299-12-2;,4420322,NA,NA,,1,0,one-to-none
+threonylphenylalanine,Peptide,Dipeptide,31530,LC/MS Pos,2500,267.2,NA,4.0998e+13,NA,NA,,1,0,one-to-none
+threonylvaline,Peptide,Dipeptide,42011,LC/MS Pos,1574.5,219.2,99032-17-4;,4.16721e+12,NA,NA,,1,0,one-to-none
+tryptophan betaine,Amino acid,Tryptophan metabolism,37097,LC/MS Pos,2464,247.1,20671-76-5;,442106,C09213,NA,HMDB0061115,1,1,one-to-one
+tryptophylglutamate,Peptide,Dipeptide,41401,LC/MS Pos,2246,334.2,36099-95-3;,3634442,NA,NA,HMDB0029082,1,1,one-to-one
+tryptophylleucine,Peptide,Dipeptide,40080,LC/MS Pos,3369,318.2,13123-35-8;,323786,NA,NA,HMDB0029087,1,1,one-to-one
+tyrosylalanine,Peptide,Dipeptide,40018,LC/MS Pos,1589.5,253.2,730-08-5;,5.49646e+13,NA,NA,,1,0,one-to-none
+tyrosylglycine,Peptide,Dipeptide,41375,LC/MS Pos,1596.8,239.1,673-05-5;,259323,NA,NA,HMDB0259337,1,1,one-to-one
+tyrosylleucine,Peptide,Dipeptide,40031,LC/MS Pos,2656,295.2,17355-10-1;,8.70717e+11,NA,NA,,1,0,one-to-none
+tyrosylphenylalanine,Peptide,Dipeptide,41492,LC/MS Pos,2890,329.2,17355-11-2;,3421919,NA,NA,HMDB0029112,1,1,one-to-one
+tyrosyltyrosine,Peptide,Dipeptide,40667,LC/MS Pos,2177,345.2,1050-28-8;,5057430,NA,NA,,1,0,one-to-none
+tyrosylvaline,Peptide,Dipeptide,41424,LC/MS Pos,2041,281.2,17355-09-8;,7.00956e+13,NA,NA,,1,0,one-to-none
+valylalanine,Peptide,Dipeptide,41518,LC/MS Pos,1278.6,189.1,27493-61-4;,334517,NA,NA,,1,0,one-to-none
+valylarginine,Peptide,Dipeptide,42072,LC/MS Pos,794.2,274.2,37682-75-0;,4266827,NA,NA,HMDB0304792,1,1,one-to-one
+valylaspartate,Peptide,Dipeptide,40650,LC/MS Pos,1073.3,233.1,20556-16-5;,9964657,NA,NA,,1,0,one-to-none
+valylglutamate,Peptide,Dipeptide,32454,LC/MS Pos,1346,247.1,3062-07-5;,7009623,NA,NA,HMDB0029126,1,1,one-to-one
+valylglutamine,Peptide,Dipeptide,42079,LC/MS Pos,1102,246.2,42854-54-6;,5253209,NA,NA,,1,0,one-to-none
+valylglycine,Peptide,Dipeptide,40475,LC/MS Pos,1330,175.1,686-43-1;,136487,NA,NA,HMDB0259740,1,1,one-to-one
+valylisoleucine,Peptide,Dipeptide,40050,LC/MS Pos,2365,231.2,20556-14-3;,5.24601e+13,NA,NA,,1,0,one-to-none
+valylleucine,Peptide,Dipeptide,39994,LC/MS Pos,2503.3,231.2,NA,352039,NA,NA,,1,0,one-to-none
+valyllysine,Peptide,Dipeptide,41384,LC/MS Neg,1601.8,244.2,22677-62-9;,5253210,NA,NA,,1,0,one-to-none
+valylmethionine,Peptide,Dipeptide,40674,LC/MS Pos,2000,249.1,14486-09-0;,292427,NA,NA,,1,0,one-to-none
+valylphenylalanine,Peptide,Dipeptide,40688,LC/MS Pos,2790,265.2,3918-92-1;,6.99312e+13,NA,NA,,1,0,one-to-none
+valylserine,Peptide,Dipeptide,40716,LC/MS Neg,1332,203.2,15388-94-8;,139506,NA,NA,,1,0,one-to-none
+valyltryptophan,Peptide,Dipeptide,40649,LC/MS Pos,2830,304.2,24587-37-9;,3360287,NA,NA,,1,0,one-to-none
+valyltyrosine,Peptide,Dipeptide,40697,LC/MS Pos,2000,281.2,3061-91-4;,4065033,NA,NA,,1,0,one-to-none
+valylvaline,Peptide,Dipeptide,40728,LC/MS Pos,1842,217.2,3918-94-3;,4.09682e+12,NA,NA,,1,0,one-to-none
+xylonate,Carbohydrate,"Nucleotide sugars, pentose metabolism",35638,GC/MS,1722,292,73686-31-7;,6602431,C05411,NA,HMDB0059750; HMDB0242170,1,2,one-to-many

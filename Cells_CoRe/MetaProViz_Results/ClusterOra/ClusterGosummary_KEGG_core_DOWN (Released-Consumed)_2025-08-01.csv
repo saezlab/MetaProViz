@@ -1,0 +1,18 @@
+ID,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,Metabolites_in_pathway,Count,Metabolites_in_Pathway,percentage_of_Pathway_detected
+Fatty acyl carnitines,1/4,4/48,0.25,3,1.2464826546183718,0.3023383698221812,0.3023383698221812,0.3023383698221812,propionylcarnitine,1,11,9.09
+Glycolysis / Gluconeogenesis,1/4,3/48,0.3333333333333333,4,1.6011359603844901,0.2342738205365401,0.3023383698221812,0.3023383698221812,glucose,1,9,11.11
+Purine metabolism,1/4,3/48,0.3333333333333333,4,1.6011359603844901,0.2342738205365401,0.3023383698221812,0.3023383698221812,hypoxanthine,1,23,4.35
+"Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,35,0
+Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Citrate cycle (TCA cycle),NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Fatty acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Not assigned,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,38,0
+Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,18,0
+"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0

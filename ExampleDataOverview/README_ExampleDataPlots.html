@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style type="text/css">
+@font-face {
+font-family: octicons-link;
+src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+body {
+-webkit-text-size-adjust: 100%;
+text-size-adjust: 100%;
+color: #333;
+font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+font-size: 16px;
+line-height: 1.6;
+word-wrap: break-word;
+}
+a {
+background-color: transparent;
+}
+a:active,
+a:hover {
+outline: 0;
+}
+strong {
+font-weight: bold;
+}
+h1 {
+font-size: 2em;
+margin: 0.67em 0;
+}
+img {
+border: 0;
+}
+hr {
+box-sizing: content-box;
+height: 0;
+}
+pre {
+overflow: auto;
+}
+code,
+kbd,
+pre {
+font-family: monospace, monospace;
+font-size: 1em;
+}
+input {
+color: inherit;
+font: inherit;
+margin: 0;
+}
+html input[disabled] {
+cursor: default;
+}
+input {
+line-height: normal;
+}
+input[type="checkbox"] {
+box-sizing: border-box;
+padding: 0;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+td,
+th {
+padding: 0;
+}
+* {
+box-sizing: border-box;
+}
+input {
+font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+a {
+color: #4078c0;
+text-decoration: none;
+}
+a:hover,
+a:active {
+text-decoration: underline;
+}
+hr {
+height: 0;
+margin: 15px 0;
+overflow: hidden;
+background: transparent;
+border: 0;
+border-bottom: 1px solid #ddd;
+}
+hr:before {
+display: table;
+content: "";
+}
+hr:after {
+display: table;
+clear: both;
+content: "";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 15px;
+margin-bottom: 15px;
+line-height: 1.1;
+}
+h1 {
+font-size: 30px;
+}
+h2 {
+font-size: 21px;
+}
+h3 {
+font-size: 16px;
+}
+h4 {
+font-size: 14px;
+}
+h5 {
+font-size: 12px;
+}
+h6 {
+font-size: 11px;
+}
+blockquote {
+margin: 0;
+}
+ul,
+ol {
+padding: 0;
+margin-top: 0;
+margin-bottom: 0;
+}
+ol ol,
+ul ol {
+list-style-type: lower-roman;
+}
+ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+list-style-type: lower-alpha;
+}
+dd {
+margin-left: 0;
+}
+code {
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 12px;
+}
+pre {
+margin-top: 0;
+margin-bottom: 0;
+font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.select::-ms-expand {
+opacity: 0;
+}
+.octicon {
+font: normal normal normal 16px/1 octicons-link;
+display: inline-block;
+text-decoration: none;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+.octicon-link:before {
+content: '\f05c';
+}
+.markdown-body:before {
+display: table;
+content: "";
+}
+.markdown-body:after {
+display: table;
+clear: both;
+content: "";
+}
+.markdown-body>*:first-child {
+margin-top: 0 !important;
+}
+.markdown-body>*:last-child {
+margin-bottom: 0 !important;
+}
+a:not([href]) {
+color: inherit;
+text-decoration: none;
+}
+.anchor {
+display: inline-block;
+padding-right: 2px;
+margin-left: -18px;
+}
+.anchor:focus {
+outline: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 1em;
+margin-bottom: 16px;
+font-weight: bold;
+line-height: 1.4;
+}
+h1 .octicon-link,
+h2 .octicon-link,
+h3 .octicon-link,
+h4 .octicon-link,
+h5 .octicon-link,
+h6 .octicon-link {
+color: #000;
+vertical-align: middle;
+visibility: hidden;
+}
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor,
+h4:hover .anchor,
+h5:hover .anchor,
+h6:hover .anchor {
+text-decoration: none;
+}
+h1:hover .anchor .octicon-link,
+h2:hover .anchor .octicon-link,
+h3:hover .anchor .octicon-link,
+h4:hover .anchor .octicon-link,
+h5:hover .anchor .octicon-link,
+h6:hover .anchor .octicon-link {
+visibility: visible;
+}
+h1 {
+padding-bottom: 0.3em;
+font-size: 2.25em;
+line-height: 1.2;
+border-bottom: 1px solid #eee;
+}
+h1 .anchor {
+line-height: 1;
+}
+h2 {
+padding-bottom: 0.3em;
+font-size: 1.75em;
+line-height: 1.225;
+border-bottom: 1px solid #eee;
+}
+h2 .anchor {
+line-height: 1;
+}
+h3 {
+font-size: 1.5em;
+line-height: 1.43;
+}
+h3 .anchor {
+line-height: 1.2;
+}
+h4 {
+font-size: 1.25em;
+}
+h4 .anchor {
+line-height: 1.2;
+}
+h5 {
+font-size: 1em;
+}
+h5 .anchor {
+line-height: 1.1;
+}
+h6 {
+font-size: 1em;
+color: #777;
+}
+h6 .anchor {
+line-height: 1.1;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre {
+margin-top: 0;
+margin-bottom: 16px;
+}
+hr {
+height: 4px;
+padding: 0;
+margin: 16px 0;
+background-color: #e7e7e7;
+border: 0 none;
+}
+ul,
+ol {
+padding-left: 2em;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+margin-top: 0;
+margin-bottom: 0;
+}
+li>p {
+margin-top: 16px;
+}
+dl {
+padding: 0;
+}
+dl dt {
+padding: 0;
+margin-top: 16px;
+font-size: 1em;
+font-style: italic;
+font-weight: bold;
+}
+dl dd {
+padding: 0 16px;
+margin-bottom: 16px;
+}
+blockquote {
+padding: 0 15px;
+color: #777;
+border-left: 4px solid #ddd;
+}
+blockquote>:first-child {
+margin-top: 0;
+}
+blockquote>:last-child {
+margin-bottom: 0;
+}
+table {
+display: block;
+width: 100%;
+overflow: auto;
+word-break: normal;
+word-break: keep-all;
+}
+table th {
+font-weight: bold;
+}
+table th,
+table td {
+padding: 6px 13px;
+border: 1px solid #ddd;
+}
+table tr {
+background-color: #fff;
+border-top: 1px solid #ccc;
+}
+table tr:nth-child(2n) {
+background-color: #f8f8f8;
+}
+img {
+max-width: 100%;
+box-sizing: content-box;
+background-color: #fff;
+}
+code {
+padding: 0;
+padding-top: 0.2em;
+padding-bottom: 0.2em;
+margin: 0;
+font-size: 85%;
+background-color: rgba(0,0,0,0.04);
+border-radius: 3px;
+}
+code:before,
+code:after {
+letter-spacing: -0.2em;
+content: "\00a0";
+}
+pre>code {
+padding: 0;
+margin: 0;
+font-size: 100%;
+word-break: normal;
+white-space: pre;
+background: transparent;
+border: 0;
+}
+.highlight {
+margin-bottom: 16px;
+}
+.highlight pre,
+pre {
+padding: 16px;
+overflow: auto;
+font-size: 85%;
+line-height: 1.45;
+background-color: #f7f7f7;
+border-radius: 3px;
+}
+.highlight pre {
+margin-bottom: 0;
+word-break: normal;
+}
+pre {
+word-wrap: normal;
+}
+pre code {
+display: inline;
+max-width: initial;
+padding: 0;
+margin: 0;
+overflow: initial;
+line-height: inherit;
+word-wrap: normal;
+background-color: transparent;
+border: 0;
+}
+pre code:before,
+pre code:after {
+content: normal;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font-size: 11px;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.pl-c {
+color: #969896;
+}
+.pl-c1,
+.pl-s .pl-v {
+color: #0086b3;
+}
+.pl-e,
+.pl-en {
+color: #795da3;
+}
+.pl-s .pl-s1,
+.pl-smi {
+color: #333;
+}
+.pl-ent {
+color: #63a35c;
+}
+.pl-k {
+color: #a71d5d;
+}
+.pl-pds,
+.pl-s,
+.pl-s .pl-pse .pl-s1,
+.pl-sr,
+.pl-sr .pl-cce,
+.pl-sr .pl-sra,
+.pl-sr .pl-sre {
+color: #183691;
+}
+.pl-v {
+color: #ed6a43;
+}
+.pl-id {
+color: #b52a1d;
+}
+.pl-ii {
+background-color: #b52a1d;
+color: #f8f8f8;
+}
+.pl-sr .pl-cce {
+color: #63a35c;
+font-weight: bold;
+}
+.pl-ml {
+color: #693a17;
+}
+.pl-mh,
+.pl-mh .pl-en,
+.pl-ms {
+color: #1d3e81;
+font-weight: bold;
+}
+.pl-mq {
+color: #008080;
+}
+.pl-mi {
+color: #333;
+font-style: italic;
+}
+.pl-mb {
+color: #333;
+font-weight: bold;
+}
+.pl-md {
+background-color: #ffecec;
+color: #bd2c00;
+}
+.pl-mi1 {
+background-color: #eaffea;
+color: #55a532;
+}
+.pl-mdr {
+color: #795da3;
+font-weight: bold;
+}
+.pl-mo {
+color: #1d3e81;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.task-list-item {
+list-style-type: none;
+}
+.task-list-item+.task-list-item {
+margin-top: 3px;
+}
+.task-list-item input {
+margin: 0 0.35em 0.25em -1.6em;
+vertical-align: middle;
+}
+:checked+.radio-label {
+z-index: 1;
+position: relative;
+border-color: #4078c0;
+}
+.sourceLine {
+display: inline-block;
+}
+code .kw { color: #000000; }
+code .dt { color: #ed6a43; }
+code .dv { color: #009999; }
+code .bn { color: #009999; }
+code .fl { color: #009999; }
+code .ch { color: #009999; }
+code .st { color: #183691; }
+code .co { color: #969896; }
+code .ot { color: #0086b3; }
+code .al { color: #a61717; }
+code .fu { color: #63a35c; }
+code .er { color: #a61717; background-color: #e3d2d2; }
+code .wa { color: #000000; }
+code .cn { color: #008080; }
+code .sc { color: #008080; }
+code .vs { color: #183691; }
+code .ss { color: #183691; }
+code .im { color: #000000; }
+code .va {color: #008080; }
+code .cf { color: #000000; }
+code .op { color: #000000; }
+code .bu { color: #000000; }
+code .ex { color: #000000; }
+code .pp { color: #999999; }
+code .at { color: #008080; }
+code .do { color: #969896; }
+code .an { color: #008080; }
+code .cv { color: #008080; }
+code .in { color: #008080; }
+</style>
+<style>
+body {
+box-sizing: border-box;
+min-width: 200px;
+max-width: 980px;
+margin: 0 auto;
+padding: 45px;
+padding-top: 0px;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(MetaProViz)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">suppressMessages</span>(<span class="fu">suppressWarnings</span>( <span class="fu">library</span>(tidyverse)))</span></code></pre></div>
+<h2 id="example-data">Example Data</h2>
+<p>clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et.
+al including 138 matched tumour and normal tissue pairs (Hakimi et al.
+2016). Cell-lines data from intra- and extracellular metabolomics data
+from cell culture media from <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418">metabolomics
+workbench project PR001418</a>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Create an overview of the example data</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>TissuePlot <span class="ot">&lt;-</span> tissue_norm<span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">&quot;Code&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="fu">filter</span>(TISSUE_TYPE <span class="sc">!=</span> <span class="st">&quot;NORMAL&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="fu">separate</span>(<span class="st">`</span><span class="at">TYPE-STAGE</span><span class="st">`</span>, <span class="at">into=</span><span class="fu">c</span>(<span class="st">&quot;Type&quot;</span>, <span class="st">&quot;Stage&quot;</span>), <span class="at">sep=</span><span class="st">&quot;-&quot;</span>, <span class="at">remove=</span><span class="cn">FALSE</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>TissuePlot<span class="sc">$</span>Count <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>TissuePlot<span class="sc">$</span>AGEFactor <span class="ot">&lt;-</span> <span class="fu">factor</span>(TissuePlot<span class="sc">$</span>AGE, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Young&quot;</span>,<span class="st">&quot;Middle&quot;</span>, <span class="st">&quot;Old&quot;</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#Plot</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>Plot <span class="ot">&lt;-</span> ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(TissuePlot, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">fill=</span>Stage, <span class="at">y=</span>Count, <span class="at">x=</span>AGEFactor)) <span class="sc">+</span> </span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">&quot;stack&quot;</span>, <span class="at">stat=</span><span class="st">&quot;identity&quot;</span>)<span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;STAGE I&quot;</span> <span class="ot">=</span> <span class="st">&quot;#006384&quot;</span>  , <span class="st">&quot;STAGE II&quot;</span> <span class="ot">=</span> <span class="st">&quot;#9F0162&quot;</span>, <span class="st">&quot;STAGE III&quot;</span> <span class="ot">=</span> <span class="st">&quot;#00735C&quot;</span> , <span class="st">&quot;STAGE IV&quot;</span> <span class="ot">=</span> <span class="st">&quot;grey&quot;</span> ))<span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">theme_classic</span>()<span class="sc">+</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">ggtitle</span>(<span class="st">&quot;ccRCC patients metadata&quot;</span>)<span class="sc">+</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">subtitle=</span><span class="st">&quot;Age at surgery &lt;42 = Young,  &gt;58 = Old, else = Middle&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Age&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Patients&quot;</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>Plot_Sized <span class="ot">&lt;-</span>  MetaProViz<span class="sc">:::</span><span class="fu">plot_grob_superplot</span>(<span class="at">input_plot=</span>Plot, <span class="at">metadata_info=</span><span class="fu">c</span>(<span class="at">Conditions=</span><span class="st">&quot;Conditions&quot;</span>, <span class="at">Superplot=</span><span class="st">&quot;Conditions&quot;</span>), <span class="at">metadata_sample=</span>TissuePlot<span class="sc">%&gt;%</span>dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="st">&quot;Conditions&quot;</span><span class="ot">=</span><span class="st">&quot;AGE&quot;</span>), <span class="at">plot_name =</span> <span class="st">&quot;ccRCC patients metadata&quot;</span>, <span class="at">subtitle =</span> <span class="st">&quot;Age at surgery &lt;42 = Young,  &gt;58 = Old, else = Middle&quot;</span>, <span class="at">plot_type=</span><span class="st">&quot;Bar&quot;</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a> </span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>PlotHeight <span class="ot">&lt;-</span> grid<span class="sc">::</span><span class="fu">convertUnit</span>(Plot_Sized<span class="sc">$</span>height, <span class="st">&#39;cm&#39;</span>, <span class="at">valueOnly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>PlotWidth <span class="ot">&lt;-</span> grid<span class="sc">::</span><span class="fu">convertUnit</span>(Plot_Sized<span class="sc">$</span>width, <span class="st">&#39;cm&#39;</span>, <span class="at">valueOnly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>Plot_Sized <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>      {ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">annotation_custom</span>(.)} <span class="sc">%&gt;%</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>       magrittr<span class="sc">::</span><span class="fu">add</span>(ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>)))</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">&quot;Tissue_MetadataPlot.svg&quot;</span>, <span class="at">plot =</span> Plot_Sized, <span class="at">width =</span> PlotWidth,  <span class="at">height =</span> PlotHeight, <span class="at">unit=</span><span class="st">&quot;cm&quot;</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a> </span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>Plot_Sized_Tissue <span class="ot">&lt;-</span> Plot_Sized</span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="do">###################################################################################################################################################</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co"># Create an overview of the example data</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>CellPlot_Intra <span class="ot">&lt;-</span> intracell_raw<span class="sc">%&gt;%</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">&quot;Code&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>  <span class="fu">filter</span>(Conditions <span class="sc">!=</span> <span class="st">&quot;Pool&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">Celltype =</span> <span class="fu">case_when</span>(Conditions<span class="sc">==</span><span class="st">&quot;HK2&quot;</span> <span class="sc">~</span> <span class="st">&#39;Healthy&#39;</span>,</span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;786-O&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>                               <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&#39;MetastaticTumour&#39;</span>))</span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>CellPlot_Intra<span class="sc">$</span>Count <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>CellPlot_Intra<span class="sc">$</span>CelltypeFactor <span class="ot">&lt;-</span> <span class="fu">factor</span>(CellPlot_Intra<span class="sc">$</span>Celltype, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Healthy&quot;</span>,<span class="st">&quot;PrimaryTumour&quot;</span>, <span class="st">&quot;MetastaticTumour&quot;</span>))</span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>CellPlot_Media <span class="ot">&lt;-</span> medium_raw<span class="sc">%&gt;%</span></span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">&quot;Code&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a>  <span class="fu">filter</span>(Conditions <span class="sc">!=</span> <span class="st">&quot;Pool&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a>  <span class="fu">filter</span>(Conditions <span class="sc">!=</span> <span class="st">&quot;blank&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">Celltype =</span> <span class="fu">case_when</span>(Conditions<span class="sc">==</span><span class="st">&quot;HK2&quot;</span> <span class="sc">~</span> <span class="st">&#39;Healthy&#39;</span>,<span class="co">#https://www.mdpi.com/1422-0067/24/7/6447</span></span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;786-O&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;OSRC2&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;RFX6&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a>                               <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&#39;MetastaticTumour&#39;</span>))<span class="co">#OSLM1</span></span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a><span class="co">#Plot</span></span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a>Plot <span class="ot">&lt;-</span> ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(CellPlot_Intra, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">fill=</span>Conditions, <span class="at">y=</span>Count, <span class="at">x=</span>CelltypeFactor)) <span class="sc">+</span> </span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">&quot;stack&quot;</span>, <span class="at">stat=</span><span class="st">&quot;identity&quot;</span>)<span class="sc">+</span></span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;HK2&quot;</span> <span class="ot">=</span> <span class="st">&quot;#006384&quot;</span>  , <span class="st">&quot;786-O&quot;</span> <span class="ot">=</span> <span class="st">&quot;#9F0162&quot;</span>, <span class="st">&quot;786-M1A&quot;</span> <span class="ot">=</span> <span class="st">&quot;#00735C&quot;</span>, <span class="st">&quot;786-M2A&quot;</span> <span class="ot">=</span> <span class="st">&quot;#00422E&quot;</span>))<span class="sc">+</span></span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">theme_classic</span>()<span class="sc">+</span></span>
+<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">ggtitle</span>(<span class="st">&quot;Intracellular metabolomics&quot;</span>)<span class="sc">+</span></span>
+<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Celltype&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Samples&quot;</span>,  <span class="at">fill =</span><span class="st">&quot;Cellline&quot;</span>)</span>
+<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a></span>
+<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a>Plot_Sized <span class="ot">&lt;-</span>  MetaProViz<span class="sc">:::</span><span class="fu">plot_grob_superplot</span>(<span class="at">input_plot=</span>Plot, <span class="at">metadata_info=</span><span class="fu">c</span>(<span class="at">Conditions=</span><span class="st">&quot;Conditions&quot;</span>, <span class="at">Superplot=</span><span class="st">&quot;Conditions&quot;</span>), <span class="at">metadata_sample=</span>CellPlot_Intra<span class="sc">%&gt;%</span>dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="st">&quot;Name&quot;</span><span class="ot">=</span><span class="st">&quot;Conditions&quot;</span>, <span class="st">&quot;Conditions&quot;</span><span class="ot">=</span><span class="st">&quot;Celltype&quot;</span>), <span class="at">plot_name =</span> <span class="st">&quot;Intracellular metabolomics&quot;</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>, <span class="at">plot_type=</span><span class="st">&quot;Bar&quot;</span>)</span>
+<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a> </span>
+<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a>PlotHeight <span class="ot">&lt;-</span> grid<span class="sc">::</span><span class="fu">convertUnit</span>(Plot_Sized<span class="sc">$</span>height, <span class="st">&#39;cm&#39;</span>, <span class="at">valueOnly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a>PlotWidth <span class="ot">&lt;-</span> grid<span class="sc">::</span><span class="fu">convertUnit</span>(Plot_Sized<span class="sc">$</span>width, <span class="st">&#39;cm&#39;</span>, <span class="at">valueOnly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" tabindex="-1"></a>Plot_Sized <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a>      {ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">annotation_custom</span>(.)} <span class="sc">%&gt;%</span></span>
+<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a>     magrittr<span class="sc">::</span><span class="fu">add</span>(ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>)))</span>
+<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a></span>
+<span id="cb2-71"><a href="#cb2-71" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">&quot;Cellline_IntraPlot.svg&quot;</span>, <span class="at">plot =</span> Plot_Sized, <span class="at">width =</span> PlotWidth,  <span class="at">height =</span> PlotHeight, <span class="at">unit=</span><span class="st">&quot;cm&quot;</span>)</span>
+<span id="cb2-72"><a href="#cb2-72" tabindex="-1"></a> </span>
+<span id="cb2-73"><a href="#cb2-73" tabindex="-1"></a>Plot_Sized_Intra <span class="ot">&lt;-</span> Plot_Sized</span>
+<span id="cb2-74"><a href="#cb2-74" tabindex="-1"></a></span>
+<span id="cb2-75"><a href="#cb2-75" tabindex="-1"></a><span class="do">###################################################################################################################################################</span></span>
+<span id="cb2-76"><a href="#cb2-76" tabindex="-1"></a><span class="co"># Create an overview of the example data</span></span>
+<span id="cb2-77"><a href="#cb2-77" tabindex="-1"></a>CellPlot_Media <span class="ot">&lt;-</span> medium_raw<span class="sc">%&gt;%</span></span>
+<span id="cb2-78"><a href="#cb2-78" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">&quot;Code&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-79"><a href="#cb2-79" tabindex="-1"></a>  <span class="fu">filter</span>(Conditions <span class="sc">!=</span> <span class="st">&quot;Pool&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a>  <span class="fu">filter</span>(Conditions <span class="sc">!=</span> <span class="st">&quot;blank&quot;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">Celltype =</span> <span class="fu">case_when</span>(Conditions<span class="sc">==</span><span class="st">&quot;HK2&quot;</span> <span class="sc">~</span> <span class="st">&#39;Healthy&#39;</span>,<span class="co">#https://www.mdpi.com/1422-0067/24/7/6447</span></span>
+<span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;786-O&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;OSRC2&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a>                               Conditions<span class="sc">==</span><span class="st">&quot;RFX631&quot;</span> <span class="sc">~</span> <span class="st">&#39;PrimaryTumour&#39;</span>,</span>
+<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a>                               <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&#39;MetastaticTumour&#39;</span>))<span class="co">#OSLM1</span></span>
+<span id="cb2-86"><a href="#cb2-86" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" tabindex="-1"></a>CellPlot_Media<span class="sc">$</span>Count <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-89"><a href="#cb2-89" tabindex="-1"></a>CellPlot_Media<span class="sc">$</span>CelltypeFactor <span class="ot">&lt;-</span> <span class="fu">factor</span>(CellPlot_Media<span class="sc">$</span>Celltype, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Healthy&quot;</span>,<span class="st">&quot;PrimaryTumour&quot;</span>, <span class="st">&quot;MetastaticTumour&quot;</span>))</span>
+<span id="cb2-90"><a href="#cb2-90" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" tabindex="-1"></a></span>
+<span id="cb2-92"><a href="#cb2-92" tabindex="-1"></a><span class="co">#Plot</span></span>
+<span id="cb2-93"><a href="#cb2-93" tabindex="-1"></a>Plot <span class="ot">&lt;-</span> ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(CellPlot_Media, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">fill=</span>Conditions, <span class="at">y=</span>Count, <span class="at">x=</span>CelltypeFactor)) <span class="sc">+</span> </span>
+<span id="cb2-94"><a href="#cb2-94" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">&quot;stack&quot;</span>, <span class="at">stat=</span><span class="st">&quot;identity&quot;</span>)<span class="sc">+</span></span>
+<span id="cb2-95"><a href="#cb2-95" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;HK2&quot;</span> <span class="ot">=</span> <span class="st">&quot;#006384&quot;</span>  , <span class="st">&quot;786-O&quot;</span> <span class="ot">=</span> <span class="st">&quot;#d03293&quot;</span>, <span class="st">&quot;OSRC2&quot;</span><span class="ot">=</span> <span class="st">&quot;#9F0162&quot;</span> , <span class="st">&quot;RFX631&quot;</span><span class="ot">=</span> <span class="st">&quot;#630026&quot;</span>, <span class="st">&quot;786-M1A&quot;</span> <span class="ot">=</span> <span class="st">&quot;#00735C&quot;</span>, <span class="st">&quot;786-M2A&quot;</span> <span class="ot">=</span> <span class="st">&quot;#00422E&quot;</span>, <span class="st">&quot;OSLM1B&quot;</span><span class="ot">=</span> <span class="st">&quot;#002B1A&quot;</span>))<span class="sc">+</span></span>
+<span id="cb2-96"><a href="#cb2-96" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">theme_classic</span>()<span class="sc">+</span></span>
+<span id="cb2-97"><a href="#cb2-97" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">ggtitle</span>(<span class="st">&quot;Media metabolomics&quot;</span>)<span class="sc">+</span></span>
+<span id="cb2-98"><a href="#cb2-98" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb2-99"><a href="#cb2-99" tabindex="-1"></a>        ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Celltype&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Samples&quot;</span>,  <span class="at">fill =</span><span class="st">&quot;Cellline&quot;</span>)</span>
+<span id="cb2-100"><a href="#cb2-100" tabindex="-1"></a></span>
+<span id="cb2-101"><a href="#cb2-101" tabindex="-1"></a>Plot_Sized <span class="ot">&lt;-</span>  MetaProViz<span class="sc">:::</span><span class="fu">plot_grob_superplot</span>(<span class="at">input_plot=</span>Plot, <span class="at">metadata_info=</span><span class="fu">c</span>(<span class="at">Conditions=</span><span class="st">&quot;Conditions&quot;</span>, <span class="at">Superplot=</span><span class="st">&quot;Conditions&quot;</span>), <span class="at">metadata_sample=</span>CellPlot_Media<span class="sc">%&gt;%</span>dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="st">&quot;Name&quot;</span><span class="ot">=</span><span class="st">&quot;Conditions&quot;</span>, <span class="st">&quot;Conditions&quot;</span><span class="ot">=</span><span class="st">&quot;Celltype&quot;</span>), <span class="at">plot_name =</span> <span class="st">&quot;Media metabolomics&quot;</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>, <span class="at">plot_type=</span><span class="st">&quot;Bar&quot;</span>)</span>
+<span id="cb2-102"><a href="#cb2-102" tabindex="-1"></a> </span>
+<span id="cb2-103"><a href="#cb2-103" tabindex="-1"></a>PlotHeight <span class="ot">&lt;-</span> grid<span class="sc">::</span><span class="fu">convertUnit</span>(Plot_Sized<span class="sc">$</span>height, <span class="st">&#39;cm&#39;</span>, <span class="at">valueOnly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-104"><a href="#cb2-104" tabindex="-1"></a>PlotWidth <span class="ot">&lt;-</span> grid<span class="sc">::</span><span class="fu">convertUnit</span>(Plot_Sized<span class="sc">$</span>width, <span class="st">&#39;cm&#39;</span>, <span class="at">valueOnly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-105"><a href="#cb2-105" tabindex="-1"></a>Plot_Sized <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb2-106"><a href="#cb2-106" tabindex="-1"></a>      {ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">annotation_custom</span>(.)} <span class="sc">%&gt;%</span></span>
+<span id="cb2-107"><a href="#cb2-107" tabindex="-1"></a>       magrittr<span class="sc">::</span><span class="fu">add</span>(ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>)))</span>
+<span id="cb2-108"><a href="#cb2-108" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">&quot;Cellline_Media_Plot.svg&quot;</span>, <span class="at">plot =</span> Plot, <span class="at">width =</span> PlotWidth,  <span class="at">height =</span> PlotHeight, <span class="at">unit=</span><span class="st">&quot;cm&quot;</span>)</span>
+<span id="cb2-110"><a href="#cb2-110" tabindex="-1"></a></span>
+<span id="cb2-111"><a href="#cb2-111" tabindex="-1"></a>Plot_Sized_Media <span class="ot">&lt;-</span> Plot_Sized</span>
+<span id="cb2-112"><a href="#cb2-112" tabindex="-1"></a></span>
+<span id="cb2-113"><a href="#cb2-113" tabindex="-1"></a>gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(Plot_Sized_Tissue, Plot_Sized_Intra, Plot_Sized_Media, <span class="at">ncol=</span><span class="dv">3</span>)</span></code></pre></div>
+<img role="img" src="data:image/png;base64,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" style="display: block; margin: auto auto auto 0;" />
+
+<h2 id="liscence">Liscence</h2>
+<p>GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007</p>
+<h2 id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+
+<div id="ref-Hakimi2016" class="csl-entry">
+
+<p>Hakimi, A Ari, Ed Reznik, Chung-Han Lee, Chad J Creighton, A Rose
+Brannon, Augustin Luna, B Arman Aksoy, et al. 2016. “An Integrated
+Metabolic Atlas of Clear Cell Renal Cell Carcinoma.” <em>Cancer
+Cell</em> 29 (1): 104–16. <a href="https://doi.org/10.1016/j.ccell.2015.12.004">https://doi.org/10.1016/j.ccell.2015.12.004</a>.</p>
+</div>
+
+</div>
+
+</body>
+</html>

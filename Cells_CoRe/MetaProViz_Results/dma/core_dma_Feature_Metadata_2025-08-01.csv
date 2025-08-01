@@ -1,0 +1,200 @@
+Metabolite,HMDB,KEGG.ID,KEGGCompound,Pathway,core_786-M1A,core_HK2,core_786-M2A,core_786-O,core_OSLM1B,core_OSRC2,core_RFX631
+2-aminoadipic acid,HMDB0302754,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+2-hydroxyglutarate,HMDB0059655,C02630,2-Hydroxyglutarate,Citrate cycle (TCA cycle),Released,Consumed,Released,Released,Released,Released,Released
+2-ketoglutarate,HMDB0000208,C00026,2-Oxoglutarate,Citrate cycle (TCA cycle),Released,Consumed,Released,Released,Consumed,Consumed,Consumed
+2/3-phosphoglycerate,HMDB0060180,C00197,3-Phospho-D-glycerate,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA
+3-Dehydro-L-threonate,NA,NA,NA,Amino acid metabolism,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+4-guanidinobutanoate,HMDB0003464,C01035,4-Guanidinobutanoate,Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,NA
+4-hydroxyphenyllactate,HMDB0000755,C03672,3-(4-Hydroxyphenyl)lactate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+5-aminolevulinic acid,HMDB0001149,C00430,5-Aminolevulinate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+5-aminovaleric acid*,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+5-methylthioadenosine (MTA),HMDB0001173,C00170,5'-Methylthioadenosine,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+6-phosphogluconate,HMDB0001316,C00345,6-Phospho-D-gluconate,Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,NA
+acetyl-CoA,HMDB0001206,C00024,Acetyl-CoA,Citrate cycle (TCA cycle),NA,NA,NA,NA,NA,NA,NA
+acetylcarnitine,HMDB0000201,C02571,O-Acetylcarnitine,Fatty acyl carnitines,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Released
+acetylcholine,HMDB0000895,C01996,Acetylcholine,Glycerophospholipid metabolism,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+acetylornithine,HMDB0003357,C00437,N-Acetylornithine,Arginine and proline metabolism,Released,Consumed,Released,Released,Released,Released,Released
+aconitate,HMDB0000072,C00417,cis-Aconitate,Citrate cycle (TCA cycle),Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+adenosine,HMDB0000050,C00212,Adenosine,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+ADP,HMDB0001341,C00008,ADP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+ADP-ribose,HMDB0001178,C00301,ADP-ribose,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+AICAR,HMDB0001517,C04677,1-(5'-Phosphoribosyl)-5-amino-4-imidazolecarboxamide,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+alanine,HMDB0000161,C00041,L-Alanine,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+AMP,HMDB0000045,C00020,AMP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+arginine,HMDB0000517,C00062,L-Arginine,Amino acid metabolism,Released,Released,Released,Released,Released,Released,Released
+argininosuccinate,HMDB0000052,C03406,N-(L-Arginino)succinate,"Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,NA
+asparagine,HMDB0000168,C00152,L-Asparagine,Amino acid metabolism,Released,Released,Released,Released,Released,Released,Consumed
+aspartate,HMDB0000191,C00049,L-Aspartate,Amino acid metabolism,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+ATP,HMDB0000538,C00002,ATP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+beta-alanine,HMDB0000056,C00099,beta-Alanine,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+beta-citrylglutamic acid,HMDB0013220,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+betaine,HMDB0000043,C00719,Betaine,Not assigned,Released,Released,Released,Released,Released,Released,Released
+butyryl-carnitine,HMDB0002013,C02862,O-Butanoylcarnitine,Fatty acyl carnitines,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+butyrylcarnitine C4,HMDB0002013,C02862,NA,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA
+cAMP,HMDB0000058,C00575,Cyclic AMP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+carbamoyl phosphate,HMDB0001096,C00169,Carbamoyl phosphate,Purine metabolism,Released,Released,Released,Released,Consumed,Consumed,Consumed
+carnitinamide,NA,C02290,L-Carnitinamide,Not assigned,NA,NA,NA,NA,NA,NA,NA
+carnitine,NA,C00487,Carnitine,Fatty acyl carnitines,Consumed,Consumed,Consumed,Released,Released,Released,Consumed
+carnosine,HMDB0000033,C00386,Carnosine,Not assigned,NA,NA,NA,NA,NA,NA,NA
+CDP,HMDB0001546,C00112,CDP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+CDP-ethanolamine,HMDB0001564,C00570,CDP-ethanolamine,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+choline,HMDB0000097,C00114,Choline,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+citicoline,HMDB0001413,C00307,CDP-choline,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+citrate,HMDB0000094,C00158,Citrate,Citrate cycle (TCA cycle),NA,NA,NA,NA,NA,NA,NA
+citrulline,HMDB0000904,C00327,L-Citrulline,Arginine and proline metabolism,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+CMP,HMDB0000095,C00055,CMP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+CMP-2-aminoethylphosphonate,HMDB0060067,C05673,CMP-2-aminoethylphosphonate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+CMP-acetylneuraminic acid,HMDB0001176,C00128,CMP-N-acetylneuraminate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+creatine,HMDB0000064,C00300,Creatine,Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,NA
+creatinine,HMDB0000562,C00791,Creatinine,Arginine and proline metabolism,Released,Released,Released,Released,Released,Consumed,Released
+CTP,HMDB0000082,C00063,CTP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+cyclic ADP-ribose,HMDB0249529,C13050,Cyclic ADP-ribose,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+cystathionine,HMDB0000099,C02291,L-Cystathionine,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+cysteic acid,HMDB0002757,C00506,L-Cysteate,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+cysteinylglycine,HMDB0000078,C01419,Cys-Gly,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+cystine,HMDB0000192,C00491,L-Cystine,Cysteine and methionine metabolism,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+cytidine,HMDB0000089,C00475,Cytidine,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+cytosine,HMDB0000630,C00380,Cytosine,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+dATP,HMDB0001532,C00131,dATP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+dCTP,HMDB0000998,C00458,dCTP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+deoxyadenosine,HMDB0000101,C00559,Deoxyadenosine,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+deoxycytidine,HMDB0000014,C00881,Deoxycytidine,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+deoxyribose 5-phosphate,HMDB0001031,C00673,2-Deoxy-D-ribose 5-phosphate,Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,NA
+dihydroorotate,HMDB0003349,C00337,(S)-Dihydroorotate,Pyrimidine metabolism,Released,Released,Consumed,Released,Consumed,Consumed,Released
+dihydroxyacetone phosphate,HMDB0001473,C00111,Glycerone phosphate,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA
+dimethylarginine (ADMA+SDMA),NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+dTTP,HMDB0001342,C00459,dTTP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+FAD,HMDB0001248,C00016,FAD,Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA
+FAICAR,HMDB0001439,C04734,FAICAR,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+fructose,HMDB0000660,C02336,beta-D-Fructose,Not assigned,NA,NA,NA,NA,NA,NA,NA
+"fructose 1,6-bisphosphate",HMDB0001058,C00354,"D-Fructose 1,6-bisphosphate",Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA
+fructose 6-Phosphate,HMDB0000124,C00085,D-Fructose 6-phosphate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+fumarate,HMDB0000134,C00122,Fumarate,Citrate cycle (TCA cycle),Released,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+GDP,HMDB0001201,C00035,GDP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+GDP-hexose,NA,NA,NA,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+gluconate,HMDB0000625,C00257,D-Gluconic acid,Pentose phosphate pathway,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+glucose,HMDB0003345,C00267,alpha-D-Glucose,Glycolysis / Gluconeogenesis,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+glucose 1-phosphate,HMDB0001586,C00103,D-Glucose 1-phosphate,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA
+glucose 6-phosphate,HMDB0001401,C00092,D-Glucose 6-phosphate,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA
+glucuronic acid,HMDB0000127,C00191,D-Glucuronate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+glutamate,HMDB0000148,C00025,L-Glutamate,Amino acid metabolism,Released,Consumed,Released,Released,Consumed,Consumed,Consumed
+glutamine,HMDB0000641,C00064,L-Glutamine,Amino acid metabolism,Released,Consumed,Released,Released,Released,Released,Released
+glutamylcysteine,HMDB0001049,C00669,gamma-L-Glutamyl-L-cysteine,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+glutamylglutamate,HMDB0028818,C01425,Glutamyl-glutamic acid,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+glutamyllysine,HMDB0004207,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+glutamylthreonine,HMDB0028829,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+glutathione,HMDB0000125,C00051,Glutathione,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+glutathione oxidized,HMDB0003337,C00127,Glutathione disulfide,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+Gly-Gly,HMDB0011733,C02037,N-Glycylglycine,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+glyceraldehyde 3-phosphate,HMDB0001112,C00118,D-Glyceraldehyde 3-phosphate,Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA
+glycerol 3-phosphate,HMDB0000126,C00093,sn-Glycerol 3-phosphate,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+glycerophosphocholine,HMDB0000086,C00670,sn-Glycero-3-phosphocholine,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+glycerophosphoethanolamine,HMDB0000114,C01233,sn-Glycero-3-phosphoethanolamine,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+glycerophosphoinositol,HMDB0011649,C01225,sn-Glycero-3-phospho-1-inositol,Not assigned,NA,NA,NA,NA,NA,NA,NA
+glycerylphosphorylcholine,HMDB0252858,NA,NA,Not assigned,Consumed,Consumed,Released,Released,Consumed,Consumed,Consumed
+glycine,HMDB0000123,C00037,Glycine,Amino acid metabolism,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+GMP,HMDB0001397,C00144,GMP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+GTP,HMDB0001273,C00044,GTP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+guanosine,HMDB0000133,C00387,Guanosine,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+hexenoylcarnitine C6:1,NA,NA,NA,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA
+hexosamine phosphate,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+histidine,HMDB0000177,C00135,L-Histidine,Amino acid metabolism,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+homoarginine,HMDB0000670,C01924,L-Homoarginine,Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,NA
+hydroxyphenyllactic acid,HMDB0000755,C03672,3-(4-Hydroxyphenyl)lactate,Not assigned,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+hydroxyphenylpyruvate,NA,NA,NA,Not assigned,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+hydroxyproline,HMDB0000725,C01157,L-Hydroxyproline,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+hypotaurine,HMDB0000965,C00519,Hypotaurine,Not assigned,NA,NA,NA,NA,NA,NA,NA
+hypoxanthine,HMDB0000157,C00262,Hypoxanthine,Purine metabolism,Consumed,Released,Consumed,Released,Released,Consumed,Released
+IMP,HMDB0000175,C00130,IMP,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+indole,HMDB0000738,C00463,Indole,Not assigned,NA,NA,NA,NA,NA,NA,NA
+indole-3-lactate,HMDB0000671,C02043,Indolelactate,Not assigned,NA,NA,NA,NA,NA,NA,NA
+inosine,HMDB0000195,C00294,Inosine,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+isoleucine,HMDB0000172,C00407,L-Isoleucine,"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA
+isovalerylcarnitine,HMDB0000688,C20826,Isovalerylcarnitine,Fatty acyl carnitines,Consumed,Released,Released,Consumed,Consumed,Consumed,Consumed
+KMV,NA,NA,NA,"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA
+KMV+KIC,NA,NA,NA,"Valine, leucine and isoleucine biosynthesis",Consumed,Released,Released,Released,Consumed,Consumed,Consumed
+lactate,HMDB0000190,C00186,(S)-Lactate,Glycolysis / Gluconeogenesis,Released,Released,Consumed,Consumed,Consumed,Consumed,Released
+leucine,HMDB0000687,C00123,L-Leucine,"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA
+leucine+isoleucine,NA,NA,NA,"Valine, leucine and isoleucine biosynthesis",Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+linoleic acid,HMDB0000673,C01595,Linoleate,Fatty acid biosynthesis,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Released
+lysine,HMDB0000182,C00047,L-Lysine,Amino acid metabolism,Released,Released,Released,Consumed,Released,Released,Released
+malate,HMDB0000156,C00149,(S)-Malate,Citrate cycle (TCA cycle),Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+malonate,HMDB0000691,C00383,Malonate,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+malonylcarnitine C3-DC,HMDB0002095,NA,NA,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA
+mesaconate,HMDB0000749,C01732,Mesaconate,Citrate cycle (TCA cycle),NA,NA,NA,NA,NA,NA,NA
+methionine,HMDB0000696,C00073,L-Methionine,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+methionine sulfoxide,HMDB0002005,C02989,L-Methionine S-oxide,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+methylarginine,HMDB0250980,NA,NA,Amino acid metabolism,Released,Released,Released,Released,Released,Released,Released
+methylaspartate,HMDB0002393,C12269,N-Methyl-D-aspartic acid,Not assigned,Released,Consumed,Released,Released,Consumed,Consumed,Consumed
+methylhistidine,HMDB0000001,C01152,N(pi)-Methyl-L-histidine,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+methylindole,HMDB0000466,C08313,Skatole,Not assigned,NA,NA,NA,NA,NA,NA,NA
+methylmalonylcarnitine C3-DC-M/succinylcarnitine C4-DC,NA,NA,NA,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA
+mevalonic acid 5-pyrophosphate,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+myo-inositol,HMDB0000211,C00137,myo-Inositol,Not assigned,Released,Consumed,Released,Released,Released,Released,Released
+N-acetylalanine,HMDB0000766,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-acetylarginine,HMDB0004620,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-acetylaspartate,HMDB0000812,C01042,N-Acetyl-L-aspartate,"Alanine, aspartate and glutamate metabolism",Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+N-acetylaspartylglutamate,HMDB0001067,C12270,N-Acetylaspartylglutamate,"Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,NA
+N-acetylglutamate,HMDB0001138,C00624,N-Acetyl-L-glutamate,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+N-acetylglutamine,HMDB0006029,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-acetylhexosamine phosphate,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+N-acetylhistidine,HMDB0032055,C02997,N-Acetyl-L-histidine,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-acetylmethionine,HMDB0011745,C02712,N-Acetylmethionine,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-acetylneuramic acid,HMDB0000230,C19910,N-Acetyl-beta-neuraminate,Not assigned,Consumed,Released,Consumed,Released,Released,Released,Released
+N-acetylornithine,NA,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-acetylserine,HMDB0002931,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+N-carbamoylaspartate,HMDB0000828,C00438,N-Carbamoyl-L-aspartate,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+NAD,HMDB0000902,C00003,NAD+,Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA
+NADH,HMDB0001487,C00004,NADH,Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA
+NADP,HMDB0304435,C00006,NADP+,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+NADPH,HMDB0000221,C00005,NADPH,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+oleic acid,HMDB0000207,C00712,(9Z)-Octadecenoic acid,Not assigned,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+ophthalmate,HMDB0005765,C21016,Ophthalmate,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+ornithine,HMDB0000214,C00077,L-Ornithine,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+orotate,HMDB0000226,C00295,Orotate,Pyrimidine metabolism,Released,Consumed,Released,Released,Consumed,Consumed,Consumed
+orotidine,HMDB0000218,C01103,Orotidine 5'-phosphate,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+palmitate,HMDB0000220,C00249,Hexadecanoic acid,Fatty acid biosynthesis,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+pantothenate,HMDB0000210,C00864,Pantothenate,Vitamin digestion and absorption,Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+pentose phosphates,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+phenylalanine,HMDB0000159,C00079,L-Phenylalanine,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+phosphocholine,NA,NA,NA,Not assigned,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Released
+phosphocreatine,HMDB0001511,C02305,Phosphocreatine,Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,NA
+phosphoenolpyruvate,HMDB0000263,C00074,Phosphoenolpyruvate,Citrate cycle (TCA cycle),NA,NA,NA,NA,NA,NA,NA
+phosphoethanolamine,HMDB0000224,C00346,Ethanolamine phosphate,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+phosphorylcholine,HMDB0001565,C00588,Choline phosphate,Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA
+proline,HMDB0000162,C00148,L-Proline,Amino acid metabolism,Released,Consumed,Released,Released,Consumed,Consumed,Consumed
+propionylcarnitine,HMDB0000824,C03017,O-Propanoylcarnitine,Fatty acyl carnitines,Consumed,Released,Consumed,Consumed,Released,Consumed,Consumed
+pyroglutamic-acid,HMDB0000267,C01879,5-Oxoproline,Glutathione metabolism,Consumed,Consumed,Consumed,Released,Released,Released,Released
+pyroglutamic acid,HMDB0000267,C01879,Pyroglutamic acid,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+pyruvate,HMDB0000243,C00022,Pyruvate,Glycolysis / Gluconeogenesis,Released,Released,Released,Released,Released,Consumed,Consumed
+S-(2-succinyl)cysteine,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+S-adenosylhomocysteine,HMDB0000939,C00021,S-Adenosyl-L-homocysteine,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+S-adenosylmethionine,HMDB0001185,C00019,S-Adenosyl-L-methionine,Cysteine and methionine metabolism,NA,NA,NA,NA,NA,NA,NA
+S-lactoylglutathione,HMDB0001066,C03451,(R)-S-Lactoylglutathione,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+SAICAR,HMDB0000797,C04823,1-(5'-Phosphoribosyl)-5-amino-4-(N-succinocarboxamide)-imidazole,Purine metabolism,NA,NA,NA,NA,NA,NA,NA
+sedoheptulose 7-phosphate,HMDB0258206,C05382,Sedoheptulose 7-phosphate,Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,NA
+serine,HMDB0000187,C00065,L-Serine,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+stearic acid,HMDB0000827,C01530,Octadecanoic acid,Fatty acid biosynthesis,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+stearoylcarnitine C18,HMDB0000848,NA,NA,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA
+succinate,HMDB0000254,C00042,Succinate,Citrate cycle (TCA cycle),Consumed,Consumed,Consumed,Consumed,Released,Released,Consumed
+succinyladenosine,HMDB0000912,NA,NA,Not assigned,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed,Consumed
+succinylglutathione,NA,C03174,S-Succinylglutathione,Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA
+taurine,HMDB0000251,C00245,Taurine,Not assigned,Consumed,Consumed,Consumed,Released,Released,Released,Consumed
+tetradecanoylcarnitine C14,HMDB0005066,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+tetradecenoylcarnitine C14:1,NA,NA,NA,Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA
+thiamine,HMDB0000235,C00378,Thiamine,Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA
+threonine,HMDB0000167,C00188,L-Threonine,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+trans-4-hydroxyproline,HMDB0000725,C01157,Hydroxyproline,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+trimethyllysine,HMDB0001325,C03793,"N6,N6,N6-Trimethyl-L-lysine",Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+tryptophan,HMDB0000929,C00078,L-Tryptophan,Amino acid metabolism,Consumed,Released,Consumed,Consumed,Consumed,Consumed,Consumed
+tyrosine,HMDB0000158,C00082,L-Tyrosine,Amino acid metabolism,Consumed,Consumed,Consumed,Consumed,Released,Consumed,Consumed
+UDP,HMDB0000295,C00015,UDP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+UDP-GlcNac,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+UDP-hexose,NA,NA,NA,Not assigned,NA,NA,NA,NA,NA,NA,NA
+UMP,HMDB0000288,C00105,UMP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+uric acid,HMDB0000289,C00366,Urate,Purine metabolism,Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+uridine,HMDB0000296,C00299,Uridine,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+UTP,HMDB0000285,C00075,UTP,Pyrimidine metabolism,NA,NA,NA,NA,NA,NA,NA
+Val-Lys,HMDB0029132,NA,NA,Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA
+valine,HMDB0000883,C00183,L-Valine,"Valine, leucine and isoleucine biosynthesis",Consumed,Released,Consumed,Consumed,Released,Released,Consumed
+xanthine,HMDB0000292,C00385,Xanthine,Purine metabolism,Released,Consumed,Released,Released,Released,Released,Released

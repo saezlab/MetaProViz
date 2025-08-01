@@ -1,0 +1,18 @@
+ID,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,Metabolites_in_pathway,Count,Metabolites_in_Pathway,percentage_of_Pathway_detected
+Fatty acyl carnitines,3/13,10/176,0.3,4.061538461538461,2.8072595894876047,0.028135762530561294,0.16881457518336776,0.1480829606871647,isovalerylcarnitine/malonylcarnitine C3-DC/methylmalonylcarnitine C3-DC-M/succinylcarnitine C4-DC,3,11,27.27
+Cysteine and methionine metabolism,2/13,7/176,0.2857142857142857,3.868131868131868,2.180728909697825,0.08581345901500535,0.25744037704501604,0.22582489214475093,cysteic acid/S-adenosylmethionine,2,8,25
+Citrate cycle (TCA cycle),2/13,10/176,0.2,2.707692307692308,1.5658583639855483,0.16180517763705546,0.2638005721352863,0.231404010644988,2-ketoglutarate/mesaconate,2,10,20
+Not assigned,4/13,31/176,0.12903225806451613,1.7468982630272953,1.29019452183226,0.17586704809019088,0.2638005721352863,0.231404010644988,hypotaurine/myo-inositol/N-acetylneuramic acid/taurine,4,38,10.53
+Pentose phosphate pathway,1/13,4/176,0.25,3.3846153846153846,1.358566846068802,0.26632721474260246,0.31959265769112294,0.2803444365711605,deoxyribose 5-phosphate,1,4,25
+Pyrimidine metabolism,1/13,18/176,0.05555555555555555,0.752136752136752,-0.3125480139125789,0.7667684643434708,0.7667684643434708,0.6726039160907639,orotidine,1,18,5.56
+"Alanine, aspartate and glutamate metabolism",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Amino acid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,35,0
+Arginine and proline metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Fatty acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Glutathione metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Purine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,23,0
+"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0

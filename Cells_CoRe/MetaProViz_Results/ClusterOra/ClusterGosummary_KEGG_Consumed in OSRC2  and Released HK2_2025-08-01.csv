@@ -1,0 +1,447 @@
+ID,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,Metabolites_in_pathway,Count,Metabolites_in_Pathway,percentage_of_Pathway_detected
+2-Oxocarboxylic acid metabolism,7/21,15/52,0.4666666666666667,1.1555555555555554,0.5821624400930056,0.38855346389047407,0.9890183906307293,0.9890183906307294,L-Alanine/L-Methionine/N-Acetyl-L-glutamate/L-Ornithine/L-Phenylalanine/Pyruvate/L-Tryptophan,7,144,4.86
+ABC transporters,4/21,18/52,0.2222222222222222,0.5502645502645502,-1.9233919943560367,0.9890183906307293,0.9890183906307293,0.9890183906307294,L-Alanine/L-Cystine/L-Ornithine/L-Phenylalanine,4,129,3.1
+"Alanine, aspartate and glutamate metabolism",5/21,11/52,0.45454545454545453,1.1255411255411256,0.38221200228853397,0.47884518456824454,0.9890183906307293,0.9890183906307294,L-Alanine/Carbamoyl phosphate/Fumarate/N-Acetyl-L-aspartate/Pyruvate,5,27,18.52
+Aminoacyl-tRNA biosynthesis,4/21,17/52,0.23529411764705882,0.5826330532212884,-1.709709714378176,0.9807531828748082,0.9890183906307293,0.9890183906307294,L-Alanine/L-Methionine/L-Phenylalanine/L-Tryptophan,4,52,7.69
+Arginine and proline metabolism,3/21,7/52,0.42857142857142855,1.0612244897959182,0.14193249144011708,0.5980643356752076,0.9890183906307293,0.9890183906307294,Creatinine/L-Ornithine/Pyruvate,3,70,4.29
+Arginine biosynthesis,4/21,11/52,0.36363636363636365,0.9004329004329005,-0.30313365698745826,0.7393921189584627,0.9890183906307293,0.9890183906307294,Carbamoyl phosphate/Fumarate/N-Acetyl-L-glutamate/L-Ornithine,4,21,19.05
+Ascorbate and aldarate metabolism,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Pyruvate,1,57,1.75
+Bile secretion,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Acetylcholine,1,90,1.11
+Biosynthesis of alkaloids derived from histidine and purine,4/21,9/52,0.4444444444444444,1.1005291005291005,0.27032904627109217,0.5332284356009663,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/Pyruvate,4,35,11.43
+"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",6/21,13/52,0.46153846153846156,1.1428571428571428,0.484791750625621,0.43131125605022436,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/L-Ornithine/L-Phenylalanine/Pyruvate,6,67,8.96
+Biosynthesis of alkaloids derived from shikimate pathway,6/21,11/52,0.5454545454545454,1.3506493506493504,1.0675576615645261,0.23080450302875724,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/L-Phenylalanine/Pyruvate/L-Tryptophan,6,143,4.2
+Biosynthesis of alkaloids derived from terpenoid and polyketide,4/21,7/52,0.5714285714285714,1.4149659863945576,0.9619868864274609,0.28525955461527075,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/Pyruvate,4,48,8.33
+Biosynthesis of amino acids,8/21,24/52,0.3333333333333333,0.8253968253968254,-0.9501509991680798,0.8933607926137583,0.9890183906307293,0.9890183906307294,L-Alanine/Carbamoyl phosphate/L-Methionine/N-Acetyl-L-glutamate/L-Ornithine/L-Phenylalanine/Pyruvate/L-Tryptophan,8,126,6.35
+Biosynthesis of cofactors,5/21,15/52,0.3333333333333333,0.8253968253968254,-0.6534476368390877,0.834060849753546,0.9890183906307293,0.9890183906307294,Carbamoyl phosphate/(S)-Dihydroorotate/L-Methionine/Pyruvate/L-Tryptophan,5,329,1.52
+Biosynthesis of phenylpropanoids,6/21,9/52,0.6666666666666666,1.6507936507936507,1.750024878491807,0.08278955087465727,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/L-Phenylalanine/Pyruvate/L-Tryptophan,6,106,5.66
+Biosynthesis of plant hormones,7/21,11/52,0.6363636363636364,1.575757575757576,1.7529033208405185,0.07816408361984176,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/L-Methionine/L-Phenylalanine/Pyruvate/L-Tryptophan,7,68,10.29
+Biosynthesis of plant secondary metabolites,10/21,29/52,0.3448275862068966,0.8538587848932677,-0.9645431996382455,0.8958728226025263,0.9890183906307293,0.9890183906307294,L-Alanine/Fumarate/alpha-D-Glucose/Linoleate/(S)-Malate/L-Methionine/L-Ornithine/L-Phenylalanine/Pyruvate/L-Tryptophan,10,141,7.09
+Biosynthesis of secondary metabolites,13/21,34/52,0.38235294117647056,0.9467787114845938,-0.4299346810913489,0.7682196434564859,0.9890183906307293,0.9890183906307294,L-Alanine/Carbamoyl phosphate/Fumarate/D-Gluconic acid/alpha-D-Glucose/(S)-Lactate/(S)-Malate/L-Methionine/N-Acetyl-L-glutamate/L-Ornithine/L-Phenylalanine/Pyruvate/L-Tryptophan,13,2307,0.56
+Biosynthesis of terpenoids and steroids,4/21,7/52,0.5714285714285714,1.4149659863945576,0.9619868864274609,0.28525955461527075,0.9890183906307293,0.9890183906307294,Fumarate/alpha-D-Glucose/(S)-Malate/Pyruvate,4,98,4.08
+Biosynthesis of unsaturated fatty acids,1/21,4/52,0.25,0.6190476190476191,-0.6463890008341615,0.8837750484809308,0.9890183906307293,0.9890183906307294,Linoleate,1,74,1.35
+Biosynthesis of various antibiotics,2/21,8/52,0.25,0.6190476190476191,-0.954779830383817,0.9161374077845754,0.9890183906307293,0.9890183906307294,L-Ornithine/Pyruvate,2,101,1.98
+Biosynthesis of various other secondary metabolites,5/21,11/52,0.45454545454545453,1.1255411255411256,0.38221200228853397,0.47884518456824454,0.9890183906307293,0.9890183906307294,L-Alanine/L-Ornithine/L-Phenylalanine/Pyruvate/L-Tryptophan,5,64,7.81
+Biosynthesis of various plant secondary metabolites,3/21,5/52,0.6,1.4857142857142858,0.9311739946616585,0.31717840982546863,0.9890183906307293,0.9890183906307294,L-Methionine/L-Phenylalanine/L-Tryptophan,3,148,2.03
+Butanoate metabolism,2/21,6/52,0.3333333333333333,0.8253968253968254,-0.3706489153451511,0.7885695030876507,0.9890183906307293,0.9890183906307294,Fumarate/Pyruvate,2,47,4.26
+C5-Branched dibasic acid metabolism,1/21,5/52,0.2,0.49523809523809526,-0.967690621903292,0.9346234647705236,0.9890183906307293,0.9890183906307294,Pyruvate,1,35,2.86
+cAMP signaling pathway,2/21,3/52,0.6666666666666666,1.6507936507936507,0.9464981797928793,0.35475113122171953,0.9890183906307293,0.9890183906307294,Acetylcholine/(S)-Lactate,2,19,10.53
+Carbon fixation by Calvin cycle,3/21,4/52,0.75,1.8571428571428572,1.4543752518768633,0.17440206851971551,0.9890183906307293,0.9890183906307294,L-Alanine/(S)-Malate/Pyruvate,3,19,15.79
+Carbon metabolism,7/21,13/52,0.5384615384615384,1.3333333333333333,1.1311807514597825,0.20660541214685593,0.9890183906307293,0.9890183906307294,L-Alanine/Carbamoyl phosphate/Fumarate/D-Gluconic acid/alpha-D-Glucose/(S)-Malate/Pyruvate,7,113,6.19
+Central carbon metabolism in cancer,8/21,21/52,0.38095238095238093,0.9433106575963719,-0.2742484035538724,0.7127350368259843,0.9890183906307293,0.9890183906307294,L-Alanine/Fumarate/(S)-Lactate/(S)-Malate/L-Methionine/L-Phenylalanine/Pyruvate/L-Tryptophan,8,36,22.22
+Citrate cycle (TCA cycle),3/21,6/52,0.5,1.2380952380952381,0.5054303391070246,0.46400514379237767,0.9890183906307293,0.9890183906307294,Fumarate/(S)-Malate/Pyruvate,3,20,15
+Cyanoamino acid metabolism,1/21,7/52,0.14285714285714285,0.3537414965986394,-1.4981762985345706,0.9803447049495099,0.9890183906307293,0.9890183906307294,L-Phenylalanine,1,44,2.27
+Cysteine and methionine metabolism,4/21,6/52,0.6666666666666666,1.6507936507936507,1.3815095935592003,0.17035167585855948,0.9890183906307293,0.9890183906307294,L-Alanine/L-Cystine/L-Methionine/Pyruvate,4,68,5.88
+D-Amino acid metabolism,6/21,17/52,0.35294117647058826,0.8739495798319329,-0.5163552828658919,0.7936501464819976,0.9890183906307293,0.9890183906307294,L-Alanine/L-Methionine/N-Acetyl-L-glutamate/L-Ornithine/L-Phenylalanine/Pyruvate,6,69,8.7
+Degradation of aromatic compounds,2/21,3/52,0.6666666666666666,1.6507936507936507,0.9464981797928793,0.35475113122171953,0.9890183906307293,0.9890183906307294,Fumarate/Pyruvate,2,262,0.76
+Efferocytosis,3/21,4/52,0.75,1.8571428571428572,1.4543752518768633,0.17440206851971551,0.9890183906307293,0.9890183906307294,(S)-Lactate/L-Methionine/L-Ornithine,3,20,15
+Folate transport and metabolism,2/21,3/52,0.6666666666666666,1.6507936507936507,0.9464981797928793,0.35475113122171953,0.9890183906307293,0.9890183906307294,Acetylcholine/L-Methionine,2,19,10.53
+Glucagon signaling pathway,4/21,6/52,0.6666666666666666,1.6507936507936507,1.3815095935592003,0.17035167585855948,0.9890183906307293,0.9890183906307294,Fumarate/(S)-Lactate/(S)-Malate/Pyruvate,4,25,16
+Glucosinolate biosynthesis,3/21,5/52,0.6,1.4857142857142858,0.9311739946616585,0.31717840982546863,0.9890183906307293,0.9890183906307294,L-Methionine/L-Phenylalanine/L-Tryptophan,3,77,3.9
+Glutathione metabolism,1/21,4/52,0.25,0.6190476190476191,-0.6463890008341615,0.8837750484809308,0.9890183906307293,0.9890183906307294,L-Ornithine,1,37,2.7
+"Glycine, serine and threonine metabolism",2/21,8/52,0.25,0.6190476190476191,-0.954779830383817,0.9161374077845754,0.9890183906307293,0.9890183906307294,Pyruvate/L-Tryptophan,2,46,4.35
+Glycolysis / Gluconeogenesis,3/21,3/52,1,2.4761904761904763,2.1469348956277505,0.060180995475113123,0.9890183906307293,0.9890183906307294,alpha-D-Glucose/(S)-Lactate/Pyruvate,3,31,9.68
+Glyoxylate and dicarboxylate metabolism,2/21,9/52,0.2222222222222222,0.5502645502645502,-1.2093667859496227,0.9494918478702556,0.9890183906307293,0.9890183906307294,(S)-Malate/Pyruvate,2,60,3.33
+HIF-1 signaling pathway,2/21,3/52,0.6666666666666666,1.6507936507936507,0.9464981797928793,0.35475113122171953,0.9890183906307293,0.9890183906307294,(S)-Lactate/Pyruvate,2,10,20
+Lipoic acid metabolism,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Pyruvate,1,42,2.38
+Metabolic pathways,19/21,49/52,0.3877551020408163,0.9601554907677355,-0.9464981797928812,0.9398190045248869,0.9890183906307293,0.9890183906307294,L-Alanine/Carbamoyl phosphate/Creatinine/L-Cystine/(S)-Dihydroorotate/Fumarate/D-Gluconic acid/alpha-D-Glucose/Hypoxanthine/(S)-Lactate/Linoleate/(S)-Malate/L-Methionine/N-Acetyl-L-aspartate/N-Acetyl-L-glutamate/L-Ornithine/L-Phenylalanine/Pyruvate/L-Tryptophan,19,3128,0.61
+Methane metabolism,2/21,5/52,0.4,0.9904761904761905,-0.018258313620816768,0.6803813833225598,0.9890183906307293,0.9890183906307294,(S)-Malate/Pyruvate,2,87,2.3
+Microbial metabolism in diverse environments,9/21,22/52,0.4090909090909091,1.012987012987013,0.06536930631902138,0.5858028964541678,0.9890183906307293,0.9890183906307294,L-Alanine/Carbamoyl phosphate/Fumarate/D-Gluconic acid/alpha-D-Glucose/(S)-Lactate/(S)-Malate/L-Methionine/Pyruvate,9,1091,0.82
+Mineral absorption,4/21,11/52,0.36363636363636365,0.9004329004329005,-0.30313365698745826,0.7393921189584627,0.9890183906307293,0.9890183906307294,L-Alanine/L-Methionine/L-Phenylalanine/L-Tryptophan,4,18,22.22
+Monobactam biosynthesis,1/21,6/52,0.16666666666666666,0.4126984126984127,-1.246728169797327,0.9638342571070981,0.9890183906307293,0.9890183906307294,Pyruvate,1,39,2.56
+Neuroactive ligand-receptor interaction,1/21,5/52,0.2,0.49523809523809526,-0.967690621903292,0.9346234647705236,0.9890183906307293,0.9890183906307294,Acetylcholine,1,53,1.89
+Nicotinate and nicotinamide metabolism,2/21,4/52,0.5,1.2380952380952381,0.4039931255213509,0.5351001939237232,0.9890183906307293,0.9890183906307294,Fumarate/Pyruvate,2,55,3.64
+Nitrogen metabolism,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Carbamoyl phosphate,1,13,7.69
+Nucleotide metabolism,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Hypoxanthine,1,58,1.72
+One carbon pool by folate,1/21,4/52,0.25,0.6190476190476191,-0.6463890008341615,0.8837750484809308,0.9890183906307293,0.9890183906307294,L-Methionine,1,26,3.85
+Other carbon fixation pathways,3/21,6/52,0.5,1.2380952380952381,0.5054303391070246,0.46400514379237767,0.9890183906307293,0.9890183906307294,Fumarate/(S)-Malate/Pyruvate,3,42,7.14
+Pantothenate and CoA biosynthesis,1/21,4/52,0.25,0.6190476190476191,-0.6463890008341615,0.8837750484809308,0.9890183906307293,0.9890183906307294,Pyruvate,1,30,3.33
+Pathways of neurodegeneration - multiple diseases,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Acetylcholine,1,23,4.35
+Phenylalanine metabolism,3/21,5/52,0.6,1.4857142857142858,0.9311739946616585,0.31717840982546863,0.9890183906307293,0.9890183906307294,Fumarate/L-Phenylalanine/Pyruvate,3,49,6.12
+"Phenylalanine, tyrosine and tryptophan biosynthesis",2/21,3/52,0.6666666666666666,1.6507936507936507,0.9464981797928793,0.35475113122171953,0.9890183906307293,0.9890183906307294,L-Phenylalanine/L-Tryptophan,2,35,5.71
+Protein digestion and absorption,5/21,18/52,0.2777777777777778,0.6878306878306878,-1.3350603254941902,0.9518249557290843,0.9890183906307293,0.9890183906307294,L-Alanine/L-Cystine/L-Methionine/L-Phenylalanine/L-Tryptophan,5,40,12.5
+Proximal tubule bicarbonate reclamation,2/21,5/52,0.4,0.9904761904761905,-0.018258313620816768,0.6803813833225598,0.9890183906307293,0.9890183906307294,alpha-D-Glucose/(S)-Malate,2,9,22.22
+Purine metabolism,2/21,6/52,0.3333333333333333,0.8253968253968254,-0.3706489153451511,0.7885695030876507,0.9890183906307293,0.9890183906307294,Carbamoyl phosphate/Hypoxanthine,2,98,2.04
+Pyrimidine metabolism,2/21,4/52,0.5,1.2380952380952381,0.4039931255213509,0.5351001939237232,0.9890183906307293,0.9890183906307294,Carbamoyl phosphate/(S)-Dihydroorotate,2,66,3.03
+Pyruvate metabolism,4/21,5/52,0.8,1.980952380952381,1.8806063029441338,0.07921784098254693,0.9890183906307293,0.9890183906307294,Fumarate/(S)-Lactate/(S)-Malate/Pyruvate,4,32,12.5
+Staurosporine biosynthesis,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,L-Tryptophan,1,48,2.08
+Sulfur metabolism,1/21,4/52,0.25,0.6190476190476191,-0.6463890008341615,0.8837750484809308,0.9890183906307293,0.9890183906307294,L-Methionine,1,44,2.27
+Synaptic vesicle cycle,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Acetylcholine,1,10,10
+Taste transduction,2/21,3/52,0.6666666666666666,1.6507936507936507,0.9464981797928793,0.35475113122171953,0.9890183906307293,0.9890183906307294,Acetylcholine/(S)-Malate,2,28,7.14
+Taurine and hypotaurine metabolism,2/21,5/52,0.4,0.9904761904761905,-0.018258313620816768,0.6803813833225598,0.9890183906307293,0.9890183906307294,L-Alanine/Pyruvate,2,24,8.33
+Thiamine metabolism,1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Pyruvate,1,31,3.23
+Two-component system,3/21,7/52,0.42857142857142855,1.0612244897959182,0.14193249144011708,0.5980643356752076,0.9890183906307293,0.9890183906307294,Fumarate/(S)-Malate/Pyruvate,3,45,6.67
+Tyrosine metabolism,2/21,4/52,0.5,1.2380952380952381,0.4039931255213509,0.5351001939237232,0.9890183906307293,0.9890183906307294,Fumarate/Pyruvate,2,78,2.56
+"Valine, leucine and isoleucine biosynthesis",1/21,3/52,0.3333333333333333,0.8253968253968254,-0.2539385360419919,0.7966063348416289,0.9890183906307293,0.9890183906307294,Pyruvate,1,23,4.35
+Vancomycin resistance,2/21,4/52,0.5,1.2380952380952381,0.4039931255213509,0.5351001939237232,0.9890183906307293,0.9890183906307294,L-Alanine/Pyruvate,2,24,8.33
+"1,2-Diphenyl substitution family",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Acarbose and validamycin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,36,0
+Acute myeloid leukemia,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Adipocytokine signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Adrenergic signaling in cardiomyocytes,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Aflatoxin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,27,0
+African trypanosomiasis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+AGE-RAGE signaling pathway in diabetic complications,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Alcoholic liver disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Alcoholism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Aldosterone-regulated sodium reabsorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Aldosterone synthesis and secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,19,0
+alpha-Linolenic acid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,44,0
+Alzheimer disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Amino sugar and nucleotide sugar metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,73,0
+Aminobenzoate degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,86,0
+Amoebiasis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Amphetamine addiction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+AMPK signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,19,0
+Amyotrophic lateral sclerosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Angiotensin receptor and endothelin receptor antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Anthocyanin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,66,0
+Anti-HIV agents,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Antiarrhythmic drugs,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Anticonvulsants,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Antifolate resistance,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,17,0
+Antifungal agents,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Antineoplastics - agents from natural products,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Antineoplastics - alkylating agents,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Anxiolytics,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Apelin signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Apoptosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Apoptosis - fly,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Arabinogalactan biosynthesis - Mycobacterium,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Arachidonic acid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,79,0
+Asthma,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Atrazine degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,22,0
+Autoimmune thyroid disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Autophagy - animal,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Autophagy - other,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Autophagy - yeast,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Axon regeneration,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+B cell receptor signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Bacterial chemotaxis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Bacterial secretion system,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Basal cell carcinoma,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Benzoate degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,77,0
+Benzodiazepine family,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Benzoic acid family,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Benzoxazinoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+beta-Adrenergic receptor agonists/antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+beta-Alanine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+beta-Lactam resistance,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Betalain biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,23,0
+Biofilm formation - Escherichia coli,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Biofilm formation - Pseudomonas aeruginosa,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Biofilm formation - Vibrio cholerae,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+"Biosynthesis of 12-, 14- and 16-membered macrolides",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,87,0
+Biosynthesis of ansamycins,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+Biosynthesis of enediyne antibiotics,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,63,0
+Biosynthesis of nucleotide sugars,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,190,0
+Biosynthesis of siderophore group nonribosomal peptides,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Biosynthesis of type II polyketide backbone,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Biosynthesis of type II polyketide products,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,138,0
+Biosynthesis of vancomycin group antibiotics,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,19,0
+Biosynthesis of various alkaloids,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,77,0
+Biosynthesis of various nucleotide sugars,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,111,0
+Biotin metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,29,0
+Bisphenol degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,25,0
+Brassinosteroid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,29,0
+Breast cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+C-type lectin receptor signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Caffeine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,22,0
+Calcium signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Caprolactam degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,26,0
+Carbapenem biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+Carbohydrate digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,22,0
+Carotenoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,123,0
+Catecholamine transferase inhibitors,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Cationic antimicrobial peptide (CAMP) resistance,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,13,0
+Cell cycle - Caulobacter,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Cell cycle - yeast,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Cellular senescence,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Cephalosporins - oral agents,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Cephalosporins - parenteral agents,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+cGMP-PKG signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Chagas disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Chemical carcinogenesis - DNA adducts,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,76,0
+Chemical carcinogenesis - reactive oxygen species,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,49,0
+Chemical carcinogenesis - receptor activation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,28,0
+Chemokine signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Chloroalkane and chloroalkene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,42,0
+Chlorocyclohexane and chlorobenzene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,82,0
+Cholesterol metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Choline metabolism in cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Cholinergic and anticholinergic drugs,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Cholinergic synapse,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Chronic myeloid leukemia,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Circadian entrainment,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Circadian rhythm,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Clavulanic acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Cobalamin transport and metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,14,0
+Cocaine addiction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Collecting duct acid secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Colorectal cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Complement and coagulation cascades,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,31,0
+Coronavirus disease - COVID-19,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Cortisol synthesis and secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Cushing syndrome,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+"Cutin, suberine and wax biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,27,0
+Cytosolic DNA-sensing pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Degradation of flavonoids,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,40,0
+Diabetic cardiomyopathy,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+Dilated cardiomyopathy,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Dioxin degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,65,0
+Diterpenoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,114,0
+Dopaminergic synapse,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Drug metabolism - cytochrome P450,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,87,0
+Drug metabolism - other enzymes,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,52,0
+EGFR tyrosine kinase inhibitor resistance,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Eicosanoids,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Endocrine and other factor-regulated calcium reabsorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Endocrine resistance,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Endocytosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Endometrial cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Epithelial cell signaling in Helicobacter pylori infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Epstein-Barr virus infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+ErbB signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Estrogen signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Ether lipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,25,0
+Ethylbenzene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,14,0
+Fat digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,12,0
+Fatty acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,58,0
+Fatty acid degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,49,0
+Fatty acid elongation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,39,0
+Fatty acid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,122,0
+Fc epsilon RI signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Fc gamma R-mediated phagocytosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Ferroptosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,25,0
+Flavone and flavonol biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,49,0
+Flavonoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,73,0
+Fluid shear stress and atherosclerosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Fluorobenzoate degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+Focal adhesion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Folate biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,58,0
+FoxO signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Fructose and mannose metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,55,0
+Furfural degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+GABA-A receptor agonists/antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+GABAergic synapse,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Galactose metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,46,0
+Gap junction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Gastric acid secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Gastric cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Glioma,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Glucocorticoid and mineralocorticoid receptor agonists/antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Glutamatergic synapse,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Glycerolipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,37,0
+Glycerophospholipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,56,0
+Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Glycosaminoglycan biosynthesis - heparan sulfate / heparin,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Glycosaminoglycan degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Glycosylphosphatidylinositol (GPI)-anchor biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,16,0
+GnRH secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+GnRH signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Graft-versus-host disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+"Growth hormone synthesis, secretion and action",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Hedgehog signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Hepatitis C,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Hepatocellular carcinoma,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Herpes simplex virus 1 infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Histamine H1 receptor antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Histamine H2/H3 receptor agonists/antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Histidine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,47,0
+HIV protease inhibitors,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+HMG-CoA reductase inhibitors,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Hormone signaling,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,17,0
+Human cytomegalovirus infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Human immunodeficiency virus 1 infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Human papillomavirus infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Human T-cell leukemia virus 1 infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Huntington disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Hypertrophic cardiomyopathy,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Hypnotics,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Indole alkaloid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,102,0
+Indole diterpene alkaloid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,33,0
+Inflammatory mediator regulation of TRP channels,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+Influenza A,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Inositol phosphate metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,47,0
+Insect hormone biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,25,0
+Insulin resistance,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,17,0
+Insulin secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Insulin signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Intestinal immune network for IgA production,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Isoflavonoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,64,0
+Isoquinoline alkaloid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,131,0
+Kaposi sarcoma-associated herpesvirus infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Legionellosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Leishmaniasis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Leukocyte transendothelial migration,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Limonene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,47,0
+Linoleic acid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,29,0
+Lipid and atherosclerosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Lipoarabinomannan (LAM) biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Lipopolysaccharide biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,43,0
+Local analgesics,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Long-term depression,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Long-term potentiation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Longevity regulating pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Longevity regulating pathway - multiple species,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Longevity regulating pathway - worm,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Lysine biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,35,0
+Lysine degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,56,0
+Lysosome,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Malaria,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Mannose type O-glycan biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+MAPK signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Measles,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Meiosis - yeast,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Melanogenesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Melanoma,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Metabolism of xenobiotics by cytochrome P450,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,121,0
+Mitophagy - animal,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Monoterpenoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,61,0
+Morphine addiction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+mTOR signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Mucin type O-glycan biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Mycolic acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,34,0
+N-Glycan biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+N-Methyl-D-aspartic acid (NMDA) receptor antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Naphthalene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,60,0
+Naphthalene family,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Natural killer cell mediated cytotoxicity,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Necroptosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+"Neomycin, kanamycin and gentamicin biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,81,0
+Neurotrophin signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Neutrophil extracellular trap formation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+NF-kappa B signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Nicotine addiction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Nicotinic cholinergic receptor antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Nitrogen cycle,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Nitrotoluene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,27,0
+NOD-like receptor signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Non-alcoholic fatty liver disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Non-small cell lung cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Nonribosomal peptide structures,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,17,0
+Notch signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Novobiocin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,32,0
+Olfactory transduction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Oocyte meiosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Opioid analgesics,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Opioid receptor agonists/antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Osteoclast differentiation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Ovarian steroidogenesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Oxytocin signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Pancreatic cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Pancreatic secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+"Parathyroid hormone synthesis, secretion and action",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Parkinson disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,19,0
+Pathogenic Escherichia coli infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Pathways in cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,26,0
+PD-L1 expression and PD-1 checkpoint pathway in cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Penicillin and cephalosporin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,18,0
+Penicillins,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Pentose and glucuronate interconversions,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,59,0
+Pentose phosphate pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,37,0
+Peptidoglycan biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,27,0
+Peroxisome proliferator-activated receptor (PPAR) agonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Pertussis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Phagosome,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Phenazine biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,31,0
+Phenylpropanoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,58,0
+Phosphatidylinositol signaling system,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,28,0
+Phospholipase D signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Phosphonate and phosphinate metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,57,0
+Phosphotransferase system (PTS),NA,NA,NA,NA,NA,NA,NA,NA,NA,0,57,0
+Photosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Phototransduction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Phototransduction - fly,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+PI3K-Akt signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+"Pinene, camphor and geraniol degradation",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,55,0
+Plant hormone signal transduction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,13,0
+Platelet activation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,12,0
+Polycyclic aromatic hydrocarbon degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,107,0
+Polyketide sugar unit biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,58,0
+Porphyrin metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,145,0
+Potassium channel blocking and opening drugs,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+PPAR signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Primary bile acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,47,0
+Prion disease,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Prodigiosin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,18,0
+Progesterone-mediated oocyte maturation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+"Progesterone, androgen and estrogen receptor agonists/antagonists",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Prolactin signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Propanoate metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,42,0
+Prostaglandins,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Prostate cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Proteoglycans in cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Quinolones,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Quorum sensing,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,54,0
+Rap1 signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Ras signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Regulation of actin cytoskeleton,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Regulation of lipolysis in adipocytes,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,13,0
+Relaxin signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Renal cell carcinoma,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Renin-angiotensin system,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Renin-angiotensin system inhibitors,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Renin secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,12,0
+Retinol metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Retrograde endocannabinoid signaling,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,16,0
+Rheumatoid arthritis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Riboflavin metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Rifamycins,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+RIG-I-like receptor signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Salivary secretion,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Salmonella infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,5,0
+Secondary bile acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,36,0
+Selenocompound metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,27,0
+Serotonergic synapse,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,39,0
+Serotonin receptor agonists/antagonists,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Sesquiterpenoid and triterpenoid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,89,0
+Shigellosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,12,0
+Small cell lung cancer,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Sphingolipid metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,35,0
+Sphingolipid signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,14,0
+Spinocerebellar ataxia,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Staphylococcus aureus infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Starch and sucrose metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,37,0
+Steroid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,57,0
+Steroid degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,18,0
+Steroid hormone biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,101,0
+"Stilbenoid, diarylheptanoid and gingerol biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,26,0
+Streptomycin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Styrene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,24,0
+Sulfonamide derivatives - overview,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Sulfonamide derivatives - sulfa drugs,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Sulfur cycle,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,16,0
+Sulfur relay system,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Systemic lupus erythematosus,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+T cell receptor signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Teichoic acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,12,0
+Terpenoid backbone biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,47,0
+Tetracycline biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,21,0
+Th1 and Th2 cell differentiation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Th17 cell differentiation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Thermogenesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,21,0
+Thyroid hormone signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,7,0
+Thyroid hormone synthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,15,0
+Toluene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,47,0
+Toxoplasmosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+"Tropane, piperidine and pyridine alkaloid biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,72,0
+Tryptophan metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,83,0
+Tuberculosis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,8,0
+Type I polyketide structures,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,25,0
+Type II diabetes mellitus,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Ubiquinone and other terpenoid-quinone biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,74,0
+"Valine, leucine and isoleucine degradation",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,42,0
+Vascular smooth muscle contraction,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,13,0
+Vasopressin-regulated water reabsorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+VEGF signaling pathway,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Vibrio cholerae infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Virion - Flavivirus and Alphavirus,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Virion - Hepatitis viruses,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Virion - Human immunodeficiency virus,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,1,0
+Virion - Orthopoxvirus,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Vitamin B6 metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,29,0
+Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,39,0
+Xylene degradation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,38,0
+Yersinia infection,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,4,0
+Zeatin biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,39,0

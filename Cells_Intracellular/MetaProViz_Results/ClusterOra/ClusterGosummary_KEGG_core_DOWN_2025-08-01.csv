@@ -1,0 +1,18 @@
+ID,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,Metabolites_in_pathway,Count,Metabolites_in_Pathway,percentage_of_Pathway_detected
+Glycerophospholipid metabolism,6/33,9/176,0.6666666666666666,3.5555555555555554,3.7701299622748827,0.001582335407123767,0.014241018664113904,0.011659313526175127,CDP-ethanolamine/citicoline/glycerol 3-phosphate/glycerophosphoethanolamine/phosphoethanolamine/phosphorylcholine,6,9,66.67
+Amino acid metabolism,12/33,32/176,0.375,2,2.99572344757639,0.004539282879137665,0.020426772956119492,0.01672367376524403,alanine/asparagine/glycine/methionine/N-acetylarginine/N-acetylglutamate/N-acetylglutamine/N-acetylmethionine/ornithine/serine/threonine/trans-4-hydroxyproline,12,35,34.29
+"Alanine, aspartate and glutamate metabolism",2/33,3/176,0.6666666666666666,3.5555555555555554,2.1386064776211673,0.09064039408866999,0.27192118226601,0.222625529340593,N-acetylaspartate/N-acetylaspartylglutamate,2,3,66.67
+Arginine and proline metabolism,2/33,6/176,0.3333333333333333,1.7777777777777777,0.9285700473473006,0.3134771723101877,0.7013327117206063,0.5741905242157012,4-guanidinobutanoate/phosphocreatine,2,7,28.57
+Cysteine and methionine metabolism,2/33,7/176,0.2857142857142857,1.5238095238095237,0.6774652660984456,0.3896292842892257,0.7013327117206063,0.5741905242157012,cystathionine/ophthalmate,2,8,25
+Glutathione metabolism,2/33,9/176,0.2222222222222222,1.1851851851851851,0.2731978233532524,0.5297886518426425,0.729848515048834,0.5975367959464138,glutathione oxidized/succinylglutathione,2,10,20
+Pentose phosphate pathway,1/33,4/176,0.25,1.3333333333333333,0.3230371671027275,0.567659956149093,0.729848515048834,0.5975367959464138,gluconate,1,4,25
+Not assigned,5/33,31/176,0.16129032258064516,0.8602150537634409,-0.4107383225313256,0.7401652007651838,0.8326858508608317,0.6817311059679324,CMP-2-aminoethylphosphonate/glycerophosphoinositol/hexosamine phosphate/S-(2-succinyl)cysteine/tetradecanoylcarnitine C14,5,38,13.16
+Pyrimidine metabolism,1/33,18/176,0.05555555555555555,0.2962962962962963,-1.5094040863937712,0.9808281448518001,0.9808281448518001,0.8030171946155089,beta-alanine,1,18,5.56
+Citrate cycle (TCA cycle),NA,NA,NA,NA,NA,NA,NA,NA,NA,0,10,0
+Fatty acid biosynthesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0
+Fatty acyl carnitines,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,11,0
+Glycolysis / Gluconeogenesis,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,9,0
+Oxidative phosphorylation,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,2,0
+Purine metabolism,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,23,0
+"Valine, leucine and isoleucine biosynthesis",NA,NA,NA,NA,NA,NA,NA,NA,NA,0,6,0
+Vitamin digestion and absorption,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,3,0

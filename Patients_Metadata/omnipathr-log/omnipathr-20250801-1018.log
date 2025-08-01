@@ -1,0 +1,149 @@
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] Reading JSON from `C:\Users\chris\AppData\Local\Cache\OmnipathR/cache.json` (encoding: UTF-8).
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Initialized cache: `C:\Users\chris\AppData\Local\Cache\OmnipathR`.
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Package `OmnipathR` packaged: 2025-04-03 09:27:23 UTC; chris
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Package `OmnipathR` date/publication: NA
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Package `OmnipathR` built: R 4.4.3; ; 2025-04-03 09:27:24 UTC; windows
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Package `OmnipathR` version: 3.15.12
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Package `OmnipathR` repository: NA
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Session info: [version=R version 4.4.3 (2025-02-28 ucrt); os=Windows 10 x64 (build 19045); system=x86_64, mingw32; ui=RTerm; language=(EN); collate=English_United Kingdom.utf8; ctype=English_United Kingdom.utf8; tz=Europe/Berlin; date=2025-08-01; pandoc=3.2 @ C:/PROGRA~1/RStudio/RESOUR~1/app/bin/quarto/bin/tools/ (via rmarkdown); quarto=NA]
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] External libraries: [cairo=1.18.2; cairoFT=; pango=; png=1.6.45; jpeg=9.6; tiff=LIBTIFF, Version 4.7.0; tcl=8.6.13; curl=8.11.1; zlib=1.3.1; bzlib=1.0.8, 13-Jul-2019; xz=5.6.3; deflate=1.23; PCRE=10.44 2024-06-07; ICU=76.1; TRE=TRE 0.8.0 R_fixes (BSD); iconv=win_iconv; readline=; BLAS=; lapack=; lapack_version=3.12.0]
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] Loaded packages: backports 1.5.0(2024-05-23); BiocManager 1.30.26(2025-06-05); bit 4.6.0(2025-03-06); bit64 4.6.0-1(2025-01-16); blob 1.2.4(2023-03-17); bslib 0.9.0(2025-01-30); cachem 1.1.0(2024-05-16); cellranger 1.1.0(2016-07-27); checkmate 2.3.2(2024-07-29); cli 3.6.4(2025-02-13); colorspace 2.1-1(2024-07-26); ComplexUpset 1.3.3(2021-12-11); crayon 1.5.3(2024-06-20); curl 6.3.0(2025-06-06); DBI 1.2.3(2024-06-02); digest 0.6.37(2024-08-19); dplyr 1.1.4(2023-11-17); evaluate 1.0.4(2025-06-18); farver 2.1.2(2024-05-13); fastmap 1.2.0(2024-05-15); fs 1.6.6(2025-04-12); generics 0.1.4(2025-05-09); ggplot2 3.5.2(2025-04-09); glue 1.8.0(2024-09-30); gtable 0.3.6(2024-10-25); hms 1.1.3(2023-03-21); htmltools 0.5.8.1(2024-04-04); httr 1.4.7(2023-08-15); httr2 1.1.2(2025-03-26); igraph 2.1.4(2025-01-23); jquerylib 0.1.4(2021-04-26); jsonlite 2.0.0(2025-03-27); knitr 1.50(2025-03-16); later 1.4.2(2025-04-08); lifecycle 1.0.4(2023-11-07); logger 0.4.0(2024-10-22); lubridate 1.9.4(2024-12-08); magrittr 2.0.3(2022-03-30); memoise 2.0.1(2021-11-26); MetaProViz 3.0.3(2025-07-31); OmnipathR 3.15.12(2025-04-03); patchwork 1.3.0(2024-09-16); pillar 1.10.2(2025-04-05); pkgconfig 2.0.3(2019-09-22); prettyunits 1.2.0(2023-09-24); progress 1.2.3(2023-12-06); purrr 1.1.0(2025-07-10); R.methodsS3 1.8.2(2022-06-13); R.oo 1.27.1(2025-05-02); R.utils 2.13.0(2025-02-24); R6 2.6.1(2025-02-15); rappdirs 0.3.3(2021-01-31); RColorBrewer 1.1-3(2022-04-03); Rcpp 1.0.14(2025-01-12); readr 2.1.5(2024-01-10); readxl 1.4.5(2025-03-07); renv 1.1.5(2025-07-24); rlang 1.1.6(2025-04-11); rmarkdown 2.29(2024-11-04); RSQLite 2.4.1(2025-06-08); rvest 1.0.4(2024-02-12); sass 0.4.10(2025-04-11); scales 1.4.0(2025-04-24); sessioninfo 1.2.3(2025-02-05); stringi 1.8.7(2025-03-27); stringr 1.5.1(2023-11-14); tibble 3.3.0(2025-06-08); tidyr 1.3.1(2024-01-24); tidyselect 1.2.1(2024-03-11); timechange 0.3.0(2024-01-18); tzdb 0.5.0(2025-03-15); vctrs 0.6.5(2023-12-01); withr 3.0.2(2024-10-28); xfun 0.52(2025-04-02); XML 3.99-0.18(2025-01-01); xml2 1.3.8(2025-03-14); yaml 2.3.10(2024-07-26); zip 2.3.3(2025-05-13)
+[2025-08-01 10:18:22] [INFO]    [OmnipathR] CURL: version: 8.14.1; headers: 8.14.1; ssl_version: (OpenSSL/3.5.0) Schannel; libz_version: 1.3; libssh_version: libssh2/1.11.0; libidn_version: NA; host: x86_64-w64-mingw32; protocols: dict, file, ftp, ftps, gopher, gophers, http, https, imap, imaps, ldap, ldaps, mqtt, pop3, pop3s, rtsp, scp, sftp, smb, smbs, smtp, smtps, telnet, tftp, ws, wss; ipv6: TRUE; http2: TRUE; idn: TRUE; url_parser: TRUE
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/chris/AppData/Local/R/cache/R/renv/cache/v5/windows/R-4.4/x86_64-w64-mingw32/OmnipathR/3.15.12/3c54670532d1529b2981f0226a71a91a/OmnipathR/db/db_def.json` (encoding: UTF-8).
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/chris/AppData/Local/R/cache/R/renv/cache/v5/windows/R-4.4/x86_64-w64-mingw32/OmnipathR/3.15.12/3c54670532d1529b2981f0226a71a91a/OmnipathR/internal/magic_bytes.json` (encoding: UTF-8).
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/chris/AppData/Local/R/cache/R/renv/cache/v5/windows/R-4.4/x86_64-w64-mingw32/OmnipathR/3.15.12/3c54670532d1529b2981f0226a71a91a/OmnipathR/internal/urls.json` (encoding: UTF-8).
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/chris/AppData/Local/R/cache/R/renv/cache/v5/windows/R-4.4/x86_64-w64-mingw32/OmnipathR/3.15.12/3c54670532d1529b2981f0226a71a91a/OmnipathR/internal/id_types.json` (encoding: UTF-8).
+[2025-08-01 10:18:22] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2025-08-01 10:18:49] [INFO]    [OmnipathR] Loading database `Ensembl and OMA organism names`.
+[2025-08-01 10:18:49] [INFO]    [OmnipathR] Looking up in cache `https://www.ensembl.org/info/about/species.html`: key=7332486db7400730697234bad76ca0c8e4d00799, latest version=1.
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Cache file path: C:\Users\chris\AppData\Local\Cache\OmnipathR/7332486db7400730697234bad76ca0c8e4d00799-1.html
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Looking up in cache: `https://omabrowser.org/All/oma-species.txt`.
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/30e690cbb55dfc63b5903ab337f34ffc2f4be397-1.rds`.
+[2025-08-01 10:18:49] [INFO]    [OmnipathR] Loaded database `Ensembl and OMA organism names`.
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] ID translation table: from `hmdb` to `chebi`, using RaMP
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:49] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/6cb5231204c9a7caf10d9a19e01e0ac86ff85b0c-1.rds`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] 340 rows before translation, 340 hmdb IDs in column `HMDB`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Translation ambiguity between columns `HMDB` and `chebi`
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] 340 rows after translation; translated 340 `hmdb` IDs in column `HMDB` to 614 `chebi` IDs in column `chebi`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] 619 rows before translation, 614 chebi IDs in column `chebi`.
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] Translation ambiguity between columns `chebi` and `hmdb`
+[2025-08-01 10:18:50] [TRACE]   [OmnipathR] 619 rows after translation; translated 614 `chebi` IDs in column `chebi` to 548 `hmdb` IDs in column `hmdb`.
+[2025-08-01 10:18:51] [TRACE]   [OmnipathR] ID translation table: from `pubchem` to `hmdb`, using RaMP
+[2025-08-01 10:18:51] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:51] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:51] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/21c642787fb88d787d6509192cb3659df2505241-1.rds`.
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] 160 rows before translation, 158 pubchem IDs in column `PUBCHEM`.
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] Translation ambiguity between columns `PUBCHEM` and `hmdb`
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] Summarizing translation ambiguity for columns `PUBCHEM_hmdb_from_ambiguity_bygroup`, `PUBCHEM_hmdb_to_ambiguity_bygroup` and `PUBCHEM_hmdb_ambiguity_bygroup`
+[2025-08-01 10:18:52] [TRACE]   [OmnipathR] 160 rows after translation; translated 158 `pubchem` IDs in column `PUBCHEM` to 132 `hmdb` IDs in column `hmdb`.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] 160 rows before translation, 26 kegg IDs in column `KEGG`.
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Translation ambiguity between columns `KEGG` and `hmdb`
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] Summarizing translation ambiguity for columns `KEGG_hmdb_from_ambiguity_bygroup`, `KEGG_hmdb_to_ambiguity_bygroup` and `KEGG_hmdb_ambiguity_bygroup`
+[2025-08-01 10:18:53] [TRACE]   [OmnipathR] 160 rows after translation; translated 26 `kegg` IDs in column `KEGG` to 23 `hmdb` IDs in column `hmdb`.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] 301 rows before translation, 301 kegg IDs in column `KEGG`.
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] Translation ambiguity between columns `KEGG` and `chebi`
+[2025-08-01 10:18:54] [TRACE]   [OmnipathR] 301 rows after translation; translated 301 `kegg` IDs in column `KEGG` to 496 `chebi` IDs in column `chebi`.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `kegg`, using RaMP
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/68dd1970517bff7b0b399dbbe78af46c921e37e7-1.rds`.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] 496 rows before translation, 496 chebi IDs in column `chebi`.
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] Translation ambiguity between columns `chebi` and `kegg`
+[2025-08-01 10:18:55] [TRACE]   [OmnipathR] 496 rows after translation; translated 496 `chebi` IDs in column `chebi` to 274 `kegg` IDs in column `kegg`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] ID translation table: from `pubchem` to `kegg`, using RaMP
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/f4ffb40ff74e3879bff99cba6276b014e17a4d0b-1.rds`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] 195 rows before translation, 181 pubchem IDs in column `PUBCHEM`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Translation ambiguity between columns `PUBCHEM` and `kegg`
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Summarizing translation ambiguity for columns `PUBCHEM_kegg_from_ambiguity_bygroup`, `PUBCHEM_kegg_to_ambiguity_bygroup` and `PUBCHEM_kegg_ambiguity_bygroup`
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] 195 rows after translation; translated 181 `pubchem` IDs in column `PUBCHEM` to 13 `kegg` IDs in column `kegg`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] ID translation table: from `hmdb` to `kegg`, using RaMP
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/1d14813c000797f02d670e1bea3da24dab3a50f0-1.rds`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] 195 rows before translation, 61 hmdb IDs in column `HMDB`.
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Translation ambiguity between columns `HMDB` and `kegg`
+[2025-08-01 10:18:56] [TRACE]   [OmnipathR] Summarizing translation ambiguity for columns `HMDB_kegg_from_ambiguity_bygroup`, `HMDB_kegg_to_ambiguity_bygroup` and `HMDB_kegg_ambiguity_bygroup`
+[2025-08-01 10:18:57] [TRACE]   [OmnipathR] 195 rows after translation; translated 61 `hmdb` IDs in column `HMDB` to 13 `kegg` IDs in column `kegg`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/link/compound/pathway`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/c6ff89c85308605f76b13b8b7eef2efc510fca11-1.rds`.
+[2025-08-01 10:19:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19148 records from cache
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/pathway`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/0bd054860c052a2ac0d7a3849b304d085f377df0-1.rds`.
+[2025-08-01 10:19:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 578 records from cache
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/compound`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/855597ce84b494f3ef3ac5750c407848569a7f66-1.rds`.
+[2025-08-01 10:19:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19460 records from cache
+[2025-08-01 10:19:00] [INFO]    [OmnipathR] Loading database `List of organisms in KEGG`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/organism`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/e7c3da8d7f582ca4c3a757f7408df807fbe91b47-1.rds`.
+[2025-08-01 10:19:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 10728 records from cache
+[2025-08-01 10:19:00] [INFO]    [OmnipathR] Loaded database `List of organisms in KEGG`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/conv/compound/pubchem`.
+[2025-08-01 10:19:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/df48f267c99a2d8dd3cb7ed031941afbedc22d48-1.rds`.
+[2025-08-01 10:19:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19331 records from cache
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/link/compound/pathway`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/c6ff89c85308605f76b13b8b7eef2efc510fca11-1.rds`.
+[2025-08-01 10:19:42] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19148 records from cache
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/pathway`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/0bd054860c052a2ac0d7a3849b304d085f377df0-1.rds`.
+[2025-08-01 10:19:42] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 578 records from cache
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/compound`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/855597ce84b494f3ef3ac5750c407848569a7f66-1.rds`.
+[2025-08-01 10:19:42] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19460 records from cache
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/conv/compound/pubchem`.
+[2025-08-01 10:19:42] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\chris\AppData\Local\Cache\OmnipathR/df48f267c99a2d8dd3cb7ed031941afbedc22d48-1.rds`.
+[2025-08-01 10:19:42] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19331 records from cache

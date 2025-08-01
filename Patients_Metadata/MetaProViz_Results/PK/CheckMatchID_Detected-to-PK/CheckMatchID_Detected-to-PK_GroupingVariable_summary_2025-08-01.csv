@@ -1,0 +1,1876 @@
+KEGG,found_match_in_PK,matches,match_overlap_percentage,original_count,matches_count,MetaboliteID,term,Count_FeatureIDs_to_GroupingVariable,Group_Conflict_Notes
+340,FALSE,NA,0,1,0,340,NA,NA,None
+C00003,TRUE,C00003,100,1,1,C00003,Longevity regulating pathway,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Oxidative phosphorylation,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Chemical carcinogenesis - reactive oxygen species,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Longevity regulating pathway - worm,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Biosynthesis of cofactors,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Alcoholic liver disease,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Aldosterone synthesis and secretion,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Drug metabolism - other enzymes,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Metabolic pathways,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Efferocytosis,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Vitamin digestion and absorption,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Thiamine metabolism,1,None
+C00003,TRUE,C00003,100,1,1,C00003,AMPK signaling pathway,1,None
+C00003,TRUE,C00003,100,1,1,C00003,Nicotinate and nicotinamide metabolism,1,None
+C00004,TRUE,C00004,100,1,1,C00004,Metabolic pathways,1,None
+C00004,TRUE,C00004,100,1,1,C00004,Oxidative phosphorylation,1,None
+C00004,TRUE,C00004,100,1,1,C00004,Calcium signaling pathway,1,None
+C00004,TRUE,C00004,100,1,1,C00004,Thermogenesis,1,None
+C00004,TRUE,C00004,100,1,1,C00004,Aldosterone synthesis and secretion,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Photosynthesis,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Oxidative phosphorylation,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Two-component system,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Quorum sensing,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Pathways of neurodegeneration - multiple diseases,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Cell cycle - yeast,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Mineral absorption,1,None
+C00009,TRUE,C00009,100,1,1,C00009,ABC transporters,1,None
+C00009,TRUE,C00009,100,1,1,C00009,Parkinson disease,1,None
+C00009,TRUE,C00009,100,1,1,C00009,"Parathyroid hormone synthesis, secretion and action",1,None
+C00013,FALSE,NA,0,1,0,C00013,NA,NA,None
+C00016,TRUE,C00016,100,1,1,C00016,Biosynthesis of secondary metabolites,1,None
+C00016,TRUE,C00016,100,1,1,C00016,Riboflavin metabolism,1,None
+C00016,TRUE,C00016,100,1,1,C00016,Vitamin digestion and absorption,1,None
+C00016,TRUE,C00016,100,1,1,C00016,Metabolic pathways,1,None
+C00016,TRUE,C00016,100,1,1,C00016,Biosynthesis of cofactors,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Zeatin biosynthesis,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Metabolic pathways,1,None
+C00020,TRUE,C00020,100,1,1,C00020,"Parathyroid hormone synthesis, secretion and action",1,None
+C00020,TRUE,C00020,100,1,1,C00020,cAMP signaling pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Nucleotide metabolism,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Parkinson disease,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Purine metabolism,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Biosynthesis of cofactors,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Regulation of lipolysis in adipocytes,1,None
+C00020,TRUE,C00020,100,1,1,C00020,mTOR signaling pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Cortisol synthesis and secretion,1,None
+C00020,TRUE,C00020,100,1,1,C00020,AMPK signaling pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,cGMP-PKG signaling pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Olfactory transduction,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Taste transduction,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Biosynthesis of secondary metabolites,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Biosynthesis of plant hormones,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Antifolate resistance,1,None
+C00020,TRUE,C00020,100,1,1,C00020,PI3K-Akt signaling pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Aldosterone synthesis and secretion,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Longevity regulating pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Pathways of neurodegeneration - multiple diseases,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Cushing syndrome,1,None
+C00020,TRUE,C00020,100,1,1,C00020,FoxO signaling pathway,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Biosynthesis of plant secondary metabolites,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Morphine addiction,1,None
+C00020,TRUE,C00020,100,1,1,C00020,Renin secretion,1,None
+C00021,TRUE,C00021,100,1,1,C00021,Folate transport and metabolism,1,None
+C00021,TRUE,C00021,100,1,1,C00021,Cysteine and methionine metabolism,1,None
+C00021,TRUE,C00021,100,1,1,C00021,Chemical carcinogenesis - reactive oxygen species,1,None
+C00021,TRUE,C00021,100,1,1,C00021,Metabolic pathways,1,None
+C00021,TRUE,C00021,100,1,1,C00021,One carbon pool by folate,1,None
+C00021,TRUE,C00021,100,1,1,C00021,Biosynthesis of cofactors,1,None
+C00021,TRUE,C00021,100,1,1,C00021,Biosynthesis of amino acids,1,None
+C00025,TRUE,C00025,100,1,1,C00025,2-Oxocarboxylic acid metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Biosynthesis of cofactors,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Aminoacyl-tRNA biosynthesis,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Protein digestion and absorption,1,None
+C00025,TRUE,C00025,100,1,1,C00025,D-Amino acid metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Two-component system,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Gap junction,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Retrograde endocannabinoid signaling,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Pathways of neurodegeneration - multiple diseases,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Alcoholism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Glutathione metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Biosynthesis of plant secondary metabolites,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Biosynthesis of various other secondary metabolites,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Central carbon metabolism in cancer,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Glyoxylate and dicarboxylate metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Cocaine addiction,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Histidine metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Long-term depression,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Nitrogen metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Carbon metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,"Alanine, aspartate and glutamate metabolism",1,None
+C00025,TRUE,C00025,100,1,1,C00025,Spinocerebellar ataxia,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Long-term potentiation,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Amyotrophic lateral sclerosis,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Circadian entrainment,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Neuroactive ligand-receptor interaction,1,None
+C00025,TRUE,C00025,100,1,1,C00025,"Neomycin, kanamycin and gentamicin biosynthesis",1,None
+C00025,TRUE,C00025,100,1,1,C00025,Nicotine addiction,1,None
+C00025,TRUE,C00025,100,1,1,C00025,ABC transporters,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Taste transduction,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Biosynthesis of various antibiotics,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Carbapenem biosynthesis,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Arginine biosynthesis,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Proximal tubule bicarbonate reclamation,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Butanoate metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Biosynthesis of amino acids,1,None
+C00025,TRUE,C00025,100,1,1,C00025,GABAergic synapse,1,None
+C00025,TRUE,C00025,100,1,1,C00025,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00025,TRUE,C00025,100,1,1,C00025,Biosynthesis of secondary metabolites,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Porphyrin metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Metabolic pathways,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Ferroptosis,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Synaptic vesicle cycle,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Microbial metabolism in diverse environments,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Phospholipase D signaling pathway,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Amphetamine addiction,1,None
+C00025,TRUE,C00025,100,1,1,C00025,C5-Branched dibasic acid metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Taurine and hypotaurine metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Huntington disease,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Glutamatergic synapse,1,None
+C00025,TRUE,C00025,100,1,1,C00025,Arginine and proline metabolism,1,None
+C00025,TRUE,C00025,100,1,1,C00025,FoxO signaling pathway,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Biosynthesis of secondary metabolites,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Aminoacyl-tRNA biosynthesis,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Synaptic vesicle cycle,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Vancomycin resistance,1,None
+C00037,TRUE,C00037,100,1,1,C00037,D-Amino acid metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,One carbon pool by folate,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Mineral absorption,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Primary bile acid biosynthesis,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Carbon metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Porphyrin metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Cyanoamino acid metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Microbial metabolism in diverse environments,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Methane metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Biofilm formation - Escherichia coli,1,None
+C00037,TRUE,C00037,100,1,1,C00037,"Glycine, serine and threonine metabolism",1,None
+C00037,TRUE,C00037,100,1,1,C00037,Thiamine metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Metabolic pathways,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Glyoxylate and dicarboxylate metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Biosynthesis of plant secondary metabolites,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Purine metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Biosynthesis of amino acids,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Biosynthesis of cofactors,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Neuroactive ligand-receptor interaction,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Protein digestion and absorption,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Phosphonate and phosphinate metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Glutathione metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Central carbon metabolism in cancer,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Lipoic acid metabolism,1,None
+C00037,TRUE,C00037,100,1,1,C00037,Lysine degradation,1,None
+C00037,TRUE,C00037,100,1,1,C00037,ABC transporters,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Carbon fixation by Calvin cycle,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Protein digestion and absorption,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Central carbon metabolism in cancer,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Biosynthesis of amino acids,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Biosynthesis of plant secondary metabolites,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Cysteine and methionine metabolism,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Taurine and hypotaurine metabolism,1,None
+C00041,TRUE,C00041,100,1,1,C00041,ABC transporters,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Sulfur relay system,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Selenocompound metabolism,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Vancomycin resistance,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Microbial metabolism in diverse environments,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Biosynthesis of various other secondary metabolites,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Biosynthesis of secondary metabolites,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Aminoacyl-tRNA biosynthesis,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Mineral absorption,1,None
+C00041,TRUE,C00041,100,1,1,C00041,Metabolic pathways,1,None
+C00041,TRUE,C00041,100,1,1,C00041,"Alanine, aspartate and glutamate metabolism",1,None
+C00041,TRUE,C00041,100,1,1,C00041,Carbon metabolism,1,None
+C00041,TRUE,C00041,100,1,1,C00041,2-Oxocarboxylic acid metabolism,1,None
+C00041,TRUE,C00041,100,1,1,C00041,D-Amino acid metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Pyruvate metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,GABAergic synapse,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Other carbon fixation pathways,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Two-component system,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Microbial metabolism in diverse environments,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Central carbon metabolism in cancer,1,None
+C00042,TRUE,C00042,100,1,1,C00042,cAMP signaling pathway,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Glucagon signaling pathway,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Tyrosine metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of terpenoids and steroids,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Degradation of aromatic compounds,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Citrate cycle (TCA cycle),1,None
+C00042,TRUE,C00042,100,1,1,C00042,Metabolic pathways,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Carbon metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Nicotinate and nicotinamide metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of plant hormones,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Lysine degradation,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of phenylpropanoids,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Butanoate metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Propanoate metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Oxidative phosphorylation,1,None
+C00042,TRUE,C00042,100,1,1,C00042,"Alanine, aspartate and glutamate metabolism",1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of plant secondary metabolites,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Chlorocyclohexane and chlorobenzene degradation,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Glyoxylate and dicarboxylate metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Sulfur metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Phenylalanine metabolism,1,None
+C00042,TRUE,C00042,100,1,1,C00042,Biosynthesis of secondary metabolites,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Aminoacyl-tRNA biosynthesis,1,None
+C00047,TRUE,C00047,100,1,1,C00047,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00047,TRUE,C00047,100,1,1,C00047,Metabolic pathways,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Lysine biosynthesis,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Lysine degradation,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Biotin metabolism,1,None
+C00047,TRUE,C00047,100,1,1,C00047,ABC transporters,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Biosynthesis of secondary metabolites,1,None
+C00047,TRUE,C00047,100,1,1,C00047,D-Amino acid metabolism,1,None
+C00047,TRUE,C00047,100,1,1,C00047,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C00047,TRUE,C00047,100,1,1,C00047,2-Oxocarboxylic acid metabolism,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Protein digestion and absorption,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Microbial metabolism in diverse environments,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Biosynthesis of amino acids,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Biosynthesis of plant secondary metabolites,1,None
+C00047,TRUE,C00047,100,1,1,C00047,Biosynthesis of various other secondary metabolites,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Histidine metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Monobactam biosynthesis,1,None
+C00049,TRUE,C00049,100,1,1,C00049,"Alanine, aspartate and glutamate metabolism",1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of secondary metabolites,1,None
+C00049,TRUE,C00049,100,1,1,C00049,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00049,TRUE,C00049,100,1,1,C00049,Aminoacyl-tRNA biosynthesis,1,None
+C00049,TRUE,C00049,100,1,1,C00049,"Glycine, serine and threonine metabolism",1,None
+C00049,TRUE,C00049,100,1,1,C00049,Central carbon metabolism in cancer,1,None
+C00049,TRUE,C00049,100,1,1,C00049,2-Oxocarboxylic acid metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Microbial metabolism in diverse environments,1,None
+C00049,TRUE,C00049,100,1,1,C00049,ABC transporters,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Two-component system,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of amino acids,1,None
+C00049,TRUE,C00049,100,1,1,C00049,D-Amino acid metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of plant secondary metabolites,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Lysine biosynthesis,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Cyanoamino acid metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Pantothenate and CoA biosynthesis,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of plant hormones,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of cofactors,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Carbon fixation by Calvin cycle,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Arginine biosynthesis,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Bacterial chemotaxis,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Neuroactive ligand-receptor interaction,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of various antibiotics,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Protein digestion and absorption,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of various plant secondary metabolites,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Carbon metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,beta-Alanine metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Nicotinate and nicotinamide metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Metabolic pathways,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Cysteine and methionine metabolism,1,None
+C00049,TRUE,C00049,100,1,1,C00049,Biosynthesis of various other secondary metabolites,1,None
+C00051,TRUE,C00051,100,1,1,C00051,ABC transporters,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Cysteine and methionine metabolism,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Diabetic cardiomyopathy,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Biosynthesis of cofactors,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Ferroptosis,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Thyroid hormone synthesis,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Chemical carcinogenesis - reactive oxygen species,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Bile secretion,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Glutathione metabolism,1,None
+C00051,TRUE,C00051,100,1,1,C00051,Metabolic pathways,1,None
+C00055,TRUE,C00055,100,1,1,C00055,Metabolic pathways,1,None
+C00055,TRUE,C00055,100,1,1,C00055,Pyrimidine metabolism,1,None
+C00055,TRUE,C00055,100,1,1,C00055,Nucleotide metabolism,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Aminoacyl-tRNA biosynthesis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Arginine biosynthesis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Biosynthesis of secondary metabolites,1,None
+C00062,TRUE,C00062,100,1,1,C00062,ABC transporters,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Metabolic pathways,1,None
+C00062,TRUE,C00062,100,1,1,C00062,mTOR signaling pathway,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Arginine and proline metabolism,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Amyotrophic lateral sclerosis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,D-Amino acid metabolism,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Biosynthesis of plant secondary metabolites,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Chagas disease,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Protein digestion and absorption,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Efferocytosis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Biosynthesis of various antibiotics,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Clavulanic acid biosynthesis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Monobactam biosynthesis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Central carbon metabolism in cancer,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Biosynthesis of amino acids,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Amoebiasis,1,None
+C00062,TRUE,C00062,100,1,1,C00062,Pathways of neurodegeneration - multiple diseases,1,None
+C00062,TRUE,C00062,100,1,1,C00062,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00064,TRUE,C00064,100,1,1,C00064,Aminoacyl-tRNA biosynthesis,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Metabolic pathways,1,None
+C00064,TRUE,C00064,100,1,1,C00064,ABC transporters,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Glutamatergic synapse,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Biosynthesis of amino acids,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Nucleotide metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Two-component system,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Mineral absorption,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Central carbon metabolism in cancer,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Nitrogen metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Vitamin B6 metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Arginine biosynthesis,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Microbial metabolism in diverse environments,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Biosynthesis of plant secondary metabolites,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Glyoxylate and dicarboxylate metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Biosynthesis of cofactors,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Pyrimidine metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,"Alanine, aspartate and glutamate metabolism",1,None
+C00064,TRUE,C00064,100,1,1,C00064,D-Amino acid metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Purine metabolism,1,None
+C00064,TRUE,C00064,100,1,1,C00064,GABAergic synapse,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Proximal tubule bicarbonate reclamation,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Protein digestion and absorption,1,None
+C00064,TRUE,C00064,100,1,1,C00064,Biosynthesis of secondary metabolites,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Nonribosomal peptide structures,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Vancomycin resistance,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Cyanoamino acid metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Aminoacyl-tRNA biosynthesis,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,One carbon pool by folate,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Biosynthesis of secondary metabolites,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Protein digestion and absorption,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,"Glycine, serine and threonine metabolism",1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Carbon metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Biosynthesis of cofactors,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Cysteine and methionine metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Biosynthesis of various other secondary metabolites,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Metabolic pathways,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,ABC transporters,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Central carbon metabolism in cancer,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Biosynthesis of amino acids,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Sphingolipid metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Sphingolipid signaling pathway,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Sulfur metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Monobactam biosynthesis,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00716,Bacterial chemotaxis,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Biosynthesis of various antibiotics,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Glycerophospholipid metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Mineral absorption,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Biosynthesis of plant secondary metabolites,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Microbial metabolism in diverse environments,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Glyoxylate and dicarboxylate metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,D-Amino acid metabolism,1,None
+"C00065, C00716",TRUE,"C00065, C00716",100,2,2,C00065,Methane metabolism,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Glutathione metabolism,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Biosynthesis of secondary metabolites,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Biosynthesis of cofactors,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Vitamin digestion and absorption,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Phosphotransferase system (PTS),1,None
+C00072,TRUE,C00072,100,1,1,C00072,Ascorbate and aldarate metabolism,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Metabolic pathways,1,None
+C00072,TRUE,C00072,100,1,1,C00072,HIF-1 signaling pathway,1,None
+C00072,TRUE,C00072,100,1,1,C00072,Microbial metabolism in diverse environments,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Folate transport and metabolism,1,None
+C00073,TRUE,C00073,100,1,1,C00073,2-Oxocarboxylic acid metabolism,1,None
+C00073,TRUE,C00073,100,1,1,C00073,One carbon pool by folate,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Microbial metabolism in diverse environments,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Metabolic pathways,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Sulfur cycle,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Biosynthesis of secondary metabolites,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Biosynthesis of plant hormones,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Efferocytosis,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Sulfur metabolism,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Mineral absorption,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Glucosinolate biosynthesis,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Protein digestion and absorption,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Biosynthesis of cofactors,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Cobalamin transport and metabolism,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Antifolate resistance,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Biosynthesis of amino acids,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Aminoacyl-tRNA biosynthesis,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Biosynthesis of plant secondary metabolites,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Cysteine and methionine metabolism,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Central carbon metabolism in cancer,1,None
+C00073,TRUE,C00073,100,1,1,C00073,Biosynthesis of various plant secondary metabolites,1,None
+C00073,TRUE,C00073,100,1,1,C00073,D-Amino acid metabolism,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Carbon metabolism,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of various alkaloids,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of amino acids,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Phosphotransferase system (PTS),1,None
+C00074,TRUE,C00074,100,1,1,C00074,Citrate cycle (TCA cycle),1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of various plant secondary metabolites,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of phenylpropanoids,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Central carbon metabolism in cancer,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Other carbon fixation pathways,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of plant secondary metabolites,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of secondary metabolites,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Glycolysis / Gluconeogenesis,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Phosphonate and phosphinate metabolism,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of plant hormones,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Glucagon signaling pathway,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of terpenoids and steroids,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Microbial metabolism in diverse environments,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Carbon fixation by Calvin cycle,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of various antibiotics,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Pyruvate metabolism,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Metabolic pathways,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Biosynthesis of cofactors,1,None
+C00074,TRUE,C00074,100,1,1,C00074,"Phenylalanine, tyrosine and tryptophan biosynthesis",1,None
+C00074,TRUE,C00074,100,1,1,C00074,Proximal tubule bicarbonate reclamation,1,None
+C00074,TRUE,C00074,100,1,1,C00074,Methane metabolism,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Efferocytosis,1,None
+C00077,TRUE,C00077,100,1,1,C00077,ABC transporters,1,None
+C00077,TRUE,C00077,100,1,1,C00077,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00077,TRUE,C00077,100,1,1,C00077,Biosynthesis of various other secondary metabolites,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Glutathione metabolism,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Biosynthesis of plant secondary metabolites,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Biosynthesis of amino acids,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Biosynthesis of secondary metabolites,1,None
+C00077,TRUE,C00077,100,1,1,C00077,2-Oxocarboxylic acid metabolism,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Biosynthesis of various antibiotics,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Metabolic pathways,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Arginine biosynthesis,1,None
+C00077,TRUE,C00077,100,1,1,C00077,Arginine and proline metabolism,1,None
+C00077,TRUE,C00077,100,1,1,C00077,D-Amino acid metabolism,1,None
+C00078,TRUE,C00078,100,1,1,C00078,"Phenylalanine, tyrosine and tryptophan biosynthesis",1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of various other secondary metabolites,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Tryptophan metabolism,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Protein digestion and absorption,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Staurosporine biosynthesis,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Mineral absorption,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Indole alkaloid biosynthesis,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of plant secondary metabolites,1,None
+C00078,TRUE,C00078,100,1,1,C00078,African trypanosomiasis,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of various plant secondary metabolites,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of cofactors,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Metabolic pathways,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of amino acids,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Aminoacyl-tRNA biosynthesis,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of phenylpropanoids,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of various alkaloids,1,None
+C00078,TRUE,C00078,100,1,1,C00078,2-Oxocarboxylic acid metabolism,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Axon regeneration,1,None
+C00078,TRUE,C00078,100,1,1,C00078,"Glycine, serine and threonine metabolism",1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of plant hormones,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of secondary metabolites,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Serotonergic synapse,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Glucosinolate biosynthesis,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Central carbon metabolism in cancer,1,None
+C00078,TRUE,C00078,100,1,1,C00078,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of plant secondary metabolites,1,None
+C00079,TRUE,C00079,100,1,1,C00079,2-Oxocarboxylic acid metabolism,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of secondary metabolites,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Glucosinolate biosynthesis,1,None
+C00079,TRUE,C00079,100,1,1,C00079,D-Amino acid metabolism,1,None
+C00079,TRUE,C00079,100,1,1,C00079,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of phenylpropanoids,1,None
+C00079,TRUE,C00079,100,1,1,C00079,ABC transporters,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Metabolic pathways,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of various alkaloids,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of plant hormones,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of various plant secondary metabolites,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Cyanoamino acid metabolism,1,None
+C00079,TRUE,C00079,100,1,1,C00079,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of various other secondary metabolites,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Phenylalanine metabolism,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Protein digestion and absorption,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Phenylpropanoid biosynthesis,1,None
+C00079,TRUE,C00079,100,1,1,C00079,"Phenylalanine, tyrosine and tryptophan biosynthesis",1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Central carbon metabolism in cancer,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Aminoacyl-tRNA biosynthesis,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Mineral absorption,1,None
+C00079,TRUE,C00079,100,1,1,C00079,Biosynthesis of amino acids,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Isoquinoline alkaloid biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of various other secondary metabolites,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Metabolic pathways,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Betalain biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Phenylalanine metabolism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Cocaine addiction,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Aminoacyl-tRNA biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of various antibiotics,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Ubiquinone and other terpenoid-quinone biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of cofactors,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Tyrosine metabolism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of secondary metabolites,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Thiamine metabolism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of enediyne antibiotics,1,None
+C00082,TRUE,C00082,100,1,1,C00082,"Phenylalanine, tyrosine and tryptophan biosynthesis",1,None
+C00082,TRUE,C00082,100,1,1,C00082,Dopaminergic synapse,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of various plant secondary metabolites,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Amphetamine addiction,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Monobactam biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Cyanoamino acid metabolism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Parkinson disease,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Glucosinolate biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,2-Oxocarboxylic acid metabolism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Prolactin signaling pathway,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Novobiocin biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Melanogenesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of plant secondary metabolites,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of amino acids,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Phenylpropanoid biosynthesis,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Alcoholism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Protein digestion and absorption,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Biosynthesis of vancomycin group antibiotics,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Methane metabolism,1,None
+C00082,TRUE,C00082,100,1,1,C00082,Central carbon metabolism in cancer,1,None
+C00086,TRUE,C00086,100,1,1,C00086,ABC transporters,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Metabolic pathways,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Purine metabolism,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Arginine and proline metabolism,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Atrazine degradation,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Biosynthesis of secondary metabolites,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Epithelial cell signaling in Helicobacter pylori infection,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Arginine biosynthesis,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Pyrimidine metabolism,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Microbial metabolism in diverse environments,1,None
+C00086,TRUE,C00086,100,1,1,C00086,Biotin metabolism,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Aminobenzoate degradation,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Polycyclic aromatic hydrocarbon degradation,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Degradation of aromatic compounds,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Metabolic pathways,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Fluorobenzoate degradation,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Microbial metabolism in diverse environments,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Naphthalene degradation,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Benzoate degradation,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Chlorocyclohexane and chlorobenzene degradation,1,None
+C00090,TRUE,C00090,100,1,1,C00090,Dioxin degradation,1,None
+C00093,TRUE,C00093,100,1,1,C00093,Glycerophospholipid metabolism,1,None
+C00093,TRUE,C00093,100,1,1,C00093,Biosynthesis of secondary metabolites,1,None
+C00093,TRUE,C00093,100,1,1,C00093,Metabolic pathways,1,None
+C00093,TRUE,C00093,100,1,1,C00093,ABC transporters,1,None
+C00093,TRUE,C00093,100,1,1,C00093,Glycerolipid metabolism,1,None
+C00093,TRUE,C00093,100,1,1,C00093,Choline metabolism in cancer,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Phosphotransferase system (PTS),1,None
+C00095,TRUE,C00095,100,1,1,C00095,Metabolic pathways,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Fructose and mannose metabolism,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Galactose metabolism,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Amino sugar and nucleotide sugar metabolism,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Diabetic cardiomyopathy,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Biosynthesis of nucleotide sugars,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Carbohydrate digestion and absorption,1,None
+C00095,TRUE,C00095,100,1,1,C00095,ABC transporters,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Starch and sucrose metabolism,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Insulin resistance,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Taste transduction,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Biosynthesis of secondary metabolites,1,None
+C00095,TRUE,C00095,100,1,1,C00095,Microbial metabolism in diverse environments,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Protein digestion and absorption,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Glutathione metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Sulfur cycle,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Biosynthesis of plant secondary metabolites,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Sulfur relay system,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Penicillin and cephalosporin biosynthesis,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Biosynthesis of amino acids,1,None
+C00097,TRUE,C00097,100,1,1,C00097,One carbon pool by folate,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Taurine and hypotaurine metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Carbapenem biosynthesis,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Central carbon metabolism in cancer,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Microbial metabolism in diverse environments,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Carbon metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Aminoacyl-tRNA biosynthesis,1,None
+C00097,TRUE,C00097,100,1,1,C00097,"Glycine, serine and threonine metabolism",1,None
+C00097,TRUE,C00097,100,1,1,C00097,Pantothenate and CoA biosynthesis,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Sulfur metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Cysteine and methionine metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Thiamine metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Biosynthesis of cofactors,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Ferroptosis,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Biosynthesis of secondary metabolites,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Metabolic pathways,1,None
+C00097,TRUE,C00097,100,1,1,C00097,Cyanoamino acid metabolism,1,None
+C00097,TRUE,C00097,100,1,1,C00097,D-Amino acid metabolism,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Pyrimidine metabolism,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Neuroactive ligand-receptor interaction,1,None
+C00099,TRUE,C00099,100,1,1,C00099,beta-Alanine metabolism,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Biosynthesis of cofactors,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Propanoate metabolism,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Protein digestion and absorption,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Biosynthesis of secondary metabolites,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Pantothenate and CoA biosynthesis,1,None
+C00099,TRUE,C00099,100,1,1,C00099,Metabolic pathways,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Acarbose and validamycin biosynthesis,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Microbial metabolism in diverse environments,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Amino sugar and nucleotide sugar metabolism,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Biosynthesis of cofactors,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Starch and sucrose metabolism,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Biosynthesis of plant secondary metabolites,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Metabolic pathways,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Biosynthesis of nucleotide sugars,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Biosynthesis of various nucleotide sugars,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Polyketide sugar unit biosynthesis,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Galactose metabolism,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Pentose and glucuronate interconversions,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Glycolysis / Gluconeogenesis,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Biosynthesis of secondary metabolites,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Glycerolipid metabolism,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Glucagon signaling pathway,1,None
+C00103,TRUE,C00103,100,1,1,C00103,Streptomycin biosynthesis,1,None
+C00106,TRUE,C00106,100,1,1,C00106,Metabolic pathways,1,None
+C00106,TRUE,C00106,100,1,1,C00106,Pyrimidine metabolism,1,None
+C00106,TRUE,C00106,100,1,1,C00106,beta-Alanine metabolism,1,None
+C00106,TRUE,C00106,100,1,1,C00106,Pantothenate and CoA biosynthesis,1,None
+C00106,TRUE,C00106,100,1,1,C00106,Nucleotide metabolism,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Regulation of lipolysis in adipocytes,1,None
+C00116,TRUE,C00116,100,1,1,C00116,ABC transporters,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Galactose metabolism,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Metabolic pathways,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Pentose and glucuronate interconversions,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Glycerolipid metabolism,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Thermogenesis,1,None
+C00116,TRUE,C00116,100,1,1,C00116,Retrograde endocannabinoid signaling,1,None
+C00121,TRUE,C00121,100,1,1,C00121,Pentose phosphate pathway,1,None
+C00121,TRUE,C00121,100,1,1,C00121,Bacterial chemotaxis,1,None
+C00121,TRUE,C00121,100,1,1,C00121,Metabolic pathways,1,None
+C00121,TRUE,C00121,100,1,1,C00121,ABC transporters,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Styrene degradation,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of phenylpropanoids,1,None
+C00122,TRUE,C00122,100,1,1,C00122,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of plant hormones,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Other carbon fixation pathways,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Arginine biosynthesis,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Phenylalanine metabolism,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Degradation of aromatic compounds,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Pathways in cancer,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Carbon metabolism,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Microbial metabolism in diverse environments,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Two-component system,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of secondary metabolites,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Pyruvate metabolism,1,None
+C00122,TRUE,C00122,100,1,1,C00122,"Alanine, aspartate and glutamate metabolism",1,None
+C00122,TRUE,C00122,100,1,1,C00122,Nicotinate and nicotinamide metabolism,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of terpenoids and steroids,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Glucagon signaling pathway,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of plant secondary metabolites,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Citrate cycle (TCA cycle),1,None
+C00122,TRUE,C00122,100,1,1,C00122,Metabolic pathways,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Oxidative phosphorylation,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Tyrosine metabolism,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Central carbon metabolism in cancer,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Butanoate metabolism,1,None
+C00122,TRUE,C00122,100,1,1,C00122,Renal cell carcinoma,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Biosynthesis of amino acids,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Mineral absorption,1,None
+C00123,TRUE,C00123,100,1,1,C00123,2-Oxocarboxylic acid metabolism,1,None
+C00123,TRUE,C00123,100,1,1,C00123,"Valine, leucine and isoleucine biosynthesis",1,None
+C00123,TRUE,C00123,100,1,1,C00123,"Valine, leucine and isoleucine degradation",1,None
+C00123,TRUE,C00123,100,1,1,C00123,Metabolic pathways,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Central carbon metabolism in cancer,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Biosynthesis of secondary metabolites,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Aminoacyl-tRNA biosynthesis,1,None
+C00123,TRUE,C00123,100,1,1,C00123,mTOR signaling pathway,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Glucosinolate biosynthesis,1,None
+C00123,TRUE,C00123,100,1,1,C00123,ABC transporters,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Biosynthesis of plant secondary metabolites,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Protein digestion and absorption,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00123,TRUE,C00123,100,1,1,C00123,Shigellosis,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Biosynthesis of cofactors,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Metabolic pathways,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Glutathione metabolism,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Thyroid hormone synthesis,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Ferroptosis,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Diabetic cardiomyopathy,1,None
+C00127,TRUE,C00127,100,1,1,C00127,Chemical carcinogenesis - reactive oxygen species,1,None
+C00134,TRUE,C00134,100,1,1,C00134,D-Amino acid metabolism,1,None
+C00134,TRUE,C00134,100,1,1,C00134,Biosynthesis of plant secondary metabolites,1,None
+C00134,TRUE,C00134,100,1,1,C00134,Protein digestion and absorption,1,None
+C00134,TRUE,C00134,100,1,1,C00134,Metabolic pathways,1,None
+C00134,TRUE,C00134,100,1,1,C00134,Glutathione metabolism,1,None
+C00134,TRUE,C00134,100,1,1,C00134,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C00134,TRUE,C00134,100,1,1,C00134,Efferocytosis,1,None
+C00134,TRUE,C00134,100,1,1,C00134,Arginine and proline metabolism,1,None
+C00134,TRUE,C00134,100,1,1,C00134,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00134,TRUE,C00134,100,1,1,C00134,Biosynthesis of secondary metabolites,1,None
+C00134,TRUE,C00134,100,1,1,C00134,ABC transporters,1,None
+C00135,TRUE,C00135,100,1,1,C00135,ABC transporters,1,None
+C00135,TRUE,C00135,100,1,1,C00135,D-Amino acid metabolism,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Metabolic pathways,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Protein digestion and absorption,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Staurosporine biosynthesis,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Biosynthesis of amino acids,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Central carbon metabolism in cancer,1,None
+C00135,TRUE,C00135,100,1,1,C00135,beta-Alanine metabolism,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Biosynthesis of plant secondary metabolites,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Biosynthesis of secondary metabolites,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Aminoacyl-tRNA biosynthesis,1,None
+C00135,TRUE,C00135,100,1,1,C00135,Histidine metabolism,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Biosynthesis of nucleotide sugars,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Galactose metabolism,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Streptomycin biosynthesis,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Ascorbate and aldarate metabolism,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Microbial metabolism in diverse environments,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Biosynthesis of secondary metabolites,1,None
+C00137,TRUE,C00137,100,1,1,C00137,ABC transporters,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Metabolic pathways,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Phosphatidylinositol signaling system,1,None
+C00137,TRUE,C00137,100,1,1,C00137,Inositol phosphate metabolism,1,None
+C00140,TRUE,C00140,100,1,1,C00140,Metabolic pathways,1,None
+C00140,TRUE,C00140,100,1,1,C00140,Biosynthesis of nucleotide sugars,1,None
+C00140,TRUE,C00140,100,1,1,C00140,Amino sugar and nucleotide sugar metabolism,1,None
+C00140,TRUE,C00140,100,1,1,C00140,ABC transporters,1,None
+C00140,TRUE,C00140,100,1,1,C00140,Phosphotransferase system (PTS),1,None
+C00147,TRUE,C00147,100,1,1,C00147,Zeatin biosynthesis,1,None
+C00147,TRUE,C00147,100,1,1,C00147,Nucleotide metabolism,1,None
+C00147,TRUE,C00147,100,1,1,C00147,Biosynthesis of secondary metabolites,1,None
+C00147,TRUE,C00147,100,1,1,C00147,Purine metabolism,1,None
+C00147,TRUE,C00147,100,1,1,C00147,Metabolic pathways,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Staurosporine biosynthesis,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Novobiocin biosynthesis,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Carbapenem biosynthesis,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Central carbon metabolism in cancer,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Metabolic pathways,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Mineral absorption,1,None
+C00148,TRUE,C00148,100,1,1,C00148,D-Amino acid metabolism,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Arginine and proline metabolism,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Aminoacyl-tRNA biosynthesis,1,None
+C00148,TRUE,C00148,100,1,1,C00148,ABC transporters,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Prodigiosin biosynthesis,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Protein digestion and absorption,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Biosynthesis of secondary metabolites,1,None
+C00148,TRUE,C00148,100,1,1,C00148,Biosynthesis of amino acids,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of secondary metabolites,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Taste transduction,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Glucagon signaling pathway,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of terpenoids and steroids,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Renal cell carcinoma,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Proximal tubule bicarbonate reclamation,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Glyoxylate and dicarboxylate metabolism,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Pyruvate metabolism,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Other carbon fixation pathways,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Two-component system,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Citrate cycle (TCA cycle),1,None
+C00149,TRUE,C00149,100,1,1,C00149,Carbon metabolism,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Carbon fixation by Calvin cycle,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Pathways in cancer,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of plant hormones,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Microbial metabolism in diverse environments,1,None
+C00149,TRUE,C00149,100,1,1,C00149,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00149,TRUE,C00149,100,1,1,C00149,Metabolic pathways,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Central carbon metabolism in cancer,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of phenylpropanoids,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Methane metabolism,1,None
+C00149,TRUE,C00149,100,1,1,C00149,Biosynthesis of plant secondary metabolites,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Cyanoamino acid metabolism,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Metabolic pathways,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Aminoacyl-tRNA biosynthesis,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Biosynthesis of plant secondary metabolites,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Biosynthesis of amino acids,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Protein digestion and absorption,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Biosynthesis of secondary metabolites,1,None
+C00152,TRUE,C00152,100,1,1,C00152,"Alanine, aspartate and glutamate metabolism",1,None
+C00152,TRUE,C00152,100,1,1,C00152,Central carbon metabolism in cancer,1,None
+C00152,TRUE,C00152,100,1,1,C00152,Mineral absorption,1,None
+C00153,TRUE,C00153,100,1,1,C00153,Biosynthesis of cofactors,1,None
+C00153,TRUE,C00153,100,1,1,C00153,Metabolic pathways,1,None
+C00153,TRUE,C00153,100,1,1,C00153,Nicotinate and nicotinamide metabolism,1,None
+C00153,TRUE,C00153,100,1,1,C00153,Vitamin digestion and absorption,1,None
+C00153,TRUE,C00153,100,1,1,C00153,Longevity regulating pathway - worm,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C05330,NA,NA,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Sulfur metabolism,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Biosynthesis of secondary metabolites,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Folate transport and metabolism,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Microbial metabolism in diverse environments,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Cobalamin transport and metabolism,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,One carbon pool by folate,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Antifolate resistance,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Biosynthesis of amino acids,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Cysteine and methionine metabolism,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,Metabolic pathways,1,None
+"C00155, C05330",TRUE,C00155,50,2,1,C00155,NOD-like receptor signaling pathway,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Glyoxylate and dicarboxylate metabolism,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Two-component system,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00158,TRUE,C00158,100,1,1,C00158,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00158,TRUE,C00158,100,1,1,C00158,Citrate cycle (TCA cycle),1,None
+C00158,TRUE,C00158,100,1,1,C00158,Other carbon fixation pathways,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Central carbon metabolism in cancer,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of amino acids,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Microbial metabolism in diverse environments,1,None
+C00158,TRUE,C00158,100,1,1,C00158,2-Oxocarboxylic acid metabolism,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Glucagon signaling pathway,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Taste transduction,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Carbon metabolism,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of terpenoids and steroids,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of cofactors,1,None
+C00158,TRUE,C00158,100,1,1,C00158,"Alanine, aspartate and glutamate metabolism",1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of phenylpropanoids,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of plant hormones,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Metabolic pathways,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of secondary metabolites,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of siderophore group nonribosomal peptides,1,None
+C00158,TRUE,C00158,100,1,1,C00158,Biosynthesis of plant secondary metabolites,1,None
+C00159,TRUE,C00159,100,1,1,C00159,C-type lectin receptor signaling pathway,1,None
+C00159,TRUE,C00159,100,1,1,C00159,Phosphotransferase system (PTS),1,None
+C00159,TRUE,C00159,100,1,1,C00159,Fructose and mannose metabolism,1,None
+C00159,TRUE,C00159,100,1,1,C00159,Biosynthesis of nucleotide sugars,1,None
+C00159,TRUE,C00159,100,1,1,C00159,Metabolic pathways,1,None
+C00159,TRUE,C00159,100,1,1,C00159,Amino sugar and nucleotide sugar metabolism,1,None
+C00159,TRUE,C00159,100,1,1,C00159,Lysosome,1,None
+C00159,TRUE,C00159,100,1,1,C00159,Galactose metabolism,1,None
+C00159,TRUE,C00159,100,1,1,C00159,ABC transporters,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Carbon metabolism,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Microbial metabolism in diverse environments,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Chloroalkane and chloroalkene degradation,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Chlorocyclohexane and chlorobenzene degradation,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Glyoxylate and dicarboxylate metabolism,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Biosynthesis of secondary metabolites,1,None
+C00160,TRUE,C00160,100,1,1,C00160,Metabolic pathways,1,None
+C00168,TRUE,C00168,100,1,1,C00168,"Glycine, serine and threonine metabolism",1,None
+C00168,TRUE,C00168,100,1,1,C00168,Glyoxylate and dicarboxylate metabolism,1,None
+C00168,TRUE,C00168,100,1,1,C00168,Carbon metabolism,1,None
+C00168,TRUE,C00168,100,1,1,C00168,Microbial metabolism in diverse environments,1,None
+C00168,TRUE,C00168,100,1,1,C00168,Methane metabolism,1,None
+C00168,TRUE,C00168,100,1,1,C00168,Biosynthesis of secondary metabolites,1,None
+C00168,TRUE,C00168,100,1,1,C00168,Metabolic pathways,1,None
+C00170,TRUE,C00170,100,1,1,C00170,Biosynthesis of plant secondary metabolites,1,None
+C00170,TRUE,C00170,100,1,1,C00170,Cysteine and methionine metabolism,1,None
+C00170,TRUE,C00170,100,1,1,C00170,Metabolic pathways,1,None
+C00170,TRUE,C00170,100,1,1,C00170,Zeatin biosynthesis,1,None
+C00178,TRUE,C00178,100,1,1,C00178,Nucleotide metabolism,1,None
+C00178,TRUE,C00178,100,1,1,C00178,Metabolic pathways,1,None
+C00178,TRUE,C00178,100,1,1,C00178,Pyrimidine metabolism,1,None
+C00179,TRUE,C00179,100,1,1,C00179,Metabolic pathways,1,None
+C00179,TRUE,C00179,100,1,1,C00179,Biosynthesis of various plant secondary metabolites,1,None
+C00179,TRUE,C00179,100,1,1,C00179,Arginine and proline metabolism,1,None
+C00179,TRUE,C00179,100,1,1,C00179,Biosynthesis of secondary metabolites,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Dioxin degradation,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Metabolic pathways,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Benzoate degradation,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Microbial metabolism in diverse environments,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Toluene degradation,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Degradation of aromatic compounds,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Aminobenzoate degradation,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Biosynthesis of various alkaloids,1,None
+C00180,TRUE,C00180,100,1,1,C00180,Biosynthesis of secondary metabolites,1,None
+C00181,TRUE,C00181,100,1,1,C00181,Pentose and glucuronate interconversions,1,None
+C00181,TRUE,C00181,100,1,1,C00181,Amino sugar and nucleotide sugar metabolism,1,None
+C00181,TRUE,C00181,100,1,1,C00181,ABC transporters,1,None
+C00181,TRUE,C00181,100,1,1,C00181,Metabolic pathways,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Metabolic pathways,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Penicillin and cephalosporin biosynthesis,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Biosynthesis of amino acids,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Protein digestion and absorption,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Pantothenate and CoA biosynthesis,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Biosynthesis of cofactors,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Biosynthesis of plant secondary metabolites,1,None
+C00183,TRUE,C00183,100,1,1,C00183,2-Oxocarboxylic acid metabolism,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Glucosinolate biosynthesis,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Biosynthesis of secondary metabolites,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Mineral absorption,1,None
+C00183,TRUE,C00183,100,1,1,C00183,ABC transporters,1,None
+C00183,TRUE,C00183,100,1,1,C00183,"Valine, leucine and isoleucine degradation",1,None
+C00183,TRUE,C00183,100,1,1,C00183,"Valine, leucine and isoleucine biosynthesis",1,None
+C00183,TRUE,C00183,100,1,1,C00183,Aminoacyl-tRNA biosynthesis,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Central carbon metabolism in cancer,1,None
+C00183,TRUE,C00183,100,1,1,C00183,Cyanoamino acid metabolism,1,None
+C00184,TRUE,C00184,100,1,1,C00184,Metabolic pathways,1,None
+C00184,TRUE,C00184,100,1,1,C00184,Carbon metabolism,1,None
+C00184,TRUE,C00184,100,1,1,C00184,Methane metabolism,1,None
+C00184,TRUE,C00184,100,1,1,C00184,Microbial metabolism in diverse environments,1,None
+C00184,TRUE,C00184,100,1,1,C00184,Glycerolipid metabolism,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Glucagon signaling pathway,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Propanoate metabolism,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Styrene degradation,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Fructose and mannose metabolism,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Microbial metabolism in diverse environments,1,None
+C00186,TRUE,C00186,100,1,1,C00186,cAMP signaling pathway,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Glycolysis / Gluconeogenesis,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Metabolic pathways,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Efferocytosis,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Pyruvate metabolism,1,None
+C00186,TRUE,C00186,100,1,1,C00186,HIF-1 signaling pathway,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Biosynthesis of secondary metabolites,1,None
+C00186,TRUE,C00186,100,1,1,C00186,Central carbon metabolism in cancer,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Insect hormone biosynthesis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Lipid and atherosclerosis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Pathways in cancer,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Efferocytosis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Primary bile acid biosynthesis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Steroid degradation,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Fat digestion and absorption,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Aldosterone synthesis and secretion,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Basal cell carcinoma,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Ovarian steroidogenesis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Cortisol synthesis and secretion,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Bile secretion,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Steroid hormone biosynthesis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Vitamin digestion and absorption,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Cholesterol metabolism,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Steroid biosynthesis,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Microbial metabolism in diverse environments,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Cushing syndrome,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Metabolic pathways,1,None
+C00187,TRUE,C00187,100,1,1,C00187,Biosynthesis of various alkaloids,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Metabolic pathways,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Biosynthesis of secondary metabolites,1,None
+C00188,TRUE,C00188,100,1,1,C00188,ABC transporters,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Microbial metabolism in diverse environments,1,None
+C00188,TRUE,C00188,100,1,1,C00188,"Glycine, serine and threonine metabolism",1,None
+C00188,TRUE,C00188,100,1,1,C00188,Biosynthesis of amino acids,1,None
+C00188,TRUE,C00188,100,1,1,C00188,D-Amino acid metabolism,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Mineral absorption,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Monobactam biosynthesis,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Biosynthesis of plant secondary metabolites,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Protein digestion and absorption,1,None
+C00188,TRUE,C00188,100,1,1,C00188,Aminoacyl-tRNA biosynthesis,1,None
+C00188,TRUE,C00188,100,1,1,C00188,"Valine, leucine and isoleucine biosynthesis",1,None
+C00188,TRUE,C00188,100,1,1,C00188,Porphyrin metabolism,1,None
+C00189,TRUE,C00189,100,1,1,C00189,Retrograde endocannabinoid signaling,1,None
+C00189,TRUE,C00189,100,1,1,C00189,Glycerophospholipid metabolism,1,None
+C00189,TRUE,C00189,100,1,1,C00189,Metabolic pathways,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Biosynthesis of nucleotide sugars,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Pentose and glucuronate interconversions,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Amino sugar and nucleotide sugar metabolism,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Biosynthesis of cofactors,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Ascorbate and aldarate metabolism,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Inositol phosphate metabolism,1,None
+C00191,TRUE,C00191,100,1,1,C00191,Metabolic pathways,1,None
+C00208,TRUE,C00208,100,1,1,C00208,ABC transporters,1,None
+C00208,TRUE,C00208,100,1,1,C00208,Carbohydrate digestion and absorption,1,None
+C00208,TRUE,C00208,100,1,1,C00208,Phosphotransferase system (PTS),1,None
+C00208,TRUE,C00208,100,1,1,C00208,Starch and sucrose metabolism,1,None
+C00208,TRUE,C00208,100,1,1,C00208,Bacterial chemotaxis,1,None
+C00208,TRUE,C00208,100,1,1,C00208,Taste transduction,1,None
+C00208,TRUE,C00208,100,1,1,C00208,Metabolic pathways,1,None
+C00208,TRUE,C00208,100,1,1,C00208,Biosynthesis of secondary metabolites,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Purine metabolism,1,None
+C00212,TRUE,C00212,100,1,1,C00212,ABC transporters,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Sphingolipid signaling pathway,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Parkinson disease,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Nucleotide metabolism,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Neuroactive ligand-receptor interaction,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Alcoholism,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Metabolic pathways,1,None
+C00212,TRUE,C00212,100,1,1,C00212,cGMP-PKG signaling pathway,1,None
+C00212,TRUE,C00212,100,1,1,C00212,cAMP signaling pathway,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Vascular smooth muscle contraction,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Regulation of lipolysis in adipocytes,1,None
+C00212,TRUE,C00212,100,1,1,C00212,One carbon pool by folate,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Morphine addiction,1,None
+C00212,TRUE,C00212,100,1,1,C00212,Renin secretion,1,None
+C00213,TRUE,C00213,100,1,1,C00213,Arginine and proline metabolism,1,None
+C00213,TRUE,C00213,100,1,1,C00213,One carbon pool by folate,1,None
+C00213,TRUE,C00213,100,1,1,C00213,"Glycine, serine and threonine metabolism",1,None
+C00213,TRUE,C00213,100,1,1,C00213,Metabolic pathways,1,None
+C00214,TRUE,C00214,100,1,1,C00214,Nucleotide metabolism,1,None
+C00214,TRUE,C00214,100,1,1,C00214,Metabolic pathways,1,None
+C00214,TRUE,C00214,100,1,1,C00214,Pyrimidine metabolism,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Leishmaniasis,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Oxytocin signaling pathway,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Arachidonic acid metabolism,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Necroptosis,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Metabolic pathways,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Aldosterone synthesis and secretion,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Vascular smooth muscle contraction,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Regulation of lipolysis in adipocytes,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Ovarian steroidogenesis,1,None
+C00219,TRUE,C00219,100,1,1,C00219,GnRH signaling pathway,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Linoleic acid metabolism,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Ferroptosis,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Long-term depression,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Eicosanoids,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Retrograde endocannabinoid signaling,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Inflammatory mediator regulation of TRP channels,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Biosynthesis of unsaturated fatty acids,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Amoebiasis,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Phototransduction - fly,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Fc epsilon RI signaling pathway,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Serotonergic synapse,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Platelet activation,1,None
+C00219,TRUE,C00219,100,1,1,C00219,Fc gamma R-mediated phagocytosis,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Insulin resistance,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Meiosis - yeast,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Biosynthesis of secondary metabolites,2,Biosynthesis of secondary metabolites
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Carbohydrate digestion and absorption,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Biofilm formation - Vibrio cholerae,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Indole alkaloid biosynthesis,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Glucagon signaling pathway,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00221,Biosynthesis of secondary metabolites,2,Biosynthesis of secondary metabolites
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Bile secretion,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Non-alcoholic fatty liver disease,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Insulin signaling pathway,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Metabolic pathways,2,Metabolic pathways
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Prolactin signaling pathway,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,AGE-RAGE signaling pathway in diabetic complications,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00221,Carbon metabolism,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Two-component system,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00221,Microbial metabolism in diverse environments,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Galactose metabolism,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Glycolysis / Gluconeogenesis,2,Glycolysis / Gluconeogenesis
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Efferocytosis,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,FoxO signaling pathway,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Diabetic cardiomyopathy,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00221,Pentose phosphate pathway,2,Pentose phosphate pathway
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Starch and sucrose metabolism,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Taste transduction,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Mineral absorption,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Pentose phosphate pathway,2,Pentose phosphate pathway
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Streptomycin biosynthesis,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00221,Metabolic pathways,2,Metabolic pathways
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Insulin secretion,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00221,Glycolysis / Gluconeogenesis,2,Glycolysis / Gluconeogenesis
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Type II diabetes mellitus,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Phosphotransferase system (PTS),1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,AMPK signaling pathway,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,"Neomycin, kanamycin and gentamicin biosynthesis",1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Amino sugar and nucleotide sugar metabolism,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,HIF-1 signaling pathway,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Mycolic acid biosynthesis,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,ABC transporters,1,None
+"C00221, C00031",TRUE,"C00221, C00031",100,2,2,C00031,Central carbon metabolism in cancer,1,None
+C00233,TRUE,C00233,100,1,1,C00233,"Valine, leucine and isoleucine degradation",1,None
+C00233,TRUE,C00233,100,1,1,C00233,2-Oxocarboxylic acid metabolism,1,None
+C00233,TRUE,C00233,100,1,1,C00233,Biosynthesis of secondary metabolites,1,None
+C00233,TRUE,C00233,100,1,1,C00233,Metabolic pathways,1,None
+C00233,TRUE,C00233,100,1,1,C00233,"Valine, leucine and isoleucine biosynthesis",1,None
+C00233,TRUE,C00233,100,1,1,C00233,Glucosinolate biosynthesis,1,None
+C00233,TRUE,C00233,100,1,1,C00233,Lipoic acid metabolism,1,None
+C00233,TRUE,C00233,100,1,1,C00233,Biosynthesis of amino acids,1,None
+C00242,TRUE,C00242,100,1,1,C00242,Metabolic pathways,1,None
+C00242,TRUE,C00242,100,1,1,C00242,Nucleotide metabolism,1,None
+C00242,TRUE,C00242,100,1,1,C00242,Purine metabolism,1,None
+C00245,TRUE,C00245,100,1,1,C00245,Metabolic pathways,1,None
+C00245,TRUE,C00245,100,1,1,C00245,Taurine and hypotaurine metabolism,1,None
+C00245,TRUE,C00245,100,1,1,C00245,Sulfur metabolism,1,None
+C00245,TRUE,C00245,100,1,1,C00245,Neuroactive ligand-receptor interaction,1,None
+C00245,TRUE,C00245,100,1,1,C00245,ABC transporters,1,None
+C00245,TRUE,C00245,100,1,1,C00245,Primary bile acid biosynthesis,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Biosynthesis of unsaturated fatty acids,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Fatty acid metabolism,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Fatty acid elongation,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Metabolic pathways,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Fatty acid degradation,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Biosynthesis of plant secondary metabolites,1,None
+C00249,TRUE,C00249,100,1,1,C00249,Fatty acid biosynthesis,1,None
+C00249,TRUE,C00249,100,1,1,C00249,"Cutin, suberine and wax biosynthesis",1,None
+C00250,TRUE,C00250,100,1,1,C00250,Biosynthesis of cofactors,1,None
+C00250,TRUE,C00250,100,1,1,C00250,Vitamin digestion and absorption,1,None
+C00250,TRUE,C00250,100,1,1,C00250,Microbial metabolism in diverse environments,1,None
+C00250,TRUE,C00250,100,1,1,C00250,Metabolic pathways,1,None
+C00250,TRUE,C00250,100,1,1,C00250,Vitamin B6 metabolism,1,None
+C00252,TRUE,C00252,100,1,1,C00252,Starch and sucrose metabolism,1,None
+C00252,TRUE,C00252,100,1,1,C00252,Metabolic pathways,1,None
+C00253,TRUE,C00253,100,1,1,C00253,Metabolic pathways,1,None
+C00253,TRUE,C00253,100,1,1,C00253,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00253,TRUE,C00253,100,1,1,C00253,Biosynthesis of plant secondary metabolites,1,None
+C00253,TRUE,C00253,100,1,1,C00253,Pertussis,1,None
+C00253,TRUE,C00253,100,1,1,C00253,Microbial metabolism in diverse environments,1,None
+C00253,TRUE,C00253,100,1,1,C00253,Biosynthesis of cofactors,1,None
+C00253,TRUE,C00253,100,1,1,C00253,Nicotinate and nicotinamide metabolism,1,None
+C00253,TRUE,C00253,100,1,1,C00253,Biosynthesis of secondary metabolites,1,None
+C00253,TRUE,C00253,100,1,1,C00253,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C00255,TRUE,C00255,100,1,1,C00255,Metabolic pathways,1,None
+C00255,TRUE,C00255,100,1,1,C00255,Biosynthesis of secondary metabolites,1,None
+C00255,TRUE,C00255,100,1,1,C00255,Vitamin digestion and absorption,1,None
+C00255,TRUE,C00255,100,1,1,C00255,Riboflavin metabolism,1,None
+C00255,TRUE,C00255,100,1,1,C00255,Biosynthesis of cofactors,1,None
+C00255,TRUE,C00255,100,1,1,C00255,ABC transporters,1,None
+C00257,TRUE,C00257,100,1,1,C00257,Microbial metabolism in diverse environments,1,None
+C00257,TRUE,C00257,100,1,1,C00257,Biosynthesis of secondary metabolites,1,None
+C00257,TRUE,C00257,100,1,1,C00257,Carbon metabolism,1,None
+C00257,TRUE,C00257,100,1,1,C00257,Metabolic pathways,1,None
+C00257,TRUE,C00257,100,1,1,C00257,Pentose phosphate pathway,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Methane metabolism,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Biosynthesis of secondary metabolites,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Carbon metabolism,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Microbial metabolism in diverse environments,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Pentose phosphate pathway,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Metabolic pathways,1,None
+C00258,TRUE,C00258,100,1,1,C00258,"Glycine, serine and threonine metabolism",1,None
+C00258,TRUE,C00258,100,1,1,C00258,Glyoxylate and dicarboxylate metabolism,1,None
+C00258,TRUE,C00258,100,1,1,C00258,Glycerolipid metabolism,1,None
+C00262,TRUE,C00262,100,1,1,C00262,Purine metabolism,1,None
+C00262,TRUE,C00262,100,1,1,C00262,Nucleotide metabolism,1,None
+C00262,TRUE,C00262,100,1,1,C00262,Metabolic pathways,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Lysine biosynthesis,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Biosynthesis of amino acids,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Metabolic pathways,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Cysteine and methionine metabolism,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Biosynthesis of secondary metabolites,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Sulfur metabolism,1,None
+C00263,TRUE,C00263,100,1,1,C00263,Microbial metabolism in diverse environments,1,None
+C00263,TRUE,C00263,100,1,1,C00263,"Glycine, serine and threonine metabolism",1,None
+C00270,TRUE,C00270,100,1,1,C00270,Biosynthesis of nucleotide sugars,1,None
+C00270,TRUE,C00270,100,1,1,C00270,Metabolic pathways,1,None
+C00270,TRUE,C00270,100,1,1,C00270,Biosynthesis of various nucleotide sugars,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Amino sugar and nucleotide sugar metabolism,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Biosynthesis of secondary metabolites,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Metabolic pathways,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Biosynthesis of various nucleotide sugars,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Fructose and mannose metabolism,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Biosynthesis of nucleotide sugars,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Lysosome,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Biosynthesis of cofactors,1,None
+C00275,TRUE,C00275,100,1,1,C00275,Phosphotransferase system (PTS),1,None
+C00296,TRUE,C00296,100,1,1,C00296,"Phenylalanine, tyrosine and tryptophan biosynthesis",1,None
+C00296,TRUE,C00296,100,1,1,C00296,Metabolic pathways,1,None
+C00299,TRUE,C00299,100,1,1,C00299,ABC transporters,1,None
+C00299,TRUE,C00299,100,1,1,C00299,Pyrimidine metabolism,1,None
+C00299,TRUE,C00299,100,1,1,C00299,Nucleotide metabolism,1,None
+C00299,TRUE,C00299,100,1,1,C00299,Metabolic pathways,1,None
+C00300,TRUE,C00300,100,1,1,C00300,Arginine and proline metabolism,1,None
+C00300,TRUE,C00300,100,1,1,C00300,"Glycine, serine and threonine metabolism",1,None
+C00300,TRUE,C00300,100,1,1,C00300,Metabolic pathways,1,None
+C00309,TRUE,C00309,100,1,1,C00309,Pentose and glucuronate interconversions,1,None
+C00309,TRUE,C00309,100,1,1,C00309,Metabolic pathways,1,None
+C00310,TRUE,C00310,100,1,1,C00310,Pentose and glucuronate interconversions,1,None
+C00310,TRUE,C00310,100,1,1,C00310,Metabolic pathways,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Bile secretion,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Arginine and proline metabolism,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Metabolic pathways,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Biosynthesis of secondary metabolites,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Phenylpropanoid biosynthesis,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Glutathione metabolism,1,None
+C00315,TRUE,C00315,100,1,1,C00315,beta-Alanine metabolism,1,None
+C00315,TRUE,C00315,100,1,1,C00315,Biosynthesis of siderophore group nonribosomal peptides,1,None
+C00315,TRUE,C00315,100,1,1,C00315,ABC transporters,1,None
+C00318,TRUE,C00318,100,1,1,C00318,Thermogenesis,1,None
+C00318,TRUE,C00318,100,1,1,C00318,Bile secretion,1,None
+C00318,TRUE,C00318,100,1,1,C00318,Diabetic cardiomyopathy,1,None
+C00319,TRUE,C00319,100,1,1,C00319,Metabolic pathways,1,None
+C00319,TRUE,C00319,100,1,1,C00319,Apoptosis,1,None
+C00319,TRUE,C00319,100,1,1,C00319,Sphingolipid signaling pathway,1,None
+C00319,TRUE,C00319,100,1,1,C00319,Necroptosis,1,None
+C00319,TRUE,C00319,100,1,1,C00319,Sphingolipid metabolism,1,None
+C00327,TRUE,C00327,100,1,1,C00327,Biosynthesis of amino acids,1,None
+C00327,TRUE,C00327,100,1,1,C00327,Metabolic pathways,1,None
+C00327,TRUE,C00327,100,1,1,C00327,Biosynthesis of secondary metabolites,1,None
+C00327,TRUE,C00327,100,1,1,C00327,Arginine biosynthesis,1,None
+C00328,TRUE,C00328,100,1,1,C00328,Tryptophan metabolism,1,None
+C00328,TRUE,C00328,100,1,1,C00328,Biosynthesis of cofactors,1,None
+C00328,TRUE,C00328,100,1,1,C00328,African trypanosomiasis,1,None
+C00328,TRUE,C00328,100,1,1,C00328,Metabolic pathways,1,None
+C00330,TRUE,C00330,100,1,1,C00330,Purine metabolism,1,None
+C00330,TRUE,C00330,100,1,1,C00330,Nucleotide metabolism,1,None
+C00330,TRUE,C00330,100,1,1,C00330,ABC transporters,1,None
+C00330,TRUE,C00330,100,1,1,C00330,Metabolic pathways,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Microbial metabolism in diverse environments,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Morphine addiction,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Arginine and proline metabolism,1,None
+C00334,TRUE,C00334,100,1,1,C00334,beta-Alanine metabolism,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Metabolic pathways,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Neuroactive ligand-receptor interaction,1,None
+C00334,TRUE,C00334,100,1,1,C00334,"Alanine, aspartate and glutamate metabolism",1,None
+C00334,TRUE,C00334,100,1,1,C00334,cAMP signaling pathway,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Nicotine addiction,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Quorum sensing,1,None
+C00334,TRUE,C00334,100,1,1,C00334,GABAergic synapse,1,None
+C00334,TRUE,C00334,100,1,1,C00334,GnRH secretion,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Taste transduction,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Nicotinate and nicotinamide metabolism,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Estrogen signaling pathway,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Synaptic vesicle cycle,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Butanoate metabolism,1,None
+C00334,TRUE,C00334,100,1,1,C00334,Retrograde endocannabinoid signaling,1,None
+C00345,TRUE,C00345,100,1,1,C00345,Microbial metabolism in diverse environments,1,None
+C00345,TRUE,C00345,100,1,1,C00345,Pentose phosphate pathway,1,None
+C00345,TRUE,C00345,100,1,1,C00345,Biosynthesis of secondary metabolites,1,None
+C00345,TRUE,C00345,100,1,1,C00345,Carbon metabolism,1,None
+C00345,TRUE,C00345,100,1,1,C00345,Metabolic pathways,1,None
+C00346,TRUE,C00346,100,1,1,C00346,Metabolic pathways,1,None
+C00346,TRUE,C00346,100,1,1,C00346,Glycosylphosphatidylinositol (GPI)-anchor biosynthesis,1,None
+C00346,TRUE,C00346,100,1,1,C00346,Cationic antimicrobial peptide (CAMP) resistance,1,None
+C00346,TRUE,C00346,100,1,1,C00346,Glycerophospholipid metabolism,1,None
+C00346,TRUE,C00346,100,1,1,C00346,Sphingolipid signaling pathway,1,None
+C00346,TRUE,C00346,100,1,1,C00346,Sphingolipid metabolism,1,None
+C00357,TRUE,C00357,100,1,1,C00357,Phosphotransferase system (PTS),1,None
+C00357,TRUE,C00357,100,1,1,C00357,Amino sugar and nucleotide sugar metabolism,1,None
+C00357,TRUE,C00357,100,1,1,C00357,Biosynthesis of nucleotide sugars,1,None
+C00357,TRUE,C00357,100,1,1,C00357,Metabolic pathways,1,None
+C00366,TRUE,C00366,100,1,1,C00366,Metabolic pathways,1,None
+C00366,TRUE,C00366,100,1,1,C00366,Microbial metabolism in diverse environments,1,None
+C00366,TRUE,C00366,100,1,1,C00366,Purine metabolism,1,None
+C00366,TRUE,C00366,100,1,1,C00366,Bile secretion,1,None
+C00379,TRUE,C00379,100,1,1,C00379,ABC transporters,1,None
+C00379,TRUE,C00379,100,1,1,C00379,Metabolic pathways,1,None
+C00379,TRUE,C00379,100,1,1,C00379,Pentose and glucuronate interconversions,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Biosynthesis of secondary metabolites,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Biosynthesis of plant secondary metabolites,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Purine metabolism,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Metabolic pathways,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Caffeine metabolism,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Microbial metabolism in diverse environments,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00385,TRUE,C00385,100,1,1,C00385,Nucleotide metabolism,1,None
+C00387,TRUE,C00387,100,1,1,C00387,Purine metabolism,1,None
+C00387,TRUE,C00387,100,1,1,C00387,Nucleotide metabolism,1,None
+C00387,TRUE,C00387,100,1,1,C00387,Metabolic pathways,1,None
+C00387,TRUE,C00387,100,1,1,C00387,ABC transporters,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Neuroactive ligand-receptor interaction,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Gastric acid secretion,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Histidine metabolism,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Synaptic vesicle cycle,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Biosynthesis of secondary metabolites,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Inflammatory mediator regulation of TRP channels,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Histamine H2/H3 receptor agonists/antagonists,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Fc epsilon RI signaling pathway,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Asthma,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Metabolic pathways,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Protein digestion and absorption,1,None
+C00388,TRUE,C00388,100,1,1,C00388,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00392,TRUE,C00392,100,1,1,C00392,Metabolic pathways,1,None
+C00392,TRUE,C00392,100,1,1,C00392,Phosphotransferase system (PTS),1,None
+C00392,TRUE,C00392,100,1,1,C00392,ABC transporters,1,None
+C00392,TRUE,C00392,100,1,1,C00392,Fructose and mannose metabolism,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Aminoacyl-tRNA biosynthesis,1,None
+C00407,TRUE,C00407,100,1,1,C00407,"Valine, leucine and isoleucine degradation",1,None
+C00407,TRUE,C00407,100,1,1,C00407,Biosynthesis of amino acids,1,None
+C00407,TRUE,C00407,100,1,1,C00407,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00407,TRUE,C00407,100,1,1,C00407,Protein digestion and absorption,1,None
+C00407,TRUE,C00407,100,1,1,C00407,"Valine, leucine and isoleucine biosynthesis",1,None
+C00407,TRUE,C00407,100,1,1,C00407,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C00407,TRUE,C00407,100,1,1,C00407,Glucosinolate biosynthesis,1,None
+C00407,TRUE,C00407,100,1,1,C00407,2-Oxocarboxylic acid metabolism,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Biosynthesis of secondary metabolites,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Mineral absorption,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Shigellosis,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Central carbon metabolism in cancer,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Cyanoamino acid metabolism,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Metabolic pathways,1,None
+C00407,TRUE,C00407,100,1,1,C00407,Biosynthesis of plant secondary metabolites,1,None
+C00407,TRUE,C00407,100,1,1,C00407,ABC transporters,1,None
+C00408,TRUE,C00408,100,1,1,C00408,Biosynthesis of secondary metabolites,1,None
+C00408,TRUE,C00408,100,1,1,C00408,Lysine degradation,1,None
+C00408,TRUE,C00408,100,1,1,C00408,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C00408,TRUE,C00408,100,1,1,C00408,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00408,TRUE,C00408,100,1,1,C00408,Microbial metabolism in diverse environments,1,None
+C00408,TRUE,C00408,100,1,1,C00408,Biosynthesis of plant secondary metabolites,1,None
+C00408,TRUE,C00408,100,1,1,C00408,Metabolic pathways,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Metabolic pathways,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Glyoxylate and dicarboxylate metabolism,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Citrate cycle (TCA cycle),1,None
+C00417,TRUE,C00417,100,1,1,C00417,Microbial metabolism in diverse environments,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of terpenoids and steroids,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of secondary metabolites,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of plant hormones,1,None
+C00417,TRUE,C00417,100,1,1,C00417,2-Oxocarboxylic acid metabolism,1,None
+C00417,TRUE,C00417,100,1,1,C00417,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Other carbon fixation pathways,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of plant secondary metabolites,1,None
+C00417,TRUE,C00417,100,1,1,C00417,C5-Branched dibasic acid metabolism,1,None
+C00417,TRUE,C00417,100,1,1,C00417,Biosynthesis of phenylpropanoids,1,None
+C00429,TRUE,C00429,100,1,1,C00429,Pantothenate and CoA biosynthesis,1,None
+C00429,TRUE,C00429,100,1,1,C00429,beta-Alanine metabolism,1,None
+C00429,TRUE,C00429,100,1,1,C00429,Metabolic pathways,1,None
+C00429,TRUE,C00429,100,1,1,C00429,Pyrimidine metabolism,1,None
+C00431,TRUE,C00431,100,1,1,C00431,Microbial metabolism in diverse environments,1,None
+C00431,TRUE,C00431,100,1,1,C00431,Lysine degradation,1,None
+C00431,TRUE,C00431,100,1,1,C00431,D-Amino acid metabolism,1,None
+C00431,TRUE,C00431,100,1,1,C00431,Arginine and proline metabolism,1,None
+C00431,TRUE,C00431,100,1,1,C00431,Metabolic pathways,1,None
+C00437,TRUE,C00437,100,1,1,C00437,Biosynthesis of amino acids,1,None
+C00437,TRUE,C00437,100,1,1,C00437,Metabolic pathways,1,None
+C00437,TRUE,C00437,100,1,1,C00437,Biosynthesis of secondary metabolites,1,None
+C00437,TRUE,C00437,100,1,1,C00437,Arginine biosynthesis,1,None
+C00437,TRUE,C00437,100,1,1,C00437,2-Oxocarboxylic acid metabolism,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Cobalamin transport and metabolism,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Folate transport and metabolism,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Metabolic pathways,1,None
+C00440,TRUE,C00440,100,1,1,C00440,One carbon pool by folate,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Antifolate resistance,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Carbon metabolism,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Microbial metabolism in diverse environments,1,None
+C00440,TRUE,C00440,100,1,1,C00440,Other carbon fixation pathways,1,None
+C00449,TRUE,C00449,100,1,1,C00449,Lysine biosynthesis,1,None
+C00449,TRUE,C00449,100,1,1,C00449,Lysine degradation,1,None
+C00449,TRUE,C00449,100,1,1,C00449,Metabolic pathways,1,None
+C00449,TRUE,C00449,100,1,1,C00449,Biosynthesis of secondary metabolites,1,None
+C00449,TRUE,C00449,100,1,1,C00449,Biosynthesis of amino acids,1,None
+C00455,TRUE,C00455,100,1,1,C00455,Nicotinate and nicotinamide metabolism,1,None
+C00455,TRUE,C00455,100,1,1,C00455,Metabolic pathways,1,None
+C00474,TRUE,C00474,100,1,1,C00474,Riboflavin metabolism,1,None
+C00474,TRUE,C00474,100,1,1,C00474,Metabolic pathways,1,None
+C00474,TRUE,C00474,100,1,1,C00474,Pentose and glucuronate interconversions,1,None
+C00475,TRUE,C00475,100,1,1,C00475,Metabolic pathways,1,None
+C00475,TRUE,C00475,100,1,1,C00475,ABC transporters,1,None
+C00475,TRUE,C00475,100,1,1,C00475,Nucleotide metabolism,1,None
+C00475,TRUE,C00475,100,1,1,C00475,Pyrimidine metabolism,1,None
+C00486,TRUE,C00486,100,1,1,C00486,Bile secretion,1,None
+C00486,TRUE,C00486,100,1,1,C00486,Biosynthesis of secondary metabolites,1,None
+C00486,TRUE,C00486,100,1,1,C00486,Metabolic pathways,1,None
+C00486,TRUE,C00486,100,1,1,C00486,Porphyrin metabolism,1,None
+C00489,TRUE,C00489,100,1,1,C00489,Metabolic pathways,1,None
+C00489,TRUE,C00489,100,1,1,C00489,Microbial metabolism in diverse environments,1,None
+C00489,TRUE,C00489,100,1,1,C00489,Lysine degradation,1,None
+C00489,TRUE,C00489,100,1,1,C00489,Fatty acid degradation,1,None
+C00491,TRUE,C00491,100,1,1,C00491,ABC transporters,1,None
+C00491,TRUE,C00491,100,1,1,C00491,Protein digestion and absorption,1,None
+C00491,TRUE,C00491,100,1,1,C00491,Ferroptosis,1,None
+C00491,TRUE,C00491,100,1,1,C00491,Metabolic pathways,1,None
+C00491,TRUE,C00491,100,1,1,C00491,Cysteine and methionine metabolism,1,None
+C00503,TRUE,C00503,100,1,1,C00503,ABC transporters,1,None
+C00519,TRUE,C00519,100,1,1,C00519,Taurine and hypotaurine metabolism,1,None
+C00519,TRUE,C00519,100,1,1,C00519,Metabolic pathways,1,None
+C00523,TRUE,C00523,100,1,1,C00523,Metabolic pathways,1,None
+C00523,TRUE,C00523,100,1,1,C00523,Steroid hormone biosynthesis,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Ovarian steroidogenesis,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Steroid degradation,1,None
+C00535,TRUE,C00535,100,1,1,C00535,"Progesterone, androgen and estrogen receptor agonists/antagonists",1,None
+C00535,TRUE,C00535,100,1,1,C00535,GnRH secretion,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Microbial metabolism in diverse environments,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Metabolic pathways,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Endocrine resistance,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Steroid hormone biosynthesis,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Pathways in cancer,1,None
+C00535,TRUE,C00535,100,1,1,C00535,Prostate cancer,1,None
+C00581,TRUE,C00581,100,1,1,C00581,Metabolic pathways,1,None
+C00581,TRUE,C00581,100,1,1,C00581,Arginine and proline metabolism,1,None
+C00581,TRUE,C00581,100,1,1,C00581,"Glycine, serine and threonine metabolism",1,None
+C00583,TRUE,C00583,100,1,1,C00583,Propanoate metabolism,1,None
+C00583,TRUE,C00583,100,1,1,C00583,Metabolic pathways,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Arachidonic acid metabolism,1,None
+C00584,TRUE,C00584,100,1,1,C00584,African trypanosomiasis,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Amoebiasis,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Human cytomegalovirus infection,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Efferocytosis,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Serotonergic synapse,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Leishmaniasis,1,None
+C00584,TRUE,C00584,100,1,1,C00584,cAMP signaling pathway,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Human papillomavirus infection,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Neuroactive ligand-receptor interaction,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Rheumatoid arthritis,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Regulation of lipolysis in adipocytes,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Metabolic pathways,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Oxytocin signaling pathway,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Pathways in cancer,1,None
+C00584,TRUE,C00584,100,1,1,C00584,C-type lectin receptor signaling pathway,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Renin secretion,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Bile secretion,1,None
+C00584,TRUE,C00584,100,1,1,C00584,Inflammatory mediator regulation of TRP channels,1,None
+C00597,FALSE,NA,0,1,0,C00597,NA,NA,None
+C00631,TRUE,C00631,100,1,1,C00631,Glycolysis / Gluconeogenesis,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Pentose phosphate pathway,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Biosynthesis of amino acids,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Biosynthesis of secondary metabolites,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Microbial metabolism in diverse environments,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Methane metabolism,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Biosynthesis of terpenoids and steroids,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Carbon metabolism,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Central carbon metabolism in cancer,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Biosynthesis of plant secondary metabolites,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Glycerolipid metabolism,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Glyoxylate and dicarboxylate metabolism,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Glucagon signaling pathway,1,None
+C00631,TRUE,C00631,100,1,1,C00631,Metabolic pathways,1,None
+C00631,TRUE,C00631,100,1,1,C00631,"Glycine, serine and threonine metabolism",1,None
+C00631,TRUE,C00631,100,1,1,C00631,Biosynthesis of phenylpropanoids,1,None
+C00642,TRUE,C00642,100,1,1,C00642,Degradation of flavonoids,1,None
+C00642,TRUE,C00642,100,1,1,C00642,Degradation of aromatic compounds,1,None
+C00642,TRUE,C00642,100,1,1,C00642,Tyrosine metabolism,1,None
+C00642,TRUE,C00642,100,1,1,C00642,Metabolic pathways,1,None
+C00642,TRUE,C00642,100,1,1,C00642,Microbial metabolism in diverse environments,1,None
+C00642,TRUE,C00642,100,1,1,C00642,Phenylalanine metabolism,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Metabolic pathways,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of plant hormones,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of alkaloids derived from shikimate pathway,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of secondary metabolites,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of plant secondary metabolites,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Glucagon signaling pathway,1,None
+C00668,TRUE,C00668,100,1,1,C00668,AMPK signaling pathway,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of phenylpropanoids,1,None
+C00668,TRUE,C00668,100,1,1,C00668,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C00668,TRUE,C00668,100,1,1,C00668,Galactose metabolism,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Carbon metabolism,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of nucleotide sugars,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of cofactors,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Pentose phosphate pathway,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Amino sugar and nucleotide sugar metabolism,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Microbial metabolism in diverse environments,1,None
+C00668,TRUE,C00668,100,1,1,C00668,Glycolysis / Gluconeogenesis,1,None
+C00669,TRUE,C00669,100,1,1,C00669,Metabolic pathways,1,None
+C00669,TRUE,C00669,100,1,1,C00669,Biosynthesis of cofactors,1,None
+C00669,TRUE,C00669,100,1,1,C00669,Glutathione metabolism,1,None
+C00669,TRUE,C00669,100,1,1,C00669,Ferroptosis,1,None
+C00670,TRUE,C00670,100,1,1,C00670,Ether lipid metabolism,1,None
+C00670,TRUE,C00670,100,1,1,C00670,Choline metabolism in cancer,1,None
+C00670,TRUE,C00670,100,1,1,C00670,Glycerophospholipid metabolism,1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C06008,NA,NA,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,Metabolic pathways,1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,"Valine, leucine and isoleucine degradation",1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,Lipoic acid metabolism,1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,Biosynthesis of amino acids,1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,"Valine, leucine and isoleucine biosynthesis",1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,2-Oxocarboxylic acid metabolism,1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,Biosynthesis of secondary metabolites,1,None
+"C00671, C06008",TRUE,C00671,50,2,1,C00671,Glucosinolate biosynthesis,1,None
+C00712,TRUE,C00712,100,1,1,C00712,"Cutin, suberine and wax biosynthesis",1,None
+C00712,TRUE,C00712,100,1,1,C00712,Biosynthesis of unsaturated fatty acids,1,None
+C00712,TRUE,C00712,100,1,1,C00712,Biosynthesis of plant secondary metabolites,1,None
+C00712,TRUE,C00712,100,1,1,C00712,Longevity regulating pathway - worm,1,None
+C00712,TRUE,C00712,100,1,1,C00712,Fatty acid biosynthesis,1,None
+C00719,TRUE,C00719,100,1,1,C00719,"Glycine, serine and threonine metabolism",1,None
+C00719,TRUE,C00719,100,1,1,C00719,ABC transporters,1,None
+C00719,TRUE,C00719,100,1,1,C00719,Folate transport and metabolism,1,None
+C00719,TRUE,C00719,100,1,1,C00719,Metabolic pathways,1,None
+C00719,TRUE,C00719,100,1,1,C00719,One carbon pool by folate,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Steroid hormone biosynthesis,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Aldosterone-regulated sodium reabsorption,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Glucocorticoid and mineralocorticoid receptor agonists/antagonists,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Cushing syndrome,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Metabolic pathways,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Pathways in cancer,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Cortisol synthesis and secretion,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Prostate cancer,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Neuroactive ligand-receptor interaction,1,None
+C00735,TRUE,C00735,100,1,1,C00735,Bile secretion,1,None
+C00750,TRUE,C00750,100,1,1,C00750,Glutathione metabolism,1,None
+C00750,TRUE,C00750,100,1,1,C00750,Bile secretion,1,None
+C00750,TRUE,C00750,100,1,1,C00750,Biosynthesis of cofactors,1,None
+C00750,TRUE,C00750,100,1,1,C00750,Pantothenate and CoA biosynthesis,1,None
+C00750,TRUE,C00750,100,1,1,C00750,beta-Alanine metabolism,1,None
+C00750,TRUE,C00750,100,1,1,C00750,Metabolic pathways,1,None
+C00750,TRUE,C00750,100,1,1,C00750,Arginine and proline metabolism,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of plant hormones,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Sesquiterpenoid and triterpenoid biosynthesis,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Metabolic pathways,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of secondary metabolites,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Steroid biosynthesis,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of various alkaloids,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of terpenoids and steroids,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of plant secondary metabolites,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C00751,TRUE,C00751,100,1,1,C00751,Biosynthesis of various plant secondary metabolites,1,None
+C00762,TRUE,C00762,100,1,1,C00762,Glucocorticoid and mineralocorticoid receptor agonists/antagonists,1,None
+C00762,TRUE,C00762,100,1,1,C00762,Pathways in cancer,1,None
+C00762,TRUE,C00762,100,1,1,C00762,Metabolic pathways,1,None
+C00762,TRUE,C00762,100,1,1,C00762,Steroid hormone biosynthesis,1,None
+C00762,TRUE,C00762,100,1,1,C00762,Aldosterone-regulated sodium reabsorption,1,None
+C00762,TRUE,C00762,100,1,1,C00762,Prostate cancer,1,None
+C00785,TRUE,C00785,100,1,1,C00785,Metabolic pathways,1,None
+C00785,TRUE,C00785,100,1,1,C00785,Histidine metabolism,1,None
+C00791,TRUE,C00791,100,1,1,C00791,Metabolic pathways,1,None
+C00791,TRUE,C00791,100,1,1,C00791,Arginine and proline metabolism,1,None
+C00794,TRUE,C00794,100,1,1,C00794,ABC transporters,1,None
+C00794,TRUE,C00794,100,1,1,C00794,Metabolic pathways,1,None
+C00794,TRUE,C00794,100,1,1,C00794,Galactose metabolism,1,None
+C00794,TRUE,C00794,100,1,1,C00794,Phosphotransferase system (PTS),1,None
+C00794,TRUE,C00794,100,1,1,C00794,Fructose and mannose metabolism,1,None
+C00794,TRUE,C00794,100,1,1,C00794,Diabetic cardiomyopathy,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Biosynthesis of plant hormones,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Biosynthesis of siderophore group nonribosomal peptides,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Metabolic pathways,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Naphthalene degradation,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Microbial metabolism in diverse environments,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Plant hormone signal transduction,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Degradation of aromatic compounds,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Biosynthesis of secondary metabolites,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Biosynthesis of phenylpropanoids,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Dioxin degradation,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Bile secretion,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Polycyclic aromatic hydrocarbon degradation,1,None
+C00805,TRUE,C00805,100,1,1,C00805,Biosynthesis of various alkaloids,1,None
+C00815,FALSE,NA,0,1,0,C00815,NA,NA,None
+C00818,TRUE,C00818,100,1,1,C00818,Metabolic pathways,1,None
+C00818,TRUE,C00818,100,1,1,C00818,Ascorbate and aldarate metabolism,1,None
+C00836,TRUE,C00836,100,1,1,C00836,Sphingolipid signaling pathway,1,None
+C00836,TRUE,C00836,100,1,1,C00836,Metabolic pathways,1,None
+C00836,TRUE,C00836,100,1,1,C00836,Sphingolipid metabolism,1,None
+C00847,TRUE,C00847,100,1,1,C00847,Microbial metabolism in diverse environments,1,None
+C00847,TRUE,C00847,100,1,1,C00847,Vitamin B6 metabolism,1,None
+C00847,TRUE,C00847,100,1,1,C00847,Metabolic pathways,1,None
+C00864,TRUE,C00864,100,1,1,C00864,Biosynthesis of cofactors,1,None
+C00864,TRUE,C00864,100,1,1,C00864,beta-Alanine metabolism,1,None
+C00864,TRUE,C00864,100,1,1,C00864,Pantothenate and CoA biosynthesis,1,None
+C00864,TRUE,C00864,100,1,1,C00864,Metabolic pathways,1,None
+C00864,TRUE,C00864,100,1,1,C00864,Vitamin digestion and absorption,1,None
+C00864,TRUE,C00864,100,1,1,C00864,Biosynthesis of secondary metabolites,1,None
+C00878,TRUE,C00878,100,1,1,C00878,Metabolic pathways,1,None
+C00878,TRUE,C00878,100,1,1,C00878,Ascorbate and aldarate metabolism,1,None
+C00882,TRUE,C00882,100,1,1,C00882,Biosynthesis of cofactors,1,None
+C00882,TRUE,C00882,100,1,1,C00882,Pantothenate and CoA biosynthesis,1,None
+C00882,TRUE,C00882,100,1,1,C00882,Metabolic pathways,1,None
+C00898,TRUE,C00898,100,1,1,C00898,Glyoxylate and dicarboxylate metabolism,1,None
+C00898,TRUE,C00898,100,1,1,C00898,Metabolic pathways,1,None
+C00946,FALSE,NA,0,1,0,C00946,NA,NA,None
+C00954,TRUE,C00954,100,1,1,C00954,Plant hormone signal transduction,1,None
+C00954,TRUE,C00954,100,1,1,C00954,Biosynthesis of plant hormones,1,None
+C00954,TRUE,C00954,100,1,1,C00954,Metabolic pathways,1,None
+C00954,TRUE,C00954,100,1,1,C00954,Tryptophan metabolism,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Lysine biosynthesis,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Penicillin and cephalosporin biosynthesis,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Microbial metabolism in diverse environments,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Biosynthesis of amino acids,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Biosynthesis of secondary metabolites,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Lysine degradation,1,None
+C00956,TRUE,C00956,100,1,1,C00956,Metabolic pathways,1,None
+C00956,TRUE,C00956,100,1,1,C00956,2-Oxocarboxylic acid metabolism,1,None
+C00993,TRUE,C00993,100,1,1,C00993,Metabolic pathways,1,None
+C00993,TRUE,C00993,100,1,1,C00993,Peptidoglycan biosynthesis,1,None
+C00993,TRUE,C00993,100,1,1,C00993,Vancomycin resistance,1,None
+C00993,TRUE,C00993,100,1,1,C00993,D-Amino acid metabolism,1,None
+C01004,TRUE,C01004,100,1,1,C01004,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C01019,TRUE,C01019,100,1,1,C01019,Metabolic pathways,1,None
+C01019,TRUE,C01019,100,1,1,C01019,Quorum sensing,1,None
+C01019,TRUE,C01019,100,1,1,C01019,Microbial metabolism in diverse environments,1,None
+C01019,TRUE,C01019,100,1,1,C01019,C-type lectin receptor signaling pathway,1,None
+C01019,TRUE,C01019,100,1,1,C01019,Fructose and mannose metabolism,1,None
+C01019,TRUE,C01019,100,1,1,C01019,Two-component system,1,None
+C01019,TRUE,C01019,100,1,1,C01019,Biosynthesis of nucleotide sugars,1,None
+C01019,TRUE,C01019,100,1,1,C01019,Amino sugar and nucleotide sugar metabolism,1,None
+C01026,TRUE,C01026,100,1,1,C01026,One carbon pool by folate,1,None
+C01026,TRUE,C01026,100,1,1,C01026,Folate transport and metabolism,1,None
+C01026,TRUE,C01026,100,1,1,C01026,"Glycine, serine and threonine metabolism",1,None
+C01026,TRUE,C01026,100,1,1,C01026,Metabolic pathways,1,None
+C01035,TRUE,C01035,100,1,1,C01035,Metabolic pathways,1,None
+C01035,TRUE,C01035,100,1,1,C01035,Arginine and proline metabolism,1,None
+C01040,TRUE,C01040,100,1,1,C01040,Metabolic pathways,1,None
+C01040,TRUE,C01040,100,1,1,C01040,Biosynthesis of cofactors,1,None
+C01040,TRUE,C01040,100,1,1,C01040,Ascorbate and aldarate metabolism,1,None
+C01042,TRUE,C01042,100,1,1,C01042,"Alanine, aspartate and glutamate metabolism",1,None
+C01042,TRUE,C01042,100,1,1,C01042,Metabolic pathways,1,None
+C01046,TRUE,C01046,100,1,1,C01046,Methane metabolism,1,None
+C01046,TRUE,C01046,100,1,1,C01046,Metabolic pathways,1,None
+C01046,TRUE,C01046,100,1,1,C01046,Microbial metabolism in diverse environments,1,None
+C01089,TRUE,C01089,100,1,1,C01089,cAMP signaling pathway,1,None
+C01089,TRUE,C01089,100,1,1,C01089,Metabolic pathways,1,None
+C01089,TRUE,C01089,100,1,1,C01089,Butanoate metabolism,1,None
+C01094,TRUE,C01094,100,1,1,C01094,Microbial metabolism in diverse environments,1,None
+C01094,TRUE,C01094,100,1,1,C01094,Phosphotransferase system (PTS),1,None
+C01094,TRUE,C01094,100,1,1,C01094,Metabolic pathways,1,None
+C01094,TRUE,C01094,100,1,1,C01094,"Phenylalanine, tyrosine and tryptophan biosynthesis",1,None
+C01094,TRUE,C01094,100,1,1,C01094,Fructose and mannose metabolism,1,None
+C01096,TRUE,C01096,100,1,1,C01096,Phosphotransferase system (PTS),1,None
+C01096,TRUE,C01096,100,1,1,C01096,Metabolic pathways,1,None
+C01096,TRUE,C01096,100,1,1,C01096,Fructose and mannose metabolism,1,None
+C01118,TRUE,C01118,100,1,1,C01118,Microbial metabolism in diverse environments,1,None
+C01118,TRUE,C01118,100,1,1,C01118,Sulfur metabolism,1,None
+C01118,TRUE,C01118,100,1,1,C01118,Cysteine and methionine metabolism,1,None
+C01118,TRUE,C01118,100,1,1,C01118,Biosynthesis of secondary metabolites,1,None
+C01118,TRUE,C01118,100,1,1,C01118,Biosynthesis of amino acids,1,None
+C01118,TRUE,C01118,100,1,1,C01118,Metabolic pathways,1,None
+C01152,TRUE,C01152,100,1,1,C01152,Histidine metabolism,1,None
+C01152,TRUE,C01152,100,1,1,C01152,Metabolic pathways,1,None
+C01157,TRUE,C01157,100,1,1,C01157,Metabolic pathways,1,None
+C01157,TRUE,C01157,100,1,1,C01157,Arginine and proline metabolism,1,None
+C01157,TRUE,C01157,100,1,1,C01157,ABC transporters,1,None
+C01157,TRUE,C01157,100,1,1,C01157,D-Amino acid metabolism,1,None
+C01177,TRUE,C01177,100,1,1,C01177,Phosphatidylinositol signaling system,1,None
+C01177,TRUE,C01177,100,1,1,C01177,ABC transporters,1,None
+C01177,TRUE,C01177,100,1,1,C01177,Metabolic pathways,1,None
+C01177,TRUE,C01177,100,1,1,C01177,Inositol phosphate metabolism,1,None
+C01181,TRUE,C01181,100,1,1,C01181,Metabolic pathways,1,None
+C01181,TRUE,C01181,100,1,1,C01181,ABC transporters,1,None
+C01181,TRUE,C01181,100,1,1,C01181,Lysine degradation,1,None
+C01233,TRUE,C01233,100,1,1,C01233,Glycerophospholipid metabolism,1,None
+C01233,TRUE,C01233,100,1,1,C01233,Metabolic pathways,1,None
+C01233,TRUE,C01233,100,1,1,C01233,Ether lipid metabolism,1,None
+C01262,TRUE,C01262,100,1,1,C01262,Metabolic pathways,1,None
+C01262,TRUE,C01262,100,1,1,C01262,beta-Alanine metabolism,1,None
+C01262,TRUE,C01262,100,1,1,C01262,Histidine metabolism,1,None
+C01367,TRUE,C01367,100,1,1,C01367,Purine metabolism,1,None
+C01367,TRUE,C01367,100,1,1,C01367,Metabolic pathways,1,None
+C01419,TRUE,C01419,100,1,1,C01419,Glutathione metabolism,1,None
+C01419,TRUE,C01419,100,1,1,C01419,Metabolic pathways,1,None
+C01425,FALSE,NA,0,1,0,C01425,NA,NA,None
+C01468,TRUE,C01468,100,1,1,C01468,Metabolic pathways,1,None
+C01468,TRUE,C01468,100,1,1,C01468,Nitrotoluene degradation,1,None
+C01468,TRUE,C01468,100,1,1,C01468,Microbial metabolism in diverse environments,1,None
+C01468,TRUE,C01468,100,1,1,C01468,Protein digestion and absorption,1,None
+C01468,TRUE,C01468,100,1,1,C01468,Degradation of aromatic compounds,1,None
+C01468,TRUE,C01468,100,1,1,C01468,Toluene degradation,1,None
+C01517,FALSE,NA,0,1,0,C01517,NA,NA,None
+C01530,TRUE,C01530,100,1,1,C01530,Phototransduction - fly,1,None
+C01530,TRUE,C01530,100,1,1,C01530,Biosynthesis of plant secondary metabolites,1,None
+C01530,TRUE,C01530,100,1,1,C01530,Biosynthesis of unsaturated fatty acids,1,None
+C01530,TRUE,C01530,100,1,1,C01530,Metabolic pathways,1,None
+C01530,TRUE,C01530,100,1,1,C01530,Fatty acid biosynthesis,1,None
+C01571,TRUE,C01571,100,1,1,C01571,Fatty acid biosynthesis,1,None
+C01571,TRUE,C01571,100,1,1,C01571,Metabolic pathways,1,None
+C01582,FALSE,NA,0,1,0,C01582,NA,NA,None
+C01585,FALSE,NA,0,1,0,C01585,NA,NA,None
+C01586,FALSE,NA,0,1,0,C01586,NA,NA,None
+C01595,TRUE,C01595,100,1,1,C01595,Linoleic acid metabolism,1,None
+C01595,TRUE,C01595,100,1,1,C01595,Biosynthesis of plant secondary metabolites,1,None
+C01595,TRUE,C01595,100,1,1,C01595,Biosynthesis of unsaturated fatty acids,1,None
+C01595,TRUE,C01595,100,1,1,C01595,Metabolic pathways,1,None
+C01601,FALSE,NA,0,1,0,C01601,NA,NA,None
+C01620,TRUE,C01620,100,1,1,C01620,Ascorbate and aldarate metabolism,1,None
+C01620,TRUE,C01620,100,1,1,C01620,Metabolic pathways,1,None
+C01762,TRUE,C01762,100,1,1,C01762,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C01762,TRUE,C01762,100,1,1,C01762,Metabolic pathways,1,None
+C01762,TRUE,C01762,100,1,1,C01762,Caffeine metabolism,1,None
+C01762,TRUE,C01762,100,1,1,C01762,Nucleotide metabolism,1,None
+C01762,TRUE,C01762,100,1,1,C01762,ABC transporters,1,None
+C01762,TRUE,C01762,100,1,1,C01762,Biosynthesis of secondary metabolites,1,None
+C01762,TRUE,C01762,100,1,1,C01762,Purine metabolism,1,None
+"C01835, C00721, C00420",TRUE,"C01835, C00721",66.66666666666666,3,2,C01835,Carbohydrate digestion and absorption,1,None
+"C01835, C00721, C00420",TRUE,"C01835, C00721",66.66666666666666,3,2,C00721,Metabolic pathways,1,None
+"C01835, C00721, C00420",TRUE,"C01835, C00721",66.66666666666666,3,2,C01835,ABC transporters,1,None
+"C01835, C00721, C00420",TRUE,"C01835, C00721",66.66666666666666,3,2,C00721,Starch and sucrose metabolism,1,None
+"C01835, C00721, C00420",TRUE,"C01835, C00721",66.66666666666666,3,2,C00721,Biosynthesis of secondary metabolites,1,None
+"C01835, C00721, C00420",TRUE,"C01835, C00721",66.66666666666666,3,2,C00420,NA,NA,None
+C01879,TRUE,C01879,100,1,1,C01879,Glutathione metabolism,1,None
+C01879,TRUE,C01879,100,1,1,C01879,Metabolic pathways,1,None
+C01936,FALSE,NA,0,1,0,C01936,NA,NA,None
+"C01991, C00989",TRUE,C00989,50,2,1,C00989,Butanoate metabolism,1,None
+"C01991, C00989",TRUE,C00989,50,2,1,C01991,NA,NA,None
+"C01991, C00989",TRUE,C00989,50,2,1,C00989,Microbial metabolism in diverse environments,1,None
+"C01991, C00989",TRUE,C00989,50,2,1,C00989,Carbon metabolism,1,None
+"C01991, C00989",TRUE,C00989,50,2,1,C00989,Other carbon fixation pathways,1,None
+"C01991, C00989",TRUE,C00989,50,2,1,C00989,Metabolic pathways,1,None
+C02037,FALSE,NA,0,1,0,C02037,NA,NA,None
+C02043,FALSE,NA,0,1,0,C02043,NA,NA,None
+"C02052, C00464",TRUE,C00464,50,2,1,C00464,Metabolic pathways,1,None
+"C02052, C00464",TRUE,C00464,50,2,1,C02052,NA,NA,None
+"C02052, C00464",TRUE,C00464,50,2,1,C00464,Fructose and mannose metabolism,1,None
+"C02052, C00464",TRUE,C00464,50,2,1,C00464,Neutrophil extracellular trap formation,1,None
+C02067,TRUE,C02067,100,1,1,C02067,Metabolic pathways,1,None
+C02067,TRUE,C02067,100,1,1,C02067,Pyrimidine metabolism,1,None
+C02155,FALSE,NA,0,1,0,C02155,NA,NA,None
+C02180,FALSE,NA,0,1,0,C02180,NA,NA,None
+C02261,FALSE,NA,0,1,0,C02261,NA,NA,None
+C02354,TRUE,C02354,100,1,1,C02354,Metabolic pathways,1,None
+C02354,TRUE,C02354,100,1,1,C02354,Pyrimidine metabolism,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Biosynthesis of plant secondary metabolites,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Biosynthesis of cofactors,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Ubiquinone and other terpenoid-quinone biosynthesis,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Vitamin digestion and absorption,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Ferroptosis,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Metabolic pathways,1,None
+C02477,TRUE,C02477,100,1,1,C02477,Biosynthesis of secondary metabolites,1,None
+C02483,TRUE,C02483,100,1,1,C02483,Metabolic pathways,1,None
+C02483,TRUE,C02483,100,1,1,C02483,Ubiquinone and other terpenoid-quinone biosynthesis,1,None
+C02483,TRUE,C02483,100,1,1,C02483,Biosynthesis of secondary metabolites,1,None
+C02483,TRUE,C02483,100,1,1,C02483,Biosynthesis of cofactors,1,None
+C02494,FALSE,NA,0,1,0,C02494,NA,NA,None
+C02504,TRUE,C02504,100,1,1,C02504,2-Oxocarboxylic acid metabolism,1,None
+C02504,TRUE,C02504,100,1,1,C02504,Metabolic pathways,1,None
+C02504,TRUE,C02504,100,1,1,C02504,Biosynthesis of amino acids,1,None
+C02504,TRUE,C02504,100,1,1,C02504,Pyruvate metabolism,1,None
+C02504,TRUE,C02504,100,1,1,C02504,"Valine, leucine and isoleucine biosynthesis",1,None
+C02504,TRUE,C02504,100,1,1,C02504,Biosynthesis of secondary metabolites,1,None
+C02562,FALSE,NA,0,1,0,C02562,NA,NA,None
+C02571,TRUE,C02571,100,1,1,C02571,Insulin resistance,1,None
+C02603,FALSE,NA,0,1,0,C02603,NA,NA,None
+C02630,TRUE,C02630,100,1,1,C02630,Metabolic pathways,1,None
+C02630,TRUE,C02630,100,1,1,C02630,Butanoate metabolism,1,None
+C02630,TRUE,C02630,100,1,1,C02630,C5-Branched dibasic acid metabolism,1,None
+C02636,FALSE,NA,0,1,0,C02636,NA,NA,None
+C02642,TRUE,C02642,100,1,1,C02642,Pantothenate and CoA biosynthesis,1,None
+C02642,TRUE,C02642,100,1,1,C02642,Metabolic pathways,1,None
+C02642,TRUE,C02642,100,1,1,C02642,Pyrimidine metabolism,1,None
+C02642,TRUE,C02642,100,1,1,C02642,beta-Alanine metabolism,1,None
+C02678,FALSE,NA,0,1,0,C02678,NA,NA,None
+C02679,TRUE,C02679,100,1,1,C02679,Biosynthesis of secondary metabolites,1,None
+C02679,TRUE,C02679,100,1,1,C02679,Fatty acid biosynthesis,1,None
+C02679,TRUE,C02679,100,1,1,C02679,Metabolic pathways,1,None
+C02679,TRUE,C02679,100,1,1,C02679,Prodigiosin biosynthesis,1,None
+C02710,FALSE,NA,0,1,0,C02710,NA,NA,None
+C02712,FALSE,NA,0,1,0,C02712,NA,NA,None
+C02716,FALSE,NA,0,1,0,C02716,NA,NA,None
+C02727,TRUE,C02727,100,1,1,C02727,Metabolic pathways,1,None
+C02727,TRUE,C02727,100,1,1,C02727,Lysine degradation,1,None
+C02847,FALSE,NA,0,1,0,C02847,NA,NA,None
+C02862,FALSE,NA,0,1,0,C02862,NA,NA,None
+C02979,FALSE,NA,0,1,0,C02979,NA,NA,None
+C03017,FALSE,NA,0,1,0,C03017,NA,NA,None
+C03079,FALSE,NA,0,1,0,C03079,NA,NA,None
+C03137,FALSE,NA,0,1,0,C03137,NA,NA,None
+C03242,TRUE,C03242,100,1,1,C03242,Biosynthesis of unsaturated fatty acids,1,None
+C03242,TRUE,C03242,100,1,1,C03242,Metabolic pathways,1,None
+C03242,TRUE,C03242,100,1,1,C03242,Linoleic acid metabolism,1,None
+C03406,TRUE,C03406,100,1,1,C03406,Metabolic pathways,1,None
+C03406,TRUE,C03406,100,1,1,C03406,"Alanine, aspartate and glutamate metabolism",1,None
+C03406,TRUE,C03406,100,1,1,C03406,Biosynthesis of amino acids,1,None
+C03406,TRUE,C03406,100,1,1,C03406,Arginine biosynthesis,1,None
+C03406,TRUE,C03406,100,1,1,C03406,Biosynthesis of secondary metabolites,1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,Biosynthesis of cofactors,1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,Metabolic pathways,2,Metabolic pathways
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,Tryptophan metabolism,1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03460,Metabolic pathways,2,Metabolic pathways
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,Biosynthesis of plant secondary metabolites,1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,beta-Alanine metabolism,1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03460,"Valine, leucine and isoleucine degradation",1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+"C03460, C03722",TRUE,"C03460, C03722",100,2,2,C03722,Nicotinate and nicotinamide metabolism,1,None
+C03519,TRUE,C03519,100,1,1,C03519,Metabolic pathways,1,None
+C03519,TRUE,C03519,100,1,1,C03519,Phenylalanine metabolism,1,None
+C03594,TRUE,C03594,100,1,1,C03594,Metabolic pathways,1,None
+C03594,TRUE,C03594,100,1,1,C03594,Primary bile acid biosynthesis,1,None
+C03626,FALSE,NA,0,1,0,C03626,NA,NA,None
+C03672,FALSE,NA,0,1,0,C03672,NA,NA,None
+C03793,TRUE,C03793,100,1,1,C03793,Lysine degradation,1,None
+C03793,TRUE,C03793,100,1,1,C03793,Metabolic pathways,1,None
+C03794,TRUE,C03794,100,1,1,C03794,Purine metabolism,1,None
+C03794,TRUE,C03794,100,1,1,C03794,"Alanine, aspartate and glutamate metabolism",1,None
+C03794,TRUE,C03794,100,1,1,C03794,Metabolic pathways,1,None
+C03794,TRUE,C03794,100,1,1,C03794,Nucleotide metabolism,1,None
+C03794,TRUE,C03794,100,1,1,C03794,Biosynthesis of cofactors,1,None
+C03882,TRUE,C03882,100,1,1,C03882,"Tropane, piperidine and pyridine alkaloid biosynthesis",1,None
+C03882,TRUE,C03882,100,1,1,C03882,"Biosynthesis of alkaloids derived from ornithine, lysine and nicotinic acid",1,None
+C04100,FALSE,NA,0,1,0,C04100,NA,NA,None
+C04148,TRUE,C04148,100,1,1,C04148,Phenylalanine metabolism,1,None
+C04230,TRUE,C04230,100,1,1,C04230,Choline metabolism in cancer,1,None
+C04230,TRUE,C04230,100,1,1,C04230,Glycerophospholipid metabolism,1,None
+C04230,TRUE,C04230,100,1,1,C04230,Efferocytosis,1,None
+C04295,TRUE,C04295,100,1,1,C04295,Metabolic pathways,1,None
+C04295,TRUE,C04295,100,1,1,C04295,Ovarian steroidogenesis,1,None
+C04295,TRUE,C04295,100,1,1,C04295,Steroid hormone biosynthesis,1,None
+C04545,FALSE,NA,0,1,0,C04545,NA,NA,None
+C04805,TRUE,C04805,100,1,1,C04805,Metabolic pathways,1,None
+C04805,TRUE,C04805,100,1,1,C04805,Inflammatory mediator regulation of TRP channels,1,None
+C04805,TRUE,C04805,100,1,1,C04805,Arachidonic acid metabolism,1,None
+C05145,FALSE,NA,0,1,0,C05145,NA,NA,None
+C05208,FALSE,NA,0,1,0,C05208,NA,NA,None
+C05282,FALSE,NA,0,1,0,C05282,NA,NA,None
+C05283,FALSE,NA,0,1,0,C05283,NA,NA,None
+C05345,FALSE,NA,0,1,0,C05345,NA,NA,None
+C05382,TRUE,C05382,100,1,1,C05382,Pentose phosphate pathway,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Carbon fixation by Calvin cycle,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Microbial metabolism in diverse environments,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Carbon metabolism,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Biosynthesis of amino acids,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Biosynthesis of secondary metabolites,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Biosynthesis of various nucleotide sugars,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Biosynthesis of nucleotide sugars,1,None
+C05382,TRUE,C05382,100,1,1,C05382,Metabolic pathways,1,None
+C05411,TRUE,C05411,100,1,1,C05411,Pentose and glucuronate interconversions,1,None
+C05411,TRUE,C05411,100,1,1,C05411,Ascorbate and aldarate metabolism,1,None
+C05484,TRUE,C05484,100,1,1,C05484,Steroid hormone biosynthesis,1,None
+C05484,TRUE,C05484,100,1,1,C05484,Metabolic pathways,1,None
+C05512,TRUE,C05512,100,1,1,C05512,ABC transporters,1,None
+C05512,TRUE,C05512,100,1,1,C05512,Metabolic pathways,1,None
+C05512,TRUE,C05512,100,1,1,C05512,Purine metabolism,1,None
+C05512,TRUE,C05512,100,1,1,C05512,Nucleotide metabolism,1,None
+C05519,TRUE,C05519,100,1,1,C05519,Metabolic pathways,1,None
+C05519,TRUE,C05519,100,1,1,C05519,"Glycine, serine and threonine metabolism",1,None
+C05551,TRUE,C05551,100,1,1,C05551,Bile secretion,1,None
+C05565,TRUE,C05565,100,1,1,C05565,Histidine metabolism,1,None
+C05570,TRUE,C05570,100,1,1,C05570,Histidine metabolism,1,None
+C05570,TRUE,C05570,100,1,1,C05570,Metabolic pathways,1,None
+C05576,TRUE,C05576,100,1,1,C05576,Metabolic pathways,1,None
+C05576,TRUE,C05576,100,1,1,C05576,Tyrosine metabolism,1,None
+C05584,TRUE,C05584,100,1,1,C05584,Metabolic pathways,1,None
+C05584,TRUE,C05584,100,1,1,C05584,Tyrosine metabolism,1,None
+C05793,TRUE,C05793,100,1,1,C05793,Porphyrin metabolism,1,None
+C05822,TRUE,C05822,100,1,1,C05822,Pyrimidine metabolism,1,None
+C05822,TRUE,C05822,100,1,1,C05822,Metabolic pathways,1,None
+C05828,TRUE,C05828,100,1,1,C05828,Histidine metabolism,1,None
+C05828,TRUE,C05828,100,1,1,C05828,Metabolic pathways,1,None
+C05842,TRUE,C05842,100,1,1,C05842,Nicotinate and nicotinamide metabolism,1,None
+C05842,TRUE,C05842,100,1,1,C05842,Metabolic pathways,1,None
+C05953,TRUE,C05953,100,1,1,C05953,Arachidonic acid metabolism,1,None
+C05953,TRUE,C05953,100,1,1,C05953,Metabolic pathways,1,None
+C05953,TRUE,C05953,100,1,1,C05953,Serotonergic synapse,1,None
+C05961,TRUE,C05961,100,1,1,C05961,Arachidonic acid metabolism,1,None
+C05961,TRUE,C05961,100,1,1,C05961,Metabolic pathways,1,None
+C05984,TRUE,C05984,100,1,1,C05984,Propanoate metabolism,1,None
+C06104,TRUE,C06104,100,1,1,C06104,Degradation of aromatic compounds,1,None
+C06104,TRUE,C06104,100,1,1,C06104,Metabolic pathways,1,None
+C06104,TRUE,C06104,100,1,1,C06104,Microbial metabolism in diverse environments,1,None
+C06104,TRUE,C06104,100,1,1,C06104,Caprolactam degradation,1,None
+C06153,TRUE,C06153,100,1,1,C06153,Metabolic pathways,1,None
+C06153,TRUE,C06153,100,1,1,C06153,Inositol phosphate metabolism,1,None
+C06153,TRUE,C06153,100,1,1,C06153,Microbial metabolism in diverse environments,1,None
+C06174,TRUE,C06174,100,1,1,C06174,Metabolic pathways,1,None
+C06174,TRUE,C06174,100,1,1,C06174,Isoquinoline alkaloid biosynthesis,1,None
+C06174,TRUE,C06174,100,1,1,C06174,Biosynthesis of secondary metabolites,1,None
+C06174,TRUE,C06174,100,1,1,C06174,Drug metabolism - cytochrome P450,1,None
+C06218,FALSE,NA,0,1,0,C06218,NA,NA,None
+C06423,TRUE,C06423,100,1,1,C06423,Biosynthesis of plant secondary metabolites,1,None
+C06423,TRUE,C06423,100,1,1,C06423,Metabolic pathways,1,None
+C06423,TRUE,C06423,100,1,1,C06423,Biosynthesis of alkaloids derived from terpenoid and polyketide,1,None
+C06423,TRUE,C06423,100,1,1,C06423,Biosynthesis of cofactors,1,None
+C06423,TRUE,C06423,100,1,1,C06423,Lipoic acid metabolism,1,None
+C06423,TRUE,C06423,100,1,1,C06423,Fatty acid biosynthesis,1,None
+C06424,TRUE,C06424,100,1,1,C06424,Fatty acid biosynthesis,1,None
+C06424,TRUE,C06424,100,1,1,C06424,Metabolic pathways,1,None
+C06425,TRUE,C06425,100,1,1,C06425,Biosynthesis of unsaturated fatty acids,1,None
+C06427,TRUE,C06427,100,1,1,C06427,Biosynthesis of secondary metabolites,1,None
+C06427,TRUE,C06427,100,1,1,C06427,Biosynthesis of plant hormones,1,None
+C06427,TRUE,C06427,100,1,1,C06427,Metabolic pathways,1,None
+C06427,TRUE,C06427,100,1,1,C06427,Biosynthesis of unsaturated fatty acids,1,None
+C06427,TRUE,C06427,100,1,1,C06427,alpha-Linolenic acid metabolism,1,None
+C06427,TRUE,C06427,100,1,1,C06427,Biosynthesis of plant secondary metabolites,1,None
+C06428,TRUE,C06428,100,1,1,C06428,Biosynthesis of unsaturated fatty acids,1,None
+C06429,TRUE,C06429,100,1,1,C06429,Biosynthesis of unsaturated fatty acids,1,None
+C06804,TRUE,C06804,100,1,1,C06804,Bile secretion,1,None
+C07151,TRUE,C07151,100,1,1,C07151,AMPK signaling pathway,1,None
+C07151,TRUE,C07151,100,1,1,C07151,Bile secretion,1,None
+C07151,TRUE,C07151,100,1,1,C07151,Longevity regulating pathway,1,None
+C07187,FALSE,NA,0,1,0,C07187,NA,NA,None
+"C07202,D02358",FALSE,NA,0,2,0,D02358,NA,NA,None
+"C07202,D02358",FALSE,NA,0,2,0,C07202,NA,NA,None
+C07326,FALSE,NA,0,1,0,C07326,NA,NA,None
+C07480,TRUE,C07480,100,1,1,C07480,Metabolic pathways,1,None
+C07480,TRUE,C07480,100,1,1,C07480,Caffeine metabolism,1,None
+C07480,TRUE,C07480,100,1,1,C07480,Biosynthesis of plant secondary metabolites,1,None
+C07480,TRUE,C07480,100,1,1,C07480,Microbial metabolism in diverse environments,1,None
+C07480,TRUE,C07480,100,1,1,C07480,Biosynthesis of alkaloids derived from histidine and purine,1,None
+C07480,TRUE,C07480,100,1,1,C07480,Biosynthesis of secondary metabolites,1,None
+C07572,TRUE,C07572,100,1,1,C07572,Drug metabolism - cytochrome P450,1,None
+C07588,FALSE,NA,0,1,0,C07588,NA,NA,None
+C08261,FALSE,NA,0,1,0,C08261,NA,NA,None
+C08283,FALSE,NA,0,1,0,C08283,NA,NA,None
+C08316,TRUE,C08316,100,1,1,C08316,Biosynthesis of unsaturated fatty acids,1,None
+C08322,FALSE,NA,0,1,0,C08322,NA,NA,None
+C08323,TRUE,C08323,100,1,1,C08323,Biosynthesis of unsaturated fatty acids,1,None
+C08362,TRUE,C08362,100,1,1,C08362,Fatty acid biosynthesis,1,None
+C08362,TRUE,C08362,100,1,1,C08362,Metabolic pathways,1,None
+C08367,FALSE,NA,0,1,0,C08367,NA,NA,None
+C09213,FALSE,NA,0,1,0,C09213,NA,NA,None
+C10172,FALSE,NA,0,1,0,C10172,NA,NA,None
+C11301,FALSE,NA,0,1,0,C11301,NA,NA,None
+C11332,FALSE,NA,0,1,0,C11332,NA,NA,None
+C12144,TRUE,C12144,100,1,1,C12144,Metabolic pathways,1,None
+C12144,TRUE,C12144,100,1,1,C12144,Sphingolipid metabolism,1,None
+C12270,TRUE,C12270,100,1,1,C12270,"Alanine, aspartate and glutamate metabolism",1,None
+C12270,TRUE,C12270,100,1,1,C12270,Metabolic pathways,1,None
+C12270,TRUE,C12270,100,1,1,C12270,Neuroactive ligand-receptor interaction,1,None
+C12600,FALSE,NA,0,1,0,C12600,NA,NA,None
+C12989,FALSE,NA,0,1,0,C12989,NA,NA,None
+C13857,FALSE,NA,0,1,0,C13857,NA,NA,None
+C14152,TRUE,C14152,100,1,1,C14152,Biosynthesis of cofactors,1,None
+C14152,TRUE,C14152,100,1,1,C14152,Biosynthesis of secondary metabolites,1,None
+C14152,TRUE,C14152,100,1,1,C14152,Metabolic pathways,1,None
+C14152,TRUE,C14152,100,1,1,C14152,Ubiquinone and other terpenoid-quinone biosynthesis,1,None
+C14732,TRUE,C14732,100,1,1,C14732,Arachidonic acid metabolism,1,None
+C14732,TRUE,C14732,100,1,1,C14732,Metabolic pathways,1,None
+C16300,TRUE,C16300,100,1,1,C16300,alpha-Linolenic acid metabolism,1,None
+C16300,TRUE,C16300,100,1,1,C16300,Biosynthesis of secondary metabolites,1,None
+C16513,TRUE,C16513,100,1,1,C16513,Biosynthesis of unsaturated fatty acids,1,None
+C16525,TRUE,C16525,100,1,1,C16525,Biosynthesis of unsaturated fatty acids,1,None
+C16526,TRUE,C16526,100,1,1,C16526,Biosynthesis of unsaturated fatty acids,1,None
+C16527,TRUE,C16527,100,1,1,C16527,Ferroptosis,1,None
+C16527,TRUE,C16527,100,1,1,C16527,Biosynthesis of unsaturated fatty acids,1,None
+C16533,TRUE,C16533,100,1,1,C16533,Biosynthesis of unsaturated fatty acids,1,None
+C16534,FALSE,NA,0,1,0,C16534,NA,NA,None
+C16537,FALSE,NA,0,1,0,C16537,NA,NA,None
+C16884,FALSE,NA,0,1,0,C16884,NA,NA,None
+C17337,TRUE,C17337,100,1,1,C17337,Primary bile acid biosynthesis,1,None
+"C17737, C00695",TRUE,"C17737, C00695",100,2,2,C17737,Secondary bile acid biosynthesis,2,Secondary bile acid biosynthesis
+"C17737, C00695",TRUE,"C17737, C00695",100,2,2,C00695,Secondary bile acid biosynthesis,2,Secondary bile acid biosynthesis
+"C17737, C00695",TRUE,"C17737, C00695",100,2,2,C00695,Bile secretion,1,None
+"C17737, C00695",TRUE,"C17737, C00695",100,2,2,C00695,Metabolic pathways,1,None
+"C17737, C00695",TRUE,"C17737, C00695",100,2,2,C00695,Primary bile acid biosynthesis,1,None
+C18218,TRUE,C18218,100,1,1,C18218,"Cutin, suberine and wax biosynthesis",1,None
+C18218,TRUE,C18218,100,1,1,C18218,Metabolic pathways,1,None
+C20522,TRUE,C20522,100,1,1,C20522,Histidine metabolism,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Hormone signaling,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Two-component system,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Tyrosine metabolism,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Regulation of lipolysis in adipocytes,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Metabolic pathways,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,D00095,NA,NA,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Quorum sensing,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Neuroactive ligand-receptor interaction,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Renin secretion,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Adrenergic signaling in cardiomyocytes,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,Chemical carcinogenesis - receptor activation,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,C00788,cAMP signaling pathway,1,None
+"D00095,C00788,D02149",TRUE,C00788,33.33333333333333,3,1,D02149,NA,NA,None
+D00235,FALSE,NA,0,1,0,D00235,NA,NA,None
+D00332,FALSE,NA,0,1,0,D00332,NA,NA,None
+D00358,FALSE,NA,0,1,0,D00358,NA,NA,None
+D00422,FALSE,NA,0,1,0,D00422,NA,NA,None
+"D00567,C07589",FALSE,NA,0,2,0,C07589,NA,NA,None
+"D00567,C07589",FALSE,NA,0,2,0,D00567,NA,NA,None
+"D00887,C06834",FALSE,NA,0,2,0,D00887,NA,NA,None
+"D00887,C06834",FALSE,NA,0,2,0,C06834,NA,NA,None
+D01947,FALSE,NA,0,1,0,D01947,NA,NA,None
+"D02362,C07415",FALSE,NA,0,2,0,C07415,NA,NA,None
+"D02362,C07415",FALSE,NA,0,2,0,D02362,NA,NA,None
+G00265,FALSE,NA,0,1,0,G00265,NA,NA,None

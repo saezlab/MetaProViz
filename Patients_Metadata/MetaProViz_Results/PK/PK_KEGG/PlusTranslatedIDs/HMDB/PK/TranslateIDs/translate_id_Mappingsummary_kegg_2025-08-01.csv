@@ -1,0 +1,9 @@
+SUPER_PATHWAY,one_to_none,one_to_one,total,to_none,to_one,to_total,from_one,from_total,scope
+Amino acid,14,3,17,14,3,17,4,4,group
+Carbohydrate,1,1,2,1,1,2,2,2,group
+Lipid,20,4,24,20,4,24,5,5,group
+Cofactors and vitamins,1,2,3,1,2,3,3,3,group
+Peptide,9,1,10,9,1,10,2,2,group
+Xenobiotics,4,1,5,4,1,5,2,2,group
+Nucleotide,4,1,5,4,1,5,2,2,group
+NA,1,0,1,1,0,1,1,1,group
