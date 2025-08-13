@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 
 # MetaProViz <img src="vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
 
-
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![GitHub issues](https://img.shields.io/github/issues/saezlab/MetaProViz)](https://github.com/saezlab/MetaProViz/issues)
