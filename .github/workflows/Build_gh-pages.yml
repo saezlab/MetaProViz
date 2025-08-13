@@ -3,9 +3,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # ✅ allows manual run
   schedule:
     - cron: '0 4 * * *'
-  workflow_dispatch: # ✅ allows manual run
 
 name: Build_gh-pages.yml #shown when action is run
 
