@@ -22,7 +22,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }} #to push results to gh-pages branch!
 
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.ref == 'refs/heads/development')) ||
       (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
     steps: #Series of steps that is executed sequencially: https://github.com/r-lib/actions/
