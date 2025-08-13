@@ -3,9 +3,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches: [main, development]
-    workflow_dispatch: #allows manual run
+      - development
   schedule:
     - cron: '0 4 * * *'
 
