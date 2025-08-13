@@ -4,8 +4,7 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
+    branches: [main, development]
   workflow_dispatch: # ✅ allows manual run
   schedule:
     - cron: '0 4 * * *'
