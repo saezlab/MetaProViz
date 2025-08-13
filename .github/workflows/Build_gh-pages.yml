@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - dev
   schedule:
     - cron: '0 4 * * *'
 
@@ -44,12 +45,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-${{ env.R_VERSION }}
 
-      - name: Install fgsea & pkgdown
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install --cask xquartz
+
+      - name: Install fgsea & pkgdown & OmnipathR
         run: |
           Rscript -e 'install.packages("remotes")'
-          Rscript -e 'remotes::install_github("r-lib/remotes")'  # see: https://github.com/r-lib/remotes/issues/798
           Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
           Rscript -e 'install.packages("pkgdown")'
+          Rscript -e "remotes::install_github('saezlab/OmnipathR@devel')"
 
       - name: Install MetaProViz from GitHub by remotes
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
