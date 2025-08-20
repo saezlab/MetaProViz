@@ -73,7 +73,7 @@ jobs:
 
       - name: Install package dependencies
         run: |
-          Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl"))'
+          Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra"))'
 
       - name: Install Bioconductor dependencies
         run: |
