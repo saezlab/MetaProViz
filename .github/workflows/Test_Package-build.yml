@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - development
   schedule:
     - cron: '0 4 * * *'
 
@@ -23,6 +24,7 @@ jobs:
         config:
           - {os: macos-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'release'}
+          - {os: windows-latest, r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -72,6 +74,7 @@ jobs:
           Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
       - name: Install MetaProViz from git by remotes
+        if: github.ref == 'refs/heads/main'
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
 
       - name: Build and check package
