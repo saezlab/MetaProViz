@@ -56,8 +56,8 @@ jobs:
 
       - name: Set R version
         run: |
-          echo "R_VERSION=`R --version | head -n 1 | awk '{print $3}' | cut -b 1-3`" >> $GITHUB_ENV
-          echo "R_LIBS_USER=`Rscript -e 'cat(.libPaths()[1L])'`" >> $GITHUB_ENV
+          Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
+          Rscript -e "cat('R_LIBS_USER=', .libPaths()[1L], '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
       - name: Set up R dependency cache
         uses: actions/cache@v4
@@ -67,6 +67,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-${{ env.R_VERSION }}
 
+      - name: Install knitr
+        run: Rscript -e 'install.packages("knitr")'
       - name: Install remotes
         run: |
           Rscript -e 'install.packages("remotes")'
@@ -81,3 +83,9 @@ jobs:
         run: |
           R CMD build .
           R CMD check *.tar.gz --no-manual
+
+      - name: Run BiocCheck
+        run: |
+          Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
+          Rscript -e 'BiocManager::install("BiocCheck")'
+          Rscript -e 'BiocCheck::BiocCheck(list.files(pattern = "*.tar.gz"))'
