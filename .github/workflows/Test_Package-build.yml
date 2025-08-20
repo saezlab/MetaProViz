@@ -74,6 +74,12 @@ jobs:
           Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
           Rscript -e "cat('R_LIBS_USER=', .libPaths()[1L], '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
+      # Ensure user library directory exists (fixes permissions errors on Ubuntu and other platforms)
+      - name: Create user library directory
+        run: |
+          mkdir -p "${{ env.R_LIBS_USER }}"
+        shell: bash
+
       # Cache R package installations to speed up repeated builds
       - name: Set up R dependency cache
         uses: actions/cache@v4
@@ -109,7 +115,9 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
 
+      # Build and check the package using bash shell (required for Windows compatibility)
       - name: Build and check package
+        shell: bash
         run: |
           R CMD build .
           R CMD check *.tar.gz --no-manual
