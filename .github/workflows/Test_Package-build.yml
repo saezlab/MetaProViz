@@ -78,7 +78,8 @@ jobs:
       - name: Create user library directory (Windows)
         if: runner.os == 'Windows'
         run: |
-          New-Item -ItemType Directory -Force -Path $env:R_LIBS_USER
+          $libPath = $env:R_LIBS_USER.Trim()
+          New-Item -ItemType Directory -Force -Path $libPath
         shell: pwsh
 
       # Ensure user library directory exists on macOS and Ubuntu
