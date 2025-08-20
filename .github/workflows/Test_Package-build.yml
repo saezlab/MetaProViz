@@ -41,7 +41,7 @@ jobs:
 
     # Only run on push to main/development or scheduled run
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development') ||
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development')) ||
       (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
     steps:
