@@ -69,6 +69,11 @@ jobs:
 
       - name: Install knitr
         run: Rscript -e 'install.packages("knitr")'
+
+      - name: Install package dependencies
+        run: |
+          Rscript -e 'install.packages(c("broom", "ComplexUpset", "cosmosR", "DBI", "dplyr", "EnhancedVolcano", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "limma", "logger", "OmnipathR", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "qvalue", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl"))'
+          
       - name: Install remotes
         run: |
           Rscript -e 'install.packages("remotes")'
