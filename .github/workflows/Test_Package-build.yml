@@ -69,10 +69,10 @@ jobs:
           use-public-rspm: true
 
       # Set R version and library path as environment variables (used for caching and package installation)
-      - name: Set R version
-        run: |
-          Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
-          Rscript -e "cat('R_LIBS_USER=', .libPaths()[1L], '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
+       - name: Set R version
+         run: |
+           Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
+           Rscript -e "cat('R_LIBS_USER=', trimws(.libPaths()[1L]), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
       # Ensure user library directory exists on Windows (fixes permissions errors)
       - name: Create user library directory (Windows)
