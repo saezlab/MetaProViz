@@ -74,14 +74,18 @@ jobs:
           Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
           Rscript -e "cat('R_LIBS_USER=', .libPaths()[1L], '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
-      # Ensure user library directory exists (fixes permissions errors on all platforms)
-      - name: Create user library directory (cross-platform)
+      # Ensure user library directory exists on Windows (fixes permissions errors)
+      - name: Create user library directory (Windows)
+        if: runner.os == 'Windows'
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            pwsh -Command "New-Item -ItemType Directory -Force -Path $env:R_LIBS_USER"
-          else
-            mkdir -p "$R_LIBS_USER"
-          fi
+          New-Item -ItemType Directory -Force -Path $env:R_LIBS_USER
+        shell: pwsh
+
+      # Ensure user library directory exists on macOS and Ubuntu
+      - name: Create user library directory (macOS/Ubuntu)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p "$R_LIBS_USER"
         shell: bash
 
       # Cache R package installations to speed up repeated builds
