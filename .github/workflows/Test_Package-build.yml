@@ -2,6 +2,8 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 # This workflow tests if the package can be installed from github from within
 # a github action.
+
+# Trigger workflow on push to main or development, and on a daily schedule
 on:
   push:
     branches:
@@ -10,55 +12,69 @@ on:
   schedule:
     - cron: '0 4 * * *'
 
+
+# Name of the workflow as shown in GitHub Actions UI
 name: R-CMD-check
+
 
 jobs:
   R-CMD-check:
+    # Run the job on each OS in the matrix (macOS, Ubuntu, Windows)
     runs-on: ${{ matrix.config.os }}
 
+    # Show OS and R version in job name
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
+    # Define the matrix for cross-platform testing
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'release'}
-          - {os: windows-latest, r: 'release'}
+          - {os: macos-latest, r: 'release'}   # macOS latest with R release
+          - {os: ubuntu-latest, r: 'release'}   # Ubuntu latest with R release
+          - {os: windows-latest, r: 'release'}  # Windows latest with R release
 
+    # Set environment variables for authentication and R package source retention
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
+    # Only run on push to main/development or scheduled run
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development') ||
       (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
-
     steps:
+      # Checkout the repository code
       - uses: actions/checkout@v4
 
+      # Setup Pandoc (required for vignette and markdown rendering)
       - uses: r-lib/actions/setup-pandoc@v2
 
+      # Install system dependency for glpk (required by some R packages on Ubuntu)
       - name: Install libglpk40
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: sudo apt-get install -y libglpk40
 
+      # Install XQuartz for graphics on macOS (required by some R packages)
       - name: Install xquartz (Mac OS)
         if: ${{ matrix.config.os == 'macos-latest' }}
         run: brew install --cask xquartz
 
+      # Setup R with the specified version
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      # Set R version and library path as environment variables (used for caching and package installation)
       - name: Set R version
         run: |
           Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
           Rscript -e "cat('R_LIBS_USER=', .libPaths()[1L], '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
+      # Cache R package installations to speed up repeated builds
       - name: Set up R dependency cache
         uses: actions/cache@v4
         with:
@@ -67,14 +83,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-${{ env.R_VERSION }}
 
+      # Install knitr to user library (required for vignette building; fixes missing knitr error)
       - name: Install knitr
-        run: Rscript -e 'install.packages("knitr")'
+        run: Rscript -e 'install.packages("knitr", lib = Sys.getenv("R_LIBS_USER"))'
 
 
+      # Install CRAN dependencies to user library (fixes permissions error on Ubuntu and ensures all CRAN packages are available)
       - name: Install package dependencies
         run: |
-          Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra"))'
+          Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra"), lib = Sys.getenv("R_LIBS_USER"))'
 
+      # Install Bioconductor dependencies (required for package build; fixes missing Bioconductor package errors)
       - name: Install Bioconductor dependencies
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
