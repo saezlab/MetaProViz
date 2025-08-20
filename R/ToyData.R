@@ -38,6 +38,10 @@
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
+#'
+#' @examples
+#' data(intracell_raw)
+#' head(intracell_raw)
 "intracell_raw"
 
 ####################################################
@@ -51,6 +55,10 @@
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+#'
+#' @examples
+#' data(intracell_dma)
+#' head(intracell_dma)
 "intracell_dma"
 
 
@@ -66,6 +74,10 @@
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+#'
+#' @examples
+#' data(medium_raw)
+#' head(medium_raw)
 "medium_raw"
 
 ####################################################
@@ -79,6 +91,10 @@
 #'
 #' @source  Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+#'
+#' @examples
+#' data(cellular_meta)
+#' head(cellular_meta)
 "cellular_meta"
 
 ####################################################
@@ -92,6 +108,10 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#'
+#' @examples
+#' data(tissue_norm)
+#' head(tissue_norm)
 "tissue_norm"
 
 ####################################################
@@ -105,6 +125,9 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @examples
+#' data(tissue_meta)
+#' head(tissue_meta)
 "tissue_meta"
 
 ####################################################
@@ -118,6 +141,10 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#'
+#' @examples
+#' data(tissue_dma)
+#' head(tissue_dma)
 "tissue_dma"
 
 ####################################################
@@ -132,6 +159,9 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @examples
+#' data(tissue_dma_old)
+#' head(tissue_dma_old)
 "tissue_dma_old"
 
 ####################################################
@@ -146,6 +176,9 @@
 #'
 #' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
 #' \doi{10.1016/j.ccell.2015.12.004}
+#' @examples
+#' data(tissue_dma_young)
+#' head(tissue_dma_young)
 "tissue_dma_young"
 
 ####################################################
@@ -160,6 +193,9 @@
 #' @source Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
 #' regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
 #' proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
+#' @examples
+#' data(tissue_tvn_proteomics)
+#' head(tissue_tvn_proteomics)
 "tissue_tvn_proteomics"
 
 ####################################################
@@ -174,6 +210,9 @@
 #' @source Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
 #' regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
 #' proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
+#' @examples
+#' data(tissue_tvn_rnaseq)
+#' head(tissue_tvn_rnaseq)
 "tissue_tvn_rnaseq"
 
 ####################################################
@@ -185,6 +224,9 @@
 #' @format Columns include metabolite trivial names, metabolite IDs (HMDB, KEGG, etc.), metabolite structural information (=INCHI).
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+#' @examples
+#' data(equivalent_features)
+#' head(equivalent_features)
 "equivalent_features"
 
 ####################################################
@@ -197,6 +239,9 @@
 #' information (INCHI, Key, etc.).
 #'
 #' @source Biocrates MxP® Quant 500 XL kit, https://biocrates.com/mxp-quant-500-xl/
+#' @examples
+#' data(biocrates_features)
+#' head(biocrates_features)
 "biocrates_features"
 
 ####################################################
@@ -209,7 +254,9 @@
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-#'
+#' @examples
+#' data(mca_twocond_rules)
+#' head(mca_twocond_rules)
 "mca_twocond_rules"
 
 ####################################################
@@ -222,7 +269,9 @@
 #' columns (RG1-RG3)
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
-#'
+#' @examples
+#' data(mca_core_rules)
+#' head(mca_core_rules)
 "mca_core_rules"
 
 ####################################################
@@ -234,6 +283,9 @@
 #' @format Columns include pathway_name, pathwayId and pathwaySource as well as inputID  and commonName.
 #'
 #' @source Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+#' @examples
+#' data(alanine_pathways)
+#' head(alanine_pathways)
 "alanine_pathways"
 
 
@@ -241,12 +293,18 @@
 #'
 #' @format Data frame with columns: term, gene
 #'
-#' @source ?
+#' @source Omnipath
+#' @examples
+#' data(hallmarks)
+#' head(hallmarks)
 "hallmarks"
 
 #' gaude_pathways
 #'
-#' @format ?
+#' @format Data frame with columns: term, gene
 #'
-#' @source ?
+#' @source Omnipath
+#' @examples
+#' data(gaude_pathways)
+#' head(gaude_pathways)
 "gaude_pathways"
