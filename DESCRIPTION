@@ -7,7 +7,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-3867-0881")),
     person("Denes", "Turei", role = "aut",
            comment = c(ORCID = "0000-0002-7249-9379")),
-    person("Dimitrios", "Prymidis", role = "aut"),
+    person("Dimitrios", "Prymidis", role = "aut",
+           comment = c(ORCID = "0009-0000-0168-3841")),
     person("Macabe", "Daley", role = "aut",
            comment = c(ORCID = "0000-0002-8026-7068")),
     person("Julio", "Saez-Rodriguez", role = "aut",
@@ -16,9 +17,9 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-3293-7397"))
   )
 Description: MetaProViz can analyse standard metabolomics and
-    exometabolomics data (CoRe).It performs pre-processing including
-    feature filtering, missimg value imputation, normalisation and outlier
-    detection. It perform functional analysis including differential
+    exometabolomics data (CoRe). It performs pre-processing including
+    feature filtering, missing value imputation, normalisation and outlier
+    detection. It performs functional analysis including differential
     metabolite analysis (DMA), clustering based on regulatory rules (MCA)
     and contains different visualisation methods to extract biological
     interpretable graphs and saves them in a publication ready format.
@@ -51,7 +52,6 @@ Imports:
     hash,
     igraph,
     inflection,
-    kableExtra,
     limma,
     logger,
     magrittr,
@@ -71,15 +71,16 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    writexl,
-    ggVennDiagram,
+    writexl
 Suggests:
     BiocStyle,
     ggupset,
+    ggVennDiagram,
+    kableExtra,
     knitr,
     pkgdown,
     svglite,
     testthat (>= 3.0.3)
-Remotes: saezlab/OmnipathR@devel, saezlab/cosmosR, git::https://git.bioconductor.org/packages/limma.git
+Remotes: saezlab/OmnipathR@devel
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
