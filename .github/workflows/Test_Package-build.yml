@@ -37,6 +37,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      R_LIBS_USER: ${{ runner.temp }}/Library
 
     # Only run on push to main/development or scheduled run
     if: |
@@ -67,23 +68,13 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      # Set R version and library path as environment variables (used for caching and package installation)
+      # Set R version as environment variable (used for caching and package installation)
       - name: Set R version
         run: |
           Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
-          Rscript -e "cat('R_LIBS_USER=', trimws(.libPaths()[1L]), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
-      # Ensure user library directory exists on Windows (fixes permissions errors)
-      - name: Create user library directory (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          $libPath = $env:R_LIBS_USER.Trim()
-          New-Item -ItemType Directory -Force -Path $libPath
-        shell: pwsh
-
-      # Ensure user library directory exists on macOS and Ubuntu
-      - name: Create user library directory (macOS/Ubuntu)
-        if: runner.os != 'Windows'
+      # Ensure user library directory exists (cross-platform)
+      - name: Create user library directory
         run: |
           mkdir -p "$R_LIBS_USER"
         shell: bash
