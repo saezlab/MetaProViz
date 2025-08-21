@@ -106,6 +106,7 @@ patients processed with SiRCle (Mora et al. 2024), originally from
 [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127)
 (Clark et al. 2019).
 
+
 ## Installation
 
 **MetaProViz** is an R package and to install the package, start R and
@@ -119,6 +120,15 @@ Now **MetaProViz** can be imported as:
 
 ``` r
 library(MetaProViz)
+```
+
+### OmnipathR version requirement
+MetaProViz requires OmnipathR version >= 3.17.4. If this version is not available in your Bioconductor release, you can install it from Bioconductor devel with:
+
+``` r
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("OmnipathR")
 ```
 
 ### Windows specifications

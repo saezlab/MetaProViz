@@ -179,6 +179,7 @@ patients <- data.frame(
   RNA= c("",  ""))
 ```
 
+
 ## Installation
 **MetaProViz** is an R package and to install the package, start R and enter:
 ```{r github_install, eval=FALSE}
@@ -188,6 +189,14 @@ devtools::install_github("https://github.com/saezlab/MetaProViz")
 Now **MetaProViz** can be imported as:
 ```{r load_library, eval=FALSE}
 library(MetaProViz)
+```
+
+### OmnipathR version requirement
+MetaProViz requires OmnipathR version >= 3.17.4. If this version is not available in your Bioconductor release, you can install it from Bioconductor devel with:
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("OmnipathR")
 ```
 
 ### Windows specifications
