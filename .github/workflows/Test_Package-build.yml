@@ -98,11 +98,20 @@ jobs:
         run: |
           Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
 
-      # Install Bioconductor dependencies (required for package build; fixes missing Bioconductor package errors)
-      - name: Install Bioconductor dependencies
+
+
+      # Install OmnipathR from Bioconductor devel
+      - name: Install OmnipathR from Bioconductor devel
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
-          Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "OmnipathR", "qvalue"))'
+          Rscript -e 'BiocManager::install(version = "devel")'
+          Rscript -e 'BiocManager::install("OmnipathR")'
+
+      # Set Bioconductor back to release and install other Bioconductor dependencies
+      - name: Install other Bioconductor dependencies from release
+        run: |
+          Rscript -e 'BiocManager::install(version = "release")'
+          Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue"))'
 
       - name: Install remotes
         run: |
