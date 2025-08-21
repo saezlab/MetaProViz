@@ -689,6 +689,7 @@ mapping_ambiguity <- function(data,
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @importFrom dplyr mutate
+#' @importFrom tidyr separate_rows
 #' @importFrom rlang !!! !! := sym syms
 #'
 #' @examples
@@ -841,7 +842,7 @@ checkmatch_pk_to_data <- function(data,
     df %>%
       mutate(row_id = dplyr::row_number()) %>%
       mutate(!!paste0("OriginalEntry_", df_name, sep="") := !!sym(id_col)) %>%  # Store original values
-      separate_rows(!!sym(id_col), sep = ",\\s*") %>%
+      tidyr::separate_rows(!!sym(id_col), sep = ",\\s*") %>%
       group_by(row_id) %>%
       mutate(!!(paste0("OriginalGroup_", df_name, sep="")) := paste0(df_name, "_", dplyr::cur_group_id())) %>%
       ungroup()
@@ -976,8 +977,8 @@ checkmatch_pk_to_data <- function(data,
     )%>%
     dplyr::mutate(
       InputID_select = case_when(
-        original_count ==1 & matches_count <= 1 ~ !!sym(metadata_info[["InputID"]]),
-        original_count >=2 & matches_count == 0 ~ str_split(!!sym(metadata_info[["InputID"]]), ",\\s*") %>% sapply(`[`, 1),
+        original_count ==1 & matches_count <= 1 ~ metadata_info[["InputID"]],
+        original_count >=2 & matches_count == 0 ~ str_split(metadata_info[["InputID"]], ",\\s*") %>% sapply(`[`, 1),
         original_count >=2 & matches_count == 1 ~ matches,
         TRUE ~ NA_character_
       ),
