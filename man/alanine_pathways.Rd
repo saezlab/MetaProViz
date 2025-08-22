@@ -17,4 +17,8 @@ alanine_pathways
 Manually curated table for the amino acid alanine toshowcase pathways (wiki, reactome, etc.) and alanine IDs (chebi, hmdb, etc.)
 included in those pathways
 }
+\examples{
+data(alanine_pathways)
+head(alanine_pathways)
+}
 \keyword{datasets}

@@ -20,4 +20,8 @@ We performed differential metabolite analysis comparing ccRCC tissue versus adja
 the patient's subset of young patient's (age <42 years) using median normalised data from the supplementary
 table 2 of Hakimi et. al.(="Tissue_Norm").
 }
+\examples{
+data(tissue_dma_young)
+head(tissue_dma_young)
+}
 \keyword{datasets}

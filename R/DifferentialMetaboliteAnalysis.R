@@ -472,30 +472,16 @@ log2fc <-function(data,
   }
 
   ## ------------ Check Missingness ------------- ##
-  Num <- data %>%#Are sample numbers enough?
+  Num <- data %>%
     filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator) %>%
-    dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
+    dplyr::select_if(is.numeric)
   Denom <- data %>%
     dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator) %>%
     dplyr::select_if(is.numeric)
 
-  Num_Miss <- replace(Num, Num==0, NA)
-  Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
-
-  Denom_Miss <- replace(Denom, Denom==0, NA)
-  Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
-
-  if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
-    Metabolites_Miss <- colnames(Num_Miss)
-  }else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
-    Metabolites_Miss <- colnames(Denom_Miss)
-  }else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
-  }else{
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
-  }
+  Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
+  Denom_Miss <- Denom[, colSums(Denom == 0) > 0, drop = FALSE]
+  Metabolites_Miss <- unique(c(colnames(Num_Miss), colnames(Denom_Miss)))
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
@@ -743,30 +729,16 @@ dma_stat_single <- function(data,
   metaproviz_init()
 
   ## ------------ Check Missingness ------------- ##
-  Num <- data %>%#Are sample numbers enough?
+  Num <- data %>%
     dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Numerator"]]) %>%
-    dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
+    dplyr::select_if(is.numeric)
   Denom <- data %>%
     dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]) %>%
     dplyr::select_if(is.numeric)
 
-  Num_Miss <- replace(Num, Num==0, NA)
-  Num_Miss <- Num_Miss[, (colSums(is.na(Num_Miss)) > 0), drop = FALSE]
-
-  Denom_Miss <- replace(Denom, Denom==0, NA)
-  Denom_Miss <- Denom_Miss[, (colSums(is.na(Denom_Miss)) > 0), drop = FALSE]
-
-  if((ncol(Num_Miss)>0 & ncol(Denom_Miss)==0)){
-    Metabolites_Miss <- colnames(Num_Miss)
-  }else if(ncol(Num_Miss)==0 & ncol(Denom_Miss)>0){
-    Metabolites_Miss <- colnames(Denom_Miss)
-  }else if(ncol(Num_Miss)>0 & ncol(Denom_Miss)>0){
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
-  }else{
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
-  }
+  Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
+  Denom_Miss <- Denom[, colSums(Denom == 0) > 0, drop = FALSE]
+  Metabolites_Miss <- unique(c(colnames(Num_Miss), colnames(Denom_Miss)))
 
   # Comparisons
   comparisons <- matrix(c(metadata_info[["Numerator"]], metadata_info[["Denominator"]]))

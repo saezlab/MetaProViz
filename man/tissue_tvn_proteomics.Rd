@@ -20,4 +20,8 @@ tissue_tvn_proteomics
 The processed proteomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
 used the study from Clark et. al. under Proteomics data Commons PDC000127.
 }
+\examples{
+data(tissue_tvn_proteomics)
+head(tissue_tvn_proteomics)
+}
 \keyword{datasets}

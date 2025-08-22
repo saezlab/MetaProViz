@@ -54,10 +54,12 @@ MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4
                             pval ="aov",
                             core=TRUE)
 
-IntraDMA <- intracell_raw \%>\%tibble::column_to_rownames("Code")
+IntraDMA <- intracell_dma
 
-Res <- MetaProViz::mca_core(data_intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
-                            data_core = MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+Res <- MetaProViz::mca_core(
+    data_intra = as.data.frame(IntraDMA),
+    data_core = as.data.frame(MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+  )
 
 }
 \keyword{biological}

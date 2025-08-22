@@ -24,4 +24,8 @@ intracell_raw
 Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
 peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
 }
+\examples{
+data(intracell_raw)
+head(intracell_raw)
+}
 \keyword{datasets}

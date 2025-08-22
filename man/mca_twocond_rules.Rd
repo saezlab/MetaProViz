@@ -18,4 +18,8 @@ mca_twocond_rules
 Manually curated table defining the flow of information of the two condition biological regulatory clusters Regulatory labels
 from the different grouping methods.
 }
+\examples{
+data(mca_twocond_rules)
+head(mca_twocond_rules)
+}
 \keyword{datasets}

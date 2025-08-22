@@ -5,15 +5,19 @@
 \alias{gaude_pathways}
 \title{gaude_pathways}
 \format{
-?
+Data frame with columns: term, gene
 }
 \source{
-?
+Omnipath
 }
 \usage{
 gaude_pathways
 }
 \description{
 gaude_pathways
+}
+\examples{
+data(gaude_pathways)
+head(gaude_pathways)
 }
 \keyword{datasets}
