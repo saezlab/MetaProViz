@@ -111,7 +111,7 @@ jobs:
       - name: Install other Bioconductor dependencies from release
         run: |
           Rscript -e 'BiocManager::install(version = "release")'
-          Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue"))'
+          Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
 
       - name: Install remotes
         run: |

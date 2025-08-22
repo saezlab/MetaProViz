@@ -57,6 +57,7 @@ Imports:
     magrittr,
     methods,
     OmnipathR (>= 3.17.4),
+    SummarizedExperiment,
     patchwork,
     pheatmap,
     Polychrome,

@@ -26,7 +26,8 @@
 
 #' Modularised Normalization: 80%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Alternatively, if `se=TRUE`, provide a SummarizedExperiment object.
+#' @param se Logical. If TRUE, the input for `data` must be a SummarizedExperiment object and `metadata_sample`/`metadata_feature` will be extracted automatically. If FALSE (default), standard data and metadata inputs are used.
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition.
 #' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" (mandatory) with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" (optional) including numerical values. For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added. Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions.
 #' @param featurefilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
@@ -44,16 +45,23 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
-#' ResI <- MetaProViz::processing(data=Intra[-c(49:58) ,-c(1:3)],
-#'                                metadata_sample=Intra[-c(49:58) , c(1:3)],
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
+#' ResI <- MetaProViz::processing(data=Intra[-c(49:58), -c(1:3)],
+#'                                metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
-#' Media <- medium_raw %>%tibble::column_to_rownames("Code")
-#' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
-#'                                metadata_sample = Media[-c(40:45) ,c(1:3)] ,
+#' Media <- medium_raw %>% tibble::column_to_rownames("Code")
+#' ResM <- MetaProViz::processing(data = Media[-c(40:45), -c(1:3)],
+#'                                metadata_sample = Media[-c(40:45), c(1:3)],
 #'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                core=TRUE)
+#'
+#' # Example using SummarizedExperiment
+#' mat <- Intra[-c(49:58), -c(1:5, 97)]
+#' colData <- cellular_meta %>% dplyr::filter(Metabolite %in% colnames(mat)) %>% tibble::column_to_rownames("Metabolite")%>% .[colnames(mat), , drop = FALSE]
+#' rowData <- Intra[-c(49:58), c(1:3)]
+#' se <- SummarizedExperiment::SummarizedExperiment(assays = list(counts = mat), colData = colData, rowData = rowData)
+#' ResSE <- MetaProViz::processing(data = se, se = TRUE, metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' @keywords 80  percent filtering rule, Missing Value Imputation, total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts
 #'
@@ -76,8 +84,16 @@ processing <- function(data,
                        save_plot = "svg",
                        save_table = "csv",
                        print_plot = TRUE,
-                       path = NULL
+                       path = NULL,
+                       se = FALSE
 ){
+  # If se=TRUE, extract data and metadata from SummarizedExperiment
+  if (se) {
+    se_inputs <- MetaProViz:::process_se(data)
+    data <- se_inputs$data
+    metadata_sample <- se_inputs$metadata_sample
+    # metadata_feature <- se_inputs$metadata_feature # Not used in this function, but available
+  }
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
@@ -258,6 +274,9 @@ processing <- function(data,
   Res_List <- list("DF"= DFList ,"Plot" =PlotList)
 
   # Save Plots and DFs
+
+  ## --- Add SummarizedExperiment output if se=TRUE --- ##
+
   #As row names are not saved we need to make row.names to column for the DFs that needs this:
   DFList[["data_Rawdata"]] <- DFList[["data_Rawdata"]]%>%tibble::rownames_to_column("Code")
   DFList[["Preprocessing_output"]] <- DFList[["Preprocessing_output"]]%>%tibble::rownames_to_column("Code")
@@ -276,9 +295,6 @@ processing <- function(data,
   #Return
   invisible(return(Res_List))
 }
-
-
-
 
 ############################################################
 ### ### ### Merge analytical replicates function ### ### ###
