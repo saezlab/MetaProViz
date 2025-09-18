@@ -1049,72 +1049,149 @@ log2fc <- function(
                 log2fc_table <- Log2FC_C1vC2
             }
         } 
-    }else if(core==FALSE){
-      #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
-      Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_Merge <- merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        dplyr::rename("C1"=2,
-               "C2"=3)
-      Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
+        else if (core == FALSE) {
+            # Mean values could be 0, which can not be used to calculate a 
+            # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) 
+            # for A and/or B being 0, with x being set to 1
+            Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_Merge <- 
+                merge(
+                    Mean_C1_t,
+                    Mean_C2_t,
+                    by = "Metabolite",
+                    all = TRUE
+                ) %>%
+                dplyr::rename(
+                    "C1" = 2,
+                    "C2" = 3
+                )
+            # Column to enable the check if mean values of 0 are due to missing 
+            # values (NA/0) and not by coincidence
+            Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
-      Mean_Merge <- Mean_Merge%>%
-        dplyr::mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C1)))%>%
-        dplyr::mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C2)))%>%
-        dplyr::mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
-        dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
+            Mean_Merge <- Mean_Merge %>%
+                dplyr::mutate(C1_Adapted = case_when(
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C2 == 0 & `NA/0` == TRUE ~ paste(C1),
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C1 == 0 & `NA/0` == TRUE ~ paste(C1),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data,
+                    # hence we add the constant +1
+                    C2 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data,
+                    # hence we add the constant +1
+                    C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                    TRUE ~ paste(C1)
+                    )
+                ) %>%
+                dplyr::mutate(C2_Adapted = case_when(
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C1 == 0 & `NA/0` == TRUE ~ paste(C2),
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C2 == 0 & `NA/0` == TRUE ~ paste(C2),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data, 
+                    # hence we add the constant +1
+                    C1 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data, 
+                    # hence we add the constant +1
+                    C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                    TRUE ~ paste(C2)
+                    )
+                ) %>%
+                dplyr::mutate(C1_Adapted = as.numeric(C1_Adapted)) %>%
+                    dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
 
-      if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
-        X <- Mean_Merge%>%
-          subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
-        message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
-      }
+            if (any(
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+            ) == TRUE) {
+                X <- Mean_Merge %>%
+                subset(
+                    (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                    (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+                )
+                message(
+                    "We added +1 to the mean value of metabolite(s) ",
+                    paste0(X$Metabolite, collapse = ", "),
+                    paste0(
+                        ", since the mean of the replicate values where 0. ",
+                        "This was not due to missing values (NA/0)."
+                    )
+                )
+            }
 
-      #Calculate the Log2FC
-      if(transform== TRUE){#data are not log2 transformed
-        Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
-        Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
-      }
+            # Calculate the Log2FC
+            if (transform == TRUE) { # data are not log2 transformed
+                # FoldChange
+                Mean_Merge$FC_C1vC2 <- 
+                    Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted
+                Mean_Merge$Log2FC <- 
+                    gtools::foldchange2logratio(
+                        Mean_Merge$FC_C1vC2,
+                        base = 2
+                    )
+            }
 
-      if(transform== FALSE){#data has been log2 transformed and hence we need to take this into account when calculating the log2FC
-        Mean_Merge$FC_C1vC2 <- "Empty"
-        Mean_Merge$Log2FC <- Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
-      }
+            # data has been log2 transformed and hence we need to take this into
+            # account when calculating the log2FC
+            if (transform == FALSE) {
+                Mean_Merge$FC_C1vC2 <- "Empty"
+                Mean_Merge$Log2FC <- 
+                    Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
+            }
 
-      #Add info on Input:
-      temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
-      temp4 <- as.data.frame(t(C2))%>%tibble::rownames_to_column("Metabolite")
-      temp_3a4 <-merge(temp3, temp4, by="Metabolite", all=TRUE)
-      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,8)], temp_3a4, by="Metabolite", all.x=TRUE)
+            # Add info on Input:
+            temp3 <- as.data.frame(t(C1)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp4 <- as.data.frame(t(C2)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
+            Log2FC_C1vC2 <- merge(
+                Mean_Merge[,
+                c(1, 8)],
+                temp_3a4,
+                by = "Metabolite",
+                all.x = TRUE
+            )
 
-      #Return DFs
-      ##Make reverse DF
-      Log2FC_C2vC1 <-Log2FC_C1vC2
-      Log2FC_C2vC1$Log2FC <- Log2FC_C2vC1$Log2FC*-1
+            # Return DFs
+            ## Make reverse DF
+            Log2FC_C2vC1 <- Log2FC_C1vC2
+            Log2FC_C2vC1$Log2FC <- Log2FC_C2vC1$Log2FC * -1
 
-      if(MultipleComparison == TRUE){
-        logname <- paste(comparisons[1,column], comparisons[2,column],sep="_vs_")
-        logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
+            if (MultipleComparison == TRUE) {
+                logname <- paste(
+                    comparisons[1, column],
+                    comparisons[2, column],
+                    sep = "_vs_"
+                )
+                logname_reverse <- paste(
+                    comparisons[2, column],
+                    comparisons[1, column],
+                    sep = "_vs_"
+                )
 
-        # Store the data frame in the results list, named after the contrast
-        log2fc_table[[logname]] <- Log2FC_C1vC2
-        log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-      }else{
-        log2fc_table <- Log2FC_C1vC2
-      }
+                # Store the data frame in the results list, named after the contrast
+                log2fc_table[[logname]] <- Log2FC_C1vC2
+                log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
+            } 
+            else {
+                log2fc_table <- Log2FC_C1vC2
+            }
+        }
     }
-  }
-  return(invisible(log2fc_table))
+    return(invisible(log2fc_table))
 }
 
 
