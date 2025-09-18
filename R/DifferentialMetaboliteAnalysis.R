@@ -478,41 +478,49 @@ dma <- function(
         }
     }
 
-  ################################################################################################################################################################################################
-  ###############  Plots ###############
-  if(core==TRUE){
-    x <- "Log2(Distance)"
-    VolPlot_metadata_info= c(color="core")
-    VolPlot_SettingsFile = DMA_Output
-  }else{
-    x <- "Log2FC"
-    VolPlot_metadata_info= NULL
-    VolPlot_SettingsFile = NULL
-  }
-
-  volplotList = list()
-  for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
-    Volplotdata<- DMA_Output[[DF]]
-
-    if(core==TRUE){
-      VolPlot_SettingsFile <- DMA_Output[[DF]]%>%tibble::column_to_rownames("Metabolite")
+    ############################################################################
+    ###############  Plots ###############
+    if (core == TRUE) {
+        x <- "Log2(Distance)"
+        VolPlot_metadata_info <- c(color = "core")
+        VolPlot_SettingsFile <- DMA_Output
+    } 
+    else {
+        x <- "Log2FC"
+        VolPlot_metadata_info <- NULL
+        VolPlot_SettingsFile <- NULL
     }
 
-    dev.new()
-    VolcanoPlot <- invisible(viz_volcano(plot_types="Standard",
-                                                    data=Volplotdata%>%tibble::column_to_rownames("Metabolite"),
-                                                    metadata_info=VolPlot_metadata_info,
-                                                    metadata_feature=VolPlot_SettingsFile,
-                                                    y= "p.adj",
-                                                    x= x,
-                                                    plot_name= DF,
-                                                    subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                    save_plot= NULL))
+    volplotList <- list()
+    for (DF in names(DMA_Output)) { # DF = names(DMA_Output)[2]
+        Volplotdata <- DMA_Output[[DF]]
 
-    DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
-    volplotList[[DF_save]]<- VolcanoPlot[["Plot_Sized"]][[1]]
+        if (core == TRUE) {
+            VolPlot_SettingsFile <- 
+                DMA_Output[[DF]] %>%
+                    tibble::column_to_rownames("Metabolite")
+        }
 
-    dev.off()
+        dev.new()
+        VolcanoPlot <- invisible(
+            viz_volcano(
+                plot_types = "Standard",
+                data = Volplotdata %>% tibble::column_to_rownames("Metabolite"),
+                metadata_info = VolPlot_metadata_info,
+                metadata_feature = VolPlot_SettingsFile,
+                y = "p.adj",
+                x = x,
+                plot_name = DF,
+                subtitle = bquote(italic("Differential Metabolite Analysis")),
+                save_plot = NULL
+            )
+        )
+
+        ## Remove special characters and replace spaces with underscores
+        DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)
+        volplotList[[DF_save]] <- VolcanoPlot[["Plot_Sized"]][[1]]
+
+        dev.off()
     }
 
   ######################################################################################################################################################################
