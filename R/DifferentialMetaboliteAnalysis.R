@@ -386,23 +386,42 @@ dma <- function(
     }
 
 
-  ################################################################################################################################################################################################
-  ###############  Add the previous metabolite names back ###############
-  DMA_Output <- lapply(STAT_C1vC2, function(df){
-    merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
-    merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
-      dplyr::rename("Metabolite"=1)
-    return(merged_df)
-    })
+    ############################################################################
+    ###############  Add the previous metabolite names back ###############
+    DMA_Output <- 
+        lapply(
+            STAT_C1vC2, function(df) {
+                merged_df <- 
+                    merge(
+                        savedMetaboliteNames,
+                        df,
+                        by = "Metabolite",
+                        all.y = TRUE
+                    )
+                # remove the names we used as part of the function and 
+                # add back the input names.
+                merged_df <- merged_df[, -1] %>%
+                    dplyr::rename("Metabolite" = 1)
+                return(merged_df)
+            }
+        )
 
-
-  ################################################################################################################################################################################################
-  ###############  Add the metabolite Metadata if available ###############
-  if(is.null(metadata_feature) == FALSE){
-      DMA_Output <- lapply(DMA_Output, function(df){
-        merged_df <- merge(df,metadata_feature%>%tibble::rownames_to_column("Metabolite") , by = "Metabolite", all.x = TRUE)
-        return(merged_df)
-      })
+    ############################################################################
+    ###############  Add the metabolite Metadata if available ###############
+    if (is.null(metadata_feature) == FALSE) {
+        DMA_Output <- 
+            lapply(
+                DMA_Output, function(df) {
+                    merged_df <- 
+                        merge(
+                            df,
+                            metadata_feature %>% tibble::rownames_to_column("Metabolite"),
+                            by = "Metabolite",
+                            all.x = TRUE
+                        )
+                    return(merged_df)
+                }
+            )
     }
 
   ################################################################################################################################################################################################
