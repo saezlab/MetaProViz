@@ -523,80 +523,117 @@ dma <- function(
         dev.off()
     }
 
-  ######################################################################################################################################################################
-  ##----- Save and Return
-  DMA_Output_List <- list()
-  #Here we make a list in which we will save the outputs:
-  if(shapiro==TRUE & exists("Shapiro_output")==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=Shapiro_output[["DF"]],
-                           inputlist_plot= Shapiro_output[["Plot"]][["Distributions"]],
-                           save_table=save_table,
-                           save_plot=save_plot,
-                           path= Subfolder_S ,
-                           file_name= "ShapiroTest",
-                           core=core,
-                           print_plot=print_plot)))
+    ############################################################################
+    ## ----- Save and Return
+    DMA_Output_List <- list()
+    # Here we make a list in which we will save the outputs:
+    if (shapiro == TRUE & exists("Shapiro_output") == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = Shapiro_output[["DF"]],
+                    inputlist_plot = Shapiro_output[["Plot"]][["Distributions"]],
+                    save_table = save_table,
+                    save_plot = save_plot,
+                    path = Subfolder_S,
+                    file_name = "ShapiroTest",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+    )
 
-    DMA_Output_List <- list("ShapiroTest"=Shapiro_output)
-  }
+      DMA_Output_List <- list("ShapiroTest" = Shapiro_output)
+    }
 
-  if(bartlett==TRUE & exists("Bartlett_output")==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=Bartlett_output[["DF"]],
-                           inputlist_plot= Bartlett_output[["Plot"]],
-                           save_table=save_table,
-                           save_plot=save_plot,
-                           path= Subfolder_B ,
-                           file_name= "BartlettTest",
-                           core=core,
-                           print_plot=print_plot)))
+    if (bartlett == TRUE & exists("Bartlett_output") == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = Bartlett_output[["DF"]],
+                    inputlist_plot = Bartlett_output[["Plot"]],
+                    save_table = save_table,
+                    save_plot = save_plot,
+                    path = Subfolder_B,
+                    file_name = "BartlettTest",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+        )
 
-    DMA_Output_List <- c(DMA_Output_List, list("BartlettTest"=Bartlett_output))
-  }
+      DMA_Output_List <- 
+        c(
+            DMA_Output_List,
+            list("BartlettTest" = Bartlett_output)
+        )
+    }
 
-  if(vst==TRUE & exists("vst_res")==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=vst_res[["DF"]],
-                           inputlist_plot= vst_res[["Plot"]],
-                           save_table=save_table,
-                           save_plot=save_plot,
-                           path= Subfolder_V ,
-                           file_name= "vst_res",
-                           core=core,
-                           print_plot=print_plot)))
+    if (vst == TRUE & exists("vst_res") == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = vst_res[["DF"]],
+                    inputlist_plot = vst_res[["Plot"]],
+                    save_table = save_table,
+                    save_plot = save_plot,
+                    path = Subfolder_V,
+                    file_name = "vst_res",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+        )
 
-    DMA_Output_List <- c(DMA_Output_List, list("vstres"=Bartlett_output))
-  }
+      DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
+    }
 
-  if(core==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=list("Feature_Metadata"=Feature_Metadata),
-              inputlist_plot= NULL,
-              save_table=save_table,
-              save_plot=NULL,
-              path= folder,
-              file_name= "dma",
-              core=core,
-              print_plot=print_plot)))
+    if (core == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = list("Feature_Metadata" = Feature_Metadata),
+                    inputlist_plot = NULL,
+                    save_table = save_table,
+                    save_plot = NULL,
+                    path = folder,
+                    file_name = "dma",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+        )
 
-    DMA_Output_List <- c(DMA_Output_List, list("Feature_Metadata"=Feature_Metadata))
-  }
+        DMA_Output_List <- 
+            c(
+                DMA_Output_List,
+                list("Feature_Metadata" = Feature_Metadata)
+            )
+    }
 
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=DMA_Output,#This needs to be a list, also for single comparisons
-            inputlist_plot= volplotList,
-            save_table=save_table,
-            save_plot=save_plot,
-            path= folder,
-            file_name= "dma",
-            core=core,
-            print_plot=print_plot)))
+    suppressMessages(
+        suppressWarnings(
+            save_res(
+                # This needs to be a list, also for single comparisons
+                inputlist_df = DMA_Output,
+                inputlist_plot = volplotList,
+                save_table = save_table,
+                save_plot = save_plot,
+                path = folder,
+                file_name = "dma",
+                core = core,
+                print_plot = print_plot
+            )
+        )
+    )
 
-  DMA_Output_List <- c(DMA_Output_List, list("dma"=DMA_Output, "VolcanoPlot"=volplotList))
+    DMA_Output_List <- 
+        c(
+            DMA_Output_List,
+            list("dma" = DMA_Output, "VolcanoPlot" = volplotList)
+        )
 
-
-  return(invisible(DMA_Output_List))
+    return(invisible(DMA_Output_List))
 }
 
 
