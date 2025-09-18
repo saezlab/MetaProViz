@@ -190,49 +190,85 @@ dma <- function(
             }
         }
     }
-    
-  ###############################################################################################################################################################################################################
-  ## ------------ Check hypothesis test assumptions ----------- ##
-  # 1. Normality
-  if(shapiro==TRUE){
-    if(length(Settings[["Metabolites_Miss"]]>=1)){
-    message("There are NA's/0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs/0s.")#
-      }
-    tryCatch(
-    {
-     Shapiro_output <-suppressWarnings(shapiro(data=data,
-                                                            metadata_sample=metadata_sample,
-                                                            metadata_info=metadata_info,
-                                                            pval=pval,
-                                                            qqplots=FALSE))
-    },
-    error = function(e) {
-      message("Error occurred during shapiro that performs the shapiro-Wilk test. Message: ", conditionMessage(e))
-    }
-  )
-  }
 
-  # 2. Variance homogeneity
-  if(bartlett==TRUE){
-    if(Settings[["MultipleComparison"]]==TRUE){#if we only have two conditions, which can happen even tough multiple comparison (C1 versus C2 and C2 versus C1 is done)
-      UniqueConditions <- metadata_sample%>%
-        subset(metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] | metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]], select = c(metadata_info[["Conditions"]]))
-      UniqueConditions <- unique(UniqueConditions[[metadata_info[["Conditions"]]]])
-
-    if(length(UniqueConditions)>2){
-      tryCatch(
-        {
-          Bartlett_output<-suppressWarnings(bartlett(data=data,
-                                                                  metadata_sample=metadata_sample,
-                                                                  metadata_info=metadata_info))
-        },
-        error = function(e) {
-          message("Error occurred during bartlett that performs the bartlett test. Message: ", conditionMessage(e))
+    ############################################################################
+    ## ------------ Check hypothesis test assumptions ----------- ##
+    # 1. Normality
+    if (shapiro == TRUE) {
+        if (length(Settings[["Metabolites_Miss"]] >= 1)) {
+          
+          message(
+              paste0(
+                "There are NA's/0s in the data. This can impact the output of ",
+                "the SHapiro-Wilk test for all metabolites that include NAs/0s."
+              )
+          )
         }
-      )
+        tryCatch(
+            {
+            Shapiro_output <- 
+              suppressWarnings(
+                  shapiro(
+                      data = data,
+                      metadata_sample = metadata_sample,
+                      metadata_info = metadata_info,
+                      pval = pval,
+                      qqplots = FALSE
+                  )
+              )
+            },
+            error = function(e) {
+                message(
+                    paste0(
+                      "Error occurred during shapiro that performs ",
+                      "the shapiro-Wilk test. Message:"
+                    ),
+                    conditionMessage(e)
+                )
+            }
+        )
     }
+
+    # 2. Variance homogeneity
+    if (bartlett == TRUE) {
+        # if we only have two conditions, which can happen even tough multiple
+        # comparison (C1 versus C2 and C2 versus C1 is done)
+        if (Settings[["MultipleComparison"]] == TRUE) {
+            UniqueConditions <- 
+                metadata_sample %>%
+                    subset(
+                        metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] | metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]],
+                        select = c(metadata_info[["Conditions"]])
+                    )
+            UniqueConditions <- 
+                unique(UniqueConditions[[metadata_info[["Conditions"]]]])
+
+            if (length(UniqueConditions) > 2) {
+                tryCatch(
+                    {
+                    Bartlett_output <- 
+                        suppressWarnings(
+                              bartlett(
+                                  data = data,
+                                  metadata_sample = metadata_sample,
+                                  metadata_info = metadata_info
+                              )
+                        )
+                    },
+                    error = function(e) {
+                        message(
+                            paste0(
+                                "Error occurred during bartlett that performs ",
+                                "the bartlett test. Message:"
+                            ),
+                            conditionMessage(e)
+                        )
+                    }
+                )
+            }
+        }
     }
-  }
+
 
   ###############################################################################################################################################################################################################
   #### Prepare the data ######
