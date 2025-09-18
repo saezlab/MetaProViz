@@ -424,37 +424,59 @@ dma <- function(
             )
     }
 
-  ################################################################################################################################################################################################
-  ###############  For core=TRUE create summary of Feature_metadata ###############
-  if(core==TRUE){
-    df_list_selected <- purrr::map(names(DMA_Output), function(df_name) {
-    df <- DMA_Output[[df_name]]  # Extract the dataframe
+    ############################################################################
+    ###############  For core=TRUE create summary of Feature_metadata  #########
+    if (core == TRUE) {
+        df_list_selected <- 
+            purrr::map(
+                names(DMA_Output), function(df_name) {
+                    df <- DMA_Output[[df_name]] # Extract the dataframe
 
-    # Extract the dynamic column name
-    core_col <- grep("^core_", names(df), value = TRUE)  # Find the column that starts with "core_"
-    # Filter only columns where the part after "core_" is in valid_conditions
-    core_col <- core_col[str_remove(core_col, "^core_") %in% unique(metadata_sample[[metadata_info[["Conditions"]]]])]
+                    # Extract the dynamic column name
+                    # Find the column that starts with "core_"
+                    core_col <- grep("^core_", names(df), value = TRUE)
+                    # Filter only columns where the part after "core_" 
+                    # is in valid_conditions
+                    core_col <- 
+                        core_col[str_remove(core_col, "^core_") %in% 
+                            unique(
+                                metadata_sample[[metadata_info[["Conditions"]]]]
+                                )
+                        ]
 
+                    # Select only the relevant columns
+                    df_selected <- df %>%
+                        select(Metabolite, all_of(core_col))
 
-    # Select only the relevant columns
-    df_selected <- df %>%
-      select(Metabolite, all_of(core_col))
+                    return(df_selected)
+                }
+            )
 
-    return(df_selected)
-  })
+        # Merge all dataframes by "Metabolite"
+        merged_df <- 
+            purrr::reduce(
+                df_list_selected,
+                dplyr::full_join,
+                by = "Metabolite"
+            )
+        # It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to
+        # be added to the column names. We only keep one column (.x)
+        names(merged_df) <- gsub("\\.x$", "", names(merged_df))
 
-  # Merge all dataframes by "Metabolite"
-  merged_df <- purrr::reduce(df_list_selected, dplyr::full_join, by = "Metabolite")
-  names(merged_df) <- gsub("\\.x$", "", names(merged_df))#It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to be added to the column names. We only keep one column (.x)
+        Feature_Metadata <- merged_df %>%
+            # Now we remove all other columns with .x.x, .y.y, etc.
+            select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))
 
-  Feature_Metadata <- merged_df %>%
-    select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))#Now we remove all other columns with .x.x, .y.y, etc.
-
-  if(is.null(metadata_feature) == FALSE){ #Add to Metadata file:
-    Feature_Metadata <- merge(metadata_feature%>%tibble::rownames_to_column("Metabolite"), Feature_Metadata , by = "Metabolite", all.x = TRUE)
-  }
-  }
-
+        if (is.null(metadata_feature) == FALSE) { # Add to Metadata file:
+            Feature_Metadata <- 
+                merge(
+                    metadata_feature %>% tibble::rownames_to_column("Metabolite"),
+                    Feature_Metadata,
+                    by = "Metabolite",
+                    all.x = TRUE
+                )
+        }
+    }
 
   ################################################################################################################################################################################################
   ###############  Plots ###############
