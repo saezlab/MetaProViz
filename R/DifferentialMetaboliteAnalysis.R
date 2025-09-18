@@ -761,28 +761,37 @@ log2fc <- function(
         MultipleComparison <- FALSE
     }
 
-  ####################################################################################################################################
-  ## ----------------- Log2FC ----------------------------
-  log2fc_table <- list()# Create an empty list to store results data frames
-  for(column in 1:dim(comparisons)[2]){
-    C1 <- data %>% # Numerator
-      dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1,column]) %>%
-      dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
-    C2 <- data %>% # Deniminator
-      dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in%  comparisons[2,column]) %>%
-      dplyr::select_if(is.numeric)
+    ############################################################################
+    ## ----------------- Log2FC ----------------------------
+    log2fc_table <- list() # Create an empty list to store results data frames
+    for (column in 1:dim(comparisons)[2]) {
+        # Numerator
+        C1 <- data %>%
+            dplyr::filter(
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
+            ) %>%
+            # only keep numeric columns with metabolite values
+            dplyr::select_if(is.numeric)
+        # Deniminator
+        C2 <- data %>%
+            dplyr::filter(
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[2, column]
+            ) %>%
+            dplyr::select_if(is.numeric)
 
-    ## ------------  Calculate Log2FC ----------- ##
-    # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if mean = 0 (If one value is NA, the mean will be NA even though all other values are available.)
-    C1_Zero <- C1
-    C1_Zero[is.na(C1_Zero)] <- 0
-    Mean_C1 <- C1_Zero %>%
-      dplyr::summarise_all("mean")
+        ## ------------  Calculate Log2FC ----------- ##
+        # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if
+        # mean = 0 (If one value is NA, the mean will be NA even though all other
+        # values are available.)
+        C1_Zero <- C1
+        C1_Zero[is.na(C1_Zero)] <- 0
+        Mean_C1 <- C1_Zero %>%
+        dplyr::summarise_all("mean")
 
-    C2_Zero <- C2
-    C2_Zero[is.na(C2_Zero)] <- 0
-    Mean_C2 <- C2_Zero %>%
-      dplyr::summarise_all("mean")
+        C2_Zero <- C2
+        C2_Zero[is.na(C2_Zero)] <- 0
+        Mean_C2 <- C2_Zero %>%
+        dplyr::summarise_all("mean")
 
     if(core==TRUE){#Calculate absolute distance between the means. log2 transform and add sign (-/+):
       #core values can be negative and positive, which can does not allow us to calculate a Log2FC.
