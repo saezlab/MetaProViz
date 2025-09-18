@@ -793,113 +793,262 @@ log2fc <- function(
         Mean_C2 <- C2_Zero %>%
         dplyr::summarise_all("mean")
 
-    if(core==TRUE){#Calculate absolute distance between the means. log2 transform and add sign (-/+):
-      #core values can be negative and positive, which can does not allow us to calculate a Log2FC.
-      Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        dplyr::rename("C1"=2,
-                      "C2"=3)
+    # Calculate absolute distance between the means. log2 transform 
+        # and add sign (-/+):
+        if (core == TRUE) {
+            # core values can be negative and positive, which can does not allow us to
+            # calculate a Log2FC.
+            Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_Merge <- merge(
+                Mean_C1_t,
+                Mean_C2_t,
+                by = "Metabolite",
+                all = TRUE
+            ) %>%
+                dplyr::rename(
+                "C1" = 2,
+                "C2" = 3
+                )
 
-      #Deal with NA/0s
-      Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
+            # Deal with NA/0s
+            # Column to enable the check if mean values of 0 are due to missing
+            # values (NA/0) and not by coincidence
+            Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
-      if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
-        Mean_Merge <- Mean_Merge%>%
-          dplyr::mutate(C1 = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                TRUE ~ paste(C1)))%>%
-          dplyr::mutate(C2 = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                TRUE ~ paste(C2)))%>%
-          dplyr::mutate(C1 = as.numeric(C1))%>%
-          dplyr::mutate(C2 = as.numeric(C2))
+            if (any(
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+            ) == TRUE) {
+                Mean_Merge <- Mean_Merge %>%
+                    dplyr::mutate(C1 = case_when(
+                        # Here we have a "true" 0 value due to 0/NAs 
+                        # in the input data
+                        C2 == 0 & `NA/0` == TRUE ~ paste(C1),
+                        # Here we have a "true" 0 value due to 0/NAs 
+                        # in the input data
+                        C1 == 0 & `NA/0` == TRUE ~ paste(C1),
+                        # Here we have a "false" 0 value that occured at random 
+                        # and not due to 0/NAs in the input data, hence we add 
+                        # the constant +1
+                        C2 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                        # Here we have a "false" 0 value that occured at random
+                        # and not due to 0/NAs in the input data, hence we add 
+                        # the constant +1
+                        C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                        TRUE ~ paste(C1)
+                    )) %>%
+                    dplyr::mutate(C2 = case_when(
+                        # Here we have a "true" 0 value due to 0/NAs in the 
+                        # input data
+                        C1 == 0 & `NA/0` == TRUE ~ paste(C2),
+                        # Here we have a "true" 0 value due to 0/NAs in the 
+                        # input data
+                        C2 == 0 & `NA/0` == TRUE ~ paste(C2),
+                        # Here we have a "false" 0 value that occured at random 
+                        # and not due to 0/NAs in the input data, hence we
+                        # add the constant +1
+                        C1 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                        # Here we have a "false" 0 value that occured at random 
+                        # and not due to 0/NAs in the input data, hence we 
+                        # add the constant +1
+                        C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                        TRUE ~ paste(C2)
+                    )) %>%
+                    dplyr::mutate(C1 = as.numeric(C1)) %>%
+                    dplyr::mutate(C2 = as.numeric(C2))
 
-        X <- Mean_Merge%>%
-          subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
-        message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
-      }
+                X <- Mean_Merge %>%
+                    subset(
+                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+                    )
+                    message(
+                        "We added +1 to the mean value of metabolite(s) ",
+                        paste0(X$Metabolite, collapse = ", "),
+                        paste0(
+                            ", since the mean of the replicate values where 0. ",
+                            "This was not due to missing values (NA/0)."
+                        )
+                    )
+            }
 
-      #Add the distance column:
-      Mean_Merge$`Log2(Distance)` <-log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
+            # Add the distance column:
+            Mean_Merge$`Log2(Distance)` <- 
+                log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
 
-      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
-        dplyr::mutate(`Log2(Distance)` = case_when(C1 > C2 ~ paste(`Log2(Distance)`*+1),#If C1>C2 the distance stays positive to reflect that C1 > C2
-                                            C1 < C2 ~ paste(`Log2(Distance)`*-1),#If C1<C2 the distance gets a negative sign to reflect that C1 < C2
-                                            TRUE ~ 'NA'))%>%
-        dplyr::mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+            # Now we can adapt the values to take into account the distance
+            Mean_Merge <- Mean_Merge %>%
+                dplyr::mutate(`Log2(Distance)` = case_when(
+                    # If C1>C2 the distance stays positive to reflect 
+                    # that C1 > C2
+                    C1 > C2 ~ paste(`Log2(Distance)` * +1),
+                    # If C1<C2 the distance gets a negative sign to reflect 
+                    # that C1 < C2
+                    C1 < C2 ~ paste(`Log2(Distance)` * -1),
+                    TRUE ~ "NA"
+                    )
+                ) %>%
+                dplyr::mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
-      #Add additional information:
-      temp1 <- Mean_C1
-      temp2 <- Mean_C2
-      #Add Info of core:
-      core_info <- rbind(temp1, temp2,rep(0,length(temp1)))
-      for (i in 1:length(temp1)){
-        if (temp1[i]>0 & temp2[i]>0){
-          core_info[3,i] <- "Released"
-        }else if (temp1[i]<0 & temp2[i]<0){
-          core_info[3,i] <- "Consumed"
-        }else if(temp1[i]>0 & temp2[i]<0){
-          core_info[3,i] <- paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")
-        } else if(temp1[i]<0 & temp2[i]>0){
-          core_info[3,i] <- paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")
-        }else{
-          core_info[3,i] <- "No Change"
-        }
-      }
+            # Add additional information:
+            temp1 <- Mean_C1
+            temp2 <- Mean_C2
+            # Add Info of core:
+            core_info <- rbind(temp1, temp2, rep(0, length(temp1)))
+            for (i in 1:length(temp1)) {
+                if (temp1[i] > 0 & temp2[i] > 0) {
+                    core_info[3, i] <- "Released"
+                } 
+                else if (temp1[i] < 0 & temp2[i] < 0) {
+                    core_info[3, i] <- "Consumed"
+                } 
+                else if (temp1[i] > 0 & temp2[i] < 0) {
+                    core_info[3, i] <- 
+                        paste(
+                            "Released in",
+                            comparisons[1,
+                            column],
+                            "and Consumed",
+                            comparisons[2,
+                            column],
+                            sep = " "
+                        )
+                } 
+                else if (temp1[i] < 0 & temp2[i] > 0) {
+                    core_info[3, i] <- 
+                        paste(
+                            "Consumed in",
+                            comparisons[1,
+                            column],
+                            " and Released",
+                            comparisons[2,
+                            column],
+                            sep = " "
+                        )
+                } 
+                else {
+                    core_info[3, i] <- "No Change"
+                }
+            }
 
-      core_info <- t(core_info) %>% as.data.frame()
-      core_info <- rownames_to_column(core_info, "Metabolite")
-      names(core_info)[2] <- paste("Mean",  comparisons[1,column], sep="_")
-      names(core_info)[3] <- paste("Mean",  comparisons[2,column], sep="_")
-      names(core_info)[4] <- "core_specific"
+            core_info <- t(core_info) %>% as.data.frame()
+            core_info <- rownames_to_column(core_info, "Metabolite")
+            names(core_info)[2] <- 
+                paste(
+                    "Mean", comparisons[1, column], sep = "_"
+                    )
+            names(core_info)[3] <- 
+                paste(
+                    "Mean", comparisons[2, column], sep = "_"
+                )
+            names(core_info)[4] <- "core_specific"
 
-      core_info <-core_info%>%
-        dplyr::mutate(core = case_when(core_specific == "Released" ~ 'Released',
-                                       core_specific == "Consumed" ~ 'Consumed',
-                                       TRUE ~ 'Released/Consumed'))%>%
-        dplyr::mutate(!!paste("core_", comparisons[1,column], sep="") := case_when(core_specific == "Released" ~ 'Released',
-                                                                                   core_specific == "Consumed" ~ 'Consumed',
-                                                                                   core_specific == paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")~ 'Consumed',
-                                                                                   core_specific == paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")~ 'Released',
-                                                                                   TRUE ~ 'NA'))%>%
-        dplyr::mutate(!!paste("core_", comparisons[2,column], sep="") := case_when(core_specific == "Released" ~ 'Released',
-                                                                                   core_specific == "Consumed" ~ 'Consumed',
-                                                                                   core_specific == paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")~ 'Released',
-                                                                                   core_specific == paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")~ 'Consumed',
-                                                                                   TRUE ~ 'NA'))
+            core_info <- core_info %>%
+                dplyr::mutate(
+                    core = case_when(
+                        core_specific == "Released" ~ "Released",
+                        core_specific == "Consumed" ~ "Consumed",
+                        TRUE ~ "Released/Consumed"
+                    )
+                ) %>%
+                dplyr::mutate(!!paste(
+                    "core_", comparisons[1, column], sep = ""
+                    ) := case_when(
+                        core_specific == "Released" ~ "Released",
+                        core_specific == "Consumed" ~ "Consumed",
+                        core_specific == paste(
+                            "Consumed in",
+                            comparisons[1, column],
+                            " and Released",
+                            comparisons[2, column],
+                            sep = " "
+                        ) ~ "Consumed",
+                        core_specific == paste(
+                            "Released in",
+                            comparisons[1, column],
+                            "and Consumed",
+                            comparisons[2, column],
+                            sep = " "
+                        ) ~ "Released",
+                        TRUE ~ "NA"
+                )
+                ) %>%
+                dplyr::mutate(!!paste(
+                    "core_",
+                    comparisons[2, column],
+                    sep = ""
+                ) := case_when(
+                    core_specific == "Released" ~ "Released",
+                    core_specific == "Consumed" ~ "Consumed",
+                    core_specific == paste(
+                        "Consumed in",
+                        comparisons[1, column],
+                        " and Released",
+                        comparisons[2, column],
+                        sep = " "
+                    ) ~ "Released",
+                    core_specific == paste(
+                        "Released in",
+                        comparisons[1, column],
+                        "and Consumed",
+                        comparisons[2, column],
+                        sep = " "
+                    ) ~ "Consumed",
+                    TRUE ~ "NA"
+                    )
+                )
 
 
-      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], core_info[,c(1,2,6,3,7,4:5)], by="Metabolite", all.x=TRUE)
+            Log2FC_C1vC2 <- merge(
+                Mean_Merge[, c(1, 5)],
+                core_info[, c(1, 2, 6, 3, 7, 4:5)],
+                by = "Metabolite",
+                all.x = TRUE
+            )
 
-      #Add info on Input:
-      temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
-      temp4 <- as.data.frame(t(C2))%>%tibble::rownames_to_column("Metabolite")
-      temp_3a4 <- merge(temp3, temp4, by="Metabolite", all=TRUE)
-      Log2FC_C1vC2 <- merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
+            # Add info on Input:
+            temp3 <- as.data.frame(t(C1)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp4 <- as.data.frame(t(C2)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
+            Log2FC_C1vC2 <- merge(
+                Log2FC_C1vC2,
+                temp_3a4,
+                by = "Metabolite",
+                all.x = TRUE
+            )
 
-      #Return DFs
-      ##Make reverse DF
-      Log2FC_C2vC1 <- Log2FC_C1vC2
-      Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` *-1
+            # Return DFs
+            ## Make reverse DF
+            Log2FC_C2vC1 <- Log2FC_C1vC2
+            Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` * -1
 
-      ##Name them
-      if(MultipleComparison == TRUE){
-        logname <- paste(comparisons[1,column], comparisons[2,column],sep="_vs_")
-        logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
+            ## Name them
+            if (MultipleComparison == TRUE) {
+                logname <- paste(
+                comparisons[1, column],
+                comparisons[2, column],
+                sep = "_vs_"
+                )
+                logname_reverse <- paste(
+                comparisons[2, column],
+                comparisons[1, column],
+                sep = "_vs_"
+                )
 
-        # Store the data frame in the results list, named after the contrast
-        log2fc_table[[logname]] <- Log2FC_C1vC2
-        log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-      }else{
-        log2fc_table <- Log2FC_C1vC2
-      }
+                # Store the data frame in the results list, 
+                # named after the contrast
+                log2fc_table[[logname]] <- Log2FC_C1vC2
+                log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
+            } 
+            else {
+                log2fc_table <- Log2FC_C1vC2
+            }
+        } 
     }else if(core==FALSE){
       #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
       Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
