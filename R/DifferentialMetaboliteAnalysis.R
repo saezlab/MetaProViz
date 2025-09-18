@@ -288,65 +288,103 @@ dma <- function(
         transform = transform
     )
 
-  ################################################################################################################################################################################################
-  ############### Perform Hypothesis testing ###############
-  if(Settings[["MultipleComparison"]] == FALSE){
-    if(pval=="lmFit"){
-      STAT_C1vC2 <- dma_stat_limma(data=data,
-                                                metadata_sample=metadata_sample,
-                                                metadata_info=metadata_info,
-                                                padj=padj,
-                                                log2fc_table=log2fc_table,
-                                                core=core,
-                                                transform=transform)
+    ############################################################################
+    ############### Perform Hypothesis testing ###############
+    if (Settings[["MultipleComparison"]] == FALSE) {
+        if (pval == "lmFit") {
+            STAT_C1vC2 <- 
+                dma_stat_limma(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    padj = padj,
+                    log2fc_table = log2fc_table,
+                    core = core,
+                    transform = transform
+                )
+        } 
+        else {
+            STAT_C1vC2 <- 
+                dma_stat_single(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table,
+                    pval = pval,
+                    padj = padj
+                )
+        }
+    } 
+    else { # MultipleComparison = TRUE
+        # Correct data heteroscedasticity
+        if (pval != "lmFit" & vst == TRUE) {
+            vst_res <- vst(data)
+            data <- vst_res[["DFs"]][["Corrected_data"]]
+        }
 
-    }else{
-      STAT_C1vC2 <-dma_stat_single(data=data,
-                                                metadata_sample=metadata_sample,
-                                                metadata_info=metadata_info,
-                                                log2fc_table=log2fc_table,
-                                                pval=pval,
-                                                padj=padj)
-    }
-  }else{ # MultipleComparison = TRUE
-    #Correct data heteroscedasticity
-    if(pval!="lmFit" & vst == TRUE){
-      vst_res <- vst(data)
-      data <- vst_res[["DFs"]][["Corrected_data"]]
+        if (Settings[["all_vs_all"]] == TRUE) {
+            message(
+                paste0(
+                    "No conditions were specified as numerator or denumerator. ",
+                    "Performing multiple testing `all-vs-all` using"
+                ),
+                paste(pval),
+                "."
+            )
+        } 
+        else { # for 1 vs all
+            message(
+                "No condition was specified as numerator and ",
+                Settings[["denominator"]],
+                paste0(
+                    "was selected as a denominator. Performing ",
+                    "multiple testing `all-vs-one` using"
+                ),
+                paste(pval),
+                "."
+            )
+        }
+
+        if (pval == "aov") {
+            STAT_C1vC2 <- 
+                aov(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table
+                )
+        } 
+        else if (pval == "kruskal.test") {
+            STAT_C1vC2 <- 
+                kruskal(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table,
+                    padj = padj
+                )
+        } 
+        else if (pval == "welch") {
+            STAT_C1vC2 <- 
+                welch(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table
+                )
+        } else if (pval == "lmFit") {
+            STAT_C1vC2 <- dma_stat_limma(
+            data = data,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            padj = padj,
+            log2fc_table = log2fc_table,
+            core = core,
+            transform = transform
+            )
+        }
     }
 
-    if(Settings[["all_vs_all"]] ==TRUE){
-      message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(pval), ".")
-    }else{# for 1 vs all
-      message("No condition was specified as numerator and ", Settings[["denominator"]], " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(pval), ".")
-    }
-
-    if(pval=="aov"){
-      STAT_C1vC2 <- aov(data=data,
-                                     metadata_sample=metadata_sample,
-                                     metadata_info=metadata_info,
-                                     log2fc_table=log2fc_table)
-    }else if(pval=="kruskal.test"){
-      STAT_C1vC2 <-kruskal(data=data,
-                                        metadata_sample=metadata_sample,
-                                        metadata_info=metadata_info,
-                                        log2fc_table=log2fc_table,
-                                        padj=padj)
-    }else if(pval=="welch"){
-      STAT_C1vC2 <-welch(data=data,
-                                      metadata_sample=metadata_sample,
-                                      metadata_info=metadata_info,
-                                      log2fc_table=log2fc_table)
-    }else if(pval=="lmFit"){
-      STAT_C1vC2 <- dma_stat_limma(data=data,
-                                                metadata_sample=metadata_sample,
-                                                metadata_info=metadata_info,
-                                                padj=padj,
-                                                log2fc_table=log2fc_table,
-                                                core=core,
-                                                transform=transform)
-    }
-  }
 
   ################################################################################################################################################################################################
   ###############  Add the previous metabolite names back ###############
