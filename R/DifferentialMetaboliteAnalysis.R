@@ -270,20 +270,23 @@ dma <- function(
     }
 
 
-  ###############################################################################################################################################################################################################
-  #### Prepare the data ######
-  #1. Metabolite names:
-  savedMetaboliteNames <-  data.frame("InputName"=colnames(data))
-  savedMetaboliteNames$Metabolite <- paste0("M", seq(1,length(colnames(data))))
-  colnames(data) <- savedMetaboliteNames$Metabolite
+    ############################################################################
+    #### Prepare the data ######
+    # 1. Metabolite names:
+    savedMetaboliteNames <- data.frame("InputName" = colnames(data))
+    savedMetaboliteNames$Metabolite <- paste0("M", seq(1, length(colnames(data))))
+    colnames(data) <- savedMetaboliteNames$Metabolite
 
-  ################################################################################################################################################################################################
-  ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  log2fc_table <- log2fc(data=data,
-                                          metadata_sample=metadata_sample,
-                                          metadata_info=metadata_info,
-                                          core=core,
-                                          transform=transform)
+    ############################################################################
+    ############### Calculate Log2FC, pval, padj, tval and add additional info
+    ############### ###############
+    log2fc_table <- log2fc(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        transform = transform
+    )
 
   ################################################################################################################################################################################################
   ############### Perform Hypothesis testing ###############
