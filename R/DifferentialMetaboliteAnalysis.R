@@ -108,71 +108,89 @@
 #'
 #' @export
 #'
-dma <-function(data,
-               metadata_sample,
-               metadata_info = c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-               pval ="lmFit",
-               padj="fdr",
-               metadata_feature = NULL,
-               core=FALSE,
-               vst = FALSE,
-               shapiro =TRUE,
-               bartlett =TRUE,
-               transform=TRUE,
-               save_plot = "svg",
-               save_table = "csv",
-               print_plot = TRUE,
-               path = NULL
-){
+dma <- function(
+    data,
+    metadata_sample,
+    metadata_info = c(
+        Conditions = "Conditions",
+        Numerator = NULL,
+        Denominator = NULL
+    ) ,
+    pval = "lmFit",
+    padj = "fdr",
+    metadata_feature = NULL,
+    core = FALSE,
+    vst = FALSE,
+    shapiro = TRUE,
+    bartlett = TRUE,
+    transform = TRUE,
+    save_plot = "svg",
+    save_table = "csv",
+    print_plot = TRUE,
+    path = NULL
+    ) {
+        
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
+    logger::log_info("dma: Differential metabolite analysis.")
 
-  logger::log_info("dma: Differential metabolite analysis.")
+    ## ------------ Check Input files ----------- ##
+    # HelperFunction `check_param`
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_feature = metadata_feature,
+        metadata_info = metadata_info,
+        save_plot = save_plot,
+        save_table = save_table,
+        core = core,
+        print_plot = print_plot
+    )
 
-  ## ------------ Check Input files ----------- ##
-  # HelperFunction `check_param`
-  check_param(data=data,
-                          metadata_sample=metadata_sample,
-                          metadata_feature=metadata_feature,
-                          metadata_info=metadata_info,
-                          save_plot=save_plot,
-                          save_table=save_table,
-                          core=core,
-                          print_plot= print_plot)
+    # HelperFunction `check_param` Specific
+    Settings <- 
+        check_param_dma(
+            data = data,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            pval = pval,
+            padj = padj,
+            shapiro = shapiro,
+            bartlett = bartlett,
+            vst = vst,
+            transform = transform
+        )
 
-  # HelperFunction `check_param` Specific
-  Settings <- check_param_dma(data=data,
-                 metadata_sample=metadata_sample,
-                 metadata_info=metadata_info,
-                 pval=pval,
-                 padj=padj,
-                 shapiro=shapiro,
-                 bartlett=bartlett,
-                 vst=vst,
-                 transform=transform)
+    ## ------------ Create Results output folder ----------- ##
+    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
+        folder <- save_path(
+            folder_name = "dma",
+            path = path
+        )
 
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "dma",
-                                    path=path)
+        if (shapiro == TRUE) {
+            Subfolder_S <- file.path(folder, "shapiro")
+            if (!dir.exists(Subfolder_S)) {
+                dir.create(Subfolder_S)
+            }
+        }
 
-    if(shapiro==TRUE){
-      Subfolder_S <- file.path(folder, "shapiro")
-      if (!dir.exists(Subfolder_S)) {dir.create(Subfolder_S)}
+        if (bartlett == TRUE) {
+          Subfolder_B <- file.path(folder, "bartlett")
+            if (!dir.exists(Subfolder_B)) {
+                dir.create(Subfolder_B)
+            }
+        }
+
+        if (vst == TRUE) {
+            Subfolder_V <- file.path(folder, "vst")
+            if (!dir.exists(Subfolder_V)) {
+                dir.create(Subfolder_V)
+            }
+        }
     }
-
-    if(bartlett==TRUE){
-      Subfolder_B <- file.path(folder, "bartlett")
-      if (!dir.exists(Subfolder_B)) {dir.create(Subfolder_B)}
-    }
-
-    if(vst==TRUE){
-      Subfolder_V <- file.path(folder, "vst")
-      if (!dir.exists(Subfolder_V)) {dir.create(Subfolder_V)}
-    }
-  }
-
+    
   ###############################################################################################################################################################################################################
   ## ------------ Check hypothesis test assumptions ----------- ##
   # 1. Normality
