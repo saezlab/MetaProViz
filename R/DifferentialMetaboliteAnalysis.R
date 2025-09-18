@@ -1195,28 +1195,49 @@ log2fc <- function(
 }
 
 
-
-
-
-##########################################################################################
-### ### ### dma helper function: Internal Function to perform single comparison ### ### ###
-##########################################################################################
+################################################################################
+### ### dma helper function: Internal Function to perform single comparison  ###
+################################################################################
 
 #' This helper function to calculate One-vs-One comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (here one-vs-one).
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default = "t.test"}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param data DF with unique sample identifiers as row names and metabolite
+#'        numerical values in columns with metabolite identifiers as column
+#'        names. Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the
+#'        samples, which will be combined with your input data based on the
+#'        unique sample identifiers used as rownames.
+#' @param metadata_info  Named vector including the information about the
+#'        conditions column information on numerator or denominator
+#'        c(Conditions="ColumnName_SettingsFile", Numerator =
+#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'        Denominator and Numerator will specify which comparison(s) will be
+#'        done (here one-vs-one).
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
+#'        column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
+#'        from MetaProViz:::log2fc. If NULL, the output statistics will not be
+#'        added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the
+#'        selected test to calculate p.value. For one-vs-one comparisons choose
+#'        t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default =
+#'        "t.test"}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the
+#'        selected p.adjusted test for p.value correction for multiple
+#'        Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
+#'        "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with
+#'         p-value, t-value and adjusted p-value column and column with feature
+#'         names
 #'
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom stats p.adjust
-#' @importFrom dplyr select_if filter rename mutate summarise_all
+#' @importFrom dplyr select_if
+#' @importFrom dplyr filter
+#' @importFrom dplyr rename
+#' @importFrom dplyr mutate
+#' @importFrom dplyr summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #'
