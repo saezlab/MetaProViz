@@ -641,19 +641,44 @@ dma <- function(
 ### ### ### Log2FC  ### ### ###
 ###############################
 
-#' This helper function calculates the Log2(FoldChange) or in case of core Log2(Distance).
+#' This helper function calculates the Log2(FoldChange) or in case of 
+#' core Log2(Distance).
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{default = FALSE}
-#' @param transform \emph{Optional: } If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma.\strong{default = TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite
+#'        numerical values in columns with metabolite identifiers as column
+#'        names. Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the
+#'        samples, which will be combined with your input data based on the
+#'        unique sample identifiers used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information
+#'        about the conditions column information on numerator or denominator
+#'        c(Conditions="ColumnName_SettingsFile", Numerator =
+#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'        Denominator and Numerator will specify which comparison(s) will be
+#'        done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'        Numerator =NULL selects all the condition and performs multiple
+#'        comparison all-vs-all. Log2FC are obtained by dividing the numerator
+#'        by the denominator, thus positive Log2FC values mean higher expression
+#'        in the numerator. \strong{Default = c(conditions="Conditions",
+#'        numerator = NULL, denumerator = NULL)}
+#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
+#'        input is used \strong{default = FALSE}
+#' @param transform \emph{Optional: } If TRUE we expect the data to be not log2
+#'        transformed and log2 transformation will be performed within the limma
+#'        function and Log2FC calculation. If FALSE we expect the data to be
+#'        log2 transformed as this impacts the Log2FC calculation and
+#'        limma.\strong{default = TRUE}
 #'
-#' @return List of DFs named after comparison (e.g. Tumour versus Normal) with Log2FC or Log2(Distance) column and column with feature names
+#' @return List of DFs named after comparison (e.g. Tumour versus Normal) with
+#'         Log2FC or Log2(Distance) column and column with feature names
 #'
 #' @keywords Log2FC, core, Distance
 #'
-#' @importFrom dplyr select_if filter rename mutate summarise_all
+#' @importFrom dplyr select_if
+#' @importFrom dplyr filter
+#' @importFrom dplyr rename
+#' @importFrom dplyr mutate
+#' @importFrom dplyr summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
