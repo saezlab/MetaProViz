@@ -106,7 +106,6 @@ patients processed with SiRCle (Mora et al. 2024), originally from
 [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127)
 (Clark et al. 2019).
 
-
 ## Installation
 
 **MetaProViz** is an R package and to install the package, start R and
@@ -123,7 +122,10 @@ library(MetaProViz)
 ```
 
 ### OmnipathR version requirement
-MetaProViz requires OmnipathR version >= 3.17.4. If this version is not available in your Bioconductor release, you can install it from Bioconductor devel with:
+
+MetaProViz requires OmnipathR version \>= 3.17.4. If this version is not
+available in your Bioconductor release, you can install it from
+Bioconductor devel with:
 
 ``` r
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
@@ -145,14 +147,16 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
 ## Citation
 
-    @Manual{,
-      title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
+Please cite our bioRxiv preprint:
+<https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full>
 
-      author = {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez and Christian Frezza},
-      year = {2024},
-      note = {R package version 3.1.0},
-
-    }
+    @article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025, 
+             title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
+             DOI={10.1101/2025.08.18.670781},
+             journal={BioRxiv}, 
+             author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio}, 
+             year={2025}, 
+             month={Aug}}
 
 ## References
 
