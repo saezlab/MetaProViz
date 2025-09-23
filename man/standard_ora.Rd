@@ -25,7 +25,7 @@ standard_ora(
 
 \item{cutoff_stat}{\emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}}
 
-\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom \% of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}}
+\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom \% of selected percentage Column, usually t.val or Log2FC \strong{default: 10}}
 
 \item{input_pathway}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
 
@@ -44,4 +44,11 @@ Saves results as individual .csv files.
 }
 \description{
 Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
+}
+\examples{
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+DMAres <- as.data.frame(intracell_dma) \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
+MetaProViz::standard_ora(data= DMAres,
+input_pathway=KEGG_Pathways)
+
 }
