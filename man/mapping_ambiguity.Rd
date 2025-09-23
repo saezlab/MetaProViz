@@ -15,7 +15,7 @@ mapping_ambiguity(
 )
 }
 \arguments{
-\item{data}{Translated DF from MetaProViz::translate_id reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).}
+\item{data}{Translated DF from translate_id reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).}
 
 \item{from}{Column name of the secondary or translated metabolite identifier in data. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.}
 
@@ -36,9 +36,9 @@ List with at least 4 DFs: 1-3) from-to-to: 1. MappingIssues, 2. MappingIssues su
 Create Mapping Ambiguities between two ID types
 }
 \examples{
-KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-InputDF <- MetaProViz::translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
-Res <- MetaProViz::mapping_ambiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
+KEGG_Pathways <- metsigdb_kegg()
+InputDF <- translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
+Res <- mapping_ambiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
 
 }
 \keyword{Mapping}

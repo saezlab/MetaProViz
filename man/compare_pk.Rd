@@ -83,7 +83,7 @@ that is used for grouping in the UpSet plot.
 data_single <- list(Biocft = biocrates_features)
 metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 
-res_single <- MetaProViz::compare_pk(data = data_single, metadata_info = metadata_info_single,
+res_single <- compare_pk(data = data_single, metadata_info = metadata_info_single,
                           plot_name = "Overlap of BioCrates Columns")
 
 ## Example 2: Custom data Frames with Custom Column Names
@@ -98,6 +98,6 @@ data <- list(Hallmarks = hallmarks_df, Gaude = gaude_df,
                 MetalinksDB = metalinks_df, RAMP = ramp_df)
 metadata_info <- list(Hallmarks = "feature", Gaude = "feature",
                      MetalinksDB = c("hmdb", "gene_symbol"), RAMP = "class_source_id")
-res <- MetaProViz::compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
+res <- compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
 
 }

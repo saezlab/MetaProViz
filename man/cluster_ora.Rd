@@ -46,9 +46,9 @@ Saves results as individual .csv files.
 Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
 }
 \examples{
-KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-DMAres <- as.data.frame(intracell_dma) \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
-MetaProViz::cluster_ora(data= DMAres,
+KEGG_Pathways <- metsigdb_kegg()
+DMAres <- as.data.frame(intracell_dma) \%>\% filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
+cluster_ora(data= DMAres,
 metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
 input_pathway=KEGG_Pathways,
 remove_background=FALSE)

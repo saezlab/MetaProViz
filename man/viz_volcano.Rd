@@ -88,7 +88,7 @@ Volcano plot
 }
 \examples{
 Intra <- intracell_dma\%>\%tibble::column_to_rownames("Metabolite")
-Res <- MetaProViz::viz_volcano(data=Intra)
+Res <- viz_volcano(data=Intra)
 
 }
 \keyword{Volcano}

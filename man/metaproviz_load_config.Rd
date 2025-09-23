@@ -18,7 +18,7 @@ used.}
 exists in the current directory. By default, the local config files
 have prioroty over the user level config.}
 
-\item{...}{Passed to \code{yaml::yaml.load_file}.}
+\item{...}{Passed to \code{yaml.load_file}.}
 }
 \value{
 Invisibly returns the config as a list.

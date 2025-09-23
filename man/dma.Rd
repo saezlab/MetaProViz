@@ -103,8 +103,8 @@ This function allows you to perform differential metabolite analysis to
 obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 }
 \examples{
-Intra <- intracell_raw[-c(49:58), ] \%>\% tibble::column_to_rownames("Code")
-ResI <- MetaProViz::dma(
+Intra <- intracell_raw[-c(49:58), ] \%>\% column_to_rownames("Code")
+ResI <- dma(
     data = Intra[, -c(1:3)],
     metadata_sample = Intra[, c(1:3)],
     metadata_info = c(

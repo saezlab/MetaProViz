@@ -47,9 +47,9 @@ Can be applied on the result of differential metabolite analysis (DMA),
 requires a pathway list (from databases).
 }
 \examples{
-KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-DMAres <- as.data.frame(intracell_dma) \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
-MetaProViz::standard_ora(data= DMAres,
+KEGG_Pathways <- metsigdb_kegg()
+DMAres <- as.data.frame(intracell_dma) \%>\% filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
+standard_ora(data= DMAres,
 input_pathway=KEGG_Pathways)
 
 }

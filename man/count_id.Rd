@@ -55,6 +55,6 @@ It considers both \code{NA} values and empty strings as zero entries, and catego
 the distribution of entry counts.
 }
 \examples{
-MetaProViz::count_id(biocrates_features, "HMDB")
+count_id(biocrates_features, "HMDB")
 
 }

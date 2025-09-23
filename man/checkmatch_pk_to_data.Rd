@@ -28,7 +28,7 @@ Check and summarize relationship between prior knowledge to measured features
 }
 \examples{
 DetectedIDs <-  cellular_meta \%>\%dplyr::select("Metabolite", "HMDB")\%>\%tidyr::drop_na()
-input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]\%>\%tidyr::drop_na()
-Res <- MetaProViz::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+input_pathway <- translate_id(data= metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]\%>\%tidyr::drop_na()
+Res <- checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 
 }
