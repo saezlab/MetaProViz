@@ -88,8 +88,9 @@ metsigdb_kegg <- function(){
 ##########################################################################################
 ### ### ### Load RaMP prior knowledge ### ### ###
 ##########################################################################################
+
+#' Metabolite chemical classes from RaMP DB
 #'
-#' @title Prior Knowledge Import
 #' @param version \emph{Optional: } Version of the RaMP database loaded from OmniPathR. \strong{default: "2.5.4"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
@@ -104,7 +105,7 @@ metsigdb_kegg <- function(){
 #' @return A data frame containing the Prior Knowledge.
 #'
 #' @examples
-#' ChemicalClass <- MetaProViz::metsigdb_chemicalclass()
+#' ChemicalClass <- metsigdb_chemicalclass()
 #'
 #' @export
 metsigdb_chemicalclass <- function(version = "2.5.4",
@@ -182,7 +183,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 ##########################################################################################
 ### ### ### Get Metabolite Pathways using Cosmos prior knowledge ### ### ###
 ##########################################################################################
-#'
+
 #' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
 #'
 #' @param input_pk dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
@@ -191,8 +192,12 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
+#' @examples
+#' make_gene_metab_set(hallmarks)
+#'
+#' @return List of two data frames: "GeneMetabSet" and "MetabSet".
+#'
 #' @export
-
 make_gene_metab_set <- function(input_pk,
                               metadata_info=c(Target="gene"),
                               pk_name= NULL,
@@ -304,6 +309,12 @@ make_gene_metab_set <- function(input_pk,
 #' @param uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#'
+#'
+#' @return A data frame of metabolite-protein interactions from MetalinksDB.
+#'
+#' @examples
+#' metsigdb_metalinks()
 #'
 #' @importFrom DBI dbListTables dbDisconnect dbGetQuery
 #' @importFrom OmnipathR metalinksdb_sqlite
@@ -530,7 +541,7 @@ metsigdb_metalinks <- function(types = NULL,
 	MetalinksDB %<>%
 		mutate(
 			term_specific = ifelse(
-			  is.na(protein_type), 
+			  is.na(protein_type),
 				NA,
 				sprintf(
 					'%s_%s',
