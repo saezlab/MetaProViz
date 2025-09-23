@@ -1557,6 +1557,9 @@ compare_pk <- function(data,
 #' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
+#' @examples
+#' MetaProViz::count_id(biocrates_features, "HMDB")
+#'
 #' @return A list with two elements:
 #'   \item{result}{A data frame that includes three additional columns: \code{was_na} (logical indicator
 #'                  of missing or empty cells), \code{entry_count} (number of entries in each cell), and
