@@ -24,7 +24,7 @@
 ### ### ### Volcano Plots ### ### ###
 #####################################
 
-#' Volcano plot visualization
+#' Volcano plot
 #'
 #' @param plot_types \emph{Optional: } Choose between "Standard" (data), "Compare" (plot two comparisons together data and data2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
 #' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_metadata_feature", shape = "ColumnName_metadata_feature", individual="ColumnName_metadata_feature"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_data2"=each pathway will be plotted, PEA_score="ColumnName_data2", PEA_stat= "ColumnName_data2"= usually p.adj column, "PEA_Feature="ColumnName_data2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_metadata_feature", shape= "ColumnName_metadata_feature").\strong{Default = NULL}
@@ -59,15 +59,12 @@
 #'
 #' @keywords Volcano plot, pathways
 #'
-#' @importFrom ggplot2 ggplot theme
 #' @importFrom dplyr rename filter mutate rename_with
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom tibble column_to_rownames remove_rownames
 #' @importFrom logger log_trace
 #' @importFrom tidyselect all_of
-#'
 #' @export
-#'
 viz_volcano <- function(plot_types="Standard",
                        data,
                        metadata_info= NULL,
@@ -374,13 +371,11 @@ viz_volcano <- function(plot_types="Standard",
 #'
 #' @keywords Standard volcano plots
 #'
-#' @importFrom ggplot2 ggplot theme
-#' @importFrom dplyr rename filter mutate
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
-#'
+#' @importFrom EnhancedVolcano EnhancedVolcano
+#' @importFrom ggplot2 element_rect ggplot
+#' @importFrom grid convertUnit
 #' @noRd
-#'
 viz_volcano_standard <- function(data,
                                 metadata_feature,
                                 metadata_info,
@@ -672,14 +667,14 @@ viz_volcano_standard <- function(data,
 #'
 #' @keywords Compare volcano plots
 #'
-#' @importFrom ggplot2 ggplot theme
-#' @importFrom dplyr rename filter mutate
+#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom dplyr filter mutate
+#' @importFrom EnhancedVolcano EnhancedVolcano
+#' @importFrom grid convertUnit
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
+#' @importFrom tibble rownames_to_column
 #' @importFrom logger log_trace
-#'
 #' @noRd
-#'
 viz_volcano_compare <- function(data,
                                data2,
                                metadata_feature,
@@ -1045,14 +1040,13 @@ viz_volcano_compare <- function(data,
 #'
 #' @keywords Volcano plots of pathway enrichment results
 #'
-#' @importFrom ggplot2 ggplot theme
-#' @importFrom dplyr rename filter mutate
+#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom EnhancedVolcano EnhancedVolcano
+#' @importFrom grid convertUnit
+#' @importFrom dplyr rename filter
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames remove_rownames
 #' @importFrom logger log_trace
-#'
 #' @noRd
-#'
 viz_volcano_pea <- function(data,
                            data2,
                            metadata_feature,

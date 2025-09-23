@@ -22,7 +22,8 @@
 #################################
 ### ### ### cluster_ora ### ### ###
 #################################
-#' cluster_ora
+
+#' Overrepresentation analysis by cluster
 #'
 #' Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
 #'
@@ -169,7 +170,10 @@ cluster_ora <- function(data,
 ### ### ### standard_ora ### ### ###
 ###################################
 
-#' Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
+#' Overrepresentation analysis of metabolite sets in pathways
+#'
+#' Can be applied on the result of differential metabolite analysis (DMA),
+#' requires a pathway list (from databases).
 #'
 #' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
 #' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage. Also pass ColumnName for input_pathway including term and feature names. (pvalColumn = ColumnName data, percentageColumn= ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
@@ -190,8 +194,8 @@ cluster_ora <- function(data,
 #'
 #' @return Saves results as individual .csv files.
 #'
+#' @importFrom dplyr rename
 #' @export
-#'
 standard_ora <- function(data,
                         metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                         cutoff_stat=0.05,

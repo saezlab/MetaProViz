@@ -57,12 +57,10 @@
 #'
 #' @keywords 80  percent filtering rule, Missing Value Imputation, total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts
 #'
-#' @importFrom dplyr mutate_all
+#' @importFrom dplyr mutate_all full_join
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
-#'
 #' @export
-#'
 processing <- function(data,
                        metadata_sample,
                        metadata_info,
@@ -304,9 +302,7 @@ processing <- function(data,
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
 #' @importFrom tidyr unite
-#'
 #' @export
-#'
 replicate_sum <- function(data,
                          metadata_sample,
                          metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
@@ -419,14 +415,13 @@ replicate_sum <- function(data,
 #'
 #' @keywords Coefficient of Variation, high variance metabolites
 #'
-#' @importFrom dplyr case_when select rowwise mutate ungroup
+#' @importFrom dplyr case_when select rowwise mutate
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_info log_trace
 #' @importFrom ggplot2 after_stat
-#'
+#' @importFrom ggrepel geom_text_repel
 #' @export
-#'
 pool_estimation <- function(data,
                            metadata_sample = NULL,
                            metadata_info = NULL,
@@ -626,7 +621,7 @@ pool_estimation <- function(data,
 ### ### ### processing helper function: feature_filtering ### ### ###
 ################################################################################################
 
-#' feature_filtering
+#' Filter features
 #'
 #' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
@@ -648,9 +643,7 @@ pool_estimation <- function(data,
 #' @importFrom dplyr filter mutate_all
 #' @importFrom magrittr %>% %<>%
 #' @importFrom logger log_info log_trace
-#'
 #' @noRd
-#'
 feature_filtering <-function(data,
                             metadata_sample,
                             metadata_info,
@@ -771,14 +764,12 @@ feature_filtering <-function(data,
 #'
 #' @keywords Half minimum missing value imputation
 #'
-#' @importFrom dplyr select mutate group_by filter
+#' @importFrom dplyr select mutate group_by filter mutate_all
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble column_to_rownames
-#' @importFrom logger log_info log_trace
-#'
+#' @importFrom logger log_info
 #' @noRd
-#'
-mvi_imputation <-function(data,
+mvi_imputation <- function(data,
                           metadata_sample,
                           metadata_info,
                           core=FALSE,
@@ -926,10 +917,8 @@ mvi_imputation <-function(data,
 #' @importFrom ggplot2 ggplot geom_boxplot geom_hline labs theme_classic
 #' @importFrom ggplot2 theme_minimal theme annotation_custom aes_string element_text
 #' @importFrom logger log_info log_trace
-#'
 #' @noRd
-#'
-tic_norm <-function(data,
+tic_norm <- function(data,
                    metadata_sample,
                    metadata_info,
                    tic=TRUE){
@@ -1027,7 +1016,7 @@ tic_norm <-function(data,
 ### ### ### processing helper function: core nomalisation ### ### ###
 ################################################################################################
 
-#' Consumption Release Normalisation
+#' Normalize consumption release data
 #'
 #' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
 #' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
@@ -1046,15 +1035,12 @@ tic_norm <-function(data,
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom ggrepel geom_text_repel
-#' @importFrom ggplot2 ggplot geom_histogram geom_vline geom_density labs theme_classic geom_violin geom_dotplot
+#' @importFrom ggplot2 ggplot geom_histogram geom_vline geom_density labs
+#' @importFrom ggplot2 after_stat theme_classic geom_violin geom_dotplot
 #' @importFrom logger log_info log_trace
 #' @importFrom dplyr case_when summarise_all mutate rowwise mutate_all select filter pull
-#'
-#'
 #' @noRd
-#'
-#'
-core_norm <-function(data,
+core_norm <- function(data,
                     metadata_sample,
                     metadata_info){
   ## ------------------ Prepare the data ------------------- ##
@@ -1318,16 +1304,15 @@ core_norm <-function(data,
 #' @importFrom dplyr relocate case_when mutate mutate_all select
 #' @importFrom inflection uik
 #' @importFrom factoextra fviz_screeplot
-#' @importFrom ggplot2 ggplot theme_classic theme geom_vline annotate geom_line geom_point geom_hline scale_y_continuous ggtitle scale_linetype_discrete
+#' @importFrom ggplot2 ggplot theme_classic theme geom_vline annotate geom_line element_text
+#' @importFrom ggplot2 geom_point geom_hline scale_y_continuous ggtitle scale_linetype_discrete
 #' @importFrom qcc mqcc
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom hash values keys
+#' @importFrom tibble rownames_to_column
+#' @importFrom hash values keys hash
 #' @importFrom logger log_info log_trace
-#'
 #' @noRd
-#'
-outlier_detection <-function(data,
+outlier_detection <- function(data,
                             metadata_sample,
                             metadata_info,
                             core=FALSE,

@@ -29,9 +29,7 @@
 #' # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 #'
 #' @importFrom OmnipathR logfile
-#'
 #' @export
-#'
 #' @seealso \code{\link{metaproviz_log}}
 metaproviz_logfile <- function(){
   #Creates the path for the log file
@@ -50,7 +48,6 @@ metaproviz_logfile <- function(){
 #' }
 #'
 #' @importFrom OmnipathR read_log
-#'
 #' @export
 #' @seealso \code{\link{metaproviz_logfile}}
 metaproviz_log <- function(){
@@ -82,18 +79,19 @@ metaproviz_set_loglevel <- function(level, target = 'logfile'){
 #'
 #' @noRd
 mpv_trace <- function() {#MPV=MetaProViz
+
   # Useful for debugging
   metaproviz_set_loglevel('trace', target = 'console')
+
 }
+
 
 #' Set the console log level to "trace"
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @importFrom logger log_info
 #' @importFrom utils packageVersion
-#'
 #' @noRd
-#'
 metaproviz_init <- function(){
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
   if(is.null(metaproviz.env$init)){

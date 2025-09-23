@@ -23,19 +23,20 @@
 ### ### ### Get KEGG prior knowledge ### ### ###
 ##########################################################################################
 
-#' Imports KEGG pathways into the environment
+#' KEGG pathways
 #'
-#' @title KEGG
-#' @description Import and process KEGG.
-#' @importFrom utils read.csv
-#' @importFrom OmnipathR kegg_link kegg_conv
-#' @return A data frame containing the KEGG pathways for ORA.
+#' @return A data frame containing the KEGG pathways suitable for ORA.
 #'
 #' @examples
-#' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+#' metsigdb_kegg()
 #'
+#' @importFrom OmnipathR kegg_conv kegg_link kegg_list
+#' @importFrom dplyr filter inner_join mutate rename
+#' @importFrom logger log_info
+#' @importFrom purrr map_chr map_lgl set_names
+#' @importFrom remotes install_github
+#' @importFrom stringr str_replace str_split
 #' @export
-#'
 metsigdb_kegg <- function(){
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -95,18 +96,16 @@ metsigdb_kegg <- function(){
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
-#' @description Import and process file to create Prior Knowledge.
-#'
-#' @importFrom  OmnipathR ramp_table
-#' @importFrom rappdirs user_cache_dir
-#' @importFrom dplyr filter select group_by summarise mutate
-#' @importFrom stringr str_remove
-#'
 #' @return A data frame containing the Prior Knowledge.
 #'
 #' @examples
 #' ChemicalClass <- metsigdb_chemicalclass()
 #'
+#' @importFrom OmnipathR ramp_table
+#' @importFrom dplyr filter group_by mutate select summarise
+#' @importFrom rappdirs user_cache_dir
+#' @importFrom stringr str_remove str_starts
+#' @importFrom tidyr pivot_wider
 #' @export
 metsigdb_chemicalclass <- function(version = "2.5.4",
                      save_table="csv",
@@ -184,7 +183,9 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 ### ### ### Get Metabolite Pathways using Cosmos prior knowledge ### ### ###
 ##########################################################################################
 
-#' Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
+#' Create metabolite sets from existing genesets
+#'
+#' Gene to metabolite translation is based on mappings in Recon-3D (cosmosR).
 #'
 #' @param input_pk dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
 #' @param metadata_info \emph{Optional: }  Column name of Target in input_pk. \strong{Default = c(Target="gene")}
@@ -192,11 +193,13 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
 #'
+#' @return List of two data frames: "GeneMetabSet" and "MetabSet".
+#'
 #' @examples
 #' make_gene_metab_set(hallmarks)
 #'
-#' @return List of two data frames: "GeneMetabSet" and "MetabSet".
-#'
+#' @importFrom dplyr rename
+#' @importFrom logger log_info
 #' @export
 make_gene_metab_set <- function(input_pk,
                               metadata_info=c(Target="gene"),
@@ -319,7 +322,7 @@ make_gene_metab_set <- function(input_pk,
 #' @importFrom DBI dbListTables dbDisconnect dbGetQuery
 #' @importFrom OmnipathR metalinksdb_sqlite
 #' @importFrom logger log_info
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate case_when mutate
 #' @importFrom stringr str_replace_all
 #' @export
 metsigdb_metalinks <- function(types = NULL,

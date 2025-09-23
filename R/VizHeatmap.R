@@ -59,7 +59,8 @@
 #'
 #' @keywords Heatmap
 #'
-#' @importFrom ggplot2 ggplot theme
+#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom grid convertUnit
 #' @importFrom dplyr rename select
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames

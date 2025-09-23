@@ -97,17 +97,14 @@
 #' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing,
 #'           Normality testing
 #'
-#' @importFrom dplyr rename
-#' @importFrom dplyr full_join
 #' @importFrom magrittr %>%
-#' @importFrom tibble rownames_to_column
-#' @importFrom tibble column_to_rownames
-#' @importFrom purrr map
-#' @importFrom purrr reduce
 #' @importFrom logger log_info
+#' @importFrom dplyr full_join rename
+#' @importFrom logger log_info
+#' @importFrom purrr map reduce
+#' @importFrom tibble column_to_rownames rownames_to_column
 #'
 #' @export
-#'
 dma <- function(
     data,
     metadata_sample,
@@ -129,7 +126,7 @@ dma <- function(
     print_plot = TRUE,
     path = NULL
     ) {
-        
+
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
@@ -149,7 +146,7 @@ dma <- function(
     )
 
     # HelperFunction `check_param` Specific
-    Settings <- 
+    Settings <-
         check_param_dma(
             data = data,
             metadata_sample = metadata_sample,
@@ -196,7 +193,7 @@ dma <- function(
     # 1. Normality
     if (shapiro == TRUE) {
         if (length(Settings[["Metabolites_Miss"]] >= 1)) {
-          
+
           message(
               paste0(
                 "There are NA's/0s in the data. This can impact the output of ",
@@ -206,7 +203,7 @@ dma <- function(
         }
         tryCatch(
             {
-            Shapiro_output <- 
+            Shapiro_output <-
               suppressWarnings(
                   shapiro(
                       data = data,
@@ -234,19 +231,19 @@ dma <- function(
         # if we only have two conditions, which can happen even tough multiple
         # comparison (C1 versus C2 and C2 versus C1 is done)
         if (Settings[["MultipleComparison"]] == TRUE) {
-            UniqueConditions <- 
+            UniqueConditions <-
                 metadata_sample %>%
                     subset(
                         metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] | metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]],
                         select = c(metadata_info[["Conditions"]])
                     )
-            UniqueConditions <- 
+            UniqueConditions <-
                 unique(UniqueConditions[[metadata_info[["Conditions"]]]])
 
             if (length(UniqueConditions) > 2) {
                 tryCatch(
                     {
-                    Bartlett_output <- 
+                    Bartlett_output <-
                         suppressWarnings(
                               bartlett(
                                   data = data,
@@ -292,7 +289,7 @@ dma <- function(
     ############### Perform Hypothesis testing ###############
     if (Settings[["MultipleComparison"]] == FALSE) {
         if (pval == "lmFit") {
-            STAT_C1vC2 <- 
+            STAT_C1vC2 <-
                 dma_stat_limma(
                     data = data,
                     metadata_sample = metadata_sample,
@@ -302,9 +299,9 @@ dma <- function(
                     core = core,
                     transform = transform
                 )
-        } 
+        }
         else {
-            STAT_C1vC2 <- 
+            STAT_C1vC2 <-
                 dma_stat_single(
                     data = data,
                     metadata_sample = metadata_sample,
@@ -314,7 +311,7 @@ dma <- function(
                     padj = padj
                 )
         }
-    } 
+    }
     else { # MultipleComparison = TRUE
         # Correct data heteroscedasticity
         if (pval != "lmFit" & vst == TRUE) {
@@ -331,7 +328,7 @@ dma <- function(
                 paste(pval),
                 "."
             )
-        } 
+        }
         else { # for 1 vs all
             message(
                 "No condition was specified as numerator and ",
@@ -346,16 +343,16 @@ dma <- function(
         }
 
         if (pval == "aov") {
-            STAT_C1vC2 <- 
+            STAT_C1vC2 <-
                 aov(
                     data = data,
                     metadata_sample = metadata_sample,
                     metadata_info = metadata_info,
                     log2fc_table = log2fc_table
                 )
-        } 
+        }
         else if (pval == "kruskal.test") {
-            STAT_C1vC2 <- 
+            STAT_C1vC2 <-
                 kruskal(
                     data = data,
                     metadata_sample = metadata_sample,
@@ -363,9 +360,9 @@ dma <- function(
                     log2fc_table = log2fc_table,
                     padj = padj
                 )
-        } 
+        }
         else if (pval == "welch") {
-            STAT_C1vC2 <- 
+            STAT_C1vC2 <-
                 welch(
                     data = data,
                     metadata_sample = metadata_sample,
@@ -388,17 +385,17 @@ dma <- function(
 
     ############################################################################
     ###############  Add the previous metabolite names back ###############
-    DMA_Output <- 
+    DMA_Output <-
         lapply(
             STAT_C1vC2, function(df) {
-                merged_df <- 
+                merged_df <-
                     merge(
                         savedMetaboliteNames,
                         df,
                         by = "Metabolite",
                         all.y = TRUE
                     )
-                # remove the names we used as part of the function and 
+                # remove the names we used as part of the function and
                 # add back the input names.
                 merged_df <- merged_df[, -1] %>%
                     dplyr::rename("Metabolite" = 1)
@@ -409,10 +406,10 @@ dma <- function(
     ############################################################################
     ###############  Add the metabolite Metadata if available ###############
     if (is.null(metadata_feature) == FALSE) {
-        DMA_Output <- 
+        DMA_Output <-
             lapply(
                 DMA_Output, function(df) {
-                    merged_df <- 
+                    merged_df <-
                         merge(
                             df,
                             metadata_feature %>% tibble::rownames_to_column("Metabolite"),
@@ -427,7 +424,7 @@ dma <- function(
     ############################################################################
     ###############  For core=TRUE create summary of Feature_metadata  #########
     if (core == TRUE) {
-        df_list_selected <- 
+        df_list_selected <-
             purrr::map(
                 names(DMA_Output), function(df_name) {
                     df <- DMA_Output[[df_name]] # Extract the dataframe
@@ -435,10 +432,10 @@ dma <- function(
                     # Extract the dynamic column name
                     # Find the column that starts with "core_"
                     core_col <- grep("^core_", names(df), value = TRUE)
-                    # Filter only columns where the part after "core_" 
+                    # Filter only columns where the part after "core_"
                     # is in valid_conditions
-                    core_col <- 
-                        core_col[str_remove(core_col, "^core_") %in% 
+                    core_col <-
+                        core_col[str_remove(core_col, "^core_") %in%
                             unique(
                                 metadata_sample[[metadata_info[["Conditions"]]]]
                                 )
@@ -453,7 +450,7 @@ dma <- function(
             )
 
         # Merge all dataframes by "Metabolite"
-        merged_df <- 
+        merged_df <-
             purrr::reduce(
                 df_list_selected,
                 dplyr::full_join,
@@ -468,7 +465,7 @@ dma <- function(
             select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))
 
         if (is.null(metadata_feature) == FALSE) { # Add to Metadata file:
-            Feature_Metadata <- 
+            Feature_Metadata <-
                 merge(
                     metadata_feature %>% tibble::rownames_to_column("Metabolite"),
                     Feature_Metadata,
@@ -484,7 +481,7 @@ dma <- function(
         x <- "Log2(Distance)"
         VolPlot_metadata_info <- c(color = "core")
         VolPlot_SettingsFile <- DMA_Output
-    } 
+    }
     else {
         x <- "Log2FC"
         VolPlot_metadata_info <- NULL
@@ -496,7 +493,7 @@ dma <- function(
         Volplotdata <- DMA_Output[[DF]]
 
         if (core == TRUE) {
-            VolPlot_SettingsFile <- 
+            VolPlot_SettingsFile <-
                 DMA_Output[[DF]] %>%
                     tibble::column_to_rownames("Metabolite")
         }
@@ -562,7 +559,7 @@ dma <- function(
             )
         )
 
-      DMA_Output_List <- 
+      DMA_Output_List <-
         c(
             DMA_Output_List,
             list("BartlettTest" = Bartlett_output)
@@ -604,7 +601,7 @@ dma <- function(
             )
         )
 
-        DMA_Output_List <- 
+        DMA_Output_List <-
             c(
                 DMA_Output_List,
                 list("Feature_Metadata" = Feature_Metadata)
@@ -627,7 +624,7 @@ dma <- function(
         )
     )
 
-    DMA_Output_List <- 
+    DMA_Output_List <-
         c(
             DMA_Output_List,
             list("dma" = DMA_Output, "VolcanoPlot" = volplotList)
@@ -641,7 +638,7 @@ dma <- function(
 ### ### ### Log2FC  ### ### ###
 ###############################
 
-#' This helper function calculates the Log2(FoldChange) or in case of 
+#' This helper function calculates the Log2(FoldChange) or in case of
 #' core Log2(Distance).
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite
@@ -674,12 +671,8 @@ dma <- function(
 #'
 #' @keywords Log2FC, core, Distance
 #'
-#' @importFrom dplyr select_if
-#' @importFrom dplyr filter
-#' @importFrom dplyr rename
-#' @importFrom dplyr mutate
-#' @importFrom dplyr summarise_all
 #' @importFrom magrittr %>%
+#' @importFrom dplyr filter mutate rename select_if summarise_all
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
 #'
@@ -709,7 +702,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } 
+    }
     else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
@@ -753,7 +746,7 @@ log2fc <- function(
     # all_vs_all.
     if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
         MultipleComparison <- TRUE
-    } 
+    }
     else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
         MultipleComparison <- TRUE
     }
@@ -793,7 +786,7 @@ log2fc <- function(
         Mean_C2 <- C2_Zero %>%
         dplyr::summarise_all("mean")
 
-    # Calculate absolute distance between the means. log2 transform 
+    # Calculate absolute distance between the means. log2 transform
         # and add sign (-/+):
         if (core == TRUE) {
             # core values can be negative and positive, which can does not allow us to
@@ -819,40 +812,40 @@ log2fc <- function(
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
             if (any(
-                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  |
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
             ) == TRUE) {
                 Mean_Merge <- Mean_Merge %>%
                     dplyr::mutate(C1 = case_when(
-                        # Here we have a "true" 0 value due to 0/NAs 
+                        # Here we have a "true" 0 value due to 0/NAs
                         # in the input data
                         C2 == 0 & `NA/0` == TRUE ~ paste(C1),
-                        # Here we have a "true" 0 value due to 0/NAs 
+                        # Here we have a "true" 0 value due to 0/NAs
                         # in the input data
                         C1 == 0 & `NA/0` == TRUE ~ paste(C1),
-                        # Here we have a "false" 0 value that occured at random 
-                        # and not due to 0/NAs in the input data, hence we add 
+                        # Here we have a "false" 0 value that occured at random
+                        # and not due to 0/NAs in the input data, hence we add
                         # the constant +1
                         C2 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
                         # Here we have a "false" 0 value that occured at random
-                        # and not due to 0/NAs in the input data, hence we add 
+                        # and not due to 0/NAs in the input data, hence we add
                         # the constant +1
                         C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
                         TRUE ~ paste(C1)
                     )) %>%
                     dplyr::mutate(C2 = case_when(
-                        # Here we have a "true" 0 value due to 0/NAs in the 
+                        # Here we have a "true" 0 value due to 0/NAs in the
                         # input data
                         C1 == 0 & `NA/0` == TRUE ~ paste(C2),
-                        # Here we have a "true" 0 value due to 0/NAs in the 
+                        # Here we have a "true" 0 value due to 0/NAs in the
                         # input data
                         C2 == 0 & `NA/0` == TRUE ~ paste(C2),
-                        # Here we have a "false" 0 value that occured at random 
+                        # Here we have a "false" 0 value that occured at random
                         # and not due to 0/NAs in the input data, hence we
                         # add the constant +1
                         C1 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
-                        # Here we have a "false" 0 value that occured at random 
-                        # and not due to 0/NAs in the input data, hence we 
+                        # Here we have a "false" 0 value that occured at random
+                        # and not due to 0/NAs in the input data, hence we
                         # add the constant +1
                         C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
                         TRUE ~ paste(C2)
@@ -862,7 +855,7 @@ log2fc <- function(
 
                 X <- Mean_Merge %>%
                     subset(
-                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  |
                         (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
                     )
                     message(
@@ -876,16 +869,16 @@ log2fc <- function(
             }
 
             # Add the distance column:
-            Mean_Merge$`Log2(Distance)` <- 
+            Mean_Merge$`Log2(Distance)` <-
                 log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
 
             # Now we can adapt the values to take into account the distance
             Mean_Merge <- Mean_Merge %>%
                 dplyr::mutate(`Log2(Distance)` = case_when(
-                    # If C1>C2 the distance stays positive to reflect 
+                    # If C1>C2 the distance stays positive to reflect
                     # that C1 > C2
                     C1 > C2 ~ paste(`Log2(Distance)` * +1),
-                    # If C1<C2 the distance gets a negative sign to reflect 
+                    # If C1<C2 the distance gets a negative sign to reflect
                     # that C1 < C2
                     C1 < C2 ~ paste(`Log2(Distance)` * -1),
                     TRUE ~ "NA"
@@ -901,12 +894,12 @@ log2fc <- function(
             for (i in 1:length(temp1)) {
                 if (temp1[i] > 0 & temp2[i] > 0) {
                     core_info[3, i] <- "Released"
-                } 
+                }
                 else if (temp1[i] < 0 & temp2[i] < 0) {
                     core_info[3, i] <- "Consumed"
-                } 
+                }
                 else if (temp1[i] > 0 & temp2[i] < 0) {
-                    core_info[3, i] <- 
+                    core_info[3, i] <-
                         paste(
                             "Released in",
                             comparisons[1,
@@ -916,9 +909,9 @@ log2fc <- function(
                             column],
                             sep = " "
                         )
-                } 
+                }
                 else if (temp1[i] < 0 & temp2[i] > 0) {
-                    core_info[3, i] <- 
+                    core_info[3, i] <-
                         paste(
                             "Consumed in",
                             comparisons[1,
@@ -928,7 +921,7 @@ log2fc <- function(
                             column],
                             sep = " "
                         )
-                } 
+                }
                 else {
                     core_info[3, i] <- "No Change"
                 }
@@ -936,11 +929,11 @@ log2fc <- function(
 
             core_info <- t(core_info) %>% as.data.frame()
             core_info <- rownames_to_column(core_info, "Metabolite")
-            names(core_info)[2] <- 
+            names(core_info)[2] <-
                 paste(
                     "Mean", comparisons[1, column], sep = "_"
                     )
-            names(core_info)[3] <- 
+            names(core_info)[3] <-
                 paste(
                     "Mean", comparisons[2, column], sep = "_"
                 )
@@ -1010,9 +1003,9 @@ log2fc <- function(
             )
 
             # Add info on Input:
-            temp3 <- as.data.frame(t(C1)) %>% 
+            temp3 <- as.data.frame(t(C1)) %>%
                 tibble::rownames_to_column("Metabolite")
-            temp4 <- as.data.frame(t(C2)) %>% 
+            temp4 <- as.data.frame(t(C2)) %>%
                 tibble::rownames_to_column("Metabolite")
             temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
             Log2FC_C1vC2 <- merge(
@@ -1040,24 +1033,24 @@ log2fc <- function(
                 sep = "_vs_"
                 )
 
-                # Store the data frame in the results list, 
+                # Store the data frame in the results list,
                 # named after the contrast
                 log2fc_table[[logname]] <- Log2FC_C1vC2
                 log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-            } 
+            }
             else {
                 log2fc_table <- Log2FC_C1vC2
             }
-        } 
+        }
         else if (core == FALSE) {
-            # Mean values could be 0, which can not be used to calculate a 
-            # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) 
+            # Mean values could be 0, which can not be used to calculate a
+            # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x))
             # for A and/or B being 0, with x being set to 1
             Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
                 tibble::rownames_to_column("Metabolite")
             Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
                 tibble::rownames_to_column("Metabolite")
-            Mean_Merge <- 
+            Mean_Merge <-
                 merge(
                     Mean_C1_t,
                     Mean_C2_t,
@@ -1068,23 +1061,23 @@ log2fc <- function(
                     "C1" = 2,
                     "C2" = 3
                 )
-            # Column to enable the check if mean values of 0 are due to missing 
+            # Column to enable the check if mean values of 0 are due to missing
             # values (NA/0) and not by coincidence
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
             Mean_Merge <- Mean_Merge %>%
                 dplyr::mutate(C1_Adapted = case_when(
-                    # Here we have a "true" 0 value due to 
+                    # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C2 == 0 & `NA/0` == TRUE ~ paste(C1),
-                    # Here we have a "true" 0 value due to 
+                    # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C1 == 0 & `NA/0` == TRUE ~ paste(C1),
-                    # Here we have a "false" 0 value that occured at random 
+                    # Here we have a "false" 0 value that occured at random
                     # and not due to 0/NAs in the input data,
                     # hence we add the constant +1
                     C2 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
-                    # Here we have a "false" 0 value that occured at random 
+                    # Here we have a "false" 0 value that occured at random
                     # and not due to 0/NAs in the input data,
                     # hence we add the constant +1
                     C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
@@ -1092,18 +1085,18 @@ log2fc <- function(
                     )
                 ) %>%
                 dplyr::mutate(C2_Adapted = case_when(
-                    # Here we have a "true" 0 value due to 
+                    # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C1 == 0 & `NA/0` == TRUE ~ paste(C2),
-                    # Here we have a "true" 0 value due to 
+                    # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C2 == 0 & `NA/0` == TRUE ~ paste(C2),
-                    # Here we have a "false" 0 value that occured at random 
-                    # and not due to 0/NAs in the input data, 
+                    # Here we have a "false" 0 value that occured at random
+                    # and not due to 0/NAs in the input data,
                     # hence we add the constant +1
                     C1 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
-                    # Here we have a "false" 0 value that occured at random 
-                    # and not due to 0/NAs in the input data, 
+                    # Here we have a "false" 0 value that occured at random
+                    # and not due to 0/NAs in the input data,
                     # hence we add the constant +1
                     C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
                     TRUE ~ paste(C2)
@@ -1113,12 +1106,12 @@ log2fc <- function(
                     dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
 
             if (any(
-                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  |
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
             ) == TRUE) {
                 X <- Mean_Merge %>%
                 subset(
-                    (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                    (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  |
                     (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
                 )
                 message(
@@ -1134,9 +1127,9 @@ log2fc <- function(
             # Calculate the Log2FC
             if (transform == TRUE) { # data are not log2 transformed
                 # FoldChange
-                Mean_Merge$FC_C1vC2 <- 
+                Mean_Merge$FC_C1vC2 <-
                     Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted
-                Mean_Merge$Log2FC <- 
+                Mean_Merge$Log2FC <-
                     gtools::foldchange2logratio(
                         Mean_Merge$FC_C1vC2,
                         base = 2
@@ -1147,14 +1140,14 @@ log2fc <- function(
             # account when calculating the log2FC
             if (transform == FALSE) {
                 Mean_Merge$FC_C1vC2 <- "Empty"
-                Mean_Merge$Log2FC <- 
+                Mean_Merge$Log2FC <-
                     Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
             }
 
             # Add info on Input:
-            temp3 <- as.data.frame(t(C1)) %>% 
+            temp3 <- as.data.frame(t(C1)) %>%
                 tibble::rownames_to_column("Metabolite")
-            temp4 <- as.data.frame(t(C2)) %>% 
+            temp4 <- as.data.frame(t(C2)) %>%
                 tibble::rownames_to_column("Metabolite")
             temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
             Log2FC_C1vC2 <- merge(
@@ -1185,7 +1178,7 @@ log2fc <- function(
                 # Store the data frame in the results list, named after the contrast
                 log2fc_table[[logname]] <- Log2FC_C1vC2
                 log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-            } 
+            }
             else {
                 log2fc_table <- Log2FC_C1vC2
             }
@@ -1199,7 +1192,7 @@ log2fc <- function(
 ### ### dma helper function: Internal Function to perform single comparison  ###
 ################################################################################
 
-#' This helper function to calculate One-vs-One comparison statistics
+#' Calculate One-vs-One comparison statistics
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite
 #'        numerical values in columns with metabolite identifiers as column
@@ -1233,16 +1226,10 @@ log2fc <- function(
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom stats p.adjust
-#' @importFrom dplyr select_if
-#' @importFrom dplyr filter
-#' @importFrom dplyr rename
-#' @importFrom dplyr mutate
-#' @importFrom dplyr summarise_all
+#' @importFrom dplyr summarise_all filter mutate rename select_if
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
-#'
 #' @noRd
-#'
 dma_stat_single <- function(data,
                             metadata_sample,
                             metadata_info,
@@ -1354,10 +1341,8 @@ dma_stat_single <- function(data,
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
-#'
 #' @noRd
-#'
-aov <-function(data,
+aov <- function(data,
                metadata_sample,
                metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                log2fc_table=NULL){
@@ -1494,10 +1479,8 @@ aov <-function(data,
 #' @importFrom dplyr rename mutate_all mutate select
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
-#'
 #' @noRd
-#'
-kruskal <-function(data,
+kruskal <- function(data,
                    metadata_sample,
                    metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                    log2fc_table = NULL,
@@ -1614,7 +1597,7 @@ kruskal <-function(data,
 ### ### ### welch: Internal Function to perform anova for unequal variance groups ### ### ###
 #############################################################################################
 
-#' This helper function to calculate One-vs-All or All-vs-All comparison statistics
+#' Calculate One-vs-All or All-vs-All comparison statistics
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -1629,10 +1612,8 @@ kruskal <-function(data,
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
-#'
 #' @noRd
-#'
-welch <-function(data,
+welch <- function(data,
                  metadata_sample,
                  metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                  log2fc_table=NULL
@@ -1757,9 +1738,7 @@ welch <-function(data,
 #' @importFrom tidyr separate unite
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
-#'
 #' @noRd
-#'
 dma_stat_limma <- function(data,
                            metadata_sample,
                            metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
@@ -2008,7 +1987,7 @@ dma_stat_limma <- function(data,
 ### ### ### shapiro function: Internal Function to perform shapiro test and plots ### ### ###
 #############################################################################################
 
-#' This helper function to perform shapiro test and plots
+#' Shapiro test and plots
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -2026,10 +2005,8 @@ dma_stat_limma <- function(data,
 #' @importFrom dplyr rename select_if filter
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
-#'
 #' @noRd
-#'
-shapiro <-function(data,
+shapiro <- function(data,
                    metadata_sample,
                    metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
                    pval= "t-test",
@@ -2249,7 +2226,7 @@ shapiro <-function(data,
 ### ### ### bartlett function: Internal Function to perform bartlett test and plots ### ###
 ###########################################################################################
 
-#' This helper function perform the bartlett test to check the homogeneity of variances across groups
+#' Bartlett test for variance homogeneity check across groups
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
 #' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
@@ -2264,10 +2241,8 @@ shapiro <-function(data,
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
-#'
 #' @noRd
-#'
-bartlett <-function(data,
+bartlett <- function(data,
                     metadata_sample,
                     metadata_info){
 
@@ -2317,7 +2292,7 @@ bartlett <-function(data,
 ### ### ### Variance stabilizing transformation function ### ###
 ################################################################
 
-#' This function performs a variance stabilizing transformation (vst) on the input data.
+#' Variance stabilizing transformation (vst)
 #'
 #' @param data data frame with unique sample identifiers
 # not true: no need to have row names, they are not used here, and in general,
@@ -2331,14 +2306,14 @@ bartlett <-function(data,
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom stats lm
-#' @importFrom ggplot2 ggplot geom_point theme_bw scale_x_continuous scale_y_continuous xlab ylab geom_abline ggtitle geom_smooth aes
+#' @importFrom ggplot2 ggplot geom_point theme_bw scale_x_continuous
+#' @importFrom ggplot2 scale_y_continuous xlab ylab geom_abline ggtitle
+#' @importFrom ggplot2 geom_smooth aes
 #' @importFrom patchwork wrap_plots
 #' @importFrom dplyr summarise group_by
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
-#'
 #' @noRd
-#'
 vst <- function(data){
 
   ## ------------ Create log file ----------- ##

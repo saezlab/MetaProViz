@@ -47,10 +47,7 @@
 #' @importFrom dplyr rename mutate case_when mutate_at count
 #' @importFrom tidyr replace_na
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames
-
 #' @export
-#'
 mca_2cond <- function(data_c1,
                       data_c2,
                       metadata_info_c1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
@@ -429,7 +426,7 @@ mca_2cond <- function(data_c1,
 #'
 #' @examples
 #'
-#' Media <- medium_raw %>%tibble::column_to_rownames("Code")
+#' Media <- medium_raw %>% tibble::column_to_rownames("Code")
 #' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
@@ -450,13 +447,10 @@ mca_2cond <- function(data_c1,
 #'
 #' @keywords biological clustering
 #'
-#' @importFrom dplyr rename mutate case_when mutate_at count
+#' @importFrom dplyr rename mutate case_when mutate_at count distinct group_by
 #' @importFrom tidyr replace_na
 #' @importFrom magrittr %>% %<>%
-#' @importFrom tibble rownames_to_column column_to_rownames
-#'
 #' @export
-#'
 mca_core <- function(data_intra,
                      data_core,
                      metadata_info_intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),

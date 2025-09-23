@@ -33,8 +33,7 @@
 #' @keywords folder, path
 #'
 #' @noRd
-#'
-save_path<- function(folder_name, path){
+save_path <- function(folder_name, path){
   #Check if folder_name includes special characters that are not allowed
   cleaned_folder_name <- gsub("[^a-zA-Z0-9 ]", "", folder_name)
   if (folder_name != cleaned_folder_name){
@@ -42,11 +41,11 @@ save_path<- function(folder_name, path){
   }
 
   #Check if path exist
-  if(is.null(path)){
+  if(is.null(path)) {
     path <- getwd()
     path <- file.path(path, "MetaProViz_Results")
     if(!dir.exists(path)){dir.create(path)}
-  }else{
+  } else {
     if(dir.exists(path)==FALSE){
       path <- getwd()
       message("Provided `path` does not exist and hence results are saved here: ", path, sep="")
@@ -93,10 +92,11 @@ results_dir <- function(path = 'MetaProViz_Results') {
 #' @param plot_unit \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
 #'
 #' @keywords Save
+#' @importFrom ggplot2 ggsave
+#' @importFrom readr write_csv write_delim
+#' @importFrom writexl write_xlsx
 #' @noRd
-#'
-
-save_res<- function(inputlist_df= NULL,
+save_res <- function(inputlist_df= NULL,
                    inputlist_plot= NULL,
                    save_table = NULL,
                    save_plot = NULL,

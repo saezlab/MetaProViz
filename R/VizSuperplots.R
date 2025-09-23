@@ -49,20 +49,18 @@
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
 #' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot
-#' @importFrom ggplot2 position_dodge element_text
+#' @importFrom ggplot2 position_dodge element_text theme_classic
 #' @importFrom ggplot2 geom_bar labs scale_color_manual theme xlab ylab
-#' @importFrom ggpubr stat_pvalue_manual
+#' @importFrom ggpubr stat_pvalue_manual stat_compare_means
+#' @importFrom ggbeeswarm geom_beeswarm
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select group_by summarise filter mutate n across
 #' @importFrom tidyr separate unite
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom ggbeeswarm geom_beeswarm
 #' @importFrom logger log_trace log_info
 #' @importFrom tidyselect all_of
-#'
 #' @export
-#'
 viz_superplot <- function(data,
                          metadata_sample,
                          metadata_info = c(Conditions="Conditions", Superplot = NULL),

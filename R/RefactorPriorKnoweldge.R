@@ -44,11 +44,9 @@
 #' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR id_types translate_ids
-#' @importFrom logger log_warn
+#' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower
-#'
 #' @export
-#'
 translate_id <- function(data,
                         metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
                         from = "kegg",
@@ -480,9 +478,9 @@ equivalent_id <- function(data,
 #' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR ambiguity
-#'
+#' @importFrom logger log_trace
+#' @importFrom tidyr unnest
 #' @export
-#'
 mapping_ambiguity <- function(data,
                              from,
                              to,
@@ -680,7 +678,7 @@ mapping_ambiguity <- function(data,
 ### ### ### Check Measured ID's in prior knowledge ### ### ###
 ##########################################################################################
 
-#' Check and summarize prior_knowledge-to-MeasuredFeatures relationship
+#' Check and summarize relationship between prior knowledge to measured features
 #'
 #' @param data dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.
 #' @param input_pk dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).
@@ -688,15 +686,16 @@ mapping_ambiguity <- function(data,
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
-#' @importFrom dplyr mutate n_distinct filter
-#' @importFrom tidyr separate_rows
-#' @importFrom rlang !!! !! := sym syms
-#'
 #' @examples
 #' DetectedIDs <-  cellular_meta %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
 #' Res <- MetaProViz::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
+#' @importFrom dplyr cur_group_id filter mutate n_distinct row_number select
+#' @importFrom logger log_trace
+#' @importFrom tibble tibble
+#' @importFrom tidyr separate_rows
+#' @importFrom rlang !!! !! := sym syms
 #' @export
 checkmatch_pk_to_data <- function(data,
                            input_pk,
@@ -1037,10 +1036,10 @@ checkmatch_pk_to_data <- function(data,
 #' @param metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
 #'
 #' @examples
-#' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' data = KEGG_Pathways
+#' metsigdb_kegg()
 #'
-#'
+#' @importFrom dplyr bind_rows filter group_by left_join mutate
+#' @importFrom dplyr select summarize ungroup
 #' @importFrom igraph graph_from_adjacency_matrix components
 #' @noRd
 cluster_pk <- function(data, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
@@ -1163,7 +1162,12 @@ cluster_pk <- function(data, # This can be either the original PK (e.g. KEGG pat
 ### ### ### Helper function to add term information to Enrichment Results ### ### ###
 ##########################################################################################
 
-#' Adds extra columns to enrichment output that inform about 1. The amount of genes associated with term in prior knowledge, 2. The amount of genes detected in input data associated with term in prior knowledge, and 3. The percentage of genes detected in input data associated with term in prior knowledge.
+# Better function Name and parameter names needed
+# Use in ORA functions and showcase in vignette with decoupleR output
+
+#' Adds extra columns to enrichment output
+#'
+#' These columns inform about 1. The amount of genes associated with term in prior knowledge, 2. The amount of genes detected in input data associated with term in prior knowledge, and 3. The percentage of genes detected in input data associated with term in prior knowledge.
 #'
 #' @param mat data matrix used as input for enrichment analysis
 #' @param net Prior Knowledge used as input for enrichment analysis
@@ -1172,11 +1176,8 @@ cluster_pk <- function(data, # This can be either the original PK (e.g. KEGG pat
 #' @param .target used as input for enrichment analysis
 #' @param complete TRUE or FALSE, weather only .source with results should be returned or all .source in net.
 #'
+#' @importFrom tibble rownames_to_column
 #' @noRd
-
-# Better function Name and parameter names needed
-# Use in ORA functions and showcase in vignette with decoupleR output
-
 add_info <- function(mat,
                     net,
                     res,
@@ -1318,8 +1319,7 @@ add_info <- function(mat,
 #' res <- MetaProViz::compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
 #'
 #' @importFrom dplyr mutate select
-#' @importFrom utils write.csv
-#'
+#' @importFrom logger log_trace
 #' @export
 compare_pk <- function(data,
                        metadata_info = NULL,
@@ -1564,6 +1564,11 @@ compare_pk <- function(data,
 #'                  \code{id_label} (a categorical label based on the entry count).}
 #'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
 #'
+#' @importFrom dplyr case_when mutate rename
+#' @importFrom ggplot2 aes element_rect element_text expansion geom_bar
+#' @importFrom ggplot2 geom_histogram ggplot labs scale_fill_manual scale_x_continuous
+#' @importFrom ggplot2 scale_y_continuous theme theme_classic
+#' @importFrom grid convertUnit
 #' @export
 count_id <- function(data,
                       column,

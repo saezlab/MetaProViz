@@ -42,9 +42,7 @@
 #' @keywords Input check
 #'
 #' @importFrom logger log_trace
-#'
 #' @noRd
-#'
 check_param <- function(data,
                        data_num=TRUE,
                        metadata_sample=NULL,
@@ -345,9 +343,7 @@ check_param <- function(data,
 #' @keywords Input check for MetaProViz::processing
 #'
 #' @importFrom logger log_trace
-#'
 #' @noRd
-#'
 check_param_processing <- function(metadata_sample,
                                      metadata_info,
                                      core=FALSE,
@@ -435,13 +431,11 @@ check_param_processing <- function(metadata_sample,
 #'
 #' @keywords Input check for MetaProViz::dma
 #'
-#' @importFrom logger log_trace
+#' @importFrom logger log_trace log_info
 #' @importFrom dplyr filter select_if
 #' @importFrom magrittr %>%
 #' @importFrom utils combn
-#'
 #' @noRd
-#'
 check_param_dma <- function(data,
                            metadata_sample,
                            metadata_info= c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
@@ -637,9 +631,7 @@ check_param_dma <- function(data,
 #'
 #' @importFrom logger log_trace
 #' @importFrom dplyr rename
-#'
 #' @noRd
-#'
 check_param_ora <- function(data,
                            metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                            cutoff_stat=0.05,
@@ -824,9 +816,7 @@ check_param_ora <- function(data,
 #' @keywords Input check MetaProViz::mca_2cond and MetaProViz::mca_core
 #'
 #' @importFrom logger log_trace
-#'
 #' @noRd
-#'
 check_param_mca <- function(data_c1,
                            data_c2,
                            data_core,

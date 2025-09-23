@@ -21,7 +21,6 @@
 #' Workaround against R CMD check notes about using `:::`
 #'
 #' @importFrom rlang enquo !!
-#'
 #' @noRd
 `%:::%` <- function(pkg, fun){
 

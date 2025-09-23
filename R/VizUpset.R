@@ -46,11 +46,11 @@
 #' @keywords upset plot, complex upset
 #'
 #' @importFrom ggplot2 scale_fill_manual scale_fill_viridis_d element_text theme
+#' @importFrom ggplot2 aes_string theme_minimal
 #' @importFrom Polychrome palette36.colors
-#' @importFrom ComplexUpset intersection_size
+#' @importFrom ComplexUpset intersection_size upset upset_set_size
 #' @importFrom logger log_info log_trace
 #' @importFrom stats setNames
-#'
 #' @noRd
 viz_upset <- function(df,
                      class_col = NULL,

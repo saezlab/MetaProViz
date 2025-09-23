@@ -52,16 +52,16 @@
 #' @keywords PCA
 #'
 #' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
-#  required for autoplot.prcomp:
+#' @importFrom ggplot2 scale_color_manual theme_classic annotation_custom
+#' @importFrom grid convertUnit
 #' @importFrom ggfortify fortify_map
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
+#' @importFrom stats prcomp
 #' @importFrom logger log_info log_trace
-#'
 #' @export
-#'
 viz_pca <- function(data,
                    metadata_info= NULL,
                    metadata_sample = NULL,

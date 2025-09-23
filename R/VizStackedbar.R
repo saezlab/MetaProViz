@@ -34,6 +34,11 @@
 #'
 #' @return A \code{ggplot} object representing the stacked bar plot.
 #'
+#' @importFrom dplyr arrange group_by mutate n pull
+#' @importFrom dplyr summarise
+#' @importFrom ggplot2 aes_string element_text geom_bar ggplot labs
+#' @importFrom ggplot2 scale_fill_manual theme theme_minimal
+#' @importFrom rlang sym
 #' @noRd
 viz_stackedbar <- function(data,
                           group_col,
