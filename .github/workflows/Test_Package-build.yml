@@ -38,7 +38,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       R_LIBS_USER: ${{ github.workspace }}/.Rlibrary
-      R_BIOC_VERSION: devel
+      R_BIOC_VERSION: "3.22"
 
     # Only run on push to main/development or scheduled run
     if: |
