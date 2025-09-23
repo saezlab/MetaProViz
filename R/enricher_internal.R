@@ -39,7 +39,7 @@
 ##' @param max_gs_size maximal size of each geneSet for analyzing
 ##' @param qvalueCutoff cutoff of qvalue
 ##' @param USER_DATA ontology information
-##' @return  A \code{enrichResult} instance.
+##' @return \code{enrichResult} instance.
 ##' @importClassesFrom methods data.frame
 ##' @importFrom qvalue qvalue
 ##' @importFrom methods new
@@ -344,9 +344,9 @@ get_geneSet_index <- function(gene_sets, min_gs_size, max_gs_size) {
 
 ##' interal method for enrichment analysis
 ##'
-##' @param path2gene Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
-##' @param path2name Pathway[,c("term", "Description")]# term and description
-##' @return  A \code{enrichResult} instance.
+##' @param path2gene Pathwaywith "term", "gene"# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
+##' @param path2name Pathway with "term", "Description"# term and description
+##' @return \code{enrichResult} instance.
 ##' @author Guangchuang Yu \url{https://yulab-smu.top}
 ##' @noRd
 build_Anno <- function(path2gene, path2name) {
