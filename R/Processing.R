@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: processing
-##
-## Purpose of script: Metabolomics (raw ion counts) pre-processing, normalization, outlier detection and QC plots
-##
-## Author: Dimitrios Prymidis, Denes Turei and Christina Schmidt
-##
-## Date Created: 2022-10-28
-##
-## Copyright (c) Dimitrios Prymidis,Denes Turei and Christina Schmidt
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 
 

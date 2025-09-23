@@ -24,7 +24,7 @@ exometabolomics (=consumption-release (CoRe) data). Those modules and
 their functions can be used independently from each other or in
 combination (**Fig.1**).
 
-  
+
 <center>
 
 <figure>
@@ -37,15 +37,15 @@ MetaProViz functions.</figcaption>
 
 </center>
 
-  
-  
+
+
 The first module, **MetaProViz**, `Processing`, allows the customized
 processing of raw peak metabolomics data from different experimental
 setups, including options to perform feature filtering due to
 missingness, Total Ion Count (TIC) normalisation, Missing Value
 Imputation (MVI) based on half-minimum and outlier detection based on
 Hotellin’s T2. All of these pre-processing parameters can be customized
-and combined as needed.  
+and combined as needed.
 The second module of **MetaProViz**,
 `Differential Metabolite Analysis (DMA)`, allows the user to perform
 differential analysis between two conditions (e.g. Tumour versus
@@ -53,7 +53,7 @@ Healthy) calculating the Log2FC, p-value, adjusted p-value and t-value,
 whereby the user can choose all the test statistics. The input can
 either be the output of the `Preprocessing` module or any DF including
 metabolite values and information about the conditions that should be
-compared.  
+compared.
 The third module of **MetaProViz**, `Functional Analysis`, includes
 different methods to create clusters of metabolites based on their
 distribution across the data using logical regulatory rules, prior
@@ -61,7 +61,7 @@ knowledge for enrichment analysis and functions to perform over
 representation analysis (ORA). Here, the user can either input the
 output of the `Processing` or `Differential Metabolite Analysis (DMA)`
 module, or any other DF including Log2FC and statistics or metabolite
-values.  
+values.
 The fourth module of **MetaProViz**, `Visualization`, can easily create
 customized visualizations of the output results of each of the other
 **MetaProViz** modules or custom files. Here we not only enable overview
@@ -80,16 +80,16 @@ functionalities MetaProViz offers using publicly available datasets,
 which are included as example data within **MetaProViz**. You can find
 those tutorial on the top under the “Tutorials” button, where you can
 follow specific user case examples for different analysis. Otherwise,
-you can also follow the links below:  
+you can also follow the links below:
 - [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html)  
+data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html)
 - [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html)  
+media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html)
 - [Prior Knowledge Access &
-Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html)  
+Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html)
 - [Sample Metadata
-Analysis](https://saezlab.github.io/MetaProViz/articles/sample-metadata.html)  
-  
+Analysis](https://saezlab.github.io/MetaProViz/articles/sample-metadata.html)
+
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
 
@@ -100,7 +100,7 @@ including 138 matched tumour and normal tissue pairs (Hakimi et al.
 2016). Cell-lines data from intra- and extracellular metabolomics data
 from cell culture media from [metabolomics workbench project
 PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
-<img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;" />  
+<img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;" />
 Additionally we also added transcriptomics and proteomics data of ccRCC
 patients processed with SiRCle (Mora et al. 2024), originally from
 [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127)
@@ -145,17 +145,22 @@ just google “Long paths fix” and your Windows version)
 
 GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
+## Contributors
+
+Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley,
+Jannik Franken, Christian Frezza, Julio Saez-Rodriguez
+
 ## Citation
 
 Please cite our bioRxiv preprint:
 <https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full>
 
-    @article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025, 
+    @article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025,
              title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
              DOI={10.1101/2025.08.18.670781},
-             journal={BioRxiv}, 
-             author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio}, 
-             year={2025}, 
+             journal={BioRxiv},
+             author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
+             year={2025},
              month={Aug}}
 
 ## References

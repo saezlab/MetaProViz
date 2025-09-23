@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: HelperFunctions
-##
-## Purpose of script: General helper functions to check function input and save results
-##
-## Author: Christina Schmidt
-##
-## Date Created: 2023-06-14
-##
-## Copyright (c) Christina Schmidt
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 ################################################################################################
 ### ### ### Built-in example data (docs) ### ### ###
