@@ -208,15 +208,15 @@ Computer Configuration > Administrative Templates > System > Filesystem > Enable
 GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
 ## Citation
+Please cite our bioRxiv preprint: https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full
 ```
-@Manual{,
-  title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
-
-  author = {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez and Christian Frezza},
-  year = {2024},
-  note = {R package version 3.1.0},
-
-}
+@article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025, 
+         title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
+         DOI={10.1101/2025.08.18.670781},
+         journal={BioRxiv}, 
+         author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio}, 
+         year={2025}, 
+         month={Aug}}
 ```
 
 ## References
