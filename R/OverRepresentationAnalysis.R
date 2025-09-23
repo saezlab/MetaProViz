@@ -36,6 +36,14 @@
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
+#' @examples
+#' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+#' DMAres <- as.data.frame(intracell_dma) %>% dplyr::filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
+#' MetaProViz::cluster_ora(data= DMAres,
+#' metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+#' input_pathway=KEGG_Pathways,
+#' remove_background=FALSE)
+#'
 #' @return Saves results as individual .csv files.
 #'
 #' @importFrom logger log_info
