@@ -54,3 +54,7 @@ It considers both \code{NA} values and empty strings as zero entries, and catego
 "No ID", "Single ID", or "Multiple IDs" based on the count. A histogram is then generated to visualize
 the distribution of entry counts.
 }
+\examples{
+MetaProViz::count_id(biocrates_features, "HMDB")
+
+}

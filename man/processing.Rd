@@ -18,8 +18,7 @@ processing(
   save_plot = "svg",
   save_table = "csv",
   print_plot = TRUE,
-  path = NULL,
-  se = FALSE
+  path = NULL
 )
 }
 \arguments{
@@ -50,8 +49,6 @@ processing(
 \item{print_plot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
-
-\item{se}{Logical. If TRUE, the input for \code{data} must be a SummarizedExperiment object and \code{metadata_sample}/\code{metadata_feature} will be extracted automatically. If FALSE (default), standard data and metadata inputs are used.}
 }
 \value{
 List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
@@ -70,12 +67,6 @@ ResM <- MetaProViz::processing(data = Media[-c(40:45), -c(1:3)],
                                metadata_sample = Media[-c(40:45), c(1:3)],
                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
                                core=TRUE)
-
-# Example using SummarizedExperiment
-se <- create_se(data = Intra[-c(49:58), -c(1:5, 97)],
-                metadata_sample = cellular_meta \%>\% dplyr::filter(Metabolite \%in\% colnames(mat)) \%>\% tibble::column_to_rownames("Metabolite")\%>\% .[colnames(mat), , drop = FALSE],
-                metadata_feature = Intra[-c(49:58), c(1:3)])
-ResSE <- MetaProViz::processing(data = se, se = TRUE, metadata_info = c(Conditions = "Group"))
 
 }
 \keyword{80}

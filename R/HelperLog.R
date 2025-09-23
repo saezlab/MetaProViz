@@ -52,12 +52,11 @@ metaproviz_logfile <- function(){
 #' @importFrom OmnipathR read_log
 #'
 #' @export
-#'
 #' @seealso \code{\link{metaproviz_logfile}}
-#'
 metaproviz_log <- function(){
-  #Opens log file for browsing
+
   OmnipathR::read_log('MetaProViz')
+
 }
 
 

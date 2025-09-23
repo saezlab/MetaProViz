@@ -23,6 +23,13 @@ make_gene_metab_set(
 
 \item{path}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
 }
+\value{
+List of two data frames: "GeneMetabSet" and "MetabSet".
+}
 \description{
 Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
+}
+\examples{
+make_gene_metab_set(hallmarks)
+
 }
