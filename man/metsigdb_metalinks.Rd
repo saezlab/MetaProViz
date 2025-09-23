@@ -38,6 +38,13 @@ metsigdb_metalinks(
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
 }
+\value{
+A data frame of metabolite-protein interactions from MetalinksDB.
+}
 \description{
 Annotated metabolite-protein interactions from MetalinksDB
+}
+\examples{
+metsigdb_metalinks()
+
 }
