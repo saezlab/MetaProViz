@@ -111,7 +111,6 @@ jobs:
       # Set Bioconductor back to release and install other Bioconductor dependencies
       - name: Install other Bioconductor dependencies from release
         run: |
-          Rscript -e 'BiocManager::install(version = "release")'
           Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
 
       - name: Install remotes
