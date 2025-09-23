@@ -116,8 +116,8 @@ jobs:
       # Set Bioconductor back to release and install other Bioconductor dependencies
       - name: Install other Bioconductor dependencies from release
         run: |
-          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
           Rscript -e 'install.packages("ComplexUpset", type="source")'
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
           # Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
 
       - name: Install MetaProViz from git by remotes
