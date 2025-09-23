@@ -38,6 +38,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       R_LIBS_USER: ${{ github.workspace }}/.Rlibrary
+      R_BIOC_VERSION: devel
 
     # Only run on push to main/development or scheduled run
     if: |
@@ -104,7 +105,7 @@ jobs:
       - name: Install OmnipathR from Bioconductor devel
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
-          Rscript -e 'BiocManager::install(version = "devel")'
+          Rscript -e 'BiocManager::install()'
           Rscript -e 'BiocManager::install("OmnipathR")'
 
       # Set Bioconductor back to release and install other Bioconductor dependencies
