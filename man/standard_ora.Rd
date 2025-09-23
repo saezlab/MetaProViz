@@ -2,7 +2,7 @@
 % Please edit documentation in R/OverRepresentationAnalysis.R
 \name{standard_ora}
 \alias{standard_ora}
-\title{Uses enricher to run ORA on the differential metabolites (DM) using a pathway list}
+\title{Overrepresentation analysis of metabolite sets in pathways}
 \usage{
 standard_ora(
   data,
@@ -43,7 +43,8 @@ standard_ora(
 Saves results as individual .csv files.
 }
 \description{
-Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
+Can be applied on the result of differential metabolite analysis (DMA),
+requires a pathway list (from databases).
 }
 \examples{
 KEGG_Pathways <- MetaProViz::metsigdb_kegg()

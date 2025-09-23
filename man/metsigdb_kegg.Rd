@@ -2,20 +2,17 @@
 % Please edit documentation in R/GetPriorKnowledge.R
 \name{metsigdb_kegg}
 \alias{metsigdb_kegg}
-\title{KEGG}
+\title{KEGG pathways}
 \usage{
 metsigdb_kegg()
 }
 \value{
-A data frame containing the KEGG pathways for ORA.
+A data frame containing the KEGG pathways suitable for ORA.
 }
 \description{
-Import and process KEGG.
-}
-\details{
-Imports KEGG pathways into the environment
+KEGG pathways
 }
 \examples{
-KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+metsigdb_kegg()
 
 }

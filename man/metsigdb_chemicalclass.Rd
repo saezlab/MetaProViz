@@ -17,7 +17,7 @@ metsigdb_chemicalclass(version = "2.5.4", save_table = "csv", path = NULL)
 A data frame containing the Prior Knowledge.
 }
 \description{
-Import and process file to create Prior Knowledge.
+Metabolite chemical classes from RaMP DB
 }
 \examples{
 ChemicalClass <- metsigdb_chemicalclass()

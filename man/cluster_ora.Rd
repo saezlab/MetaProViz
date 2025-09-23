@@ -4,7 +4,7 @@
 \alias{cluster_ora}
 \title{\subsection{---------------------------}{
 
-cluster_ora
+Overrepresentation analysis by cluster
 }}
 \usage{
 cluster_ora(
