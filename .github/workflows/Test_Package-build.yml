@@ -100,6 +100,11 @@ jobs:
         run: |
           Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
 
+      - name: Install remotes
+        run: |
+          Rscript -e 'install.packages("remotes")'
+          Rscript -e 'remotes::install_github("r-lib/remotes")'  # see: https://github.com/r-lib/remotes/issues/798
+          Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
       # Install OmnipathR from Bioconductor devel
       - name: Install OmnipathR from Bioconductor devel
@@ -113,12 +118,6 @@ jobs:
       - name: Install other Bioconductor dependencies from release
         run: |
           Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
-
-      - name: Install remotes
-        run: |
-          Rscript -e 'install.packages("remotes")'
-          Rscript -e 'remotes::install_github("r-lib/remotes")'  # see: https://github.com/r-lib/remotes/issues/798
-          Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
       - name: Install MetaProViz from git by remotes
         if: github.ref == 'refs/heads/main'
