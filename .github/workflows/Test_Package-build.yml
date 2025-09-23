@@ -97,7 +97,8 @@ jobs:
       # Install CRAN dependencies to user library (fixes permissions error on Ubuntu and ensures all CRAN packages are available)
       - name: Install package dependencies
         run: |
-          Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
+          Rscript -e 'install.packages(c("broom", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
+          Rscript -e 'install.packages("ComplexUpset", type="source")'
 
       - name: Install remotes
         run: |
