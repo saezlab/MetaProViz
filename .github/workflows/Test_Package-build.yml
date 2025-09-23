@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - main
-      - development
+      - devel
   schedule:
     - cron: '0 4 * * *'
 
