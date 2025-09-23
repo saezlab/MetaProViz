@@ -3,7 +3,7 @@ Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
 Version: 3.0.4
 Authors@R: c(
-    person("Christina", "Schmidt",  email = "christina.schmidt@uni-heidelberg.de", role = c("aut", "cre"),
+    person("Christina", "Schmidt",  email = "christina.schmidt.science@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
     person("Denes", "Turei", role = "aut",
            comment = c(ORCID = "0000-0002-7249-9379")),
@@ -25,7 +25,7 @@ Description: MetaProViz can analyse standard metabolomics and
     interpretable graphs and saves them in a publication ready format.
 URL: https://saezlab.github.io/MetaProViz
 BugReports: https://github.com/saezlab/MetaProViz/issues
-BiocViews: Metabolomics, QualityControl, SystemsBiology, Visualization
+biocViews: Metabolomics, QualityControl, SystemsBiology, Visualization
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr

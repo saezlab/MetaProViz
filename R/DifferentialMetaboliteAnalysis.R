@@ -12,9 +12,7 @@
 ## Email:
 ##
 ## ---------------------------
-##
 ## Notes:
-##
 ##
 ## ---------------------------
 
@@ -24,387 +22,618 @@
 ### ### ### Differential Metabolite Analysis ### ### ###
 ########################################################
 
-#' This function allows you to perform differential metabolite analysis to obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+#' This function allows you to perform differential metabolite analysis to
+#' obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
-#' @param metadata_feature \emph{Optional: } DF which contains the metadata information , i.e. pathway information, retention time,..., for each metabolite. The row names must match the metabolite names in the columns of the data. \strong{Default = NULL}
-#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used. \strong{Default = FALSE}
-#' @param vst TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = FALSE}
-#' @param shapiro TRUE or FALSE for whether to perform the shapiro.test and get informed about data distribution (normal versus not-normal distribution. \strong{Default = TRUE}
-#' @param bartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
-#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param data DF with unique sample identifiers as row names and metabolite
+#'        numerical values in columns with metabolite identifiers as column
+#'        names. Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the
+#'        samples, which will be combined with your input data based on the
+#'        unique sample identifiers used as rownames.
+#' @param metadata_info  \emph{Optional: } Named vector including the
+#'        information about the conditions column information on numerator or
+#'        denominator c(Conditions="ColumnName_SettingsFile", Numerator =
+#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'        Denominator and Numerator will specify which comparison(s) will be
+#'        done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'        Numerator =NULL selects all the condition and performs multiple
+#'        comparison all-vs-all. Log2FC are obtained by dividing the numerator
+#'        by the denominator, thus positive Log2FC values mean higher expression
+#'        in the numerator. \strong{Default = c(conditions="Conditions",
+#'        numerator = NULL, denumerator = NULL)}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the
+#'        selected test to calculate p.value. For one-vs-one comparisons choose
+#'        t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for
+#'        one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch
+#'        anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the
+#'        selected p.adjusted test for p.value correction for multiple
+#'        Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
+#'        "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param metadata_feature \emph{Optional: } DF which contains the metadata
+#'        information , i.e. pathway information, retention time,..., for each
+#'        metabolite. The row names must match the metabolite names in the
+#'        columns of the data. \strong{Default = NULL}
+#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
+#'        input is used. \strong{Default = FALSE}
+#' @param vst TRUE or FALSE for whether to use variance stabilizing
+#'        transformation on the data when linear modeling is used for hypothesis
+#'        testing. \strong{Default = FALSE}
+#' @param shapiro TRUE or FALSE for whether to perform the shapiro.test and get
+#'        informed about data distribution (normal versus not-normal
+#'        distribution. \strong{Default = TRUE}
+#' @param bartlett TRUE or FALSE for whether to perform the bartlett.test.
+#'        \strong{Default = TRUE}
+#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2
+#'        transformed and log2 transformation will be performed within the limma
+#'        function and Log2FC calculation. If FALSE we expect the data to be
+#'        log2 transformed as this impacts the Log2FC calculation and limma.
+#'        \strong{Default= TRUE}
+#' @param save_plot \emph{Optional: } Select the file type of output plots.
+#'        Options are svg, png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#'        "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
+#'        saved as an overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved
+#'        at. \strong{Default = NULL}
 #'
-#' @return Dependent on parameter settings, list of lists will be returned for dma (DF of each comparison), shapiro (Includes DF and Plot), bartlett (Includes DF and Histogram), vst (Includes DF and Plot) and VolcanoPlot (Plots of each comparison).
+#' @return Dependent on parameter settings, list of lists will be returned for
+#'         dma (DF of each comparison), shapiro (Includes DF and Plot), bartlett
+#'         (Includes DF and Histogram), vst (Includes DF and Plot) and
+#'         VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
-#' Intra <- intracell_raw[-c(49:58) ,]%>%tibble::column_to_rownames("Code")
-#' ResI <- MetaProViz::dma(data=Intra[ ,-c(1:3)],
-#'                        metadata_sample=Intra[ , c(1:3)],
-#'                        metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+#' Intra <- intracell_raw[-c(49:58), ] %>% tibble::column_to_rownames("Code")
+#' ResI <- MetaProViz::dma(
+#'     data = Intra[, -c(1:3)],
+#'     metadata_sample = Intra[, c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+#'     )
+#' )
 #'
-#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing, Normality testing
+#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing,
+#'           Normality testing
 #'
-#' @importFrom dplyr rename full_join
+#' @importFrom dplyr rename
+#' @importFrom dplyr full_join
 #' @importFrom magrittr %>%
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom purrr map reduce
+#' @importFrom tibble rownames_to_column
+#' @importFrom tibble column_to_rownames
+#' @importFrom purrr map
+#' @importFrom purrr reduce
 #' @importFrom logger log_info
 #'
 #' @export
 #'
-dma <-function(data,
-               metadata_sample,
-               metadata_info = c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-               pval ="lmFit",
-               padj="fdr",
-               metadata_feature = NULL,
-               core=FALSE,
-               vst = FALSE,
-               shapiro =TRUE,
-               bartlett =TRUE,
-               transform=TRUE,
-               save_plot = "svg",
-               save_table = "csv",
-               print_plot = TRUE,
-               path = NULL
-){
+dma <- function(
+    data,
+    metadata_sample,
+    metadata_info = c(
+        Conditions = "Conditions",
+        Numerator = NULL,
+        Denominator = NULL
+    ) ,
+    pval = "lmFit",
+    padj = "fdr",
+    metadata_feature = NULL,
+    core = FALSE,
+    vst = FALSE,
+    shapiro = TRUE,
+    bartlett = TRUE,
+    transform = TRUE,
+    save_plot = "svg",
+    save_table = "csv",
+    print_plot = TRUE,
+    path = NULL
+    ) {
+        
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
+    logger::log_info("dma: Differential metabolite analysis.")
 
-  logger::log_info("dma: Differential metabolite analysis.")
+    ## ------------ Check Input files ----------- ##
+    # HelperFunction `check_param`
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_feature = metadata_feature,
+        metadata_info = metadata_info,
+        save_plot = save_plot,
+        save_table = save_table,
+        core = core,
+        print_plot = print_plot
+    )
 
-  ## ------------ Check Input files ----------- ##
-  # HelperFunction `check_param`
-  check_param(data=data,
-                          metadata_sample=metadata_sample,
-                          metadata_feature=metadata_feature,
-                          metadata_info=metadata_info,
-                          save_plot=save_plot,
-                          save_table=save_table,
-                          core=core,
-                          print_plot= print_plot)
+    # HelperFunction `check_param` Specific
+    Settings <- 
+        check_param_dma(
+            data = data,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            pval = pval,
+            padj = padj,
+            shapiro = shapiro,
+            bartlett = bartlett,
+            vst = vst,
+            transform = transform
+        )
 
-  # HelperFunction `check_param` Specific
-  Settings <- check_param_dma(data=data,
-                 metadata_sample=metadata_sample,
-                 metadata_info=metadata_info,
-                 pval=pval,
-                 padj=padj,
-                 shapiro=shapiro,
-                 bartlett=bartlett,
-                 vst=vst,
-                 transform=transform)
+    ## ------------ Create Results output folder ----------- ##
+    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
+        folder <- save_path(
+            folder_name = "dma",
+            path = path
+        )
 
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "dma",
-                                    path=path)
-
-    if(shapiro==TRUE){
-      Subfolder_S <- file.path(folder, "shapiro")
-      if (!dir.exists(Subfolder_S)) {dir.create(Subfolder_S)}
-    }
-
-    if(bartlett==TRUE){
-      Subfolder_B <- file.path(folder, "bartlett")
-      if (!dir.exists(Subfolder_B)) {dir.create(Subfolder_B)}
-    }
-
-    if(vst==TRUE){
-      Subfolder_V <- file.path(folder, "vst")
-      if (!dir.exists(Subfolder_V)) {dir.create(Subfolder_V)}
-    }
-  }
-
-  ###############################################################################################################################################################################################################
-  ## ------------ Check hypothesis test assumptions ----------- ##
-  # 1. Normality
-  if(shapiro==TRUE){
-    if(length(Settings[["Metabolites_Miss"]]>=1)){
-    message("There are NA's/0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs/0s.")#
-      }
-    tryCatch(
-    {
-     Shapiro_output <-suppressWarnings(shapiro(data=data,
-                                                            metadata_sample=metadata_sample,
-                                                            metadata_info=metadata_info,
-                                                            pval=pval,
-                                                            qqplots=FALSE))
-    },
-    error = function(e) {
-      message("Error occurred during shapiro that performs the shapiro-Wilk test. Message: ", conditionMessage(e))
-    }
-  )
-  }
-
-  # 2. Variance homogeneity
-  if(bartlett==TRUE){
-    if(Settings[["MultipleComparison"]]==TRUE){#if we only have two conditions, which can happen even tough multiple comparison (C1 versus C2 and C2 versus C1 is done)
-      UniqueConditions <- metadata_sample%>%
-        subset(metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] | metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]], select = c(metadata_info[["Conditions"]]))
-      UniqueConditions <- unique(UniqueConditions[[metadata_info[["Conditions"]]]])
-
-    if(length(UniqueConditions)>2){
-      tryCatch(
-        {
-          Bartlett_output<-suppressWarnings(bartlett(data=data,
-                                                                  metadata_sample=metadata_sample,
-                                                                  metadata_info=metadata_info))
-        },
-        error = function(e) {
-          message("Error occurred during bartlett that performs the bartlett test. Message: ", conditionMessage(e))
+        if (shapiro == TRUE) {
+            Subfolder_S <- file.path(folder, "shapiro")
+            if (!dir.exists(Subfolder_S)) {
+                dir.create(Subfolder_S)
+            }
         }
-      )
-    }
-    }
-  }
 
-  ###############################################################################################################################################################################################################
-  #### Prepare the data ######
-  #1. Metabolite names:
-  savedMetaboliteNames <-  data.frame("InputName"=colnames(data))
-  savedMetaboliteNames$Metabolite <- paste0("M", seq(1,length(colnames(data))))
-  colnames(data) <- savedMetaboliteNames$Metabolite
+        if (bartlett == TRUE) {
+          Subfolder_B <- file.path(folder, "bartlett")
+            if (!dir.exists(Subfolder_B)) {
+                dir.create(Subfolder_B)
+            }
+        }
 
-  ################################################################################################################################################################################################
-  ############### Calculate Log2FC, pval, padj, tval and add additional info ###############
-  log2fc_table <- log2fc(data=data,
-                                          metadata_sample=metadata_sample,
-                                          metadata_info=metadata_info,
-                                          core=core,
-                                          transform=transform)
-
-  ################################################################################################################################################################################################
-  ############### Perform Hypothesis testing ###############
-  if(Settings[["MultipleComparison"]] == FALSE){
-    if(pval=="lmFit"){
-      STAT_C1vC2 <- dma_stat_limma(data=data,
-                                                metadata_sample=metadata_sample,
-                                                metadata_info=metadata_info,
-                                                padj=padj,
-                                                log2fc_table=log2fc_table,
-                                                core=core,
-                                                transform=transform)
-
-    }else{
-      STAT_C1vC2 <-dma_stat_single(data=data,
-                                                metadata_sample=metadata_sample,
-                                                metadata_info=metadata_info,
-                                                log2fc_table=log2fc_table,
-                                                pval=pval,
-                                                padj=padj)
-    }
-  }else{ # MultipleComparison = TRUE
-    #Correct data heteroscedasticity
-    if(pval!="lmFit" & vst == TRUE){
-      vst_res <- vst(data)
-      data <- vst_res[["DFs"]][["Corrected_data"]]
+        if (vst == TRUE) {
+            Subfolder_V <- file.path(folder, "vst")
+            if (!dir.exists(Subfolder_V)) {
+                dir.create(Subfolder_V)
+            }
+        }
     }
 
-    if(Settings[["all_vs_all"]] ==TRUE){
-      message("No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using ", paste(pval), ".")
-    }else{# for 1 vs all
-      message("No condition was specified as numerator and ", Settings[["denominator"]], " was selected as a denominator. Performing multiple testing `all-vs-one` using ", paste(pval), ".")
+    ############################################################################
+    ## ------------ Check hypothesis test assumptions ----------- ##
+    # 1. Normality
+    if (shapiro == TRUE) {
+        if (length(Settings[["Metabolites_Miss"]] >= 1)) {
+          
+          message(
+              paste0(
+                "There are NA's/0s in the data. This can impact the output of ",
+                "the SHapiro-Wilk test for all metabolites that include NAs/0s."
+              )
+          )
+        }
+        tryCatch(
+            {
+            Shapiro_output <- 
+              suppressWarnings(
+                  shapiro(
+                      data = data,
+                      metadata_sample = metadata_sample,
+                      metadata_info = metadata_info,
+                      pval = pval,
+                      qqplots = FALSE
+                  )
+              )
+            },
+            error = function(e) {
+                message(
+                    paste0(
+                      "Error occurred during shapiro that performs ",
+                      "the shapiro-Wilk test. Message:"
+                    ),
+                    conditionMessage(e)
+                )
+            }
+        )
     }
 
-    if(pval=="aov"){
-      STAT_C1vC2 <- aov(data=data,
-                                     metadata_sample=metadata_sample,
-                                     metadata_info=metadata_info,
-                                     log2fc_table=log2fc_table)
-    }else if(pval=="kruskal.test"){
-      STAT_C1vC2 <-kruskal(data=data,
-                                        metadata_sample=metadata_sample,
-                                        metadata_info=metadata_info,
-                                        log2fc_table=log2fc_table,
-                                        padj=padj)
-    }else if(pval=="welch"){
-      STAT_C1vC2 <-welch(data=data,
-                                      metadata_sample=metadata_sample,
-                                      metadata_info=metadata_info,
-                                      log2fc_table=log2fc_table)
-    }else if(pval=="lmFit"){
-      STAT_C1vC2 <- dma_stat_limma(data=data,
-                                                metadata_sample=metadata_sample,
-                                                metadata_info=metadata_info,
-                                                padj=padj,
-                                                log2fc_table=log2fc_table,
-                                                core=core,
-                                                transform=transform)
-    }
-  }
+    # 2. Variance homogeneity
+    if (bartlett == TRUE) {
+        # if we only have two conditions, which can happen even tough multiple
+        # comparison (C1 versus C2 and C2 versus C1 is done)
+        if (Settings[["MultipleComparison"]] == TRUE) {
+            UniqueConditions <- 
+                metadata_sample %>%
+                    subset(
+                        metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] | metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]],
+                        select = c(metadata_info[["Conditions"]])
+                    )
+            UniqueConditions <- 
+                unique(UniqueConditions[[metadata_info[["Conditions"]]]])
 
-  ################################################################################################################################################################################################
-  ###############  Add the previous metabolite names back ###############
-  DMA_Output <- lapply(STAT_C1vC2, function(df){
-    merged_df <- merge(savedMetaboliteNames, df, by = "Metabolite", all.y = TRUE)
-    merged_df <-merged_df[,-1]%>%#remove the names we used as part of the function and add back the input names.
-      dplyr::rename("Metabolite"=1)
-    return(merged_df)
-    })
-
-
-  ################################################################################################################################################################################################
-  ###############  Add the metabolite Metadata if available ###############
-  if(is.null(metadata_feature) == FALSE){
-      DMA_Output <- lapply(DMA_Output, function(df){
-        merged_df <- merge(df,metadata_feature%>%tibble::rownames_to_column("Metabolite") , by = "Metabolite", all.x = TRUE)
-        return(merged_df)
-      })
+            if (length(UniqueConditions) > 2) {
+                tryCatch(
+                    {
+                    Bartlett_output <- 
+                        suppressWarnings(
+                              bartlett(
+                                  data = data,
+                                  metadata_sample = metadata_sample,
+                                  metadata_info = metadata_info
+                              )
+                        )
+                    },
+                    error = function(e) {
+                        message(
+                            paste0(
+                                "Error occurred during bartlett that performs ",
+                                "the bartlett test. Message:"
+                            ),
+                            conditionMessage(e)
+                        )
+                    }
+                )
+            }
+        }
     }
 
-  ################################################################################################################################################################################################
-  ###############  For core=TRUE create summary of Feature_metadata ###############
-  if(core==TRUE){
-    df_list_selected <- purrr::map(names(DMA_Output), function(df_name) {
-    df <- DMA_Output[[df_name]]  # Extract the dataframe
 
-    # Extract the dynamic column name
-    core_col <- grep("^core_", names(df), value = TRUE)  # Find the column that starts with "core_"
-    # Filter only columns where the part after "core_" is in valid_conditions
-    core_col <- core_col[str_remove(core_col, "^core_") %in% unique(metadata_sample[[metadata_info[["Conditions"]]]])]
+    ############################################################################
+    #### Prepare the data ######
+    # 1. Metabolite names:
+    savedMetaboliteNames <- data.frame("InputName" = colnames(data))
+    savedMetaboliteNames$Metabolite <- paste0("M", seq(1, length(colnames(data))))
+    colnames(data) <- savedMetaboliteNames$Metabolite
 
+    ############################################################################
+    ############### Calculate Log2FC, pval, padj, tval and add additional info
+    ############### ###############
+    log2fc_table <- log2fc(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        transform = transform
+    )
 
-    # Select only the relevant columns
-    df_selected <- df %>%
-      select(Metabolite, all_of(core_col))
+    ############################################################################
+    ############### Perform Hypothesis testing ###############
+    if (Settings[["MultipleComparison"]] == FALSE) {
+        if (pval == "lmFit") {
+            STAT_C1vC2 <- 
+                dma_stat_limma(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    padj = padj,
+                    log2fc_table = log2fc_table,
+                    core = core,
+                    transform = transform
+                )
+        } 
+        else {
+            STAT_C1vC2 <- 
+                dma_stat_single(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table,
+                    pval = pval,
+                    padj = padj
+                )
+        }
+    } 
+    else { # MultipleComparison = TRUE
+        # Correct data heteroscedasticity
+        if (pval != "lmFit" & vst == TRUE) {
+            vst_res <- vst(data)
+            data <- vst_res[["DFs"]][["Corrected_data"]]
+        }
 
-    return(df_selected)
-  })
+        if (Settings[["all_vs_all"]] == TRUE) {
+            message(
+                paste0(
+                    "No conditions were specified as numerator or denumerator. ",
+                    "Performing multiple testing `all-vs-all` using"
+                ),
+                paste(pval),
+                "."
+            )
+        } 
+        else { # for 1 vs all
+            message(
+                "No condition was specified as numerator and ",
+                Settings[["denominator"]],
+                paste0(
+                    "was selected as a denominator. Performing ",
+                    "multiple testing `all-vs-one` using"
+                ),
+                paste(pval),
+                "."
+            )
+        }
 
-  # Merge all dataframes by "Metabolite"
-  merged_df <- purrr::reduce(df_list_selected, dplyr::full_join, by = "Metabolite")
-  names(merged_df) <- gsub("\\.x$", "", names(merged_df))#It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to be added to the column names. We only keep one column (.x)
-
-  Feature_Metadata <- merged_df %>%
-    select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))#Now we remove all other columns with .x.x, .y.y, etc.
-
-  if(is.null(metadata_feature) == FALSE){ #Add to Metadata file:
-    Feature_Metadata <- merge(metadata_feature%>%tibble::rownames_to_column("Metabolite"), Feature_Metadata , by = "Metabolite", all.x = TRUE)
-  }
-  }
-
-
-  ################################################################################################################################################################################################
-  ###############  Plots ###############
-  if(core==TRUE){
-    x <- "Log2(Distance)"
-    VolPlot_metadata_info= c(color="core")
-    VolPlot_SettingsFile = DMA_Output
-  }else{
-    x <- "Log2FC"
-    VolPlot_metadata_info= NULL
-    VolPlot_SettingsFile = NULL
-  }
-
-  volplotList = list()
-  for(DF in names(DMA_Output)){ # DF = names(DMA_Output)[2]
-    Volplotdata<- DMA_Output[[DF]]
-
-    if(core==TRUE){
-      VolPlot_SettingsFile <- DMA_Output[[DF]]%>%tibble::column_to_rownames("Metabolite")
+        if (pval == "aov") {
+            STAT_C1vC2 <- 
+                aov(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table
+                )
+        } 
+        else if (pval == "kruskal.test") {
+            STAT_C1vC2 <- 
+                kruskal(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table,
+                    padj = padj
+                )
+        } 
+        else if (pval == "welch") {
+            STAT_C1vC2 <- 
+                welch(
+                    data = data,
+                    metadata_sample = metadata_sample,
+                    metadata_info = metadata_info,
+                    log2fc_table = log2fc_table
+                )
+        } else if (pval == "lmFit") {
+            STAT_C1vC2 <- dma_stat_limma(
+            data = data,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            padj = padj,
+            log2fc_table = log2fc_table,
+            core = core,
+            transform = transform
+            )
+        }
     }
 
-    dev.new()
-    VolcanoPlot <- invisible(viz_volcano(plot_types="Standard",
-                                                    data=Volplotdata%>%tibble::column_to_rownames("Metabolite"),
-                                                    metadata_info=VolPlot_metadata_info,
-                                                    metadata_feature=VolPlot_SettingsFile,
-                                                    y= "p.adj",
-                                                    x= x,
-                                                    plot_name= DF,
-                                                    subtitle=  bquote(italic("Differential Metabolite Analysis")),
-                                                    save_plot= NULL))
 
-    DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)## Remove special characters and replace spaces with underscores
-    volplotList[[DF_save]]<- VolcanoPlot[["Plot_Sized"]][[1]]
+    ############################################################################
+    ###############  Add the previous metabolite names back ###############
+    DMA_Output <- 
+        lapply(
+            STAT_C1vC2, function(df) {
+                merged_df <- 
+                    merge(
+                        savedMetaboliteNames,
+                        df,
+                        by = "Metabolite",
+                        all.y = TRUE
+                    )
+                # remove the names we used as part of the function and 
+                # add back the input names.
+                merged_df <- merged_df[, -1] %>%
+                    dplyr::rename("Metabolite" = 1)
+                return(merged_df)
+            }
+        )
 
-    dev.off()
+    ############################################################################
+    ###############  Add the metabolite Metadata if available ###############
+    if (is.null(metadata_feature) == FALSE) {
+        DMA_Output <- 
+            lapply(
+                DMA_Output, function(df) {
+                    merged_df <- 
+                        merge(
+                            df,
+                            metadata_feature %>% tibble::rownames_to_column("Metabolite"),
+                            by = "Metabolite",
+                            all.x = TRUE
+                        )
+                    return(merged_df)
+                }
+            )
     }
 
-  ######################################################################################################################################################################
-  ##----- Save and Return
-  DMA_Output_List <- list()
-  #Here we make a list in which we will save the outputs:
-  if(shapiro==TRUE & exists("Shapiro_output")==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=Shapiro_output[["DF"]],
-                           inputlist_plot= Shapiro_output[["Plot"]][["Distributions"]],
-                           save_table=save_table,
-                           save_plot=save_plot,
-                           path= Subfolder_S ,
-                           file_name= "ShapiroTest",
-                           core=core,
-                           print_plot=print_plot)))
+    ############################################################################
+    ###############  For core=TRUE create summary of Feature_metadata  #########
+    if (core == TRUE) {
+        df_list_selected <- 
+            purrr::map(
+                names(DMA_Output), function(df_name) {
+                    df <- DMA_Output[[df_name]] # Extract the dataframe
 
-    DMA_Output_List <- list("ShapiroTest"=Shapiro_output)
-  }
+                    # Extract the dynamic column name
+                    # Find the column that starts with "core_"
+                    core_col <- grep("^core_", names(df), value = TRUE)
+                    # Filter only columns where the part after "core_" 
+                    # is in valid_conditions
+                    core_col <- 
+                        core_col[str_remove(core_col, "^core_") %in% 
+                            unique(
+                                metadata_sample[[metadata_info[["Conditions"]]]]
+                                )
+                        ]
 
-  if(bartlett==TRUE & exists("Bartlett_output")==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=Bartlett_output[["DF"]],
-                           inputlist_plot= Bartlett_output[["Plot"]],
-                           save_table=save_table,
-                           save_plot=save_plot,
-                           path= Subfolder_B ,
-                           file_name= "BartlettTest",
-                           core=core,
-                           print_plot=print_plot)))
+                    # Select only the relevant columns
+                    df_selected <- df %>%
+                        select(Metabolite, all_of(core_col))
 
-    DMA_Output_List <- c(DMA_Output_List, list("BartlettTest"=Bartlett_output))
-  }
+                    return(df_selected)
+                }
+            )
 
-  if(vst==TRUE & exists("vst_res")==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=vst_res[["DF"]],
-                           inputlist_plot= vst_res[["Plot"]],
-                           save_table=save_table,
-                           save_plot=save_plot,
-                           path= Subfolder_V ,
-                           file_name= "vst_res",
-                           core=core,
-                           print_plot=print_plot)))
+        # Merge all dataframes by "Metabolite"
+        merged_df <- 
+            purrr::reduce(
+                df_list_selected,
+                dplyr::full_join,
+                by = "Metabolite"
+            )
+        # It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to
+        # be added to the column names. We only keep one column (.x)
+        names(merged_df) <- gsub("\\.x$", "", names(merged_df))
 
-    DMA_Output_List <- c(DMA_Output_List, list("vstres"=Bartlett_output))
-  }
+        Feature_Metadata <- merged_df %>%
+            # Now we remove all other columns with .x.x, .y.y, etc.
+            select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))
 
-  if(core==TRUE){
-    suppressMessages(suppressWarnings(
-      save_res(inputlist_df=list("Feature_Metadata"=Feature_Metadata),
-              inputlist_plot= NULL,
-              save_table=save_table,
-              save_plot=NULL,
-              path= folder,
-              file_name= "dma",
-              core=core,
-              print_plot=print_plot)))
+        if (is.null(metadata_feature) == FALSE) { # Add to Metadata file:
+            Feature_Metadata <- 
+                merge(
+                    metadata_feature %>% tibble::rownames_to_column("Metabolite"),
+                    Feature_Metadata,
+                    by = "Metabolite",
+                    all.x = TRUE
+                )
+        }
+    }
 
-    DMA_Output_List <- c(DMA_Output_List, list("Feature_Metadata"=Feature_Metadata))
-  }
+    ############################################################################
+    ###############  Plots ###############
+    if (core == TRUE) {
+        x <- "Log2(Distance)"
+        VolPlot_metadata_info <- c(color = "core")
+        VolPlot_SettingsFile <- DMA_Output
+    } 
+    else {
+        x <- "Log2FC"
+        VolPlot_metadata_info <- NULL
+        VolPlot_SettingsFile <- NULL
+    }
 
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=DMA_Output,#This needs to be a list, also for single comparisons
-            inputlist_plot= volplotList,
-            save_table=save_table,
-            save_plot=save_plot,
-            path= folder,
-            file_name= "dma",
-            core=core,
-            print_plot=print_plot)))
+    volplotList <- list()
+    for (DF in names(DMA_Output)) { # DF = names(DMA_Output)[2]
+        Volplotdata <- DMA_Output[[DF]]
 
-  DMA_Output_List <- c(DMA_Output_List, list("dma"=DMA_Output, "VolcanoPlot"=volplotList))
+        if (core == TRUE) {
+            VolPlot_SettingsFile <- 
+                DMA_Output[[DF]] %>%
+                    tibble::column_to_rownames("Metabolite")
+        }
 
+        dev.new()
+        VolcanoPlot <- invisible(
+            viz_volcano(
+                plot_types = "Standard",
+                data = Volplotdata %>% tibble::column_to_rownames("Metabolite"),
+                metadata_info = VolPlot_metadata_info,
+                metadata_feature = VolPlot_SettingsFile,
+                y = "p.adj",
+                x = x,
+                plot_name = DF,
+                subtitle = bquote(italic("Differential Metabolite Analysis")),
+                save_plot = NULL
+            )
+        )
 
-  return(invisible(DMA_Output_List))
+        ## Remove special characters and replace spaces with underscores
+        DF_save <- gsub("[^A-Za-z0-9._-]", "_", DF)
+        volplotList[[DF_save]] <- VolcanoPlot[["Plot_Sized"]][[1]]
+
+        dev.off()
+    }
+
+    ############################################################################
+    ## ----- Save and Return
+    DMA_Output_List <- list()
+    # Here we make a list in which we will save the outputs:
+    if (shapiro == TRUE & exists("Shapiro_output") == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = Shapiro_output[["DF"]],
+                    inputlist_plot = Shapiro_output[["Plot"]][["Distributions"]],
+                    save_table = save_table,
+                    save_plot = save_plot,
+                    path = Subfolder_S,
+                    file_name = "ShapiroTest",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+    )
+
+      DMA_Output_List <- list("ShapiroTest" = Shapiro_output)
+    }
+
+    if (bartlett == TRUE & exists("Bartlett_output") == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = Bartlett_output[["DF"]],
+                    inputlist_plot = Bartlett_output[["Plot"]],
+                    save_table = save_table,
+                    save_plot = save_plot,
+                    path = Subfolder_B,
+                    file_name = "BartlettTest",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+        )
+
+      DMA_Output_List <- 
+        c(
+            DMA_Output_List,
+            list("BartlettTest" = Bartlett_output)
+        )
+    }
+
+    if (vst == TRUE & exists("vst_res") == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = vst_res[["DF"]],
+                    inputlist_plot = vst_res[["Plot"]],
+                    save_table = save_table,
+                    save_plot = save_plot,
+                    path = Subfolder_V,
+                    file_name = "vst_res",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+        )
+
+      DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
+    }
+
+    if (core == TRUE) {
+        suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = list("Feature_Metadata" = Feature_Metadata),
+                    inputlist_plot = NULL,
+                    save_table = save_table,
+                    save_plot = NULL,
+                    path = folder,
+                    file_name = "dma",
+                    core = core,
+                    print_plot = print_plot
+                )
+            )
+        )
+
+        DMA_Output_List <- 
+            c(
+                DMA_Output_List,
+                list("Feature_Metadata" = Feature_Metadata)
+            )
+    }
+
+    suppressMessages(
+        suppressWarnings(
+            save_res(
+                # This needs to be a list, also for single comparisons
+                inputlist_df = DMA_Output,
+                inputlist_plot = volplotList,
+                save_table = save_table,
+                save_plot = save_plot,
+                path = folder,
+                file_name = "dma",
+                core = core,
+                print_plot = print_plot
+            )
+        )
+    )
+
+    DMA_Output_List <- 
+        c(
+            DMA_Output_List,
+            list("dma" = DMA_Output, "VolcanoPlot" = volplotList)
+        )
+
+    return(invisible(DMA_Output_List))
 }
 
 
@@ -412,308 +641,603 @@ dma <-function(data,
 ### ### ### Log2FC  ### ### ###
 ###############################
 
-#' This helper function calculates the Log2(FoldChange) or in case of core Log2(Distance).
+#' This helper function calculates the Log2(FoldChange) or in case of 
+#' core Log2(Distance).
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. Log2FC are obtained by dividing the numerator by the denominator, thus positive Log2FC values mean higher expression in the numerator. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release  input is used \strong{default = FALSE}
-#' @param transform \emph{Optional: } If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma.\strong{default = TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite
+#'        numerical values in columns with metabolite identifiers as column
+#'        names. Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the
+#'        samples, which will be combined with your input data based on the
+#'        unique sample identifiers used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information
+#'        about the conditions column information on numerator or denominator
+#'        c(Conditions="ColumnName_SettingsFile", Numerator =
+#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'        Denominator and Numerator will specify which comparison(s) will be
+#'        done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'        Numerator =NULL selects all the condition and performs multiple
+#'        comparison all-vs-all. Log2FC are obtained by dividing the numerator
+#'        by the denominator, thus positive Log2FC values mean higher expression
+#'        in the numerator. \strong{Default = c(conditions="Conditions",
+#'        numerator = NULL, denumerator = NULL)}
+#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
+#'        input is used \strong{default = FALSE}
+#' @param transform \emph{Optional: } If TRUE we expect the data to be not log2
+#'        transformed and log2 transformation will be performed within the limma
+#'        function and Log2FC calculation. If FALSE we expect the data to be
+#'        log2 transformed as this impacts the Log2FC calculation and
+#'        limma.\strong{default = TRUE}
 #'
-#' @return List of DFs named after comparison (e.g. Tumour versus Normal) with Log2FC or Log2(Distance) column and column with feature names
+#' @return List of DFs named after comparison (e.g. Tumour versus Normal) with
+#'         Log2FC or Log2(Distance) column and column with feature names
 #'
 #' @keywords Log2FC, core, Distance
 #'
-#' @importFrom dplyr select_if filter rename mutate summarise_all
+#' @importFrom dplyr select_if
+#' @importFrom dplyr filter
+#' @importFrom dplyr rename
+#' @importFrom dplyr mutate
+#' @importFrom dplyr summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
 #'
 #' @noRd
 #'
-log2fc <-function(data,
-                      metadata_sample,
-                      metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-                      core=FALSE,
-                      transform=TRUE
-){
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
+log2fc <- function(
+    data,
+    metadata_sample,
+    metadata_info = c(
+        Conditions = "Conditions",
+        Numerator = NULL,
+        Denominator = NULL
+    ),
+    core = FALSE,
+    transform = TRUE
+    ) {
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-  # ------------ Assignments ----------- ##
-  if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
-    # all-vs-all: Generate all pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = TRUE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
-    #all-vs-one: Generate the pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <- metadata_info[["Denominator"]]
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    # Remove denom from num
-    numerator <- numerator[!numerator %in% denominator]
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = FALSE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==TRUE){
-    # one-vs-one: Generate the comparisons
-    denominator <- metadata_info[["Denominator"]]
-    numerator <- metadata_info[["Numerator"]]
-    comparisons <- matrix(c(numerator, denominator))
-    #Settings:
-    MultipleComparison = FALSE
-    all_vs_all = FALSE
-  }
-
-  ## ------------ Check Missingness ------------- ##
-  Num <- data %>%
-    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator) %>%
-    dplyr::select_if(is.numeric)
-  Denom <- data %>%
-    dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator) %>%
-    dplyr::select_if(is.numeric)
-
-  Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
-  Denom_Miss <- Denom[, colSums(Denom == 0) > 0, drop = FALSE]
-  Metabolites_Miss <- unique(c(colnames(Num_Miss), colnames(Denom_Miss)))
-
-  ## ------------ Denominator/numerator ----------- ##
-  # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-  if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
-    MultipleComparison = TRUE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
-    MultipleComparison = TRUE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==TRUE){
-   MultipleComparison = FALSE
-  }
-
-  ####################################################################################################################################
-  ## ----------------- Log2FC ----------------------------
-  log2fc_table <- list()# Create an empty list to store results data frames
-  for(column in 1:dim(comparisons)[2]){
-    C1 <- data %>% # Numerator
-      dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1,column]) %>%
-      dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
-    C2 <- data %>% # Deniminator
-      dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in%  comparisons[2,column]) %>%
-      dplyr::select_if(is.numeric)
-
-    ## ------------  Calculate Log2FC ----------- ##
-    # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if mean = 0 (If one value is NA, the mean will be NA even though all other values are available.)
-    C1_Zero <- C1
-    C1_Zero[is.na(C1_Zero)] <- 0
-    Mean_C1 <- C1_Zero %>%
-      dplyr::summarise_all("mean")
-
-    C2_Zero <- C2
-    C2_Zero[is.na(C2_Zero)] <- 0
-    Mean_C2 <- C2_Zero %>%
-      dplyr::summarise_all("mean")
-
-    if(core==TRUE){#Calculate absolute distance between the means. log2 transform and add sign (-/+):
-      #core values can be negative and positive, which can does not allow us to calculate a Log2FC.
-      Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_Merge <-merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        dplyr::rename("C1"=2,
-                      "C2"=3)
-
-      #Deal with NA/0s
-      Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
-
-      if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
-        Mean_Merge <- Mean_Merge%>%
-          dplyr::mutate(C1 = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                TRUE ~ paste(C1)))%>%
-          dplyr::mutate(C2 = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                TRUE ~ paste(C2)))%>%
-          dplyr::mutate(C1 = as.numeric(C1))%>%
-          dplyr::mutate(C2 = as.numeric(C2))
-
-        X <- Mean_Merge%>%
-          subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
-        message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
-      }
-
-      #Add the distance column:
-      Mean_Merge$`Log2(Distance)` <-log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
-
-      Mean_Merge <- Mean_Merge%>%#Now we can adapt the values to take into account the distance
-        dplyr::mutate(`Log2(Distance)` = case_when(C1 > C2 ~ paste(`Log2(Distance)`*+1),#If C1>C2 the distance stays positive to reflect that C1 > C2
-                                            C1 < C2 ~ paste(`Log2(Distance)`*-1),#If C1<C2 the distance gets a negative sign to reflect that C1 < C2
-                                            TRUE ~ 'NA'))%>%
-        dplyr::mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
-
-      #Add additional information:
-      temp1 <- Mean_C1
-      temp2 <- Mean_C2
-      #Add Info of core:
-      core_info <- rbind(temp1, temp2,rep(0,length(temp1)))
-      for (i in 1:length(temp1)){
-        if (temp1[i]>0 & temp2[i]>0){
-          core_info[3,i] <- "Released"
-        }else if (temp1[i]<0 & temp2[i]<0){
-          core_info[3,i] <- "Consumed"
-        }else if(temp1[i]>0 & temp2[i]<0){
-          core_info[3,i] <- paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")
-        } else if(temp1[i]<0 & temp2[i]>0){
-          core_info[3,i] <- paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")
-        }else{
-          core_info[3,i] <- "No Change"
-        }
-      }
-
-      core_info <- t(core_info) %>% as.data.frame()
-      core_info <- rownames_to_column(core_info, "Metabolite")
-      names(core_info)[2] <- paste("Mean",  comparisons[1,column], sep="_")
-      names(core_info)[3] <- paste("Mean",  comparisons[2,column], sep="_")
-      names(core_info)[4] <- "core_specific"
-
-      core_info <-core_info%>%
-        dplyr::mutate(core = case_when(core_specific == "Released" ~ 'Released',
-                                       core_specific == "Consumed" ~ 'Consumed',
-                                       TRUE ~ 'Released/Consumed'))%>%
-        dplyr::mutate(!!paste("core_", comparisons[1,column], sep="") := case_when(core_specific == "Released" ~ 'Released',
-                                                                                   core_specific == "Consumed" ~ 'Consumed',
-                                                                                   core_specific == paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")~ 'Consumed',
-                                                                                   core_specific == paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")~ 'Released',
-                                                                                   TRUE ~ 'NA'))%>%
-        dplyr::mutate(!!paste("core_", comparisons[2,column], sep="") := case_when(core_specific == "Released" ~ 'Released',
-                                                                                   core_specific == "Consumed" ~ 'Consumed',
-                                                                                   core_specific == paste("Consumed in" ,comparisons[1,column] , " and Released",comparisons[2,column] , sep=" ")~ 'Released',
-                                                                                   core_specific == paste("Released in" ,comparisons[1,column] , "and Consumed",comparisons[2,column] , sep=" ")~ 'Consumed',
-                                                                                   TRUE ~ 'NA'))
-
-
-      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,5)], core_info[,c(1,2,6,3,7,4:5)], by="Metabolite", all.x=TRUE)
-
-      #Add info on Input:
-      temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
-      temp4 <- as.data.frame(t(C2))%>%tibble::rownames_to_column("Metabolite")
-      temp_3a4 <- merge(temp3, temp4, by="Metabolite", all=TRUE)
-      Log2FC_C1vC2 <- merge(Log2FC_C1vC2, temp_3a4, by="Metabolite", all.x=TRUE)
-
-      #Return DFs
-      ##Make reverse DF
-      Log2FC_C2vC1 <- Log2FC_C1vC2
-      Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` *-1
-
-      ##Name them
-      if(MultipleComparison == TRUE){
-        logname <- paste(comparisons[1,column], comparisons[2,column],sep="_vs_")
-        logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
-
-        # Store the data frame in the results list, named after the contrast
-        log2fc_table[[logname]] <- Log2FC_C1vC2
-        log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-      }else{
-        log2fc_table <- Log2FC_C1vC2
-      }
-    }else if(core==FALSE){
-      #Mean values could be 0, which can not be used to calculate a Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) for A and/or B being 0, with x being set to 1
-      Mean_C1_t <- as.data.frame(t(Mean_C1))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_C2_t <- as.data.frame(t(Mean_C2))%>%
-        tibble::rownames_to_column("Metabolite")
-      Mean_Merge <- merge(Mean_C1_t, Mean_C2_t, by="Metabolite", all=TRUE)%>%
-        dplyr::rename("C1"=2,
-               "C2"=3)
-      Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss#Column to enable the check if mean values of 0 are due to missing values (NA/0) and not by coincidence
-
-      Mean_Merge <- Mean_Merge%>%
-        dplyr::mutate(C1_Adapted = case_when(C2 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== TRUE ~ paste(C1),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C1+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C1)))%>%
-        dplyr::mutate(C2_Adapted = case_when(C1 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C2 == 0 & `NA/0`== TRUE ~ paste(C2),#Here we have a "true" 0 value due to 0/NAs in the input data
-                                      C1 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      C2 == 0 & `NA/0`== FALSE ~ paste(C2+1),#Here we have a "false" 0 value that occured at random and not due to 0/NAs in the input data, hence we add the constant +1
-                                      TRUE ~ paste(C2)))%>%
-        dplyr::mutate(C1_Adapted = as.numeric(C1_Adapted))%>%
-        dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
-
-      if(any((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))==TRUE){
-        X <- Mean_Merge%>%
-          subset((Mean_Merge$`NA/0`==FALSE & Mean_Merge$C1 ==0) | (Mean_Merge$`NA/0`==FALSE & Mean_Merge$C2==0))
-        message("We added +1 to the mean value of metabolite(s) ", paste0(X$Metabolite, collapse = ", "), ", since the mean of the replicate values where 0. This was not due to missing values (NA/0).")
-      }
-
-      #Calculate the Log2FC
-      if(transform== TRUE){#data are not log2 transformed
-        Mean_Merge$FC_C1vC2 <- Mean_Merge$C1_Adapted/Mean_Merge$C2_Adapted #FoldChange
-        Mean_Merge$Log2FC <- gtools::foldchange2logratio(Mean_Merge$FC_C1vC2, base=2)
-      }
-
-      if(transform== FALSE){#data has been log2 transformed and hence we need to take this into account when calculating the log2FC
-        Mean_Merge$FC_C1vC2 <- "Empty"
-        Mean_Merge$Log2FC <- Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
-      }
-
-      #Add info on Input:
-      temp3 <- as.data.frame(t(C1))%>%tibble::rownames_to_column("Metabolite")
-      temp4 <- as.data.frame(t(C2))%>%tibble::rownames_to_column("Metabolite")
-      temp_3a4 <-merge(temp3, temp4, by="Metabolite", all=TRUE)
-      Log2FC_C1vC2 <-merge(Mean_Merge[,c(1,8)], temp_3a4, by="Metabolite", all.x=TRUE)
-
-      #Return DFs
-      ##Make reverse DF
-      Log2FC_C2vC1 <-Log2FC_C1vC2
-      Log2FC_C2vC1$Log2FC <- Log2FC_C2vC1$Log2FC*-1
-
-      if(MultipleComparison == TRUE){
-        logname <- paste(comparisons[1,column], comparisons[2,column],sep="_vs_")
-        logname_reverse <- paste(comparisons[2,column], comparisons[1,column],sep="_vs_")
-
-        # Store the data frame in the results list, named after the contrast
-        log2fc_table[[logname]] <- Log2FC_C1vC2
-        log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-      }else{
-        log2fc_table <- Log2FC_C1vC2
-      }
+    # ------------ Assignments ----------- ##
+    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+        # all-vs-all: Generate all pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        numerator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        comparisons <- combn(unique(conditions), 2) %>% as.matrix()
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- TRUE
+    } 
+    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+        # all-vs-one: Generate the pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- metadata_info[["Denominator"]]
+        numerator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        # Remove denom from num
+        numerator <- numerator[!numerator %in% denominator]
+        comparisons <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
     }
-  }
-  return(invisible(log2fc_table))
+    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+        # one-vs-one: Generate the comparisons
+        denominator <- metadata_info[["Denominator"]]
+        numerator <- metadata_info[["Numerator"]]
+        comparisons <- matrix(c(numerator, denominator))
+        # Settings:
+        MultipleComparison <- FALSE
+        all_vs_all <- FALSE
+    }
+
+    ## ------------ Check Missingness ------------- ##
+    Num <- data %>%
+        filter(
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator
+            ) %>%
+            dplyr::select_if(is.numeric)
+    Denom <- data %>%
+        dplyr::filter(
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
+        ) %>%
+        dplyr::select_if(is.numeric)
+
+    Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
+    Denom_Miss <- Denom[, colSums(Denom == 0) > 0, drop = FALSE]
+    Metabolites_Miss <- unique(c(colnames(Num_Miss), colnames(Denom_Miss)))
+
+    ## ------------ Denominator/numerator ----------- ##
+    # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or
+    # all_vs_all.
+    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+        MultipleComparison <- TRUE
+    } 
+    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+        MultipleComparison <- TRUE
+    }
+    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+        MultipleComparison <- FALSE
+    }
+
+    ############################################################################
+    ## ----------------- Log2FC ----------------------------
+    log2fc_table <- list() # Create an empty list to store results data frames
+    for (column in 1:dim(comparisons)[2]) {
+        # Numerator
+        C1 <- data %>%
+            dplyr::filter(
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
+            ) %>%
+            # only keep numeric columns with metabolite values
+            dplyr::select_if(is.numeric)
+        # Deniminator
+        C2 <- data %>%
+            dplyr::filter(
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[2, column]
+            ) %>%
+            dplyr::select_if(is.numeric)
+
+        ## ------------  Calculate Log2FC ----------- ##
+        # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if
+        # mean = 0 (If one value is NA, the mean will be NA even though all other
+        # values are available.)
+        C1_Zero <- C1
+        C1_Zero[is.na(C1_Zero)] <- 0
+        Mean_C1 <- C1_Zero %>%
+        dplyr::summarise_all("mean")
+
+        C2_Zero <- C2
+        C2_Zero[is.na(C2_Zero)] <- 0
+        Mean_C2 <- C2_Zero %>%
+        dplyr::summarise_all("mean")
+
+    # Calculate absolute distance between the means. log2 transform 
+        # and add sign (-/+):
+        if (core == TRUE) {
+            # core values can be negative and positive, which can does not allow us to
+            # calculate a Log2FC.
+            Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_Merge <- merge(
+                Mean_C1_t,
+                Mean_C2_t,
+                by = "Metabolite",
+                all = TRUE
+            ) %>%
+                dplyr::rename(
+                "C1" = 2,
+                "C2" = 3
+                )
+
+            # Deal with NA/0s
+            # Column to enable the check if mean values of 0 are due to missing
+            # values (NA/0) and not by coincidence
+            Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
+
+            if (any(
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+            ) == TRUE) {
+                Mean_Merge <- Mean_Merge %>%
+                    dplyr::mutate(C1 = case_when(
+                        # Here we have a "true" 0 value due to 0/NAs 
+                        # in the input data
+                        C2 == 0 & `NA/0` == TRUE ~ paste(C1),
+                        # Here we have a "true" 0 value due to 0/NAs 
+                        # in the input data
+                        C1 == 0 & `NA/0` == TRUE ~ paste(C1),
+                        # Here we have a "false" 0 value that occured at random 
+                        # and not due to 0/NAs in the input data, hence we add 
+                        # the constant +1
+                        C2 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                        # Here we have a "false" 0 value that occured at random
+                        # and not due to 0/NAs in the input data, hence we add 
+                        # the constant +1
+                        C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                        TRUE ~ paste(C1)
+                    )) %>%
+                    dplyr::mutate(C2 = case_when(
+                        # Here we have a "true" 0 value due to 0/NAs in the 
+                        # input data
+                        C1 == 0 & `NA/0` == TRUE ~ paste(C2),
+                        # Here we have a "true" 0 value due to 0/NAs in the 
+                        # input data
+                        C2 == 0 & `NA/0` == TRUE ~ paste(C2),
+                        # Here we have a "false" 0 value that occured at random 
+                        # and not due to 0/NAs in the input data, hence we
+                        # add the constant +1
+                        C1 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                        # Here we have a "false" 0 value that occured at random 
+                        # and not due to 0/NAs in the input data, hence we 
+                        # add the constant +1
+                        C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                        TRUE ~ paste(C2)
+                    )) %>%
+                    dplyr::mutate(C1 = as.numeric(C1)) %>%
+                    dplyr::mutate(C2 = as.numeric(C2))
+
+                X <- Mean_Merge %>%
+                    subset(
+                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+                    )
+                    message(
+                        "We added +1 to the mean value of metabolite(s) ",
+                        paste0(X$Metabolite, collapse = ", "),
+                        paste0(
+                            ", since the mean of the replicate values where 0. ",
+                            "This was not due to missing values (NA/0)."
+                        )
+                    )
+            }
+
+            # Add the distance column:
+            Mean_Merge$`Log2(Distance)` <- 
+                log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
+
+            # Now we can adapt the values to take into account the distance
+            Mean_Merge <- Mean_Merge %>%
+                dplyr::mutate(`Log2(Distance)` = case_when(
+                    # If C1>C2 the distance stays positive to reflect 
+                    # that C1 > C2
+                    C1 > C2 ~ paste(`Log2(Distance)` * +1),
+                    # If C1<C2 the distance gets a negative sign to reflect 
+                    # that C1 < C2
+                    C1 < C2 ~ paste(`Log2(Distance)` * -1),
+                    TRUE ~ "NA"
+                    )
+                ) %>%
+                dplyr::mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+
+            # Add additional information:
+            temp1 <- Mean_C1
+            temp2 <- Mean_C2
+            # Add Info of core:
+            core_info <- rbind(temp1, temp2, rep(0, length(temp1)))
+            for (i in 1:length(temp1)) {
+                if (temp1[i] > 0 & temp2[i] > 0) {
+                    core_info[3, i] <- "Released"
+                } 
+                else if (temp1[i] < 0 & temp2[i] < 0) {
+                    core_info[3, i] <- "Consumed"
+                } 
+                else if (temp1[i] > 0 & temp2[i] < 0) {
+                    core_info[3, i] <- 
+                        paste(
+                            "Released in",
+                            comparisons[1,
+                            column],
+                            "and Consumed",
+                            comparisons[2,
+                            column],
+                            sep = " "
+                        )
+                } 
+                else if (temp1[i] < 0 & temp2[i] > 0) {
+                    core_info[3, i] <- 
+                        paste(
+                            "Consumed in",
+                            comparisons[1,
+                            column],
+                            " and Released",
+                            comparisons[2,
+                            column],
+                            sep = " "
+                        )
+                } 
+                else {
+                    core_info[3, i] <- "No Change"
+                }
+            }
+
+            core_info <- t(core_info) %>% as.data.frame()
+            core_info <- rownames_to_column(core_info, "Metabolite")
+            names(core_info)[2] <- 
+                paste(
+                    "Mean", comparisons[1, column], sep = "_"
+                    )
+            names(core_info)[3] <- 
+                paste(
+                    "Mean", comparisons[2, column], sep = "_"
+                )
+            names(core_info)[4] <- "core_specific"
+
+            core_info <- core_info %>%
+                dplyr::mutate(
+                    core = case_when(
+                        core_specific == "Released" ~ "Released",
+                        core_specific == "Consumed" ~ "Consumed",
+                        TRUE ~ "Released/Consumed"
+                    )
+                ) %>%
+                dplyr::mutate(!!paste(
+                    "core_", comparisons[1, column], sep = ""
+                    ) := case_when(
+                        core_specific == "Released" ~ "Released",
+                        core_specific == "Consumed" ~ "Consumed",
+                        core_specific == paste(
+                            "Consumed in",
+                            comparisons[1, column],
+                            " and Released",
+                            comparisons[2, column],
+                            sep = " "
+                        ) ~ "Consumed",
+                        core_specific == paste(
+                            "Released in",
+                            comparisons[1, column],
+                            "and Consumed",
+                            comparisons[2, column],
+                            sep = " "
+                        ) ~ "Released",
+                        TRUE ~ "NA"
+                )
+                ) %>%
+                dplyr::mutate(!!paste(
+                    "core_",
+                    comparisons[2, column],
+                    sep = ""
+                ) := case_when(
+                    core_specific == "Released" ~ "Released",
+                    core_specific == "Consumed" ~ "Consumed",
+                    core_specific == paste(
+                        "Consumed in",
+                        comparisons[1, column],
+                        " and Released",
+                        comparisons[2, column],
+                        sep = " "
+                    ) ~ "Released",
+                    core_specific == paste(
+                        "Released in",
+                        comparisons[1, column],
+                        "and Consumed",
+                        comparisons[2, column],
+                        sep = " "
+                    ) ~ "Consumed",
+                    TRUE ~ "NA"
+                    )
+                )
+
+
+            Log2FC_C1vC2 <- merge(
+                Mean_Merge[, c(1, 5)],
+                core_info[, c(1, 2, 6, 3, 7, 4:5)],
+                by = "Metabolite",
+                all.x = TRUE
+            )
+
+            # Add info on Input:
+            temp3 <- as.data.frame(t(C1)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp4 <- as.data.frame(t(C2)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
+            Log2FC_C1vC2 <- merge(
+                Log2FC_C1vC2,
+                temp_3a4,
+                by = "Metabolite",
+                all.x = TRUE
+            )
+
+            # Return DFs
+            ## Make reverse DF
+            Log2FC_C2vC1 <- Log2FC_C1vC2
+            Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` * -1
+
+            ## Name them
+            if (MultipleComparison == TRUE) {
+                logname <- paste(
+                comparisons[1, column],
+                comparisons[2, column],
+                sep = "_vs_"
+                )
+                logname_reverse <- paste(
+                comparisons[2, column],
+                comparisons[1, column],
+                sep = "_vs_"
+                )
+
+                # Store the data frame in the results list, 
+                # named after the contrast
+                log2fc_table[[logname]] <- Log2FC_C1vC2
+                log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
+            } 
+            else {
+                log2fc_table <- Log2FC_C1vC2
+            }
+        } 
+        else if (core == FALSE) {
+            # Mean values could be 0, which can not be used to calculate a 
+            # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x)) 
+            # for A and/or B being 0, with x being set to 1
+            Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
+                tibble::rownames_to_column("Metabolite")
+            Mean_Merge <- 
+                merge(
+                    Mean_C1_t,
+                    Mean_C2_t,
+                    by = "Metabolite",
+                    all = TRUE
+                ) %>%
+                dplyr::rename(
+                    "C1" = 2,
+                    "C2" = 3
+                )
+            # Column to enable the check if mean values of 0 are due to missing 
+            # values (NA/0) and not by coincidence
+            Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
+
+            Mean_Merge <- Mean_Merge %>%
+                dplyr::mutate(C1_Adapted = case_when(
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C2 == 0 & `NA/0` == TRUE ~ paste(C1),
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C1 == 0 & `NA/0` == TRUE ~ paste(C1),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data,
+                    # hence we add the constant +1
+                    C2 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data,
+                    # hence we add the constant +1
+                    C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
+                    TRUE ~ paste(C1)
+                    )
+                ) %>%
+                dplyr::mutate(C2_Adapted = case_when(
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C1 == 0 & `NA/0` == TRUE ~ paste(C2),
+                    # Here we have a "true" 0 value due to 
+                    # 0/NAs in the input data
+                    C2 == 0 & `NA/0` == TRUE ~ paste(C2),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data, 
+                    # hence we add the constant +1
+                    C1 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                    # Here we have a "false" 0 value that occured at random 
+                    # and not due to 0/NAs in the input data, 
+                    # hence we add the constant +1
+                    C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
+                    TRUE ~ paste(C2)
+                    )
+                ) %>%
+                dplyr::mutate(C1_Adapted = as.numeric(C1_Adapted)) %>%
+                    dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
+
+            if (any(
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+            ) == TRUE) {
+                X <- Mean_Merge %>%
+                subset(
+                    (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  | 
+                    (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
+                )
+                message(
+                    "We added +1 to the mean value of metabolite(s) ",
+                    paste0(X$Metabolite, collapse = ", "),
+                    paste0(
+                        ", since the mean of the replicate values where 0. ",
+                        "This was not due to missing values (NA/0)."
+                    )
+                )
+            }
+
+            # Calculate the Log2FC
+            if (transform == TRUE) { # data are not log2 transformed
+                # FoldChange
+                Mean_Merge$FC_C1vC2 <- 
+                    Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted
+                Mean_Merge$Log2FC <- 
+                    gtools::foldchange2logratio(
+                        Mean_Merge$FC_C1vC2,
+                        base = 2
+                    )
+            }
+
+            # data has been log2 transformed and hence we need to take this into
+            # account when calculating the log2FC
+            if (transform == FALSE) {
+                Mean_Merge$FC_C1vC2 <- "Empty"
+                Mean_Merge$Log2FC <- 
+                    Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
+            }
+
+            # Add info on Input:
+            temp3 <- as.data.frame(t(C1)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp4 <- as.data.frame(t(C2)) %>% 
+                tibble::rownames_to_column("Metabolite")
+            temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
+            Log2FC_C1vC2 <- merge(
+                Mean_Merge[,
+                c(1, 8)],
+                temp_3a4,
+                by = "Metabolite",
+                all.x = TRUE
+            )
+
+            # Return DFs
+            ## Make reverse DF
+            Log2FC_C2vC1 <- Log2FC_C1vC2
+            Log2FC_C2vC1$Log2FC <- Log2FC_C2vC1$Log2FC * -1
+
+            if (MultipleComparison == TRUE) {
+                logname <- paste(
+                    comparisons[1, column],
+                    comparisons[2, column],
+                    sep = "_vs_"
+                )
+                logname_reverse <- paste(
+                    comparisons[2, column],
+                    comparisons[1, column],
+                    sep = "_vs_"
+                )
+
+                # Store the data frame in the results list, named after the contrast
+                log2fc_table[[logname]] <- Log2FC_C1vC2
+                log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
+            } 
+            else {
+                log2fc_table <- Log2FC_C1vC2
+            }
+        }
+    }
+    return(invisible(log2fc_table))
 }
 
 
-
-
-
-##########################################################################################
-### ### ### dma helper function: Internal Function to perform single comparison ### ### ###
-##########################################################################################
+################################################################################
+### ### dma helper function: Internal Function to perform single comparison  ###
+################################################################################
 
 #' This helper function to calculate One-vs-One comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (here one-vs-one).
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default = "t.test"}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param data DF with unique sample identifiers as row names and metabolite
+#'        numerical values in columns with metabolite identifiers as column
+#'        names. Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the
+#'        samples, which will be combined with your input data based on the
+#'        unique sample identifiers used as rownames.
+#' @param metadata_info  Named vector including the information about the
+#'        conditions column information on numerator or denominator
+#'        c(Conditions="ColumnName_SettingsFile", Numerator =
+#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'        Denominator and Numerator will specify which comparison(s) will be
+#'        done (here one-vs-one).
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
+#'        column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
+#'        from MetaProViz:::log2fc. If NULL, the output statistics will not be
+#'        added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the
+#'        selected test to calculate p.value. For one-vs-one comparisons choose
+#'        t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default =
+#'        "t.test"}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the
+#'        selected p.adjusted test for p.value correction for multiple
+#'        Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
+#'        "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with
+#'         p-value, t-value and adjusted p-value column and column with feature
+#'         names
 #'
 #' @keywords Statistical testing, p-value, t-value
 #'
 #' @importFrom stats p.adjust
-#' @importFrom dplyr select_if filter rename mutate summarise_all
+#' @importFrom dplyr select_if
+#' @importFrom dplyr filter
+#' @importFrom dplyr rename
+#' @importFrom dplyr mutate
+#' @importFrom dplyr summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #'
