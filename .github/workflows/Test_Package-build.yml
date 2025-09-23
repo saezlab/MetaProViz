@@ -46,11 +46,7 @@ jobs:
       (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
     steps:
-      # Install OmmipathR devel branch from github
-      - name: Install OmmipathR devel branch from github
-        run: |
-          Rscript -e 'install_github("saezlab/OmnipathR@devel")'
-
+      
       # Checkout the repository code
       - uses: actions/checkout@v4
 
@@ -110,6 +106,7 @@ jobs:
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
           Rscript -e 'BiocManager::install()'
+          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel")'
           # Rscript -e 'BiocManager::install("OmnipathR")'
 
       # Set Bioconductor back to release and install other Bioconductor dependencies
