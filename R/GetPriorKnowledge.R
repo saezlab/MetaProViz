@@ -41,7 +41,7 @@ metsigdb_kegg <- function(){
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  logger::log_info("Load KEGG.")
+  log_info("Load KEGG.")
 
   #------------------------------------------------------------------
   # Remove Metabolites
@@ -55,29 +55,29 @@ metsigdb_kegg <- function(){
     unlist()
 
 
-  # remotes::install_github("saezlab/OmnipathR@devel")
-  KEGG_H <- OmnipathR::kegg_link('compound', 'pathway') %>%
-    dplyr::mutate(across(everything(), ~stringr::str_replace(., '^\\w+:', ''))) %>%
-    purrr::set_names(c('pathway', 'compound')) %>%
-    dplyr::inner_join(OmnipathR::kegg_list('pathway'), by = c(pathway = 'id')) %>%
-    dplyr::inner_join(OmnipathR::kegg_list('compound'), by = c(compound = 'id')) %>%
-    dplyr::inner_join(
-      OmnipathR::kegg_conv('compound', 'pubchem') %>%
-        dplyr::mutate(across(everything(), ~stringr::str_replace(., '^\\w+:', ''))),
+  # install_github("saezlab/OmnipathR@devel")
+  KEGG_H <- kegg_link('compound', 'pathway') %>%
+    mutate(across(everything(), ~str_replace(., '^\\w+:', ''))) %>%
+    set_names(c('pathway', 'compound')) %>%
+    inner_join(kegg_list('pathway'), by = c(pathway = 'id')) %>%
+    inner_join(kegg_list('compound'), by = c(compound = 'id')) %>%
+    inner_join(
+      kegg_conv('compound', 'pubchem') %>%
+        mutate(across(everything(), ~str_replace(., '^\\w+:', ''))),
       by = c(compound = 'id_b')
     ) %>%
-    dplyr::rename(pathway_name = name.x, compound_name = name.y, pubchem = id_a)%>%
-    dplyr::mutate(
-      compound_names = stringr::str_split(compound_name, '; '),
-      compound_name = purrr::map_chr(compound_names, ~extract(.x, 1L))
+    rename(pathway_name = name.x, compound_name = name.y, pubchem = id_a)%>%
+    mutate(
+      compound_names = str_split(compound_name, '; '),
+      compound_name = map_chr(compound_names, ~extract(.x, 1L))
     ) %>%
-    dplyr::filter(
-      purrr::map_lgl(
+    filter(
+      map_lgl(
         compound_names,
         ~intersect(.x, to_remove) %>% length() == 0
       )
     )%>%
-    dplyr::rename(term = pathway_name, Metabolite = compound_name, MetaboliteID = compound, Description = pathway) #Update vignettes and remove rename
+    rename(term = pathway_name, Metabolite = compound_name, MetaboliteID = compound, Description = pathway) #Update vignettes and remove rename
 
 
   #Return into environment
@@ -128,7 +128,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 
   ######################################################
   #Get the directory and filepath of cache results of R
-  directory <- rappdirs::user_cache_dir()#get chache directory
+  directory <- user_cache_dir()#get chache directory
   File_path <-paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep="")
 
   if(file.exists(File_path)==TRUE){# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
@@ -136,25 +136,25 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
     message("Cached file loaded from: ", File_path)
   }else{# load from OmniPath
   # Get RaMP via OmnipathR and extract ClassyFire classes
-  Structure <- OmnipathR::ramp_table( "metabolite_class" , version = version)
-  Class <- OmnipathR::ramp_table( "chem_props" , version = version)
+  Structure <- ramp_table( "metabolite_class" , version = version)
+  Class <- ramp_table( "chem_props" , version = version)
 
   HMDB_ChemicalClass <- merge(Structure, Class[,c(1:3,10)], by="ramp_id", all.x=TRUE)%>%
-    dplyr::filter(stringr::str_starts(class_source_id, "hmdb:"))%>% # Select HMDB only!
-    dplyr::filter(stringr::str_starts(chem_source_id, "hmdb:"))%>% # Select HMDB only!
-    dplyr::select(-c("chem_data_source", "chem_source_id"))%>%
-    tidyr::pivot_wider(
+    filter(str_starts(class_source_id, "hmdb:"))%>% # Select HMDB only!
+    filter(str_starts(chem_source_id, "hmdb:"))%>% # Select HMDB only!
+    select(-c("chem_data_source", "chem_source_id"))%>%
+    pivot_wider(
       names_from = class_level_name, # Use class_level_name as the new column names
       values_from = class_name,      # Use class_name as the values for the new columns
       values_fn = list(class_name = ~paste(unique(.), collapse = ", ")) # Combine duplicate values
     )%>%
-    dplyr::group_by(across(-common_name))%>%
-    dplyr::summarise(
+    group_by(across(-common_name))%>%
+    summarise(
       common_name = paste(unique(common_name), collapse = "; "), # Combine all common names into one
       .groups = "drop"  # Ungroup after summarising
     )%>%
-    dplyr::mutate(class_source_id = stringr::str_remove(class_source_id, "^hmdb:"))%>% # Remove 'hmdb:' prefix
-    dplyr::select(class_source_id, common_name, ClassyFire_class, ClassyFire_super_class, ClassyFire_sub_class) # Reorder columns
+    mutate(class_source_id = str_remove(class_source_id, "^hmdb:"))%>% # Remove 'hmdb:' prefix
+    select(class_source_id, common_name, ClassyFire_class, ClassyFire_super_class, ClassyFire_sub_class) # Reorder columns
 
   #Save the results as an RDS file in the Cache directory of R
   if(!dir.exists(directory)) {dir.create(directory)}
@@ -210,7 +210,7 @@ make_gene_metab_set <- function(input_pk,
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  logger::log_info("make_gene_metab_set.")
+  log_info("make_gene_metab_set.")
 
   ## ------------ Check Input files ----------- ##
   # 1. The input data:
@@ -254,8 +254,8 @@ make_gene_metab_set <- function(input_pk,
   meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target),]#extract entries with genes in source or Target
 
   #Get reactant and product
-  meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),]%>% dplyr::rename("metab"=1, "gene"=2)
-  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),]%>% dplyr::rename("gene"=1, "metab"=2)
+  meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),]%>% rename("metab"=1, "gene"=2)
+  meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),]%>% rename("gene"=1, "metab"=2)
 
   meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
   meta_network_metabs$gene <- gsub("Gene.*__","",meta_network_metabs$gene)
@@ -338,7 +338,7 @@ metsigdb_metalinks <- function(types = NULL,
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  logger::log_info("MetaLinksDB.")
+  log_info("MetaLinksDB.")
 
 
   #------------------------------------------------------------------
@@ -365,16 +365,16 @@ metsigdb_metalinks <- function(types = NULL,
     if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
   }
 
-  con <- OmnipathR::metalinksdb_sqlite()
-  on.exit(DBI::dbDisconnect(con))
+  con <- metalinksdb_sqlite()
+  on.exit(dbDisconnect(con))
   #------------------------------------------------------------------
   #Query the database for a specific tables
-  tables <- DBI::dbListTables(con)
+  tables <- dbListTables(con)
 
   TablesList <- list()
   for(table in tables){
     query <- paste("SELECT * FROM", table)
-    data <- DBI::dbGetQuery(con, query)
+    data <- dbGetQuery(con, query)
     TablesList[[table]] <- data
   }
 
@@ -522,12 +522,12 @@ metsigdb_metalinks <- function(types = NULL,
 
   ## Rearrange columns:
   MetalinksDB <- MetalinksDB[,c(2,10:12, 1, 13:14, 3:9)]%>%
-    dplyr::mutate(type = dplyr::case_when(
+    mutate(type = case_when(
       type == "lr" ~ "Ligand-Receptor",
       type == "pd" ~ "Production-Degradation",
       TRUE ~ type  # this keeps the original value if it doesn't match any condition
     ))%>%
-    dplyr::mutate(mode_of_regulation = dplyr::case_when(
+    mutate(mode_of_regulation = case_when(
     mor == -1 ~ "Inhibiting",
     mor == 1 ~ "Activating",
     mor == 0 ~ "Binding",

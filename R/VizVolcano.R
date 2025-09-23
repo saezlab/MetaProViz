@@ -55,7 +55,7 @@
 #'
 #' @examples
 #' Intra <- intracell_dma%>%tibble::column_to_rownames("Metabolite")
-#' Res <- MetaProViz::viz_volcano(data=Intra)
+#' Res <- viz_volcano(data=Intra)
 #'
 #' @keywords Volcano plot, pathways
 #'
@@ -116,42 +116,42 @@ viz_volcano <- function(plot_types="Standard",
   # check_param` Specific:
   if(is.numeric(cutoff_y)== FALSE |cutoff_y > 1 | cutoff_y < 0){
     message<- paste0("Check input. The selected cutoff_y value should be numeric and between 0 and 1.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
   if(is.numeric(cutoff_x)== FALSE  | cutoff_x < 0){
     message<- paste0("Check input. The selected cutoff_x value should be numeric and between 0 and +oo.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
   if(paste(x) %in% colnames(data)==FALSE | paste(y) %in% colnames(data)==FALSE){
     message<- paste0("Check your input. The column name of x and/ore y does not exist in Input_data.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   if(is.null(select_label)==FALSE & is.vector(select_label)==FALSE){
     message<- paste0("Check input. select_label must be either NULL or a vector.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   if(is.logical(connectors) == FALSE){
     message<- paste0("Check input. The connectors value should be either = TRUE if connectors from names to points are to be added to the plot or =FALSE if not.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   if(is.null(plot_name)==FALSE & is.vector(plot_name)==FALSE){
     message<- paste0("Check input.plot_name must be either NULL or a vector.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   Plot_options <- c("Standard", "Compare", "PEA")
   if (plot_types %in% Plot_options == FALSE){
     message<- paste0("plot_types option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
@@ -170,22 +170,22 @@ viz_volcano <- function(plot_types="Standard",
        if((metadata_info[["shape"]] == metadata_info[["color"]])==TRUE){
          metadata_feature$shape <- metadata_feature[,paste(metadata_info[["color"]])]
          metadata_feature<- metadata_feature%>%
-           dplyr::rename("color"=paste(metadata_info[["color"]]))
+           rename("color"=paste(metadata_info[["color"]]))
        }else{
          metadata_feature <- metadata_feature%>%
-           dplyr::rename("color"=paste(metadata_info[["color"]]),
+           rename("color"=paste(metadata_info[["color"]]),
                          "shape"=paste(metadata_info[["shape"]]))
        }
      }else if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==FALSE){
        metadata_feature <- metadata_feature%>%
-         dplyr::rename("color"=paste(metadata_info[["color"]]))
+         rename("color"=paste(metadata_info[["color"]]))
      }else if("color" %in% names(metadata_info)==FALSE & "shape" %in% names(metadata_info)==TRUE){
        metadata_feature <- metadata_feature%>%
-         dplyr::rename("shape"=paste(metadata_info[["shape"]]))
+         rename("shape"=paste(metadata_info[["shape"]]))
      }
      if("individual" %in% names(metadata_info)==TRUE){
        metadata_feature <- metadata_feature%>%
-         dplyr::rename("individual"=paste(metadata_info[["individual"]]))
+         rename("individual"=paste(metadata_info[["individual"]]))
      }
 
 
@@ -202,31 +202,31 @@ viz_volcano <- function(plot_types="Standard",
        metadata_feature %<>%  # rename those column since they otherwise
                                    # will cause issues when we merge the DFs
                                    # later
-        # this should not be handled like this, use suffixes for dplyr::join
+        # this should not be handled like this, use suffixes for join
         # instead
-        dplyr::rename_with(
+        rename_with(
           ~paste0(.x, "_metadata_feature"),
-          tidyselect::all_of(common_columns)
+          all_of(common_columns)
         )
     }
 
     if(plot_types=="PEA"){
       Volcanodata <- merge(x=metadata_feature ,y=data[, c(x, y)], by.x=metadata_info[["PEA_Feature"]] , by.y=0, all.y=TRUE)%>%
-        tibble::remove_rownames()%>%
-        dplyr::mutate(FeatureNames = metadata_info[["PEA_Feature"]])%>%
-        dplyr::filter(!is.na(x) | !is.na(x))
+        remove_rownames()%>%
+        mutate(FeatureNames = metadata_info[["PEA_Feature"]])%>%
+        filter(!is.na(x) | !is.na(x))
     }else{
      Volcanodata <- merge(x=metadata_feature ,y=data[, c(x, y)], by=0, all.y=TRUE)%>%
-       tibble::remove_rownames()%>%
-       tibble::column_to_rownames("Row.names")%>%
-       dplyr::mutate(FeatureNames = rownames(data))%>%
-       dplyr::filter(!is.na(x) | !is.na(x))
+       remove_rownames()%>%
+       column_to_rownames("Row.names")%>%
+       mutate(FeatureNames = rownames(data))%>%
+       filter(!is.na(x) | !is.na(x))
     }
 
    }else{
      Volcanodata <- data[, c(x, y)]%>%
-       dplyr::mutate(FeatureNames = rownames(data))%>%
-       dplyr::filter(!is.na(x) | !is.na(x))
+       mutate(FeatureNames = rownames(data))%>%
+       filter(!is.na(x) | !is.na(x))
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -448,7 +448,7 @@ viz_volcano_standard <- function(data,
         }
 
         #Prepare the Plot:
-        Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+        Plot<- EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$FeatureNames,#Metabolite name
                                                 selectLab = select_label,
                                                 x = paste(x),
@@ -493,11 +493,11 @@ viz_volcano_standard <- function(data,
         #Set the total heights and widths
         PlotTitle <- paste(plot_name, ": ", i, sep="")
         Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
-        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
-          {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+          {ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
@@ -561,7 +561,7 @@ viz_volcano_standard <- function(data,
       }
 
       #Prepare the Plot:
-      Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+      Plot<- EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$FeatureNames,#Metabolite name
                                               selectLab = select_label,
                                               x = paste(x),
@@ -605,11 +605,11 @@ viz_volcano_standard <- function(data,
 
       #Set the total heights and widths
       Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name =plot_name, subtitle = subtitle)
-      plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-      plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
-        {ggplot2::ggplot() + annotation_custom(.)} %>%
-        add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+        {ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
       PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
@@ -703,14 +703,14 @@ viz_volcano_compare <- function(data,
   if(is.data.frame(data2)==FALSE){
     if(paste(x) %in% colnames(data2)==FALSE | paste(y) %in% colnames(data2)==FALSE){
       message <- paste("Check your data2. The column name of ", x, " and/or ", y, " does not exist in data2.")
-      logger::log_trace(paste("Error ", message, sep=""))
+      log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
     }
 
   if(any(duplicated(row.names(data2)))==TRUE){
     message <- paste("Duplicated row.names of data2, whilst row.names must be unique")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
@@ -804,7 +804,7 @@ viz_volcano_compare <- function(data,
           }
         }
         #Prepare the Plot:
-        Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+        Plot<- EnhancedVolcano(InputVolcano,
                                                 lab = InputVolcano$FeatureNames,#Metabolite name
                                                 selectLab = select_label,
                                                 x = paste(x),
@@ -849,11 +849,11 @@ viz_volcano_compare <- function(data,
         #Set the total heights and widths
         PlotTitle <- paste(plot_name, ": ", i, sep="")
         Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
-        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
-          {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+          {ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
@@ -936,7 +936,7 @@ viz_volcano_compare <- function(data,
         }
       }
       #Prepare the Plot:
-      Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+      Plot<- EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$FeatureNames,#Metabolite name
                                               selectLab = select_label,
                                               x = paste(x),
@@ -979,11 +979,11 @@ viz_volcano_compare <- function(data,
       PlotList[["Plot"]] <- Plot
 
       Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name =plot_name, subtitle = subtitle)
-      plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-      plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
       Plot_Sized %<>%
-        {ggplot2::ggplot() + annotation_custom(.)} %>%
-        add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+        {ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
       PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
@@ -1075,7 +1075,7 @@ viz_volcano_pea <- function(data,
       "You have chosen Settings=`PEA` that requires you to ",
       "provide a vector for metadata_info."
     )
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
   if(is.null(metadata_feature)==TRUE){
@@ -1083,13 +1083,13 @@ viz_volcano_pea <- function(data,
       "You have chosen Settings=`PEA` that requires you to provide a DF ",
       "metadata_feature including the pathways used for the enrichment analysis."
     )
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
   if(is.null(metadata_feature)==FALSE & is.null(metadata_feature)==FALSE){
     if("PEA_Feature" %in% names(metadata_info)==FALSE | "PEA_score" %in% names(metadata_info)==FALSE | "PEA_stat" %in% names(metadata_info)==FALSE | "PEA_Pathway" %in% names(metadata_info)==FALSE){
       message <- paste0("You have chosen Settings=`PEA` that requires you to provide a vector for metadata_info including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
-      logger::log_trace(paste("Error ", message, sep=""))
+      log_trace(paste("Error ", message, sep=""))
       stop(message)
     }
   }
@@ -1100,16 +1100,16 @@ viz_volcano_pea <- function(data,
 
   #Prepare data:
   data <- data%>%
-    dplyr::rename("PEA_Feature"= !!metadata_info[["PEA_Feature"]])
+    rename("PEA_Feature"= !!metadata_info[["PEA_Feature"]])
 
 
   data2 <- data2%>%
-    dplyr::rename("PEA_score"= !!metadata_info[["PEA_score"]],
+    rename("PEA_score"= !!metadata_info[["PEA_score"]],
                   "PEA_stat"= !!metadata_info[["PEA_stat"]],
                   "PEA_Pathway"= !!metadata_info[["PEA_Pathway"]])
 
   metadata_feature <- metadata_feature%>%
-    dplyr::rename("PEA_Pathway"= !!metadata_info[["PEA_Pathway"]],
+    rename("PEA_Pathway"= !!metadata_info[["PEA_Pathway"]],
                   "PEA_Feature"= !!metadata_info[["PEA_Feature"]])
 
   #################
@@ -1168,7 +1168,7 @@ viz_volcano_pea <- function(data,
       }
 
       #Prepare the Plot:
-      Plot<- EnhancedVolcano::EnhancedVolcano(InputVolcano,
+      Plot<- EnhancedVolcano(InputVolcano,
                                               lab = InputVolcano$PEA_Feature,#Metabolite name
                                               selectLab = select_label,
                                               x = paste(x),
@@ -1213,12 +1213,12 @@ viz_volcano_pea <- function(data,
       #Set the total heights and widths
       PlotTitle <- paste(plot_name, ": ", i, sep="")
       Plot_Sized <-  plot_grob_volcano(input_plot=Plot, metadata_info=metadata_info, plot_name = PlotTitle, subtitle = subtitle)
-      plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-      plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+      plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+      plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 
       Plot_Sized %<>%
-        {ggplot2::ggplot() + annotation_custom(.)} %>%
-        add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+        {ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
       cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
       PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized

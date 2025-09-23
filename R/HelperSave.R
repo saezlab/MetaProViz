@@ -119,7 +119,7 @@ save_res <- function(inputlist_df= NULL,
         file_name <- paste0(path,"/core_" , file_name,"_",Sys.Date(), sep = "")
       }
       #Save Excel
-      writexl::write_xlsx(inputlist_df, paste0(file_name,".xlsx", sep = "") , col_names = TRUE)
+      write_xlsx(inputlist_df, paste0(file_name,".xlsx", sep = "") , col_names = TRUE)
     }else{
       for(DF in names(inputlist_df)){
         #Make file_name
@@ -140,10 +140,10 @@ save_res <- function(inputlist_df= NULL,
         #Save table
         if (save_table == "csv"){
           inputlist_df[[DF]]%>%
-            readr::write_csv(paste0(file_name_Save,".csv", sep = ""))
+            write_csv(paste0(file_name_Save,".csv", sep = ""))
         }else if (save_table == "txt"){
           inputlist_df[[DF]]%>%
-            readr::write_delim(paste0(file_name_Save,".csv", sep = ""))
+            write_delim(paste0(file_name_Save,".csv", sep = ""))
         }
       }
     }
@@ -170,7 +170,7 @@ save_res <- function(inputlist_df= NULL,
         plot_unit <- "cm"
       }
 
-      ggplot2::ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = inputlist_plot[[Plot]], width = plot_width,  height = plot_height, unit=plot_unit)
+      ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = inputlist_plot[[Plot]], width = plot_width,  height = plot_height, unit=plot_unit)
 
       if(print_plot==TRUE){
         suppressMessages(suppressWarnings(plot(inputlist_plot[[Plot]])))

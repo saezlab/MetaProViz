@@ -201,7 +201,7 @@ set_sizes <- function(gtbl, dim, param) {
 
     param %>%
     reduce(
-        ~rlang::exec(set_size, .x, !!!.y, dim = dim),
+        ~exec(set_size, .x, !!!.y, dim = dim),
         .init = gtbl
     )
 
@@ -499,8 +499,8 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
   ))
 
   Plot_Sized %<>%
-    {ggplot2::ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+    {ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
 
   return(Plot_Sized)
 }
@@ -560,8 +560,8 @@ plot_grob_pca <- function(input_plot, metadata_info,plot_name){
 
   log_trace(
     'Sum of heights: %.02f, sum of widths: %.02f',
-    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
-    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+    convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
   )
 
   #Return
@@ -654,7 +654,7 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
     legendHeights <- unit((sum(length(unique(legend_names_M))+length(unique(colour_names_M))+length(unique(legend_names))+length(unique(colour_names)))), "cm")
 
     Plot_Sized$width %<>% add(legendWidth)
-    if((grid::convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
+    if((convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
       Plot_Sized$height <- legendHeights
     }
 
@@ -720,8 +720,8 @@ plot_grob_volcano <- function(input_plot, metadata_info,plot_name, subtitle){
 
   log_trace(
     'Sum of heights: %.02f, sum of widths: %.02f',
-    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
-    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+    convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
   )
 
   #Return
@@ -751,7 +751,7 @@ plot_grob_superplot <- function(input_plot,
                                plot_type){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   X_Con <- metadata_sample%>%
-    dplyr::distinct(Conditions)
+    distinct(Conditions)
 
   X_tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 

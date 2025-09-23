@@ -33,7 +33,7 @@
 #' @seealso \code{\link{metaproviz_log}}
 metaproviz_logfile <- function(){
   #Creates the path for the log file
-  OmnipathR::logfile('MetaProViz')
+  logfile('MetaProViz')
 }
 
 
@@ -52,7 +52,7 @@ metaproviz_logfile <- function(){
 #' @seealso \code{\link{metaproviz_logfile}}
 metaproviz_log <- function(){
 
-  OmnipathR::read_log('MetaProViz')
+  read_log('MetaProViz')
 
 }
 
@@ -65,13 +65,13 @@ metaproviz_log <- function(){
 #' @return Returns `NULL`.
 #'
 #' @examples
-#' metaproviz_set_loglevel(logger::FATAL, target = 'console')
+#' metaproviz_set_loglevel(FATAL, target = 'console')
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @export
 metaproviz_set_loglevel <- function(level, target = 'logfile'){
   #to change log-level e.g. to see all messages being printed
-  OmnipathR::set_loglevel(level, target = target, pkg = 'MetaProViz')
+  set_loglevel(level, target = target, pkg = 'MetaProViz')
 }
 
 

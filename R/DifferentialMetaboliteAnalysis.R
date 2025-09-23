@@ -85,8 +85,8 @@
 #'         VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
-#' Intra <- intracell_raw[-c(49:58), ] %>% tibble::column_to_rownames("Code")
-#' ResI <- MetaProViz::dma(
+#' Intra <- intracell_raw[-c(49:58), ] %>% column_to_rownames("Code")
+#' ResI <- dma(
 #'     data = Intra[, -c(1:3)],
 #'     metadata_sample = Intra[, c(1:3)],
 #'     metadata_info = c(
@@ -130,7 +130,7 @@ dma <- function(
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
-    logger::log_info("dma: Differential metabolite analysis.")
+    log_info("dma: Differential metabolite analysis.")
 
     ## ------------ Check Input files ----------- ##
     # HelperFunction `check_param`
@@ -398,7 +398,7 @@ dma <- function(
                 # remove the names we used as part of the function and
                 # add back the input names.
                 merged_df <- merged_df[, -1] %>%
-                    dplyr::rename("Metabolite" = 1)
+                    rename("Metabolite" = 1)
                 return(merged_df)
             }
         )
@@ -412,7 +412,7 @@ dma <- function(
                     merged_df <-
                         merge(
                             df,
-                            metadata_feature %>% tibble::rownames_to_column("Metabolite"),
+                            metadata_feature %>% rownames_to_column("Metabolite"),
                             by = "Metabolite",
                             all.x = TRUE
                         )
@@ -425,7 +425,7 @@ dma <- function(
     ###############  For core=TRUE create summary of Feature_metadata  #########
     if (core == TRUE) {
         df_list_selected <-
-            purrr::map(
+            map(
                 names(DMA_Output), function(df_name) {
                     df <- DMA_Output[[df_name]] # Extract the dataframe
 
@@ -451,9 +451,9 @@ dma <- function(
 
         # Merge all dataframes by "Metabolite"
         merged_df <-
-            purrr::reduce(
+            reduce(
                 df_list_selected,
-                dplyr::full_join,
+                full_join,
                 by = "Metabolite"
             )
         # It is likely we have duplications that cause .x, .y, .x.x, .y.y, etc. to
@@ -467,7 +467,7 @@ dma <- function(
         if (is.null(metadata_feature) == FALSE) { # Add to Metadata file:
             Feature_Metadata <-
                 merge(
-                    metadata_feature %>% tibble::rownames_to_column("Metabolite"),
+                    metadata_feature %>% rownames_to_column("Metabolite"),
                     Feature_Metadata,
                     by = "Metabolite",
                     all.x = TRUE
@@ -495,14 +495,14 @@ dma <- function(
         if (core == TRUE) {
             VolPlot_SettingsFile <-
                 DMA_Output[[DF]] %>%
-                    tibble::column_to_rownames("Metabolite")
+                    column_to_rownames("Metabolite")
         }
 
         dev.new()
         VolcanoPlot <- invisible(
             viz_volcano(
                 plot_types = "Standard",
-                data = Volplotdata %>% tibble::column_to_rownames("Metabolite"),
+                data = Volplotdata %>% column_to_rownames("Metabolite"),
                 metadata_info = VolPlot_metadata_info,
                 metadata_feature = VolPlot_SettingsFile,
                 y = "p.adj",
@@ -730,12 +730,12 @@ log2fc <- function(
         filter(
             metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator
             ) %>%
-            dplyr::select_if(is.numeric)
+            select_if(is.numeric)
     Denom <- data %>%
-        dplyr::filter(
+        filter(
             metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
         ) %>%
-        dplyr::select_if(is.numeric)
+        select_if(is.numeric)
 
     Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
     Denom_Miss <- Denom[, colSums(Denom == 0) > 0, drop = FALSE]
@@ -760,17 +760,17 @@ log2fc <- function(
     for (column in 1:dim(comparisons)[2]) {
         # Numerator
         C1 <- data %>%
-            dplyr::filter(
+            filter(
                 metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
             ) %>%
             # only keep numeric columns with metabolite values
-            dplyr::select_if(is.numeric)
+            select_if(is.numeric)
         # Deniminator
         C2 <- data %>%
-            dplyr::filter(
+            filter(
                 metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[2, column]
             ) %>%
-            dplyr::select_if(is.numeric)
+            select_if(is.numeric)
 
         ## ------------  Calculate Log2FC ----------- ##
         # For C1_Mean and C2_Mean use 0 to obtain values, leading to Log2FC=NA if
@@ -779,12 +779,12 @@ log2fc <- function(
         C1_Zero <- C1
         C1_Zero[is.na(C1_Zero)] <- 0
         Mean_C1 <- C1_Zero %>%
-        dplyr::summarise_all("mean")
+        summarise_all("mean")
 
         C2_Zero <- C2
         C2_Zero[is.na(C2_Zero)] <- 0
         Mean_C2 <- C2_Zero %>%
-        dplyr::summarise_all("mean")
+        summarise_all("mean")
 
     # Calculate absolute distance between the means. log2 transform
         # and add sign (-/+):
@@ -792,16 +792,16 @@ log2fc <- function(
             # core values can be negative and positive, which can does not allow us to
             # calculate a Log2FC.
             Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             Mean_Merge <- merge(
                 Mean_C1_t,
                 Mean_C2_t,
                 by = "Metabolite",
                 all = TRUE
             ) %>%
-                dplyr::rename(
+                rename(
                 "C1" = 2,
                 "C2" = 3
                 )
@@ -816,7 +816,7 @@ log2fc <- function(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0)
             ) == TRUE) {
                 Mean_Merge <- Mean_Merge %>%
-                    dplyr::mutate(C1 = case_when(
+                    mutate(C1 = case_when(
                         # Here we have a "true" 0 value due to 0/NAs
                         # in the input data
                         C2 == 0 & `NA/0` == TRUE ~ paste(C1),
@@ -833,7 +833,7 @@ log2fc <- function(
                         C1 == 0 & `NA/0` == FALSE ~ paste(C1 + 1),
                         TRUE ~ paste(C1)
                     )) %>%
-                    dplyr::mutate(C2 = case_when(
+                    mutate(C2 = case_when(
                         # Here we have a "true" 0 value due to 0/NAs in the
                         # input data
                         C1 == 0 & `NA/0` == TRUE ~ paste(C2),
@@ -850,8 +850,8 @@ log2fc <- function(
                         C2 == 0 & `NA/0` == FALSE ~ paste(C2 + 1),
                         TRUE ~ paste(C2)
                     )) %>%
-                    dplyr::mutate(C1 = as.numeric(C1)) %>%
-                    dplyr::mutate(C2 = as.numeric(C2))
+                    mutate(C1 = as.numeric(C1)) %>%
+                    mutate(C2 = as.numeric(C2))
 
                 X <- Mean_Merge %>%
                     subset(
@@ -874,7 +874,7 @@ log2fc <- function(
 
             # Now we can adapt the values to take into account the distance
             Mean_Merge <- Mean_Merge %>%
-                dplyr::mutate(`Log2(Distance)` = case_when(
+                mutate(`Log2(Distance)` = case_when(
                     # If C1>C2 the distance stays positive to reflect
                     # that C1 > C2
                     C1 > C2 ~ paste(`Log2(Distance)` * +1),
@@ -884,7 +884,7 @@ log2fc <- function(
                     TRUE ~ "NA"
                     )
                 ) %>%
-                dplyr::mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+                mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
             # Add additional information:
             temp1 <- Mean_C1
@@ -940,14 +940,14 @@ log2fc <- function(
             names(core_info)[4] <- "core_specific"
 
             core_info <- core_info %>%
-                dplyr::mutate(
+                mutate(
                     core = case_when(
                         core_specific == "Released" ~ "Released",
                         core_specific == "Consumed" ~ "Consumed",
                         TRUE ~ "Released/Consumed"
                     )
                 ) %>%
-                dplyr::mutate(!!paste(
+                mutate(!!paste(
                     "core_", comparisons[1, column], sep = ""
                     ) := case_when(
                         core_specific == "Released" ~ "Released",
@@ -969,7 +969,7 @@ log2fc <- function(
                         TRUE ~ "NA"
                 )
                 ) %>%
-                dplyr::mutate(!!paste(
+                mutate(!!paste(
                     "core_",
                     comparisons[2, column],
                     sep = ""
@@ -1004,9 +1004,9 @@ log2fc <- function(
 
             # Add info on Input:
             temp3 <- as.data.frame(t(C1)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             temp4 <- as.data.frame(t(C2)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
             Log2FC_C1vC2 <- merge(
                 Log2FC_C1vC2,
@@ -1047,9 +1047,9 @@ log2fc <- function(
             # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x))
             # for A and/or B being 0, with x being set to 1
             Mean_C1_t <- as.data.frame(t(Mean_C1)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             Mean_C2_t <- as.data.frame(t(Mean_C2)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             Mean_Merge <-
                 merge(
                     Mean_C1_t,
@@ -1057,7 +1057,7 @@ log2fc <- function(
                     by = "Metabolite",
                     all = TRUE
                 ) %>%
-                dplyr::rename(
+                rename(
                     "C1" = 2,
                     "C2" = 3
                 )
@@ -1066,7 +1066,7 @@ log2fc <- function(
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
             Mean_Merge <- Mean_Merge %>%
-                dplyr::mutate(C1_Adapted = case_when(
+                mutate(C1_Adapted = case_when(
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C2 == 0 & `NA/0` == TRUE ~ paste(C1),
@@ -1084,7 +1084,7 @@ log2fc <- function(
                     TRUE ~ paste(C1)
                     )
                 ) %>%
-                dplyr::mutate(C2_Adapted = case_when(
+                mutate(C2_Adapted = case_when(
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C1 == 0 & `NA/0` == TRUE ~ paste(C2),
@@ -1102,8 +1102,8 @@ log2fc <- function(
                     TRUE ~ paste(C2)
                     )
                 ) %>%
-                dplyr::mutate(C1_Adapted = as.numeric(C1_Adapted)) %>%
-                    dplyr::mutate(C2_Adapted = as.numeric(C2_Adapted))
+                mutate(C1_Adapted = as.numeric(C1_Adapted)) %>%
+                    mutate(C2_Adapted = as.numeric(C2_Adapted))
 
             if (any(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0)  |
@@ -1130,7 +1130,7 @@ log2fc <- function(
                 Mean_Merge$FC_C1vC2 <-
                     Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted
                 Mean_Merge$Log2FC <-
-                    gtools::foldchange2logratio(
+                    foldchange2logratio(
                         Mean_Merge$FC_C1vC2,
                         base = 2
                     )
@@ -1146,9 +1146,9 @@ log2fc <- function(
 
             # Add info on Input:
             temp3 <- as.data.frame(t(C1)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             temp4 <- as.data.frame(t(C2)) %>%
-                tibble::rownames_to_column("Metabolite")
+                rownames_to_column("Metabolite")
             temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
             Log2FC_C1vC2 <- merge(
                 Mean_Merge[,
@@ -1241,11 +1241,11 @@ dma_stat_single <- function(data,
 
   ## ------------ Check Missingness ------------- ##
   Num <- data %>%
-    dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Numerator"]]) %>%
-    dplyr::select_if(is.numeric)
+    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Numerator"]]) %>%
+    select_if(is.numeric)
   Denom <- data %>%
-    dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]) %>%
-    dplyr::select_if(is.numeric)
+    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]) %>%
+    select_if(is.numeric)
 
   Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
   Denom_Miss <- Denom[, colSums(Denom == 0) > 0, drop = FALSE]
@@ -1257,11 +1257,11 @@ dma_stat_single <- function(data,
   ## ------------ Perform Hypothesis testing ----------- ##
   for(column in 1:dim(comparisons)[2]){
     C1 <- data %>% # Numerator
-      dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1,column]) %>%
-      dplyr::select_if(is.numeric)#only keep numeric columns with metabolite values
+      filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1,column]) %>%
+      select_if(is.numeric)#only keep numeric columns with metabolite values
     C2 <- data %>% # Denominator
-      dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in%  comparisons[2,column]) %>%
-      dplyr::select_if(is.numeric)
+      filter(metadata_sample[[metadata_info[["Conditions"]]]] %in%  comparisons[2,column]) %>%
+      select_if(is.numeric)
   }
 
   # For C1 and C2 we use 0, since otherwise we can not perform the statistical testing.
@@ -1285,7 +1285,7 @@ dma_stat_single <- function(data,
   #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
   PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
   PVal_C1vC2 <-PVal_C1vC2%>%
-    dplyr::mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
+    mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
                              TRUE ~ paste(VecPVAL_C1vC2)))
   PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
 
@@ -1295,7 +1295,7 @@ dma_stat_single <- function(data,
   PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
   #perform adjustment
-  VecPADJ_C1vC2 <- stats::p.adjust((PVal_C1vC2[,2]),method = padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
+  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   Metabolite <- PVal_C1vC2[,1]
   PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
@@ -1376,10 +1376,10 @@ aov <- function(data,
 
   #############################################################################################
   ## 1. Anova p.val
-  aov.res= apply(data,2,function(x) stats::aov(x~conditions))
+  aov.res= apply(data,2,function(x) aov(x~conditions))
 
   ## 2. Tukey test p.adj
-  posthoc.res = lapply(aov.res, stats::TukeyHSD, conf.level=0.95)
+  posthoc.res = lapply(aov.res, TukeyHSD, conf.level=0.95)
   Tukey_res <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'p adj'])) %>% as.data.frame()
 
   comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
@@ -1402,9 +1402,9 @@ aov <- function(data,
 
   #Make output DFs:
   Pval_table <- Tukey_res
-  Pval_table <- tibble::rownames_to_column(Pval_table,"Metabolite")
+  Pval_table <- rownames_to_column(Pval_table,"Metabolite")
 
-  Tval_table <- tibble::rownames_to_column(Tukey_res_diff,"Metabolite")
+  Tval_table <- rownames_to_column(Tukey_res_diff,"Metabolite")
 
   common_col_names <- setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
 
@@ -1412,7 +1412,7 @@ aov <- function(data,
   for(col_name in common_col_names){
     # Create a new data frame by merging the two data frames
     merged_df <- merge(Pval_table[,c("Metabolite",col_name)], Tval_table[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
-      dplyr::rename("p.adj"=2,
+      rename("p.adj"=2,
                     "t.val"=3)
 
     #We need to add _vs_ into the comparison col_name
@@ -1516,15 +1516,15 @@ kruskal <- function(data,
 
   #############################################################################################
   # kruskal test (p.val)
-  aov.res= apply(data,2,function(x) stats::kruskal.test(x~conditions))
+  aov.res= apply(data,2,function(x) kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
-  anova_res <- as.matrix(dplyr::mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
+  anova_res <- as.matrix(mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
   colnames(anova_res) = c("Kruskal_p.val")
 
   # Dunn test (p.adj)
   Dunndata <- data %>%
-    dplyr::mutate(conditions = conditions) %>%
-    dplyr::select(conditions, everything())%>%
+    mutate(conditions = conditions) %>%
+    select(conditions, everything())%>%
     as.data.frame()
 
   # Applying a loop to obtain p.adj and t.val:
@@ -1536,7 +1536,7 @@ kruskal <- function(data,
 
     ## If a metabolite starts with number remove it
     formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
-    posthoc.res= rstatix::dunn_test(data, formula, p.adjust.method = padj)
+    posthoc.res= dunn_test(data, formula, p.adjust.method = padj)
 
     pres <- data.frame(comparisons = c(paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ), paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" )))
     pres[[colnames(Dunndata)[col] ]] <-  c(posthoc.res$p.adj, posthoc.res$p.adj )
@@ -1550,15 +1550,15 @@ kruskal <- function(data,
   }
 
   #Make output DFs:
-  Dunn_Pres <- tibble::column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
-  Pval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x)))) %>%
+  Dunn_Pres <- column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
+  Pval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x)))) %>%
     as.data.frame()%>%
-    tibble::rownames_to_column("Metabolite")
+    rownames_to_column("Metabolite")
 
-  Dunn_Tres <- tibble::column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
-  Tval_table <- as.matrix(dplyr::mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))%>%
+  Dunn_Tres <- column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
+  Tval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))%>%
     as.data.frame()%>%
-    tibble::rownames_to_column("Metabolite")
+    rownames_to_column("Metabolite")
 
   common_col_names <- setdiff(names(Dunn_Pres), "row.names")
 
@@ -1566,7 +1566,7 @@ kruskal <- function(data,
   for(col_name in common_col_names){
     # Create a new data frame by merging the two data frames
     merged_df <- merge(Pval_table[,c("Metabolite",col_name)], Tval_table[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
-      dplyr::rename("p.adj"=2,
+      rename("p.adj"=2,
                     "t.val"=3)
     # Add the new data frame to the list with the column name as the list element name
     results_list[[col_name]] <- merged_df
@@ -1649,13 +1649,13 @@ welch <- function(data,
   ## 1. welch's ANOVA using oneway.test is not used by the Games post.hoc function
   #aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
   games_data <- merge(metadata_sample, data, by=0)%>%
-    dplyr::rename("conditions"=metadata_info[["Conditions"]])
+    rename("conditions"=metadata_info[["Conditions"]])
   games_data$conditions <- conditions
   posthoc.res.list <- list()
 
   ## 2. Games post hoc test
   for (col in names(data)){ # col = names(Input_data)[1]
-    posthoc.res <- rstatix::games_howell_test(data = games_data,detailed =TRUE, formula = as.formula(paste0(`col`, " ~ ", "conditions"))) %>% as.data.frame()
+    posthoc.res <- games_howell_test(data = games_data,detailed =TRUE, formula = as.formula(paste0(`col`, " ~ ", "conditions"))) %>% as.data.frame()
 
     result.df <- rbind(data.frame(p.adj = posthoc.res[,"p.adj"],
                                   t.val = posthoc.res[,"statistic"],
@@ -1668,20 +1668,20 @@ welch <- function(data,
   Games_Pres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'p.adj'])) %>% as.data.frame()
   colnames(Games_Pres) <- rownames(posthoc.res.list[[1]])
   comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
-  Games_Pres <- Games_Pres[,colnames(Games_Pres) %in% comps] %>% tibble::rownames_to_column("Metabolite")
+  Games_Pres <- Games_Pres[,colnames(Games_Pres) %in% comps] %>% rownames_to_column("Metabolite")
   # In case of p.adj =0 we change it to 10^-6
   Games_Pres[Games_Pres ==0] <- 0.000001
 
   ## 3. t.val
   Games_Tres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'t.val'])) %>% as.data.frame()
   colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
-  Games_Tres <- Games_Tres[,colnames(Games_Tres) %in% comps] %>% tibble::rownames_to_column("Metabolite")
+  Games_Tres <- Games_Tres[,colnames(Games_Tres) %in% comps] %>% rownames_to_column("Metabolite")
 
   results_list <- list()
   for(col_name in colnames(Games_Pres)){
     # Create a new data frame by merging the two data frames
     merged_df <- merge(Games_Pres[,c("Metabolite",col_name)], Games_Tres[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
-      dplyr::rename("p.adj"=2,
+      rename("p.adj"=2,
                     "t.val"=3)
 
     #We need to add _vs_ into the comparison col_name
@@ -1765,17 +1765,17 @@ dma_stat_limma <- function(data,
 
   ####------ Ensure that Input_data is ordered by conditions and sample names are the same as in Input_metadata_sample:
   targets <- metadata_sample%>%
-    tibble::rownames_to_column("sample")
+    rownames_to_column("sample")
   targets<- targets[,c("sample", metadata_info[["Conditions"]])]%>%
-    dplyr::rename("condition"=2)%>%
-    dplyr::arrange(sample)#Order the column "sample" alphabetically
+    rename("condition"=2)%>%
+    arrange(sample)#Order the column "sample" alphabetically
   targets$condition_limma_compatible <-make.names(targets$condition)#make appropriate condition names accepted by limma
 
   if(MultipleComparison==FALSE){
     #subset the data:
     targets<-targets%>%
       subset(condition==metadata_info[["Numerator"]] | condition==metadata_info[["Denominator"]])%>%
-      dplyr::arrange(sample)#Order the column "sample" alphabetically
+      arrange(sample)#Order the column "sample" alphabetically
 
     Limma_input <- data%>%tibble::rownames_to_column("sample")
     Limma_input <-merge(targets[,1:2],  Limma_input, by="sample", all.x=TRUE)
@@ -1783,7 +1783,7 @@ dma_stat_limma <- function(data,
       arrange(sample)#Order the column "sample" alphabetically
   }else if(MultipleComparison==TRUE){
     Limma_input <- data%>%tibble::rownames_to_column("sample")%>%
-      dplyr::arrange(sample)#Order the column "sample" alphabetically
+      arrange(sample)#Order the column "sample" alphabetically
   }
 
   #Check if the order of the "sample" column is the same in both data frames
@@ -1792,7 +1792,7 @@ dma_stat_limma <- function(data,
   }
 
   targets_limma <-targets[,-2]%>%
-    dplyr::rename("condition"="condition_limma_compatible")
+    rename("condition"="condition_limma_compatible")
 
   #We need to transpose the df to run limma. Also, if the data is not log2 transformed, we will not calculate the Log2FC as limma just substracts one condition from the other
   Limma_input <- as.data.frame(t(Limma_input%>%tibble::column_to_rownames("sample")))
@@ -1809,7 +1809,7 @@ dma_stat_limma <- function(data,
   colnames(design) <- levels(fcond) # Give meaningful column names to the design matrix
 
   #### Fit the linear model
-  fit <- limma::lmFit(Limma_input, design)
+  fit <- lmFit(Limma_input, design)
 
   ####  Make contrast matrix:
   if(all_vs_all ==TRUE & MultipleComparison==TRUE){
@@ -1885,15 +1885,15 @@ dma_stat_limma <- function(data,
     cont.matrix<- t(cont.matrix)
   }else if(all_vs_all ==FALSE & MultipleComparison==FALSE){
     Name_Comp <- paste(make.names(metadata_info[["Numerator"]]), "-", make.names(metadata_info[["Denominator"]]), sep="")
-    cont.matrix <- as.data.frame(limma::makeContrasts(contrasts=Name_Comp, levels=colnames(design)))%>%
-      dplyr::rename(!!paste(make.names(metadata_info[["Numerator"]]), "_vs_", make.names(metadata_info[["Denominator"]]), sep="") := 1)
+    cont.matrix <- as.data.frame(makeContrasts(contrasts=Name_Comp, levels=colnames(design)))%>%
+      rename(!!paste(make.names(metadata_info[["Numerator"]]), "_vs_", make.names(metadata_info[["Denominator"]]), sep="") := 1)
     cont.matrix <-as.matrix(cont.matrix)
   }
 
   # Fit the linear model with contrasts
-  #fit2 <- limma::contrasts.fit(fit, cont.matrix)
-  fit2 <- limma::contrasts.fit(fit, cont.matrix)
-  fit2 <- limma::eBayes(fit2)# Perform empirical Bayes moderation
+  #fit2 <- contrasts.fit(fit, cont.matrix)
+  fit2 <- contrasts.fit(fit, cont.matrix)
+  fit2 <- eBayes(fit2)# Perform empirical Bayes moderation
 
   #### ------Extract results:
   contrast_names <- colnames(fit2$coefficients)  # Get all contrast names
@@ -1901,14 +1901,14 @@ dma_stat_limma <- function(data,
   results_list <- list()# Create an empty list to store results data frames
   for (contrast_name in contrast_names) {
     # Extract results for the current contrast
-    res.t <- limma::topTable(fit2, coef=contrast_name, n=Inf, sort.by="n", adjust.method = padj)%>% # coef= the comparison the test is done for!
-      dplyr::rename("Log2FC"=1,
+    res.t <- topTable(fit2, coef=contrast_name, n=Inf, sort.by="n", adjust.method = padj)%>% # coef= the comparison the test is done for!
+      rename("Log2FC"=1,
                     "t.val"=3,
                     "p.val"=4,
                     "p.adj"=5)
 
     res.t <- res.t%>%
-      tibble::rownames_to_column("Metabolite")
+      rownames_to_column("Metabolite")
 
     # Store the data frame in the results list, named after the contrast
     results_list[[contrast_name]] <- res.t
@@ -1916,16 +1916,16 @@ dma_stat_limma <- function(data,
 
   #Make the name_match_df
   name_match_df <- as.data.frame(names(results_list))%>%
-    tidyr::separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
+    separate("names(results_list)", into=c("a", "b"), sep="_vs_", remove=FALSE)
 
   name_match_df <-merge(name_match_df, targets[,-c(1)] , by.x="a", by.y="condition_limma_compatible", all.x=TRUE)%>%
-    dplyr::rename("Condition1"=4)
+    rename("Condition1"=4)
   name_match_df <- merge(name_match_df, targets[,-c(1)] , by.x="b", by.y="condition_limma_compatible", all.x=TRUE)%>%
-    dplyr::rename("Condition2"=5)%>%
-    tidyr::unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
+    rename("Condition2"=5)%>%
+    unite("New", "Condition1", "Condition2", sep="_vs_", remove=FALSE)
 
   name_match_df<- name_match_df[,c(3,4)]%>%
-    dplyr::distinct(New, .keep_all = TRUE)
+    distinct(New, .keep_all = TRUE)
 
   results_list_new <- list()
   #Match the lists using name_match_df
@@ -1956,7 +1956,7 @@ dma_stat_limma <- function(data,
 
   #Add input data
   Cond <- metadata_sample%>%
-    tibble::rownames_to_column("Code")
+    rownames_to_column("Code")
 
   InputReturn <- merge(Cond[,c("Code",metadata_info[["Conditions"]])], as.data.frame(t(Limma_input)),by.x="Code", by.y=0, all.y=TRUE)
 
@@ -1965,8 +1965,8 @@ dma_stat_limma <- function(data,
     C1 <- parts[1]
     C2 <- parts[2]
     InputReturn_Filt <- InputReturn%>%
-      dplyr::filter(get(metadata_info[["Conditions"]])==C1 | get(metadata_info[["Conditions"]])==C2)%>%
-      tibble::column_to_rownames("Code")
+      filter(get(metadata_info[["Conditions"]])==C1 | get(metadata_info[["Conditions"]])==C2)%>%
+      column_to_rownames("Code")
     InputReturn_Filt <-as.data.frame(t(InputReturn_Filt[,-c(1)]))
 
     if(transform==TRUE){#Add prefix & suffix to each column since the data have been log2 transformed!
@@ -2021,7 +2021,7 @@ shapiro <- function(data,
     message("In metadata_info=c(Conditions= ColumnName): ColumnName contains special charaters, hence this is renamed.")
     ColumnNameCondition_clean <- gsub("[[:space:]()-./\\\\]", "_", metadata_info[["Conditions"]])
     metadata_sample <- metadata_sample%>%
-      dplyr::rename(!!paste(ColumnNameCondition_clean):= metadata_info[["Conditions"]])
+      rename(!!paste(ColumnNameCondition_clean):= metadata_info[["Conditions"]])
 
     metadata_info[["Conditions"]] <- ColumnNameCondition_clean
   }
@@ -2064,8 +2064,8 @@ shapiro <- function(data,
   ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
   #Prepare the input:
   Input_shaptest <- replace(data, is.na(data), 0)%>% #shapiro test can not handle NAs!
-    dplyr::filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator)%>%
-    dplyr::select_if(is.numeric)
+    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator)%>%
+    select_if(is.numeric)
   temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0#  we have to remove features with zero variance if there are any.
   temp <- temp[complete.cases(temp)]  # Remove NAs from temp
   columns_with_zero_variance <- names(temp[temp])# Extract column names where temp is TRUE
@@ -2092,7 +2092,7 @@ shapiro <- function(data,
   for (i in UniqueConditions) {
     # Subset the data for the current condition
     subset_data <- Input_shaptest_Cond%>%
-      tibble::column_to_rownames("Row.names")%>%
+      column_to_rownames("Row.names")%>%
       subset(get(metadata_info[["Conditions"]]) == i, select = -c(1))
 
     #Check the sample size (shapiro.test(x) : sample size must be between 3 and 5000):
@@ -2102,7 +2102,7 @@ shapiro <- function(data,
       warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
     }else{
       # Apply shapiro-Wilk test to each feature in the subset
-     shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) stats::shapiro.test(x)))
+     shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
     }
   }
 
@@ -2146,29 +2146,29 @@ shapiro <- function(data,
 
       #### Make Group wise data distribution plot and QQ plots
       subset_data <- Input_shaptest_Cond%>%
-        tibble::column_to_rownames("Row.names")%>%
+        column_to_rownames("Row.names")%>%
         subset(get(metadata_info[["Conditions"]]) ==  colnames(transpose), select = -c(1))
       all_data <- unlist(subset_data)
 
-      plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
-        ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(density)), binwidth=.5, colour="black", fill="white")  +
-        ggplot2::geom_density(alpha = 0.2, fill = "grey45")
+      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
+        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white")  +
+        geom_density(alpha = 0.2, fill = "grey45")
 
-      density_values <- ggplot2::ggplot_build(plot)$data[[2]]
+      density_values <- ggplot_build(plot)$data[[2]]
 
-      plot <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
-        ggplot2::geom_histogram( ggplot2::aes(y=ggplot2::after_stat(density)), binwidth=.5, colour="black", fill="white") +
-        ggplot2::geom_density(alpha=.2, fill="grey45") +
-        ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
+      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
+        geom_histogram( aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
+        geom_density(alpha=.2, fill="grey45") +
+        scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
 
-      density_values2 <- ggplot2::ggplot_build(plot)$data[[2]]
+      density_values2 <- ggplot_build(plot)$data[[2]]
 
-      suppressWarnings(sampleDist <- ggplot2::ggplot(data.frame(x = all_data), aes(x = x)) +
-                         ggplot2::geom_histogram(aes(y=ggplot2::after_stat(density)), binwidth=.5, colour="black", fill="white") +
-                         ggplot2::geom_density(alpha=.2, fill="grey45") +
-                         ggplot2::scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
-                         ggplot2::theme_minimal()+
-                         ggplot2::labs(title=paste("data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on shapiro test"),x="Abundance", y = "Density")
+      suppressWarnings(sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
+                         geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
+                         geom_density(alpha=.2, fill="grey45") +
+                         scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
+                         theme_minimal()+
+                         labs(title=paste("data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on shapiro test"),x="Abundance", y = "Density")
       )
 
       Density_plots[[paste(colnames(transpose))]] <- sampleDist
@@ -2181,10 +2181,10 @@ shapiro <- function(data,
         #QQ plots for each groups for each metabolite for normality visual check
         qq_plot_list <- list()
         for (col_name in colnames(subset_data)){
-          qq_plot <- ggplot2::ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
-            ggplot2::geom_qq() +
-            ggplot2::geom_qq_line(color = "red") +
-            ggplot2::labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+          qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
+            geom_qq() +
+            geom_qq_line(color = "red") +
+            labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
 
           plot.new()
           plot(qq_plot)
@@ -2254,7 +2254,7 @@ bartlett <- function(data,
   conditions = metadata_sample[[metadata_info[["Conditions"]]]]
 
   # Use Bartletts test
-  bartlett_res =  apply(data,2,function(x) stats::bartlett.test(x~conditions))
+  bartlett_res =  apply(data,2,function(x) bartlett.test(x~conditions))
 
   #Make the output DF
   DF_bartlett_results <- as.data.frame(matrix(NA, nrow = ncol(data)), ncol = 1)
@@ -2264,22 +2264,22 @@ bartlett <- function(data,
   for(l in 1:length(bartlett_res)){
     DF_bartlett_results[l, 1] <-bartlett_res[[l]]$p.value
   }
-  DF_bartlett_results <- DF_bartlett_results %>% dplyr::mutate(`Var homogeneity`= case_when(`bartlett p.val`< 0.05~ FALSE,
+  DF_bartlett_results <- DF_bartlett_results %>% mutate(`Var homogeneity`= case_when(`bartlett p.val`< 0.05~ FALSE,
                                                                                      `bartlett p.val`>=0.05 ~ TRUE))
   # if p<0.05 then unequal variances
   message("For ",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
 
-  DF_bartlett_results <- DF_bartlett_results %>% tibble::rownames_to_column("Metabolite") %>% relocate("Metabolite")
+  DF_bartlett_results <- DF_bartlett_results %>% rownames_to_column("Metabolite") %>% relocate("Metabolite")
   DF_Bartlett_results_out <- DF_bartlett_results
 
   #### Plots:
   #Make density plots
-  Bartlettplot <- ggplot2::ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`bartlett p.val`)) +
-    ggplot2::geom_histogram(aes(y=..density..), colour="black", fill="white")  +
-    ggplot2::geom_density(alpha = 0.2, fill = "grey45")+
-    ggplot2::ggtitle("bartlett's test p.value distribution") +
-    ggplot2::xlab("p.value")+
-    ggplot2::geom_vline(aes(xintercept = 0.05, color="darkred"))
+  Bartlettplot <- ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`bartlett p.val`)) +
+    geom_histogram(aes(y=..density..), colour="black", fill="white")  +
+    geom_density(alpha = 0.2, fill = "grey45")+
+    ggtitle("bartlett's test p.value distribution") +
+    xlab("p.value")+
+    geom_vline(aes(xintercept = 0.05, color="darkred"))
 
   Bartlett_output_list<- list("DF"=list("Bartlett_result"=DF_Bartlett_results_out) , "Plot"=list("Histogram"=Bartlettplot))
 
@@ -2322,22 +2322,22 @@ vst <- function(data){
   # model the mean and variance relationship on the data
   het.data <-
     data %>%
-    tidyr::pivot_longer(-1L, names_to = 'variable') %>%
-    dplyr::group_by(variable) %>% # make a dataframe to save the values
-    dplyr::summarise(mean=mean(value), sd=sd(value))
+    pivot_longer(-1L, names_to = 'variable') %>%
+    group_by(variable) %>% # make a dataframe to save the values
+    summarise(mean=mean(value), sd=sd(value))
   het.data$lm <- 1 # add a common group for the lm function to account for the whole data together
 
   invisible(het_plot <-
-              ggplot2::ggplot(het.data, ggplot2::aes(x = mean, y = sd)) +
-              ggplot2::geom_point() +
-              ggplot2::theme_bw() +
-              ggplot2::scale_x_continuous(trans='log2') +
-              ggplot2::scale_y_continuous(trans='log2') +
-              ggplot2::xlab("log(mean)") +
-              ggplot2::ylab("log(sd)") +
-              ggplot2::geom_abline(intercept = 0, slope = 1)  +
-              ggplot2::ggtitle(" data heteroscedasticity")  +
-              ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
+              ggplot(het.data, aes(x = mean, y = sd)) +
+              geom_point() +
+              theme_bw() +
+              scale_x_continuous(trans='log2') +
+              scale_y_continuous(trans='log2') +
+              xlab("log(mean)") +
+              ylab("log(sd)") +
+              geom_abline(intercept = 0, slope = 1)  +
+              ggtitle(" data heteroscedasticity")  +
+              geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
 
   # select data
   prevst.data <- het.data
@@ -2345,7 +2345,7 @@ vst <- function(data){
   prevst.data$sd <- log(prevst.data$sd)
 
   # calculate the slope of the log data
-  data.fit <- stats::lm(sd~mean, prevst.data)
+  data.fit <- lm(sd~mean, prevst.data)
   coef(data.fit)
 
   # Make the vst transformation
@@ -2354,25 +2354,25 @@ vst <- function(data){
   # Heteroscedasticity visual check again
   het.vst.data <-
     data.vst %>%
-    tidyr::pivot_longer(-1L, names_to = 'variable') %>%
-    dplyr::group_by(variable) %>% # make a dataframe to save the values
-    dplyr::summarise(mean=mean(value), sd=sd(value))
+    pivot_longer(-1L, names_to = 'variable') %>%
+    group_by(variable) %>% # make a dataframe to save the values
+    summarise(mean=mean(value), sd=sd(value))
   het.vst.data$lm <- 1 # add a common group for the lm function to account for the whole data together
 
   # plot variable stadard deviation as a function of the mean
   invisible(hom_plot <-
-              ggplot2::ggplot(het.vst.data,  ggplot2::aes(x = mean, y = sd)) +
-              ggplot2::geom_point() +
-              ggplot2::theme_bw() +
-              ggplot2::scale_x_continuous(trans='log2') +
-              ggplot2::scale_y_continuous(trans='log2') +
-              ggplot2::xlab("log(mean)") +
-              ggplot2::ylab("log(sd)") +
-              ggplot2::geom_abline(intercept = 0)  +
-              ggplot2::ggtitle("vst transformed data")  +
-              ggplot2::geom_smooth(ggplot2::aes(group=lm),method='lm', formula= y~x, color = "red"))
+              ggplot(het.vst.data,  aes(x = mean, y = sd)) +
+              geom_point() +
+              theme_bw() +
+              scale_x_continuous(trans='log2') +
+              scale_y_continuous(trans='log2') +
+              xlab("log(mean)") +
+              ylab("log(sd)") +
+              geom_abline(intercept = 0)  +
+              ggtitle("vst transformed data")  +
+              geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
 
-  invisible(scedasticity_plot <- patchwork::wrap_plots(het_plot,hom_plot))
+  invisible(scedasticity_plot <- wrap_plots(het_plot,hom_plot))
 
   return(invisible(list("DFs" = list("Corrected_data" = data.vst), "Plots" = list("scedasticity_plot" = scedasticity_plot))))
 }

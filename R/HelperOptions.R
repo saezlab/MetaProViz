@@ -48,7 +48,7 @@ metaproviz_save_config <- function(
 #' @param user Force to use the user level config even if a config file
 #'     exists in the current directory. By default, the local config files
 #'     have prioroty over the user level config.
-#' @param ... Passed to \code{yaml::yaml.load_file}.
+#' @param ... Passed to \code{yaml.load_file}.
 #'
 #' @return Invisibly returns the config as a list.
 #'

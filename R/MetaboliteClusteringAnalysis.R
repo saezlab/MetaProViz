@@ -37,9 +37,9 @@
 #'
 #' @examples
 #' Intra <- intracell_raw%>%tibble::column_to_rownames("Code")
-#' Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+#' Input <- dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
-#' Res <- MetaProViz::mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],
+#' Res <- mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],
 #'                              data_c2 = Input[["dma"]][["786-M1A_vs_HK2"]])
 #'
 #' @keywords biological clustering
@@ -82,13 +82,13 @@ mca_2cond <- function(data_c1,
   ## ------------ Prepare the Input -------- ##
   #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
   Cond1_DF <- as.data.frame(data_c1)%>%
-    dplyr::rename("MetaboliteID"=paste(feature),
+    rename("MetaboliteID"=paste(feature),
                   "ValueCol"=metadata_info_c1[["ValueCol"]],
                   "PadjCol"=metadata_info_c1[["StatCol"]])
   Cond1_DF <- Cond1_DF[complete.cases(Cond1_DF$ValueCol, Cond1_DF$PadjCol), ]
 
   Cond2_DF<- as.data.frame(data_c2)%>%
-    dplyr::rename("MetaboliteID"=paste(feature),
+    rename("MetaboliteID"=paste(feature),
                   "ValueCol"=metadata_info_c2[["ValueCol"]],
                   "PadjCol"=metadata_info_c2[["StatCol"]])
   Cond2_DF <- Cond2_DF[complete.cases(Cond2_DF$ValueCol, Cond2_DF$PadjCol), ]
@@ -100,10 +100,10 @@ mca_2cond <- function(data_c1,
   ## ------------ Assign Groups -------- ##
   #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
   Cond1_DF <-Cond1_DF%>%
-    dplyr::mutate(Cutoff = dplyr::case_when(Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol > as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'UP',
+    mutate(Cutoff = case_when(Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol > as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'UP',
                               Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol < - as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change'))%>%
-    dplyr::mutate(Cutoff_Specific = dplyr::case_when(Cutoff == "UP" ~ 'UP',
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
                                        Cutoff == "No Change" & Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol > 0 ~ 'Significant Positive',
                                        Cutoff == "No Change" & Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol < 0 ~ 'Significant Negative',
@@ -111,10 +111,10 @@ mca_2cond <- function(data_c1,
                                        TRUE ~ 'NA'))
 
   Cond2_DF <- Cond2_DF%>%
-    dplyr::mutate(Cutoff = dplyr::case_when(Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol > as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'UP',
+    mutate(Cutoff = case_when(Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol > as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'UP',
                               Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol < - as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change')) %>%
-    dplyr::mutate(Cutoff_Specific = dplyr::case_when(Cutoff == "UP" ~ 'UP',
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
                                        Cutoff == "No Change" & Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol > 0 ~ 'Significant Positive',
                                        Cutoff == "No Change" & Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol < 0 ~ 'Significant Negative',
@@ -127,40 +127,40 @@ mca_2cond <- function(data_c1,
   ##Add prefix to column names to distinguish the different data types after merge
   colnames(Cond2_DF) <- paste0("Cond2_DF_", colnames(Cond2_DF))
   Cond2_DF <- Cond2_DF%>%
-    dplyr::rename("MetaboliteID" = "Cond2_DF_MetaboliteID")
+    rename("MetaboliteID" = "Cond2_DF_MetaboliteID")
 
   colnames(Cond1_DF) <- paste0("Cond1_DF_", colnames(Cond1_DF))
   Cond1_DF <-Cond1_DF%>%
-    dplyr::rename("MetaboliteID"="Cond1_DF_MetaboliteID")
+    rename("MetaboliteID"="Cond1_DF_MetaboliteID")
 
   ##Merge
   MergeDF <- merge(Cond1_DF, Cond2_DF, by="MetaboliteID", all=TRUE)
 
   ##Mark the undetected genes in each data layer
   MergeDF<-MergeDF %>%
-    dplyr::mutate_at(c("Cond2_DF_Detected","Cond1_DF_Detected"), ~tidyr::replace_na(.,"FALSE"))%>%
-    dplyr::mutate_at(c("Cond2_DF_Cutoff","Cond1_DF_Cutoff"), ~tidyr::replace_na(.,"No Change"))%>%
-    dplyr::mutate_at(c("Cond2_DF_Cutoff_Specific", "Cond1_DF_Cutoff_Specific"), ~tidyr::replace_na(.,"Not Detected"))
+    mutate_at(c("Cond2_DF_Detected","Cond1_DF_Detected"), ~replace_na(.,"FALSE"))%>%
+    mutate_at(c("Cond2_DF_Cutoff","Cond1_DF_Cutoff"), ~replace_na(.,"No Change"))%>%
+    mutate_at(c("Cond2_DF_Cutoff_Specific", "Cond1_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))
 
   #Apply Background filter (label genes that will be removed based on choosen background)
   if(method_background == "C1|C2"){# C1|C2 = Cond2 OR Cond1
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+      mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
                                    Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "C1&C2"){ # Cond2 AND Cond1
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+      mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "C2"){ # Cond2 has to be there
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+      mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "C1"){ #Cond1 has to be there
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+      mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                    Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "*"){ # Use all genes as the background
@@ -171,7 +171,7 @@ mca_2cond <- function(data_c1,
 
   #Assign SiRCle cluster names to the genes
   MergeDF <- MergeDF%>%
-    dplyr::mutate(RG1_Specific_Cond2 = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG1_Specific_Cond2 = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                           Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',#State 1
                                           Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',#State 2
                                           Cond1_DF_Cutoff=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',#State 3
@@ -193,7 +193,7 @@ mca_2cond <- function(data_c1,
                                           Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',#State 16
                                           Cond1_DF_Cutoff=="UP" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 UP + Cond2 UP',#State 17
                                           TRUE ~ 'NA'))%>%
-    dplyr::mutate(RG1_Specific_Cond1 = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG1_Specific_Cond1 = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                           Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="DOWN" ~ 'Cond2 DOWN + Cond1 DOWN',#State 1
                                           Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="Not Detected" ~ 'Cond2 DOWN + Cond1 Not Detected',#State 2
                                           Cond2_DF_Cutoff=="DOWN" & Cond1_DF_Cutoff_Specific=="Not Significant" ~ 'Cond2 DOWN + Cond1 Not Significant',#State 3
@@ -215,7 +215,7 @@ mca_2cond <- function(data_c1,
                                           Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond2 UP + Cond1 Significant Positive',#State 16
                                           Cond2_DF_Cutoff=="UP" & Cond1_DF_Cutoff_Specific=="UP" ~ 'Cond2 UP + Cond1 UP',#State 17
                                           TRUE ~ 'NA'))%>%
-    dplyr::mutate(RG1_All = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG1_All = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',#State 1
                                Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',#State 2
                                Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',#State 3
@@ -258,7 +258,7 @@ mca_2cond <- function(data_c1,
                                Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'Cond1 Not Significant + Cond2 Significant Positive',#State 16
                                Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond1 Not Significant + Cond2 UP',#State 1
                                TRUE ~ 'NA'))%>%
-    dplyr::mutate(RG2_Significant = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG2_Significant = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                        Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'core_DOWN',#State 1
                                        Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1_DOWN',#State 2
                                        Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1_DOWN',#State 3
@@ -301,7 +301,7 @@ mca_2cond <- function(data_c1,
                                        Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="Significant Positive" ~ 'None',#State 16
                                        Cond1_DF_Cutoff_Specific=="Not Significant" & Cond2_DF_Cutoff_Specific=="UP" ~ 'Cond2_UP',#State 1
                                        TRUE ~ 'NA'))%>%
-    dplyr::mutate(RG3_SignificantChange = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG3_SignificantChange = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                              Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="DOWN" ~ 'core_DOWN',#State 1
                                              Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Detected" ~ 'Cond1_DOWN',#State 2
                                              Cond1_DF_Cutoff_Specific=="DOWN" & Cond2_DF_Cutoff_Specific=="Not Significant" ~ 'Cond1_DOWN',#State 3
@@ -355,29 +355,29 @@ mca_2cond <- function(data_c1,
   Cond1PadjCol_Unique <-paste("Cond1_DF_",metadata_info_c1[["StatCol"]])
 
   MergeDF_Select2<- subset(MergeDF, select=-c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_SignificantChange))%>%
-    dplyr::rename(!!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
+    rename(!!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
                   !!Cond2PadjCol_Unique :="Cond2_DF_PadjCol",
                   !!Cond1ValueCol_Unique :="Cond1_DF_ValueCol",
                   !!Cond1PadjCol_Unique :="Cond1_DF_PadjCol")
 
   MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
   MergeDF_Rearrange <-MergeDF_Rearrange%>%
-    dplyr::rename("Metabolite"="MetaboliteID")
+    rename("Metabolite"="MetaboliteID")
 
   ##summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   Clustersummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    dplyr::count(RG1_All, name="Number of Features")%>%
-    dplyr::rename("SiRCle cluster Name"= "RG1_All")
+    count(RG1_All, name="Number of Features")%>%
+    rename("SiRCle cluster Name"= "RG1_All")
   Clustersummary_RG1$`Regulation Grouping` <- "RG1_All"
 
   Clustersummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    dplyr::count(RG2_Significant, name="Number of Features")%>%
-    dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
+    count(RG2_Significant, name="Number of Features")%>%
+    rename("SiRCle cluster Name"= "RG2_Significant")
   Clustersummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
   Clustersummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
-    dplyr::count(RG3_SignificantChange, name="Number of Features")%>%
-    dplyr::rename("SiRCle cluster Name"= "RG3_SignificantChange")
+    count(RG3_SignificantChange, name="Number of Features")%>%
+    rename("SiRCle cluster Name"= "RG3_SignificantChange")
   Clustersummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
 
   Clustersummary <- rbind(Clustersummary_RG1, Clustersummary_RG2,Clustersummary_RG3)
@@ -385,7 +385,7 @@ mca_2cond <- function(data_c1,
 
   ## Rename feature
   MergeDF_Rearrange <-MergeDF_Rearrange%>%
-    dplyr::rename(!!feature := "Metabolite")
+    rename(!!feature := "Metabolite")
 
   ######################################################################################################################################################################
   ##----- Save and Return
@@ -426,13 +426,13 @@ mca_2cond <- function(data_c1,
 #'
 #' @examples
 #'
-#' Media <- medium_raw %>% tibble::column_to_rownames("Code")
-#' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
+#' Media <- medium_raw %>% column_to_rownames("Code")
+#' ResM <- processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                   core=TRUE)
 #'
-#' MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
+#' MediaDMA <- dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
 #'                             metadata_sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)],
 #'                             metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"),
 #'                             pval ="aov",
@@ -440,7 +440,7 @@ mca_2cond <- function(data_c1,
 #'
 #' IntraDMA <- intracell_dma
 #'
-#' Res <- MetaProViz::mca_core(
+#' Res <- mca_core(
 #'     data_intra = as.data.frame(IntraDMA),
 #'     data_core = as.data.frame(MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
 #'   )
@@ -492,14 +492,14 @@ mca_core <- function(data_intra,
   ## ------------ Prepare the Input -------- ##
   #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
   core_DF <-  as.data.frame(data_core)%>%
-    dplyr::rename("MetaboliteID"=paste(feature),
+    rename("MetaboliteID"=paste(feature),
                   "ValueCol"=metadata_info_core[["ValueCol"]],
                   "PadjCol"=metadata_info_core[["StatCol"]],
                   "core_Direction"=metadata_info_core[["DirectionCol"]])
   core_DF <- core_DF[complete.cases(core_DF$ValueCol, core_DF$PadjCol), ]
 
   Intra_DF<- as.data.frame(data_intra)%>%
-    dplyr::rename("MetaboliteID"=paste(feature),
+    rename("MetaboliteID"=paste(feature),
                   "ValueCol"=metadata_info_intra[["ValueCol"]],
                   "PadjCol"=metadata_info_intra[["StatCol"]])
   Intra_DF <- Intra_DF[complete.cases(Intra_DF$ValueCol, Intra_DF$PadjCol), ]
@@ -510,10 +510,10 @@ mca_core <- function(data_intra,
 
   #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
   core_DF <- core_DF%>%
-    dplyr::mutate(Cutoff = dplyr::case_when(core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol > as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'UP',
+    mutate(Cutoff = case_when(core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol > as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'UP',
                               core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol < - as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change')) %>%
-    dplyr::mutate(Cutoff_Specific = dplyr::case_when(Cutoff == "UP" ~ 'UP',
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
                                        Cutoff == "No Change" & core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol > 0 ~ 'Significant Positive',
                                        Cutoff == "No Change" & core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol < 0 ~ 'Significant Negative',
@@ -521,10 +521,10 @@ mca_core <- function(data_intra,
                                        TRUE ~ 'NA'))
 
   Intra_DF <-Intra_DF%>%
-    dplyr::mutate(Cutoff = dplyr::case_when(Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol > as.numeric(metadata_info_intra[["ValueCutoff"]]) ~ 'UP',
+    mutate(Cutoff = case_when(Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol > as.numeric(metadata_info_intra[["ValueCutoff"]]) ~ 'UP',
                               Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol < - as.numeric(metadata_info_intra[["ValueCutoff"]]) ~ 'DOWN',
                               TRUE ~ 'No Change'))%>%
-    dplyr::mutate(Cutoff_Specific = dplyr::case_when(Cutoff == "UP" ~ 'UP',
+    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                        Cutoff == "DOWN" ~ 'DOWN',
                                        Cutoff == "No Change" & Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol > 0 ~ 'Significant Positive',
                                        Cutoff == "No Change" & Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol < 0 ~ 'Significant Negative',
@@ -535,41 +535,41 @@ mca_core <- function(data_intra,
   ##Add prefix to column names to distinguish the different data types after merge
   colnames(core_DF) <- paste0("core_DF_", colnames(core_DF))
   core_DF <- core_DF%>%
-    dplyr::rename("MetaboliteID" = "core_DF_MetaboliteID")
+    rename("MetaboliteID" = "core_DF_MetaboliteID")
 
   colnames(Intra_DF) <- paste0("Intra_DF_", colnames(Intra_DF))
   Intra_DF <-Intra_DF%>%
-    dplyr::rename("MetaboliteID"="Intra_DF_MetaboliteID")
+    rename("MetaboliteID"="Intra_DF_MetaboliteID")
 
   ##Merge
   MergeDF <- merge(Intra_DF, core_DF, by="MetaboliteID", all=TRUE)
 
   ##Mark the undetected genes in each data layer
   MergeDF<-MergeDF %>%
-    dplyr::mutate_at(c("core_DF_Detected","Intra_DF_Detected"), ~tidyr::replace_na(.,"FALSE"))%>%
-    dplyr::mutate_at(c("core_DF_Cutoff","Intra_DF_Cutoff"), ~tidyr::replace_na(.,"No Change"))%>%
-    dplyr::mutate_at(c("core_DF_Cutoff_Specific", "Intra_DF_Cutoff_Specific"), ~tidyr::replace_na(.,"Not Detected"))%>%
-    dplyr::mutate_at(c("core_DF_core_Direction"), ~tidyr::replace_na(.,"Not Detected"))
+    mutate_at(c("core_DF_Detected","Intra_DF_Detected"), ~replace_na(.,"FALSE"))%>%
+    mutate_at(c("core_DF_Cutoff","Intra_DF_Cutoff"), ~replace_na(.,"No Change"))%>%
+    mutate_at(c("core_DF_Cutoff_Specific", "Intra_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))%>%
+    mutate_at(c("core_DF_core_Direction"), ~replace_na(.,"Not Detected"))
 
   #Apply Background filter (label metabolites that will be removed based on chosen background)
   if(method_background == "Intra|core"){# C1|C2 = core OR Intra
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+      mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                    Intra_DF_Detected=="TRUE" & core_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
                                    Intra_DF_Detected=="FALSE" & core_DF_Detected=="TRUE" ~ 'TRUE', # Just core
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "Intra&core"){ # core AND Intra
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+      mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "core"){ # core has to be there
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+      mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                    Intra_DF_Detected=="FALSE" & core_DF_Detected=="TRUE" ~ 'TRUE', # Just core
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "Intra"){ #Intra has to be there
     MergeDF <- MergeDF%>%
-      dplyr::mutate(BG_method = dplyr::case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+      mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                    Intra_DF_Detected=="TRUE" & core_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
                                    TRUE ~ 'FALSE'))
   }else if(method_background == "*"){ # Use all metabolites as the background
@@ -580,7 +580,7 @@ mca_core <- function(data_intra,
 
   #Assign Metabolite cluster names to the metabolites
   MergeDF <- MergeDF%>%
-        dplyr::mutate(RG1_All = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+        mutate(RG1_All = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="DOWN" & core_DF_core_Direction=="Released" ~ 'Intra DOWN + core DOWN_Released',
                                Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Detected" & core_DF_core_Direction=="Not Detected"~ 'Intra DOWN + core Not Detected',
                                Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Significant" & core_DF_core_Direction=="Released"~ 'Intra DOWN + core Not Significant_Released',
@@ -709,7 +709,7 @@ mca_core <- function(data_intra,
                                Intra_DF_Cutoff_Specific=="Not Significant" & core_DF_Cutoff_Specific=="Significant Positive" & core_DF_core_Direction=="Released/Consumed"~ 'Intra Not Significant + core Significant Positive_Released/Consumed',
                                Intra_DF_Cutoff_Specific=="Not Significant" & core_DF_Cutoff_Specific=="UP" & core_DF_core_Direction=="Released/Consumed"~ 'Intra Not Significant + core UP_Released/Consumed',
                                TRUE ~ 'NA'))%>%
-    dplyr::mutate(RG2_Significant = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG2_Significant = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                        Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="DOWN" & core_DF_core_Direction=="Released" ~ 'Both_DOWN (Released)',
                                        Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Detected" & core_DF_core_Direction=="Not Detected"~ 'None',
                                        Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Significant" & core_DF_core_Direction=="Released"~ 'None',
@@ -838,7 +838,7 @@ mca_core <- function(data_intra,
                                        Intra_DF_Cutoff_Specific=="Not Significant" & core_DF_Cutoff_Specific=="Significant Positive" & core_DF_core_Direction=="Released/Consumed"~ 'None',
                                        Intra_DF_Cutoff_Specific=="Not Significant" & core_DF_Cutoff_Specific=="UP" & core_DF_core_Direction=="Released/Consumed"~ 'core_UP (Released/Consumed)',
                                        TRUE ~ 'NA'))%>%
-    dplyr::mutate(RG3_Change = dplyr::case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG3_Change = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                   Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="DOWN" & core_DF_core_Direction=="Released" ~ 'Both_DOWN (Released)',
                                   Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Detected" & core_DF_core_Direction=="Not Detected"~ 'None',
                                   Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Significant" & core_DF_core_Direction=="Released"~ 'None',
@@ -978,38 +978,38 @@ mca_core <- function(data_intra,
   IntraPadjCol_Unique <-paste("Cond1_DF_",metadata_info_intra[["StatCol"]])
 
   MergeDF_Select2<- subset(MergeDF, select=-c(Intra_DF_Detected,Intra_DF_Cutoff, core_DF_Detected,core_DF_Cutoff, core_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_Change))%>%
-    dplyr::rename(!!coreValueCol_Unique :="core_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
+    rename(!!coreValueCol_Unique :="core_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
                   !!corePadjCol_Unique :="core_DF_PadjCol",
                   !!IntraValueCol_Unique :="Intra_DF_ValueCol",
                   !!IntraPadjCol_Unique :="Intra_DF_PadjCol")
 
   MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
   MergeDF_Rearrange <-MergeDF_Rearrange%>%
-    dplyr::rename("Metabolite"="MetaboliteID")
+    rename("Metabolite"="MetaboliteID")
 
 
   ##summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
   Clustersummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    dplyr::group_by(RG1_All) %>%
-    dplyr::mutate("Number of Features" = n()) %>%
-    dplyr::distinct(RG1_All, .keep_all = TRUE) %>%
-    dplyr::rename("SiRCle cluster Name" = "RG1_All")
+    group_by(RG1_All) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG1_All, .keep_all = TRUE) %>%
+    rename("SiRCle cluster Name" = "RG1_All")
   Clustersummary_RG1$`Regulation Grouping` <- "RG1_All"
   Clustersummary_RG1 <- Clustersummary_RG1[-c(1)]
 
   Clustersummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    dplyr::group_by(RG2_Significant) %>%
-    dplyr::mutate("Number of Features" = n()) %>%
-    dplyr::distinct(RG2_Significant, .keep_all = TRUE) %>%
-    dplyr::rename("SiRCle cluster Name"= "RG2_Significant")
+    group_by(RG2_Significant) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG2_Significant, .keep_all = TRUE) %>%
+    rename("SiRCle cluster Name"= "RG2_Significant")
   Clustersummary_RG2$`Regulation Grouping` <- "RG2_Significant"
   Clustersummary_RG2 <- Clustersummary_RG2[-c(1)]
 
   Clustersummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_Change")]%>%
-    dplyr::group_by(RG3_Change) %>%
-    dplyr::mutate("Number of Features" = n()) %>%
-    dplyr::distinct(RG3_Change, .keep_all = TRUE) %>%
-    dplyr::rename("SiRCle cluster Name"= "RG3_Change")
+    group_by(RG3_Change) %>%
+    mutate("Number of Features" = n()) %>%
+    distinct(RG3_Change, .keep_all = TRUE) %>%
+    rename("SiRCle cluster Name"= "RG3_Change")
   Clustersummary_RG3$`Regulation Grouping` <- "RG3_Change"
   Clustersummary_RG3 <- Clustersummary_RG3[-c(1)]
 
@@ -1018,7 +1018,7 @@ mca_core <- function(data_intra,
 
   ## Rename feature
   MergeDF_Rearrange <-MergeDF_Rearrange%>%
-    dplyr::rename(!!feature := "Metabolite")
+    rename(!!feature := "Metabolite")
 
   ######################################################################################################################################################################
   ##----- Save and Return

@@ -38,9 +38,9 @@
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @examples
-#' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' DMAres <- as.data.frame(intracell_dma) %>% dplyr::filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
-#' MetaProViz::cluster_ora(data= DMAres,
+#' KEGG_Pathways <- metsigdb_kegg()
+#' DMAres <- as.data.frame(intracell_dma) %>% filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
+#' cluster_ora(data= DMAres,
 #' metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
 #' input_pathway=KEGG_Pathways,
 #' remove_background=FALSE)
@@ -140,7 +140,7 @@ cluster_ora <- function(data,
       clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
       clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
       clusterGosummary <- clusterGosummary%>%
-        dplyr::rename("Metabolites_in_pathway"="geneID")
+        rename("Metabolites_in_pathway"="geneID")
 
       g_save <- gsub("/", "-", g)
       df_list[[g_save]] <- clusterGosummary
@@ -187,9 +187,9 @@ cluster_ora <- function(data,
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
 #' @examples
-#' KEGG_Pathways <- MetaProViz::metsigdb_kegg()
-#' DMAres <- as.data.frame(intracell_dma) %>% dplyr::filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
-#' MetaProViz::standard_ora(data= DMAres,
+#' KEGG_Pathways <- metsigdb_kegg()
+#' DMAres <- as.data.frame(intracell_dma) %>% filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
+#' standard_ora(data= DMAres,
 #' input_pathway=KEGG_Pathways)
 #'
 #' @return Saves results as individual .csv files.
@@ -295,7 +295,7 @@ standard_ora <- function(data,
       clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
       clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
       clusterGosummary <- clusterGosummary%>%
-        dplyr::rename("Metabolites_in_pathway"="geneID")
+        rename("Metabolites_in_pathway"="geneID")
   }else{
     stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }
