@@ -82,5 +82,5 @@ Suggests:
     pkgdown,
     svglite,
     testthat (>= 3.0.4)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3
