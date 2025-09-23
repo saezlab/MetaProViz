@@ -688,7 +688,7 @@ mapping_ambiguity <- function(data,
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate n_distinct filter
 #' @importFrom tidyr separate_rows
 #' @importFrom rlang !!! !! := sym syms
 #'
@@ -698,8 +698,6 @@ mapping_ambiguity <- function(data,
 #' Res <- MetaProViz::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 #'
 #' @export
-#'
-
 checkmatch_pk_to_data <- function(data,
                            input_pk,
                            metadata_info = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term"),
@@ -992,8 +990,8 @@ checkmatch_pk_to_data <- function(data,
 
   # 4. Messages and summarise
   message0 <- paste0("data has multiple IDs per measurement = ", data_MultipleIDs, ". input_pk has multiple IDs per entry = ", PK_MultipleIDs, ".", sep="")
-  message1 <- paste0("data has ", dplyr::n_distinct(unique(data[[metadata_info[["InputID"]]]])), " unique entries with " ,dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])) ," unique ", metadata_info[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)), " match, which is ", (nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)) / dplyr::n_distinct(unique(data_long[[metadata_info[["InputID"]]]])))*100, "%." , sep="")
-  message2 <- paste0("input_pk has ", dplyr::n_distinct(input_pk[[metadata_info[["PriorID"]]]]), " unique entries with " ,dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]) ," unique ", metadata_info[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)), " are detected in the data, which is ", (nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)) / dplyr::n_distinct(PK_long[[metadata_info[["PriorID"]]]]))*100, "%.")
+  message1 <- paste0("data has ", n_distinct(unique(data[[metadata_info[["InputID"]]]])), " unique entries with " , n_distinct(unique(data_long[[metadata_info[["InputID"]]]])) ," unique ", metadata_info[["InputID"]], " IDs. Of those IDs, ", nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)), " match, which is ", (nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)) / n_distinct(unique(data_long[[metadata_info[["InputID"]]]])))*100, "%." , sep="")
+  message2 <- paste0("input_pk has ", dplyr::n_distinct(input_pk[[metadata_info[["PriorID"]]]]), " unique entries with " , n_distinct(PK_long[[metadata_info[["PriorID"]]]]) ," unique ", metadata_info[["PriorID"]], " IDs. Of those IDs, ", nrow(summary_df_short%>% dplyr::filter(matches_count >= 1)), " are detected in the data, which is ", (nrow(summary_df_short %>% filter(matches_count >= 1)) / n_distinct(PK_long[[metadata_info[["PriorID"]]]]))*100, "%.")
 
   message(message0)
   message(message1)
