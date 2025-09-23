@@ -46,6 +46,11 @@ jobs:
       (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
 
     steps:
+      # Install OmmipathR devel branch from github
+      - name: Install OmmipathR devel branch from github
+        run: |
+          Rscript -e 'install_github("saezlab/OmnipathR@devel")'
+
       # Checkout the repository code
       - uses: actions/checkout@v4
 
@@ -100,13 +105,12 @@ jobs:
           Rscript -e 'install.packages(c("broom", "ComplexUpset", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
 
 
-
       # Install OmnipathR from Bioconductor devel
       - name: Install OmnipathR from Bioconductor devel
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
           Rscript -e 'BiocManager::install()'
-          Rscript -e 'BiocManager::install("OmnipathR")'
+          # Rscript -e 'BiocManager::install("OmnipathR")'
 
       # Set Bioconductor back to release and install other Bioconductor dependencies
       - name: Install other Bioconductor dependencies from release
