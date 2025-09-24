@@ -1292,7 +1292,7 @@ dma_stat_single <- function(data,
   PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
   #perform adjustment
-  VecPADJ_C1vC2 <- p.adjust((PVal_C1vC2[,2]),method = padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
+  VecPADJ_C1vC2 <- stats::p.adjust((PVal_C1vC2[,2]),method = padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
   Metabolite <- PVal_C1vC2[,1]
   PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
   STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
@@ -1373,7 +1373,7 @@ aov <- function(data,
 
   #############################################################################################
   ## 1. Anova p.val
-  aov.res= apply(data,2,function(x) aov(x~conditions))
+  aov.res= apply(data, 2, function(x) stats::aov(x ~ conditions))
 
   ## 2. Tukey test p.adj
   posthoc.res = lapply(aov.res, TukeyHSD, conf.level=0.95)
@@ -1513,7 +1513,7 @@ kruskal <- function(data,
 
   #############################################################################################
   # kruskal test (p.val)
-  aov.res= apply(data,2,function(x) kruskal.test(x~conditions))
+  aov.res= apply(data,2,function(x) stats::kruskal.test(x~conditions))
   anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
   anova_res <- as.matrix(mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
   colnames(anova_res) = c("Kruskal_p.val")
@@ -1806,7 +1806,7 @@ dma_stat_limma <- function(data,
   colnames(design) <- levels(fcond) # Give meaningful column names to the design matrix
 
   #### Fit the linear model
-  fit <- lmFit(Limma_input, design)
+  fit <- limma::lmFit(Limma_input, design)
 
   ####  Make contrast matrix:
   if(all_vs_all ==TRUE & MultipleComparison==TRUE){
