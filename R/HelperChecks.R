@@ -643,7 +643,7 @@ check_param_ora <- function(data,
                            remove_background
 ){
   # 1. The input data:
-  if(class(data) != "data.frame"){
+  if(!inherits(data, "data.frame")){
     message <- paste0("data should be a data.frame. It's currently a ", paste(class(data), ".",sep = ""))
     log_trace(paste("Error ", message, sep=""))
     stop(message)
@@ -833,7 +833,7 @@ check_param_mca <- function(data_c1,
 
   #------------- data
   if(is.null(data_c1)==FALSE){
-    if(class(data_c1) != "data.frame"| class(data_c2) != "data.frame"){
+    if(!inherits(data_c1, "data.frame") | !inherits(data_c2, "data.frame")){
       message <- paste0("data_c1 and data_c2 should be a data.frame. It's currently a ", paste(class(data_c1)), paste(class(data_c2)), ".",sep = "")
       log_trace(paste("Error ", message, sep=""))
       stop(message)
@@ -850,7 +850,7 @@ check_param_mca <- function(data_c1,
     }
 
   }else{
-    if(class(data_intra) != "data.frame"| class(data_core) != "data.frame"){
+    if(!inherits(data_intra, "data.frame") | !inherits(data_core, "data.frame")){
       message <- paste0("data_intra and data_core should be a data.frame. It's currently a ", paste(class(data_intra)), paste(class(data_core)), ".",sep = "")
       log_trace(paste("Error ", message, sep=""))
       stop(message)
