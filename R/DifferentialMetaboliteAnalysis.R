@@ -1254,7 +1254,7 @@ dma_stat_single <- function(data,
   C2[is.na(C2)] <- 0
 
   #### 1. p.value and test statistics (=t.val)
-  T_C1vC2 <-mapply(pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = F)
+  T_C1vC2 <-mapply(pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = FALSE)
 
   VecPVAL_C1vC2 <- c()
   VecTVAL_C1vC2 <- c()

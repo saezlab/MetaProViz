@@ -489,7 +489,7 @@ pool_estimation <- function(data,
   ###################################################################################################################################
   ## ------------------ Coefficient of Variation ------------------- ##
   log_trace('Calculating coefficient of variation.')
-  result_df <- apply(Pooldata, 2,  function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 }  ) %>% t()%>% as.data.frame()
+  result_df <- apply(Pooldata, 2,  function(x) { (sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE))*100 }  ) %>% t()%>% as.data.frame()
   rownames(result_df)[1] <- "CV"
 
   NAvector <- apply(Pooldata, 2,  function(x) {(sum(is.na(x))/length(x))*100 })# Calculate the NAs
@@ -1081,7 +1081,7 @@ core_norm <- function(data,
 
     ##-- 2. Metabolite Variance Histogram
     # Coefficient of Variation
-    result_df <- apply(core_medias, 2,   function(x) { (sd(x, na.rm =T)/  mean(x, na.rm =T))*100 } ) %>% t()%>% as.data.frame()
+    result_df <- apply(core_medias, 2,   function(x) { (sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE))*100 } ) %>% t()%>% as.data.frame()
     result_df[1, is.na(result_df[1,])]<- 0
     rownames(result_df)[1] <- "CV"
 
@@ -1163,7 +1163,7 @@ core_norm <- function(data,
         }
 
         # ReCalculate coefficient of variation for each column in the filtered data
-        result_df <- apply(core_medias, 2,   function(x) { sd(x, na.rm =T)/  mean(x, na.rm =T) } ) %>% t()%>% as.data.frame()
+        result_df <- apply(core_medias, 2,   function(x) { sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE) } ) %>% t()%>% as.data.frame()
         result_df[1, is.na(result_df[1,])]<- 0
         rownames(result_df)[1] <- "CV"
 
@@ -1429,8 +1429,8 @@ outlier_detection <- function(data,
 
     #draw the horizontal lines corresponding to the LCL,UCL
     HotellingT2plot <- HotellingT2plot +
-      geom_hline(aes(yintercept = limits[,1]), color = "black", data = limits,  show.legend = F) +
-      geom_hline(aes(yintercept = limits[,2], linetype = "UCL"), color = "red", data = limits, show.legend = T) +
+      geom_hline(aes(yintercept = limits[,1]), color = "black", data = limits,  show.legend = FALSE) +
+      geom_hline(aes(yintercept = limits[,2], linetype = "UCL"), color = "red", data = limits, show.legend = TRUE) +
       scale_y_continuous(breaks = sort(c(ggplot_build(HotellingT2plot)$layout$panel_ranges[[1]]$y.major_source, c(limits[,1],limits[,2]))))
 
     HotellingT2plot <- HotellingT2plot +

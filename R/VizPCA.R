@@ -239,7 +239,7 @@ viz_pca <- function(data,
                   shape = Param_Sha,
                   size = 3,
                   alpha = 0.8,
-                  label=T,
+                  label = TRUE,
                   label.size=2.5,
                   label.repel = TRUE,
                   loadings= as.logical(show_loadings), #draws Eigenvectors
