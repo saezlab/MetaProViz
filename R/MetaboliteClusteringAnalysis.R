@@ -55,9 +55,9 @@
 #'
 #' @examples
 #' Intra <- intracell_raw%>%tibble::column_to_rownames("Code")
-#' Input <- dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
+#' Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
-#' Res <- mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],
+#' Res <- MetaProViz::mca_2cond(data_c1 = Input[["dma"]][["786-O_vs_HK2"]],
 #'                              data_c2 = Input[["dma"]][["786-M1A_vs_HK2"]])
 #'
 #' @keywords biological clustering
@@ -444,13 +444,13 @@ mca_2cond <- function(data_c1,
 #'
 #' @examples
 #'
-#' Media <- medium_raw %>% column_to_rownames("Code")
-#' ResM <- processing(data = Media[-c(40:45) ,-c(1:3)],
+#' Media <- medium_raw %>% tibble::column_to_rownames("Code")
+#' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
 #'                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
 #'                                   core=TRUE)
 #'
-#' MediaDMA <- dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
+#' MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4)],
 #'                             metadata_sample=ResM[["DF"]][["Preprocessing_output"]][ , c(1:4)],
 #'                             metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"),
 #'                             pval ="aov",
@@ -458,7 +458,7 @@ mca_2cond <- function(data_c1,
 #'
 #' IntraDMA <- intracell_dma
 #'
-#' Res <- mca_core(
+#' Res <- MetaProViz::mca_core(
 #'     data_intra = as.data.frame(IntraDMA),
 #'     data_core = as.data.frame(MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
 #'   )
