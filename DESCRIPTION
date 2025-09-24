@@ -32,7 +32,7 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 LazyData: true
 Depends:
-    R (>= 4.4.1)
+    R (>= 4.4)
 Imports:
     broom,
     ComplexUpset (>= 1.3.3),
