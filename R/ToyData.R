@@ -32,8 +32,8 @@
 #'   \item{Conditions}{Character vector indicating cell line identity}
 #'   \item{Analytical_Replicate}{Integer replicate number for analytical replicates}
 #'   \item{Biological_Replicate}{Integer replicate number for biological replicates}
-#'   \item{...}{Numeric columns for each measured metabolite (raw peak values)}
 #' }
+#' The remaining columns contain raw intensities for 183 metabolites.
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
