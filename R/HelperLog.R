@@ -64,7 +64,7 @@ metaproviz_log <- function(){
 #' @return Returns `NULL`.
 #'
 #' @examples
-#' metaproviz_set_loglevel(FATAL, target = 'console')
+#' metaproviz_set_loglevel(logger::FATAL, target = 'console')
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @export
