@@ -86,7 +86,7 @@
 #'         VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
-#' Intra <- intracell_raw[-c(49:58), ] %>% column_to_rownames("Code")
+#' Intra <- intracell_raw[-c(49:58), ] %>% tibble::column_to_rownames("Code")
 #' ResI <- dma(
 #'     data = Intra[, -c(1:3)],
 #'     metadata_sample = Intra[, c(1:3)],
