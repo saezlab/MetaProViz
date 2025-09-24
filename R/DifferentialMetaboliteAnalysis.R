@@ -348,8 +348,7 @@ dma <- function(
                     metadata_info = metadata_info,
                     log2fc_table = log2fc_table
                 )
-        }
-        else if (pval == "kruskal.test") {
+        } else if (pval == "kruskal.test") {
             STAT_C1vC2 <-
                 kruskal(
                     data = data,
@@ -358,8 +357,7 @@ dma <- function(
                     log2fc_table = log2fc_table,
                     padj = padj
                 )
-        }
-        else if (pval == "welch") {
+        } else if (pval == "welch") {
             STAT_C1vC2 <-
                 welch(
                     data = data,
@@ -700,8 +698,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    }
-    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -712,8 +709,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
-    }
-    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
         # one-vs-one: Generate the comparisons
         denominator <- metadata_info[["Denominator"]]
         numerator <- metadata_info[["Numerator"]]
@@ -744,11 +740,9 @@ log2fc <- function(
     # all_vs_all.
     if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
         MultipleComparison <- TRUE
-    }
-    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
         MultipleComparison <- TRUE
-    }
-    else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
         MultipleComparison <- FALSE
     }
 
@@ -892,11 +886,9 @@ log2fc <- function(
             for (i in 1:length(temp1)) {
                 if (temp1[i] > 0 & temp2[i] > 0) {
                     core_info[3, i] <- "Released"
-                }
-                else if (temp1[i] < 0 & temp2[i] < 0) {
+                } else if (temp1[i] < 0 & temp2[i] < 0) {
                     core_info[3, i] <- "Consumed"
-                }
-                else if (temp1[i] > 0 & temp2[i] < 0) {
+                } else if (temp1[i] > 0 & temp2[i] < 0) {
                     core_info[3, i] <-
                         paste(
                             "Released in",
@@ -907,8 +899,7 @@ log2fc <- function(
                             column],
                             sep = " "
                         )
-                }
-                else if (temp1[i] < 0 & temp2[i] > 0) {
+                } else if (temp1[i] < 0 & temp2[i] > 0) {
                     core_info[3, i] <-
                         paste(
                             "Consumed in",
@@ -919,8 +910,7 @@ log2fc <- function(
                             column],
                             sep = " "
                         )
-                }
-                else {
+                } else {
                     core_info[3, i] <- "No Change"
                 }
             }
@@ -1035,12 +1025,10 @@ log2fc <- function(
                 # named after the contrast
                 log2fc_table[[logname]] <- Log2FC_C1vC2
                 log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-            }
-            else {
+            } else {
                 log2fc_table <- Log2FC_C1vC2
             }
-        }
-        else if (core == FALSE) {
+        } else if (core == FALSE) {
             # Mean values could be 0, which can not be used to calculate a
             # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x))
             # for A and/or B being 0, with x being set to 1
@@ -1176,8 +1164,7 @@ log2fc <- function(
                 # Store the data frame in the results list, named after the contrast
                 log2fc_table[[logname]] <- Log2FC_C1vC2
                 log2fc_table[[logname_reverse]] <- Log2FC_C2vC1
-            }
-            else {
+            } else {
                 log2fc_table <- Log2FC_C1vC2
             }
         }
