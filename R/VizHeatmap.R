@@ -64,6 +64,7 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_trace
+#' @importFrom pheatmap pheatmap
 #' @export
 viz_heatmap <- function(data,
                        metadata_info= NULL,
