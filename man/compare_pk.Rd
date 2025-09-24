@@ -37,6 +37,8 @@ Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. Thi
 
 \item{plot_name}{\emph{Optional: } String which is added to the output files of the Upsetplot \strong{Default = ""}}
 
+\item{name_col}{\emph{Optional: } column name including the feature names. Default is \code{"TrivialName"}.}
+
 \item{palette_type}{Character. Color palette to be used in the plot. Default is \code{"polychrome"}.}
 
 \item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
@@ -46,8 +48,6 @@ Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. Thi
 \item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
-
-\item{output_file}{Character. Optional file path to save the generated plot; if \code{NULL}, the plot is not saved.}
 }
 \value{
 A list containing two elements: \itemize{

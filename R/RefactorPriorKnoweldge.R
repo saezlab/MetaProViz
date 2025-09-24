@@ -52,8 +52,7 @@ translate_id <- function(data,
                         to = c("pubchem","chebi","hmdb"),
                         summary=FALSE,
                         save_table= "csv",
-                        path=NULL,
-                        plot=FALSE #toDO
+                        path=NULL
   ){# Add ability to also get metabolite names that are human readable from an ID type!
 
   metaproviz_init()
@@ -1273,11 +1272,11 @@ add_info <- function(mat,
 #' @param filter_by Character. Optional filter for the resulting features when comparing multiple resources.
 #'        Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. This parameter is ignored in within-resource mode.
 #' @param plot_name \emph{Optional: } String which is added to the output files of the Upsetplot \strong{Default = ""}
+#' @param name_col \emph{Optional: } column name including the feature names. Default is \code{"TrivialName"}.
 #' @param palette_type Character. Color palette to be used in the plot. Default is \code{"polychrome"}.
 #' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param output_file Character. Optional file path to save the generated plot; if \code{NULL}, the plot is not saved.
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
 #' @return A list containing two elements: \itemize{

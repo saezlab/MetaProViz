@@ -11,8 +11,7 @@ translate_id(
   to = c("pubchem", "chebi", "hmdb"),
   summary = FALSE,
   save_table = "csv",
-  path = NULL,
-  plot = FALSE
+  path = NULL
 )
 }
 \arguments{
