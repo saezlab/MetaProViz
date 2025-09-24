@@ -93,7 +93,7 @@ Tissue_Norm <- tissue_norm%>%
 # Check how our data looks like:
 Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
   kableExtra::kbl(caption = "Preview of the DF `Tissue_Norm` including columns with sample information and metabolite ids with their measured values.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 
@@ -106,7 +106,7 @@ Tissue_MetaData <- tissue_meta%>%
 # Check how our data looks like:
 Tissue_MetaData[1:5,c(1:2, 7:10)] %>%
   kableExtra::kbl(caption = "Preview of the DF `Tissue_MetaData` including the trivial metabolite identifiers used in the experiment as well as IDs and pathway information.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 
@@ -149,7 +149,7 @@ We generated the general anova output DF:\
 # Check how our data looks like:
 MetaRes[["res_aov"]][c(1:2, 1777:1778, 3191:3192), -c(10:11)]%>%
   kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_aov`]] including the main metabolite drivers that separate patients based on their demographics.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 We generated the summarised results output DF, where each feature (=metabolite) was assigned a main demographics parameter this feature is separating:\
@@ -157,7 +157,7 @@ We generated the summarised results output DF, where each feature (=metabolite) 
 # Check how our data looks like:
 MetaRes[["res_summary"]][c(1:6), ]%>%
   kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_summary`]] including the metabolite drivers in rows and list the patients demographics they can separate.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 ```{r, fig.align="left", fig.width=10, fig.height=5}
@@ -387,7 +387,7 @@ summary_table <-
 
 summary_table%>%
   kableExtra::kbl(caption = "Overview of other ID types for metabolites without HMDB ID.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 ```
 
@@ -513,7 +513,7 @@ problems_terms <- ccRCC_to_KEGGPathways[["GroupingVariable_summary"]]%>%
 ```{r, echo=FALSE}
 problems_terms[,c(1,5:8)]%>%
   kableExtra::kbl(caption = "Terms in KEGG pathways where the same measured feature mapps with more than one ID, which will inflate the enrichment analysis.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its moire likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge. 
@@ -525,7 +525,7 @@ multipleIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
 ```{r, echo=FALSE}
 multipleIDs[,c(1,12, 5:6, 3, 9, 11, 13)]%>%
   kableExtra::kbl(caption = "Terms in KEGG pathways where the same measured feature mapps with more than one ID, which may inflate the enrichment analysis.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 In case of `ActionRequired=="Check"`, we can look into the column `Action_Specific` which contains additional information. In case of the entry `KeepEachID`, multiple matches to the prior knowledge were found, yet the features are in different pathways (=GroupingVariable). Yet, in case of `KeepOneID`, the different IDs map to the same pathway in the prior knowledge for at least one case and therefore keeping both would inflate the enrichment analysis.\
