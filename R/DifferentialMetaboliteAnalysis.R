@@ -672,6 +672,7 @@ dma <- function(
 #' @importFrom dplyr filter mutate rename select_if summarise_all
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
+#' @importFrom utils combn
 #'
 #' @noRd
 #'
@@ -1338,6 +1339,8 @@ dma_stat_single <- function(data,
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
+#' @importFrom utils combn
+#'
 #' @noRd
 aov <- function(data,
                metadata_sample,
@@ -1476,6 +1479,8 @@ aov <- function(data,
 #' @importFrom dplyr rename mutate_all mutate select
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom utils combn
+#'
 #' @noRd
 kruskal <- function(data,
                    metadata_sample,
@@ -1609,6 +1614,8 @@ kruskal <- function(data,
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
+#' @importFrom utils combn
+#'
 #' @noRd
 welch <- function(data,
                  metadata_sample,
@@ -2002,6 +2009,8 @@ dma_stat_limma <- function(data,
 #' @importFrom dplyr rename select_if filter
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom utils combn
+#'
 #' @noRd
 shapiro <- function(data,
                    metadata_sample,
