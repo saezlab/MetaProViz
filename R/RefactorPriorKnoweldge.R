@@ -684,6 +684,13 @@ mapping_ambiguity <- function(data,
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
 #'
+#' @return A \code{list} with three elements:
+#' \itemize{
+#'   \item \code{data_summary} — a data frame summarising matching results per input ID, including counts, conflicts, and recommended actions.
+#'   \item \code{GroupingVariable_summary} — a detailed data frame showing matches grouped by the specified variable, with conflict annotations.
+#'   \item \code{data_long} — a merged data frame of prior knowledge IDs and detected IDs in long format.
+#' }
+#' 
 #' @examples
 #' DetectedIDs <-  cellular_meta %>%dplyr::select("Metabolite", "HMDB")%>%tidyr::drop_na()
 #' input_pathway <- translate_id(data= metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]%>%tidyr::drop_na()
