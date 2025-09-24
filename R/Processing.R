@@ -43,12 +43,12 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- intracell_raw %>% column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
 #'                                metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
-#' Media <- medium_raw %>% column_to_rownames("Code")
+#' Media <- medium_raw %>% tibble::column_to_rownames("Code")
 #' ResM <- processing(data = Media[-c(40:45), -c(1:3)],
 #'                                metadata_sample = Media[-c(40:45), c(1:3)],
 #'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
@@ -289,7 +289,7 @@ processing <- function(data,
 #' @return DF with the merged analytical replicates
 #'
 #' @examples
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
 #'                                 metadata_sample=Intra[-c(49:58) , c(1:3)],
 #'                                 metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
@@ -407,7 +407,7 @@ replicate_sum <- function(data,
 #' @return List with two elements: DF (including input and output table) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- pool_estimation(data=Intra[ ,-c(1:3)],
 #'                                 metadata_sample=Intra[ , c(1:3)],
 #'                                 metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
@@ -633,9 +633,11 @@ pool_estimation <- function(data,
 #'
 #' @examples
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
-#' Res <- feature_filtering(data=Intra[-c(49:58), -c(1:3)]%>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                                      metadata_sample=Intra[-c(49:58), c(1:3)],
-#'                                      metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' Res <- feature_filtering(
+#'     data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#' )
 #'
 #' @keywords feature filtering or modified feature filtering
 #'
@@ -757,9 +759,11 @@ feature_filtering <-function(data,
 #'
 #' @examples
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
-#' Res <- mvi_imputation(data=Intra[-c(49:58), -c(1:3)]%>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                       metadata_sample=Intra[-c(49:58), c(1:3)],
-#'                       metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' Res <- mvi_imputation(
+#'     data = Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#' )
 #'
 #' @keywords Half minimum missing value imputation
 #'
@@ -904,9 +908,11 @@ mvi_imputation <- function(data,
 #'
 #' @examples
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
-#' Res <- tic_norm(data=Intra[-c(49:58), -c(1:3)]%>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                             metadata_sample=Intra[-c(49:58), c(1:3)],
-#'                             metadata_info = c(Conditions = "Conditions"))
+#' Res <- tic_norm(
+#'     data=Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(Conditions = "Conditions")
+#' )
 #'
 #' @keywords total ion count normalisation
 #'
@@ -1024,10 +1030,16 @@ tic_norm <- function(data,
 #' @return List with two elements: DF (including output table) and Plot (including all plots generated)
 #'
 #' @examples
-#' Media <- medium_raw %>%tibble::column_to_rownames("Code")%>% subset(!Conditions=="Pool")%>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
-#' Res <- core_norm(data= Media[, -c(1:3)],
-#'                             metadata_sample= Media[, c(1:3)],
-#'                             metadata_info = c(Conditions = "Conditions", core_norm_factor = "GrowthFactor", core_media = "blank"))
+#' Media <-
+#'     medium_raw %>%
+#'     tibble::column_to_rownames("Code") %>%
+#'     subset(!Conditions=="Pool") %>%
+#'     dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+#' Res <- core_norm(
+#'     data = Media[, -c(1:3)],
+#'     metadata_sample = Media[, c(1:3)],
+#'     metadata_info = c(Conditions = "Conditions", core_norm_factor = "GrowthFactor", core_media = "blank")
+#' )
 #'
 #' @keywords Consumption Release Metaqbolomics, Normalisation, Exometabolomics
 #'
@@ -1294,9 +1306,11 @@ core_norm <- function(data,
 #'
 #' @examples
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
-#' Res <- outlier_detection(data=Intra[-c(49:58), -c(1:3)]%>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'                                      metadata_sample=Intra[-c(49:58), c(1:3)],
-#'                                      metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' Res <- outlier_detection(
+#'     data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#' )
 #'
 #' @keywords Hotellins T2 outlier detection
 #'
