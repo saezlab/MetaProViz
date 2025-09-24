@@ -195,6 +195,8 @@ adjust_layout <- function(gtbl, param) {
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce
 #' @importFrom rlang !!!
+#' @importFrom rlang exec
+#'
 #' @noRd
 set_sizes <- function(gtbl, dim, param) {
 
