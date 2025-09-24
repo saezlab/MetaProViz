@@ -300,8 +300,7 @@ dma <- function(
                     core = core,
                     transform = transform
                 )
-        }
-        else {
+        } else {
             STAT_C1vC2 <-
                 dma_stat_single(
                     data = data,
@@ -312,8 +311,7 @@ dma <- function(
                     padj = padj
                 )
         }
-    }
-    else { # MultipleComparison = TRUE
+    } else { # MultipleComparison = TRUE
         # Correct data heteroscedasticity
         if (pval != "lmFit" & vst == TRUE) {
             vst_res <- vst(data)
@@ -329,8 +327,7 @@ dma <- function(
                 paste(pval),
                 "."
             )
-        }
-        else { # for 1 vs all
+        } else { # for 1 vs all
             message(
                 "No condition was specified as numerator and ",
                 Settings[["denominator"]],
@@ -482,8 +479,7 @@ dma <- function(
         x <- "Log2(Distance)"
         VolPlot_metadata_info <- c(color = "core")
         VolPlot_SettingsFile <- DMA_Output
-    }
-    else {
+    } else {
         x <- "Log2FC"
         VolPlot_metadata_info <- NULL
         VolPlot_SettingsFile <- NULL
