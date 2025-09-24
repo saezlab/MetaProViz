@@ -229,7 +229,7 @@ translate_id <- function(data,
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
-#' @importFrom dplyr mutate select group_by ungroup distinct filter across rowwise
+#' @importFrom dplyr mutate select group_by ungroup distinct filter across rowwise if_else
 #' @importFrom tidyr separate_rows unnest
 #' @importFrom purrr map_chr
 #' @importFrom tidyselect all_of starts_with
