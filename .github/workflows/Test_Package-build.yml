@@ -45,7 +45,7 @@ jobs:
       (github.event_name == 'schedule' && github.ref == 'refs/heads/devel')
 
     steps:
-      
+
       # Checkout the repository code
       - uses: actions/checkout@v4
 
@@ -98,7 +98,7 @@ jobs:
       #- name: Install package dependencies
       #  run: |
       #    Rscript -e 'install.packages(c("broom", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
-          
+
 
       - name: Install remotes
         run: |
@@ -116,10 +116,17 @@ jobs:
       # Set Bioconductor back to release and install other Bioconductor dependencies
       - name: Install other Bioconductor dependencies from release
         run: |
-          Rscript -e 'install.packages("ComplexUpset", type="source")'
           Rscript -e 'remotes::install_deps(dependencies = TRUE)'
           # Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
 
+      # ComplexUpset should be installed after ggplot2 to ensure compatibility, especially on Linux/Ubuntu.
+      - name: Install latest ggplot2
+        run: Rscript -e 'install.packages("ggplot2")'
+
+      - name: Install ComplexUpset from source
+        run: Rscript -e 'install.packages("ComplexUpset", type="source")'
+
+      # Install  MetaProViz
       - name: Install MetaProViz from git by remotes
         if: github.ref == 'refs/heads/main'
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
