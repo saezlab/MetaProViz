@@ -23,6 +23,14 @@ checkmatch_pk_to_data(
 
 \item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
+\value{
+A \code{list} with three elements:
+\itemize{
+  \item \code{data_summary} — a data frame summarising matching results per input ID, including counts, conflicts, and recommended actions.
+  \item \code{GroupingVariable_summary} — a detailed data frame showing matches grouped by the specified variable, with conflict annotations.
+  \item \code{data_long} — a merged data frame of prior knowledge IDs and detected IDs in long format.
+}
+}
 \description{
 Check and summarize relationship between prior knowledge to measured features
 }
