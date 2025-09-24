@@ -27,13 +27,11 @@
 #' Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
 #' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
 #'
-#' @format A data frame with multiple rows and columns:
-#' \describe{
-#'   \item{Conditions}{Character vector indicating cell line identity}
-#'   \item{Analytical_Replicate}{Integer replicate number for analytical replicates}
-#'   \item{Biological_Replicate}{Integer replicate number for biological replicates}
-#' }
-#' The remaining columns contain raw intensities for 183 metabolites.
+#' @format A data frame with the following columns:
+#'   - `Conditions`: Character vector indicating cell line identity
+#'   - `Analytical_Replicate`: Integer replicate number for analytical replicates
+#'   - `Biological_Replicate`: Integer replicate number for biological replicates
+#'   - Additional numeric columns (183 in total) containing raw metabolite intensities
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
 #' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
