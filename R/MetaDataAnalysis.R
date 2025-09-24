@@ -168,7 +168,7 @@ metadata_analysis <- function(data,
       Formula <- as.formula(paste(pc_col, "~", meta_col, sep=""))# Create a formula for ANOVA --> When constructing the ANOVA formula, it's important to ensure that the response variable (dependent variable) is numeric.
       #pairwiseFormula <- as.formula(paste("pairwise ~" , meta_col, sep=""))
 
-      anova_result <- aov(Formula, data = PCA.res_Info)# Perform ANOVA
+      anova_result <- stats::aov(Formula, data = PCA.res_Info)# Perform ANOVA
       anova_result_tidy <- tidy(anova_result)#tidy --> convert statistics into table
       anova_row <- filter(anova_result_tidy, term != "Residuals")  # Exclude Residuals row
 
