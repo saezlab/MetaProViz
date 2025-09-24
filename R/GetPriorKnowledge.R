@@ -33,7 +33,6 @@
 #' @importFrom dplyr filter inner_join mutate rename
 #' @importFrom logger log_info
 #' @importFrom purrr map_chr map_lgl set_names
-#' @importFrom remotes install_github
 #' @importFrom stringr str_replace str_split
 #' @export
 metsigdb_kegg <- function(){

@@ -66,7 +66,6 @@ Imports:
     qvalue,
     rappdirs,
     readr,
-    remotes,
     rlang,
     rstatix,
     stringr,
