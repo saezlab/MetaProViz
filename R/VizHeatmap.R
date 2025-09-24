@@ -211,7 +211,7 @@ viz_heatmap <- function(data,
 
       # Make the plot
       if(nrow(t(data_path))>= 2){
-        set.seed(1234)
+        # set.seed(1234)
 
         heatmap <- pheatmap(t(data_path),
                                      show_rownames = as.logical(show_rownames),
@@ -354,7 +354,7 @@ viz_heatmap <- function(data,
 
         # Make the plot
         if(nrow(t(data_path))>= 2){
-        set.seed(1234)
+        # set.seed(1234)
 
         heatmap <- pheatmap(t(data_path),
                                       show_rownames = as.logical(show_rownames),
@@ -520,7 +520,7 @@ viz_heatmap <- function(data,
 
             # Make the plot
             if(nrow(t(data_path))>= 2){
-            set.seed(1234)
+              # set.seed(1234)
 
             heatmap <- pheatmap(t(data_path),
                                           show_rownames = as.logical(show_rownames),
@@ -637,7 +637,7 @@ viz_heatmap <- function(data,
 
     #Make the plot:
     if(nrow(t(data))>= 2){
-    set.seed(1234)
+    # set.seed(1234)
 
     heatmap <- pheatmap(t(data),
                                   show_rownames = as.logical(show_rownames),
