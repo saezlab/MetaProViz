@@ -5,13 +5,13 @@
 \alias{intracell_raw}
 \title{intracell_raw}
 \format{
-A data frame with multiple rows and columns:
-\describe{
-\item{Conditions}{Character vector indicating cell line identity}
-\item{Analytical_Replicate}{Integer replicate number for analytical replicates}
-\item{Biological_Replicate}{Integer replicate number for biological replicates}
+A data frame with the following columns:
+\itemize{
+\item \code{Conditions}: Character vector indicating cell line identity
+\item \code{Analytical_Replicate}: Integer replicate number for analytical replicates
+\item \code{Biological_Replicate}: Integer replicate number for biological replicates
+\item Additional numeric columns (183 in total) containing raw metabolite intensities
 }
-The remaining columns contain raw intensities for 183 metabolites.
 }
 \source{
 Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
