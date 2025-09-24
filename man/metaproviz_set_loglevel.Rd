@@ -18,6 +18,6 @@ Returns \code{NULL}.
 Sets the log level for the package logger
 }
 \examples{
-metaproviz_set_loglevel(FATAL, target = 'console')
+metaproviz_set_loglevel(logger::FATAL, target = 'console')
 
 }
