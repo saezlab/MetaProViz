@@ -49,8 +49,8 @@ requires a pathway list (from databases).
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
 data(intracell_dma) # loads the object into your environment
-DMAres <- as.data.frame(intracell_dma) \%>\% filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
-standard_ora(data= DMAres,
+DMAres <- intracell_dma \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
+RES <- MetaProViz::standard_ora(data= DMAres,
 input_pathway=KEGG_Pathways)
 
 }
