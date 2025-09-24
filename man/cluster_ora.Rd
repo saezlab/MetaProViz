@@ -47,6 +47,7 @@ Uses enricher to run ORA on each of the metabolite cluster from any of the MCA f
 }
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
+data(intracell_dma) # loads the object into your environment
 DMAres <- as.data.frame(intracell_dma) \%>\% filter(!is.na(KEGGCompound))\%>\% as.data.frame()\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
 cluster_ora(data= DMAres,
 metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),

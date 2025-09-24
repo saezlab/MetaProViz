@@ -57,6 +57,7 @@
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
+#' data(intracell_dma) # loads the object into your environment
 #' DMAres <- as.data.frame(intracell_dma) %>% filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
 #' cluster_ora(data= DMAres,
 #' metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
@@ -206,6 +207,7 @@ cluster_ora <- function(data,
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
+#' data(intracell_dma) # loads the object into your environment
 #' DMAres <- as.data.frame(intracell_dma) %>% filter(!is.na(KEGGCompound))%>% as.data.frame()%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
 #' standard_ora(data= DMAres,
 #' input_pathway=KEGG_Pathways)
