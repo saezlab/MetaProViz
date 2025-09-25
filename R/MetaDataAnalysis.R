@@ -75,6 +75,7 @@
 #' @importFrom tidyr separate_rows pivot_wider
 #' @importFrom tibble rownames_to_column
 #' @importFrom logger log_info
+#' @importFrom purrr map_lgl
 #'
 #' @export
 metadata_analysis <- function(data,
@@ -152,9 +153,9 @@ metadata_analysis <- function(data,
 
   #--- 3. convert columns that are not numeric to factor:
   ## Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
-  char_cols <- vapply(PCA.res_Info, is.character, FUN.VALUE = logical(1))
+  char_cols <- map_lgl(PCA.res_Info, is.character)
   PCA.res_Info[char_cols] <- lapply(PCA.res_Info[char_cols], as.factor)
-  int_cols <- vapply(PCA.res_Info, is.integer, FUN.VALUE = logical(1))
+  int_cols <- map_lgl(PCA.res_Info, is.integer)
   PCA.res_Info[int_cols] <- lapply(PCA.res_Info[int_cols], as.factor)
 
   ###############################################################################################################################################################################################################

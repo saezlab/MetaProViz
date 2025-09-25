@@ -653,7 +653,7 @@ MultipleIDs <- Biocrates_to_MetalinksDB$data_summary%>%
 ######################################
 # Extract first ID:
 extract_first_id <- function(id_col) {
-  sapply(as.character(id_col), function(x) {
+  map_chr(as.character(id_col), function(x) {
     # Check for NA or empty string
     if (is.na(x) || x == "") {
       return(NA)

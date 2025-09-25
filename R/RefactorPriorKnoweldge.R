@@ -230,7 +230,7 @@ translate_id <- function(data,
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across rowwise if_else
 #' @importFrom tidyr separate_rows unnest
-#' @importFrom purrr map_chr
+#' @importFrom purrr map_chr map_lgl map_int 
 #' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR id_types translate_ids
@@ -478,6 +478,9 @@ equivalent_id <- function(data,
 #' @importFrom OmnipathR ambiguity
 #' @importFrom logger log_trace
 #' @importFrom tidyr unnest
+#' @importFrom purrr map_chr map_int map_lgl
+#' @importFrom dplyr first
+#' 
 #' @export
 mapping_ambiguity <- function(data,
                              from,
@@ -701,6 +704,9 @@ mapping_ambiguity <- function(data,
 #' @importFrom tibble tibble
 #' @importFrom tidyr separate_rows
 #' @importFrom rlang !!! !! := sym syms
+#' @importFrom purrr map_chr
+#' @importFrom stringr str_split
+#' @importFrom dplyr first
 #' @export
 checkmatch_pk_to_data <- function(data,
                            input_pk,
@@ -752,13 +758,16 @@ checkmatch_pk_to_data <- function(data,
 
   data_MultipleIDs <- any(
      grepl(",\\s*", data[[metadata_info[["InputID"]]]]) |  # Comma-separated
-       sapply(data[[metadata_info[["InputID"]]]] , function(x) {
-         if (grepl("^c\\(|^list\\(", x)) {
-           parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
-           return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+       map_lgl(
+         data[[metadata_info[["InputID"]]]],
+         function(x) {
+           if (grepl("^c\\(|^list\\(", x)) {
+             parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
+             return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+           }
+           FALSE
          }
-         FALSE
-       })
+       )
    )
 
   ## input_pk:
@@ -819,13 +828,16 @@ checkmatch_pk_to_data <- function(data,
 
   PK_MultipleIDs <- any(# Check if multiple IDs are present:
     grepl(",\\s*", input_pk[[metadata_info[["PriorID"]]]]) |  # Comma-separated
-      sapply(input_pk[[metadata_info[["PriorID"]]]] , function(x) {
-        if (grepl("^c\\(|^list\\(", x)) {
-          parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
-          return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+      map_lgl(
+        input_pk[[metadata_info[["PriorID"]]]],
+        function(x) {
+          if (grepl("^c\\(|^list\\(", x)) {
+            parsed <- tryCatch(eval(parse(text = x)), error = function(e) NULL)
+            return(is.list(parsed) && length(parsed) > 1 || is.vector(parsed) && length(parsed) > 1)
+          }
+          FALSE
         }
-        FALSE
-      })
+      )
   )
 
   ## ------------ Create Results output folder ----------- ##
@@ -980,7 +992,8 @@ checkmatch_pk_to_data <- function(data,
     mutate(
       InputID_select = case_when(
         original_count ==1 & matches_count <= 1 ~ metadata_info[["InputID"]],
-        original_count >=2 & matches_count == 0 ~ str_split(metadata_info[["InputID"]], ",\\s*") %>% sapply(`[`, 1),
+        original_count >=2 & matches_count == 0 ~ str_split(metadata_info[["InputID"]], ",\\s*") %>%
+          map_chr(first),
         original_count >=2 & matches_count == 1 ~ matches,
         TRUE ~ NA_character_
       ),
@@ -1618,13 +1631,16 @@ count_id <- function(data,
   processed_data <- mutate(
     data,
     was_na = is.na(.data[[column]]) | .data[[column]] == "",
-    entry_count = sapply(.data[[column]], function(cell) {
-      if (is.na(cell) || cell == "") {
-        0  # Treat NA or empty as 0 entries for counting
-      } else {
-        length(unlist(strsplit(as.character(cell), delimiter)))
+    entry_count = map_int(
+      .data[[column]],
+      function(cell) {
+        if (is.na(cell) || cell == "") {
+          0L  # Treat NA or empty as 0 entries for counting
+        } else {
+          as.integer(length(unlist(strsplit(as.character(cell), delimiter))))
+        }
       }
-    }),
+    ),
     id_label = case_when(
       entry_count == 0 ~ "No ID",
       entry_count == 1 ~ "Single ID",

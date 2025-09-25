@@ -59,6 +59,7 @@
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_trace log_info
 #' @importFrom tidyselect all_of
+#' @importFrom purrr map_dbl
 #' @export
 viz_superplot <- function(data,
                          metadata_sample,
@@ -352,7 +353,7 @@ viz_superplot <- function(data,
         df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE)%>%
           separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
           unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
-        df$p.adj <- round(sapply(STAT_C1vC2, function(x) x$p.adj),5)
+        df$p.adj <- round(map_dbl(STAT_C1vC2, ~ .x$p.adj), 5)
 
         # Add the 'res' column by repeating 'position' to match the number of rows
         position <- c(max(dataMeans$Intensity + 2*dataMeans$sd),
@@ -431,3 +432,4 @@ viz_superplot <- function(data,
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
+
