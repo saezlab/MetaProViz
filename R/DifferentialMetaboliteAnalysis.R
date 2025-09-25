@@ -2097,7 +2097,11 @@ shapiro <- function(data,
       warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
     }else{
       # Apply shapiro-Wilk test to each feature in the subset
-     shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+    # shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+     shapiro_results[[i]] <- as.data.frame(
+      vapply(subset_data, shapiro.test, FUN.VALUE = list(statistic = c(W = 0), p.value = 0.0, method = "", data.name = ""))
+     )
+     
     }
   }
 
