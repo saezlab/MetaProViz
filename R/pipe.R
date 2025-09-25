@@ -17,5 +17,6 @@
 #
 
 #' @importFrom magrittr %>%
+#' @return The left-hand side object, passed into the function on the right-hand side.
 #' @export
 magrittr::`%>%`

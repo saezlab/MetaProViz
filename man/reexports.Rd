@@ -5,6 +5,9 @@
 \alias{reexports}
 \alias{\%>\%}
 \title{Objects exported from other packages}
+\value{
+The left-hand side object, passed into the function on the right-hand side.
+}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
