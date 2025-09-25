@@ -2059,7 +2059,9 @@ shapiro <- function(data,
   Input_shaptest <- replace(data, is.na(data), 0)%>% #shapiro test can not handle NAs!
     filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator)%>%
     select_if(is.numeric)
-  temp<- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x)) == 0#  we have to remove features with zero variance if there are any.
+  # temp <- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x))  == 0 #  we have to remove features with zero variance if there are any.
+  temp <- vapply(Input_shaptest, function(x) var(x, na.rm = TRUE), FUN.VALUE = numeric(1)) == 0 #  we have to remove features with zero variance if there are any.
+
   temp <- temp[complete.cases(temp)]  # Remove NAs from temp
   columns_with_zero_variance <- names(temp[temp])# Extract column names where temp is TRUE
 
