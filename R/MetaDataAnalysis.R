@@ -152,8 +152,10 @@ metadata_analysis <- function(data,
 
   #--- 3. convert columns that are not numeric to factor:
   ## Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
-  PCA.res_Info[sapply(PCA.res_Info, is.character)] <- lapply(PCA.res_Info[sapply(PCA.res_Info, is.character)], as.factor)
-  PCA.res_Info[sapply(PCA.res_Info, is.integer)] <- lapply(PCA.res_Info[sapply(PCA.res_Info, is.integer)], as.factor)
+  char_cols <- vapply(PCA.res_Info, is.character, FUN.VALUE = logical(1))
+  PCA.res_Info[char_cols] <- lapply(PCA.res_Info[char_cols], as.factor)
+  int_cols <- vapply(PCA.res_Info, is.integer, FUN.VALUE = logical(1))
+  PCA.res_Info[int_cols] <- lapply(PCA.res_Info[int_cols], as.factor)
 
   ###############################################################################################################################################################################################################
   ## ---------- STATS ------------##
@@ -430,4 +432,5 @@ meta_pk <- function(data,
   Res <- list(Metadata_prior_knowledge = Metadata_df)
 
 }
+
 
