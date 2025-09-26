@@ -13,10 +13,10 @@ on:
 
 
 # Name of the workflow as shown in GitHub Actions UI
-name: R-CMD-check
+name: 'Package build & check'
 
 jobs:
-  R-CMD-check:
+  build-check:
     # Run the job on each OS in the matrix (macOS, Ubuntu, Windows)
     runs-on: ${{ matrix.config.os }}
 

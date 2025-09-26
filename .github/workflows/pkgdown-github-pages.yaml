@@ -6,11 +6,11 @@ on:
   schedule:
     - cron: '0 4 * * *'
 
-name: Build_gh-pages.yml #shown when action is run
+name: 'GitHub Pages pkgdown site build'
 
 jobs:
 
-  pkgdown:
+  build-deploy:
 
     runs-on: ubuntu-latest
     container:
