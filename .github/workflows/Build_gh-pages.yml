@@ -14,7 +14,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: rocker/r-ubuntu:latest
+      image: bioconductor/bioconductor_docker:devel
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,7 +22,7 @@ jobs:
 
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/devel')
 
     steps: #Series of steps that is executed sequencially: https://github.com/r-lib/actions/
       - name: Install system dependencies
