@@ -19,4 +19,8 @@ intracell_dma
 Metabolomics workbench project PR001418, study ST002224 where we performed differential metabolite
 analysis comparing intracellular metabolomics of 786-M1A versus HK2 cells.
 }
+\examples{
+data(intracell_dma)
+head(intracell_dma)
+}
 \keyword{datasets}

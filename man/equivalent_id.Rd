@@ -31,7 +31,7 @@ Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 }
 \examples{
 DetectedIDs <- cellular_meta\%>\%tidyr::drop_na()
-Res <- MetaProViz::equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
+Res <- equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
 
 }
 \keyword{Find}

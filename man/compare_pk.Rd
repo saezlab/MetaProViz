@@ -37,6 +37,8 @@ Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. Thi
 
 \item{plot_name}{\emph{Optional: } String which is added to the output files of the Upsetplot \strong{Default = ""}}
 
+\item{name_col}{\emph{Optional: } column name including the feature names. Default is \code{"TrivialName"}.}
+
 \item{palette_type}{Character. Color palette to be used in the plot. Default is \code{"polychrome"}.}
 
 \item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}}
@@ -46,8 +48,6 @@ Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. Thi
 \item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}}
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
-
-\item{output_file}{Character. Optional file path to save the generated plot; if \code{NULL}, the plot is not saved.}
 }
 \value{
 A list containing two elements: \itemize{
@@ -76,26 +76,17 @@ to have a grouping column named \code{"Class"} (or, alternatively, a column spec
 that is used for grouping in the UpSet plot.
 }
 \examples{
-## Example 1: Multi-Resource Comparison
-
-# Using automatic data loading for multiple resources.
-data <- list(hallmarks = hallmarks, gaude = gaude_pathways,
-                metalinksdb = metsigdb_metalinks(), ramp = metsigdb_chemicalclass())
-
-# Filtering to include only gene features:
-res_genes <- MetaProViz::compare_pk(data = data, filter_by = "gene")
-
-## Example 2: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
+## Example 1: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
 
 # biocrates_features is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 # Here the "Class" column is used as the grouping variable in the UpSet plot.
 data_single <- list(Biocft = biocrates_features)
 metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 
-res_single <- MetaProViz::compare_pk(data = data_single, metadata_info = metadata_info_single,
+res_single <- compare_pk(data = data_single, metadata_info = metadata_info_single,
                           plot_name = "Overlap of BioCrates Columns")
 
-## Example 3: Custom data Frames with Custom Column Names
+## Example 2: Custom data Frames with Custom Column Names
 
 # Example with preloaded data frames and custom column names:
 hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), stringsAsFactors = FALSE)
@@ -107,6 +98,6 @@ data <- list(Hallmarks = hallmarks_df, Gaude = gaude_df,
                 MetalinksDB = metalinks_df, RAMP = ramp_df)
 metadata_info <- list(Hallmarks = "feature", Gaude = "feature",
                      MetalinksDB = c("hmdb", "gene_symbol"), RAMP = "class_source_id")
-res <- MetaProViz::compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
+res <- compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
 
 }

@@ -64,7 +64,7 @@ Heatmap visualization
 }
 \examples{
 Intra <- intracell_raw\%>\%tibble::column_to_rownames("Code")
-Res <- MetaProViz::viz_heatmap(data=Intra[,-c(1:3)])
+Res <- viz_heatmap(data=Intra[,-c(1:3)])
 
 }
 \keyword{Heatmap}

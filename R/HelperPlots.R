@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: Helper for figures
-##
-## Purpose of script: Make ggplot figures nice
-##
-## Author:
-##
-## Date Created: 2024-09-28
-##
-## Copyright (c) Saez Lab
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 #'
 
 #' Use the second value if the first one is NULL
@@ -196,12 +195,14 @@ adjust_layout <- function(gtbl, param) {
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce
 #' @importFrom rlang !!!
+#' @importFrom rlang exec
+#'
 #' @noRd
 set_sizes <- function(gtbl, dim, param) {
 
     param %>%
     reduce(
-        ~rlang::exec(set_size, .x, !!!.y, dim = dim),
+        ~exec(set_size, .x, !!!.y, dim = dim),
         .init = gtbl
     )
 
@@ -499,8 +500,8 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
   ))
 
   Plot_Sized %<>%
-    {ggplot2::ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+    {ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
 
   return(Plot_Sized)
 }
@@ -560,8 +561,8 @@ plot_grob_pca <- function(input_plot, metadata_info,plot_name){
 
   log_trace(
     'Sum of heights: %.02f, sum of widths: %.02f',
-    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
-    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+    convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
   )
 
   #Return
@@ -654,7 +655,7 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
     legendHeights <- unit((sum(length(unique(legend_names_M))+length(unique(colour_names_M))+length(unique(legend_names))+length(unique(colour_names)))), "cm")
 
     Plot_Sized$width %<>% add(legendWidth)
-    if((grid::convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
+    if((convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
       Plot_Sized$height <- legendHeights
     }
 
@@ -720,8 +721,8 @@ plot_grob_volcano <- function(input_plot, metadata_info,plot_name, subtitle){
 
   log_trace(
     'Sum of heights: %.02f, sum of widths: %.02f',
-    grid::convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
-    grid::convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
+    convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
+    convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
   )
 
   #Return
@@ -751,7 +752,7 @@ plot_grob_superplot <- function(input_plot,
                                plot_type){
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   X_Con <- metadata_sample%>%
-    dplyr::distinct(Conditions)
+    distinct(Conditions)
 
   X_tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 

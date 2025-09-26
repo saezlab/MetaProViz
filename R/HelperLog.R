@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: HelperFunctions
-##
-## Purpose of script: Log files
-##
-## Author: Denes Turei
-##
-## Date Created: 2024-06-14
-##
-## Copyright (c) Denes Turei
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 
 #' Path to the current MetaProViz log file
@@ -29,13 +28,11 @@
 #' # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 #'
 #' @importFrom OmnipathR logfile
-#'
 #' @export
-#'
 #' @seealso \code{\link{metaproviz_log}}
 metaproviz_logfile <- function(){
   #Creates the path for the log file
-  OmnipathR::logfile('MetaProViz')
+  logfile('MetaProViz')
 }
 
 
@@ -50,14 +47,12 @@ metaproviz_logfile <- function(){
 #' }
 #'
 #' @importFrom OmnipathR read_log
-#'
 #' @export
-#'
 #' @seealso \code{\link{metaproviz_logfile}}
-#'
 metaproviz_log <- function(){
-  #Opens log file for browsing
-  OmnipathR::read_log('MetaProViz')
+
+  read_log('MetaProViz')
+
 }
 
 
@@ -75,7 +70,7 @@ metaproviz_log <- function(){
 #' @export
 metaproviz_set_loglevel <- function(level, target = 'logfile'){
   #to change log-level e.g. to see all messages being printed
-  OmnipathR::set_loglevel(level, target = target, pkg = 'MetaProViz')
+  set_loglevel(level, target = target, pkg = 'MetaProViz')
 }
 
 
@@ -83,18 +78,19 @@ metaproviz_set_loglevel <- function(level, target = 'logfile'){
 #'
 #' @noRd
 mpv_trace <- function() {#MPV=MetaProViz
+
   # Useful for debugging
   metaproviz_set_loglevel('trace', target = 'console')
+
 }
+
 
 #' Set the console log level to "trace"
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @importFrom logger log_info
 #' @importFrom utils packageVersion
-#'
 #' @noRd
-#'
 metaproviz_init <- function(){
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
   if(is.null(metaproviz.env$init)){

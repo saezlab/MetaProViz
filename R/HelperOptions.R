@@ -1,3 +1,21 @@
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 .metaproviz_options_defaults <- list(
   metaproviz.loglevel = 'trace',
@@ -48,7 +66,7 @@ metaproviz_save_config <- function(
 #' @param user Force to use the user level config even if a config file
 #'     exists in the current directory. By default, the local config files
 #'     have prioroty over the user level config.
-#' @param ... Passed to \code{yaml::yaml.load_file}.
+#' @param ... Passed to \code{yaml.load_file}.
 #'
 #' @return Invisibly returns the config as a list.
 #'

@@ -8,12 +8,16 @@
 Data frame with columns: term, gene
 }
 \source{
-?
+Omnipath
 }
 \usage{
 hallmarks
 }
 \description{
 hallmarks
+}
+\examples{
+data(hallmarks)
+head(hallmarks)
 }
 \keyword{datasets}

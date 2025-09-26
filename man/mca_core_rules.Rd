@@ -18,4 +18,8 @@ mca_core_rules
 Manually curated table defining the flow of information of the Conusuption-Release and Intracellular metabolomics biological
 regulatory clusters Regulatory labels from the different grouping methods.
 }
+\examples{
+data(mca_core_rules)
+head(mca_core_rules)
+}
 \keyword{datasets}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/OverRepresentationAnalysis.R
 \name{standard_ora}
 \alias{standard_ora}
-\title{Uses enricher to run ORA on the differential metabolites (DM) using a pathway list}
+\title{Overrepresentation analysis of metabolite sets in pathways}
 \usage{
 standard_ora(
   data,
@@ -25,7 +25,7 @@ standard_ora(
 
 \item{cutoff_stat}{\emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}}
 
-\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom \% of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}}
+\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom \% of selected percentage Column, usually t.val or Log2FC \strong{default: 10}}
 
 \item{input_pathway}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
 
@@ -43,5 +43,14 @@ standard_ora(
 Saves results as individual .csv files.
 }
 \description{
-Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
+Can be applied on the result of differential metabolite analysis (DMA),
+requires a pathway list (from databases).
+}
+\examples{
+KEGG_Pathways <- metsigdb_kegg()
+data(intracell_dma) # loads the object into your environment
+DMAres <- intracell_dma \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
+RES <- MetaProViz::standard_ora(data= DMAres,
+input_pathway=KEGG_Pathways)
+
 }

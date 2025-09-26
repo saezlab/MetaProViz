@@ -17,4 +17,8 @@ equivalent_features
 Manually curated list of aminoacids and aminoacid-related metabolites with corresponding metabolite
 identifiers (HMDB, KEGG, etc.) irrespective of chirality.
 }
+\examples{
+data(equivalent_features)
+head(equivalent_features)
+}
 \keyword{datasets}

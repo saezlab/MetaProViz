@@ -21,3 +21,4 @@
 ^pkgdown$
 ^vignettes/.*\.png$
 ^inst/doc/.*\.png$
+^MetaProViz.BiocCheck$

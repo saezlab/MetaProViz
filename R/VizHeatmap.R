@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: Visualization
-##
-## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
-##
-## Author: Dimitrios Prymidis and Christina Schmidt
-##
-## Date Created: 2022-10-28
-##
-## Copyright (c) Dimitrios Prymidis and Christina Schmidt
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 ###############################
 ### ### ### Heatmap ### ### ###
@@ -55,15 +54,17 @@
 #'
 #' @examples
 #' Intra <- intracell_raw%>%tibble::column_to_rownames("Code")
-#' Res <- MetaProViz::viz_heatmap(data=Intra[,-c(1:3)])
+#' Res <- viz_heatmap(data=Intra[,-c(1:3)])
 #'
 #' @keywords Heatmap
 #'
-#' @importFrom ggplot2 ggplot theme
+#' @importFrom ggplot2 ggplot theme element_rect
+#' @importFrom grid convertUnit
 #' @importFrom dplyr rename select
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_trace
+#' @importFrom pheatmap pheatmap
 #' @export
 viz_heatmap <- function(data,
                        metadata_info= NULL,
@@ -94,14 +95,14 @@ viz_heatmap <- function(data,
   # check_param` Specific
   if(is.logical(enforce_featurenames) == FALSE | is.logical(enforce_samplenames) == FALSE){
     message <- paste0("Check input. The enforce_featurenames and enforce_samplenames value should be either =TRUE or = FALSE.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   scale_options <- c("row","column", "none")
   if(scale %in% scale_options == FALSE){
     message <- paste0("Check input. The selected scale option is not valid. Please select one of the folowwing: ",paste(scale_options,collapse = ", "),"." )
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
 
@@ -118,13 +119,13 @@ viz_heatmap <- function(data,
 
   if(is.null(metadata_feature)==FALSE){#removes information about metabolites that are not included in the data
     metadata_feature <- merge(x=metadata_feature, y=as.data.frame(t(data)), by=0, all.y=TRUE)%>%
-      tibble::column_to_rownames("Row.names")
+      column_to_rownames("Row.names")
     metadata_feature <- metadata_feature[,-c((ncol(metadata_feature)-nrow(data)+1):ncol(metadata_feature))]
   }
 
     if(is.null(metadata_sample)==FALSE){#removes information about samples that are not included in the data
       metadata_sample <- merge(x=metadata_sample, y=data, by=0, all.y=TRUE)%>%
-        tibble::column_to_rownames("Row.names")
+        column_to_rownames("Row.names")
       metadata_sample <- metadata_sample[,-c((ncol(metadata_sample)-ncol(data)+1):ncol(metadata_sample))]
     }
 
@@ -140,7 +141,7 @@ viz_heatmap <- function(data,
       selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
       if(length(selected_path_metabs)==1 ){
         message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-        logger::log_trace(paste("Warning ", message, sep=""))
+        log_trace(paste("Warning ", message, sep=""))
         warning(message)
         unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
       }
@@ -154,7 +155,7 @@ viz_heatmap <- function(data,
     for (i in IndividualPlots){
       selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
       selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-      data_path <- data %>% dplyr::select(all_of(selected_path_metabs))
+      data_path <- data %>% select(all_of(selected_path_metabs))
 
       # Column annotation
       col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
@@ -210,9 +211,9 @@ viz_heatmap <- function(data,
 
       # Make the plot
       if(nrow(t(data_path))>= 2){
-        set.seed(1234)
+        # set.seed(1234)
 
-        heatmap <- pheatmap::pheatmap(t(data_path),
+        heatmap <- pheatmap(t(data_path),
                                      show_rownames = as.logical(show_rownames),
                                      show_colnames = as.logical(show_colnames),
                                      clustering_method =  "complete",
@@ -220,7 +221,7 @@ viz_heatmap <- function(data,
                                      clustering_distance_rows = "correlation",
                                      annotation_col = col_annot,
                                      annotation_row = row_annot,
-                                     legend = T,
+                                     legend = TRUE,
                                      cellwidth = cellwidth_Sample,
                                      cellheight = cellheight_Feature,
                                      fontsize_row= 10,
@@ -235,11 +236,11 @@ viz_heatmap <- function(data,
 
         #Width and height according to Sample and metabolite number
         Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
-        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
-          {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+          {ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
@@ -259,7 +260,7 @@ viz_heatmap <- function(data,
 
       }else{
         message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
-        logger::log_trace(paste("Message ", message, sep=""))
+        log_trace(paste("Message ", message, sep=""))
         message(message)
         }
     }
@@ -277,7 +278,7 @@ viz_heatmap <- function(data,
         selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
         if(length(selected_path_metabs)==1 ){
           message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-          logger::log_trace(paste("Warning ", message, sep=""))
+          log_trace(paste("Warning ", message, sep=""))
           warning(message)
           unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
         }
@@ -290,15 +291,15 @@ viz_heatmap <- function(data,
       for (i in IndividualPlots){
         #Select the data:
         selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == i)%>%
-          tibble::rownames_to_column("UniqueID")
+          rownames_to_column("UniqueID")
         selected_path <- as.data.frame(selected_path[,1])%>%
-          dplyr::rename("UniqueID"=1)
-        data_path <- merge(selected_path, data%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+          rename("UniqueID"=1)
+        data_path <- merge(selected_path, data%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
         data_path <- data_path%>%
-          tibble::column_to_rownames("UniqueID")
+          column_to_rownames("UniqueID")
 
         # Column annotation
-        selected_metadata_sample <- merge(selected_path, metadata_sample%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+        selected_metadata_sample <- merge(selected_path, metadata_sample%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
 
         col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
         col_annot<- NULL
@@ -353,9 +354,9 @@ viz_heatmap <- function(data,
 
         # Make the plot
         if(nrow(t(data_path))>= 2){
-        set.seed(1234)
+        # set.seed(1234)
 
-        heatmap <- pheatmap::pheatmap(t(data_path),
+        heatmap <- pheatmap(t(data_path),
                                       show_rownames = as.logical(show_rownames),
                                       show_colnames = as.logical(show_colnames),
                                       clustering_method =  "complete",
@@ -363,7 +364,7 @@ viz_heatmap <- function(data,
                                       clustering_distance_rows = "correlation",
                                       annotation_col = col_annot,
                                       annotation_row = row_annot,
-                                      legend = T,
+                                      legend = TRUE,
                                       cellwidth = cellwidth_Sample,
                                       cellheight = cellheight_Feature,
                                       fontsize_row= 10,
@@ -378,11 +379,11 @@ viz_heatmap <- function(data,
 
         #Width and height according to Sample and metabolite number
         Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name= cleaned_i)
-        plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+        plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+        plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
-          {ggplot2::ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+          {ggplot() + annotation_custom(.)} %>%
+          add(theme(panel.background = element_rect(fill = "transparent")))
 
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
@@ -401,7 +402,7 @@ viz_heatmap <- function(data,
                                plot_unit="cm")))
         }else{
           message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
-          logger::log_trace(paste("Message ", message, sep=""))
+          log_trace(paste("Message ", message, sep=""))
           message(message)
         }
         }
@@ -419,7 +420,7 @@ viz_heatmap <- function(data,
           selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           if(length(selected_path_metabs)==1 ){
             message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-            logger::log_trace(paste("Warning ", message, sep=""))
+            log_trace(paste("Warning ", message, sep=""))
             warning(message)
             unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
           }
@@ -435,7 +436,7 @@ viz_heatmap <- function(data,
           selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
           if(length(selected_path_metabs)==1 ){
             message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-            logger::log_trace(paste("Warning ", message, sep=""))
+            log_trace(paste("Warning ", message, sep=""))
             warning(message)
             unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
           }
@@ -450,7 +451,7 @@ viz_heatmap <- function(data,
         for (i in IndividualPlots_Metab){
           selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
           selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-          data_path_metab <- data %>% dplyr::select(all_of(selected_path_metabs))
+          data_path_metab <- data %>% select(all_of(selected_path_metabs))
 
           # Row annotation
           row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
@@ -470,15 +471,15 @@ viz_heatmap <- function(data,
           for (s in IndividualPlots_Sample){
             #Select the data:
             selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == s)%>%
-              tibble::rownames_to_column("UniqueID")
+              rownames_to_column("UniqueID")
             selected_path <- as.data.frame(selected_path[,1])%>%
-              dplyr::rename("UniqueID"=1)
-            data_path <- merge(selected_path, data_path_metab%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+              rename("UniqueID"=1)
+            data_path <- merge(selected_path, data_path_metab%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
             data_path <- data_path%>%
-              tibble::column_to_rownames("UniqueID")
+              column_to_rownames("UniqueID")
 
             # Column annotation
-            selected_metadata_sample <- merge(selected_path, metadata_sample%>% tibble::rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
+            selected_metadata_sample <- merge(selected_path, metadata_sample%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
 
             col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
             col_annot<- NULL
@@ -519,9 +520,9 @@ viz_heatmap <- function(data,
 
             # Make the plot
             if(nrow(t(data_path))>= 2){
-            set.seed(1234)
+              # set.seed(1234)
 
-            heatmap <- pheatmap::pheatmap(t(data_path),
+            heatmap <- pheatmap(t(data_path),
                                           show_rownames = as.logical(show_rownames),
                                           show_colnames = as.logical(show_colnames),
                                           clustering_method =  "complete",
@@ -529,7 +530,7 @@ viz_heatmap <- function(data,
                                           clustering_distance_rows = "correlation",
                                           annotation_col = col_annot,
                                           annotation_row = row_annot,
-                                          legend = T,
+                                          legend = TRUE,
                                           cellwidth = cellwidth_Sample,
                                           cellheight = cellheight_Feature,
                                           fontsize_row= 10,
@@ -547,11 +548,11 @@ viz_heatmap <- function(data,
             #Width and height according to Sample and metabolite number
            plot_name <- paste(cleaned_i,cleaned_s, sep="_")
             Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
-            plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-            plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+            plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+            plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
             Plot_Sized %<>%
-              {ggplot2::ggplot() + annotation_custom(.)} %>%
-              add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+              {ggplot() + annotation_custom(.)} %>%
+              add(theme(panel.background = element_rect(fill = "transparent")))
 
             PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- Plot_Sized
 
@@ -636,9 +637,9 @@ viz_heatmap <- function(data,
 
     #Make the plot:
     if(nrow(t(data))>= 2){
-    set.seed(1234)
+    # set.seed(1234)
 
-    heatmap <- pheatmap::pheatmap(t(data),
+    heatmap <- pheatmap(t(data),
                                   show_rownames = as.logical(show_rownames),
                                   show_colnames = as.logical(show_colnames),
                                   clustering_method =  "complete",
@@ -646,7 +647,7 @@ viz_heatmap <- function(data,
                                   clustering_distance_rows = "correlation",
                                   annotation_col = col_annot,
                                   annotation_row = row_annot,
-                                  legend = T,
+                                  legend = TRUE,
                                   cellwidth = cellwidth_Sample,
                                   cellheight = cellheight_Feature,
                                   fontsize_row= 10,
@@ -661,11 +662,11 @@ viz_heatmap <- function(data,
     #-------- Plot width and heights
     #Width and height according to Sample and metabolite number
     Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
-    plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-    plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+    plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+    plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
-      {ggplot2::ggplot() + annotation_custom(.)} %>%
-      add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+      {ggplot() + annotation_custom(.)} %>%
+      add(theme(panel.background = element_rect(fill = "transparent")))
 
     PlotList_adaptedGrid[[paste("Heatmap_",plot_name, sep="")]] <- Plot_Sized
 
@@ -687,7 +688,7 @@ viz_heatmap <- function(data,
 
     }else{
       message <- paste0(plot_name , " includes <= 2 objects and is hence not plotted.")
-      logger::log_trace(paste("Message ", message, sep=""))
+      log_trace(paste("Message ", message, sep=""))
       message(message)
     }
     }

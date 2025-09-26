@@ -1,14 +1,21 @@
-## ---------------------------
-##
-## Script name: Visualization using Complex Upset plots
-##
-## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
-##
-## Author: Macabe Daley
-##
-## Date Created: 2025-04-08
-##
-## Copyright (c) Macabe Daley and Christina Schmidt
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 
 ##########################################################################################
@@ -46,10 +53,12 @@
 #' @keywords upset plot, complex upset
 #'
 #' @importFrom ggplot2 scale_fill_manual scale_fill_viridis_d element_text theme
+#' @importFrom ggplot2 aes_string theme_minimal margin labs
 #' @importFrom Polychrome palette36.colors
-#' @importFrom ComplexUpset intersection_size
+#' @importFrom ComplexUpset intersection_size upset upset_set_size
 #' @importFrom logger log_info log_trace
 #' @importFrom stats setNames
+#' @importFrom grid convertUnit
 #'
 #' @noRd
 viz_upset <- function(df,
@@ -66,7 +75,7 @@ viz_upset <- function(df,
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  logger::log_info("viz_upset: Upset plot visualization")
+  log_info("viz_upset: Upset plot visualization")
   ## ------------ Check Input files ----------- ##
   #
   palette_type <- match.arg(palette_type,
@@ -77,7 +86,7 @@ viz_upset <- function(df,
   if(is.null(save_plot)==FALSE){
     folder <- save_path(folder_name= "UpsetPlots",
                        path=path)
-    logger::log_info("viz_upset results saved at ", folder)
+    log_info("viz_upset results saved at ", folder)
   }
 
 
@@ -95,61 +104,61 @@ viz_upset <- function(df,
   if (!is.null(class_col)) {
     df[[class_col]] <- as.factor(df[[class_col]])
     if(palette_type == "viridis"){
-      fill_scale <- ggplot2::scale_fill_viridis_d(option = "viridis")
+      fill_scale <- scale_fill_viridis_d(option = "viridis")
     } else if(palette_type == "polychrome"){
       class_levels <- levels(df[[class_col]])
-      my_palette <- Polychrome::palette36.colors(n = 36)
+      my_palette <- palette36.colors(n = 36)
       if(length(my_palette) < length(class_levels)) {
-        fill_scale <- ggplot2::scale_fill_viridis_d(option = "viridis")
+        fill_scale <- scale_fill_viridis_d(option = "viridis")
         message <- paste0("Not enough colors in the Polychrome palette for the number of classes. Hence viridis palette was used instead.")
         warning("Not enough colors in the Polychrome palette for the number of classes!")
 
-        logger::log_trace(paste("Warning ", message, sep=""))
+        log_trace(paste("Warning ", message, sep=""))
       }
-      my_palette_named <- stats::setNames(my_palette[1:length(class_levels)], class_levels)
-      fill_scale <- ggplot2::scale_fill_manual(values = my_palette_named)
+      my_palette_named <- setNames(my_palette[1:length(class_levels)], class_levels)
+      fill_scale <- scale_fill_manual(values = my_palette_named)
     }
     # Build the base annotation with a mapping for fill based on the class column.
     base_annotation <- list(
-      "Intersection size" = ComplexUpset::intersection_size(
-        mapping = ggplot2::aes_string(fill = class_col),
+      "Intersection size" = intersection_size(
+        mapping = aes_string(fill = class_col),
         counts = TRUE
       ) + fill_scale +
-        ggplot2::theme(
+        theme(
           legend.position = "right",
-          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
+          axis.text.x = element_text(angle = 90, hjust = 1)
         )
     )
   } else {
     # No class column provided: use default annotation without fill mapping.
     base_annotation <- list(
-      "Intersection size" = ComplexUpset::intersection_size(counts = TRUE) +
-        ggplot2::theme(
-          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)
+      "Intersection size" = intersection_size(counts = TRUE) +
+        theme(
+          axis.text.x = element_text(angle = 90, hjust = 1)
         )
     )
   }
 
   ## ----------- Make the  plot based on the choosen parameters ------------ ##
   # Create the upset plot
-  p <- ComplexUpset::upset(
+  p <- upset(
     data = df,
     intersect = intersect_cols,
     name = plot_name,
     base_annotations = base_annotation,
     set_sizes = (
-      ComplexUpset::upset_set_size() +
-        ggplot2::theme(axis.text.y = ggplot2::element_text(size = 10))
+      upset_set_size() +
+        theme(axis.text.y = element_text(size = 10))
     )
   ) +
-    ggplot2::theme_minimal(base_size = 14) +
-    ggplot2::theme(
-      plot.margin = ggplot2::margin(1, 1, 1, 1, "cm")
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.margin = margin(1, 1, 1, 1, "cm")
     )
 
   # If a class column was provided, hide the legend if there are too many unique terms
   if (!is.null(class_col) && length(levels(df[[class_col]])) > max_legend_terms) {
-    p <- p + ggplot2::theme(legend.position = "none")
+    p <- p + theme(legend.position = "none")
   }
 
 

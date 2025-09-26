@@ -1,14 +1,21 @@
-## ---------------------------
-##
-## Script name: Visualization using Stacked Bar plots
-##
-## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
-##
-## Author: Macabe Daley
-##
-## Date Created: 2025-04-08
-##
-## Copyright (c) Macabe Daley and Christina Schmidt
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 
 
 ##########################################################################################
@@ -34,6 +41,11 @@
 #'
 #' @return A \code{ggplot} object representing the stacked bar plot.
 #'
+#' @importFrom dplyr arrange group_by mutate n pull
+#' @importFrom dplyr summarise
+#' @importFrom ggplot2 aes_string element_text geom_bar ggplot labs
+#' @importFrom ggplot2 scale_fill_manual theme theme_minimal
+#' @importFrom rlang sym
 #' @noRd
 viz_stackedbar <- function(data,
                           group_col,
@@ -45,21 +57,21 @@ viz_stackedbar <- function(data,
                           y_label = NULL,
                           legend_position = c(0.95, 0.05)) {
   # Convert column names to symbols for tidy evaluation
-  group_sym <- rlang::sym(group_col)
-  fill_sym  <- rlang::sym(fill_col)
+  group_sym <- sym(group_col)
+  fill_sym  <- sym(fill_col)
 
   # Determine order of groups by overall frequency (ascending)
   group_order <- data %>%
-    dplyr::group_by(!!group_sym) %>%
-    dplyr::summarise(total = dplyr::n(), .groups = 'drop') %>%
-    dplyr::arrange(total) %>%
-    dplyr::pull(!!group_sym)
+    group_by(!!group_sym) %>%
+    summarise(total = n(), .groups = 'drop') %>%
+    arrange(total) %>%
+    pull(!!group_sym)
 
   # Summarize data by group and fill status, then reorder the group factor
   summary_data <- data %>%
-    dplyr::group_by(!!group_sym, !!fill_sym) %>%
-    dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
-    dplyr::mutate(!!group_sym := factor(!!group_sym, levels = group_order))
+    group_by(!!group_sym, !!fill_sym) %>%
+    summarise(count = n(), .groups = 'drop') %>%
+    mutate(!!group_sym := factor(!!group_sym, levels = group_order))
 
   # If y_label is not provided, use the grouping column name
   if (is.null(y_label)) {
@@ -67,21 +79,21 @@ viz_stackedbar <- function(data,
   }
 
   # Create the plot
-  plot <- ggplot2::ggplot(summary_data, ggplot2::aes_string(y = group_col,
+  plot <- ggplot(summary_data, aes_string(y = group_col,
                                                     x = "count",
                                                     fill = paste0("as.factor(", fill_col, ")"))) +
-    ggplot2::geom_bar(stat = "identity") +
-    ggplot2::scale_fill_manual(values = fill_values,
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = fill_values,
                                labels = fill_labels,
                                name = "Match Status") +
-    ggplot2::labs(title = plot_name,
+    labs(title = plot_name,
                   x = x_label,
                   y = y_label) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 1),
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 0, hjust = 1),
                    legend.position = legend_position,
                    legend.justification = c("right", "bottom"),
-                   plot.title = ggplot2::element_text(hjust = 0.4))
+                   plot.title = element_text(hjust = 0.4))
 
   ## ----------- Save and return -------------#
   # Only needed if exported!

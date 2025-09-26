@@ -19,4 +19,8 @@ tissue_dma
 We performed differential metabolite analysis comparing ccRCC tissue versus adjacent normal tissue using
 median normalised data from the supplementary table 2 of Hakimi et. al.(="Tissue_Norm").
 }
+\examples{
+data(tissue_dma)
+head(tissue_dma)
+}
 \keyword{datasets}

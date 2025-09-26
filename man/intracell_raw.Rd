@@ -5,12 +5,12 @@
 \alias{intracell_raw}
 \title{intracell_raw}
 \format{
-A data frame with multiple rows and columns:
-\describe{
-\item{Conditions}{Character vector indicating cell line identity}
-\item{Analytical_Replicate}{Integer replicate number for analytical replicates}
-\item{Biological_Replicate}{Integer replicate number for biological replicates}
-\item{...}{Numeric columns for each measured metabolite (raw peak values)}
+A data frame with the following columns:
+\itemize{
+\item \code{Conditions}: Character vector indicating cell line identity
+\item \code{Analytical_Replicate}: Integer replicate number for analytical replicates
+\item \code{Biological_Replicate}: Integer replicate number for biological replicates
+\item Additional numeric columns (183 in total) containing raw metabolite intensities
 }
 }
 \source{
@@ -23,5 +23,9 @@ intracell_raw
 \description{
 Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
 peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
+}
+\examples{
+data(intracell_raw)
+head(intracell_raw)
 }
 \keyword{datasets}

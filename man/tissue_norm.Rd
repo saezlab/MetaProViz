@@ -19,4 +19,8 @@ tissue_norm
 This is median normalised data from the supplementary table 2 of Hakimi et al with metabolomic
 profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
 }
+\examples{
+data(tissue_norm)
+head(tissue_norm)
+}
 \keyword{datasets}

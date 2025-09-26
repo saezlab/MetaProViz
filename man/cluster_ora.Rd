@@ -4,7 +4,7 @@
 \alias{cluster_ora}
 \title{\subsection{---------------------------}{
 
-cluster_ora
+Overrepresentation analysis by cluster
 }}
 \usage{
 cluster_ora(
@@ -44,4 +44,14 @@ Saves results as individual .csv files.
 }
 \description{
 Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
+}
+\examples{
+KEGG_Pathways <- metsigdb_kegg()
+data(intracell_dma) # loads the object into your environment
+DMAres <- intracell_dma \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
+RES <- MetaProViz::cluster_ora(data= DMAres,
+metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+input_pathway=KEGG_Pathways,
+remove_background=FALSE)
+
 }

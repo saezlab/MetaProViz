@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: Visualization  PCA plot
-##
-## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
-##
-## Author: Dimitrios Prymidis and Christina Schmidt
-##
-## Date Created: 2022-10-28
-##
-## Copyright (c) Dimitrios Prymidis and Christina Schmidt
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 #'
 #' This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis
 
@@ -46,22 +45,22 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
-#' Intra <- intracell_raw[,-c(1:3)]%>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw[,-c(2:4)]%>%tibble::column_to_rownames("Code")
 #' Res <- viz_pca(Intra)
 #'
 #' @keywords PCA
 #'
 #' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
-#  required for autoplot.prcomp:
+#' @importFrom ggplot2 scale_color_manual theme_classic annotation_custom
+#' @importFrom grid convertUnit
 #' @importFrom ggfortify fortify_map
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
+#' @importFrom stats prcomp
 #' @importFrom logger log_info log_trace
-#'
 #' @export
-#'
 viz_pca <- function(data,
                    metadata_info= NULL,
                    metadata_sample = NULL,
@@ -83,7 +82,7 @@ viz_pca <- function(data,
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  logger::log_info("viz_pca: PCA plot visualization")
+  log_info("viz_pca: PCA plot visualization")
   ## ------------ Check Input files ----------- ##
   # HelperFunction `check_param`
   check_param(data=data,
@@ -98,19 +97,19 @@ viz_pca <- function(data,
   # check_param` Specific
   if(is.logical(show_loadings) == FALSE){
     message <- paste("The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
   if(is.logical(scaling) == FALSE){
     message <- paste("The scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   if(any(is.na(data))) {
      data[is.na(data)] <- 0#replace NA with 0
      message <- paste("NA values are included in data that were set to 0 prior to performing PCA.")
-     logger::log_info(message)
+     log_info(message)
      message(message)
   }
 
@@ -120,7 +119,7 @@ viz_pca <- function(data,
     folder <- save_path(folder_name= "PCAPlots",
                                     path=path)
   }
-  logger::log_info("viz_pca results saved at ", folder)
+  log_info("viz_pca results saved at ", folder)
 
   ###########################################################################
   ## ----------- Set the plot parameters: ------------ ##
@@ -140,35 +139,35 @@ viz_pca <- function(data,
     safe_shape_palette <-shape_palette
   }
 
-  logger::log_info(paste("viz_pca colour:", paste(safe_colorblind_palette, collapse = ", ")))
-  logger::log_info(paste("viz_pca shape:", paste(safe_shape_palette, collapse = ", ")))
+  log_info(paste("viz_pca colour:", paste(safe_colorblind_palette, collapse = ", ")))
+  log_info(paste("viz_pca shape:", paste(safe_shape_palette, collapse = ", ")))
 
   ##--- Prepare the color scheme:
   if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==TRUE){
     if((metadata_info[["shape"]] == metadata_info[["color"]])==TRUE){
       metadata_sample$shape <- metadata_sample[,paste(metadata_info[["color"]])]
       metadata_sample<- metadata_sample%>%
-        dplyr::rename("color"=paste(metadata_info[["color"]]))
+        rename("color"=paste(metadata_info[["color"]]))
     }else{
       metadata_sample <- metadata_sample%>%
-          dplyr::rename("color"=paste(metadata_info[["color"]]),
+          rename("color"=paste(metadata_info[["color"]]),
                         "shape"=paste(metadata_info[["shape"]]))
       }
  }else if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==FALSE){
    if("color" %in% names(metadata_info)==TRUE){
      metadata_sample <- metadata_sample%>%
-        dplyr::rename("color"=paste(metadata_info[["color"]]))
+        rename("color"=paste(metadata_info[["color"]]))
    }
    if("shape" %in% names(metadata_info)==TRUE){
       metadata_sample <- metadata_sample%>%
-        dplyr::rename("shape"=paste(metadata_info[["shape"]]))
+        rename("shape"=paste(metadata_info[["shape"]]))
    }
  }
 
   ##--- Prepare Input data:
   if(is.null(metadata_sample)==FALSE){
     InputPCA  <- merge(x=metadata_sample%>%tibble::rownames_to_column("UniqueID") , y=data%>%tibble::rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
-      tibble::column_to_rownames("UniqueID")
+      column_to_rownames("UniqueID")
   }else{
     InputPCA  <- data
   }
@@ -190,13 +189,13 @@ viz_pca <- function(data,
         color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
         #Overwrite color_scale
         scale_color <- "discrete"
-        logger::log_info("Warning: scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
+        log_info("Warning: scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
         warning("scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
       }
     }
   }
 
-  logger::log_info("viz_pca scale_color: ", scale_color)
+  log_info("viz_pca scale_color: ", scale_color)
 
   if("shape" %in% names(metadata_sample)==TRUE){
     shape_select <- safe_shape_palette[1:length(unique(InputPCA$shape))]
@@ -210,7 +209,7 @@ viz_pca <- function(data,
   ##---  #assign column and legend name
   if("color" %in% names(metadata_sample)==TRUE){
     InputPCA  <- InputPCA%>%
-      dplyr::rename(!!paste(metadata_info[["color"]]) :="color")
+      rename(!!paste(metadata_info[["color"]]) :="color")
     Param_Col <-paste(metadata_info[["color"]])
   } else{
     color_select <- NULL
@@ -219,7 +218,7 @@ viz_pca <- function(data,
 
   if("shape" %in% names(metadata_sample)==TRUE){
     InputPCA  <- InputPCA%>%
-      dplyr::rename(!!paste(metadata_info[["shape"]]) :="shape")
+      rename(!!paste(metadata_info[["shape"]]) :="shape")
     Param_Sha <-paste(metadata_info[["shape"]])
   } else{
     shape_select <-NULL
@@ -231,7 +230,7 @@ viz_pca <- function(data,
   PlotList_adaptedGrid <- list()
 
   #Make the plot:
-  PCA <- ggplot2::autoplot(stats::prcomp(as.matrix(data), scale. = as.logical(scaling)),
+  PCA <- autoplot(prcomp(as.matrix(data), scale. = as.logical(scaling)),
                   data= InputPCA,
                   x= pcx ,
                   y= pcy,
@@ -240,7 +239,7 @@ viz_pca <- function(data,
                   shape = Param_Sha,
                   size = 3,
                   alpha = 0.8,
-                  label=T,
+                  label = TRUE,
                   label.size=2.5,
                   label.repel = TRUE,
                   loadings= as.logical(show_loadings), #draws Eigenvectors
@@ -249,13 +248,13 @@ viz_pca <- function(data,
                   loadings.label.size=2.5,
                   loadings.colour="grey10",
                   loadings.label.colour="grey10" ) +
-    ggplot2::scale_shape_manual(values=shape_select)+
-    ggplot2::ggtitle(paste(plot_name)) +
-    ggplot2::geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
-    ggplot2::geom_vline(xintercept=0,  color = "black", linewidth=0.1)
+    scale_shape_manual(values=shape_select)+
+    ggtitle(paste(plot_name)) +
+    geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
+    geom_vline(xintercept=0,  color = "black", linewidth=0.1)
 
     if(scale_color=="discrete"){
-      PCA <-PCA + ggplot2::scale_color_manual(values=color_select)
+      PCA <-PCA + scale_color_manual(values=color_select)
     }else if(scale_color=="continuous" & is.null(color_palette)){
       PCA <-PCA + color_select
     }
@@ -264,7 +263,7 @@ viz_pca <- function(data,
   if(is.null(theme)==FALSE){
     PCA <- PCA+theme
   }else{
-    PCA <- PCA+ggplot2::theme_classic()
+    PCA <- PCA+theme_classic()
   }
 
   ## Store the plot in the 'plots' list
@@ -272,11 +271,11 @@ viz_pca <- function(data,
 
   #Set the total heights and widths
   PCA %<>% plot_grob_pca(metadata_info=metadata_info,plot_name=plot_name)
-  plot_height <- grid::convertUnit(PCA$height, 'cm', valueOnly = TRUE)
-  plot_width <- grid::convertUnit(PCA$width, 'cm', valueOnly = TRUE)
+  plot_height <- convertUnit(PCA$height, 'cm', valueOnly = TRUE)
+  plot_width <- convertUnit(PCA$width, 'cm', valueOnly = TRUE)
   PCA %<>%
-    {ggplot2::ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+    {ggplot() + annotation_custom(.)} %>%
+    add(theme(panel.background = element_rect(fill = "transparent")))
 
   PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 

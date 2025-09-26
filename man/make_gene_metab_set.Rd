@@ -2,7 +2,7 @@
 % Please edit documentation in R/GetPriorKnowledge.R
 \name{make_gene_metab_set}
 \alias{make_gene_metab_set}
-\title{Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge}
+\title{Create metabolite sets from existing genesets}
 \usage{
 make_gene_metab_set(
   input_pk,
@@ -23,6 +23,13 @@ make_gene_metab_set(
 
 \item{path}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
 }
+\value{
+List of two data frames: "GeneMetabSet" and "MetabSet".
+}
 \description{
-Function to add metabolite HMDB IDs to existing genesets based on cosmosR prior knowledge
+Gene to metabolite translation is based on mappings in Recon-3D (cosmosR).
+}
+\examples{
+make_gene_metab_set(hallmarks)
+
 }

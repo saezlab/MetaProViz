@@ -3,7 +3,7 @@
 \name{viz_volcano}
 \alias{viz_volcano}
 \title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis
-Volcano plot visualization}
+Volcano plot}
 \usage{
 viz_volcano(
   plot_types = "Standard",
@@ -84,11 +84,11 @@ List with two elements: Plot and Plot_Sized
 }
 \description{
 This script allows you to perform different data visualizations using the results of the MetaProViz analysis
-Volcano plot visualization
+Volcano plot
 }
 \examples{
 Intra <- intracell_dma\%>\%tibble::column_to_rownames("Metabolite")
-Res <- MetaProViz::viz_volcano(data=Intra)
+Res <- viz_volcano(data=Intra)
 
 }
 \keyword{Volcano}

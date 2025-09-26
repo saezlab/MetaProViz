@@ -1,3 +1,21 @@
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 #'## ---------------------------
 ##
 ## Script name: Over representation Analysis (ORA)
@@ -22,7 +40,8 @@
 #################################
 ### ### ### cluster_ora ### ### ###
 #################################
-#' cluster_ora
+
+#' Overrepresentation analysis by cluster
 #'
 #' Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
 #'
@@ -35,6 +54,15 @@
 #' @param max_gssize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#'
+#' @examples
+#' KEGG_Pathways <- metsigdb_kegg()
+#' data(intracell_dma) # loads the object into your environment
+#' DMAres <- intracell_dma %>% dplyr::filter(!is.na(KEGGCompound))%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
+#' RES <- MetaProViz::cluster_ora(data= DMAres,
+#' metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+#' input_pathway=KEGG_Pathways,
+#' remove_background=FALSE)
 #'
 #' @return Saves results as individual .csv files.
 #'
@@ -131,7 +159,7 @@ cluster_ora <- function(data,
       clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
       clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
       clusterGosummary <- clusterGosummary%>%
-        dplyr::rename("Metabolites_in_pathway"="geneID")
+        rename("Metabolites_in_pathway"="geneID")
 
       g_save <- gsub("/", "-", g)
       df_list[[g_save]] <- clusterGosummary
@@ -161,12 +189,15 @@ cluster_ora <- function(data,
 ### ### ### standard_ora ### ### ###
 ###################################
 
-#' Uses enricher to run ORA on the differential metabolites (DM) using a pathway list
+#' Overrepresentation analysis of metabolite sets in pathways
+#'
+#' Can be applied on the result of differential metabolite analysis (DMA),
+#' requires a pathway list (from databases).
 #'
 #' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
 #' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage. Also pass ColumnName for input_pathway including term and feature names. (pvalColumn = ColumnName data, percentageColumn= ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
 #' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
-#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom % of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}
+#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom % of selected percentage Column, usually t.val or Log2FC \strong{default: 10}
 #' @param input_pathway DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
 #' @param pathway_name \emph{Optional: } Name of the input_pathway used \strong{default: ""}
 #' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
@@ -174,10 +205,17 @@ cluster_ora <- function(data,
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
 #'
+#' @examples
+#' KEGG_Pathways <- metsigdb_kegg()
+#' data(intracell_dma) # loads the object into your environment
+#' DMAres <- intracell_dma %>% dplyr::filter(!is.na(KEGGCompound))%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
+#' RES <- MetaProViz::standard_ora(data= DMAres,
+#' input_pathway=KEGG_Pathways)
+#'
 #' @return Saves results as individual .csv files.
 #'
+#' @importFrom dplyr rename
 #' @export
-#'
 standard_ora <- function(data,
                         metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
                         cutoff_stat=0.05,
@@ -277,7 +315,7 @@ standard_ora <- function(data,
       clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
       clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
       clusterGosummary <- clusterGosummary%>%
-        dplyr::rename("Metabolites_in_pathway"="geneID")
+        rename("Metabolites_in_pathway"="geneID")
   }else{
     stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }

@@ -19,4 +19,8 @@ tissue_meta
 In Hakimi et. al. metabolites were assigned to metabolite IDs, pathways, platform, mass and other
 fetaure metainformation.
 }
+\examples{
+data(tissue_meta)
+head(tissue_meta)
+}
 \keyword{datasets}

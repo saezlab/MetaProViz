@@ -20,4 +20,8 @@ Metabolomics workbench project PR001418, study ST002226 where we exported integr
 peak values of intracellular metabolomics of HK2 and cccRCC cell lines 786-O, 786-M1A,
 786-M2A, OS-RC-2, OS-LM1 and RFX-631.
 }
+\examples{
+data(medium_raw)
+head(medium_raw)
+}
 \keyword{datasets}

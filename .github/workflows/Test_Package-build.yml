@@ -1,62 +1,86 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-# This workflow tests if the package can be installed from github from within
-# a github action.
+# This workflow tests if the package can be installed
+
+# Trigger workflow on push to main or development, and on a daily schedule
 on:
   push:
     branches:
       - main
+      - devel
   schedule:
     - cron: '0 4 * * *'
 
+
+# Name of the workflow as shown in GitHub Actions UI
 name: R-CMD-check
 
 jobs:
   R-CMD-check:
+    # Run the job on each OS in the matrix (macOS, Ubuntu, Windows)
     runs-on: ${{ matrix.config.os }}
 
+    # Show OS and R version in job name
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
+    # Define the matrix for cross-platform testing
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'release'}
+          - {os: macos-latest, r: 'release'}   # macOS latest with R release
+          - {os: ubuntu-latest, r: 'release'}   # Ubuntu latest with R release
+          - {os: windows-latest, r: 'release'}  # Windows latest with R release
 
+    # Set environment variables for authentication and R package source retention
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      R_LIBS_USER: ${{ github.workspace }}/.Rlibrary
+      R_BIOC_VERSION: "3.22"
 
+    # Only run on push to main/development or scheduled run
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
-
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devel')) ||
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/devel')
 
     steps:
+
+      # Checkout the repository code
       - uses: actions/checkout@v4
 
+      # Setup Pandoc (required for vignette and markdown rendering)
       - uses: r-lib/actions/setup-pandoc@v2
 
+      # Install system dependency for glpk (required by some R packages on Ubuntu)
       - name: Install libglpk40
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: sudo apt-get install -y libglpk40
 
+      # Install XQuartz for graphics on macOS (required by some R packages)
       - name: Install xquartz (Mac OS)
         if: ${{ matrix.config.os == 'macos-latest' }}
         run: brew install --cask xquartz
 
+      # Setup R with the specified version
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      # Set R version as environment variable (used for caching and package installation)
       - name: Set R version
         run: |
-          echo "R_VERSION=`R --version | head -n 1 | awk '{print $3}' | cut -b 1-3`" >> $GITHUB_ENV
-          echo "R_LIBS_USER=`Rscript -e 'cat(.libPaths()[1L])'`" >> $GITHUB_ENV
+          Rscript -e "cat('R_VERSION=', as.character(getRversion()), '\n', file = Sys.getenv('GITHUB_ENV'), append = TRUE)"
 
+      # Ensure user library directory exists (cross-platform)
+      - name: Create user library directory
+        run: |
+          mkdir -p "$R_LIBS_USER"
+        shell: bash
+
+      # Cache R package installations to speed up repeated builds
       - name: Set up R dependency cache
         uses: actions/cache@v4
         with:
@@ -65,16 +89,57 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-${{ env.R_VERSION }}
 
+      # Install knitr to user library (required for vignette building; fixes missing knitr error)
+      - name: Install knitr
+        run: Rscript -e 'install.packages("knitr", lib = Sys.getenv("R_LIBS_USER"))'
+
+
+      # Install CRAN dependencies to user library (fixes permissions error on Ubuntu and ensures all CRAN packages are available)
+      #- name: Install package dependencies
+      #  run: |
+      #    Rscript -e 'install.packages(c("broom", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
+
+
       - name: Install remotes
         run: |
           Rscript -e 'install.packages("remotes")'
           Rscript -e 'remotes::install_github("r-lib/remotes")'  # see: https://github.com/r-lib/remotes/issues/798
-          Rscript -e 'remotes::install_github("ctlab/fgsea")'  # see: https://github.com/ctlab/fgsea/issues/165
 
+      # Install OmnipathR from Bioconductor devel
+      - name: Install OmnipathR from Bioconductor devel
+        run: |
+          Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
+          Rscript -e 'BiocManager::install()'
+          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel")'
+          # Rscript -e 'BiocManager::install("OmnipathR")'
+
+      # Set Bioconductor back to release and install other Bioconductor dependencies
+      - name: Install other Bioconductor dependencies from release
+        run: |
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+          # Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
+
+      # ComplexUpset should be installed after ggplot2 to ensure compatibility, especially on Linux/Ubuntu.
+      - name: Install latest ggplot2
+        run: Rscript -e 'install.packages("ggplot2", type="source")'
+
+      - name: Install ComplexUpset from source
+        run: Rscript -e 'install.packages("ComplexUpset", type="source")'
+
+      # Install  MetaProViz
       - name: Install MetaProViz from git by remotes
+        if: github.ref == 'refs/heads/main'
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
 
+      # Build and check the package using bash shell (required for Windows compatibility)
       - name: Build and check package
+        shell: bash
         run: |
           R CMD build .
           R CMD check *.tar.gz --no-manual
+
+      - name: Run BiocCheck
+        run: |
+          Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
+          Rscript -e 'BiocManager::install("BiocCheck")'
+          Rscript -e 'BiocCheck::BiocCheck(list.files(pattern = "*.tar.gz"))'

@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 
 # MetaProViz <img src="vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
 
-
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![GitHub issues](https://img.shields.io/github/issues/saezlab/MetaProViz)](https://github.com/saezlab/MetaProViz/issues)
@@ -43,20 +42,22 @@ The fourth module of **MetaProViz**, `Visualization`, can easily create customiz
 
 ## Tutorials
 We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within **MetaProViz**. You can find those tutorial on the top under the "Tutorials" button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:\
-- [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)\
-- [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/CoRe%20Metabolomics.html)\
-- [Prior Knowledge Access & Integration](https://saezlab.github.io/MetaProViz/articles/Prior%20Knowledge%20-%20Access%20&%20Integration.html)\
-- [Sample Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Sample%20Metadata%20Analysis.html)\
+- [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html)\
+- [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html)\
+- [Prior Knowledge Access & Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html)\
+- [Sample Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/sample-metadata.html)\
 \
 Here you will find a brief overview and information about the installation of the package and its dependencies.
 
 ## Example Data
 clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs [@Hakimi2016]. Cell-lines data from intra- and extracellular metabolomics data from cell culture media from [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
 ```{r, echo=FALSE,  fig.width=10, fig.height=5.5, fig.align="left"}
-suppressMessages(suppressWarnings( library(tidyverse)))
+suppressMessages(suppressWarnings(library(tidyverse)))
+suppressMessages(suppressWarnings(library(MetaProViz)))
 
 # Create an overview of the example data
-TissuePlot <- MetaProViz::ToyData("Tissue_Norm")%>%
+TissuePlot <- tissue_norm%>%
+  column_to_rownames("Code")%>%
   filter(TISSUE_TYPE != "NORMAL")%>%
   separate(`TYPE-STAGE`, into=c("Type", "Stage"), sep="-", remove=FALSE)
 TissuePlot$Count <- 1
@@ -72,7 +73,7 @@ Plot <- ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFacto
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(subtitle="Age at surgery <42 = Young,  >58 = Old, else = Middle", x = "Age", y = "Number of Patients")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=TissuePlot%>%dplyr::rename("Conditions"="AGE"),  PlotName = "ccRCC patients metadata", Subtitle = "Age at surgery <42 = Young,  >58 = Old, else = Middle", PlotType="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=TissuePlot%>%dplyr::rename("Conditions"="AGE"), plot_name = "ccRCC patients metadata", subtitle = "Age at surgery <42 = Young,  >58 = Old, else = Middle", plot_type="Bar")
  
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -86,7 +87,8 @@ Plot_Sized_Tissue <- Plot_Sized
 
 ###################################################################################################################################################
 # Create an overview of the example data
-CellPlot_Intra <- MetaProViz::ToyData(Data="IntraCells_Raw")%>%
+CellPlot_Intra <- intracell_raw%>%
+  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
                                Conditions=="786-O" ~ 'PrimaryTumour',
@@ -95,7 +97,8 @@ CellPlot_Intra <- MetaProViz::ToyData(Data="IntraCells_Raw")%>%
 CellPlot_Intra$Count <- 1
 CellPlot_Intra$CelltypeFactor <- factor(CellPlot_Intra$Celltype, levels = c("Healthy","PrimaryTumour", "MetastaticTumour"))
 
-CellPlot_Media <- MetaProViz::ToyData(Data="CultureMedia_Raw")%>%
+CellPlot_Media <- medium_raw%>%
+  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
   filter(Conditions != "blank")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',#https://www.mdpi.com/1422-0067/24/7/6447
@@ -114,7 +117,7 @@ Plot <- ggplot2::ggplot(CellPlot_Intra, ggplot2::aes(fill=Conditions, y=Count, x
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Celltype", y = "Number of Samples",  fill ="Cellline")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=CellPlot_Intra%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"),  PlotName = "Intracellular metabolomics", Subtitle = NULL, PlotType="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=CellPlot_Intra%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"), plot_name = "Intracellular metabolomics", subtitle = NULL, plot_type="Bar")
  
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -128,7 +131,8 @@ Plot_Sized_Intra <- Plot_Sized
 
 ###################################################################################################################################################
 # Create an overview of the example data
-CellPlot_Media <- MetaProViz::ToyData(Data="CultureMedia_Raw")%>%
+CellPlot_Media <- medium_raw%>%
+  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
   filter(Conditions != "blank")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',#https://www.mdpi.com/1422-0067/24/7/6447
@@ -151,7 +155,7 @@ Plot <- ggplot2::ggplot(CellPlot_Media, ggplot2::aes(fill=Conditions, y=Count, x
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
         ggplot2::labs(x = "Celltype", y = "Number of Samples",  fill ="Cellline")
 
-Plot_Sized <-  MetaProViz:::plotGrob_Superplot(InputPlot=Plot, SettingsInfo=c(Conditions="Conditions", Superplot="Conditions"), SettingsFile_Sample=CellPlot_Media%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"),  PlotName = "Media metabolomics", Subtitle = NULL, PlotType="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=CellPlot_Media%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"), plot_name = "Media metabolomics", subtitle = NULL, plot_type="Bar")
  
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -159,7 +163,7 @@ Plot_Sized %<>%
       {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
-#ggplot2::ggsave(filename = "Cellline_Plot.svg", plot = combined_plot, width = PlotWidth,  height = PlotHeight, unit="cm")
+#ggplot2::ggsave(filename = "Cellline_Media_Plot.svg", plot = Plot, width = PlotWidth,  height = PlotHeight, unit="cm")
 
 Plot_Sized_Media <- Plot_Sized
 
@@ -175,6 +179,7 @@ patients <- data.frame(
   RNA= c("",  ""))
 ```
 
+
 ## Installation
 **MetaProViz** is an R package and to install the package, start R and enter:
 ```{r github_install, eval=FALSE}
@@ -186,6 +191,14 @@ Now **MetaProViz** can be imported as:
 library(MetaProViz)
 ```
 
+### OmnipathR version requirement
+MetaProViz requires OmnipathR version >= 3.17.4. If this version is not available in your Bioconductor release, you can install it from Bioconductor devel with:
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("OmnipathR")
+```
+
 ### Windows specifications
 Note if you are running Windows you might have an issue with long paths, which you can resolve in the registry on Windows 10:
 Computer Configuration > Administrative Templates > System > Filesystem > Enable Win32 long paths
@@ -195,15 +208,15 @@ Computer Configuration > Administrative Templates > System > Filesystem > Enable
 GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
 ## Citation
+Please cite our bioRxiv preprint: https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full
 ```
-@Manual{,
-  title = {MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation},
-
-  author = {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez and Christian Frezza},
-  year = {2024},
-  note = {R package version 3.0.1},
-
-}
+@article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025, 
+         title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
+         DOI={10.1101/2025.08.18.670781},
+         journal={BioRxiv}, 
+         author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio}, 
+         year={2025}, 
+         month={Aug}}
 ```
 
 ## References

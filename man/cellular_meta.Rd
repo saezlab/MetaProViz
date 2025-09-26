@@ -19,4 +19,8 @@ cellular_meta
 Metabolomics workbench project PR001418, study ST002226 and ST002224 measured metabolites were assigned
 HMDB and KEGG IDs as well as one main metabolic pathway.
 }
+\examples{
+data(cellular_meta)
+head(cellular_meta)
+}
 \keyword{datasets}

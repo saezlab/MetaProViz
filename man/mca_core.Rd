@@ -42,7 +42,7 @@ This script performs metabolite clustering analysis and computes clusters of met
 }
 \examples{
 
-Media <- medium_raw \%>\%tibble::column_to_rownames("Code")
+Media <- medium_raw \%>\% tibble::column_to_rownames("Code")
 ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
                                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
@@ -54,10 +54,12 @@ MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4
                             pval ="aov",
                             core=TRUE)
 
-IntraDMA <- intracell_raw \%>\%tibble::column_to_rownames("Code")
+IntraDMA <- intracell_dma
 
-Res <- MetaProViz::mca_core(data_intra = IntraDMA\%>\%tibble::rownames_to_column("Metabolite"),
-                            data_core = MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+Res <- MetaProViz::mca_core(
+    data_intra = as.data.frame(IntraDMA),
+    data_core = as.data.frame(MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+  )
 
 }
 \keyword{biological}

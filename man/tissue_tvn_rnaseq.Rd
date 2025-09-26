@@ -20,4 +20,8 @@ tissue_tvn_rnaseq
 The processed transcriptomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
 used the study from Clark et. al. under Proteomics data Commons PDC000127.
 }
+\examples{
+data(tissue_tvn_rnaseq)
+head(tissue_tvn_rnaseq)
+}
 \keyword{datasets}

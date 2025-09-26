@@ -16,7 +16,19 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
+
 #' @importFrom magrittr %>%
-#' @return The left-hand side object, passed into the function on the right-hand side.
-#' @export
-magrittr::`%>%`
+#' @importFrom rlang !!
+#' @noRd
+.onLoad <- function(libname, pkgname) {
+
+    opr <- 'OmnipathR'
+    ddb <- 'disable_doctest_bypass'
+
+    if (exists(ddb, where = asNamespace(opr), mode = 'function')) {
+
+        ((!!opr)%:::%(!!ddb))()
+
+    }
+
+}

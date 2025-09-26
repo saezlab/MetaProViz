@@ -1,22 +1,21 @@
-## ---------------------------
-##
-## Script name: Visualization Superplots
-##
-## Purpose of script: data Visualisation of the MetaProViz analysis to aid biological interpretation
-##
-## Author: Dimitrios Prymidis and Christina Schmidt
-##
-## Date Created: 2022-10-28
-##
-## Copyright (c) Dimitrios Prymidis and Christina Schmidt
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 #'
 #' This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
 
@@ -49,20 +48,19 @@
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
 #' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot
-#' @importFrom ggplot2 position_dodge element_text
+#' @importFrom ggplot2 position_dodge element_text theme_classic
 #' @importFrom ggplot2 geom_bar labs scale_color_manual theme xlab ylab
-#' @importFrom ggpubr stat_pvalue_manual
+#' @importFrom ggpubr stat_pvalue_manual stat_compare_means
+#' @importFrom ggbeeswarm geom_beeswarm
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select group_by summarise filter mutate n across
 #' @importFrom tidyr separate unite
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom ggbeeswarm geom_beeswarm
 #' @importFrom logger log_trace log_info
 #' @importFrom tidyselect all_of
-#'
+#' @importFrom purrr map_dbl
 #' @export
-#'
 viz_superplot <- function(data,
                          metadata_sample,
                          metadata_info = c(Conditions="Conditions", Superplot = NULL),
@@ -84,7 +82,7 @@ viz_superplot <- function(data,
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  logger::log_info("viz_superplot: Superplot visualization")
+  log_info("viz_superplot: Superplot visualization")
 
   ## ------------ Check Input files ----------- ##
   # HelperFunction `check_param`
@@ -100,13 +98,13 @@ viz_superplot <- function(data,
   # check_param` Specific
   if(is.null(metadata_info)==TRUE){
     message <- paste0("You must provide the column name for Conditions via metadata_info=c(Conditions=ColumnName) in order to plot the x-axis conditions.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
   if(plot_type %in% c("Box", "Bar", "Violin") == FALSE){
     message <- paste0("plot_type must be either Box, Bar or Violin.")
-    logger::log_trace(paste("Error ", message, sep=""))
+    log_trace(paste("Error ", message, sep=""))
     stop(message)
   }
 
@@ -114,7 +112,7 @@ viz_superplot <- function(data,
     for (Condition in plot_conditions){
       if(Condition %in% metadata_sample[[metadata_info[["Conditions"]]]]==FALSE){
         message <- paste0("Check Input. The plot_conditions ",Condition," were not found in the Conditions Column.")
-        logger::log_trace(paste("Error ", message, sep=""))
+        log_trace(paste("Error ", message, sep=""))
         stop(message)
       }
     }
@@ -125,12 +123,12 @@ viz_superplot <- function(data,
       if(is.null(plot_conditions)==FALSE){
         if(plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]] ==FALSE){
           message <- paste0("Check Input. The stat_comparison condition ",Comp[1], " is not found in the Conditions Column of the metadata_sample.")
-          logger::log_trace(paste("Error ", message, sep=""))
+          log_trace(paste("Error ", message, sep=""))
           stop(message)
         }
         if(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]] ==FALSE){
           message <- paste0("Check Input. The stat_comparison condition ",Comp[2], " is not found in the Conditions Column of the metadata_sample.")
-          logger::log_trace(paste("Error ", message, sep=""))
+          log_trace(paste("Error ", message, sep=""))
           stop(message)
         }
       }
@@ -164,12 +162,12 @@ viz_superplot <- function(data,
   if(is.null(pval)==FALSE){
     if(MultipleComparison == TRUE & (pval=="t.test" | pval=="wilcox.test")){
       message <- paste0("Check input. The selected pval option for Hypothesis testing,", pval, " is for multiple comparison, but you have only 2 conditions. Hence aov is performed.")
-      logger::log_trace(paste("Warning ", message, sep=""))
+      log_trace(paste("Warning ", message, sep=""))
       warning(message)
       pval <- "aov"
     }else if(MultipleComparison == FALSE & (pval=="aov" | pval=="kruskal.test")){
       message <- paste0("Check input. The selected pval option for Hypothesis testing,", pval, " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
-      logger::log_trace(paste("Warning ", message, sep=""))
+      log_trace(paste("Warning ", message, sep=""))
       warning(message)
       pval <- "t.test"
       }
@@ -187,7 +185,7 @@ viz_superplot <- function(data,
   if(is.null(padj)==FALSE){
     if(padj %in% STAT_padj_options == FALSE){
       message <- paste0("Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
-      logger::log_trace(paste("Error ", message, sep=""))
+      log_trace(paste("Error ", message, sep=""))
       stop(message)
   }
   }
@@ -201,22 +199,22 @@ viz_superplot <- function(data,
     folder <- save_path(folder_name=  paste(plot_type, "Plots", sep=""),
                                     path=path)
   }
-  logger::log_info("viz_superplot results saved at ", folder)
+  log_info("viz_superplot results saved at ", folder)
 
   ###############################################################################################################################################################################################################
   ## ------------ Prepare Input ----------- ##
   metadata_sample<- metadata_sample%>%
-    dplyr::rename("Conditions"= paste(metadata_info[["Conditions"]]) )
+    rename("Conditions"= paste(metadata_info[["Conditions"]]) )
 
   if("Superplot" %in% names(metadata_info)){
     metadata_sample<- metadata_sample%>%
-      dplyr::rename("Superplot"= paste(metadata_info[["Superplot"]]) )
+      rename("Superplot"= paste(metadata_info[["Superplot"]]) )
 
     data_merge <- merge(metadata_sample[c("Conditions","Superplot")] , data, by=0)
-    data_merge <- tibble::column_to_rownames(data_merge, "Row.names")
+    data_merge <- column_to_rownames(data_merge, "Row.names")
   }else{
     data_merge <- merge(metadata_sample[c("Conditions")] ,data, by=0)
-    data_merge <- tibble::column_to_rownames(data_merge, "Row.names")
+    data_merge <- column_to_rownames(data_merge, "Row.names")
   }
 
   # Rename the x and y lab if the information has been passed:
@@ -234,7 +232,7 @@ viz_superplot <- function(data,
 
   #Set the theme:
   if(is.null(theme)==TRUE){
-    theme <- ggplot2::theme_classic()
+    theme <- theme_classic()
   }
 
   ## ------------ Create plots ----------- ##
@@ -247,11 +245,11 @@ viz_superplot <- function(data,
     suppressWarnings(
       dataMeans <-
         data_merge %>%
-        dplyr::select(i, Conditions) %>%
-        dplyr::group_by(Conditions) %>%
-        dplyr::summarise(
-          dplyr::across(
-            tidyselect::all_of(i),
+        select(i, Conditions) %>%
+        group_by(Conditions) %>%
+        summarise(
+          across(
+            all_of(i),
             list(mean = mean, sd = sd)
           )
         ) %>%
@@ -262,13 +260,13 @@ viz_superplot <- function(data,
 
     if("Superplot" %in% names(metadata_info)){
       suppressWarnings(plotdata <- data_merge %>%
-                         dplyr::select(i,Conditions, Superplot)
-                     %>%  dplyr::group_by(Conditions)
+                         select(i,Conditions, Superplot)
+                     %>%  group_by(Conditions)
                      %>% as.data.frame() )
     }else{
       suppressWarnings(plotdata <- data_merge %>%
-                         dplyr::select(i,Conditions)
-                       %>%  dplyr::group_by(Conditions)
+                         select(i,Conditions)
+                       %>%  group_by(Conditions)
                        %>% as.data.frame() )
     }
     names(plotdata)[1] <- c("Intensity")
@@ -276,13 +274,13 @@ viz_superplot <- function(data,
 
     # Take only selected conditions
     if(is.null(plot_conditions) == FALSE){
-      dataMeans <- dataMeans %>% dplyr::filter(Conditions %in% plot_conditions)
-      plotdata <- plotdata %>% dplyr::filter(Conditions %in% plot_conditions)
+      dataMeans <- dataMeans %>% filter(Conditions %in% plot_conditions)
+      plotdata <- plotdata %>% filter(Conditions %in% plot_conditions)
       plotdata$Conditions <- factor(plotdata$Conditions, levels = plot_conditions)
     }
 
     # Make the Plot
-    Plot <- ggplot2::ggplot(plotdata, aes(x = Conditions, y = Intensity))
+    Plot <- ggplot(plotdata, aes(x = Conditions, y = Intensity))
 
     # Add graph style and error bar
     data_summary <- function(x){#calculate error bar!
@@ -293,44 +291,44 @@ viz_superplot <- function(data,
     }
 
     if (plot_type == "Bar"){
-      Plot <- Plot+  ggplot2::geom_bar(stat = "summary", fun = "mean", fill = color_palette)+ ggplot2::stat_summary(fun.data=data_summary,
+      Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = color_palette)+ stat_summary(fun.data=data_summary,
                                                                                             geom="errorbar", color="black", width=0.2)
     } else if (plot_type == "Violin"){
-      Plot <- Plot+ ggplot2::geom_violin(fill = color_palette)+ ggplot2::stat_summary(fun.data=data_summary,
+      Plot <- Plot+ geom_violin(fill = color_palette)+ stat_summary(fun.data=data_summary,
                                                               geom="errorbar", color="black", width=0.2)
     } else if (plot_type == "Box"){
-      Plot <- Plot +  ggplot2::geom_boxplot(fill=color_palette,  width=0.5, position=ggplot2::position_dodge(width = 0.5))
+      Plot <- Plot +  geom_boxplot(fill=color_palette,  width=0.5, position=position_dodge(width = 0.5))
     }
 
     # Add Superplot
     if ("Superplot" %in% names(metadata_info)){
       if(is.null(color_palette_dot)==FALSE){
-        Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
-          ggplot2::labs(color=metadata_info[["Superplot"]], fill = metadata_info[["Superplot"]])+
-          ggplot2::scale_color_manual(values = color_palette_dot)
+        Plot <- Plot+ geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
+          labs(color=metadata_info[["Superplot"]], fill = metadata_info[["Superplot"]])+
+          scale_color_manual(values = color_palette_dot)
       }else{
-        Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
-          ggplot2::labs(color=metadata_info[["Superplot"]], fill = metadata_info[["Superplot"]])
+        Plot <- Plot+ geom_beeswarm(aes(x=Conditions,y=Intensity,color=as.factor(Superplot)),size=3)+
+          labs(color=metadata_info[["Superplot"]], fill = metadata_info[["Superplot"]])
       }
     }else{
-      Plot <- Plot+ ggbeeswarm::geom_beeswarm(aes(x=Conditions,y=Intensity),size=2)
+      Plot <- Plot+ geom_beeswarm(aes(x=Conditions,y=Intensity),size=2)
     }
 
     ####---- Add stats:
     if(pval=="t.test" | pval=="wilcox.test"){
       # One vs. One comparison: t-test
       if(is.null(stat_comparison)==FALSE){
-        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = stat_comparison,
+        Plot <- Plot+ stat_compare_means(comparisons = stat_comparison,
                                                  label = "p.format", method = pval, hide.ns = TRUE,
-                                               position = ggplot2::position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+                                               position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
       }else{
         comparison <- unique(plotdata$Conditions)
-        Plot <- Plot+ ggpubr::stat_compare_means(comparisons = comparison ,
+        Plot <- Plot+ stat_compare_means(comparisons = comparison ,
                                                  label = "p.format", method = pval, hide.ns = TRUE,
-                                                 position = ggplot2::position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
+                                                 position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
 
       }
-      Plot <- Plot +ggplot2::labs(caption = paste("p.val using pairwise ", pval))
+      Plot <- Plot +labs(caption = paste("p.val using pairwise ", pval))
       }else{
         #All-vs-All comparisons table:
         conditions <- metadata_sample$Conditions
@@ -353,9 +351,9 @@ viz_superplot <- function(data,
 
         #Prepare df to add stats to plot
         df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE)%>%
-          tidyr::separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
-          tidyr::unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
-        df$p.adj <- round(sapply(STAT_C1vC2, function(x) x$p.adj),5)
+          separate(comparisons, into=c("group1", "group2"), sep="_vs_", remove=FALSE)%>%
+          unite(comparisons_rev, c("group2", "group1"), sep="_vs_", remove=FALSE)
+        df$p.adj <- round(map_dbl(STAT_C1vC2, ~ .x$p.adj), 5)
 
         # Add the 'res' column by repeating 'position' to match the number of rows
         position <- c(max(dataMeans$Intensity + 2*dataMeans$sd),
@@ -363,7 +361,7 @@ viz_superplot <- function(data,
                       max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
 
         df <- df %>%
-          dplyr::mutate(y.position = rep(position, length.out = dplyr::n()))
+          mutate(y.position = rep(position, length.out = n()))
 
         # select stats based on comparison_table
         if(is.null(stat_comparison)== FALSE){
@@ -375,41 +373,41 @@ viz_superplot <- function(data,
           }
 
           df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons", all.x=TRUE)%>%
-            tibble::column_to_rownames("entry")
+            column_to_rownames("entry")
 
           if(all(is.na(df_merge))==TRUE){#in case the reverse comparisons are needed
             df_merge <- merge(df_select, df, by.x="entry", by.y="comparisons_rev", all.x=TRUE)%>%
-              tibble::column_to_rownames("entry")
+              column_to_rownames("entry")
           }
         }else{
           df_merge <- df[,-2]%>%
-            tibble::column_to_rownames("comparisons")
+            column_to_rownames("comparisons")
           }
 
 
         # add stats to plot
         if(plot_type == "Bar"){
-          Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.05)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+          Plot <- Plot +stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.05)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
         }else{
-          Plot <- Plot +ggpubr::stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+          Plot <- Plot +stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase=0.01)#http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
         }
-        Plot <- Plot +ggplot2::labs(caption = paste("p.adj using ", pval, "and", padj))
+        Plot <- Plot +labs(caption = paste("p.adj using ", pval, "and", padj))
      }
 
-    Plot <- Plot + theme+ ggplot2::labs(title =plot_name,
+    Plot <- Plot + theme+ labs(title =plot_name,
                                 subtitle = i)# ggtitle(paste(i))
-    Plot <- Plot + ggplot2::theme(legend.position = "right",plot.title = ggplot2::element_text(size=12, face = "bold"), axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+ ggplot2::xlab(xlab)+ ggplot2::ylab(ylab)
+    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size=12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab(xlab)+ ylab(ylab)
 
     ## Store the plot in the 'plots' list
     PlotList[[i]] <- Plot
 
     # Make plot into nice format:
     Plot_Sized <-  plot_grob_superplot(input_plot=Plot, metadata_info=metadata_info, metadata_sample=metadata_sample, plot_name =plot_name, subtitle = i, plot_type=plot_type)
-    plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-    plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+    plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+    plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
-      {ggplot2::ggplot() + annotation_custom(.)} %>%
-      add(theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+      {ggplot() + annotation_custom(.)} %>%
+      add(theme(panel.background = element_rect(fill = "transparent")))
 
    ####################################################################################################################################
     ## --------------- save -----------------##
@@ -434,3 +432,4 @@ viz_superplot <- function(data,
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
+

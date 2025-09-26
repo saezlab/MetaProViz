@@ -62,7 +62,7 @@ This script allows you to perform PCA plot visualization using the results of th
 PCA plot visualization
 }
 \examples{
-Intra <- intracell_raw[,-c(1:3)]\%>\%tibble::column_to_rownames("Code")
+Intra <- intracell_raw[,-c(2:4)]\%>\%tibble::column_to_rownames("Code")
 Res <- viz_pca(Intra)
 
 }

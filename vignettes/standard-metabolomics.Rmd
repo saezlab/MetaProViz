@@ -97,7 +97,7 @@ Intra <- intracell_raw%>%
 # Check how our data looks like:
 Intra[1:5, c(1:4,21,44)]%>%
   kableExtra::kbl(caption = "Preview of the DF `Intra` including columns with sample information and metabolite ids with their measured values.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
@@ -110,7 +110,7 @@ MappingInfo <- cellular_meta%>%
 # Check how our data looks like:
 MappingInfo[1:5,]%>%
   kableExtra::kbl(caption = "Preview of the DF `Pathways` including the trivial metabolite identifiers used in the experiment as well as KEGG IDs and pathway information.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
@@ -123,7 +123,7 @@ KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 # Check how our data looks like:
 KEGG_Pathways[c(1:3,52:54),]%>%
   kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
@@ -204,7 +204,7 @@ Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
 # Check how our data looks like:
 Pool_Estimation_result_DF_CV[1:5,]%>%
   kableExtra::kbl(caption = "Preview of the Pool_Estimation result.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 The results from the `Pool_Estimation()` is a table that has the CVs. If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
@@ -259,7 +259,7 @@ Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
 # Check how our data looks like:
 Intra_Preprocessed[29:32, 1:9]%>%
   kableExtra::kbl(caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
   #kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
@@ -337,11 +337,11 @@ shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 # Check how our data looks like:
 shapiro[,c(1:6)]%>%
   kableExtra::kbl(caption = "1. Preview of the Shaprio results for the different conditions.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
   kableExtra::kbl(caption = "2. Preview of the dma results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Using the dma results, we can now use the **MetaProViz** visualization module and generate further customized Volcano plots `viz_volcano()`. You can see some examples below.
@@ -382,7 +382,7 @@ DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGosummary"]]
 # Check how our data looks like:
 DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
   kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ## MCA
@@ -422,7 +422,7 @@ MCA2Cond_Rules <- mca_twocond_rules
 # Check how our data looks like:
 MCA2Cond_Rules%>%
   kableExtra::kbl(caption ="Metabolite Clustering Analysis: 2 Conditions.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 # easyalluvial::alluvial_wide(mca_2cond[,c(1:2,4)], fill_by = 'last_variable' )
 # easyalluvial::alluvial_wide(mca_2cond[,c(1:2,5)], fill_by = 'last_variable' )
@@ -448,7 +448,7 @@ Clustersummary <- MCAres[["MCA_2Cond_summary"]]
 # Check how our data looks like:
 Clustersummary[-c(1:15),]%>%
   kableExtra::kbl(caption ="summary of MCA: 2 Conditions.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ### ORA on each metabolite cluster
@@ -457,7 +457,7 @@ As explained in detail above, Over Representation Analysis (ORA) is a pathway en
 # Check how our data looks like:
 MappingInfo[1:6,]%>%
   kableExtra::kbl(caption ="Pathway Input for MetaProViz::MC_ORA.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ```{r, include=FALSE, warning=FALSE}
@@ -493,7 +493,7 @@ MetaData_Sample <- Intra_Preprocessed[,c(1:2)]%>%
 # Check how our data looks like:
 MetaData_Sample%>%
   kableExtra::kbl(caption = "Metadata table including additional information about our Samples.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Moreover, we can use MetaData for our features (=Metabolites), which we loaded with the `MappingInfo` and we can also add the information on which cluster a metabolite was assigned to in the `MetaProViz::MCA()` analysis above:\
@@ -505,7 +505,7 @@ MetaData_Metab <-merge(MappingInfo%>%tibble::rownames_to_column("Metabolite"), M
 # Check how our data looks like:
 MetaData_Metab[c(3:4,6,24:26),]%>%
   kableExtra::kbl(caption = "Metadata table including additional information about the Metabolites.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Noteworthy, here we can also use the KEGG pathways we used for the pathway analysis.
@@ -522,7 +522,7 @@ Input_PCA <- Intra_Preprocessed[,-c(1:5)]#remove columns that include Metadata s
 # Check how our data looks like:
 Input_PCA[,1:7]%>%
   kableExtra::kbl(caption = "Input_data for `MetaProViz::viz_pca()`, with samples as rownames and metabolites as column names.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Now lets check out the standard plot:
@@ -570,7 +570,7 @@ Input_Heatmap <-  Intra_Preprocessed[,-c(1:4)]#remove columns that include Metad
 # Check how our data looks like:
 Input_Heatmap[,1:7]%>%
   kableExtra::kbl(caption = "Input for `MetaProViz::viz_heatmap()`, with samples as rownames and metabolites as column names.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Now we can generate an overview heatmap. Since we plot all metabolites the metabolite names are not plotted since this would get too crowded (You can enforce this by changing the parameter `enforce_featurenames = TRUE`).
@@ -633,7 +633,7 @@ Input_Superplot <-  Intra_Preprocessed[,-c(1:4)]#remove columns that include Met
 # Check how our data looks like:
 Input_Superplot[,1:7]%>%
   kableExtra::kbl(caption = "Input for `MetaProViz::viz_superplot()`, with samples as rownames and metabolites as column names.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 We also need the Metadata as we will need to know which conditions to plot for together. If you have further information such as replicates or patient ID, we can use this for the colour of the plotted samples per condition as in the superplots style as described in by Lord et al [@Lord2020]. \
 \
@@ -736,7 +736,7 @@ Just a quick reminder, how the input data look like:\
 # Check how our data looks like:
 DMA_786M1A_vs_HK2[1:7,]%>%
   kableExtra::kbl(caption = "Input_data for `MetaProViz::viz_volcano()` are for example differential analysis results from `MetaProViz::dma()`.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 2. Results from Pathway Enrichment Analysis (PEA): Score (e.g. NES score) and stats\
@@ -744,7 +744,7 @@ DMA_786M1A_vs_HK2[1:7,]%>%
 # Check how our data looks like:
 DM_ORA_res[["786-M1A_vs_HK2"]][["ClusterGosummary"]][1:4,-c(1,7)]%>%
   kableExtra::kbl(caption = "Input_data for `MetaProViz::viz_volcano()` are for example pathway enrichment results from `MetaProViz::DM_ORA()`.", row.names = FALSE) %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 #### **Standard**

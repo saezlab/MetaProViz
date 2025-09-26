@@ -18,4 +18,8 @@ biocrates_features
 Biocrates kit feature information of the "MxP Quant 500 XL kit" that covers more than 1,000 metabolites with biochemical
 class information and the exported different metabolite IDs (HMDB, KEGG, etc.).
 }
+\examples{
+data(biocrates_features)
+head(biocrates_features)
+}
 \keyword{datasets}

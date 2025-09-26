@@ -2,7 +2,7 @@
 % Please edit documentation in R/RefactorPriorKnoweldge.R
 \name{checkmatch_pk_to_data}
 \alias{checkmatch_pk_to_data}
-\title{Check and summarize prior_knowledge-to-MeasuredFeatures relationship}
+\title{Check and summarize relationship between prior knowledge to measured features}
 \usage{
 checkmatch_pk_to_data(
   data,
@@ -23,12 +23,20 @@ checkmatch_pk_to_data(
 
 \item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
 }
+\value{
+A \code{list} with three elements:
+\itemize{
+\item \code{data_summary} — a data frame summarising matching results per input ID, including counts, conflicts, and recommended actions.
+\item \code{GroupingVariable_summary} — a detailed data frame showing matches grouped by the specified variable, with conflict annotations.
+\item \code{data_long} — a merged data frame of prior knowledge IDs and detected IDs in long format.
+}
+}
 \description{
-Check and summarize prior_knowledge-to-MeasuredFeatures relationship
+Check and summarize relationship between prior knowledge to measured features
 }
 \examples{
 DetectedIDs <-  cellular_meta \%>\%dplyr::select("Metabolite", "HMDB")\%>\%tidyr::drop_na()
-input_pathway <- MetaProViz::translate_id(data= MetaProViz::metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]\%>\%tidyr::drop_na()
-Res <- MetaProViz::checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+input_pathway <- translate_id(data= metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]\%>\%tidyr::drop_na()
+Res <- checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
 
 }

@@ -1,3 +1,21 @@
+#!/usr/bin/env Rscript
+
+#
+#  This file is part of the `MetaProViz` R package
+#
+#  Copyright 2022-2025
+#  Saez Lab, Heidelberg University
+#
+#  Authors: see the file `README.md`
+#
+#  Distributed under the GNU GPLv3 License.
+#  See accompanying file `LICENSE` or copy at
+#      https://www.gnu.org/licenses/gpl-3.0.html
+#
+#  Website: https://saezlab.github.io/MetaProViz
+#  Git repo: https://github.com/saezlab/MetaProViz
+#
+
 #
 # From DOSE:::enricher_internal
 # https://github.com/YuLab-SMU/DOSE/blob/
@@ -21,7 +39,7 @@
 ##' @param max_gs_size maximal size of each geneSet for analyzing
 ##' @param qvalueCutoff cutoff of qvalue
 ##' @param USER_DATA ontology information
-##' @return  A \code{enrichResult} instance.
+##' @return \code{enrichResult} instance.
 ##' @importClassesFrom methods data.frame
 ##' @importFrom qvalue qvalue
 ##' @importFrom methods new
@@ -111,9 +129,9 @@ enricher_internal <- function(gene,
     qTermID <- unique(names(qTermID2ExtID))
 
     ## prepare parameter for hypergeometric test
-    k <- sapply(qTermID2ExtID, length)
+    k <- vapply(qTermID2ExtID, length, FUN.VALUE = integer(1))
     k <- k[qTermID]
-    M <- sapply(termID2ExtID, length)
+    M <- vapply(termID2ExtID, length, FUN.VALUE = integer(1))
     M <- M[qTermID]
 
     N <- rep(length(extID), length(M))
@@ -167,7 +185,7 @@ enricher_internal <- function(gene,
         qvalues <- NA
     }
 
-    geneID <- sapply(qTermID2ExtID, function(i) paste(i, collapse="/"))
+    geneID <- vapply(qTermID2ExtID, function(i) paste(i, collapse="/"), FUN.VALUE = character(1))
     geneID <- geneID[qTermID]
     Over <- data.frame(Over,
                        p.adjust = p.adj,
@@ -238,7 +256,7 @@ EXTID2TERMID <- function(gene, USER_DATA) {
         stop("not supported")
     }
 
-    len <- sapply(qExtID2Path, length)
+    len <- vapply(qExtID2Path, length, FUN.VALUE = integer(1))
     notZero.idx <- len != 0
     qExtID2Path <- qExtID2Path[notZero.idx]
 
@@ -308,7 +326,7 @@ get_geneSet_index <- function(gene_sets, min_gs_size, max_gs_size) {
 
     ## index of gene_sets in used.
     ## logical
-    geneSet_size <- sapply(gene_sets, length)
+    geneSet_size <- vapply(gene_sets, length, FUN.VALUE = integer(1))
     idx <-  min_gs_size <= geneSet_size & geneSet_size <= max_gs_size
     return(idx)
 }
@@ -326,9 +344,9 @@ get_geneSet_index <- function(gene_sets, min_gs_size, max_gs_size) {
 
 ##' interal method for enrichment analysis
 ##'
-##' @param path2gene Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
-##' @param path2name Pathway[,c("term", "Description")]# term and description
-##' @return  A \code{enrichResult} instance.
+##' @param path2gene Pathwaywith "term", "gene"# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)
+##' @param path2name Pathway with "term", "Description"# term and description
+##' @return \code{enrichResult} instance.
 ##' @author Guangchuang Yu \url{https://yulab-smu.top}
 ##' @noRd
 build_Anno <- function(path2gene, path2name) {
@@ -371,3 +389,4 @@ build_Anno <- function(path2gene, path2name) {
   }
   return(Anno_clusterProfiler_Env)
 }
+
