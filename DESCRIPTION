@@ -1,7 +1,7 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 3.1.3
+Version: 3.1.4
 Authors@R: c(
     person("Christina", "Schmidt",  email = "christina.schmidt.science@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3867-0881")),
@@ -82,6 +82,6 @@ Suggests:
     knitr,
     pkgdown,
     svglite,
-    testthat (>= 3.1.3)
+    testthat (>= 3.1.4)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
