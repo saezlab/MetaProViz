@@ -1347,18 +1347,34 @@ dma_stat_single <-
 }
 
 
-################################################################
-### ### ### aov: Internal Function to perform Anova  ### ### ###
-################################################################
+################################################################################
+### ### ### aov: Internal Function to perform Anova  ### ### ###################
+################################################################################
 
-#' This helper function to calculate One-vs-All or All-vs-All comparison statistics
+#' This helper function to calculate One-vs-All or All-vs-All 
+#' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param data DF with unique sample identifiers as row names and metabolite 
+#' numerical values in columns with metabolite 
+#' identifiers as column names. Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the 
+#' samples, which will be combined with your input data based on the unique 
+#' sample identifiers used as rownames.
+#' @param metadata_info  \emph{Optional: } Named vector including the information
+#' about the conditions column information on numerator or denominator 
+#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", 
+#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will 
+#' specify which comparison(s) will be done (Here all-vs-one, all-vs-all), 
+#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and per-
+#' forms multiple comparison all-vs-all. \strong{Default = c(conditions=
+#' "Conditions", numerator = NULL, denumerator = NULL)}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column 
+#' "MetaboliteID" and Log2FC or Log2(Distance). This is the output from 
+#' MetaProViz:::log2fc. If NULL, the output statistics will not be added into the
+#' Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with 
+#' p-value, t-value and adjusted p-value column and column with feature names
 #'
 #' @keywords Statistical testing, p-value, t-value
 #'
@@ -1369,113 +1385,197 @@ dma_stat_single <-
 #' @importFrom utils combn
 #'
 #' @noRd
-aov <- function(data,
+aov <- 
+    function(
+        data,
                metadata_sample,
-               metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-               log2fc_table=NULL){
-
+        metadata_info = c(
+            Conditions = "Conditions", 
+            Numerator = NULL, 
+            Denominator = NULL
+            ),
+        log2fc_table = NULL
+    ) {
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-  if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
+    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
     # all-vs-all: Generate all pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = TRUE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
-    #all-vs-one: Generate the pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        comparisons <- combn(
+            unique(conditions), 
+            2) %>% 
+            as.matrix()
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- TRUE
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+        # all-vs-one: Generate the pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <- metadata_info[["Denominator"]]
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = FALSE
+        comparisons <- t(
+            expand.grid(numerator, denominator)
+            ) %>% 
+            as.data.frame()
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
   }
 
-  #############################################################################################
+    ############################################################################
   ## 1. Anova p.val
-  aov.res= apply(data, 2, function(x) stats::aov(x ~ conditions))
+    aov.res <- apply(data, 2, function(x) stats::aov(x ~ conditions))
 
   ## 2. Tukey test p.adj
-  posthoc.res = lapply(aov.res, TukeyHSD, conf.level=0.95)
-  Tukey_res <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'p adj'])) %>% as.data.frame()
+    posthoc.res <- lapply(aov.res, TukeyHSD, conf.level = 0.95)
+    Tukey_res <- do.call(
+        "rbind", 
+        lapply(
+            posthoc.res, 
+            function(x) x[1][[1]][, "p adj"]
+            )
+        ) %>% 
+        as.data.frame()
 
-  comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
-  opp_comps <-  paste(comparisons[2, ], comparisons[1, ], sep="-")
+    comps <- paste(
+        comparisons[1, ], 
+        comparisons[2, ], 
+        sep = "-"
+        ) # normal
 
-  if(sum(opp_comps %in%  colnames(Tukey_res))>0){# if opposite comparisons is true
-    for (comp in 1: length(opp_comps)){
-      colnames(Tukey_res)[colnames(Tukey_res) %in% opp_comps[comp]] <-  comps[comp]
+    opp_comps <- paste(
+        comparisons[2, ], 
+        comparisons[1, ], 
+        sep = "-"
+        )
+
+    # if opposite comparisons is true
+    if (sum(opp_comps %in% colnames(Tukey_res)) > 0) { 
+        for (comp in 1:length(opp_comps)) {
+            colnames(Tukey_res)[colnames(Tukey_res) %in% opp_comps[comp]] <- comps[comp]
     }
   }
 
   ## 3. t.val
-  Tukey_res_diff <- do.call('rbind', lapply(posthoc.res, function(x) x[1][[1]][,'diff'])) %>% as.data.frame()
+    Tukey_res_diff <- do.call(
+        "rbind", 
+        lapply(
+            posthoc.res, 
+            function(x) x[1][[1]][, "diff"]
+            )
+        ) %>% 
+        as.data.frame()
 
-  if (sum(opp_comps %in%  colnames(Tukey_res_diff))>0){# if oposite comparisons is true
-    for (comp in 1: length(opp_comps)){
-      colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opp_comps[comp]] <-  comps[comp]
+    # if oposite comparisons is true
+    if (sum(opp_comps %in% colnames(Tukey_res_diff)) > 0) { 
+        for (comp in 1:length(opp_comps)) {
+            colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opp_comps[comp]] <- comps[comp]
     }
   }
 
-  #Make output DFs:
+    # Make output DFs:
   Pval_table <- Tukey_res
-  Pval_table <- rownames_to_column(Pval_table,"Metabolite")
+    Pval_table <- 
+        rownames_to_column(
+            Pval_table, 
+            "Metabolite"
+        )
 
-  Tval_table <- rownames_to_column(Tukey_res_diff,"Metabolite")
+    Tval_table <- 
+        rownames_to_column(
+            Tukey_res_diff, 
+            "Metabolite"
+        )
 
-  common_col_names <- setdiff(names(Tukey_res_diff), "row.names")#Here we need to adapt for one_vs_all or all_vs_all
+    common_col_names <- 
+        setdiff(
+            names(Tukey_res_diff), 
+            "row.names"
+        ) # Here we need to adapt for one_vs_all or all_vs_all
 
   results_list <- list()
-  for(col_name in common_col_names){
+    for (col_name in common_col_names) {
     # Create a new data frame by merging the two data frames
-    merged_df <- merge(Pval_table[,c("Metabolite",col_name)], Tval_table[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
-      rename("p.adj"=2,
-                    "t.val"=3)
+        merged_df <- 
+            merge(
+                Pval_table[, c("Metabolite", col_name)], 
+                Tval_table[, c("Metabolite", col_name)], 
+                by = "Metabolite", 
+                all = TRUE
+                ) %>%
+                rename(
+                    "p.adj" = 2,
+                    "t.val" = 3
+                )
 
-    #We need to add _vs_ into the comparison col_name
+        # We need to add _vs_ into the comparison col_name
     pattern <- paste(conditions, collapse = "|")
-    conditions_present <- unique(unlist(regmatches(col_name, gregexpr(pattern, col_name))))
-    modified_col_name <- paste(conditions_present[1], "vs", conditions_present[2], sep = "_")
+        conditions_present <- 
+            unique(
+                unlist(
+                    regmatches(
+                        col_name, 
+                        gregexpr(pattern, col_name)
+                    )
+                )
+            )
+        modified_col_name <- 
+            paste(
+                conditions_present[1], 
+                "vs", 
+                conditions_present[2], 
+                sep = "_"
+                )
 
-    # Add the new data frame to the list with the column name as the list element name
+        # Add the new data frame to the list with the column 
+        # name as the list element name
     results_list[[modified_col_name]] <- merged_df
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  if(is.null(log2fc_table)==FALSE){
-    list_names <-  names(results_list)
+    if (is.null(log2fc_table) == FALSE) {
+        list_names <- names(results_list)
 
     merged_list <- list()
-    for(name in list_names){
+        for (name in list_names) {
       # Check if the data frames exist in both lists
-      if(name %in% names(results_list) && name %in% names(log2fc_table)){
-        merged_df <- merge(results_list[[name]], log2fc_table[[name]], by = "Metabolite", all = TRUE)
-        merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+            if (name %in% names(results_list) && name %in% names(log2fc_table)) {
+                merged_df <- merge(
+                    results_list[[name]], 
+                    log2fc_table[[name]], 
+                    by = "Metabolite", 
+                    all = TRUE
+                    )
+                # reorder the columns
+                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))]
         merged_list[[name]] <- merged_df
       }
     }
-  }else{
+    } else {
     merged_list <- results_list
   }
 
   # Make sure the right comparisons are returned:
-  if(all_vs_all==TRUE){
+    if (all_vs_all == TRUE) {
     STAT_C1vC2 <- merged_list
-  }else if(all_vs_all==FALSE){
-    #remove the comparisons that are not needed:
+    } else if (all_vs_all == FALSE) {
+        # remove the comparisons that are not needed:
     modified_df_list <- list()
-    for(df_name in names(merged_list)){
-      if(endsWith(df_name, metadata_info[["Denominator"]])){
+        for (df_name in names(merged_list)) {
+            if (endsWith(df_name, metadata_info[["Denominator"]])) {
         modified_df_list[[df_name]] <- merged_list[[df_name]]
       }
     }
