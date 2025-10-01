@@ -2527,19 +2527,36 @@ dma_stat_limma <-
 }
 
 
-#############################################################################################
-### ### ### shapiro function: Internal Function to perform shapiro test and plots ### ### ###
-#############################################################################################
+################################################################################
+###   shapiro function: Internal Function to perform shapiro test and plots  ###
+################################################################################
 
 #' Shapiro test and plots
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default = "t-test"}
-#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be plotted  \strong{default = TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite 
+#' numerical values in columns with metabolite identifiers as column names. Use 
+#' NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the 
+#' samples, which will be combined with your input data based on the unique 
+#' sample identifiers used as rownames.
+#' @param metadata_info  \emph{Optional: } Named vector including the information 
+#' about the conditions column information on numerator or denominator 
+#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", 
+#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will 
+#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), 
+#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and 
+#' performs multiple comparison all-vs-all. \strong{Default = c(conditions=
+#' "Conditions", numerator = NULL, denumerator = NULL)}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the 
+#' selected test to calculate p.value. For one-vs-one comparisons choose t.test, 
+#' wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all 
+#' comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default
+#'  = "t-test"}
+#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be 
+#' plotted  \strong{default = TRUE}
 #'
-#' @return List with tewo entries: DF (including the results DF) and Plots (including the Density and QQ plots)
+#' @return List with tewo entries: DF (including the results DF) and Plots 
+#' (including the Density and QQ plots)
 #'
 #' @keywords shapiro test,Normality testing, Density plot, QQplot
 #'
@@ -2552,197 +2569,460 @@ dma_stat_limma <-
 #' @importFrom utils combn
 #'
 #' @noRd
-shapiro <- function(data,
+shapiro <- 
+    function(
+        data,
                    metadata_sample,
-                   metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-                   pval= "t-test",
-                   qqplots=TRUE
-){
-
+        metadata_info = c(
+            Conditions = "Conditions", 
+            Numerator = NULL, 
+            Denominator = NULL
+            ),
+        pval = "t-test",
+        qqplots = TRUE
+        ) {
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------- Checks --------------##
-  if(grepl("[[:space:]()-./\\\\]", metadata_info[["Conditions"]])==TRUE){
-    message("In metadata_info=c(Conditions= ColumnName): ColumnName contains special charaters, hence this is renamed.")
-    ColumnNameCondition_clean <- gsub("[[:space:]()-./\\\\]", "_", metadata_info[["Conditions"]])
-    metadata_sample <- metadata_sample%>%
-      rename(!!paste(ColumnNameCondition_clean):= metadata_info[["Conditions"]])
+    if (grepl(
+        "[[:space:]()-./\\\\]", metadata_info[["Conditions"]]
+        ) == TRUE) {
+        message(
+            paste(
+                "In metadata_info=c(Conditions= ColumnName): ",
+                "ColumnName contains special charaters, hence this is renamed.",
+                sep = ""
+            )
+        )
+        ColumnNameCondition_clean <- 
+            gsub(
+                "[[:space:]()-./\\\\]", 
+                "_", 
+                metadata_info[["Conditions"]]
+            )
+        metadata_sample <- metadata_sample %>%
+            rename(
+                !!paste(ColumnNameCondition_clean) := metadata_info[["Conditions"]]
+                )
 
     metadata_info[["Conditions"]] <- ColumnNameCondition_clean
   }
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-  if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
+    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
     # all-vs-all: Generate all pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = TRUE
-   }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
-    #all-vs-one: Generate the pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        comparisons <- 
+            combn(
+                unique(conditions), 2
+                ) %>% 
+                as.matrix()
+
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- TRUE
+
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+        # all-vs-one: Generate the pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <- metadata_info[["Denominator"]]
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = FALSE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==TRUE){
+        comparisons <- 
+            t(
+                expand.grid(numerator, denominator)
+            ) %>% 
+            as.data.frame()
+
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
+
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
     # one-vs-one: Generate the comparisons
     denominator <- metadata_info[["Denominator"]]
     numerator <- metadata_info[["Numerator"]]
-    comparisons <- matrix(c(metadata_info[["Denominator"]], metadata_info[["Numerator"]]))
-    #Settings:
-    MultipleComparison = FALSE
-    all_vs_all = FALSE
+        comparisons <- 
+            matrix(
+                c(
+                    metadata_info[["Denominator"]], 
+                    metadata_info[["Numerator"]]
+                )
+            )
+
+        # Settings:
+        MultipleComparison <- FALSE
+        all_vs_all <- FALSE
   }
 
-  ################################################################################################################################################################################################
-  ## ------------ Check data normality and statistical test chosen and generate Output DF----------- ##
-  # Before Hypothesis testing, we have to decide whether to use a parametric or a non parametric test. We can test the data normality using the shapiro test.
-  ##-------- First: Load the data and perform the shapiro.test on each metabolite across the samples of one condition. this needs to be repeated for each condition:
-  #Prepare the input:
-  Input_shaptest <- replace(data, is.na(data), 0)%>% #shapiro test can not handle NAs!
-    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator)%>%
+    ############################################################################
+    ## Check data normality and statistical test chosen and generate Output DF #
+    # Before Hypothesis testing, we have to decide whether to use a parametric or
+    # a non parametric test. 
+    # We can test the data normality using the shapiro test.
+
+    ## First: Load the data and perform the shapiro.test on each metabolite across
+    # the samples of one condition. this needs to be repeated for each condition:
+    # Prepare the input:
+    Input_shaptest <- 
+        replace(
+            data, 
+            is.na(data), 
+            0
+            ) %>% # shapiro test can not handle NAs!
+            filter(
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
+            ) %>%
     select_if(is.numeric)
-  # temp <- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x))  == 0 #  we have to remove features with zero variance if there are any.
-  temp <- vapply(Input_shaptest, function(x) var(x, na.rm = TRUE), FUN.VALUE = numeric(1)) == 0 #  we have to remove features with zero variance if there are any.
+    
+    ## before change to vapply:
+    # temp <- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x))  == 0 
+    temp <- 
+        vapply(
+            Input_shaptest, 
+            function(x) var(x, na.rm = TRUE), 
+            FUN.VALUE = numeric(1)
+            ) == 0 
 
-  temp <- temp[complete.cases(temp)]  # Remove NAs from temp
-  columns_with_zero_variance <- names(temp[temp])# Extract column names where temp is TRUE
+    temp <- temp[complete.cases(temp)] # Remove NAs from temp
+    # Extract column names where temp is TRUE
+    columns_with_zero_variance <- names(temp[temp]) 
 
-  if(length(Input_shaptest)==1){#handle a specific case where after filtering and selecting numeric variables, there's only one column left in Input_shaptest
-    Input_shaptest <-data
-  }else{
-    if(length(columns_with_zero_variance)==0){
-      Input_shaptest <-Input_shaptest
-    }else{
-      message("The following features have zero variance and are removed prior to performing the shaprio test: ",columns_with_zero_variance)
-      Input_shaptest <- Input_shaptest[,!(names(Input_shaptest) %in% columns_with_zero_variance), drop = FALSE]#drop = FALSE argument is used to ensure that the subset operation doesn't simplify the result to a vector, preserving the data frame structure
+    if (length(Input_shaptest) == 1) { 
+        # handle a specific case where after filtering and selecting numeric 
+        # variables, there's only one column left in Input_shaptest
+        Input_shaptest <- data
+    } else {
+        if (length(columns_with_zero_variance) == 0) {
+            Input_shaptest <- Input_shaptest
+        } else {
+            message(
+                paste(
+                    "The following features have zero variance and are ",
+                    "removed prior to performing the shaprio test: ",
+                    sep = ""
+                ), 
+                columns_with_zero_variance
+            )
+            # drop = FALSE argument is used to ensure that the subset operation 
+            # doesn't simplify the result to a vector, preserving the data 
+            # frame structure
+            Input_shaptest <- 
+                Input_shaptest[
+                    , 
+                    !(names(Input_shaptest) %in% columns_with_zero_variance),
+                    drop = FALSE
+                ] 
     }
   }
 
-  Input_shaptest_Cond <-merge(data.frame(Conditions = metadata_sample[, metadata_info[["Conditions"]], drop = FALSE]), Input_shaptest, by=0, all.y=TRUE)
+    Input_shaptest_Cond <- 
+        merge(
+            data.frame(
+                Conditions = metadata_sample[
+                    , 
+                    metadata_info[["Conditions"]], 
+                    drop = FALSE
+                    ]
+            ), 
+            Input_shaptest, 
+            by = 0, 
+            all.y = TRUE
+        )
 
-  UniqueConditions <- metadata_sample%>%
-    subset(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator, select = c(metadata_info[["Conditions"]]))
-  UniqueConditions <- unique(UniqueConditions[[metadata_info[["Conditions"]]]])
+    UniqueConditions <- metadata_sample %>%
+        subset(
+            metadata_sample[
+                [metadata_info[["Conditions"]]]
+            ] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator, 
+            select = c(metadata_info[["Conditions"]])
+        )
+    UniqueConditions <- 
+        unique(
+            UniqueConditions[[metadata_info[["Conditions"]]]]
+        )
 
-  #Generate the results
+    # Generate the results
   shapiro_results <- list()
   for (i in UniqueConditions) {
     # Subset the data for the current condition
-    subset_data <- Input_shaptest_Cond%>%
-      column_to_rownames("Row.names")%>%
-      subset(get(metadata_info[["Conditions"]]) == i, select = -c(1))
+        subset_data <- Input_shaptest_Cond %>%
+            column_to_rownames("Row.names") %>%
+            subset(
+                get(metadata_info[["Conditions"]]) == i, select = -c(1)
+                )
 
-    #Check the sample size (shapiro.test(x) : sample size must be between 3 and 5000):
-    if(nrow(subset_data)<3){
-      warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided <3 Samples for condition ", i, ". Hence Shaprio test can not be performed for this condition.", sep="")
-    }else if(nrow(subset_data)>5000){
-      warning("shapiro.test(x) : sample size must be between 3 and 5000. You have provided >5000 Samples for condition ", i, ". Hence Shaprio test will not be performed for this condition.", sep="")
-    }else{
+        # Check the sample size (shapiro.test(x) : sample size must be 
+        # between 3 and 5000):
+        if (nrow(subset_data) < 3) {
+            warning(
+                paste(
+                    "shapiro.test(x) : sample size must be between 3 and 5000.",
+                    " You have provided <3 Samples for condition ",
+                     i, 
+                     ". Hence Shaprio test can not be performed for ",
+                     "this condition.", 
+                     sep = ""
+                ), sep = ""
+            )
+        } else if (nrow(subset_data) > 5000) {
+            warning(
+                paste(
+                    "shapiro.test(x) : sample size must be between 3 and 5000. ",
+                    "You have provided >5000 Samples for condition ", 
+                    i, 
+                    ". Hence Shaprio test will not be performed for ",
+                    "this condition.",
+                    sep = ""
+                ), 
+                sep = ""
+            )
+        } else {
       # Apply shapiro-Wilk test to each feature in the subset
-    # shapiro_results[[i]] <- as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+            # shapiro_results[[i]] <- 
+            # as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
      shapiro_results[[i]] <- as.data.frame(
-      vapply(subset_data, shapiro.test, FUN.VALUE = list(statistic = c(W = 0), p.value = 0.0, method = "", data.name = ""))
+                vapply(
+                    subset_data, 
+                    shapiro.test, 
+                    FUN.VALUE = list(
+                        statistic = c(W = 0), 
+                        p.value = 0.0, 
+                        method = "", 
+                        data.name = "")
+                    )
      )
-     
     }
   }
 
-  if(nrow(subset_data)>=3 & nrow(subset_data)<=5000){
-    #Make the output DF
-    DF_shapiro_results <- as.data.frame(matrix(NA, nrow = length(UniqueConditions), ncol = ncol(Input_shaptest)))
+    if (nrow(subset_data) >= 3 & nrow(subset_data) <= 5000) {
+        # Make the output DF
+        DF_shapiro_results <- 
+            as.data.frame(
+                matrix(
+                    NA, 
+                    nrow = length(UniqueConditions), 
+                    ncol = ncol(Input_shaptest)
+                )
+            )
     rownames(DF_shapiro_results) <- UniqueConditions
     colnames(DF_shapiro_results) <- colnames(Input_shaptest)
-    for(k in 1:length(UniqueConditions)){
-      for(l in 1:ncol(Input_shaptest)){
-        DF_shapiro_results[k, l] <- shapiro_results[[UniqueConditions[k]]][[l]]$p.value
+        for (k in 1:length(UniqueConditions)) {
+            for (l in 1:ncol(Input_shaptest)) {
+                DF_shapiro_results[k, l] <- 
+                    shapiro_results[[UniqueConditions[k]]][[l]]$p.value
       }
     }
-    colnames(DF_shapiro_results) <- paste("shapiro p.val(", colnames(DF_shapiro_results),")", sep = "")
+        colnames(DF_shapiro_results) <- 
+            paste(
+                "shapiro p.val(", colnames(DF_shapiro_results), 
+                ")", 
+                sep = ""
+            )
 
-    ##------ Second: Give feedback to the user if the chosen test fits the data distribution. The data are normal if the p-value of the shapiro.test > 0.05.
+        ## ------ Second: Give feedback to the user if the chosen test fits the 
+        # data distribution. The data are normal if the p-value of the 
+        # shapiro.test > 0.05.
     Density_plots <- list()
-    if(qqplots==TRUE){
+        if (qqplots == TRUE) {
       QQ_plots <- list()
     }
-    for(x in 1:nrow(DF_shapiro_results)){
+        for (x in 1:nrow(DF_shapiro_results)) {
       #### Generate Results Table
-      transpose <- as.data.frame(t(DF_shapiro_results[x,]))
-      Norm <- format((round(sum(transpose[[1]] > 0.05)/nrow(transpose),4))*100, nsmall = 2) # percentage of normally distributed metabolites across samples
-      NotNorm <- format((round(sum(transpose[[1]] < 0.05)/nrow(transpose),4))*100, nsmall = 2) # percentage of not-normally distributed metabolites across samples
-      if(pval =="kruskal.test" | pval =="wilcox.test"){
-        message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(pval), ", which is for non parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
-      }else{
-        message("For the condition ", colnames(transpose) ," ", Norm, " % of the metabolites follow a normal distribution and ", NotNorm, " % of the metabolites are not-normally distributed according to the shapiro test. You have chosen ",paste(pval), ", which is for parametric Hypothesis testing. `shapiro.test` ignores missing values in the calculation.")
+            transpose <- 
+                as.data.frame(
+                    t(
+                        DF_shapiro_results[x, ]
+                    )
+                )
+            Norm <- 
+                format(
+                    (round(
+                        sum(transpose[[1]] > 0.05) / nrow(transpose), 
+                        4
+                    )) * 100, 
+                    nsmall = 2
+                    ) # percentage of normally distributed metabolites 
+                    # across samples
+            NotNorm <- 
+                format(
+                    (round(
+                        sum(transpose[[1]] < 0.05) / nrow(transpose), 
+                        4
+                    )) * 100, 
+                    nsmall = 2
+                    ) # percentage of not-normally distributed metabolites 
+                    # across samples
+            if (pval == "kruskal.test" | pval == "wilcox.test") {
+                message(
+                    "For the condition ", 
+                    colnames(transpose), 
+                    " ", 
+                    Norm, 
+                    " % of the metabolites follow a normal distribution and ", 
+                    NotNorm, 
+                    " % of the metabolites are not-normally distributed ",
+                    "according to the shapiro test. You have chosen ", 
+                    paste(pval), 
+                    ", which is for non parametric Hypothesis testing. ",
+                    "`shapiro.test` ignores missing values in the",
+                    " calculation."
+                )
+            } else {
+                message(
+                    "For the condition ", 
+                    colnames(transpose), 
+                    " ", 
+                    Norm, 
+                    " % of the metabolites follow a normal distribution and ", 
+                    NotNorm, 
+                    " % of the metabolites are not-normally distributed ",
+                    "according to the shapiro test. You have chosen ", 
+                    paste(pval), 
+                    ", which is for parametric Hypothesis testing. ",
+                    "`shapiro.test` ignores missing values in the calculation."
+                )
       }
 
-      # Assign the calculated values to the corresponding rows in result_df
+            # Assign the calculated values to the corresponding 
+            # rows in result_df
       DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
       DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
 
-      #Reorder the DF:
+            # Reorder the DF:
       all_columns <- colnames(DF_shapiro_results)
-      include_columns <- c("Metabolites with normal distribution [%]", "Metabolites with not-normal distribution [%]")
-      exclude_columns <- setdiff(all_columns, include_columns)
-      DF_shapiro_results <- DF_shapiro_results[, c(include_columns, exclude_columns)]
+            include_columns <- 
+                c(
+                    "Metabolites with normal distribution [%]", 
+                    "Metabolites with not-normal distribution [%]"
+                )
+            exclude_columns <- 
+                setdiff(
+                    all_columns, 
+                    include_columns
+                )
+            DF_shapiro_results <- 
+                DF_shapiro_results[, c(include_columns, exclude_columns)]
 
       #### Make Group wise data distribution plot and QQ plots
-      subset_data <- Input_shaptest_Cond%>%
-        column_to_rownames("Row.names")%>%
-        subset(get(metadata_info[["Conditions"]]) ==  colnames(transpose), select = -c(1))
+            subset_data <- Input_shaptest_Cond %>%
+                column_to_rownames("Row.names") %>%
+                subset(
+                    get(metadata_info[["Conditions"]]) == colnames(transpose), 
+                    select = -c(1)
+                )
       all_data <- unlist(subset_data)
 
       plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-        geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white")  +
+                geom_histogram(
+                    aes(y = after_stat(density)), 
+                    binwidth = .5, 
+                    colour = "black", 
+                    fill = "white"
+                ) +
         geom_density(alpha = 0.2, fill = "grey45")
 
       density_values <- ggplot_build(plot)$data[[2]]
 
-      plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
-        geom_histogram( aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
-        geom_density(alpha=.2, fill="grey45") +
-        scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))]))
+            plot <- ggplot(
+                data.frame(x = all_data), aes(x = x)
+                ) +
+                geom_histogram(
+                    aes(y = after_stat(density)), 
+                    binwidth = .5, 
+                    colour = "black", 
+                    fill = "white"
+                ) +
+                geom_density(
+                    alpha = .2, 
+                    fill = "grey45"
+                ) +
+                scale_x_continuous(
+                    limits = c(
+                        0, 
+                        density_values$x[max(which(density_values$scaled >= 0.1))]
+                        )
+                )
 
       density_values2 <- ggplot_build(plot)$data[[2]]
 
-      suppressWarnings(sampleDist <- ggplot(data.frame(x = all_data), aes(x = x)) +
-                         geom_histogram(aes(y=after_stat(density)), binwidth=.5, colour="black", fill="white") +
-                         geom_density(alpha=.2, fill="grey45") +
-                         scale_x_continuous(limits = c(0, density_values$x[max(which(density_values$scaled >= 0.1))])) +
-                         theme_minimal()+
-                         labs(title=paste("data distribution ",  colnames(transpose)), subtitle = paste(NotNorm, " of metabolites not normally distributed based on shapiro test"),x="Abundance", y = "Density")
+            suppressWarnings(
+                sampleDist <- 
+                    ggplot(
+                        data.frame(x = all_data), aes(x = x)
+                    ) +
+                    geom_histogram(
+                        aes(y = after_stat(density)), 
+                        binwidth = .5, 
+                        colour = "black", 
+                        fill = "white"
+                    ) +
+                    geom_density(
+                        alpha = .2, 
+                        fill = "grey45"
+                    ) +
+                    scale_x_continuous(
+                        limits = c(
+                            0, 
+                            density_values$x[max(which(density_values$scaled >= 0.1))]
+                        )
+                    ) +
+                    theme_minimal() +
+                    labs(
+                        title = paste("data distribution ", colnames(transpose)), 
+                        subtitle = paste(
+                            NotNorm, 
+                            " of metabolites not normally distributed based on ",
+                            "shapiro test"
+                        ), 
+                        x = "Abundance", 
+                        y = "Density"
+                    )
       )
 
       Density_plots[[paste(colnames(transpose))]] <- sampleDist
 
       # QQ plots
-      if(qqplots==TRUE){
+            if (qqplots == TRUE) {
         # Make folders
         conds <- unique(c(numerator, denominator))
 
-        #QQ plots for each groups for each metabolite for normality visual check
+                # QQ plots for each groups for each metabolite for normality 
+                # visual check
         qq_plot_list <- list()
-        for (col_name in colnames(subset_data)){
-          qq_plot <- ggplot(data.frame(x = subset_data[[col_name]]), aes(sample = x)) +
+                for (col_name in colnames(subset_data)) {
+                    qq_plot <- 
+                        ggplot(
+                            data.frame(x = subset_data[[col_name]]), aes(sample = x)
+                        ) +
             geom_qq() +
-            geom_qq_line(color = "red") +
-            labs(title = paste("QQPlot for", col_name),x = "Theoretical", y="Sample")+ theme_minimal()
+                        geom_qq_line(
+                            color = "red"
+                        ) +
+                        labs(
+                            title = paste("QQPlot for", col_name), 
+                            x = "Theoretical", 
+                            y = "Sample"
+                        ) +
+                        theme_minimal()
 
           plot.new()
           plot(qq_plot)
-          qq_plot_list[[col_name]] <-  recordPlot()
+                    qq_plot_list[[col_name]] <- recordPlot()
 
-          col_name2 <- (gsub("/","_",col_name))#remove "/" cause this can not be safed in a PDF name
+                    # remove "/" cause this can not be safed in a PDF name
+                    col_name2 <- (gsub("/", "_", col_name)) 
           col_name2 <- gsub("-", "", col_name2)
           col_name2 <- gsub("/", "", col_name2)
           col_name2 <- gsub(" ", "", col_name2)
@@ -2755,17 +3035,36 @@ shapiro <- function(data,
           dev.off()
         }
 
-        QQ_plots[[paste(colnames(transpose))]] <- qq_plot_list
+                QQ_plots[[paste(colnames(transpose))]] <- 
+                    qq_plot_list
       }
     }
 
     ######################################
-    ##-------- Return
-    #Here we make a list
-    if(qqplots==TRUE){
-      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%tibble::rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots, "QQ_plots" = QQ_plots))
-    }else{
-      Shapiro_output_list <- list("DF" = list("Shapiro_result"=DF_shapiro_results%>%tibble::rownames_to_column("Code")),"Plot"=list( "Distributions"=Density_plots))
+        ## -------- Return
+        # Here we make a list
+        if (qqplots == TRUE) {
+            Shapiro_output_list <- 
+                list(
+                    "DF" = list(
+                        "Shapiro_result" = DF_shapiro_results %>% 
+                            tibble::rownames_to_column("Code")
+                    ), 
+                    "Plot" = list(
+                        "Distributions" = Density_plots, "QQ_plots" = QQ_plots
+                    )
+                )
+        } else {
+            Shapiro_output_list <- 
+                list(
+                    "DF" = list(
+                        "Shapiro_result" = DF_shapiro_results %>% 
+                            tibble::rownames_to_column("Code")
+                    ), 
+                    "Plot" = list(
+                        "Distributions" = Density_plots
+                    )
+                )
     }
 
     suppressWarnings(invisible(return(Shapiro_output_list)))
