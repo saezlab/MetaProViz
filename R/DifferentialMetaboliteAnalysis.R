@@ -3073,17 +3073,29 @@ shapiro <-
 
 
 
-###########################################################################################
-### ### ### bartlett function: Internal Function to perform bartlett test and plots ### ###
-###########################################################################################
+################################################################################
+### bartlett function: Internal Function to perform bartlett test and plots  ###
+################################################################################
 
 #' Bartlett test for variance homogeneity check across groups
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
+#' @param data DF with unique sample identifiers as row names and metabolite 
+#' numerical values in columns with metabolite identifiers as column names. Use 
+#' NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the 
+#' samples, which will be combined with your input data based on the unique 
+#' sample identifiers used as rownames.
+#' @param metadata_info  \emph{Optional: } Named vector including the information
+#'  about the conditions column information on numerator or denominator 
+#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
+#'  Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will 
+#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), 
+#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and 
+#' performs multiple comparison all-vs-all. \strong{Default = c(conditions=
+#' "Conditions", numerator = NULL, denumerator = NULL)}
 #'
-#' @return List with two entries: DF (including the results DF) and Plots (including the  histogramm plot)
+#' @return List with two entries: DF (including the results DF) and Plots 
+#' (including the  histogramm plot)
 #'
 #' @keywords bartlett test,Normality testing, Density plot, QQplot
 #'
@@ -3093,49 +3105,101 @@ shapiro <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-bartlett <- function(data,
+bartlett <- 
+    function(
+        data,
                     metadata_sample,
-                    metadata_info){
-
+        metadata_info
+        ) {
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
-  ################################################################################################################################################################################################
+    ##########################################################################
 
-  conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+    conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
 
   # Use Bartletts test
-  bartlett_res =  apply(data,2,function(x) bartlett.test(x~conditions))
+    bartlett_res <- 
+        apply(
+            data, 
+            2, 
+            function(x) bartlett.test(x ~ conditions)
+        )
 
-  #Make the output DF
-  DF_bartlett_results <- as.data.frame(matrix(NA, nrow = ncol(data)), ncol = 1)
+    # Make the output DF
+    DF_bartlett_results <- 
+        as.data.frame(
+            matrix(
+                NA, 
+                nrow = ncol(data)
+            ), 
+            ncol = 1
+        )
   rownames(DF_bartlett_results) <- colnames(data)
   colnames(DF_bartlett_results) <- "bartlett p.val"
 
-  for(l in 1:length(bartlett_res)){
-    DF_bartlett_results[l, 1] <-bartlett_res[[l]]$p.value
+    for (l in 1:length(bartlett_res)) {
+        DF_bartlett_results[l, 1] <- bartlett_res[[l]]$p.value
   }
-  DF_bartlett_results <- DF_bartlett_results %>% mutate(`Var homogeneity`= case_when(`bartlett p.val`< 0.05~ FALSE,
-                                                                                     `bartlett p.val`>=0.05 ~ TRUE))
+    DF_bartlett_results <- DF_bartlett_results %>% 
+        mutate(
+            `Var homogeneity` = case_when(
+                `bartlett p.val` < 0.05 ~ FALSE,
+                `bartlett p.val` >= 0.05 ~ TRUE
+            )
+        )
   # if p<0.05 then unequal variances
-  message("For ",round(sum(DF_bartlett_results$`Var homogeneity`)/  nrow(DF_bartlett_results), digits = 4) * 100, "% of metabolites the group variances are equal.")
+    message(
+        "For ", 
+        round(sum(DF_bartlett_results$`Var homogeneity`) / nrow(DF_bartlett_results), digits = 4) * 100, 
+        "% of metabolites the group variances are equal."
+        )
 
-  DF_bartlett_results <- DF_bartlett_results %>% rownames_to_column("Metabolite") %>% relocate("Metabolite")
+    DF_bartlett_results <- DF_bartlett_results %>%
+        rownames_to_column("Metabolite") %>%
+        relocate("Metabolite")
   DF_Bartlett_results_out <- DF_bartlett_results
 
   #### Plots:
-  #Make density plots
-  Bartlettplot <- ggplot(data.frame(x = DF_Bartlett_results_out), aes(x =DF_Bartlett_results_out$`bartlett p.val`)) +
-    geom_histogram(aes(y=..density..), colour="black", fill="white")  +
-    geom_density(alpha = 0.2, fill = "grey45")+
-    ggtitle("bartlett's test p.value distribution") +
-    xlab("p.value")+
-    geom_vline(aes(xintercept = 0.05, color="darkred"))
+    # Make density plots
+    Bartlettplot <- 
+        ggplot(
+            data.frame(x = DF_Bartlett_results_out), 
+            aes(x = DF_Bartlett_results_out$`bartlett p.val`)
+        ) +
+        geom_histogram(
+            aes(y = ..density..), 
+            colour = "black", 
+            fill = "white"
+        ) +
+        geom_density(
+            alpha = 0.2, 
+            fill = "grey45"
+        ) +
+        ggtitle(
+            "bartlett's test p.value distribution"
+        ) +
+        xlab(
+            "p.value"
+        ) +
+        geom_vline(
+            aes(xintercept = 0.05, color = "darkred")
+        )
 
-  Bartlett_output_list<- list("DF"=list("Bartlett_result"=DF_Bartlett_results_out) , "Plot"=list("Histogram"=Bartlettplot))
+    Bartlett_output_list <- list(
+        "DF" = list(
+            "Bartlett_result" = DF_Bartlett_results_out
+        ), 
+        "Plot" = list(
+            "Histogram" = Bartlettplot
+        )
+    )
 
-  suppressWarnings(invisible(return(Bartlett_output_list)))
-
+    suppressWarnings(
+        invisible(
+            return(Bartlett_output_list)
+        )
+    )
 }
 
 
