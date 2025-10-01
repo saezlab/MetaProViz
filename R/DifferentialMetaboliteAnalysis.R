@@ -3210,12 +3210,14 @@ bartlett <-
 #' Variance stabilizing transformation (vst)
 #'
 #' @param data data frame with unique sample identifiers
-# not true: no need to have row names, they are not used here, and in general,
-# it is not a good practice to use row names
-#'     as row names and metabolite numerical values in columns with metabolite
-#'     identifiers as column names. Use NA for metabolites that were not detected.
+# not true: no need to have row names, they are not used here, and in 
+# general, # it is not a good practice to use row names
+#' as row names and metabolite numerical values in columns with metabolite
+#' identifiers as column names. Use NA for metabolites that were 
+#' not detected.
 #'
-#' @return List with two entries: DF (including the results DF) and Plots (including the scedasticity_plot)
+#' @return List with two entries: DF (including the results DF) 
+#' and Plots (including the scedasticity_plot)
 #'
 #' @keywords Heteroscedasticity, variance stabilizing transformation
 #'
@@ -3229,30 +3231,40 @@ bartlett <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-vst <- function(data){
-
+vst <- 
+    function(
+        data
+    ) {
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   # model the mean and variance relationship on the data
   het.data <-
     data %>%
-    pivot_longer(-1L, names_to = 'variable') %>%
+        pivot_longer(-1L, names_to = "variable") %>%
     group_by(variable) %>% # make a dataframe to save the values
-    summarise(mean=mean(value), sd=sd(value))
-  het.data$lm <- 1 # add a common group for the lm function to account for the whole data together
+        summarise(mean = mean(value), sd = sd(value))
+    # add a common group for the lm function to account for the whole 
+    # data together
+    het.data$lm <- 1 
 
-  invisible(het_plot <-
-              ggplot(het.data, aes(x = mean, y = sd)) +
+    invisible(
+        het_plot <-
+            ggplot(
+                het.data, aes(x = mean, y = sd)
+            ) +
               geom_point() +
               theme_bw() +
-              scale_x_continuous(trans='log2') +
-              scale_y_continuous(trans='log2') +
+            scale_x_continuous(trans = "log2") +
+            scale_y_continuous(trans = "log2") +
               xlab("log(mean)") +
               ylab("log(sd)") +
-              geom_abline(intercept = 0, slope = 1)  +
-              ggtitle(" data heteroscedasticity")  +
-              geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
+            geom_abline(intercept = 0, slope = 1) +
+            ggtitle(" data heteroscedasticity") +
+            geom_smooth(
+                aes(group = lm), method = "lm", formula = y ~ x, color = "red"
+            )
+    )
 
   # select data
   prevst.data <- het.data
@@ -3260,35 +3272,51 @@ vst <- function(data){
   prevst.data$sd <- log(prevst.data$sd)
 
   # calculate the slope of the log data
-  data.fit <- lm(sd~mean, prevst.data)
+    data.fit <- lm(sd ~ mean, prevst.data)
   coef(data.fit)
 
   # Make the vst transformation
-  data.vst <- as.data.frame(data^(1-coef(data.fit)['mean'][1]))
+    data.vst <- as.data.frame(
+        data^(1 - coef(data.fit)["mean"][1])
+        )
 
   # Heteroscedasticity visual check again
   het.vst.data <-
     data.vst %>%
-    pivot_longer(-1L, names_to = 'variable') %>%
+            pivot_longer(-1L, names_to = "variable") %>%
     group_by(variable) %>% # make a dataframe to save the values
-    summarise(mean=mean(value), sd=sd(value))
-  het.vst.data$lm <- 1 # add a common group for the lm function to account for the whole data together
+            summarise(mean = mean(value), sd = sd(value))
+    # add a common group for the lm function to account for the whole
+    # data together
+    het.vst.data$lm <- 1 
 
   # plot variable stadard deviation as a function of the mean
-  invisible(hom_plot <-
-              ggplot(het.vst.data,  aes(x = mean, y = sd)) +
+    invisible(
+        hom_plot <-
+            ggplot(
+                het.vst.data, aes(x = mean, y = sd)
+            ) +
               geom_point() +
               theme_bw() +
-              scale_x_continuous(trans='log2') +
-              scale_y_continuous(trans='log2') +
+            scale_x_continuous(trans = "log2") +
+            scale_y_continuous(trans = "log2") +
               xlab("log(mean)") +
               ylab("log(sd)") +
-              geom_abline(intercept = 0)  +
-              ggtitle("vst transformed data")  +
-              geom_smooth(aes(group=lm),method='lm', formula= y~x, color = "red"))
+            geom_abline(intercept = 0) +
+            ggtitle("vst transformed data") +
+            geom_smooth(
+                aes(group = lm), method = "lm", formula = y ~ x, color = "red"
+            )
+        )
 
-  invisible(scedasticity_plot <- wrap_plots(het_plot,hom_plot))
+    invisible(scedasticity_plot <- wrap_plots(het_plot, hom_plot))
 
-  return(invisible(list("DFs" = list("Corrected_data" = data.vst), "Plots" = list("scedasticity_plot" = scedasticity_plot))))
+    return(
+        invisible(
+            list(
+                "DFs" = list("Corrected_data" = data.vst), 
+                "Plots" = list("scedasticity_plot" = scedasticity_plot)
+            )
+            )
+        )
 }
-
