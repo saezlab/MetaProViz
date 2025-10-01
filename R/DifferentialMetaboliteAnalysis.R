@@ -1215,21 +1215,29 @@ log2fc <- function(
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-dma_stat_single <- function(data,
+dma_stat_single <- 
+    function(
+        data,
                             metadata_sample,
                             metadata_info,
-                            log2fc_table=NULL,
-                            pval="t.test",
-                            padj="fdr"){
+        log2fc_table = NULL,
+        pval = "t.test",
+        padj = "fdr"
+    ) {
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------ Check Missingness ------------- ##
   Num <- data %>%
-    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Numerator"]]) %>%
+        filter(
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Numerator"]]
+        ) %>%
     select_if(is.numeric)
+        
   Denom <- data %>%
-    filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]) %>%
+        filter(
+          metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]
+          ) %>%
     select_if(is.numeric)
 
   Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
@@ -1237,15 +1245,22 @@ dma_stat_single <- function(data,
   Metabolites_Miss <- unique(c(colnames(Num_Miss), colnames(Denom_Miss)))
 
   # Comparisons
-  comparisons <- matrix(c(metadata_info[["Numerator"]], metadata_info[["Denominator"]]))
+    comparisons <- matrix(c(
+      metadata_info[["Numerator"]], 
+      metadata_info[["Denominator"]]
+      ))
 
   ## ------------ Perform Hypothesis testing ----------- ##
-  for(column in 1:dim(comparisons)[2]){
+    for (column in 1:dim(comparisons)[2]) {
     C1 <- data %>% # Numerator
-      filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1,column]) %>%
-      select_if(is.numeric)#only keep numeric columns with metabolite values
+            filter(
+              metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
+              ) %>%
+            select_if(is.numeric) # only keep numeric columns with metabolite values
     C2 <- data %>% # Denominator
-      filter(metadata_sample[[metadata_info[["Conditions"]]]] %in%  comparisons[2,column]) %>%
+            filter(
+              metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[2, column]
+              ) %>%
       select_if(is.numeric)
   }
 
@@ -1254,52 +1269,77 @@ dma_stat_single <- function(data,
   C2[is.na(C2)] <- 0
 
   #### 1. p.value and test statistics (=t.val)
-  T_C1vC2 <-mapply(pval, x= as.data.frame(C2), y = as.data.frame(C1), SIMPLIFY = FALSE)
+    T_C1vC2 <- 
+        mapply(
+            pval, 
+            x = as.data.frame(C2), 
+            y = as.data.frame(C1), 
+            SIMPLIFY = FALSE
+        )
 
   VecPVAL_C1vC2 <- c()
   VecTVAL_C1vC2 <- c()
-  for(i in 1:length(T_C1vC2)){
+    for (i in 1:length(T_C1vC2)) {
     p_value <- unlist(T_C1vC2[[i]][3])
-    t_value <- unlist(T_C1vC2[[i]])[1]   # Extract the t-value
+        t_value <- unlist(T_C1vC2[[i]])[1] # Extract the t-value
     VecPVAL_C1vC2[i] <- p_value
     VecTVAL_C1vC2[i] <- t_value
   }
+    
   Metabolite <- colnames(C2)
   PVal_C1vC2 <- data.frame(Metabolite, p.val = VecPVAL_C1vC2, t.val = VecTVAL_C1vC2)
 
-  #we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
+    # we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
   PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
-  PVal_C1vC2 <-PVal_C1vC2%>%
-    mutate(p.val = case_when(`NA/0`== TRUE ~ NA,
-                             TRUE ~ paste(VecPVAL_C1vC2)))
-  PVal_C1vC2$p.val = as.numeric(as.character(PVal_C1vC2$p.val))
+    PVal_C1vC2 <- PVal_C1vC2 %>%
+        mutate(
+            p.val = case_when(
+                `NA/0` == TRUE ~ NA,
+                TRUE ~ paste(VecPVAL_C1vC2)
+            )
+        )
+    PVal_C1vC2$p.val <- as.numeric(as.character(PVal_C1vC2$p.val))
 
   #### 2. p.adjusted
-  #Split data for p.value adjustment to exclude NA
+    # Split data for p.value adjustment to exclude NA
   PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1:3)]
-  PVal_C1vC2 <-PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
+    PVal_C1vC2 <- PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
-  #perform adjustment
-  VecPADJ_C1vC2 <- stats::p.adjust((PVal_C1vC2[,2]),method = padj, n = length((PVal_C1vC2[,2]))) #p-adjusted
-  Metabolite <- PVal_C1vC2[,1]
+    # perform adjustment
+    VecPADJ_C1vC2 <- 
+        stats::p.adjust(
+            (PVal_C1vC2[, 2]), 
+            method = padj, 
+            n = length((PVal_C1vC2[, 2]))
+            ) # p-adjusted
+    Metabolite <- PVal_C1vC2[, 1]
   PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
-  STAT_C1vC2 <- merge(PVal_C1vC2,PADJ_C1vC2, by="Metabolite")
+    STAT_C1vC2 <- merge(
+        PVal_C1vC2, 
+        PADJ_C1vC2, 
+        by = "Metabolite"
+        )
 
-  #Add Metabolites that have p.val=NA back into the DF for completeness.
-  if(nrow(PVal_NA)>0){
+    # Add Metabolites that have p.val=NA back into the DF for completeness.
+    if (nrow(PVal_NA) > 0) {
     PVal_NA$p.adj <- NA
     STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
   }
 
-  #Add Log2FC
-  if(is.null(log2fc_table)==FALSE){
-    STAT_C1vC2 <- merge(log2fc_table,STAT_C1vC2[,c(1:2,4,3)], by="Metabolite")
+    # Add Log2FC
+    if (is.null(log2fc_table) == FALSE) {
+        STAT_C1vC2 <- 
+            merge(
+                log2fc_table, 
+                STAT_C1vC2[, c(1:2, 4, 3)], 
+                by = "Metabolite"
+            )
   }
 
-  #order for t.value
-  STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val,decreasing=TRUE),] # order the df based on the t-value
+    # order for t.value
+    STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val, decreasing = TRUE), ] # order the df based on the t-value
 
-  #list
+    # list
   results_list <- list()
   results_list[[paste(metadata_info[["Numerator"]], "_vs_", metadata_info[["Denominator"]])]] <- STAT_C1vC2
 
