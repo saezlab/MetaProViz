@@ -1852,18 +1852,35 @@ kruskal <-
 
 
 
-#############################################################################################
-### ### ### welch: Internal Function to perform anova for unequal variance groups ### ### ###
-#############################################################################################
+################################################################################
+### ### ### welch: Internal Function to perform anova for unequal ### ### ### ##
+### ### ### variance groups                                       ### ### ### ##
+################################################################################
 
 #' Calculate One-vs-All or All-vs-All comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param data DF with unique sample identifiers as row names and metabolite 
+#' numerical values in columns with metabolite identifiers as column names. 
+#' Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the 
+#' samples, which will be combined with your input data based on the unique 
+#' sample identifiers used as rownames.
+#' @param metadata_info  \emph{Optional: } Named vector including the 
+#' information about the conditions column information on numerator or 
+#' denominator c(Conditions="ColumnName_SettingsFile", Numerator = 
+#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). 
+#' Denominator and Numerator will specify which comparison(s) will be done 
+#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL 
+#' selects all the condition and performs multiple comparison all-vs-all. 
+#' \strong{Default = c(conditions="Conditions", numerator = NULL, 
+#' denumerator = NULL)}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a 
+#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output 
+#' from MetaProViz:::log2fc. If NULL, the output statistics will not be 
+#' added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with 
+#' p-value, t-value and adjusted p-value column and column with feature names
 #'
 #' @keywords Statistical testing, p-value, t-value
 #'
@@ -1874,102 +1891,197 @@ kruskal <-
 #' @importFrom utils combn
 #'
 #' @noRd
-welch <- function(data,
+welch <- 
+    function(
+        data,
                  metadata_sample,
-                 metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-                 log2fc_table=NULL
-){
+        metadata_info = c(
+            Conditions = "Conditions", 
+            Numerator = NULL, 
+            Denominator = NULL
+            ),
+        log2fc_table = NULL
+        ) {
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-  if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
+    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
     # all-vs-all: Generate all pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = TRUE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
-    #all-vs-one: Generate the pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        comparisons <- 
+            combn(
+                unique(conditions), 2
+            ) %>% 
+            as.matrix()
+
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- TRUE
+
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+        # all-vs-one: Generate the pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <- metadata_info[["Denominator"]]
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = FALSE
+        comparisons <- t(
+            expand.grid(numerator, denominator)
+            ) %>% 
+            as.data.frame()
+
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
   }
 
-  ###############################################################################################################
-  ## 1. welch's ANOVA using oneway.test is not used by the Games post.hoc function
-  #aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
-  games_data <- merge(metadata_sample, data, by=0)%>%
-    rename("conditions"=metadata_info[["Conditions"]])
+    ###########################################################################
+    ## 1. welch's ANOVA using oneway.test is not used by the 
+    # Games post.hoc function
+
+    # aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
+    games_data <- merge(
+        metadata_sample, 
+        data, 
+        by = 0
+        ) %>%
+        rename("conditions" = metadata_info[["Conditions"]])
   games_data$conditions <- conditions
   posthoc.res.list <- list()
 
   ## 2. Games post hoc test
-  for (col in names(data)){ # col = names(Input_data)[1]
-    posthoc.res <- games_howell_test(data = games_data,detailed =TRUE, formula = as.formula(paste0(`col`, " ~ ", "conditions"))) %>% as.data.frame()
+    for (col in names(data)) { # col = names(Input_data)[1]
+        posthoc.res <- 
+            games_howell_test(
+                data = games_data, 
+                detailed = TRUE, 
+                formula = as.formula(paste0(`col`, " ~ ", "conditions"))
+                ) %>% 
+                as.data.frame()
 
-    result.df <- rbind(data.frame(p.adj = posthoc.res[,"p.adj"],
-                                  t.val = posthoc.res[,"statistic"],
-                                  row.names = paste(posthoc.res[["group1"]], posthoc.res[["group2"]], sep = "-")),
-                       data.frame(p.adj = posthoc.res[,"p.adj"],
-                                  t.val = -posthoc.res[,"statistic"],
-                                  row.names = paste(posthoc.res[["group2"]], posthoc.res[["group1"]], sep = "-")))
+        result.df <- rbind(
+            data.frame(
+                p.adj = posthoc.res[, "p.adj"],
+                t.val = posthoc.res[, "statistic"],
+                row.names = paste(
+                    posthoc.res[["group1"]], 
+                    posthoc.res[["group2"]], 
+                    sep = "-"
+                    )
+            ),
+            data.frame(
+                p.adj = posthoc.res[, "p.adj"],
+                t.val = -posthoc.res[, "statistic"],
+                row.names = paste(
+                    posthoc.res[["group2"]], 
+                    posthoc.res[["group1"]], 
+                    sep = "-"
+                    )
+            )
+        )
     posthoc.res.list[[col]] <- result.df
   }
-  Games_Pres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'p.adj'])) %>% as.data.frame()
+    Games_Pres <- 
+        do.call(
+            "rbind", 
+            lapply(posthoc.res.list, function(x) x[, "p.adj"])
+            ) %>% 
+            as.data.frame()
   colnames(Games_Pres) <- rownames(posthoc.res.list[[1]])
-  comps <-   paste(comparisons[1, ], comparisons[2, ], sep="-")# normal
-  Games_Pres <- Games_Pres[,colnames(Games_Pres) %in% comps] %>% rownames_to_column("Metabolite")
+    comps <- paste(
+        comparisons[1, ], 
+        comparisons[2, ], 
+        sep = "-"
+        ) # normal
+    Games_Pres <- Games_Pres[, colnames(Games_Pres) %in% comps] %>% 
+        rownames_to_column("Metabolite")
   # In case of p.adj =0 we change it to 10^-6
-  Games_Pres[Games_Pres ==0] <- 0.000001
+    Games_Pres[Games_Pres == 0] <- 0.000001
 
   ## 3. t.val
-  Games_Tres <- do.call('rbind', lapply(posthoc.res.list, function(x) x[,'t.val'])) %>% as.data.frame()
+    Games_Tres <- 
+        do.call(
+            "rbind", 
+            lapply(posthoc.res.list, function(x) x[, "t.val"])
+            ) %>% 
+            as.data.frame()
   colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
-  Games_Tres <- Games_Tres[,colnames(Games_Tres) %in% comps] %>% rownames_to_column("Metabolite")
+    Games_Tres <- Games_Tres[, colnames(Games_Tres) %in% comps] %>% 
+        rownames_to_column("Metabolite")
 
   results_list <- list()
-  for(col_name in colnames(Games_Pres)){
+    for (col_name in colnames(Games_Pres)) {
     # Create a new data frame by merging the two data frames
-    merged_df <- merge(Games_Pres[,c("Metabolite",col_name)], Games_Tres[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
-      rename("p.adj"=2,
-                    "t.val"=3)
+        merged_df <- 
+            merge(
+                Games_Pres[, c("Metabolite", col_name)], 
+                Games_Tres[, c("Metabolite", col_name)], 
+                by = "Metabolite", 
+                all = TRUE
+                ) %>%
+                rename(
+                    "p.adj" = 2,
+                    "t.val" = 3
+                )
 
-    #We need to add _vs_ into the comparison col_name
+        # We need to add _vs_ into the comparison col_name
     pattern <- paste(conditions, collapse = "|")
-    conditions_present <- unique(unlist(regmatches(col_name, gregexpr(pattern, col_name))))
-    modified_col_name <- paste(conditions_present[1], "vs", conditions_present[2], sep = "_")
+        conditions_present <- 
+            unique(
+                unlist(
+                    regmatches(
+                        col_name, 
+                        gregexpr(pattern, col_name)
+                        )
+                    )
+                )
+        modified_col_name <- 
+            paste(
+                conditions_present[1], 
+                "vs", 
+                conditions_present[2], 
+                sep = "_"
+            )
 
-    # Add the new data frame to the list with the column name as the list element name
+        # Add the new data frame to the list with the column name as the 
+        # list element name
     results_list[[modified_col_name]] <- merged_df
   }
 
-  # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  if(is.null(log2fc_table)==FALSE){
-    list_names <-  names(results_list)
+    # Merge the data frames in list1 and list2 based on the 
+    # "Metabolite" column
+    if (is.null(log2fc_table) == FALSE) {
+        list_names <- names(results_list)
 
     merged_list <- list()
-    for(name in list_names){
+        for (name in list_names) {
       # Check if the data frames exist in both lists
-      if(name %in% names(results_list) && name %in% names(log2fc_table)){
-        merged_df <- merge(results_list[[name]], log2fc_table[[name]], by = "Metabolite", all = TRUE)
-        merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+            if (name %in% names(results_list) && name %in% names(log2fc_table)) {
+                merged_df <- 
+                    merge(
+                        results_list[[name]], 
+                        log2fc_table[[name]], 
+                        by = "Metabolite", 
+                        all = TRUE
+                        )
+                # reorder the columns
+                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))] 
         merged_list[[name]] <- merged_df
       }
       }
     STAT_C1vC2 <- merged_list
-    }else{
-      STAT_C1vC2 <-STAT_C1vC2 <- results_list
+    } else {
+        STAT_C1vC2 <- STAT_C1vC2 <- results_list
       }
 
   return(invisible(STAT_C1vC2))
