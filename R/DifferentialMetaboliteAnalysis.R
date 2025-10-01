@@ -1589,15 +1589,36 @@ aov <-
 ### ### ### kruskal: Internal Function to perform kruskal test  ### ### ###
 ###########################################################################
 
-#' This helper function to calculate One-vs-All or All-vs-All comparison statistics
+#' This helper function to calculate One-vs-All or All-vs-All 
+#' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will specify which comparison(s) will be done (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL selects all the condition and performs multiple comparison all-vs-all. \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from MetaProViz:::log2fc. If NULL, the output statistics will not be added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param data DF with unique sample identifiers as row names and metabolite 
+#' numerical values in columns with metabolite identifiers as column names. 
+#' Use NA for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the 
+#' samples, which will be combined with your input data based on the unique 
+#' sample identifiers used as rownames.
+#' @param metadata_info  \emph{Optional: } Named vector including the 
+#' information about the conditions column information on numerator or 
+#' denominator c(Conditions="ColumnName_SettingsFile", Numerator = 
+#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). 
+#' Denominator and Numerator will specify which comparison(s) will be done 
+#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator = NULL 
+#' selects all the condition and performs multiple comparison all-vs-all. 
+#' \strong{Default = c(conditions="Conditions", numerator = NULL, 
+#' denumerator = NULL)}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a 
+#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output 
+#' from MetaProViz:::log2fc. If NULL, the output statistics will not be 
+#' added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param padj \emph{Optional: } String which contains an abbreviation of 
+#' the selected p.adjusted test for p.value correction for multiple 
+#' Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", 
+#' "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with p-value, t-value and adjusted p-value column and column with feature names
+#' @return List of DFs named after comparison (e.g. tumour versus Normal)
+#' with p-value, t-value and adjusted p-value column and column with 
+#' feature names
 #'
 #' @keywords Statistical testing, p-value, t-value
 #'
@@ -1609,111 +1630,220 @@ aov <-
 #' @importFrom utils combn
 #'
 #' @noRd
-kruskal <- function(data,
+kruskal <- 
+    function(
+        data,
                    metadata_sample,
-                   metadata_info=c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
+        metadata_info = c(
+            Conditions = "Conditions", 
+            Numerator = NULL, 
+            Denominator = NULL
+            ),
                    log2fc_table = NULL,
                    padj = "fdr"
-){
+        ) {
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------ Denominator/numerator ----------- ##
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-  if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
+    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
     # all-vs-all: Generate all pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    comparisons <- combn(unique(conditions), 2) %>% as.matrix()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = TRUE
-  }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
-    #all-vs-one: Generate the pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- unique(
+                metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
+        comparisons <- 
+            combn(unique(conditions), 2) %>% 
+            as.matrix()
+
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- TRUE
+
+    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+        # all-vs-one: Generate the pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <- metadata_info[["Denominator"]]
-    numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        numerator <- unique(
+            metadata_sample[[metadata_info[["Conditions"]]]]
+            )
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-    #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = FALSE
+        comparisons <- t(
+            expand.grid(numerator, denominator)
+            ) %>% 
+            as.data.frame()
+
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
   }
 
   #############################################################################################
   # kruskal test (p.val)
-  aov.res= apply(data,2,function(x) stats::kruskal.test(x~conditions))
-  anova_res<-do.call('rbind', lapply(aov.res, function(x) {x["p.value"]}))
-  anova_res <- as.matrix(mutate_all(as.data.frame(anova_res), function(x) as.numeric(as.character(x))))
-  colnames(anova_res) = c("Kruskal_p.val")
+    aov.res <- apply(
+        data, 
+        2, 
+        function(x) stats::kruskal.test(x ~ conditions)
+        )
+    anova_res <- 
+        do.call(
+            "rbind", 
+            lapply(
+                aov.res, function(x) {
+                    x["p.value"]
+                }
+            )
+        )
+    anova_res <- as.matrix(
+        mutate_all(
+            as.data.frame(anova_res), 
+            function(x) as.numeric(as.character(x))
+            )
+        )
+    colnames(anova_res) <- c("Kruskal_p.val")
 
   # Dunn test (p.adj)
   Dunndata <- data %>%
-    mutate(conditions = conditions) %>%
-    select(conditions, everything())%>%
+        mutate(
+            conditions = conditions
+            ) %>%
+        select(
+            conditions, everything()
+            ) %>%
     as.data.frame()
 
   # Applying a loop to obtain p.adj and t.val:
-  Dunn_Pres<- data.frame(comparisons = paste(comparisons[1,],    comparisons[2,], sep = "_vs_" ))
-  Dunn_Tres<- Dunn_Pres
-  for(col in 2:dim(Dunndata)[2]){
-    data = Dunndata[,c(1,col)]
+    Dunn_Pres <- 
+        data.frame(
+            comparisons = paste(comparisons[1, ], 
+            comparisons[2, ], 
+            sep = "_vs_")
+        )
+    Dunn_Tres <- Dunn_Pres
+    for (col in 2:dim(Dunndata)[2]) {
+        data <- Dunndata[, c(1, col)]
     colnames(data)[2] <- gsub("^\\d+", "", colnames(data)[2])
 
     ## If a metabolite starts with number remove it
-    formula <- as.formula(paste(colnames(data)[2], "~ conditions"))
-    posthoc.res= dunn_test(data, formula, p.adjust.method = padj)
+        formula <- 
+            as.formula(
+                paste(
+                    colnames(data)[2], "~ conditions"
+                    )
+            )
+        posthoc.res <- dunn_test(data, formula, p.adjust.method = padj)
 
-    pres <- data.frame(comparisons = c(paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ), paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" )))
-    pres[[colnames(Dunndata)[col] ]] <-  c(posthoc.res$p.adj, posthoc.res$p.adj )
-    pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons ,] # take only the comparisons selected
-    Dunn_Pres <- merge(Dunn_Pres,pres,by="comparisons")
+        pres <- 
+            data.frame(
+                comparisons = c(
+                    paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_"), 
+                    paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_")
+                )
+            )
+        pres[[colnames(Dunndata)[col]]] <- c(posthoc.res$p.adj, posthoc.res$p.adj)
+        pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons, ] # take only the comparisons selected
+        Dunn_Pres <- 
+            merge(
+                Dunn_Pres, 
+                pres, 
+                by = "comparisons"
+            )
 
-    tres <- data.frame(comparisons = c(paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_" ), paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_" )))
-    tres[[colnames(Dunndata)[col] ]] <-  c(posthoc.res$statistic, -posthoc.res$statistic )
-    tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons ,]# take only the comparisons selected
-    Dunn_Tres <- merge(Dunn_Tres,tres,by="comparisons")
+        tres <- data.frame(
+            comparisons = c(
+                paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_"), 
+                paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_"))
+            )
+        tres[[colnames(Dunndata)[col]]] <- c(posthoc.res$statistic, -posthoc.res$statistic)
+        tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons, ] # take only the comparisons selected
+        Dunn_Tres <- 
+            merge(
+                Dunn_Tres, 
+                tres, 
+                by = "comparisons"
+            )
   }
 
-  #Make output DFs:
-  Dunn_Pres <- column_to_rownames(Dunn_Pres, "comparisons")%>% t() %>% as.data.frame()
-  Pval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Pres), function(x) as.numeric(as.character(x)))) %>%
-    as.data.frame()%>%
+    # Make output DFs:
+    Dunn_Pres <- 
+        column_to_rownames(
+            Dunn_Pres, 
+            "comparisons"
+            ) %>%
+            t() %>%
+            as.data.frame()
+    Pval_table <- 
+        as.matrix(
+            mutate_all(
+                as.data.frame(Dunn_Pres), 
+                function(x) as.numeric(as.character(x))
+                )
+            ) %>%
+            as.data.frame() %>%
     rownames_to_column("Metabolite")
 
-  Dunn_Tres <- column_to_rownames(Dunn_Tres, "comparisons")%>% t() %>% as.data.frame()
-  Tval_table <- as.matrix(mutate_all(as.data.frame(Dunn_Tres), function(x) as.numeric(as.character(x))))%>%
-    as.data.frame()%>%
+    Dunn_Tres <- 
+        column_to_rownames(
+            Dunn_Tres, 
+            "comparisons"
+            ) %>%
+            t() %>%
+            as.data.frame()
+    Tval_table <- 
+        as.matrix(
+            mutate_all(
+                as.data.frame(Dunn_Tres), 
+                function(x) as.numeric(as.character(x))
+                )
+            ) %>%
+            as.data.frame() %>%
     rownames_to_column("Metabolite")
 
   common_col_names <- setdiff(names(Dunn_Pres), "row.names")
 
   results_list <- list()
-  for(col_name in common_col_names){
+    for (col_name in common_col_names) {
     # Create a new data frame by merging the two data frames
-    merged_df <- merge(Pval_table[,c("Metabolite",col_name)], Tval_table[,c("Metabolite",col_name)], by="Metabolite", all=TRUE)%>%
-      rename("p.adj"=2,
-                    "t.val"=3)
+        merged_df <- 
+            merge(
+                Pval_table[, c("Metabolite", col_name)], 
+                Tval_table[, c("Metabolite", col_name)], 
+                by = "Metabolite", 
+                all = TRUE
+                ) %>%
+                rename(
+                    "p.adj" = 2,
+                    "t.val" = 3
+                )
     # Add the new data frame to the list with the column name as the list element name
     results_list[[col_name]] <- merged_df
   }
 
   # Merge the data frames in list1 and list2 based on the "Metabolite" column
-  if(is.null(log2fc_table)==FALSE){
+    if (is.null(log2fc_table) == FALSE) {
     merged_list <- list()
-    for(name in common_col_names){
+        for (name in common_col_names) {
       # Check if the data frames exist in both lists
-      if(name %in% names(results_list) && name %in% names(log2fc_table)){
-        merged_df <- merge(results_list[[name]], log2fc_table[[name]], by = "Metabolite", all = TRUE)
-        merged_df <- merged_df[,c(1,4,2:3,5:ncol(merged_df))]#reorder the columns
+            if (name %in% names(results_list) && name %in% names(log2fc_table)) {
+                merged_df <- 
+                    merge(
+                        results_list[[name]], 
+                        log2fc_table[[name]], 
+                        by = "Metabolite", 
+                        all = TRUE
+                    )
+                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))] # reorder the columns
         merged_list[[name]] <- merged_df
       }
     }
     STAT_C1vC2 <- merged_list
-  }else{
+    } else {
     STAT_C1vC2 <- results_list
     }
 
