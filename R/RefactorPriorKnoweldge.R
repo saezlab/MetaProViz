@@ -2464,46 +2464,76 @@ add_info <-
 }
 
 
-##########################################################################################
-### ### ### Compare Prior Knowledge resources against each other or themselves ### ### ###
-##########################################################################################
+################################################################################
+###   Compare Prior Knowledge resources against each other or themselves     ###
+################################################################################
 
-#' Compare Prior Knowledge Resources and/or Columns within a Single Resource and Generate an UpSet Plot
+#' Compare Prior Knowledge Resources and/or Columns within a Single Resource
+#' and Generate an UpSet Plot
 #'
-#' This function compares gene and/or metabolite features across multiple prior knowledge (PK) resources or,
-#' if a single resource is provided with a vector of column names in \code{metadata_info}, compares columns within that resource.
+#' This function compares gene and/or metabolite features across multiple prior
+#' knowledge (PK) resources or,
+#' if a single resource is provided with a vector of column names in
+#' \code{metadata_info}, compares columns within that resource.
 #'
-#' In the multi-resource mode, each element in \code{data} represents a PK resource (either as a data frame or a recognized resource name)
-#' from which a set of features is extracted. A binary summary table is then constructed and used to create an UpSet plot.
+#' In the multi-resource mode, each element in \code{data} represents a PK
+#' resource (either as a data frame or a recognized resource name)
+#' from which a set of features is extracted. A binary summary table is then
+#' constructed and used to create an UpSet plot.
 #'
-#' In the within-resource mode, a single data frame is provided (with \code{data} containing one element) and its \code{metadata_info} entry
-#' is a vector of column names to compare (e.g., binary indicators for different annotations). In this case, the function expects the data frame
-#' to have a grouping column named \code{"Class"} (or, alternatively, a column specified via the \code{class_col} attribute in \code{metadata_info})
+#' In the within-resource mode, a single data frame is provided (with
+#' \code{data} containing one element) and its \code{metadata_info} entry
+#' is a vector of column names to compare (e.g., binary indicators for
+#' different annotations). In this case, the function expects the data frame
+#' to have a grouping column named \code{"Class"} (or, alternatively, a column
+#' specified via the \code{class_col} attribute in \code{metadata_info})
 #' that is used for grouping in the UpSet plot.
 #'
-#' @param data A named list where each element corresponds to a prior knowledge (PK) resource. Each element can be:
-#'        \itemize{
-#'          \item A data frame containing gene/metabolite identifiers (and additional columns for within-resource comparison),
-#'          \item A character string indicating the resource name. Recognized names include (but are not limited to): \code{"Hallmarks"},
-#'                \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or \code{"metsigdb_chemicalclass"}). In the latter case, the function
-#'                will attempt to load the corresponding data automatically.
-#'        }
-#' @param metadata_info A named list (with names matching those in \code{data}) where each element is either a character string or a
-#'        character vector indicating the column name(s) to extract features. For multiple-resource comparisons, these refer to the columns
-#'        containing feature identifiers. For within-resource comparisons, the vector should list the columns to compare (e.g., \code{c("CHEBI", "HMDB", "LIMID")}).
-#'        In within-resource mode, the input data frame is expected to contain a column named \code{"Class"} (or a grouping column specified via the
-#'        \code{class_col} attribute). \emph{If no grouping column is found, a default grouping column named \code{"Group"} (with all rows assigned the same value) is created.}
-#' @param filter_by Character. Optional filter for the resulting features when comparing multiple resources.
-#'        Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}. This parameter is ignored in within-resource mode.
-#' @param plot_name \emph{Optional: } String which is added to the output files of the Upsetplot \strong{Default = ""}
-#' @param name_col \emph{Optional: } column name including the feature names. Default is \code{"TrivialName"}.
-#' @param palette_type Character. Color palette to be used in the plot. Default is \code{"polychrome"}.
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param data A named list where each element corresponds to a prior knowledge
+#' (PK) resource. Each element can be:
+#' \itemize{
+#'      \item   A data frame containing gene/metabolite identifiers (and 
+#'              additional columns for within-resource comparison),
+#'      \item   A character string indicating the resource name. Recognized names
+#'              include (but are not limited to): \code{"Hallmarks"},
+#'              \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or
+#'              \code{"metsigdb_chemicalclass"}). In the latter case, the 
+#'              function will attempt to load the corresponding data 
+#'              automatically.
+#' }
+#' @param metadata_info A named list (with names matching those in \code{data})
+#' where each element is either a character string or a
+#' character vector indicating the column name(s) to extract features. For
+#' multiple-resource comparisons, these refer to the columns
+#' containing feature identifiers. For within-resource comparisons, the vector
+#' should list the columns to compare (e.g., \code{c("CHEBI", "HMDB",
+#' "LIMID")}).
+#' In within-resource mode, the input data frame is expected to contain a
+#' column named \code{"Class"} (or a grouping column specified via the
+#' \code{class_col} attribute). \emph{If no grouping column is found, a default
+#' grouping column named \code{"Group"} (with all rows assigned the same value)
+#' is created.}
+#' @param filter_by Character. Optional filter for the resulting features when
+#' comparing multiple resources.
+#' Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}.
+#' This parameter is ignored in within-resource mode.
+#' @param plot_name \emph{Optional: } String which is added to the output files
+#' of the Upsetplot \strong{Default = ""}
+#' @param name_col \emph{Optional: } column name including the feature names.
+#' Default is \code{"TrivialName"}.
+#' @param palette_type Character. Color palette to be used in the plot. Default
+#' is \code{"polychrome"}.
+#' @param save_plot \emph{Optional: } Select the file type of output plots.
+#' Options are svg, png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
+#' saved as an overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved
+#' at. \strong{Default = NULL}
 #'
-#' @return A list containing two elements: \itemize{
+#' @return A list containing two elements: 
+#' \itemize{
 #'     \item{summary_table: A data frame representing either:
 #'         \itemize{
 #'             \item{the binary summary matrix of feature presence/absence across
@@ -2516,34 +2546,46 @@ add_info <-
 #' }
 #'
 #' @examples
-#' ## Example 1: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
+#' ## Example 1: Within-Resource Comparison (Comparing Columns 
+#' Within a Single data Frame)
 #'
-#' # biocrates_features is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
-#' # Here the "Class" column is used as the grouping variable in the UpSet plot.
+#' # biocrates_features is a data frame with columns: 
+#' "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
+#' # Here the "Class" column is used as the grouping variable 
+#' in the UpSet plot.
 #' data_single <- list(Biocft = biocrates_features)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
-#' res_single <- compare_pk(data = data_single, metadata_info = metadata_info_single,
+#' res_single <- 
+#' compare_pk(data = data_single, metadata_info = metadata_info_single,
 #'                           plot_name = "Overlap of BioCrates Columns")
 #'
 #' ## Example 2: Custom data Frames with Custom Column Names
 #'
 #' # Example with preloaded data frames and custom column names:
-#' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), stringsAsFactors = FALSE)
-#' gaude_df <- data.frame(feature = c("GENE2", "GENE3"), stringsAsFactors = FALSE)
+#' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), 
+#' stringsAsFactors = FALSE)
+#' gaude_df <- data.frame(feature = c("GENE2", "GENE3"), 
+#' stringsAsFactors = FALSE)
 #' metalinks_df <- data.frame(hmdb = c("HMDB0001", "HMDB0002"),
-#'                            gene_symbol = c("GENE1", "GENE4"), stringsAsFactors = FALSE)
-#' ramp_df <- data.frame(class_source_id = c("HMDB0001", "HMDB0003"), stringsAsFactors = FALSE)
+#'                            gene_symbol = c("GENE1", "GENE4"), 
+#' stringsAsFactors = FALSE)
+#' ramp_df <- data.frame(class_source_id = c("HMDB0001", "HMDB0003"), 
+#' stringsAsFactors = FALSE)
 #' data <- list(Hallmarks = hallmarks_df, Gaude = gaude_df,
 #'                 MetalinksDB = metalinks_df, RAMP = ramp_df)
 #' metadata_info <- list(Hallmarks = "feature", Gaude = "feature",
-#'                      MetalinksDB = c("hmdb", "gene_symbol"), RAMP = "class_source_id")
-#' res <- compare_pk(data = data, metadata_info = metadata_info, filter_by = "metabolite")
+#'                      MetalinksDB = c("hmdb", "gene_symbol"), 
+#' RAMP = "class_source_id")
+#' res <- compare_pk(data = data, metadata_info = metadata_info, 
+#' filter_by = "metabolite")
 #'
 #' @importFrom dplyr mutate select
 #' @importFrom logger log_trace
 #' @export
-compare_pk <- function(data,
+compare_pk <- 
+    function(
+        data,
                        metadata_info = NULL,
                        filter_by = c("both", "gene", "metabolite"),
                        plot_name = "Overlap of Prior Knowledge Resources",
@@ -2554,40 +2596,53 @@ compare_pk <- function(data,
                        print_plot = TRUE,
                        path = NULL
                        ) {
-  ###########################################################################
+
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------ Check Input files ----------- ##
   # Match filter argument
-  filter_by <- match.arg(filter_by)
+    filter_by <- 
+        match.arg(filter_by)
 
   # Validate data input
   if (!is.list(data) || length(data) < 1) {
-    message <- paste0("data must be a non-empty list.")
-    log_trace(paste("Error ", message, sep=""))
+        message <- 
+            paste0("data must be a non-empty list.")
+        log_trace(
+            paste("Error ", message, sep = "")
+        )
     stop(message)
   }
   if (is.null(names(data)) || any(names(data) == "")) {
-    message <- paste0("data must be a named list with resource names.")
-    log_trace(paste("Error ", message, sep=""))
+        message <- 
+            paste0("data must be a named list with resource names.")
+        log_trace(
+            paste("Error ", message, sep = "")
+        )
     stop(message)
   }
 
-  ###########################################################################
   ## ------------ Create folders ----------- ##
-  if(is.null(save_plot)==FALSE |is.null(save_table)==FALSE){
-    folder <- save_path(folder_name= "PK",
-                        path=path)
+    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
+        folder <- 
+            save_path(
+                folder_name = "PK",
+                path = path
+            )
 
     subfolder <- file.path(folder, "ComparePK")
-    if (!dir.exists(subfolder)) {dir.create(subfolder)}
+        if (!dir.exists(subfolder)) {
+            dir.create(subfolder)
+        }
   }
 
   ###########################################################################
   ## ----------- Input ----------- ##
-  # Define resource lookup table with information on how to retrieve and transform each resource.
-  default_cols <- list(
+    # Define resource lookup table with information on how to retrieve and
+    # transform each resource.
+    default_cols <- 
+        list(
     hallmarks = "feature",
     gaude = "feature",
     metalinksdb = c("hmdb", "gene_symbol"),
@@ -2600,7 +2655,8 @@ compare_pk <- function(data,
   }
 
   # Determine if we are in within-resource mode.
-  # If only one resource is provided and its metadata_info entry has >1 column, assume within-resource comparison.
+    # If only one resource is provided and its metadata_info entry has >1
+    # column, assume within-resource comparison.
   single_resource <- (length(data) == 1)
   within_resource_mode <- FALSE
   if (single_resource) {
@@ -2618,52 +2674,103 @@ compare_pk <- function(data,
 
     # Identify the intersection columns based on metadata_info.
     intersect_cols <- metadata_info[[resource_name]]
-    missing_cols <- setdiff(intersect_cols, colnames(resource_data))
+        missing_cols <- 
+            setdiff(
+                intersect_cols, 
+                colnames(resource_data)
+            )
     if (length(missing_cols) > 0) {
-      stop("The following intersection column(s) specified in metadata_info were not found in resource '",
-           resource_name, "': ", paste(missing_cols, collapse = ", "))
+            stop(
+                "The following intersection column(s) specified in",
+                "metadata_info were not found in resource '",
+                resource_name, "': ", paste(missing_cols, collapse = ", ")
+            )
     }
 
-    # Identify a column for grouping. If none exists, create a default grouping column.
+        # Identify a column for grouping. If none exists, create a default
+        # grouping column.
     if ("Class" %in% colnames(resource_data)) {
       class_col <- "Class"
     } else if (!is.null(attr(metadata_info[[resource_name]], "class_col"))) {
       class_col <- attr(metadata_info[[resource_name]], "class_col")
     } else {
-      # No grouping column provided—create a default column named "Group" with the same value for all rows.
+            # No grouping column provided—create a default column named "Group"
+            # with the same value for all rows.
       resource_data$Group <- "All"
       class_col <- "Group"
     }
 
-    # Convert the specified intersection columns to binary (0/1). Here non-NA and values != 0 are treated as present.
+        # Convert the specified intersection columns to binary (0/1). Here
+        # non-NA and values != 0 are treated as present.
     binary_suffix <- "_bin"
     for (col in intersect_cols) {
       new_col <- paste0(col, binary_suffix)
-      resource_data[[new_col]] <- as.integer(!is.na(resource_data[[col]]) & (resource_data[[col]] != 0) & (resource_data[[col]] != ''))
+            resource_data[[new_col]] <-
+                as.integer(
+                    !is.na(resource_data[[col]]) & 
+                    (resource_data[[col]] != 0) & 
+                    (resource_data[[col]] != "")
+                )
     }
 
     # Identify the binary columns based on the suffix
-    bin_cols <- grep(paste0(binary_suffix, "$"), colnames(resource_data), value = TRUE)
+        bin_cols <- 
+            grep(
+                paste0(
+                    binary_suffix,
+                    "$"
+                ),
+                colnames(resource_data),
+                value = TRUE
+            )
 
     # Create the "None" column using the binary columns
-    resource_data$None <- as.integer(rowSums(resource_data[, bin_cols, drop = FALSE]) == 0)
+        resource_data$None <- 
+            as.integer(
+                rowSums(
+                    resource_data[, bin_cols, drop = FALSE]
+                ) == 0
+            )
 
-    # Create df_summary, potentially with the name column (default is TrivialName, if not found, it will not be included - only used to help interpret summary table)
+        # Create df_summary, potentially with the name column (default is
+        # TrivialName, if not found, it will not be included - only used to help
+        # interpret summary table)
     if (name_col %in% colnames(resource_data)) {
-      summary_cols <- c(name_col, bin_cols, "None", class_col)
+            summary_cols <- 
+                c(
+                    name_col, 
+                    bin_cols, 
+                    "None", 
+                    class_col
+                )
+        } else {
+            summary_cols <- 
+                c(
+                    bin_cols, 
+                    "None", 
+                    class_col
+                )
     }
-    else {
-      summary_cols <- c(bin_cols, "None", class_col)
-    }
-    df_summary <- resource_data[, summary_cols, drop = FALSE]
+        df_summary <- 
+            resource_data[, summary_cols, drop = FALSE]
     # Rename the cols again
     # Find indices of columns ending in "_bin"
-    bin_cols_idx <- grep("_bin$", names(df_summary))
+        bin_cols_idx <- 
+            grep(
+                "_bin$", 
+                names(df_summary)
+            )
     # Remove the suffix from these column names
-    names(df_summary)[bin_cols_idx] <- sub("_bin$", "", names(df_summary)[bin_cols_idx])
+        names(df_summary)[bin_cols_idx] <- 
+            sub(
+                "_bin$",
+                "",
+                names(df_summary)[bin_cols_idx]
+            )
 
     # Generate the UpSet plot.
-    upset_plot <- MetaProViz:::viz_upset(
+        upset_plot <- 
+            MetaProViz:::viz_upset(
       df = df_summary,
       class_col = class_col,
       intersect_cols = c(intersect_cols, "None"),
@@ -2681,9 +2788,13 @@ compare_pk <- function(data,
       resource_val <- data[[res]]
 			resource_id <- tolower(res)
 			if (is.null(metadata_info[[res]]) && resource_id %in% names(default_cols)) {
-				metadata_info[[res]] <- default_cols[[resource_id]]
+                metadata_info[[res]] <- 
+                    default_cols[[resource_id]]
 			} else if (is.null(metadata_info[[res]])) {
-				stop("metadata_info must be provided for resource: ", res)
+                stop(
+                    "metadata_info must be provided for resource: ", 
+                    res
+                )
 			}
     }
 
@@ -2693,38 +2804,90 @@ compare_pk <- function(data,
       resource_data <- data[[res]]
       cols <- metadata_info[[res]]
       if (!all(cols %in% colnames(resource_data))) {
-        stop(paste("Column(s)", paste(cols, collapse = ", "),
-                   "not found in resource", res))
+                stop(
+                    paste(
+                        "Column(s)", 
+                        paste(cols, collapse = ", "),
+                        "not found in resource", 
+                        res
+                    )
+                )
       }
-      features <- if (length(cols) > 1) {
-        unique(unlist(lapply(cols, function(col) na.omit(resource_data[[col]]))))
+            features <- 
+                if (length(cols) > 1) {
+                    unique(
+                        unlist(
+                            lapply(
+                                cols,
+                                function(col) na.omit(resource_data[[col]])
+                            )
+                        )
+                    )
       } else {
-        unique(na.omit(resource_data[[cols]]))
+                    unique(
+                        na.omit(resource_data[[cols]])
+                    )
       }
-      resource_features[[res]] <- as.character(features)
+                resource_features[[res]] <- 
+                    as.character(features)
     }
 
     # Compile all unique features across resources.
-    all_features <- unique(unlist(resource_features))
+        all_features <- 
+            unique(
+                unlist(resource_features)
+            )
 
     # Create the binary summary table.
-    df_binary <- data.frame(Feature = all_features, stringsAsFactors = FALSE)
+        df_binary <- 
+            data.frame(
+                Feature = all_features,
+                stringsAsFactors = FALSE
+            )
+            
     for (res in names(resource_features)) {
-      df_binary[[res]] <- as.integer(all_features %in% resource_features[[res]])
+            df_binary[[res]] <-
+                as.integer(
+                    all_features %in% resource_features[[res]]
+                )
     }
-    df_binary$Type <- ifelse(grepl("^HMDB", df_binary$Feature), "metabolite (HMDB)", "gene")
-    resource_cols <- names(resource_features)
-    df_binary$None <- as.integer(rowSums(df_binary[, resource_cols, drop = FALSE]) == 0)
+
+        df_binary$Type <- 
+            ifelse(
+                grepl(
+                    "^HMDB",
+                    df_binary$Feature
+                ),
+                "metabolite (HMDB)",
+                "gene"
+            )
+
+        resource_cols <- 
+            names(resource_features)
+            
+        df_binary$None <- 
+            as.integer(
+                rowSums(df_binary[, resource_cols, drop = FALSE]) == 0
+            )
 
     # Optionally filter the summary table.
     if (filter_by == "gene") {
-      df_binary <- subset(df_binary, Type == "gene")
+            df_binary <- 
+                subset(
+                    df_binary, 
+                    Type == "gene"
+                )
     } else if (filter_by == "metabolite") {
-      df_binary <- subset(df_binary, Type == "metabolite (HMDB)")
+            df_binary <- 
+                subset(
+                    df_binary, 
+                    Type == "metabolite (HMDB)"
+                )
     }
 
     # Generate the UpSet plot.
-    upset_plot <- MetaProViz:::viz_upset(
+        upset_plot <- 
+            MetaProViz:::viz_upset(
       df = df_binary,
       class_col = "Type",
       intersect_cols = resource_cols,
@@ -2738,18 +2901,28 @@ compare_pk <- function(data,
   }
 
   ###########################################################################
-  ###-------- Save and return ----------###
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=list(summary_table = summary_table),
-             inputlist_plot= list(upset_plot = upset_plot),
-             save_table=save_table,
-             save_plot=save_plot,
-             path= subfolder,
-             file_name= "compare_pk",
-             core=FALSE,
-             print_plot=print_plot)))
+    ### -------- Save and return ----------###
+    suppressMessages(
+        suppressWarnings(
+            save_res(
+                inputlist_df = list(summary_table = summary_table),
+                inputlist_plot = list(upset_plot = upset_plot),
+                save_table = save_table,
+                save_plot = save_plot,
+                path = subfolder,
+                file_name = "compare_pk",
+                core = FALSE,
+                print_plot = print_plot
+            )
+        )
+    )
 
-  return(list(summary_table = summary_table, upset_plot = upset_plot))
+    return(
+        list(
+            summary_table = summary_table, 
+            upset_plot = upset_plot
+        )
+    )
 }
 
 
