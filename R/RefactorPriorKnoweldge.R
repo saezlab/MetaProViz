@@ -2053,13 +2053,14 @@ checkmatch_pk_to_data <-
 }
 
 
-##########################################################################################
+################################################################################
 ### ### ### cluster Prior Knowledge ### ### ###
-##########################################################################################
+################################################################################
 
 #' Deal with pathway overlap in prior knowledge
 #'
-#' @param data dataframe with at least one column with the target (e.g. metabolite) and a column source (e.g. term).
+#' @param data dataframe with at least one column with the target (e.g.
+#' metabolite) and a column source (e.g. term).
 #' @param metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
 #'
 #' @examples
@@ -2069,49 +2070,100 @@ checkmatch_pk_to_data <-
 #' @importFrom dplyr select summarize ungroup
 #' @importFrom igraph graph_from_adjacency_matrix components
 #' @noRd
-cluster_pk <- function(data, # This can be either the original PK (e.g. KEGG pathways), but it can also be the output of enrichment results (--> meaning here we would cluster based on detection!)
-                      metadata_info= c(InputID="MetaboliteID", grouping_variable="term"),
-                      clust = "Graph", # Options: "Graph", "Hierarchical",
-                      matrix ="percentage", # Choose "pearson", "spearman", "kendall", or "percentage"
-                      min= 2 # minimum pathways per cluster
+cluster_pk <- 
+    function(
+        data,
+        metadata_info = c(
+            InputID = "MetaboliteID",
+            grouping_variable = "term"
+        ),
+        clust = "Graph", 
+        matrix = "percentage",
+        min = 2  
+    ) {
+    # Notes about function arguments
+    ## data:    This can be either the original PK (e.g. KEGG pathways), but it 
+    ##          can also be the output of enrichment results (--> meaning here 
+    ##          we would cluster based on detection!)
+    ## clust:   Options: "Graph", "Hierarchical",
+    ## matrix:  Choose "pearson", "spearman", "kendall", or "percentage"
+    ## min:     # minimum pathways per cluster
 
-){
 
-  # cluster PK before running enrichment analysis --> add another column that groups the data based on the pathway overlap:
-  # provide different options for clustering (e.g. % of overlap, semantics similarity) --> Ramp uses % of overlap, semnatics similarity: https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html
+    # cluster PK before running enrichment analysis --> add another column that
+    # groups the data based on the pathway overlap:
+    # provide different options for clustering (e.g. % of overlap, semantics
+    # similarity) --> Ramp uses % of overlap, semnatics similarity:
+    # https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html
 
 
   ## ------------------ Check Input ------------------- ##
 
-
   ## ------------------ Create output folders and path ------------------- ##
 
-
-
-  ######################################################################################################################################
+    ############################################################################
   ## ------------------ cluster the data ------------------- ##
   # 1. Create a list of unique MetaboliteIDs for each term
-  term_metabolites <- data %>%
-    group_by(!!sym(metadata_info[["grouping_variable"]])) %>%
-    summarize(MetaboliteIDs = list(unique(!!sym(metadata_info[["InputID"]])))) %>%
+    term_metabolites <- 
+        data %>%
+            group_by(
+                !!sym(metadata_info[["grouping_variable"]])
+            ) %>%
+            summarize(
+                MetaboliteIDs = list(
+                    unique(
+                        !!sym(metadata_info[["InputID"]])
+                    )
+                )
+            ) %>%
     ungroup()
 
-  #2. Create the overlap matrix based on different methods:
-  if (matrix == "percentage") {# Compute pairwise overlaps
-    term_overlap <- combn(term_metabolites[[metadata_info[["grouping_variable"]]]], 2, function(terms) {
-      term1_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[1]][[1]]
-      term2_ids <- term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[2]][[1]]
+    # 2. Create the overlap matrix based on different methods:
+    if (matrix == "percentage") {
+    # Compute pairwise overlaps
+        term_overlap <-
+            combn(
+                term_metabolites[[metadata_info[["grouping_variable"]]]], 
+                2,
+                function(terms) {
+                    term1_ids <-
+                        term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[1]][[1]]
+                    term2_ids <-
+                        term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[2]][[1]]
 
-      overlap <- length(intersect(term1_ids, term2_ids)) / length(union(term1_ids, term2_ids))
-      data.frame(Term1 = terms[1], Term2 = terms[2], Overlap = overlap)
-    }, simplify = FALSE) %>%
+                    overlap <- 
+                        length(
+                            intersect(term1_ids,term2_ids)) / length(union(term1_ids, term2_ids)
+                        )
+                    data.frame(
+                        Term1 = terms[1], 
+                        Term2 = terms[2], 
+                        Overlap = overlap
+                    )
+                }, 
+                simplify = FALSE
+            ) %>%
       bind_rows()
 
-    # Create overlap matrix: An overlap matrix is typically used to quantify the degree of overlap between two sets or groups.
+        # Create overlap matrix: An overlap matrix is typically used to quantify
+        # the degree of overlap between two sets or groups.
     # overlap coefficient (or Jaccard Index) Overlap(A,B)= ∣A∪B∣ / ∣A∩B
-    #The overlap matrix measures the similarity between sets or groups based on common elements.
-    terms <- unique(c(term_overlap$Term1, term_overlap$Term2))
-    overlap_matrix <- matrix(1, nrow = length(terms), ncol = length(terms), dimnames = list(terms, terms))
+        # The overlap matrix measures the similarity between sets or groups
+        # based on common elements.
+        terms <- 
+            unique(
+                c(
+                    term_overlap$Term1, 
+                    term_overlap$Term2
+                )
+            )
+        overlap_matrix <- 
+            matrix(
+                1,
+                nrow = length(terms),
+                ncol = length(terms),
+                dimnames = list(terms, terms)
+            )
     for (i in seq_len(nrow(term_overlap))) {
       t1 <- term_overlap$Term1[i]
       t2 <- term_overlap$Term2[i]
@@ -2120,74 +2172,137 @@ cluster_pk <- function(data, # This can be either the original PK (e.g. KEGG pat
     }
   } else {
     # Create a binary matrix for correlation methods
-    terms <- term_metabolites[[metadata_info[["grouping_variable"]]]]
-    metabolites <- unique(unlist(term_metabolites$MetaboliteIDs)) #[[metadata_info[["InputID"]]]]
+        terms <- 
+            term_metabolites[[metadata_info[["grouping_variable"]]]]
+        metabolites <- 
+            unique(
+                unlist(
+                    term_metabolites$MetaboliteIDs
+                )
+            )
+        # [[metadata_info[["InputID"]]]]
 
-    binary_matrix <- matrix(0, nrow = length(terms), ncol = length(metabolites), dimnames = list(terms, metabolites))
+        binary_matrix <- 
+            matrix(
+                0,
+                nrow = length(terms),
+                ncol = length(metabolites),
+                dimnames = list(terms, metabolites)
+            )
     for (i in seq_along(terms)) {
-      metabolites_for_term <- term_metabolites$MetaboliteIDs[[i]] #[[metadata_info[["InputID"]]]]
+            metabolites_for_term <- 
+                term_metabolites$MetaboliteIDs[[i]]
+            # [[metadata_info[["InputID"]]]]
       binary_matrix[i, colnames(binary_matrix) %in% metabolites_for_term] <- 1
     }
 
-    # Compute correlation matrix: square matrix used to represent the pairwise correlation coefficients between variables or terms
-    # correlation matrix 𝐶 C is an 𝑛 × 𝑛 n×n matrix where each element 𝐶 𝑖 𝑗 C ij  is the correlation coefficient between the variables 𝑋𝑖 Xi  and 𝑋 𝑗 X j
-    #The correlation matrix measures the strength and direction of linear relationships between variables.
-    correlation_matrix <- cor(t(binary_matrix), method = matrix)
+        # Compute correlation matrix: square matrix used to represent the
+        # pairwise correlation coefficients between variables or terms
+        # correlation matrix 𝐶 C is an 𝑛 × 𝑛 n×n matrix where each element 𝐶 𝑖 𝑗
+        # C ij  is the correlation coefficient between the variables 𝑋𝑖 Xi  and
+        # 𝑋 𝑗 X j
+        # The correlation matrix measures the strength and direction of linear
+        # relationships between variables.
+        correlation_matrix <- 
+            cor(
+                t(binary_matrix), 
+                method = matrix
+            )
 
     # Convert to distance matrix
-    overlap_matrix <- 1 - correlation_matrix
+        overlap_matrix <- 
+            1 - correlation_matrix
   }
   # 3. cluster terms based on overlap threshold
-  threshold <- 0.7 # Define similarity threshold
-  term_clusters <- term_overlap %>%
-    filter(Overlap >= threshold) %>%
-    select(Term1, Term2)
+    threshold <- 0.7   # Define similarity threshold
+    
+    term_clusters <- 
+        term_overlap %>%
+            filter(
+                Overlap >= threshold
+            ) %>%
+            select(
+                Term1, 
+                Term2
+            )
 
   # 4. clustering
-  if (clust == "Graph") { #Use Graph-based clustering
+    if (clust == "Graph") { # Use Graph-based clustering
   # Here we need the distance matrix:
-  overlap_matrix <- 1 - correlation_matrix
+        overlap_matrix <- 
+            1 - correlation_matrix
 
-  # An adjacency matrix represents a graph structure and encodes the relationships between nodes (vertices)
+        # An adjacency matrix represents a graph structure and encodes the
+        # relationships between nodes (vertices)
   # Add weight (can also represent unweighted graphs)
-  adjacency_matrix <- exp(-overlap_matrix^2)  # Applying Gaussian kernel to convert distance into similarity
+
+        # Applying Gaussian kernel to convert distance into similarity
+        adjacency_matrix <- 
+            exp(-overlap_matrix^2)
 
   # Create a graph from the adjacency matrix
-  g <- graph_from_adjacency_matrix(adjacency_matrix, mode = "undirected", weighted = TRUE)
-  initial_clusters <- components(g)$membership
-  term_metabolites$cluster <- initial_clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(initial_clusters))]
-  } else if (clust == "Hierarchical") { # Hierarchical clustering
-    hclust_result <- hclust(as.dist(distance_matrix), method = "average") # make methods into parameters!
+        g <- 
+            graph_from_adjacency_matrix(
+                adjacency_matrix,
+                mode = "undirected",
+                weighted = TRUE
+            )
+        initial_clusters <- 
+            components(g)$membership
+        term_metabolites$cluster <-
+            initial_clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(initial_clusters))]
+    } else if (clust == "Hierarchical") {
+    # Hierarchical clustering
+        hclust_result <- 
+            hclust(
+                as.dist(distance_matrix), 
+                method = "average"
+            )
+        # make methods into parameters!
     num_clusters <- 4
-    term_clusters_hclust <- cutree(hclust_result, k = num_clusters)
+        term_clusters_hclust <- 
+            cutree(
+                hclust_result, 
+                k = num_clusters
+            )
 
-    term_metabolites$cluster <- paste0("cluster", term_clusters_hclust[match(terms, names(term_clusters_hclust))])
-    #term_metabolites$cluster <- clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(clusters))]
+        term_metabolites$cluster <- 
+            paste0(
+                "cluster",
+                term_clusters_hclust[match(terms, names(term_clusters_hclust))]
+            )
+        # term_metabolites$cluster <- clusters[...] (refer to previous block) ... ) names(clusters))]
   } else {
     stop("Invalid clustering method specified in clust parameter.")
   }
 
   # 5. Merge cluster group information back to the original data
-  df <- data %>%
-    left_join(term_metabolites %>% select(!!sym(metadata_info[["grouping_variable"]]), cluster), by = metadata_info[["grouping_variable"]])%>%
-    mutate(cluster = ifelse(
+    df <- 
+        data %>%
+            left_join(
+                term_metabolites %>%
+                    select(
+                        !!sym(metadata_info[["grouping_variable"]]), 
+                        cluster
+                    ),
+                by = metadata_info[["grouping_variable"]]
+            ) %>%
+            mutate(
+                cluster = ifelse(
       is.na(cluster),
-        "None", # Assign "None" to NAs
-        paste0("cluster", cluster) # Convert numeric IDs to descriptive labels
+                    "None",
+                    paste0("cluster", cluster)  # Convert numeric IDs to descriptive labels
       )
     )
 
   # 6. Summarize the clustering results
 
-
   ## ------------------ Save and return ------------------- ##
-
-
 }
 
-##########################################################################################
-### ### ### Helper function to add term information to Enrichment Results ### ### ###
-##########################################################################################
+################################################################################
+### ###     Helper function to add term information to Enrichment Results    ###
+################################################################################
 
 # Better function Name and parameter names needed
 # Use in ORA functions and showcase in vignette with decoupleR output
