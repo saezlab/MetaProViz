@@ -1603,8 +1603,7 @@ checkmatch_pk_to_data <-
                     "The ",
                     metadata_info[["grouping_variable"]],
                     " column selected as InpuID in metadata_info was not found in",
-                    "input_pk."
-                    "Please check your input."
+                    "input_pk. Please check your input."
                 )
             log_trace(
                 paste("Error ", message, sep = "")
