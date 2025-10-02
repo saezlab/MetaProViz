@@ -333,27 +333,35 @@ translate_id <-
 
 
 
-##########################################################################################
-### ### ### Find additional potential IDs  ### ### ###
-##########################################################################################
+################################################################################
+### ### ###             Find additional potential IDs                ### ### ###
+################################################################################
 
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
-#' @param data dataframe with at least one column with the detected metabolite IDs (one ID per row).
-#' @param metadata_info \emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}
-#' @param from ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param data dataframe with at least one column with the detected metabolite
+#' IDs (one ID per row).
+#' @param metadata_info \emph{Optional: } Column name of metabolite IDs.
+#' \strong{Default = list(InputID="MetaboliteID")}
+#' @param from ID type that is present in your data. Choose between "kegg",
+#' "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} Path to the folder the results should be saved at.
+#' \strong{Default = NULL}
 #'
 #' @return Input DF with additional column including potential additional IDs.
 #'
 #' @examples
-#' DetectedIDs <- cellular_meta%>%tidyr::drop_na()
-#' Res <- equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
+#' DetectedIDs <- cellular_meta %>% tidyr::drop_na()
+#' Res <- equivalent_id(data = DetectedIDs, metadata_info = c(InputID =
+# "HMDB"),
+#' from = "hmdb")
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
-#' @importFrom dplyr mutate select group_by ungroup distinct filter across rowwise if_else
+#' @importFrom dplyr mutate select group_by ungroup distinct filter across
+#' rowwise if_else
 #' @importFrom tidyr separate_rows unnest
 #' @importFrom purrr map_chr map_lgl map_int 
 #' @importFrom tidyselect all_of starts_with
@@ -362,198 +370,383 @@ translate_id <-
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
 #' @export
-equivalent_id <- function(data,
-                          metadata_info = c(InputID="MetaboliteID"),
+equivalent_id <- 
+    function(
+        data,
+        metadata_info = c(InputID = "MetaboliteID"),
                           from = "hmdb",
-                          save_table= "csv",
-                          path=NULL){
-  # FUTURE: Once we have the structural similarity tool available in OmniPath, we can start creating this function!
+        save_table = "csv",
+        path = NULL
+        ) {
+    # FUTURE: Once we have the structural similarity tool available in OmniPath,
+    # we can start creating this function!
 
   ### 1)
-  #Check Measured ID's in prior knowledge
+    # Check Measured ID's in prior knowledge
 
 
   ### 2)
-  # A user has one HMDB IDs for their measured metabolites (one ID per measured peak) --> this is often the case as the user either gets a trivial name and they have searched for the ID themselves or because the facility only provides one ID at random
+    # A user has one HMDB IDs for their measured metabolites (one ID per
+    # measured peak) --> this is often the case as the user either gets a
+    # trivial name and they have searched for the ID themselves or because the
+    # facility only provides one ID at random
   # We have mapped the HMDB IDs with the pathways and 20 do not map
-  # We want to check if it is because the pathways don't include them, or because the user just gave the wrong ID by chance (i.e. They picked D-Alanine, but the prior knowledge includes L-Alanine)
+    # We want to check if it is because the pathways don't include them, or
+    # because the user just gave the wrong ID by chance (i.e. They picked
+    # D-Alanine, but the prior knowledge includes L-Alanine)
 
-  # Do this by using structural information via  accessing the structural DB in OmniPath!
-  # Output is DF with the original ID column and a new column with additional possible IDs based on structure
+    # Do this by using structural information via  accessing the structural DB
+    # in OmniPath!
+    # Output is DF with the original ID column and a new column with additional
+    # possible IDs based on structure
 
-  #Is it possible to do this at the moment without structures, but by using other prior knowledge?
+    # Is it possible to do this at the moment without structures, but by using
+    # other prior knowledge?
 
   metaproviz_init()
 
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `check_param`
-  check_param(data=data,
-                          data_num=FALSE,
-                          save_table=save_table)
+    check_param(
+        data = data,
+        data_num = FALSE,
+        save_table = save_table
+    )
 
   # Specific checks:
-  if("InputID" %in% names(metadata_info)){
-    if(metadata_info[["InputID"]] %in% colnames(data)== FALSE){
-      message <- paste0("The ", metadata_info[["InputID"]], " column selected as InputID in metadata_info was not found in data. Please check your input.")
-      log_trace(paste("Error ", message, sep=""))
+    if ("InputID" %in% names(metadata_info)) {
+        if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
+            message <- 
+                paste0(
+                    "The ",
+                    metadata_info[["InputID"]],
+                    " column selected as InputID in metadata_info was ",
+                    "not found in data. ",
+                    "Please check your input."
+                )
+            log_trace(
+                paste("Error ", message, sep = "")
+            )
       stop(message)
     }
   }
 
-  unknown_types <- id_types() %>%
-    select(starts_with('in_')) %>%
-    unlist %>%
-    unique %>%
-    str_to_lower %>%
+    unknown_types <- 
+        id_types() %>%
+        select(
+            starts_with("in_")
+        ) %>%
+        unlist() %>%
+        unique() %>%
+        str_to_lower() %>%
     setdiff(from, .)
 
   if (length(unknown_types) > 0L) {
-    msg <- sprintf('The following ID types are not recognized: %s', paste(unknown_types, collapse = ', '))
+        msg <- 
+            sprintf(
+                "The following ID types are not recognized: %s",
+                paste(unknown_types, collapse = ", ")
+            )
     log_warn(msg)
     warning(msg)
   }
 
-  # Check that metadata_info[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
-  doublons <- data[duplicated(data[[metadata_info[['InputID']]]]), ]
+    # Check that metadata_info[['InputID']] has no duplications within one group
+    # --> should not be the case --> remove duplications and inform the user/
+    # ask if they forget to set groupings column
+    doublons <- data[duplicated(data[[metadata_info[["InputID"]]]]), ]
 
-  if(nrow(doublons) > 0){
-    data <- data %>%
-      distinct(!!sym(metadata_info[['InputID']]), .keep_all = TRUE)
+    if (nrow(doublons) > 0) {
+        data <- 
+            data %>%
+            distinct(
+                !!sym(metadata_info[["InputID"]]), 
+                .keep_all = TRUE
+            )
 
-    message <- sprintf('The following IDs are duplicated and removed: %s',paste(doublons[[metadata_info[['InputID']]]], collapse = ', '))
+        message <- 
+            sprintf(
+                "The following IDs are duplicated and removed: %s",
+                paste(
+                    doublons[[metadata_info[["InputID"]]]],
+                    collapse = ", "
+                )
+            )
     log_warn(message)
     warning(message)
   }
 
   ## ------------------  Create output folders and path ------------------- ##
-  if(is.null(save_table)==FALSE ){
-    folder <- save_path(folder_name= "PK",
-                                    path=path)
+    if (is.null(save_table) == FALSE) {
+        folder <- 
+            save_path(
+                folder_name = "PK",
+                path = path
+            )
 
     Subfolder <- file.path(folder, "EquivalentIDs")
-    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
+        if (!dir.exists(Subfolder)) {
+            dir.create(Subfolder)
+        }
   }
 
   ## ------------------ Set the ID type for to ----------------- ##
-  to <- case_when(
-    from == "chebi" ~ "pubchem",  # If to is "pubchem", choose "chebi"
-    TRUE ~ "chebi"              # For other cases, don't use a secondary column
+    to <- 
+        case_when(
+            from == "chebi" ~ "pubchem",
+            # If to is "pubchem", choose "chebi"
+            TRUE ~ "chebi"
+            # For other cases, don't use a secondary column
   )
 
-  message <- paste0(to, " is used to find additional potential IDs for ", from, ".", sep="")
+    message <- 
+        paste0(
+            to,
+            " is used to find additional potential IDs for ",
+            from,
+            ".",
+            sep = ""
+        )
   log_trace(message)
   message(message)
 
   ## ------------------ Load manual table ----------------- ##
-  if((from == "kegg") == FALSE){
-    EquivalentFeatures <- equivalent_features%>%
+    if ((from == "kegg") == FALSE) {
+        EquivalentFeatures <- 
+            equivalent_features %>%
       select(from)
   }
 
   ## ------------------ Translate from-to-to ------------------- ##
-  TranslatedDF <- translate_ids(
+    TranslatedDF <- 
+        translate_ids(
     data,
-    !!sym(metadata_info[['InputID']]) :=  !!sym(from),
-    !!!syms(to),#list of symbols, hence three !!!
+            !!sym(metadata_info[["InputID"]]) := !!sym(from),
+            !!!syms(to),
+            # list of symbols, hence three !!!
     ramp = TRUE,
     expand = FALSE,
-    quantify_ambiguity =FALSE,
-    qualify_ambiguity =  TRUE, # Can not be set to FALSE!
-    ambiguity_groups =  NULL,#Checks within the groups, without it checks across groups
-    ambiguity_summary =  FALSE
-  )%>%
-    select(all_of(intersect(names(.), names(data))), all_of(to)) %>%
-    mutate(across(all_of(to), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
-    group_by(!!sym(metadata_info[['InputID']])) %>%
-    mutate(across(all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
+            quantify_ambiguity = FALSE,
+            qualify_ambiguity = TRUE,
+            ambiguity_groups = NULL, # Can not be set to FALSE!
+            ambiguity_summary = FALSE # Checks within the groups, without it checks across groups
+        ) %>%
+        select(
+            all_of(intersect(names(.), names(data))), all_of(to)
+        ) %>%
+        mutate(
+            across(all_of(to), ~ map_chr(., ~ paste(unique(.), collapse = ", "))
+            )
+        ) %>%
+        group_by(
+            !!sym(metadata_info[["InputID"]])
+        ) %>%
+        mutate(
+            across(all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")
+        ) %>%
     ungroup() %>%
     distinct() %>%
-    mutate(across(all_of(to), ~ ifelse(. == "0", NA, .)))
+        mutate(
+            across(all_of(to), ~ ifelse(. == "0", NA, .))
+        )
 
 
   ## ------------------ Translate to-to-from ------------------- ##
-  TranslatedDF_Long <- TranslatedDF%>%
-    select(!!sym(metadata_info[['InputID']]), !!sym(to))%>%
-    rename("InputID" = !!sym(metadata_info[['InputID']]))%>%
-    separate_rows(!!sym(to), sep = ", ") %>%
-    mutate(across(all_of(to), ~trimws(.))) %>%  # Remove extra spaces
-    filter(!!sym(to) != "")  # Remove empty entries
+    TranslatedDF_Long <- 
+        TranslatedDF %>%
+            select(
+                !!sym(metadata_info[["InputID"]]), !!sym(to)
+            ) %>%
+            rename(
+                "InputID" = !!sym(metadata_info[["InputID"]])
+            ) %>%
+            separate_rows(
+                !!sym(to), sep = ", "
+            ) %>%
+            mutate(
+                across(all_of(to), ~ trimws(.))
+            ) %>%
+            filter(  # Remove extra spaces
+                !!sym(to) != ""
+            )
+            # Remove empty entries
 
-  OtherIDs <- translate_ids(
-    TranslatedDF_Long ,
+    OtherIDs <- 
+        translate_ids(
+            TranslatedDF_Long,
     !!sym(to),
-    !!sym(from),#list of symbols, hence three !!!
+            !!sym(from),
     ramp = TRUE,
     expand = FALSE,
-    quantify_ambiguity =FALSE,
-    qualify_ambiguity =  TRUE, # Can not be set to FALSE!
-    ambiguity_groups =  NULL,#Checks within the groups, without it checks across groups
-    ambiguity_summary =  FALSE
-  )%>%
-    select("InputID", !!sym(to), !!sym(from))%>%
-    distinct(InputID, !!sym(from), .keep_all = TRUE) %>%  # Remove duplicates based on InputID and from
-    mutate(AdditionalID = if_else(InputID == !!sym(from), FALSE, TRUE)) %>%
-    select("InputID",!!sym(from), "AdditionalID")%>%
-    filter(AdditionalID == TRUE) %>%
-    mutate(across(all_of(from), ~ map_chr(., ~ paste(unique(.), collapse = ", "))))%>%
+            quantify_ambiguity = FALSE,
+            qualify_ambiguity = TRUE,
+            ambiguity_groups = NULL,  # Can not be set to FALSE!
+            ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
+        ) %>%
+        select(
+            "InputID", !!sym(to), !!sym(from)
+        ) %>%
+        distinct(
+            InputID, !!sym(from), .keep_all = TRUE
+        ) %>%
+        # Remove duplicates based on InputID and from
+        mutate(
+            AdditionalID = if_else(InputID == !!sym(from), FALSE, TRUE)
+        ) %>%
+        select(
+            "InputID", !!sym(from), "AdditionalID"
+        ) %>%
+        filter(
+            AdditionalID == TRUE
+        ) %>%
+        mutate(
+            across(
+                all_of(from),
+                ~ map_chr(., ~ paste(unique(.), collapse = ", "))
+            )
+        ) %>%
     rowwise() %>%
     mutate(
-      fromList = list(str_split(!!sym(from), ",\\s*")[[1]]),  # Wrap in list
-      SameAsInput = ifelse(any(fromList == InputID), InputID, NA_character_),  # Match InputID
-      PotentialAdditionalIDs = paste(fromList[fromList != InputID], collapse = ", ")  # Combine other IDs
+            fromList = list(str_split(!!sym(from), ",\\s*")[[1]]),
+            # Wrap in list
+            SameAsInput = ifelse(
+                any(fromList == InputID),
+                InputID,
+                NA_character_
+            ),
+            # Match InputID
+            PotentialAdditionalIDs = paste(
+                fromList[fromList != InputID],
+                collapse = ", "
+            )
+            # Combine other IDs
     ) %>%
     ungroup() %>%
-    select(InputID, PotentialAdditionalIDs, !!sym(from))%>%  # Final selection
-    rename("AllIDs"= from)
+        select(
+            InputID, PotentialAdditionalIDs, !!sym(from)
+        ) %>%
+        # Final selection
+        rename(
+            "AllIDs" = from
+        )
 
   ## ------------------ Merge to Input ------------------- ##
-  OtherIDs <- merge(data, OtherIDs, by.x= metadata_info[['InputID']] , by.y= "InputID", all.x=TRUE)
+    OtherIDs <- 
+        merge(
+            data,
+            OtherIDs,
+            by.x = metadata_info[["InputID"]],
+            by.y = "InputID",
+            all.x = TRUE
+        )
 
-  ##------------------- Add additional IDs -------------- ##
+    ## ------------------- Add additional IDs -------------- ##
 
   if (exists("EquivalentFeatures")) {
    EquivalentFeatures$AllIDs <- EquivalentFeatures[[from]]
-    EquivalentFeatures_Long <- EquivalentFeatures  %>%
-      separate_rows(!!sym(from), sep = ",")
+        EquivalentFeatures_Long <- 
+            EquivalentFeatures %>%
+                separate_rows(
+                    !!sym(from), sep = ","
+                )
 
-    OtherIDs <- merge(OtherIDs, EquivalentFeatures_Long, by.x= metadata_info[['InputID']] , by.y= "hmdb", all.x=TRUE)%>%
+        OtherIDs <- 
+            merge(
+                OtherIDs,
+                EquivalentFeatures_Long,
+                by.x = metadata_info[["InputID"]],
+                by.y = "hmdb",
+                all.x = TRUE
+            ) %>%
       rowwise() %>%
-      mutate(AllIDs = paste(unique(na.omit(unlist(str_split(paste(na.omit(c(AllIDs.x, AllIDs.y)), collapse = ","), ",\\s*")))), collapse = ",")) %>%
-      ungroup()%>%
+            mutate(
+                AllIDs = paste(
+                    unique(
+                        na.omit(
+                            unlist(
+                                str_split(
+                                    paste(
+                                        na.omit(
+                                            c(
+                                                AllIDs.x,
+                                                AllIDs.y
+                                            )
+                                        ),
+                                        collapse = ","
+                                    ),
+                                ",\\s*"
+                                )
+                            )
+                        )
+                    ),
+                    collapse = ",")
+            ) %>%
+            ungroup() %>%
       rowwise() %>%
       mutate(
         PotentialAdditionalIDs = paste(
           setdiff(
-            unlist(str_split(AllIDs, ",\\s*")),  # Split merged_column into individual IDs
-            as.character(!!sym(metadata_info[['InputID']]))  # Split hmdb into individual IDs
+                        unlist(
+                            str_split(
+                                AllIDs, ",\\s*"
+                            )
+                        ),
+                        # Split merged_column into individual IDs
+                        as.character(
+                            !!sym(
+                                metadata_info[["InputID"]] # Split hmdb into individual IDs
+                            )
+                        )
           ),
-          collapse = ", "  # Combine the remaining IDs back into a comma-separated string
+                    collapse = ", " # Combine the remaining IDs back into a comma-separated string
         )
       ) %>%
-      ungroup()%>%
-      select(-AllIDs.x, -AllIDs.y)
+            ungroup() %>%
+            select(
+                -AllIDs.x, 
+                -AllIDs.y
+            )
   }
 
-  ##------------------- Fill empty cells -------------- ##
-  OtherIDs <- OtherIDs%>%
-    mutate(PotentialAdditionalIDs = ifelse(is.na(PotentialAdditionalIDs) | PotentialAdditionalIDs == "", NA, PotentialAdditionalIDs))%>%
-    mutate(AllIDs = ifelse(is.na(AllIDs) | AllIDs == "", !!sym(metadata_info[['InputID']]), AllIDs))
+    ## ------------------- Fill empty cells -------------- ##
+    OtherIDs <- 
+        OtherIDs %>%
+            mutate(
+                PotentialAdditionalIDs = ifelse(
+                    is.na(PotentialAdditionalIDs) | PotentialAdditionalIDs == "",
+                    NA,
+                    PotentialAdditionalIDs
+                )
+            ) %>%
+            mutate(
+                AllIDs = ifelse(
+                    is.na(AllIDs) | AllIDs == "",
+                    !!sym(metadata_info[["InputID"]]),
+                    AllIDs
+                )
+            )
 
   ## ------------------ Create count_id plot ------------------- ##
-  #QC plot of before and after
-  Before <-MetaProViz:::count_id(data=data,
-                                 column=metadata_info[["InputID"]],
+    # QC plot of before and after
+    Before <- 
+        MetaProViz:::count_id(
+            data = data,
+            column = metadata_info[["InputID"]],
                                  save_plot = NULL,
                                  save_table = NULL,
                                  print_plot = FALSE,
-                                 path = NULL)
+            path = NULL
+        )
 
-  After <-MetaProViz:::count_id(data=OtherIDs,
-                                  column="AllIDs",
+    After <- 
+        MetaProViz:::count_id(
+            data = OtherIDs,
+            column = "AllIDs",
                                   save_plot = NULL,
                                   save_table = NULL,
                                   print_plot = FALSE,
-                                  path = NULL)
+            path = NULL
+        )
 
 
   ## ------------------ Create Output ------------------- ##
@@ -562,15 +755,20 @@ equivalent_id <- function(data,
   ## ------------------ Save the results ------------------- ##
   ResList <- list("equivalent_id" = OutputDF)
 
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=ResList,
-                         inputlist_plot= NULL,
-                         save_table=save_table,
-                         save_plot=NULL,
-                         path= Subfolder,
-                         file_name= "equivalent_id",
-                         core=FALSE,
-                         print_plot=FALSE)))
+    suppressMessages(
+        suppressWarnings(
+            save_res(
+                inputlist_df = ResList,
+                inputlist_plot = NULL,
+                save_table = save_table,
+                save_plot = NULL,
+                path = Subfolder,
+                file_name = "equivalent_id",
+                core = FALSE,
+                print_plot = FALSE
+            )
+        )
+    )
 
   return(invisible(OutputDF))
 }
