@@ -17,25 +17,39 @@
 #
 
 
-##########################################################################################
+################################################################################
 ### ### ### Translate IDs to/from KEGG, PubChem, Chebi, HMDB ### ### ###
-##########################################################################################
+################################################################################
 
 #' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 #'
-#' @param data dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.
-#' @param metadata_info \emph{Optional: } Column name of Target in input_pk. \strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}
-#' @param from ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
-#' @param to One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}
-#' @param summary \emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param data dataframe with at least one column with the target (e.g.
+#' metabolite), you can add other columns such as source (e.g. term). Must be
+#' "long" DF, meaning one ID per row.
+#' @param metadata_info \emph{Optional: } Column name of Target in input_pk.
+#' \strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}
+#' @param from ID type that is present in your data. Choose between "kegg",
+#' "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
+#' @param to One or multiple ID types to which you want to translate your data.
+#' Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default =
+#' c("pubchem","chebi","hmdb")}
+#' @param summary \emph{Optional: } If TRUE a long summary tables are created.
+#' \strong{Default = FALSE}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} Path to the folder the results should be saved at.
+#' \strong{Default = NULL}
 #'
-#' @return List with at least three DFs: 1) Original data and the new column of translated ids spearated by comma. 2) Mapping information between Original ID to Translated ID. 3) Mapping summary between Original ID to Translated ID.
+#' @return List with at least three DFs: 1) Original data and the new column of
+#' translated ids spearated by comma. 2) Mapping information between Original
+#' ID
+#' to Translated ID. 3) Mapping summary between Original ID to Translated ID.
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
-#' Res <- translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem", "hmdb"))
+#' Res <- translate_id(data = KEGG_Pathways, metadata_info = c(InputID =
+#' "MetaboliteID", grouping_variable = "term"), from = c("kegg"), to =
+#' c("pubchem", "hmdb"))
 #'
 #' @keywords Translate metabolite IDs
 #'
@@ -46,112 +60,193 @@
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower
 #' @export
-translate_id <- function(data,
-                        metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
+translate_id <- 
+    function(
+        data,
+        metadata_info = c(
+            InputID = "MetaboliteID",
+            grouping_variable = "term"
+            ),
                         from = "kegg",
-                        to = c("pubchem","chebi","hmdb"),
-                        summary=FALSE,
-                        save_table= "csv",
-                        path=NULL
-  ){# Add ability to also get metabolite names that are human readable from an ID type!
+        to = c("pubchem", "chebi", "hmdb"),
+        summary = FALSE,
+        save_table = "csv",
+        path = NULL
+        ) {
+    # Add ability to also get metabolite names that are human readable
+    # from an ID type!
 
   metaproviz_init()
 
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `check_param`
-  check_param(data=data,
-                          data_num=FALSE,
-                          save_table=save_table)
+    check_param(
+        data = data,
+        data_num = FALSE,
+        save_table = save_table
+    )
 
   # Specific checks:
-  if("InputID" %in% names(metadata_info)){
-    if(metadata_info[["InputID"]] %in% colnames(data)== FALSE){
-      message <- paste0("The ", metadata_info[["InputID"]], " column selected as InputID in metadata_info was not found in data. Please check your input.")
-      log_trace(paste("Error ", message, sep=""))
+    if ("InputID" %in% names(metadata_info)) {
+        if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
+            message <- 
+                paste0(
+                    "The ",
+                    metadata_info[["InputID"]],
+                    " column selected as InputID in metadata_info was ",
+                    "not found in data. ",
+                    "Please check your input."
+                )
+            log_trace(paste("Error ", message, sep = ""))
       stop(message)
     }
   }
 
-  if("grouping_variable" %in% names(metadata_info)){
-    if(metadata_info[["grouping_variable"]] %in% colnames(data)== FALSE){
-      message <- paste0("The ", metadata_info[["grouping_variable"]], " column selected as grouping_variable in metadata_info was not found in data. Please check your input.")
-      log_trace(paste("Error ", message, sep=""))
+    if ("grouping_variable" %in% names(metadata_info)) {
+        if (metadata_info[["grouping_variable"]] %in% colnames(data) == FALSE) {
+            message <- 
+                paste0(
+                    "The ",
+                    metadata_info[["grouping_variable"]],
+                    " column selected as grouping_variable in metadata_info ",
+                    "was not found in data. ",
+                    "Please check your input."
+                )
+            log_trace(paste("Error ", message, sep = ""))
       stop(message)
     }
   }
 
-  if(is.logical(summary) == FALSE){
-    message <- paste0("Check input. The summary parameter should be either =TRUE or =FALSE.")
-    log_trace(paste("Error ", message, sep=""))
+    if (is.logical(summary) == FALSE) {
+        message <- 
+            paste0(
+                "Check input. The summary parameter should be either =TRUE or ",
+                "=FALSE."
+            )
+        log_trace(paste("Error ", message, sep = ""))
     stop(message)
   }
 
-  unknown_types <- id_types() %>%
-    select(starts_with('in_')) %>%
-    unlist %>%
-    unique %>%
-    str_to_lower %>%
-    setdiff(union(from, to), .)
+    unknown_types <- 
+        id_types() %>%
+        select(
+            starts_with("in_")
+        ) %>%
+        unlist() %>%
+        unique() %>%
+        str_to_lower() %>%
+        setdiff(
+            union(from, to), .
+        )
 
   if (length(unknown_types) > 0L) {
-    msg <- sprintf('The following ID types are not recognized: %s', paste(unknown_types, collapse = ', '))
+        msg <- 
+            sprintf(
+                "The following ID types are not recognized: %s",
+                paste(unknown_types, collapse = ", ")
+            )
     log_warn(msg)
     warning(msg)
   }
 
-  # Check that metadata_info[['InputID']] has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
+    # Check that metadata_info[['InputID']] has no duplications within one group
+    # --> should not be the case --> remove duplications and inform the user/
+    # ask if they forget to set groupings column
   doublons <- data %>%
-    filter(!is.na(!!sym(metadata_info[['InputID']]))) %>%
-    group_by(!!sym(metadata_info[['InputID']]), !!sym(metadata_info[['grouping_variable']]))%>%
-    filter(n() > 1) %>%
+        filter(
+            !is.na(
+                !!sym(
+                    metadata_info[["InputID"]]
+                )
+            )
+        ) %>%
+        group_by(
+            !!sym(metadata_info[["InputID"]]),
+            !!sym(metadata_info[["grouping_variable"]])
+        ) %>%
+        filter(
+            n() > 1
+        ) %>%
     summarize()
 
-  if(nrow(doublons) > 0){
-    message <- sprintf(
-        'The following IDs are duplicated within one group: %s',
-        paste(doublons %>% pull(metadata_info[['InputID']]), collapse = ', ')
+    if (nrow(doublons) > 0) {
+        message <- 
+            sprintf(
+                "The following IDs are duplicated within one group: %s",
+                paste(
+                    doublons %>% pull(metadata_info[["InputID"]]),
+                    collapse = ", "
+                )
     )
     log_warn(message)
     warning(message)
   }
 
   ## ------------------  Create output folders and path ------------------- ##
-  if(is.null(save_table)==FALSE ){
-    folder <- save_path(folder_name= "PK",
-                                    path=path)
+    if (is.null(save_table) == FALSE) {
+        folder <- 
+            save_path(
+                folder_name = "PK",
+                path = path
+            )
 
     Subfolder <- file.path(folder, "TranslateIDs")
-    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
+        if (!dir.exists(Subfolder)) {
+            dir.create(Subfolder)
+        }
   }
 
-  ########################################################################################################################################################
+    ############################################################################
   ## ------------------ Translate to-from for each pair ------------------- ##
-  TranslatedDF <- translate_ids(
+    TranslatedDF <- 
+        translate_ids(
       data,
-      !!sym(metadata_info[['InputID']]) :=  !!sym(from),
-      !!!syms(to),#list of symbols, hence three !!!
+            !!sym(metadata_info[["InputID"]]) := !!sym(from),
+            !!!syms(to), # list of symbols, hence three !!!
       ramp = TRUE,
       expand = FALSE,
       quantify_ambiguity = TRUE,
       qualify_ambiguity = TRUE,
-      ambiguity_groups =  metadata_info[['grouping_variable']],#Checks within the groups, without it checks across groups
+            ambiguity_groups = metadata_info[["grouping_variable"]], # Checks within the groups, without it checks across groups
       ambiguity_summary = TRUE
     )
-  #TranslatedDF %>% attributes %>% names
-  #TranslatedDF%>% attr('ambiguity_MetaboliteID_hmdb')
+    # TranslatedDF %>% attributes %>% names
+    # TranslatedDF%>% attr('ambiguity_MetaboliteID_hmdb')
 
   ## --------------- Create output DF -------------------- ##
   ResList <- list()
 
-  ## Create DF for TranslatedIDs only with the original data and the translatedID columns
-  DF_subset <- TranslatedDF %>%
-    select(all_of(intersect(names(.), names(data))), all_of(to)) %>%
-    mutate(across(all_of(to), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))) %>%
-    group_by(!!sym(metadata_info[['InputID']]), !!sym(metadata_info[['grouping_variable']])) %>%
-    mutate(across(all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")) %>%
+    ## Create DF for TranslatedIDs only with the original data and the
+    ## translatedID columns
+    DF_subset <- 
+        TranslatedDF %>%
+        select(
+            all_of(intersect(names(.), names(data))), all_of(to)
+        ) %>%
+        mutate(
+            across(
+                all_of(to),
+                ~ map_chr(., ~ paste(unique(.), collapse = ", "))
+            )
+        ) %>%
+        group_by(
+            !!sym(metadata_info[["InputID"]]),
+            !!sym(metadata_info[["grouping_variable"]])
+        ) %>%
+        mutate(
+            across(all_of(to),
+            ~ paste(unique(.),
+            collapse = ", "),
+            .names = "{.col}")
+        ) %>%
     ungroup() %>%
     distinct() %>%
-    mutate(across(all_of(to), ~ ifelse(. == "0", NA, .)))
+        mutate(
+            across(
+                all_of(to), 
+                ~ ifelse(. == "0", NA, .)
+            )
+        )
 
   ResList[["TranslatedDF"]] <- DF_subset
 
@@ -159,34 +254,58 @@ translate_id <- function(data,
   ResList[["TranslatedDF_MappingInfo"]] <- TranslatedDF
 
   ## Also save the different mapping summaries!
-  for(item in to){
-    summaryDF <- TranslatedDF%>% attr(paste0("ambiguity_", metadata_info[['InputID']], "_", item, sep=""))
-    ResList[[paste0("Mappingsummary_", item, sep="")]] <-  summaryDF
+    for (item in to) {
+        summaryDF <- 
+            TranslatedDF %>% 
+                attr(
+                    paste0(
+                        "ambiguity_",
+                        metadata_info[["InputID"]],
+                        "_",
+                        item,
+                        sep = ""
+                    )
+                )
+        ResList[[paste0("Mappingsummary_", item, sep = "")]] <- summaryDF
   }
 
   ## Create the long DF summary if summary =TRUE
-  if(summary==TRUE){
-    for(item in to){
-      summary <- mapping_ambiguity(data= TranslatedDF,
-                                            from = metadata_info[['InputID']],
+    if (summary == TRUE) {
+        for (item in to) {
+            summary <- 
+                mapping_ambiguity(
+                    data = TranslatedDF,
+                    from = metadata_info[["InputID"]],
                                             to = item,
-                                            grouping_variable = metadata_info[['grouping_variable']],
-                                            summary=TRUE)[["summary"]]
-      ResList[[paste0("Mappingsummary_Long_", from, "-to-", item, sep="")]] <- summary
+                    grouping_variable = metadata_info[["grouping_variable"]],
+                    summary = TRUE
+                )[["summary"]]
+            ResList[[paste0(
+                "Mappingsummary_Long_",
+                from,
+                "-to-",
+                item,
+                sep = ""
+                )]] <- summary
     }
   }
 
 
   ## ------------------ Save the results ------------------- ##
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=ResList,
-                         inputlist_plot= NULL,
-                         save_table=save_table,
-                         save_plot=NULL,
-                         path= Subfolder,
-                         file_name= "translate_id",
-                         core=FALSE,
-                         print_plot=FALSE)))
+    suppressMessages(
+        suppressWarnings(
+            save_res(
+                inputlist_df = ResList,
+                inputlist_plot = NULL,
+                save_table = save_table,
+                save_plot = NULL,
+                path = Subfolder,
+                file_name = "translate_id",
+                core = FALSE,
+                print_plot = FALSE
+            )
+        )
+    )
 
   ## ------------------ Show Upset plot of the results ------------------- ##
   ## toDO: current issue with Lists vs doubles
@@ -195,15 +314,21 @@ translate_id <- function(data,
   #   metadata_info <- list(translated = to)
   #   print(pk_list)
   #   print(to)
-  #   pk_comp_res <- MetaProViz:::compare_pk(data = pk_list,
-  #                                         metadata_info = metadata_info,
-  #                                         plot_name = "IDs available after ID Translation")
+    #   pk_comp_res <- 
+    #       MetaProViz:::compare_pk(
+    #           data = pk_list,
+    #           metadata_info = metadata_info,
+    #           plot_name = "IDs available after
+    #           ID Translation"
+    #       )
   #   ## Add Upset plot
   #   ResList[["Translated_UpsetPlot"]] <- pk_comp_res$upset_plot
-  #}
+    # }
 
-  #Return
-  invisible(return(ResList))
+    # Return
+    invisible(
+        return(ResList)
+    )
 }
 
 
