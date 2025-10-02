@@ -773,26 +773,47 @@ equivalent_id <-
   return(invisible(OutputDF))
 }
 
-##########################################################################################
-### ### ### Mapping Ambiguity ### ### ###
-##########################################################################################
+################################################################################
+### ### ###                    Mapping Ambiguity                     ### ### ###
+################################################################################
 
 #' Create Mapping Ambiguities between two ID types
 #'
-#' @param data Translated DF from translate_id reults or dataframe with at least one column with the target metabolite ID and another MetaboliteID type. One of the IDs can only have one ID per row, the other ID can be either separated by comma or a list. Optional: add other columns such as source (e.g. term).
-#' @param to Column name of original metabolite identifier in data. Here should only have one ID per row.
-#' @param from Column name of the secondary or translated metabolite identifier in data. Here can be multiple IDs per row either separated by comma " ," or a list of IDs.
-#' @param grouping_variable \emph{Optional: } If NULL no groups are used. If TRUE provide column name in data containing the grouping_variable and features are grouped. \strong{Default = NULL}
-#' @param summary \emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path {Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param data Translated DF from translate_id reults or dataframe with at
+#' least
+#' one column with the target metabolite ID and another MetaboliteID type. One
+#' of the IDs can only have one ID per row, the other ID can be either
+# separated
+#' by comma or a list. Optional: add other columns such as source (e.g. term).
+#' @param to Column name of original metabolite identifier in data. Here should
+#' only have one ID per row.
+#' @param from Column name of the secondary or translated metabolite identifier
+#' in data. Here can be multiple IDs per row either separated by comma " ," or
+#' a
+#' list of IDs.
+#' @param grouping_variable \emph{Optional: } If NULL no groups are used. If
+#' TRUE provide column name in data containing the grouping_variable and
+#' features are grouped. \strong{Default = NULL}
+#' @param summary \emph{Optional: } If TRUE a long summary tables are created.
+#' \strong{Default = FALSE}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} Path to the folder the results should be saved at.
+#' \strong{Default = NULL}
 #'
-#' @return List with at least 4 DFs: 1-3) from-to-to: 1. MappingIssues, 2. MappingIssues summary, 3. Long summary (If summary=TRUE) & 4-6) to-to-from: 4. MappingIssues, 5. MappingIssues summary, 6. Long summary (If summary=TRUE) & 7) Combined summary table (If summary=TRUE)
+#' @return List with at least 4 DFs: 1-3) from-to-to: 1. MappingIssues, 2.
+#' MappingIssues summary, 3. Long summary (If summary=TRUE) & 4-6) to-to-from:
+#' 4. MappingIssues, 5. MappingIssues summary, 6. Long summary (If
+#' summary=TRUE)
+#' & 7) Combined summary table (If summary=TRUE)
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
-#' InputDF <- translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem"))[["TranslatedDF"]]
-#' Res <- mapping_ambiguity(data= InputDF, from = "MetaboliteID", to = "pubchem", grouping_variable = "term", summary=TRUE)
+#' InputDF <- translate_id(data = KEGG_Pathways, metadata_info = c(InputID =
+#' "MetaboliteID", grouping_variable = "term"), from = c("kegg"), to =
+#' c("pubchem"))[["TranslatedDF"]]
+#' Res <- mapping_ambiguity(data = InputDF, from = "MetaboliteID", to =
+#' "pubchem", grouping_variable = "term", summary = TRUE)
 #'
 #' @keywords Mapping ambiguity
 #'
@@ -805,197 +826,550 @@ equivalent_id <-
 #' @importFrom dplyr first
 #' 
 #' @export
-mapping_ambiguity <- function(data,
+mapping_ambiguity <- 
+    function(
+        data,
                              from,
                              to,
                              grouping_variable = NULL,
-                             summary=FALSE,
-                             save_table= "csv",
-                             path=NULL
+        summary = FALSE,
+        save_table = "csv",
+        path = NULL
 ) {
-
+            
   metaproviz_init()
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `check_param`
-  check_param(data=data,
-                          data_num=FALSE,
-                          save_table=save_table)
+    check_param(
+        data = data,
+        data_num = FALSE,
+        save_table = save_table
+    )
 
   # Specific checks:
-  if(from %in% colnames(data)== FALSE){
-      message <- paste0(from, " column was not found in data. Please check your input.")
-      log_trace(paste("Error ", message, sep=""))
+    if (from %in% colnames(data) == FALSE) {
+        message <- 
+            paste0(
+                from,
+                " column was not found in data. Please check your input."
+            )
+        log_trace(
+            paste(
+                "Error ", message, sep = ""
+            )
+        )
       stop(message)
       }
 
-  if(to %in% colnames(data)== FALSE){
-    message <- paste0(to, " column was not found in data. Please check your input.")
-    log_trace(paste("Error ", message, sep=""))
+    if (to %in% colnames(data) == FALSE) {
+        message <- 
+            paste0(
+                to,
+                " column was not found in data. Please check your input."
+            )
+        log_trace(
+            paste(
+                "Error ", message, sep = ""
+            )
+        )
     stop(message)
   }
 
-  if(is.null(grouping_variable)==FALSE){
-    if(grouping_variable %in% colnames(data)== FALSE){
-      message <- paste0(grouping_variable, " column was not found in data. Please check your input.")
-      log_trace(paste("Error ", message, sep=""))
+    if (is.null(grouping_variable) == FALSE) {
+        if (grouping_variable %in% colnames(data) == FALSE) {
+            message <- 
+                paste0(
+                    grouping_variable,
+                    " column was not found in data. Please check your input."
+                )
+            log_trace(
+                paste(
+                    "Error ", message, sep = ""
+                )
+            )
       stop(message)
     }
   }
 
-  if(is.logical(summary) == FALSE){
-    message <- paste0("Check input. The summary parameter should be either =TRUE or =FALSE.")
-    log_trace(paste("Error ", message, sep=""))
+    if (is.logical(summary) == FALSE) {
+        message <- 
+            paste0(
+                "Check input. The summary parameter should be either =TRUE or ",
+                "=FALSE."
+            )
+        log_trace(
+            paste(
+                "Error ", message, sep = ""
+            )
+        )
     stop(message)
   }
 
-  ## ------------------  General checks of wrong occurences ------------------- ##
-  # Task 1: Check that from has no duplications within one group --> should not be the case --> remove duplications and inform the user/ ask if they forget to set groupings column
-  # Task 2: Check that from has the same items in to across the different entries (would be in different Groupings, otherwise there should not be any duplications) --> List of Miss-Mappings across terms
+    ## ------------------  General checks of wrong occurences
+    ## ------------------- ##
+    # Task 1: Check that from has no duplications within one group --> should
+    # not be the case --> remove duplications and inform the user/ ask if they
+    # forget to set groupings column
+    # Task 2: Check that from has the same items in to across the different
+    # entries (would be in different Groupings, otherwise there should not be
+    # any duplications) --> List of Miss-Mappings across terms
 
-  # FYI: The above can not happen if our translateID function was used, but may be the case when the user has done something manually before
+    # FYI: The above can not happen if our translateID function was used, but
+    # may be the case when the user has done something manually before
 
 
   ## ------------------  Create output folders and path ------------------- ##
-  if(is.null(save_table)==FALSE ){
-    folder <- save_path(folder_name= "PK",
-                                    path=path)
+    if (is.null(save_table) == FALSE) {
+        folder <- 
+            save_path(
+                folder_name = "PK",
+                path = path
+            )
 
     Subfolder <- file.path(folder, "MappingAmbiguities")
-    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
+        if (!dir.exists(Subfolder)) {
+            dir.create(Subfolder)
+        }
   }
 
-  #####################################################################################################################################################################################
+    ############################################################################
   ## ------------------  Prepare Input data ------------------- ##
-  #If the user provides a DF where the to column is a list of IDs, then we can use it right away
-  #If the to column is not a list of IDs, but a character column, we need to convert it into a list of IDs
-  if(is.character(data[[to]])==TRUE){
-    data[[to]] <- data[[to]]%>%
-      strsplit(", ")%>%
+    # If the user provides a DF where the to column is a list of IDs, then we
+    # can use it right away
+    # If the to column is not a list of IDs, but a character column, we need to
+    # convert it into a list of IDs
+    if (is.character(data[[to]]) == TRUE) {
+        data[[to]] <- 
+            data[[to]] %>%
+            strsplit(", ") %>%
       lapply(as.character)
   }
 
   ## ------------------  Perform ambiguity mapping ------------------- ##
-  #1. from-to-to: OriginalID-to-TranslatedID
-  #2. from-to-to: TranslatedID-to-OriginalID
+    # 1. from-to-to: OriginalID-to-TranslatedID
+    # 2. from-to-to: TranslatedID-to-OriginalID
   Comp <- list(
     list(from = from, to = to),
     list(from = to, to = from)
   )
 
   ResList <- list()
-  for(comp in seq_along(Comp)){
-    #Run Omnipath ambiguity
-    ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]] <- data %>%
-      unnest(cols = all_of(Comp[[comp]]$from))%>% # unlist the columns in case they are not expaned
-      filter(!is.na(!!sym(Comp[[comp]]$from)))%>%#Remove NA values, otherwise they are counted as column is character
+    for (comp in seq_along(Comp)) {
+        # Run Omnipath ambiguity
+        ResList[[
+            paste0(
+                Comp[[comp]]$from,
+                "-to-",
+                Comp[[comp]]$to,
+                sep = ""
+            )]] <- data %>%
+            unnest(  # unlist the columns in case they are not expaned
+                cols = all_of(Comp[[comp]]$from)
+            ) %>%
+            filter(  # Remove NA values, otherwise they are counted as column is character
+                !is.na(
+                    !!sym(Comp[[comp]]$from)
+                )
+            ) %>%
       ambiguity(
           from_col = !!sym(Comp[[comp]]$from),
           to_col = !!sym(Comp[[comp]]$to),
           groups = grouping_variable,
           quantify = TRUE,
           qualify = TRUE,
-          global = TRUE,#across groups will be done additionally --> suffix _AcrossGroup
-          summary=TRUE, #summary of the mapping column
-          expand=TRUE)
+                global = TRUE,
+                # across groups will be done additionally --> suffix
+                # _AcrossGroup
+                summary = TRUE,
+                # summary of the mapping column
+                expand = TRUE
+            )
 
-    #Extract summary table:
-    ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to, "_summary", sep="")]] <-
-        ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]%>%
-        attr(paste0("ambiguity_", Comp[[comp]]$from , "_",Comp[[comp]]$to, sep=""))
+        # Extract summary table:
+        ResList[[
+            paste0(
+                Comp[[comp]]$from,
+                "-to-",
+                Comp[[comp]]$to,
+                "_summary",
+                sep = ""
+            )]] <- ResList[[
+                paste0(
+                    Comp[[comp]]$from,
+                    "-to-",
+                    Comp[[comp]]$to,
+                    sep = ""
+                )]] %>%
+                attr(
+                    paste0(
+                        "ambiguity_",
+                        Comp[[comp]]$from,
+                        "_",
+                        Comp[[comp]]$to,
+                        sep = ""
+                    )
+                )
 
-    ############################################################################################################
-    if(summary==TRUE){
-      if(is.null(grouping_variable)==FALSE){
-        # Add further information we need to summarise the table and combine Original-to-Translated and Translated-to-Original
-        # If we have a grouping_variable we need to combine it with the MetaboliteID before merging
-        ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]%>%
-          unnest(cols = all_of(Comp[[comp]]$from))%>%
-          mutate(!!sym(paste0("AcrossGroupMappingIssue(", Comp[[comp]]$from, "_to_", Comp[[comp]]$to, ")", sep="")) := case_when(
-            !!sym(paste0(Comp[[comp]]$from, "_", Comp[[comp]]$to, "_ambiguity_bygroup", sep="")) != !!sym(paste0(Comp[[comp]]$from, "_", Comp[[comp]]$to, "_ambiguity", sep=""))  ~ "TRUE",
-            TRUE ~ "FALSE" ))%>%
-          group_by(!!sym(Comp[[comp]]$from), !!sym(grouping_variable))%>%
-          mutate(!!sym(Comp[[comp]]$to) := ifelse(!!sym(Comp[[comp]]$from) == 0, NA,  # Or another placeholder
-                                                  paste(unique(!!sym(Comp[[comp]]$to)), collapse = ", ")
-          )) %>%
-          mutate( !!sym(paste0("Count(", Comp[[comp]]$from, "_to_", Comp[[comp]]$to, ")")) := ifelse(all(!!sym(Comp[[comp]]$to) == 0), 0, n()))%>%
-          ungroup()%>%
+        ########################################################################
+        if (summary == TRUE) {
+            if (is.null(grouping_variable) == FALSE) {
+                # Add further information we need to summarise the table and
+                # combine Original-to-Translated and Translated-to-Original
+                # If we have a grouping_variable we need to combine it with the
+                # MetaboliteID before merging
+                ResList[[paste0(
+                    Comp[[comp]]$from,
+                    "-to-",
+                    Comp[[comp]]$to,
+                    "_Long",
+                    sep = ""
+                )]] <- 
+                    ResList[[paste0(
+                        Comp[[comp]]$from,
+                        "-to-",
+                        Comp[[comp]]$to,
+                        sep = ""
+                    )]] %>%
+                    unnest(
+                        cols = all_of(Comp[[comp]]$from)
+                    ) %>%
+                    mutate(
+                        !!sym(
+                            paste0(
+                                "AcrossGroupMappingIssue(",
+                                Comp[[comp]]$from,
+                                "_to_",
+                                Comp[[comp]]$to,
+                                ")",
+                                sep = ""
+                            )
+                        ) := case_when(
+                            !!sym(
+                                paste0(
+                                    Comp[[comp]]$from,
+                                    "_",
+                                    Comp[[comp]]$to,
+                                    "_ambiguity_bygroup",
+                                    sep = ""
+                                )
+                            ) != !!sym(
+                                paste0(
+                                    Comp[[comp]]$from,
+                                    "_",
+                                    Comp[[comp]]$to,
+                                    "_ambiguity",
+                                    sep = ""
+                                )
+                            ) ~ "TRUE",
+                            TRUE ~ "FALSE"
+                        )
+                    ) %>%
+                    group_by(
+                        !!sym(Comp[[comp]]$from),
+                        !!sym(grouping_variable)
+                    ) %>%
+                    mutate(
+                        !!sym(
+                            Comp[[comp]]$to
+                        ) := ifelse(
+                            !!sym(Comp[[comp]]$from) == 0,
+                            NA, # Or another placeholder
+                            paste(
+                                unique(!!sym(Comp[[comp]]$to)), 
+                                collapse = ", "
+                            )
+                        )
+                    ) %>%
+                    mutate(
+                        !!sym(
+                            paste0(
+                                "Count(",
+                                Comp[[comp]]$from,
+                                "_to_",
+                                Comp[[comp]]$to,
+                                ")"
+                            )
+                        ) := ifelse(
+                            all(!!sym(Comp[[comp]]$to) == 0),
+                            0,
+                            n()
+                        )
+                    ) %>%
+                    ungroup() %>%
           distinct() %>%
-          unite(!!sym(paste0(Comp[[comp]]$from, "_to_", Comp[[comp]]$to)), c(Comp[[comp]]$from, Comp[[comp]]$to), sep=" --> ", remove=FALSE)%>%
-          separate_rows(!!sym(Comp[[comp]]$to), sep = ", ") %>%
-          unite(UniqueID, c(from, to, grouping_variable), sep="_", remove=FALSE)%>%
+                    unite(
+                        !!sym(
+                            paste0(
+                                Comp[[comp]]$from,
+                                "_to_",
+                                Comp[[comp]]$to
+                            )
+                        ),
+                        c(Comp[[comp]]$from,
+                        Comp[[comp]]$to),
+                        sep = " --> ",
+                        remove = FALSE
+                    ) %>%
+                    separate_rows(
+                        !!sym(Comp[[comp]]$to), 
+                        sep = ", "
+                    ) %>%
+                    unite(
+                        UniqueID,
+                        c(from, to, grouping_variable),
+                        sep = "_",
+                        remove = FALSE
+                    ) %>%
           distinct()
-        }else{
-          ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to, "_Long", sep="")]] <- ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]%>%
-            unnest(cols = all_of(Comp[[comp]]$from))%>%
-            group_by(!!sym(Comp[[comp]]$from))%>%
-            mutate(!!sym(Comp[[comp]]$to) := ifelse(!!sym(Comp[[comp]]$from) == 0, NA,  # Or another placeholder
-                                                    paste(unique(!!sym(Comp[[comp]]$to)), collapse = ", ")
-            )) %>%
-            mutate( !!sym(paste0("Count(", Comp[[comp]]$from, "_to_", Comp[[comp]]$to, ")")) := ifelse(all(!!sym(Comp[[comp]]$to) == 0), 0, n()))%>%
-            ungroup()%>%
+            } else {
+                ResList[[paste0(
+                    Comp[[comp]]$from,
+                    "-to-",
+                    Comp[[comp]]$to,
+                    "_Long",
+                    sep = ""
+                )]] <- 
+                    ResList[[paste0(
+                        Comp[[comp]]$from,
+                        "-to-",
+                        Comp[[comp]]$to,
+                        sep = ""
+                    )]] %>%
+                    unnest(
+                        cols = all_of(Comp[[comp]]$from)
+                    ) %>%
+                    group_by(
+                        !!sym(Comp[[comp]]$from)
+                    ) %>%
+                    mutate(
+                        !!sym(
+                            Comp[[comp]]$to
+                        ) := ifelse(
+                            !!sym(Comp[[comp]]$from) == 0,
+                            NA, # Or another placeholder
+                            paste(
+                                unique(!!sym(Comp[[comp]]$to)), 
+                                collapse = ", "
+                            )
+                        )
+                    ) %>%
+                    mutate(
+                        !!sym(
+                            paste0(
+                                "Count(",
+                                Comp[[comp]]$from,
+                                "_to_",
+                                Comp[[comp]]$to,
+                                ")"
+                            )
+                        ) := ifelse(
+                            all(!!sym(Comp[[comp]]$to) == 0),
+                            0,
+                            n()
+                        )
+                    ) %>%
+                    ungroup() %>%
             distinct() %>%
-            unite(!!sym(paste0(Comp[[comp]]$from, "_to_", Comp[[comp]]$to)), c(Comp[[comp]]$from, Comp[[comp]]$to), sep=" --> ", remove=FALSE)%>%
-            separate_rows(!!sym(Comp[[comp]]$to), sep = ", ") %>%
-            unite(UniqueID, c(from, to), sep="_", remove=FALSE)%>%
-            distinct()%>%
-            mutate(!!sym(paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep="")) := NA)
+                    unite(
+                        !!sym(
+                            paste0(
+                                Comp[[comp]]$from,
+                                "_to_",
+                                Comp[[comp]]$to
+                            )
+                        ),
+                        c(
+                            Comp[[comp]]$from,
+                            Comp[[comp]]$to
+                        ),
+                        sep = " --> ",
+                        remove = FALSE
+                    ) %>%
+                    separate_rows(
+                        !!sym(Comp[[comp]]$to), sep = ", "
+                    ) %>%
+                    unite(
+                        UniqueID, 
+                        c(from, to), 
+                        sep = "_", 
+                        remove = FALSE
+                    ) %>%
+                    distinct() %>%
+                    mutate(
+                        !!sym(
+                            paste0(
+                                "AcrossGroupMappingIssue(",
+                                from,
+                                "_to_",
+                                to,
+                                ")",
+                                sep = ""
+                            )
+                        ) := NA
+                    )
         }
     }
 
     # Add NA metabolite maps back if they do exist:
-    Removed <- data %>%
-      unnest(cols = all_of(Comp[[comp]]$from))%>% # unlist the columns in case they are not expaned
-      filter(is.na(!!sym(Comp[[comp]]$from)))
-    if(nrow(Removed)>0){
-      ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]] <- bind_rows(ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]],
-                                                                                         test<- Removed%>%
-                                                                                            bind_cols(setNames(as.list(rep(NA, length(setdiff(names(ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]), names(Removed))))),
-                                                                                                               setdiff(names(ResList[[paste0(Comp[[comp]]$from, "-to-", Comp[[comp]]$to , sep="")]]), names(Removed))))
+        Removed <- 
+            data %>%
+            unnest(   # unlist the columns in case they are not expaned
+               cols = all_of(Comp[[comp]]$from)
+            ) %>%
+            filter(
+                is.na(!!sym(Comp[[comp]]$from))
+            )
+        if (nrow(Removed) > 0) {
+            ResList[[paste0(
+                Comp[[comp]]$from,
+                "-to-",
+                Comp[[comp]]$to,
+                sep = ""
+            )]] <- 
+                bind_rows(
+                ResList[[paste0(
+                    Comp[[comp]]$from,
+                    "-to-",
+                    Comp[[comp]]$to,
+                    sep = ""
+                )]],
+                test <- 
+                    Removed %>%
+                    bind_cols(
+                        setNames(
+                            as.list(
+                                rep(
+                                    NA,
+                                    length(
+                                        setdiff(
+                                            names(
+                                                ResList[[paste0(
+                                                    Comp[[comp]]$from,
+                                                    "-to-",
+                                                    Comp[[comp]]$to,
+                                                    sep = ""
+                                                )]]
+                                            ),
+                                            names(Removed)
+                                        )
+                                    )
+                                )
+                            ),
+                            setdiff(
+                                names(
+                                    ResList[[paste0(
+                                        Comp[[comp]]$from,
+                                        "-to-",
+                                        Comp[[comp]]$to,
+                                        sep = ""
+                                    )]]
+                                ),
+                                names(Removed)
+                            )
+                        )
+                    )
       )
     }
   }
 
   ## ------------------ Create summaryTable ------------------- ##
-  if(summary==TRUE){
+    if (summary == TRUE) {
     # Combine the two tables
-    summary <- merge(x= ResList[[paste0(from, "-to-", to, "_Long", sep="")]][,c("UniqueID", paste0(from, "_to_", to), paste0("Count(", from, "_to_", to, ")"), paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep=""))],
-                     y= ResList[[paste0(to, "-to-", from, "_Long", sep="")]][,c("UniqueID", paste0(to, "_to_", from), paste0("Count(", to, "_to_", from, ")"), paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep=""))],
+        summary <- 
+            merge(
+                x = ResList[[
+                    paste0(
+                        from, "-to-", to, "_Long", 
+                        sep = ""
+                    )]][,
+                        c(
+                            "UniqueID", 
+                            paste0(from, "_to_", to),
+                            paste0("Count(", from, "_to_", to, ")"),
+                            paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep = "")
+                        )
+                    ],
+                y = ResList[[
+                    paste0(
+                        to, "-to-", from, "_Long", 
+                        sep = ""
+                    )]][,
+                        c(
+                            "UniqueID", 
+                            paste0(to, "_to_", from), 
+                            paste0("Count(", to, "_to_", from, ")"),
+                            paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep = "")
+                        )
+                ],
                      by = "UniqueID",
-                     all = TRUE)%>%
-      separate(UniqueID, into = c(from, to, grouping_variable), sep="_", remove=FALSE)%>%
+                all = TRUE
+            ) %>%
+            separate(
+                UniqueID,
+                into = c(from, to, grouping_variable),
+                sep = "_",
+                remove = FALSE
+            ) %>%
       distinct()
 
     # Add relevant mapping information
     summary <- summary %>%
-      mutate(Mapping = case_when(
-        !!sym(paste0("Count(", from, "_to_", to, ")")) == 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1  ~ "one-to-one",
-        !!sym(paste0("Count(", from, "_to_", to, ")")) > 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1  ~ "one-to-many",
-        !!sym(paste0("Count(", from, "_to_", to, ")")) > 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) > 1  ~ "many-to-many",
-        !!sym(paste0("Count(", from, "_to_", to, ")")) == 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) > 1  ~ "many-to-one",
-        !!sym(paste0("Count(", from, "_to_", to, ")")) >= 1 & !!sym(paste0("Count(", to, "_to_", from, ")")) == NA  ~ "one-to-none",
-        !!sym(paste0("Count(", from, "_to_", to, ")")) >= 1 & is.na(!!sym(paste0("Count(", to, "_to_", from, ")")))  ~ "one-to-none",
-        !!sym(paste0("Count(", from, "_to_", to, ")")) == NA & !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1  ~ "none-to-one",
-        is.na(!!sym(paste0("Count(", from, "_to_", to, ")"))) & !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1  ~ "none-to-one",
-        TRUE ~ NA )) %>%
-      mutate( !!sym(paste0("Count(", from, "_to_", to, ")")) := replace_na( !!sym(paste0("Count(", from, "_to_", to, ")")), 0)) %>%
-      mutate( !!sym(paste0("Count(", to, "_to_", from, ")")) := replace_na( !!sym(paste0("Count(", to, "_to_", from, ")")), 0))
+            mutate(
+                Mapping = case_when(
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) == 1   &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == 1   ~ "one-to-one",
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) > 1    &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == 1   ~ "one-to-many", 
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) > 1    &   !!sym( paste0("Count(", to, "_to_", from, ")") ) > 1    ~ "many-to-many",
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) == 1   &   !!sym( paste0("Count(", to, "_to_", from, ")") ) > 1    ~ "many-to-one",
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) >= 1   &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == NA  ~ "one-to-none",
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) >= 1   &   is.na( !!sym(paste0("Count(", to, "_to_", from, ")")))  ~ "one-to-none",
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) == NA  &   !!sym( paste0("Count(", to, "_to_", from, ")") ) >= 1   ~ "none-to-one",
+                    is.na( !!sym(paste0("Count(", from, "_to_", to, ")")) ) &   !!sym( paste0("Count(", to, "_to_", from, ")") ) >= 1   ~ "none-to-one",
+                    TRUE ~ NA
+                )) %>%
+                mutate(
+                    !!sym(
+                        paste0("Count(", from, "_to_", to, ")")
+                    ) := replace_na(
+                        !!sym(
+                            paste0("Count(", from, "_to_", to, ")")
+                        ),
+                        0
+                    )
+                ) %>%
+                mutate(
+                    !!sym(
+                        paste0("Count(", to, "_to_", from, ")")
+                    ) := replace_na(
+                        !!sym(
+                            paste0("Count(", to, "_to_", from, ")")
+                        ),
+                        0
+                    )
+                )
 
     ResList[["summary"]] <- summary
   }
 
   ## ------------------ Save the results ------------------- ##
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=ResList,
-                         inputlist_plot= NULL,
-                         save_table=save_table,
-                         save_plot=NULL,
-                         path= Subfolder,
-                         file_name= "mapping_ambiguity",
-                         core=FALSE,
-                         print_plot=FALSE)))
+    suppressMessages(
+            suppressWarnings(
+                save_res(
+                    inputlist_df = ResList,
+                    inputlist_plot = NULL,
+                    save_table = save_table,
+                    save_plot = NULL,
+                    path = Subfolder,
+                    file_name = "mapping_ambiguity",
+                    core = FALSE,
+                    print_plot = FALSE
+                )
+            )
+        )
 
-  #Return
-  invisible(return(ResList))
+    # Return
+    invisible(
+        return(ResList)
+    )
 }
 
 ##########################################################################################
