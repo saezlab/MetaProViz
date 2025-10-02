@@ -1403,7 +1403,7 @@ mapping_ambiguity <-
 #' \item \code{data_summary} — a data frame summarising matching results per
 #' input ID, including counts, conflicts, and recommended actions.
 #' \item \code{GroupingVariable_summary} — a detailed data frame showing
-# matches
+#' matches
 #' grouped by the specified variable, with conflict annotations.
 #' \item \code{data_long} — a merged data frame of prior knowledge IDs and
 #' detected IDs in long format.
