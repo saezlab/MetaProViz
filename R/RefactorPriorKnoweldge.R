@@ -2307,78 +2307,160 @@ cluster_pk <-
 
 #' Adds extra columns to enrichment output
 #'
-#' These columns inform about 1. The amount of genes associated with term in prior knowledge, 2. The amount of genes detected in input data associated with term in prior knowledge, and 3. The percentage of genes detected in input data associated with term in prior knowledge.
+#' These columns inform about 1. The amount of genes associated with term in
+#' prior knowledge, 2. The amount of genes detected in input data associated
+#' with term in prior knowledge, and 3. The percentage of genes detected in
+#' input data associated with term in prior knowledge.
 #'
 #' @param mat data matrix used as input for enrichment analysis
 #' @param net Prior Knowledge used as input for enrichment analysis
 #' @param res Results returned from the enrichment analysis
 #' @param .source used as input for enrichment analysis
 #' @param .target used as input for enrichment analysis
-#' @param complete TRUE or FALSE, weather only .source with results should be returned or all .source in net.
+#' @param complete TRUE or FALSE, weather only .source with results should be
+#' returned or all .source in net.
 #'
 #' @importFrom tibble rownames_to_column
 #' @noRd
-add_info <- function(mat,
+add_info <- 
+    function(
+        mat,
                     net,
                     res,
                     .source,
                     .target,
-                    complete=FALSE){
-
+        complete = FALSE
+    ) {
   ## ------------------ Check Input ------------------- ##
-
 
   ## ------------------ Create output folders and path ------------------- ##
 
-
-  ## ------------------ Add information to enrichment results ------------------- ##
+    ## ------------------ Add information to enrichment results
 
   # add number of Genes_targeted_by_TF_num
   net$Count <- 1
-  net_Mean <- aggregate(net$Count, by=list(source=net[[.source]]), FUN=sum)%>%
+    net_Mean <- 
+        aggregate(
+            net$Count,
+            by = list(source = net[[.source]]),
+            FUN = sum
+        ) %>%
     rename("targets_num" = 2)
 
-  if(complete==TRUE){
-    res_Add<- merge(x= res, y=net_Mean, by="source", all=TRUE)
-  }else{
-    res_Add<- merge(x= res, y=net_Mean, by="source", all.x =TRUE)
+    if (complete == TRUE) {
+        res_Add <- 
+            merge(
+                x = res, 
+                y = net_Mean, 
+                by = "source", 
+                all = TRUE
+            )
+    } else {
+        res_Add <- 
+            merge(
+                x = res, 
+                y = net_Mean, 
+                by = "source", 
+                all.x = TRUE
+            )
   }
 
   # add list of Genes_targeted_by_TF_chr
-  net_List <- aggregate(net[[.target]]~net[[.source]], FUN=toString)%>%
-    rename("source" = 1,
-           "targets_chr"=2)
-  res_Add<- merge(x= res_Add, y=net_List, by="source", all.x=TRUE)
+    net_List <- 
+        aggregate(
+            net[[.target]] ~ net[[.source]], FUN = toString
+        ) %>%
+            rename(
+                "source" = 1,
+                "targets_chr" = 2
+            )
+    res_Add <- 
+        merge(
+            x = res_Add, 
+            y = net_List, 
+            by = "source", 
+            all.x = TRUE
+        )
 
   # add number of Genes_targeted_by_TF_detected_num
-  mat <- as.data.frame(mat)%>% #Are these the normalised counts?
+    mat <- 
+        as.data.frame(mat) %>%   # Are these the normalised counts?
     rownames_to_column("Symbol")
 
-  Detected <- merge(x= mat , y=net[,c(.source, .target)], by.x="Symbol", by.y=.target, all.x=TRUE)%>%
-    filter(!is.na(across(all_of(.source))))
-  Detected$Count <-1
-  Detected_Mean <- aggregate(Detected$Count, by=list(source=Detected[[.source]]), FUN=sum)%>%
+    Detected <- 
+        merge(
+            x = mat,
+            y = net[, c(.source, .target)],
+            by.x = "Symbol",
+            by.y = .target,
+            all.x = TRUE
+        ) %>%
+            filter(
+                !is.na(
+                    across(
+                        all_of(.source)
+                    )
+                )
+            )
+    Detected$Count <- 1
+    Detected_Mean <- 
+        aggregate(
+            Detected$Count,
+            by = list(source = Detected[[.source]]),
+            FUN = sum
+        ) %>%
     rename("targets_detected_num" = 2)
 
-  res_Add<- merge(x= res_Add, y=Detected_Mean, by="source", all.x=TRUE)%>%
-    mutate(targets_detected_num = replace_na(targets_detected_num, 0))
+    res_Add <- 
+        merge(
+            x = res_Add,
+            y = Detected_Mean,
+            by = "source",
+            all.x = TRUE
+        ) %>%
+            mutate(
+                targets_detected_num = replace_na(targets_detected_num, 0)
+            )
 
   # add list of Genes_targeted_by_TF_detected_chr
-  Detected_List <- aggregate(Detected$Symbol~Detected[[.source]], FUN=toString)%>%
-    rename("source"=1,
-           "targets_detected_chr" = 2)
+    Detected_List <- 
+        aggregate(
+            Detected$Symbol ~ Detected[[.source]],
+            FUN = toString
+        ) %>%
+            rename(
+                "source" = 1,
+                "targets_detected_chr" = 2
+            )
 
-  res_Add<- merge(x= res_Add, y=Detected_List, by="source", all.x=TRUE)
+    res_Add <- 
+        merge(
+            x = res_Add,
+            y = Detected_List,
+            by = "source",
+            all.x = TRUE
+        )
 
-  #add percentage of percentage_of_Genes_detected
-  res_Add$targets_detected_percentage <-round(((res_Add$targets_detected_num/res_Add$targets_num)*100),digits=2)
+    # add percentage of percentage_of_Genes_detected
+    res_Add$targets_detected_percentage <-
+        round(
+            ((res_Add$targets_detected_num / res_Add$targets_num) * 100),
+            digits = 2
+        )
 
-  #sort by score
-  res_Add<-res_Add%>%
-    arrange(desc(as.numeric(as.character(score))))
+    # sort by score
+    res_Add <- 
+        res_Add %>%
+            arrange(
+                desc(
+                    as.numeric(
+                        as.character(score)
+                    )
+                )
+            )
 
   ## ------------------ Save and return ------------------- ##
-  Output<-res_Add
+    Output <- res_Add
 }
 
 
