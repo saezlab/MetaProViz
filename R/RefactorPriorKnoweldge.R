@@ -1456,8 +1456,7 @@ checkmatch_pk_to_data <-
                     "The ",
                     metadata_info[["InputID"]],
                     " column selected as InpuID in metadata_info was not found in",
-                    "data."
-                    "Please check your input."
+                    "data. Please check your input."
                 )
             log_trace(
                 paste("Error ", message, sep = "")
