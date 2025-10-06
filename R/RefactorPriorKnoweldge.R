@@ -2927,9 +2927,8 @@ compare_pk <-
 
 
 ################################################################################
-### ### ### Helper function to count number of entries for an ID column value
-### and plot ### ### ###
-################################################################################
+### ### Helper function to count number of entries for an ID column value    ###
+### ### and plot                                                             ### 
 
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
