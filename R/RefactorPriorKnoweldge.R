@@ -1455,7 +1455,7 @@ checkmatch_pk_to_data <-
                 paste0(
                     "The ",
                     metadata_info[["InputID"]],
-                    " column selected as InpuID in metadata_info was not found in",
+                    " column selected as InpuID in metadata_info was not found in ",
                     "data. Please check your input."
                 )
             log_trace(
@@ -1549,7 +1549,7 @@ checkmatch_pk_to_data <-
                 paste0(
                     "The ",
                     metadata_info[["PriorID"]],
-                    " column selected as InpuID in metadata_info was not found in",
+                    " column selected as InpuID in metadata_info was not found in ",
                     "input_pk. Please check your input."
                 )
             log_trace(
@@ -1602,7 +1602,7 @@ checkmatch_pk_to_data <-
                 paste0(
                     "The ",
                     metadata_info[["grouping_variable"]],
-                    " column selected as InpuID in metadata_info was not found in",
+                    " column selected as InpuID in metadata_info was not found in ",
                     "input_pk. Please check your input."
                 )
             log_trace(
