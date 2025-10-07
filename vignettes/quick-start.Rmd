@@ -1,5 +1,5 @@
 ---
-title: "Quick Overview"
+title: "Getting started with MetaProViz"
 author:
   - name: Christina Schmidt
     affiliation:
@@ -183,7 +183,7 @@ In case you have performed a Consumption-Release (core) metabolomics experiment,
 For details see extensive vignette [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html).
 
 ## PCA plot and Heatmap
-Using the processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `viz_heatmap()` or PCA plots `viz_pca()`. 
+Using the processed data, we can now use the **MetaProViz** visualization module and generate some overview Heatmaps `viz_heatmap()` or PCA plots `viz_pca()`.
 1. PCA\
 Principal component analysis (PCA) is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
 We can interactively choose shape and color using the additional information of interest from our Metadata. Especially for complex data, such as patient data, it can be valuable to use different demographics (e.g. age, gender, medication,...) for this.\
@@ -275,7 +275,7 @@ DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
-In case you have performed a Consumption-Release (core) metabolomics experiment, which usually refers to a cell culture experiment where metabolomics is performed on the cell culture media, you will also need to set the parameter `core=TRUE` in the `dma()` function. In a core experiment the normalized metabolite values can be either a negative value, if the metabolite has been consumed from the media, or a positive value, if the metabolite has been released from the cell into the culture media. Since we can not calculate a Log2FC using negative values, we calculate the absolute difference between the mean of Condition 1 versus the mean of Condition 2. The absolute difference is log2 transformed in order to make the values comparable between the different metabolites, resulting in the Log2Dist. The result doesn’t consider whether one product is larger than the other; it only looks at the magnitude of their difference. to reflect the direction of change between the two conditions we multiply with -1 if C1 < C2. By setting the paramteter core = TRUE, instead of calclulating the Log2FC, the Log2 Distance is calculated. 
+In case you have performed a Consumption-Release (core) metabolomics experiment, which usually refers to a cell culture experiment where metabolomics is performed on the cell culture media, you will also need to set the parameter `core=TRUE` in the `dma()` function. In a core experiment the normalized metabolite values can be either a negative value, if the metabolite has been consumed from the media, or a positive value, if the metabolite has been released from the cell into the culture media. Since we can not calculate a Log2FC using negative values, we calculate the absolute difference between the mean of Condition 1 versus the mean of Condition 2. The absolute difference is log2 transformed in order to make the values comparable between the different metabolites, resulting in the Log2Dist. The result doesn’t consider whether one product is larger than the other; it only looks at the magnitude of their difference. to reflect the direction of change between the two conditions we multiply with -1 if C1 < C2. By setting the paramteter core = TRUE, instead of calclulating the Log2FC, the Log2 Distance is calculated.
 For details see extensive vignette [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#dma).
 
 ## Volcano Plots
@@ -302,10 +302,10 @@ For detailed exaples check out `3. Run MetaProViz Visualisation` in the vignette
 
 Over Representation Analysis (ORA) is a enrichment method that determines if a set of features (i.e. metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values. Before we can perform ORA on the dma results, we have to ensure that the metabolite names match with the metabolite IDs of the prior knowledge (PK). \
 
-## Match IDs with PK 
+## Match IDs with PK
 As part of the **MetaProViz** package you can access metabolite prior knowledge with the collection of metabolite sets MetSigDB (Metabolite signature database) for pathway enrichment analysis, compound class enrichment analysis, and by using specific PK databases, it can be used to study the connection of metabolites and receptors or transporters. In metabolite PK, the many different PK databases and resources pose issues like metabolite identifiers (e.g. KEGG, HMDB, PubChem, etc.) are not standardized across databases, and the same metabolite can have multiple identifiers in different databases. This is known as the many-to-many mapping problem. If you want to know more on how to translate ids, quantify the mapping of your data to the prior knwoeldge resource, increase the mapping, etc. have a look at our dedicated vignette, [Prior Knowledge Access & Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html).\
 \
-Here we will use the KEGG pathways [@Kanehisa2000], hence we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names. 
+Here we will use the KEGG pathways [@Kanehisa2000], hence we have to ensure that the metabolite names match with the KEGG IDs or KEGG trivial names.
 ```{r}
 #--------Add metabolite IDs to our example data:
 # 1. Load Feature metainformation of our example data
