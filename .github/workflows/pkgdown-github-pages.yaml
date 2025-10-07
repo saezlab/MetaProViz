@@ -6,15 +6,15 @@ on:
   schedule:
     - cron: '0 4 * * *'
 
-name: Build_gh-pages.yml #shown when action is run
+name: 'GitHub Pages pkgdown site build'
 
 jobs:
 
-  pkgdown:
+  build-deploy:
 
     runs-on: ubuntu-latest
     container:
-      image: rocker/r-ubuntu:latest
+      image: bioconductor/bioconductor_docker:devel
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,7 +22,7 @@ jobs:
 
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'schedule' && github.ref == 'refs/heads/development')
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/devel')
 
     steps: #Series of steps that is executed sequencially: https://github.com/r-lib/actions/
       - name: Install system dependencies
@@ -55,7 +55,7 @@ jobs:
           Rscript -e "remotes::install_github('saezlab/OmnipathR@devel')"
 
       - name: Install MetaProViz from GitHub by remotes
-        run: Rscript -e 'remotes::install_github("saezlab/MetaProViz")' #we install from GitHub as if we are a random user
+        run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
 
       - name: Build pkgdown site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
