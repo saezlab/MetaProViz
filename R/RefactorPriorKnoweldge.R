@@ -60,7 +60,7 @@
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower
 #' @export
-translate_id <- 
+translate_id <-
     function(
         data,
         metadata_info = c(
@@ -89,7 +89,7 @@ translate_id <-
   # Specific checks:
     if ("InputID" %in% names(metadata_info)) {
         if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     "The ",
                     metadata_info[["InputID"]],
@@ -104,7 +104,7 @@ translate_id <-
 
     if ("grouping_variable" %in% names(metadata_info)) {
         if (metadata_info[["grouping_variable"]] %in% colnames(data) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     "The ",
                     metadata_info[["grouping_variable"]],
@@ -118,7 +118,7 @@ translate_id <-
   }
 
     if (is.logical(summary) == FALSE) {
-        message <- 
+        message <-
             paste0(
                 "Check input. The summary parameter should be either =TRUE or ",
                 "=FALSE."
@@ -127,7 +127,7 @@ translate_id <-
     stop(message)
   }
 
-    unknown_types <- 
+    unknown_types <-
         id_types() %>%
         select(
             starts_with("in_")
@@ -140,7 +140,7 @@ translate_id <-
         )
 
   if (length(unknown_types) > 0L) {
-        msg <- 
+        msg <-
             sprintf(
                 "The following ID types are not recognized: %s",
                 paste(unknown_types, collapse = ", ")
@@ -170,7 +170,7 @@ translate_id <-
     summarize()
 
     if (nrow(doublons) > 0) {
-        message <- 
+        message <-
             sprintf(
                 "The following IDs are duplicated within one group: %s",
                 paste(
@@ -184,7 +184,7 @@ translate_id <-
 
   ## ------------------  Create output folders and path ------------------- ##
     if (is.null(save_table) == FALSE) {
-        folder <- 
+        folder <-
             save_path(
                 folder_name = "PK",
                 path = path
@@ -198,7 +198,7 @@ translate_id <-
 
     ############################################################################
   ## ------------------ Translate to-from for each pair ------------------- ##
-    TranslatedDF <- 
+    TranslatedDF <-
         translate_ids(
       data,
             !!sym(metadata_info[["InputID"]]) := !!sym(from),
@@ -218,7 +218,7 @@ translate_id <-
 
     ## Create DF for TranslatedIDs only with the original data and the
     ## translatedID columns
-    DF_subset <- 
+    DF_subset <-
         TranslatedDF %>%
         select(
             all_of(intersect(names(.), names(data))), all_of(to)
@@ -243,7 +243,7 @@ translate_id <-
     distinct() %>%
         mutate(
             across(
-                all_of(to), 
+                all_of(to),
                 ~ ifelse(. == "0", NA, .)
             )
         )
@@ -255,8 +255,8 @@ translate_id <-
 
   ## Also save the different mapping summaries!
     for (item in to) {
-        summaryDF <- 
-            TranslatedDF %>% 
+        summaryDF <-
+            TranslatedDF %>%
                 attr(
                     paste0(
                         "ambiguity_",
@@ -272,7 +272,7 @@ translate_id <-
   ## Create the long DF summary if summary =TRUE
     if (summary == TRUE) {
         for (item in to) {
-            summary <- 
+            summary <-
                 mapping_ambiguity(
                     data = TranslatedDF,
                     from = metadata_info[["InputID"]],
@@ -314,7 +314,7 @@ translate_id <-
   #   metadata_info <- list(translated = to)
   #   print(pk_list)
   #   print(to)
-    #   pk_comp_res <- 
+    #   pk_comp_res <-
     #       MetaProViz:::compare_pk(
     #           data = pk_list,
     #           metadata_info = metadata_info,
@@ -363,14 +363,14 @@ translate_id <-
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across
 #' rowwise if_else
 #' @importFrom tidyr separate_rows unnest
-#' @importFrom purrr map_chr map_lgl map_int 
+#' @importFrom purrr map_chr map_lgl map_int
 #' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
 #' @importFrom OmnipathR id_types translate_ids
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
 #' @export
-equivalent_id <- 
+equivalent_id <-
     function(
         data,
         metadata_info = c(InputID = "MetaboliteID"),
@@ -416,7 +416,7 @@ equivalent_id <-
   # Specific checks:
     if ("InputID" %in% names(metadata_info)) {
         if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     "The ",
                     metadata_info[["InputID"]],
@@ -431,7 +431,7 @@ equivalent_id <-
     }
   }
 
-    unknown_types <- 
+    unknown_types <-
         id_types() %>%
         select(
             starts_with("in_")
@@ -442,7 +442,7 @@ equivalent_id <-
     setdiff(from, .)
 
   if (length(unknown_types) > 0L) {
-        msg <- 
+        msg <-
             sprintf(
                 "The following ID types are not recognized: %s",
                 paste(unknown_types, collapse = ", ")
@@ -457,14 +457,14 @@ equivalent_id <-
     doublons <- data[duplicated(data[[metadata_info[["InputID"]]]]), ]
 
     if (nrow(doublons) > 0) {
-        data <- 
+        data <-
             data %>%
             distinct(
-                !!sym(metadata_info[["InputID"]]), 
+                !!sym(metadata_info[["InputID"]]),
                 .keep_all = TRUE
             )
 
-        message <- 
+        message <-
             sprintf(
                 "The following IDs are duplicated and removed: %s",
                 paste(
@@ -478,7 +478,7 @@ equivalent_id <-
 
   ## ------------------  Create output folders and path ------------------- ##
     if (is.null(save_table) == FALSE) {
-        folder <- 
+        folder <-
             save_path(
                 folder_name = "PK",
                 path = path
@@ -491,7 +491,7 @@ equivalent_id <-
   }
 
   ## ------------------ Set the ID type for to ----------------- ##
-    to <- 
+    to <-
         case_when(
             from == "chebi" ~ "pubchem",
             # If to is "pubchem", choose "chebi"
@@ -499,7 +499,7 @@ equivalent_id <-
             # For other cases, don't use a secondary column
   )
 
-    message <- 
+    message <-
         paste0(
             to,
             " is used to find additional potential IDs for ",
@@ -512,13 +512,13 @@ equivalent_id <-
 
   ## ------------------ Load manual table ----------------- ##
     if ((from == "kegg") == FALSE) {
-        EquivalentFeatures <- 
+        EquivalentFeatures <-
             equivalent_features %>%
       select(from)
   }
 
   ## ------------------ Translate from-to-to ------------------- ##
-    TranslatedDF <- 
+    TranslatedDF <-
         translate_ids(
     data,
             !!sym(metadata_info[["InputID"]]) := !!sym(from),
@@ -552,7 +552,7 @@ equivalent_id <-
 
 
   ## ------------------ Translate to-to-from ------------------- ##
-    TranslatedDF_Long <- 
+    TranslatedDF_Long <-
         TranslatedDF %>%
             select(
                 !!sym(metadata_info[["InputID"]]), !!sym(to)
@@ -571,7 +571,7 @@ equivalent_id <-
             )
             # Remove empty entries
 
-    OtherIDs <- 
+    OtherIDs <-
         translate_ids(
             TranslatedDF_Long,
     !!sym(to),
@@ -631,7 +631,7 @@ equivalent_id <-
         )
 
   ## ------------------ Merge to Input ------------------- ##
-    OtherIDs <- 
+    OtherIDs <-
         merge(
             data,
             OtherIDs,
@@ -644,13 +644,13 @@ equivalent_id <-
 
   if (exists("EquivalentFeatures")) {
    EquivalentFeatures$AllIDs <- EquivalentFeatures[[from]]
-        EquivalentFeatures_Long <- 
+        EquivalentFeatures_Long <-
             EquivalentFeatures %>%
                 separate_rows(
                     !!sym(from), sep = ","
                 )
 
-        OtherIDs <- 
+        OtherIDs <-
             merge(
                 OtherIDs,
                 EquivalentFeatures_Long,
@@ -703,13 +703,13 @@ equivalent_id <-
       ) %>%
             ungroup() %>%
             select(
-                -AllIDs.x, 
+                -AllIDs.x,
                 -AllIDs.y
             )
   }
 
     ## ------------------- Fill empty cells -------------- ##
-    OtherIDs <- 
+    OtherIDs <-
         OtherIDs %>%
             mutate(
                 PotentialAdditionalIDs = ifelse(
@@ -728,7 +728,7 @@ equivalent_id <-
 
   ## ------------------ Create count_id plot ------------------- ##
     # QC plot of before and after
-    Before <- 
+    Before <-
         MetaProViz:::count_id(
             data = data,
             column = metadata_info[["InputID"]],
@@ -738,7 +738,7 @@ equivalent_id <-
             path = NULL
         )
 
-    After <- 
+    After <-
         MetaProViz:::count_id(
             data = OtherIDs,
             column = "AllIDs",
@@ -824,9 +824,9 @@ equivalent_id <-
 #' @importFrom tidyr unnest
 #' @importFrom purrr map_chr map_int map_lgl
 #' @importFrom dplyr first
-#' 
+#'
 #' @export
-mapping_ambiguity <- 
+mapping_ambiguity <-
     function(
         data,
                              from,
@@ -836,7 +836,7 @@ mapping_ambiguity <-
         save_table = "csv",
         path = NULL
 ) {
-            
+
   metaproviz_init()
   ## ------------------  Check Input ------------------- ##
   # HelperFunction `check_param`
@@ -848,7 +848,7 @@ mapping_ambiguity <-
 
   # Specific checks:
     if (from %in% colnames(data) == FALSE) {
-        message <- 
+        message <-
             paste0(
                 from,
                 " column was not found in data. Please check your input."
@@ -862,7 +862,7 @@ mapping_ambiguity <-
       }
 
     if (to %in% colnames(data) == FALSE) {
-        message <- 
+        message <-
             paste0(
                 to,
                 " column was not found in data. Please check your input."
@@ -877,7 +877,7 @@ mapping_ambiguity <-
 
     if (is.null(grouping_variable) == FALSE) {
         if (grouping_variable %in% colnames(data) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     grouping_variable,
                     " column was not found in data. Please check your input."
@@ -892,7 +892,7 @@ mapping_ambiguity <-
   }
 
     if (is.logical(summary) == FALSE) {
-        message <- 
+        message <-
             paste0(
                 "Check input. The summary parameter should be either =TRUE or ",
                 "=FALSE."
@@ -920,7 +920,7 @@ mapping_ambiguity <-
 
   ## ------------------  Create output folders and path ------------------- ##
     if (is.null(save_table) == FALSE) {
-        folder <- 
+        folder <-
             save_path(
                 folder_name = "PK",
                 path = path
@@ -939,7 +939,7 @@ mapping_ambiguity <-
     # If the to column is not a list of IDs, but a character column, we need to
     # convert it into a list of IDs
     if (is.character(data[[to]]) == TRUE) {
-        data[[to]] <- 
+        data[[to]] <-
             data[[to]] %>%
             strsplit(", ") %>%
       lapply(as.character)
@@ -1023,7 +1023,7 @@ mapping_ambiguity <-
                     Comp[[comp]]$to,
                     "_Long",
                     sep = ""
-                )]] <- 
+                )]] <-
                     ResList[[paste0(
                         Comp[[comp]]$from,
                         "-to-",
@@ -1075,7 +1075,7 @@ mapping_ambiguity <-
                             !!sym(Comp[[comp]]$from) == 0,
                             NA, # Or another placeholder
                             paste(
-                                unique(!!sym(Comp[[comp]]$to)), 
+                                unique(!!sym(Comp[[comp]]$to)),
                                 collapse = ", "
                             )
                         )
@@ -1111,7 +1111,7 @@ mapping_ambiguity <-
                         remove = FALSE
                     ) %>%
                     separate_rows(
-                        !!sym(Comp[[comp]]$to), 
+                        !!sym(Comp[[comp]]$to),
                         sep = ", "
                     ) %>%
                     unite(
@@ -1128,7 +1128,7 @@ mapping_ambiguity <-
                     Comp[[comp]]$to,
                     "_Long",
                     sep = ""
-                )]] <- 
+                )]] <-
                     ResList[[paste0(
                         Comp[[comp]]$from,
                         "-to-",
@@ -1148,7 +1148,7 @@ mapping_ambiguity <-
                             !!sym(Comp[[comp]]$from) == 0,
                             NA, # Or another placeholder
                             paste(
-                                unique(!!sym(Comp[[comp]]$to)), 
+                                unique(!!sym(Comp[[comp]]$to)),
                                 collapse = ", "
                             )
                         )
@@ -1189,9 +1189,9 @@ mapping_ambiguity <-
                         !!sym(Comp[[comp]]$to), sep = ", "
                     ) %>%
                     unite(
-                        UniqueID, 
-                        c(from, to), 
-                        sep = "_", 
+                        UniqueID,
+                        c(from, to),
+                        sep = "_",
                         remove = FALSE
                     ) %>%
                     distinct() %>%
@@ -1211,7 +1211,7 @@ mapping_ambiguity <-
     }
 
     # Add NA metabolite maps back if they do exist:
-        Removed <- 
+        Removed <-
             data %>%
             unnest(   # unlist the columns in case they are not expaned
                cols = all_of(Comp[[comp]]$from)
@@ -1225,7 +1225,7 @@ mapping_ambiguity <-
                 "-to-",
                 Comp[[comp]]$to,
                 sep = ""
-            )]] <- 
+            )]] <-
                 bind_rows(
                 ResList[[paste0(
                     Comp[[comp]]$from,
@@ -1233,7 +1233,7 @@ mapping_ambiguity <-
                     Comp[[comp]]$to,
                     sep = ""
                 )]],
-                test <- 
+                test <-
                     Removed %>%
                     bind_cols(
                         setNames(
@@ -1275,15 +1275,15 @@ mapping_ambiguity <-
   ## ------------------ Create summaryTable ------------------- ##
     if (summary == TRUE) {
     # Combine the two tables
-        summary <- 
+        summary <-
             merge(
                 x = ResList[[
                     paste0(
-                        from, "-to-", to, "_Long", 
+                        from, "-to-", to, "_Long",
                         sep = ""
                     )]][,
                         c(
-                            "UniqueID", 
+                            "UniqueID",
                             paste0(from, "_to_", to),
                             paste0("Count(", from, "_to_", to, ")"),
                             paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep = "")
@@ -1291,12 +1291,12 @@ mapping_ambiguity <-
                     ],
                 y = ResList[[
                     paste0(
-                        to, "-to-", from, "_Long", 
+                        to, "-to-", from, "_Long",
                         sep = ""
                     )]][,
                         c(
-                            "UniqueID", 
-                            paste0(to, "_to_", from), 
+                            "UniqueID",
+                            paste0(to, "_to_", from),
                             paste0("Count(", to, "_to_", from, ")"),
                             paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep = "")
                         )
@@ -1317,7 +1317,7 @@ mapping_ambiguity <-
             mutate(
                 Mapping = case_when(
                     !!sym( paste0("Count(", from, "_to_", to, ")") ) == 1   &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == 1   ~ "one-to-one",
-                    !!sym( paste0("Count(", from, "_to_", to, ")") ) > 1    &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == 1   ~ "one-to-many", 
+                    !!sym( paste0("Count(", from, "_to_", to, ")") ) > 1    &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == 1   ~ "one-to-many",
                     !!sym( paste0("Count(", from, "_to_", to, ")") ) > 1    &   !!sym( paste0("Count(", to, "_to_", from, ")") ) > 1    ~ "many-to-many",
                     !!sym( paste0("Count(", from, "_to_", to, ")") ) == 1   &   !!sym( paste0("Count(", to, "_to_", from, ")") ) > 1    ~ "many-to-one",
                     !!sym( paste0("Count(", from, "_to_", to, ")") ) >= 1   &   !!sym( paste0("Count(", to, "_to_", from, ")") ) == NA  ~ "one-to-none",
@@ -1408,7 +1408,7 @@ mapping_ambiguity <-
 #' \item \code{data_long} — a merged data frame of prior knowledge IDs and
 #' detected IDs in long format.
 #' }
-#' 
+#'
 #' @examples
 #' DetectedIDs <- cellular_meta %>%
 #' dplyr::select("Metabolite", "HMDB") %>%
@@ -1430,7 +1430,7 @@ mapping_ambiguity <-
 #' @importFrom stringr str_split
 #' @importFrom dplyr first
 #' @export
-checkmatch_pk_to_data <- 
+checkmatch_pk_to_data <-
     function(
         data,
                            input_pk,
@@ -1451,7 +1451,7 @@ checkmatch_pk_to_data <-
   ## data:
     if ("InputID" %in% names(metadata_info)) {
         if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     "The ",
                     metadata_info[["InputID"]],
@@ -1464,7 +1464,7 @@ checkmatch_pk_to_data <-
       stop(message)
     }
     } else {
-        message <- 
+        message <-
             paste0(
                 "No ",
                 metadata_info[["InputID"]],
@@ -1482,7 +1482,7 @@ checkmatch_pk_to_data <-
 
     if (sum(is.na(data[[metadata_info[["InputID"]]]])) >= 1) {
     # remove NAs:
-        message <- 
+        message <-
             paste0(
                 sum(is.na(data[[metadata_info[["InputID"]]]])),
                 " NA values were removed from column ",
@@ -1492,7 +1492,7 @@ checkmatch_pk_to_data <-
             paste("Warning: ", message, sep = "")
         )
 
-        data <- 
+        data <-
             data %>%
                 filter(
                     !is.na(.data[[metadata_info[["InputID"]]]])
@@ -1503,7 +1503,7 @@ checkmatch_pk_to_data <-
 
     if (nrow(data) - nrow(distinct(data, .data[[metadata_info[["InputID"]]]])) >= 1) {
     # Remove duplicate IDs
-        message <- 
+        message <-
             paste0(
                 nrow(data) - nrow(distinct(data, .data[[metadata_info[["InputID"]]]])),
                 " duplicated IDs were removed from column ",
@@ -1513,7 +1513,7 @@ checkmatch_pk_to_data <-
             paste("Warning: ", message, sep = "")
         )
 
-        data <- 
+        data <-
             data %>%
                 distinct(
                     .data[[metadata_info[["InputID"]]]], .keep_all = TRUE
@@ -1522,7 +1522,7 @@ checkmatch_pk_to_data <-
     warning(message)
   }
 
-    data_MultipleIDs <- 
+    data_MultipleIDs <-
         any(
             grepl(",\\s*", data[[metadata_info[["InputID"]]]]) |   # Comma-separated
        map_lgl(
@@ -1545,7 +1545,7 @@ checkmatch_pk_to_data <-
   ## input_pk:
     if ("PriorID" %in% names(metadata_info)) {
         if (metadata_info[["PriorID"]] %in% colnames(input_pk) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     "The ",
                     metadata_info[["PriorID"]],
@@ -1558,7 +1558,7 @@ checkmatch_pk_to_data <-
       stop(message)
     }
     } else {
-        message <- 
+        message <-
             paste0(
                 "No ",
                 metadata_info[["PriorID"]],
@@ -1576,7 +1576,7 @@ checkmatch_pk_to_data <-
 
     if (sum(is.na(input_pk[[metadata_info[["PriorID"]]]])) >= 1) {
     # remove NAs:
-        message <- 
+        message <-
             paste0(
                 sum(is.na(input_pk[[metadata_info[["PriorID"]]]])),
                 " NA values were removed from column ",
@@ -1586,7 +1586,7 @@ checkmatch_pk_to_data <-
             paste("Warning: ", message, sep = "")
         )
 
-        input_pk <- 
+        input_pk <-
             input_pk %>%
       filter(
 !is.na(.data[[metadata_info[["PriorID"]]]])
@@ -1598,7 +1598,7 @@ checkmatch_pk_to_data <-
     if ("grouping_variable" %in% names(metadata_info)) {
     # Add grouping_variable
         if (metadata_info[["grouping_variable"]] %in% colnames(input_pk) == FALSE) {
-            message <- 
+            message <-
                 paste0(
                     "The ",
                     metadata_info[["grouping_variable"]],
@@ -1615,7 +1615,7 @@ checkmatch_pk_to_data <-
     metadata_info["grouping_variable"] <- "GroupingVariable"
     input_pk["GroupingVariable"] <- "OneGroup"
 
-        message <- 
+        message <-
             paste0(
                 "No metadata_info grouping_variable provided. ",
                 "If this was not intentional, please check your input."
@@ -1626,7 +1626,7 @@ checkmatch_pk_to_data <-
 
     if (nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1) {
     # Remove duplicate IDs
-        message <- 
+        message <-
             paste0(
                 nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])),
                 " duplicated IDs were removed from PK column ",
@@ -1636,7 +1636,7 @@ checkmatch_pk_to_data <-
             paste("Warning: ", message, sep = "")
         )
 
-        input_pk <- 
+        input_pk <-
             input_pk %>%
                 distinct(
                     .data[[metadata_info[["PriorID"]]]],
@@ -1654,7 +1654,7 @@ checkmatch_pk_to_data <-
                 ) %>%
                 ungroup() %>%
                 distinct(
-                    .data[[metadata_info[["PriorID"]]]], 
+                    .data[[metadata_info[["PriorID"]]]],
                     .keep_all = TRUE
                 )
 
@@ -1662,10 +1662,10 @@ checkmatch_pk_to_data <-
   }
 
     # Check if multiple IDs are present:
-    PK_MultipleIDs <-  
+    PK_MultipleIDs <-
         any(
             grepl(
-                ",\\s*", 
+                ",\\s*",
                 input_pk[[metadata_info[["PriorID"]]]]) |   # Comma-separated
       map_lgl(
         input_pk[[metadata_info[["PriorID"]]]],
@@ -1686,7 +1686,7 @@ checkmatch_pk_to_data <-
 
   ## ------------ Create Results output folder ----------- ##
     if (is.null(save_table) == FALSE) {
-        folder <- 
+        folder <-
             save_path(
                 folder_name = "PK",
                 path = path
@@ -1702,14 +1702,14 @@ checkmatch_pk_to_data <-
     ## ----------- ##
 
   # 1.  Create long DF
-    create_long_df <- 
+    create_long_df <-
         function(df, id_col, df_name) {
     df %>%
             mutate(
                 row_id = row_number()
             ) %>%
             mutate(   # Store original values
-                !!paste0("OriginalEntry_", df_name, sep = "") := 
+                !!paste0("OriginalEntry_", df_name, sep = "") :=
                     !!sym(id_col)
             ) %>%
             separate_rows(
@@ -1719,14 +1719,14 @@ checkmatch_pk_to_data <-
                 row_id
             ) %>%
             mutate(
-                !!(paste0("OriginalGroup_", df_name, sep = "")) := 
+                !!(paste0("OriginalGroup_", df_name, sep = "")) :=
                     paste0(df_name, "_", cur_group_id())
             ) %>%
       ungroup()
   }
 
     if (data_MultipleIDs) {
-        data_long <- 
+        data_long <-
             create_long_df(
                 data,
                 metadata_info[["InputID"]],
@@ -1738,13 +1738,13 @@ checkmatch_pk_to_data <-
                 OriginalGroup_data
             )
     } else {
-        data_long <- 
+        data_long <-
             data %>%
             mutate(
                 OriginalGroup_data := paste0("data_", row_number())
             ) %>%
             select(
-                metadata_info[["InputID"]], 
+                metadata_info[["InputID"]],
                 OriginalGroup_data
             )
         data_long$`OriginalEntry_data` <-
@@ -1752,7 +1752,7 @@ checkmatch_pk_to_data <-
   }
 
     if (PK_MultipleIDs) {
-        PK_long <- 
+        PK_long <-
             create_long_df(
                 input_pk,
                 metadata_info[["PriorID"]],
@@ -1765,7 +1765,7 @@ checkmatch_pk_to_data <-
                 metadata_info[["grouping_variable"]]
             )
     } else {
-        PK_long <- 
+        PK_long <-
             input_pk %>%
             mutate(
                 OriginalGroup_PK := paste0("PK_", row_number())
@@ -1779,7 +1779,7 @@ checkmatch_pk_to_data <-
   }
 
   # 2. Merge DF
-    merged_df <- 
+    merged_df <-
         merge(
             PK_long,
             data_long,
@@ -1795,16 +1795,16 @@ checkmatch_pk_to_data <-
             )
 
   # 3. Create summary table
-    Values_data <- 
+    Values_data <-
         unique(
             data[[metadata_info[["InputID"]]]]
         )
-    Values_PK <- 
+    Values_PK <-
         unique(
             PK_long[[metadata_info[["PriorID"]]]]
         )
 
-    summary_df <- 
+    summary_df <-
         tibble(
     !!sym(metadata_info[["InputID"]]) := Values_data,
     found_match_in_PK = NA,
@@ -1825,7 +1825,7 @@ checkmatch_pk_to_data <-
       summary_df$matches[i] <- NA
     } else {
       # Split each cell into individual entries and trim whitespace
-            entries <- 
+            entries <-
                 trimws(
                     unlist(
                         strsplit(
@@ -1859,7 +1859,7 @@ checkmatch_pk_to_data <-
     }
   }
 
-    summary_df <- 
+    summary_df <-
         merge(
             x = summary_df,
             y = merged_df %>%
@@ -1887,7 +1887,7 @@ checkmatch_pk_to_data <-
                     ) ~ ifelse(
                             all(
                                 is.na(!!sym(metadata_info[["grouping_variable"]]))
-                            ), 
+                            ),
                             "None",
                             paste(
                                 na.omit(
@@ -1906,7 +1906,7 @@ checkmatch_pk_to_data <-
       matches = ifelse(matches == "", NA, matches)
     )
 
-    summary_df_short <- 
+    summary_df_short <-
         summary_df %>%
             group_by(
                 !!sym(metadata_info[["InputID"]])
@@ -1940,7 +1940,7 @@ checkmatch_pk_to_data <-
             ) %>%
     mutate(
       matches = ifelse(matches == "", NA, matches),
-                !!sym(metadata_info[["grouping_variable"]]) := 
+                !!sym(metadata_info[["grouping_variable"]]) :=
                     ifelse(
                         !!sym(metadata_info[["grouping_variable"]]) == "",
                         NA,
@@ -1949,7 +1949,7 @@ checkmatch_pk_to_data <-
             ) %>%
     mutate(
       InputID_select = case_when(
-                    original_count == 1 & matches_count <= 1 ~ metadata_info[["InputID"]], 
+                    original_count == 1 & matches_count <= 1 ~ metadata_info[["InputID"]],
                     original_count >= 2 & matches_count == 0 ~ str_split(metadata_info[["InputID"]], ",\\s*") %>% map_chr(first),
                     original_count >= 2 & matches_count == 1 ~ matches,
         TRUE ~ NA_character_
@@ -1963,7 +1963,7 @@ checkmatch_pk_to_data <-
 
 
   # 4. Messages and summarise
-    message0 <- 
+    message0 <-
         paste0(
             "data has multiple IDs per measurement = ",
             data_MultipleIDs,
@@ -1972,7 +1972,7 @@ checkmatch_pk_to_data <-
             ".",
             sep = ""
         )
-    message1 <- 
+    message1 <-
         paste0(
             "data has ",
             n_distinct(unique(data[[metadata_info[["InputID"]]]])),
@@ -1987,7 +1987,7 @@ checkmatch_pk_to_data <-
             "%.",
             sep = ""
         )
-    message2 <- 
+    message2 <-
         paste0(
             "input_pk has ",
             n_distinct(input_pk[[metadata_info[["PriorID"]]]]),
@@ -2008,7 +2008,7 @@ checkmatch_pk_to_data <-
 
     if (nrow(summary_df_short %>% filter(ActionRequired == "Check")) >= 1) {
         warning1 <-    # "Check"
-            paste0(   
+            paste0(
                 "There are cases where multiple detected IDs match to ",
                 "multiple ",
                 "prior knowledge ",
@@ -2024,7 +2024,7 @@ checkmatch_pk_to_data <-
 
 
   ## ------------------ Save Results ----------------------##
-    ResList <- 
+    ResList <-
         list(
             "data_summary" = summary_df_short,
                   "GroupingVariable_summary" = summary_df,
@@ -2068,20 +2068,20 @@ checkmatch_pk_to_data <-
 #' @importFrom dplyr select summarize ungroup
 #' @importFrom igraph graph_from_adjacency_matrix components
 #' @noRd
-cluster_pk <- 
+cluster_pk <-
     function(
         data,
         metadata_info = c(
             InputID = "MetaboliteID",
             grouping_variable = "term"
         ),
-        clust = "Graph", 
+        clust = "Graph",
         matrix = "percentage",
-        min = 2  
+        min = 2
     ) {
     # Notes about function arguments
-    ## data:    This can be either the original PK (e.g. KEGG pathways), but it 
-    ##          can also be the output of enrichment results (--> meaning here 
+    ## data:    This can be either the original PK (e.g. KEGG pathways), but it
+    ##          can also be the output of enrichment results (--> meaning here
     ##          we would cluster based on detection!)
     ## clust:   Options: "Graph", "Hierarchical",
     ## matrix:  Choose "pearson", "spearman", "kendall", or "percentage"
@@ -2102,7 +2102,7 @@ cluster_pk <-
     ############################################################################
   ## ------------------ cluster the data ------------------- ##
   # 1. Create a list of unique MetaboliteIDs for each term
-    term_metabolites <- 
+    term_metabolites <-
         data %>%
             group_by(
                 !!sym(metadata_info[["grouping_variable"]])
@@ -2121,7 +2121,7 @@ cluster_pk <-
     # Compute pairwise overlaps
         term_overlap <-
             combn(
-                term_metabolites[[metadata_info[["grouping_variable"]]]], 
+                term_metabolites[[metadata_info[["grouping_variable"]]]],
                 2,
                 function(terms) {
                     term1_ids <-
@@ -2129,16 +2129,16 @@ cluster_pk <-
                     term2_ids <-
                         term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[2]][[1]]
 
-                    overlap <- 
+                    overlap <-
                         length(
                             intersect(term1_ids,term2_ids)) / length(union(term1_ids, term2_ids)
                         )
                     data.frame(
-                        Term1 = terms[1], 
-                        Term2 = terms[2], 
+                        Term1 = terms[1],
+                        Term2 = terms[2],
                         Overlap = overlap
                     )
-                }, 
+                },
                 simplify = FALSE
             ) %>%
       bind_rows()
@@ -2148,14 +2148,14 @@ cluster_pk <-
     # overlap coefficient (or Jaccard Index) Overlap(A,B)= ∣A∪B∣ / ∣A∩B
         # The overlap matrix measures the similarity between sets or groups
         # based on common elements.
-        terms <- 
+        terms <-
             unique(
                 c(
-                    term_overlap$Term1, 
+                    term_overlap$Term1,
                     term_overlap$Term2
                 )
             )
-        overlap_matrix <- 
+        overlap_matrix <-
             matrix(
                 1,
                 nrow = length(terms),
@@ -2170,9 +2170,9 @@ cluster_pk <-
     }
   } else {
     # Create a binary matrix for correlation methods
-        terms <- 
+        terms <-
             term_metabolites[[metadata_info[["grouping_variable"]]]]
-        metabolites <- 
+        metabolites <-
             unique(
                 unlist(
                     term_metabolites$MetaboliteIDs
@@ -2180,7 +2180,7 @@ cluster_pk <-
             )
         # [[metadata_info[["InputID"]]]]
 
-        binary_matrix <- 
+        binary_matrix <-
             matrix(
                 0,
                 nrow = length(terms),
@@ -2188,7 +2188,7 @@ cluster_pk <-
                 dimnames = list(terms, metabolites)
             )
     for (i in seq_along(terms)) {
-            metabolites_for_term <- 
+            metabolites_for_term <-
                 term_metabolites$MetaboliteIDs[[i]]
             # [[metadata_info[["InputID"]]]]
       binary_matrix[i, colnames(binary_matrix) %in% metabolites_for_term] <- 1
@@ -2201,33 +2201,33 @@ cluster_pk <-
         # 𝑋 𝑗 X j
         # The correlation matrix measures the strength and direction of linear
         # relationships between variables.
-        correlation_matrix <- 
+        correlation_matrix <-
             cor(
-                t(binary_matrix), 
+                t(binary_matrix),
                 method = matrix
             )
 
     # Convert to distance matrix
-        overlap_matrix <- 
+        overlap_matrix <-
             1 - correlation_matrix
   }
   # 3. cluster terms based on overlap threshold
     threshold <- 0.7   # Define similarity threshold
-    
-    term_clusters <- 
+
+    term_clusters <-
         term_overlap %>%
             filter(
                 Overlap >= threshold
             ) %>%
             select(
-                Term1, 
+                Term1,
                 Term2
             )
 
   # 4. clustering
     if (clust == "Graph") { # Use Graph-based clustering
   # Here we need the distance matrix:
-        overlap_matrix <- 
+        overlap_matrix <-
             1 - correlation_matrix
 
         # An adjacency matrix represents a graph structure and encodes the
@@ -2235,36 +2235,36 @@ cluster_pk <-
   # Add weight (can also represent unweighted graphs)
 
         # Applying Gaussian kernel to convert distance into similarity
-        adjacency_matrix <- 
+        adjacency_matrix <-
             exp(-overlap_matrix^2)
 
   # Create a graph from the adjacency matrix
-        g <- 
+        g <-
             graph_from_adjacency_matrix(
                 adjacency_matrix,
                 mode = "undirected",
                 weighted = TRUE
             )
-        initial_clusters <- 
+        initial_clusters <-
             components(g)$membership
         term_metabolites$cluster <-
             initial_clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(initial_clusters))]
     } else if (clust == "Hierarchical") {
     # Hierarchical clustering
-        hclust_result <- 
+        hclust_result <-
             hclust(
-                as.dist(distance_matrix), 
+                as.dist(distance_matrix),
                 method = "average"
             )
         # make methods into parameters!
     num_clusters <- 4
-        term_clusters_hclust <- 
+        term_clusters_hclust <-
             cutree(
-                hclust_result, 
+                hclust_result,
                 k = num_clusters
             )
 
-        term_metabolites$cluster <- 
+        term_metabolites$cluster <-
             paste0(
                 "cluster",
                 term_clusters_hclust[match(terms, names(term_clusters_hclust))]
@@ -2275,12 +2275,12 @@ cluster_pk <-
   }
 
   # 5. Merge cluster group information back to the original data
-    df <- 
+    df <-
         data %>%
             left_join(
                 term_metabolites %>%
                     select(
-                        !!sym(metadata_info[["grouping_variable"]]), 
+                        !!sym(metadata_info[["grouping_variable"]]),
                         cluster
                     ),
                 by = metadata_info[["grouping_variable"]]
@@ -2322,7 +2322,7 @@ cluster_pk <-
 #'
 #' @importFrom tibble rownames_to_column
 #' @noRd
-add_info <- 
+add_info <-
     function(
         mat,
                     net,
@@ -2339,7 +2339,7 @@ add_info <-
 
   # add number of Genes_targeted_by_TF_num
   net$Count <- 1
-    net_Mean <- 
+    net_Mean <-
         aggregate(
             net$Count,
             by = list(source = net[[.source]]),
@@ -2348,25 +2348,25 @@ add_info <-
     rename("targets_num" = 2)
 
     if (complete == TRUE) {
-        res_Add <- 
+        res_Add <-
             merge(
-                x = res, 
-                y = net_Mean, 
-                by = "source", 
+                x = res,
+                y = net_Mean,
+                by = "source",
                 all = TRUE
             )
     } else {
-        res_Add <- 
+        res_Add <-
             merge(
-                x = res, 
-                y = net_Mean, 
-                by = "source", 
+                x = res,
+                y = net_Mean,
+                by = "source",
                 all.x = TRUE
             )
   }
 
   # add list of Genes_targeted_by_TF_chr
-    net_List <- 
+    net_List <-
         aggregate(
             net[[.target]] ~ net[[.source]], FUN = toString
         ) %>%
@@ -2374,20 +2374,20 @@ add_info <-
                 "source" = 1,
                 "targets_chr" = 2
             )
-    res_Add <- 
+    res_Add <-
         merge(
-            x = res_Add, 
-            y = net_List, 
-            by = "source", 
+            x = res_Add,
+            y = net_List,
+            by = "source",
             all.x = TRUE
         )
 
   # add number of Genes_targeted_by_TF_detected_num
-    mat <- 
+    mat <-
         as.data.frame(mat) %>%   # Are these the normalised counts?
     rownames_to_column("Symbol")
 
-    Detected <- 
+    Detected <-
         merge(
             x = mat,
             y = net[, c(.source, .target)],
@@ -2403,7 +2403,7 @@ add_info <-
                 )
             )
     Detected$Count <- 1
-    Detected_Mean <- 
+    Detected_Mean <-
         aggregate(
             Detected$Count,
             by = list(source = Detected[[.source]]),
@@ -2411,7 +2411,7 @@ add_info <-
         ) %>%
     rename("targets_detected_num" = 2)
 
-    res_Add <- 
+    res_Add <-
         merge(
             x = res_Add,
             y = Detected_Mean,
@@ -2423,7 +2423,7 @@ add_info <-
             )
 
   # add list of Genes_targeted_by_TF_detected_chr
-    Detected_List <- 
+    Detected_List <-
         aggregate(
             Detected$Symbol ~ Detected[[.source]],
             FUN = toString
@@ -2433,7 +2433,7 @@ add_info <-
                 "targets_detected_chr" = 2
             )
 
-    res_Add <- 
+    res_Add <-
         merge(
             x = res_Add,
             y = Detected_List,
@@ -2449,7 +2449,7 @@ add_info <-
         )
 
     # sort by score
-    res_Add <- 
+    res_Add <-
         res_Add %>%
             arrange(
                 desc(
@@ -2492,13 +2492,13 @@ add_info <-
 #' @param data A named list where each element corresponds to a prior knowledge
 #' (PK) resource. Each element can be:
 #' \itemize{
-#'      \item   A data frame containing gene/metabolite identifiers (and 
+#'      \item   A data frame containing gene/metabolite identifiers (and
 #'              additional columns for within-resource comparison),
 #'      \item   A character string indicating the resource name. Recognized names
 #'              include (but are not limited to): \code{"Hallmarks"},
 #'              \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or
-#'              \code{"metsigdb_chemicalclass"}). In the latter case, the 
-#'              function will attempt to load the corresponding data 
+#'              \code{"metsigdb_chemicalclass"}). In the latter case, the
+#'              function will attempt to load the corresponding data
 #'              automatically.
 #' }
 #' @param metadata_info A named list (with names matching those in \code{data})
@@ -2532,7 +2532,7 @@ add_info <-
 #' @param path \emph{Optional:} Path to the folder the results should be saved
 #' at. \strong{Default = NULL}
 #'
-#' @return A list containing two elements: 
+#' @return A list containing two elements:
 #' \itemize{
 #'     \item{summary_table: A data frame representing either:
 #'         \itemize{
@@ -2546,68 +2546,70 @@ add_info <-
 #' }
 #'
 #' @examples
-#' ## Example 1: Within-Resource Comparison (Comparing Columns 
+#' \dontrun{
+#' ## Example 1: Within-Resource Comparison (Comparing Columns
 #' Within a Single data Frame)
 #'
-#' # biocrates_features is a data frame with columns: 
+#' # biocrates_features is a data frame with columns:
 #' "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
-#' # Here the "Class" column is used as the grouping variable 
+#' # Here the "Class" column is used as the grouping variable
 #' in the UpSet plot.
 #' data_single <- list(Biocft = biocrates_features)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
-#' res_single <- 
+#' res_single <-
 #' compare_pk(data = data_single, metadata_info = metadata_info_single,
 #'                           plot_name = "Overlap of BioCrates Columns")
 #'
 #' ## Example 2: Custom data Frames with Custom Column Names
 #'
 #' # Example with preloaded data frames and custom column names:
-#' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"), 
+#' hallmarks_df <- data.frame(feature = c("HMDB0001", "GENE1", "GENE2"),
 #' stringsAsFactors = FALSE)
-#' gaude_df <- data.frame(feature = c("GENE2", "GENE3"), 
+#' gaude_df <- data.frame(feature = c("GENE2", "GENE3"),
 #' stringsAsFactors = FALSE)
 #' metalinks_df <- data.frame(hmdb = c("HMDB0001", "HMDB0002"),
-#'                            gene_symbol = c("GENE1", "GENE4"), 
+#'                            gene_symbol = c("GENE1", "GENE4"),
 #' stringsAsFactors = FALSE)
-#' ramp_df <- data.frame(class_source_id = c("HMDB0001", "HMDB0003"), 
+#' ramp_df <- data.frame(class_source_id = c("HMDB0001", "HMDB0003"),
 #' stringsAsFactors = FALSE)
 #' data <- list(Hallmarks = hallmarks_df, Gaude = gaude_df,
 #'                 MetalinksDB = metalinks_df, RAMP = ramp_df)
 #' metadata_info <- list(Hallmarks = "feature", Gaude = "feature",
-#'                      MetalinksDB = c("hmdb", "gene_symbol"), 
+#'                      MetalinksDB = c("hmdb", "gene_symbol"),
 #' RAMP = "class_source_id")
-#' res <- compare_pk(data = data, metadata_info = metadata_info, 
+#' res <- compare_pk(data = data, metadata_info = metadata_info,
 #' filter_by = "metabolite")
+#' }
 #'
 #' @importFrom dplyr mutate select
 #' @importFrom logger log_trace
 #' @export
-compare_pk <- 
+compare_pk <-
     function(
         data,
-                       metadata_info = NULL,
-                       filter_by = c("both", "gene", "metabolite"),
-                       plot_name = "Overlap of Prior Knowledge Resources",
-                       name_col = "TrivialName",
-                       palette_type = "polychrome",
-                       save_plot = "svg",
-                       save_table = "csv",
-                       print_plot = TRUE,
-                       path = NULL
-                       ) {
+        metadata_info = NULL,
+        filter_by = c("both", "gene", "metabolite"),
+        plot_name = "Overlap of Prior Knowledge Resources",
+        name_col = "TrivialName",
+        palette_type = "polychrome",
+        save_plot = "svg",
+        save_table = "csv",
+        print_plot = TRUE,
+        path = NULL
+    ) {
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
   ## ------------ Check Input files ----------- ##
   # Match filter argument
-    filter_by <- 
+    filter_by <-
         match.arg(filter_by)
 
   # Validate data input
   if (!is.list(data) || length(data) < 1) {
-        message <- 
+        message <-
             paste0("data must be a non-empty list.")
         log_trace(
             paste("Error ", message, sep = "")
@@ -2615,7 +2617,7 @@ compare_pk <-
     stop(message)
   }
   if (is.null(names(data)) || any(names(data) == "")) {
-        message <- 
+        message <-
             paste0("data must be a named list with resource names.")
         log_trace(
             paste("Error ", message, sep = "")
@@ -2625,7 +2627,7 @@ compare_pk <-
 
   ## ------------ Create folders ----------- ##
     if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
-        folder <- 
+        folder <-
             save_path(
                 folder_name = "PK",
                 path = path
@@ -2641,7 +2643,7 @@ compare_pk <-
   ## ----------- Input ----------- ##
     # Define resource lookup table with information on how to retrieve and
     # transform each resource.
-    default_cols <- 
+    default_cols <-
         list(
     hallmarks = "feature",
     gaude = "feature",
@@ -2674,9 +2676,9 @@ compare_pk <-
 
     # Identify the intersection columns based on metadata_info.
     intersect_cols <- metadata_info[[resource_name]]
-        missing_cols <- 
+        missing_cols <-
             setdiff(
-                intersect_cols, 
+                intersect_cols,
                 colnames(resource_data)
             )
     if (length(missing_cols) > 0) {
@@ -2707,14 +2709,14 @@ compare_pk <-
       new_col <- paste0(col, binary_suffix)
             resource_data[[new_col]] <-
                 as.integer(
-                    !is.na(resource_data[[col]]) & 
-                    (resource_data[[col]] != 0) & 
+                    !is.na(resource_data[[col]]) &
+                    (resource_data[[col]] != 0) &
                     (resource_data[[col]] != "")
                 )
     }
 
     # Identify the binary columns based on the suffix
-        bin_cols <- 
+        bin_cols <-
             grep(
                 paste0(
                     binary_suffix,
@@ -2725,7 +2727,7 @@ compare_pk <-
             )
 
     # Create the "None" column using the binary columns
-        resource_data$None <- 
+        resource_data$None <-
             as.integer(
                 rowSums(
                     resource_data[, bin_cols, drop = FALSE]
@@ -2736,32 +2738,32 @@ compare_pk <-
         # TrivialName, if not found, it will not be included - only used to help
         # interpret summary table)
     if (name_col %in% colnames(resource_data)) {
-            summary_cols <- 
+            summary_cols <-
                 c(
-                    name_col, 
-                    bin_cols, 
-                    "None", 
+                    name_col,
+                    bin_cols,
+                    "None",
                     class_col
                 )
         } else {
-            summary_cols <- 
+            summary_cols <-
                 c(
-                    bin_cols, 
-                    "None", 
+                    bin_cols,
+                    "None",
                     class_col
                 )
     }
-        df_summary <- 
+        df_summary <-
             resource_data[, summary_cols, drop = FALSE]
     # Rename the cols again
     # Find indices of columns ending in "_bin"
-        bin_cols_idx <- 
+        bin_cols_idx <-
             grep(
-                "_bin$", 
+                "_bin$",
                 names(df_summary)
             )
     # Remove the suffix from these column names
-        names(df_summary)[bin_cols_idx] <- 
+        names(df_summary)[bin_cols_idx] <-
             sub(
                 "_bin$",
                 "",
@@ -2769,7 +2771,7 @@ compare_pk <-
             )
 
     # Generate the UpSet plot.
-        upset_plot <- 
+        upset_plot <-
             MetaProViz:::viz_upset(
       df = df_summary,
       class_col = class_col,
@@ -2788,11 +2790,11 @@ compare_pk <-
       resource_val <- data[[res]]
 			resource_id <- tolower(res)
 			if (is.null(metadata_info[[res]]) && resource_id %in% names(default_cols)) {
-                metadata_info[[res]] <- 
+                metadata_info[[res]] <-
                     default_cols[[resource_id]]
 			} else if (is.null(metadata_info[[res]])) {
                 stop(
-                    "metadata_info must be provided for resource: ", 
+                    "metadata_info must be provided for resource: ",
                     res
                 )
 			}
@@ -2806,14 +2808,14 @@ compare_pk <-
       if (!all(cols %in% colnames(resource_data))) {
                 stop(
                     paste(
-                        "Column(s)", 
+                        "Column(s)",
                         paste(cols, collapse = ", "),
-                        "not found in resource", 
+                        "not found in resource",
                         res
                     )
                 )
       }
-            features <- 
+            features <-
                 if (length(cols) > 1) {
                     unique(
                         unlist(
@@ -2828,23 +2830,23 @@ compare_pk <-
                         na.omit(resource_data[[cols]])
                     )
       }
-                resource_features[[res]] <- 
+                resource_features[[res]] <-
                     as.character(features)
     }
 
     # Compile all unique features across resources.
-        all_features <- 
+        all_features <-
             unique(
                 unlist(resource_features)
             )
 
     # Create the binary summary table.
-        df_binary <- 
+        df_binary <-
             data.frame(
                 Feature = all_features,
                 stringsAsFactors = FALSE
             )
-            
+
     for (res in names(resource_features)) {
             df_binary[[res]] <-
                 as.integer(
@@ -2852,7 +2854,7 @@ compare_pk <-
                 )
     }
 
-        df_binary$Type <- 
+        df_binary$Type <-
             ifelse(
                 grepl(
                     "^HMDB",
@@ -2862,31 +2864,31 @@ compare_pk <-
                 "gene"
             )
 
-        resource_cols <- 
+        resource_cols <-
             names(resource_features)
-            
-        df_binary$None <- 
+
+        df_binary$None <-
             as.integer(
                 rowSums(df_binary[, resource_cols, drop = FALSE]) == 0
             )
 
     # Optionally filter the summary table.
     if (filter_by == "gene") {
-            df_binary <- 
+            df_binary <-
                 subset(
-                    df_binary, 
+                    df_binary,
                     Type == "gene"
                 )
     } else if (filter_by == "metabolite") {
-            df_binary <- 
+            df_binary <-
                 subset(
-                    df_binary, 
+                    df_binary,
                     Type == "metabolite (HMDB)"
                 )
     }
 
     # Generate the UpSet plot.
-        upset_plot <- 
+        upset_plot <-
             MetaProViz:::viz_upset(
       df = df_binary,
       class_col = "Type",
@@ -2919,7 +2921,7 @@ compare_pk <-
 
     return(
         list(
-            summary_table = summary_table, 
+            summary_table = summary_table,
             upset_plot = upset_plot
         )
     )
@@ -2928,7 +2930,7 @@ compare_pk <-
 
 ################################################################################
 ### ### Helper function to count number of entries for an ID column value    ###
-### ### and plot                                                             ### 
+### ### and plot                                                             ###
 
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
