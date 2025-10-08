@@ -15,29 +15,43 @@ translate_id(
 )
 }
 \arguments{
-\item{data}{dataframe with at least one column with the target (e.g. metabolite), you can add other columns such as source (e.g. term). Must be "long" DF, meaning one ID per row.}
+\item{data}{dataframe with at least one column with the target (e.g.
+metabolite), you can add other columns such as source (e.g. term). Must be
+"long" DF, meaning one ID per row.}
 
-\item{metadata_info}{\emph{Optional: } Column name of Target in input_pk. \strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}}
+\item{metadata_info}{\emph{Optional: } Column name of Target in input_pk.
+\strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}}
 
-\item{from}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}}
+\item{from}{ID type that is present in your data. Choose between "kegg",
+"pubchem", "chebi", "hmdb". \strong{Default = "kegg"}}
 
-\item{to}{One or multiple ID types to which you want to translate your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = c("pubchem","chebi","hmdb")}}
+\item{to}{One or multiple ID types to which you want to translate your data.
+Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default =
+c("pubchem","chebi","hmdb")}}
 
-\item{summary}{\emph{Optional: } If TRUE a long summary tables are created. \strong{Default = FALSE}}
+\item{summary}{\emph{Optional: } If TRUE a long summary tables are created.
+\strong{Default = FALSE}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are:
+"csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at.
+\strong{Default = NULL}}
 }
 \value{
-List with at least three DFs: 1) Original data and the new column of translated ids spearated by comma. 2) Mapping information between Original ID to Translated ID. 3) Mapping summary between Original ID to Translated ID.
+List with at least three DFs: 1) Original data and the new column of
+translated ids spearated by comma. 2) Mapping information between Original
+ID
+to Translated ID. 3) Mapping summary between Original ID to Translated ID.
 }
 \description{
 Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
-Res <- translate_id(data= KEGG_Pathways, metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("pubchem", "hmdb"))
+Res <- translate_id(data = KEGG_Pathways, metadata_info = c(InputID =
+"MetaboliteID", grouping_variable = "term"), from = c("kegg"), to =
+c("pubchem", "hmdb"))
 
 }
 \keyword{IDs}

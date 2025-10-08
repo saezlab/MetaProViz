@@ -2,7 +2,8 @@
 % Please edit documentation in R/RefactorPriorKnoweldge.R
 \name{checkmatch_pk_to_data}
 \alias{checkmatch_pk_to_data}
-\title{Check and summarize relationship between prior knowledge to measured features}
+\title{Check and summarize relationship between prixor knowledge to measured
+features}
 \usage{
 checkmatch_pk_to_data(
   data,
@@ -13,30 +14,55 @@ checkmatch_pk_to_data(
 )
 }
 \arguments{
-\item{data}{dataframe with at least one column with the detected metabolite IDs (e.g. HMDB). If there are multiple IDs per detected peak, please separate them by comma ("," or ", " or chr list). If there is a main ID and additional IDs, please provide them in separate columns.}
+\item{data}{dataframe with at least one column with the detected metabolite
+IDs (e.g. HMDB). If there are multiple IDs per detected peak, please
+separate
+them by comma ("," or ", " or chr list). If there is a main ID and
+additional
+IDs, please provide them in separate columns.}
 
-\item{input_pk}{dataframe with at least one column with the metabolite ID (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If there are multiple IDs, as the original pathway IDs (e.g. KEGG) where translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr list).}
+\item{input_pk}{dataframe with at least one column with the metabolite ID
+(e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If
+there are multiple IDs, as the original pathway IDs (e.g. KEGG) where
+translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr
+list).}
 
-\item{metadata_info}{Colum name of Metabolite IDs in data and input_pk as well as column name of grouping_variable in input_pk. \strong{Default = c(InputID="HMDB", PriorID="HMDB", grouping_variable="term")}}
+\item{metadata_info}{Colum name of Metabolite IDs in data and input_pk as
+well as column name of grouping_variable in input_pk. \strong{Default =
+c(InputID="HMDB", PriorID="HMDB", grouping_variable="term")}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are:
+"csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at.
+\strong{Default = NULL}}
 }
 \value{
 A \code{list} with three elements:
 \itemize{
-\item \code{data_summary} — a data frame summarising matching results per input ID, including counts, conflicts, and recommended actions.
-\item \code{GroupingVariable_summary} — a detailed data frame showing matches grouped by the specified variable, with conflict annotations.
-\item \code{data_long} — a merged data frame of prior knowledge IDs and detected IDs in long format.
+\item \code{data_summary} — a data frame summarising matching results per
+input ID, including counts, conflicts, and recommended actions.
+\item \code{GroupingVariable_summary} — a detailed data frame showing
+matches
+grouped by the specified variable, with conflict annotations.
+\item \code{data_long} — a merged data frame of prior knowledge IDs and
+detected IDs in long format.
 }
 }
 \description{
-Check and summarize relationship between prior knowledge to measured features
+Check and summarize relationship between prixor knowledge to measured
+features
 }
 \examples{
-DetectedIDs <-  cellular_meta \%>\%dplyr::select("Metabolite", "HMDB")\%>\%tidyr::drop_na()
-input_pathway <- translate_id(data= metsigdb_kegg(), metadata_info = c(InputID="MetaboliteID", grouping_variable="term"), from = c("kegg"), to = c("hmdb"))[["TranslatedDF"]]\%>\%tidyr::drop_na()
-Res <- checkmatch_pk_to_data(data= DetectedIDs, input_pk= input_pathway, metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable="term"))
+DetectedIDs <- cellular_meta \%>\%
+dplyr::select("Metabolite", "HMDB") \%>\%
+tidyr::drop_na()
+input_pathway <- translate_id(data = metsigdb_kegg(), metadata_info =
+c(InputID = "MetaboliteID", grouping_variable = "term"), from = c("kegg"),
+to
+= c("hmdb"))[["TranslatedDF"]] \%>\% tidyr::drop_na()
+Res <- checkmatch_pk_to_data(data = DetectedIDs, input_pk = input_pathway,
+metadata_info = c(InputID = "HMDB", PriorID = "hmdb", grouping_variable =
+"term"))
 
 }

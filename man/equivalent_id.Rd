@@ -13,15 +13,20 @@ equivalent_id(
 )
 }
 \arguments{
-\item{data}{dataframe with at least one column with the detected metabolite IDs (one ID per row).}
+\item{data}{dataframe with at least one column with the detected metabolite
+IDs (one ID per row).}
 
-\item{metadata_info}{\emph{Optional: } Column name of metabolite IDs. \strong{Default = list(InputID="MetaboliteID")}}
+\item{metadata_info}{\emph{Optional: } Column name of metabolite IDs.
+\strong{Default = list(InputID="MetaboliteID")}}
 
-\item{from}{ID type that is present in your data. Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}}
+\item{from}{ID type that is present in your data. Choose between "kegg",
+"pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are:
+"csv", "xlsx", "txt". \strong{Default = "csv"}}
 
-\item{path}{{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}}
+\item{path}{{Optional:} Path to the folder the results should be saved at.
+\strong{Default = NULL}}
 }
 \value{
 Input DF with additional column including potential additional IDs.
@@ -30,8 +35,9 @@ Input DF with additional column including potential additional IDs.
 Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 }
 \examples{
-DetectedIDs <- cellular_meta\%>\%tidyr::drop_na()
-Res <- equivalent_id(data= DetectedIDs, metadata_info = c(InputID="HMDB"), from = "hmdb")
+DetectedIDs <- cellular_meta \%>\% tidyr::drop_na()
+Res <- equivalent_id(data = DetectedIDs, metadata_info = c(InputID =
+from = "hmdb")
 
 }
 \keyword{Find}
