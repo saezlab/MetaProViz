@@ -1,0 +1,23 @@
+# CITATION
+
+citHeader("To cite MetaProViz in publications, please use:")
+
+bibentry(
+  bibtype = "Article",
+  title = "Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz",
+  author = c(
+    person("Christina", "Schmidt"),
+    person("Denes", "Turei"),
+    person("Dimitrios", "Prymidis"),
+    person("Macabe", "Daley"),
+    person("Christian", "Frezza"),
+    person("Julio", "Saez-Rodriguez")
+  ),
+  journal = "BioRxiv",
+  year = 2025,
+  month = "Aug",
+  doi = "10.1101/2025.08.18.670781",
+  note = "bioRxiv preprint: https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full"
+)
+
+citFooter("Please also cite R and relevant dependencies.")
