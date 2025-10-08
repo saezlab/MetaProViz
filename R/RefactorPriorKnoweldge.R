@@ -354,9 +354,11 @@ translate_id <-
 #'
 #' @examples
 #' DetectedIDs <- cellular_meta %>% tidyr::drop_na()
-#' Res <- equivalent_id(data = DetectedIDs, metadata_info = c(InputID =
-# "HMDB"),
-#' from = "hmdb")
+#' Res <- equivalent_id(
+#' data = DetectedIDs,
+#' metadata_info = c(InputID ="HMDB"),
+#' from = "hmdb"
+#' )
 #'
 #' @keywords Find potential additional IDs for one metabolite identifier
 #'
@@ -374,7 +376,7 @@ equivalent_id <-
     function(
         data,
         metadata_info = c(InputID = "MetaboliteID"),
-                          from = "hmdb",
+        from = "hmdb",
         save_table = "csv",
         path = NULL
         ) {
