@@ -22,18 +22,18 @@ navbar:
     #Customize articles:
     articles:
       title: Tutorials
-      icon: fa-book-open # icons can be found here: https://fontawesome.com/icons?d=gallery
-      contents:
-        - file: quick-start
-          title: Getting started
-        - file: vignettes/pkgdown/standard-metabolomics.Rmd
-          title: Standard Metabolomics
-        - file: vignettes/pkgdown/core-metabolomics.Rmd
-          title: CoRe Metabolomics
-        - file: vignettes/pkgdown/prior-knowledge.Rmd
-          title: Prior knowledge
-        - file: vignettes/pkgdown/sample-metadata.Rmd
-          title: Sample Metadata Analysis
+      icon: fa-book-open
+      menu:
+        - text: "Getting started"
+          href: articles/quick-start.html
+        - text: "Standard Metabolomics"
+          href: articles/vignettes/pkgdown/standard-metabolomics.html
+        - text: "CoRe Metabolomics"
+          href: articles/vignettes/pkgdown/core-metabolomics.html
+        - text: "Prior Knowledge"
+          href: articles/vignettes/pkgdown/prior-knowledge.html
+        - text: "Sample Metadata Analysis"
+          href: articles/vignettes/pkgdown/sample-metadata.html
     #customize intro:
     reference:
       text: Reference
