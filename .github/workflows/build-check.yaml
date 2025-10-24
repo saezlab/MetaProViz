@@ -119,11 +119,6 @@ jobs:
           Rscript -e 'remotes::install_deps(dependencies = TRUE)'
           # Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
       
-      # Explicitly install EnhancedVolcano
-      - name: Install EnhancedVolcano
-        run: |
-          Rscript -e 'BiocManager::install("EnhancedVolcano", ask = FALSE, update = FALSE)'
-
       # ComplexUpset should be installed after ggplot2 to ensure compatibility, especially on Linux/Ubuntu.
       - name: Install latest ggplot2
         run: Rscript -e 'install.packages("ggplot2", type="source")'
