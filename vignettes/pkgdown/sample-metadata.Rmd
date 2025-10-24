@@ -85,6 +85,8 @@ Here we choose an example datasets, which is publicly available in the [paper](h
 We can access the built-in dataset `tissue_norm`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
 ```{r}
 # Load the example data:
+data(tissue_norm)
+
 Tissue_Norm <- tissue_norm%>%
   column_to_rownames("Code")
 ```
@@ -99,6 +101,8 @@ Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
 
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
 ```{r}
+data(tissue_meta)
+
 Tissue_MetaData <- tissue_meta%>%
   column_to_rownames("Metabolite")
 ```
@@ -348,7 +352,7 @@ ccRCC_CompareIDs <- compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rena
                                            plot_name = "Overlap of ID types in ccRCC data")
 ```
 \
-Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to understand the missing IDs focusing on HMDb as an example: 
+Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to understand the missing IDs focusing on HMDb as an example:
 ```{r}
 Plot1_HMDB <- count_id(MetaboliteIDs, "HMDB")
 ```
@@ -516,7 +520,7 @@ problems_terms[,c(1,5:8)]%>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
-Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its moire likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge. 
+Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its moire likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge.
 ```{r}
 # Select the cases where a feature has multiple IDs
 multipleIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
@@ -543,7 +547,7 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
     Action_Specific == "KeepOneID" & matches ==  "C17737, C00695" ~ "C00695", # Allocholic acid versus Cholic acid. No evidence, hence we keep the one present in more pathways (C00695 = 4 pathways, C17737 = 1 pathway)
     Action_Specific == "KeepOneID" ~ InputID_select,  # Keep NA where not matched manually
     TRUE ~ InputID_select
-  )) 
+  ))
 ```
 \
 Lastly, we need to add the column including our selected IDs to the metadata table:
@@ -563,10 +567,10 @@ DM_ORA_res<- list()
 for(comparison in names(ResList)){#Res list includes the different comparisons we performed above <-
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
   dma_res <- merge(x= Tissue_MetaData_Extended,
-                   y= ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]], 
-                   by="Metabolite", 
+                   y= ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]],
+                   by="Metabolite",
                    all=TRUE)
-  
+
   #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
   dma_res <- dma_res[,c(3,21:25)]%>%
     dplyr::mutate(InputID_select = if_else(
@@ -579,7 +583,7 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
     ungroup()%>%
     remove_rownames()%>%
     tibble::column_to_rownames("InputID_select")
-  
+
   #Perform ORA
   Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
@@ -621,10 +625,10 @@ DM_ORA_res<- list()
 for(comparison in names(ResList)){#Res list includes the different comparisons we performed above <-
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
   dma_res <- merge(x= Tissue_MetaData_Extended,
-                   y= ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]], 
-                   by="Metabolite", 
+                   y= ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]],
+                   by="Metabolite",
                    all=TRUE)
-  
+
   #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
   dma_res <- dma_res[,c(3,21:25)]%>%
     dplyr::mutate(InputID_select = if_else(
@@ -637,7 +641,7 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
     ungroup()%>%
     remove_rownames()%>%
     tibble::column_to_rownames("InputID_select")
-  
+
   #Perform ORA
   Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
@@ -778,10 +782,10 @@ KEGG_Pathways <- metsigdb_kegg()
 
 for(comparison in names(ResList)){
   dma_res <- merge(x= Tissue_MetaData_Extended,
-                   y=ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]], 
-                   by="Metabolite", 
+                   y=ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]],
+                   by="Metabolite",
                    all=TRUE)
-  
+
   #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
   dma_res <- dma_res[,c(3,21:25)]%>%
     dplyr::mutate(InputID_select = if_else(
@@ -794,8 +798,8 @@ for(comparison in names(ResList)){
     ungroup()%>%
     remove_rownames()%>%
     tibble::column_to_rownames("InputID_select")
-  
-  
+
+
   #Perform ORA
   Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),

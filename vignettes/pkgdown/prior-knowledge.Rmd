@@ -108,6 +108,8 @@ Example datasets is publicly available on [metabolomics workbench project PR0014
 
 ```{r}
 # Load the Pre-processed intracellular data:
+data(cellular_meta)
+
 FeatureMetadata_Cells <- cellular_meta%>%
   column_to_rownames("Metabolite")
 ```
@@ -118,6 +120,8 @@ Example datasets is publicly available in the [paper](https://www.cell.com/cance
 
 ```{r}
 # Load the example data:
+data(tissue_meta)
+
 FeatureMetadata_Tissue <- tissue_meta%>%
   column_to_rownames("Metabolite")
 
@@ -129,6 +133,7 @@ Here we use the Biocrates kit feature information of the ["MxP® Quant 500 XL ki
 
 ```{r}
 # Load the example data:
+data(biocrates_features)
 FeatureMetadata_Biocrates <- biocrates_features
 ```
 
@@ -211,6 +216,8 @@ to showcase the severity of this problem, we can look at the occurrence of those
 to do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 
 ```{r, echo=FALSE}
+data(alanine_pathways)
+
 Pathways <- alanine_pathways
 
 Count <- Pathways %>%
@@ -382,8 +389,10 @@ The Hallmarks [@Liberzon2015] gene-set and Gaude [@Gaude2016] gene-set is availa
 
 ```{r}
 # Load the example gene-sets:
+data(hallmarks)
 Hallmark_Pathways <- hallmarks
 
+data(gaude_pathways)
 Gaude_Pathways <- gaude_pathways
 ```
 
@@ -967,6 +976,8 @@ We have performed pre-processing and differential analysis (details can be found
 
 ```{r}
 # Load the Pre-processed intracellular data:
+data(intracell_dma)
+
 Intra_DMA_786M1A_vs_HK2 <- intracell_dma
 ```
 
@@ -976,8 +987,13 @@ We have performed differential analysis (details can be found in the vignette [M
 
 ```{r}
 # Load the example data:
+data(tissue_dma)
 Tissue_TvsN <- tissue_dma
+
+data(tissue_dma_old)
 Tissue_TvsN_Old <- tissue_dma_old
+
+data(tissue_dma_new)
 Tissue_TvsN_Young <- tissue_dma_young
 ```
 

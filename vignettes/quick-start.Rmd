@@ -72,6 +72,8 @@ Intracellular experiment **(Intra)** \
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 We can access the built-in dataset `intracell_raw`, which includes columns with Sample information and columns with the measured metabolite integrated peaks.\
 ```{r}
+data(intracell_raw)
+
 Intra <- intracell_raw%>%
   column_to_rownames("Code")
 ```
@@ -309,6 +311,8 @@ Here we will use the KEGG pathways [@Kanehisa2000], hence we have to ensure that
 ```{r}
 #--------Add metabolite IDs to our example data:
 # 1. Load Feature metainformation of our example data
+data(cellular_meta)
+
 MappingInfo <- cellular_meta
 
 # 2. Merge with our differential results (FYI: you can also do this automatically as part of the dma function using the parameter metadata_feature)
@@ -409,6 +413,8 @@ Lastly, we will get clusters of metabolites that are defined by the metabolite c
 \
 ```{r}
 # Example of all possible flows:
+data(mca_twocond_rules)
+
 MCA2Cond_Rules <- mca_twocond_rules
 ```
 
@@ -462,6 +468,8 @@ Regulatory rules:\
 \
 ```{r}
 # Example of all possible flows:
+data(mca_core_rules)
+
 MCA_CoRe_Rule <- mca_core_rules
 ```
 
