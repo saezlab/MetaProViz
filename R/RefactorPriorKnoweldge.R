@@ -2932,7 +2932,7 @@ compare_pk <-
 
 ################################################################################
 ### ### Helper function to count number of entries for an ID column value    ###
-### ### and plot                                                             ###
+### ### and plot                                                             ### 
 
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
@@ -2991,18 +2991,18 @@ compare_pk <-
 count_id <- 
     function(
         data,
-                      column,
-                      delimiter = ",",
+        column,
+        delimiter = ",",
         fill_colors = c(
             "No ID" = "#FB8072",
-                                      "Single ID" = "#B3DE69",
+            "Single ID" = "#B3DE69",
             "Multiple IDs" = "#80B1D3"
         ),
-                      binwidth = 1,
-                      title_prefix = NULL,
-                      save_plot = "svg",
-                      save_table = "csv",
-                      print_plot = TRUE,
+        binwidth = 1,
+        title_prefix = NULL,
+        save_plot = "svg",
+        save_table = "csv",
+        print_plot = TRUE,
         path = NULL
     ) {
     # @Macabe:
@@ -3023,57 +3023,57 @@ count_id <-
     # version and can be changed further)
     # create subtitle and not title prefix
 
-  ## ------------------  logger initiation ------------------- ##
+    ## ------------------  logger initiation ------------------- ##
 
-  ## ------------------  Checks ------------------- ##
+    ## ------------------  Checks ------------------- ##
 
-  ## ------------------  Create output folders and path ------------------- ##
+    ## ------------------  Create output folders and path ------------------- ##
     if (is.null(save_table) == FALSE) {
         folder <- save_path(
             folder_name = "PK",
             path = path
         )
 
-    Subfolder <- file.path(folder, "CountIDs")
+        Subfolder <- file.path(folder, "CountIDs")
         if (!dir.exists(Subfolder)) {
             dir.create(Subfolder)
         }
-  }
+    }
 
-  ## ------------------  data table ------------------- ##
+    ## ------------------  data table ------------------- ##
     # Process the data: count entries and label each cell based on the number of
     # entries.
     processed_data <- 
         mutate(
-    data,
-    was_na = is.na(.data[[column]]) | .data[[column]] == "",
-    entry_count = map_int(
-      .data[[column]],
-      function(cell) {
-        if (is.na(cell) || cell == "") {
+            data,
+            was_na = is.na(.data[[column]]) | .data[[column]] == "",
+            entry_count = map_int(
+                .data[[column]],
+                function(cell) {
+                    if (is.na(cell) || cell == "") {
                         0L
                         # Treat NA or empty as 0 entries for counting
-        } else {
+                    } else {
                         as.integer(length(unlist(strsplit(as.character(cell),
                             delimiter))))
-        }
-      }
-    ),
-    id_label = case_when(
-      entry_count == 0 ~ "No ID",
-      entry_count == 1 ~ "Single ID",
-      entry_count >= 2 ~ "Multiple IDs"
-    )
-  )
+                    }
+                }
+            ),
+            id_label = case_when(
+                entry_count == 0 ~ "No ID",
+                entry_count == 1 ~ "Single ID",
+                entry_count >= 2 ~ "Multiple IDs"
+            )
+        )
 
 
-  ## ------------------  plot ------------------- ##
-  # Generate the plot title if not provided
-  if (is.null(title_prefix)) {
-    plot_name <- paste("Number of", column, "IDs per measured peak.")
-  } else {
-    plot_name <- title_prefix
-  }
+    ## ------------------  plot ------------------- ##
+    # Generate the plot title if not provided
+    if (is.null(title_prefix)) {
+        plot_name <- paste("Number of", column, "IDs per measured peak.")
+    } else {
+        plot_name <- title_prefix
+    }
 
     # Create the histogram plot using ggplot2
     if (length(unique(processed_data$entry_count)) > 1) {
@@ -3114,7 +3114,7 @@ count_id <-
             scale_y_continuous(
                 expand = expansion(mult = c(0, 0.05))
             )
-  }
+    }
 
     plot_obj <- 
         plot_obj +
@@ -3123,20 +3123,20 @@ count_id <-
         ) +
         labs(
             title = plot_name,
-                  x = "Number of IDs",
-                  y = "Frequency",
+            x = "Number of IDs",
+            y = "Frequency",
             fill = paste0(column, " IDs", sep = "")
         ) +
-    theme_classic() +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 12),
-      legend.position.inside = c(0.8, 0.8),
-      legend.justification = c("right", "top"),
-      legend.title = element_text(size = 12),
-      legend.text = element_text(size = 12)
-    )
+        theme_classic() +
+        theme(
+            plot.title = element_text(hjust = 0.5, size = 12),
+            legend.position.inside = c(0.8, 0.8),
+            legend.justification = c("right", "top"),
+            legend.title = element_text(size = 12),
+            legend.text = element_text(size = 12)
+        )
 
-  # Make the nice plot:
+    # Make the nice plot:
     Plot_Sized <- 
         plot_grob_superplot(
             input_plot = plot_obj,
@@ -3150,7 +3150,7 @@ count_id <-
             subtitle = "",
             plot_type = "Bar"
         )
-        
+
     plot_height <- 
         convertUnit(
             Plot_Sized$height, 
@@ -3165,7 +3165,7 @@ count_id <-
             valueOnly = TRUE
         )
 
-  Plot_Sized %<>%
+    Plot_Sized %<>%
         {
             ggplot() +
             annotation_custom(.)
@@ -3176,7 +3176,7 @@ count_id <-
             )
         )
 
-  ## ------------------  save and return ------------------- ##
+    ## ------------------  save and return ------------------- ##
     suppressMessages(
         suppressWarnings(
             save_res(
@@ -3193,7 +3193,7 @@ count_id <-
         )
     )
 
-  OutputList <- list()
+    OutputList <- list()
     OutputList <- 
         list(
             "Table" = processed_data,
@@ -3201,7 +3201,7 @@ count_id <-
             "Plot_Sized" = Plot_Sized
         )
 
-  # Return the processed data and the plot object as a list
+    # Return the processed data and the plot object as a list
     return(
         invisible(OutputList)
     )
