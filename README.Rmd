@@ -1,7 +1,7 @@
 ---
 output: github_document
 bibliography: vignettes/bibliography.bib
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -65,7 +65,7 @@ TissuePlot$Count <- 1
 TissuePlot$AGEFactor <- factor(TissuePlot$AGE, levels = c("Young","Middle", "Old"))
 
 #Plot
-Plot <- ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFactor)) + 
+Plot <- ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFactor)) +
         ggplot2::geom_bar(position="stack", stat="identity")+
         ggplot2::scale_fill_manual(values = c("STAGE I" = "#006384"  , "STAGE II" = "#9F0162", "STAGE III" = "#00735C" , "STAGE IV" = "grey" ))+
         ggplot2::theme_classic()+
@@ -74,7 +74,7 @@ Plot <- ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFacto
         ggplot2::labs(subtitle="Age at surgery <42 = Young,  >58 = Old, else = Middle", x = "Age", y = "Number of Patients")
 
 Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=TissuePlot%>%dplyr::rename("Conditions"="AGE"), plot_name = "ccRCC patients metadata", subtitle = "Age at surgery <42 = Young,  >58 = Old, else = Middle", plot_type="Bar")
- 
+
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
@@ -82,7 +82,7 @@ Plot_Sized %<>%
        magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
 #ggplot2::ggsave(filename = "Tissue_MetadataPlot.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
- 
+
 Plot_Sized_Tissue <- Plot_Sized
 
 ###################################################################################################################################################
@@ -109,7 +109,7 @@ CellPlot_Media <- medium_raw%>%
 
 
 #Plot
-Plot <- ggplot2::ggplot(CellPlot_Intra, ggplot2::aes(fill=Conditions, y=Count, x=CelltypeFactor)) + 
+Plot <- ggplot2::ggplot(CellPlot_Intra, ggplot2::aes(fill=Conditions, y=Count, x=CelltypeFactor)) +
         ggplot2::geom_bar(position="stack", stat="identity")+
         ggplot2::scale_fill_manual(values = c("HK2" = "#006384"  , "786-O" = "#9F0162", "786-M1A" = "#00735C", "786-M2A" = "#00422E"))+
         ggplot2::theme_classic()+
@@ -118,7 +118,7 @@ Plot <- ggplot2::ggplot(CellPlot_Intra, ggplot2::aes(fill=Conditions, y=Count, x
         ggplot2::labs(x = "Celltype", y = "Number of Samples",  fill ="Cellline")
 
 Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=CellPlot_Intra%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"), plot_name = "Intracellular metabolomics", subtitle = NULL, plot_type="Bar")
- 
+
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
@@ -126,7 +126,7 @@ Plot_Sized %<>%
      magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
 #ggplot2::ggsave(filename = "Cellline_IntraPlot.svg", plot = Plot_Sized, width = PlotWidth,  height = PlotHeight, unit="cm")
- 
+
 Plot_Sized_Intra <- Plot_Sized
 
 ###################################################################################################################################################
@@ -147,7 +147,7 @@ CellPlot_Media$CelltypeFactor <- factor(CellPlot_Media$Celltype, levels = c("Hea
 
 
 #Plot
-Plot <- ggplot2::ggplot(CellPlot_Media, ggplot2::aes(fill=Conditions, y=Count, x=CelltypeFactor)) + 
+Plot <- ggplot2::ggplot(CellPlot_Media, ggplot2::aes(fill=Conditions, y=Count, x=CelltypeFactor)) +
         ggplot2::geom_bar(position="stack", stat="identity")+
         ggplot2::scale_fill_manual(values = c("HK2" = "#006384"  , "786-O" = "#d03293", "OSRC2"= "#9F0162" , "RFX631"= "#630026", "786-M1A" = "#00735C", "786-M2A" = "#00422E", "OSLM1B"= "#002B1A"))+
         ggplot2::theme_classic()+
@@ -156,7 +156,7 @@ Plot <- ggplot2::ggplot(CellPlot_Media, ggplot2::aes(fill=Conditions, y=Count, x
         ggplot2::labs(x = "Celltype", y = "Number of Samples",  fill ="Cellline")
 
 Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c(Conditions="Conditions", Superplot="Conditions"), metadata_sample=CellPlot_Media%>%dplyr::rename("Name"="Conditions", "Conditions"="Celltype"), plot_name = "Media metabolomics", subtitle = NULL, plot_type="Bar")
- 
+
 PlotHeight <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 PlotWidth <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
@@ -171,16 +171,9 @@ gridExtra::grid.arrange(Plot_Sized_Tissue, Plot_Sized_Intra, Plot_Sized_Media, n
 ```
 \
 Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle [@Mora_Schmidt2024], originally from [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127) [@Clark2019].
-```{r, eval=FALSE, include=FALSE}
-#This is based on Supplemetary File 2: 13073_2024_1415_MOESM2_ESM.xlsx sheet protein and sheet RNA
-patients <- data.frame(
-  Patient = c("Tumour", "Normal")
-  Protein = c("", ""),
-  RNA= c("",  ""))
-```
-
 
 ## Installation
+
 **MetaProViz** is an R package and to install the package, start R and enter:
 ```{r github_install, eval=FALSE}
 devtools::install_github("https://github.com/saezlab/MetaProViz")
@@ -210,12 +203,12 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 ## Citation
 Please cite our bioRxiv preprint: https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full
 ```
-@article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025, 
+@article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025,
          title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
          DOI={10.1101/2025.08.18.670781},
-         journal={BioRxiv}, 
-         author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio}, 
-         year={2025}, 
+         journal={BioRxiv},
+         author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
+         year={2025},
          month={Aug}}
 ```
 
