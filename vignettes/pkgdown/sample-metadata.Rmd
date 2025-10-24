@@ -131,10 +131,10 @@ This has been done by the authors of the paper and we will use the median normal
 We can use the patient's metadata to find the main metabolite drivers that separate patients based on their demographics like age, gender, etc.\
 \
 Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
-The `MetaProViz::metadata_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
+The `metadata_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
 ```{r}
-MetaRes <- MetaProViz::metadata_analysis(data=Tissue_Norm[,-c(1:13)],
+MetaRes <- metadata_analysis(data=Tissue_Norm[,-c(1:13)],
                                      metadata_sample= Tissue_Norm[,c(2,4:5,12:13)],
                                      scaling = TRUE,
                                      percentage = 0.1,
@@ -172,7 +172,7 @@ TissueTypeList <- MetaRes[["res_summary"]]%>%
 Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
 
 # Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
-MetaProViz:::viz_heatmap(data = Input_Heatmap,
+:viz_heatmap(data = Input_Heatmap,
                        metadata_sample = Tissue_Norm[,c(1:13)],
                        metadata_info = c(color_Sample = list("TISSUE_TYPE")),
                        scale ="column",
@@ -217,7 +217,7 @@ for(item in names(DFs)){
   dir.create(paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""), showWarnings = FALSE)
 
   #Perform dma
-  TvN <- MetaProViz::dma(data =  data[,-c(1:13)],
+  TvN <- dma(data =  data[,-c(1:13)],
                    metadata_sample =  data[,c(1:13)],
                    metadata_info = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
                    shapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
@@ -260,7 +260,7 @@ for(item in names(DFs)){
   dir.create(paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""), showWarnings = FALSE)
 
   #Perform dma
-  TvN <- MetaProViz::dma(data =  data[,-c(1:13)],
+  TvN <- dma(data =  data[,-c(1:13)],
                    metadata_sample =  data[,c(1:13)],
                    metadata_info = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
                    shapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
@@ -279,7 +279,7 @@ We can see from the different Volcano plots have smaller p.adjusted values and d
 Here we can also use the `MetaproViz::viz_volcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
 ```{r}
 # Early versus Late Stage
-MetaProViz::viz_volcano(plot_types="Compare",
+viz_volcano(plot_types="Compare",
                        data=ResList[["EarlyStage"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["LateStage"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="EarlyStage", data2= "LateStage"),
@@ -287,7 +287,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        subtitle= "Results of dma" )
 
 # Young versus Old
-MetaProViz::viz_volcano(plot_types="Compare",
+viz_volcano(plot_types="Compare",
                        data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="Young", data2= "Old"),
@@ -324,7 +324,7 @@ MetaData_Metab <- merge(x=tissue_meta,
   column_to_rownames("Row.names")
 
 # Make a Volcano plot:
-MetaProViz::viz_volcano(plot_types="Standard",
+viz_volcano(plot_types="Standard",
                        data=ResList[["TissueType"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        metadata_feature =  MetaData_Metab,
                        metadata_info = c(color = "MainDriver_Term"),
@@ -342,7 +342,7 @@ MetaboliteIDs <- Tissue_MetaData %>%
   dplyr::rename("HMDB"= "Group_HMDB")%>%
   slice(1:577)# only keep entrys with trivial names
 
-ccRCC_CompareIDs <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rename("Class"="SUPER_PATHWAY")),
+ccRCC_CompareIDs <- compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rename("Class"="SUPER_PATHWAY")),
                                            name_col = "Metabolite",
                                            metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
                                            plot_name = "Overlap of ID types in ccRCC data")
@@ -350,7 +350,7 @@ ccRCC_CompareIDs <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs |>
 \
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to understand the missing IDs focusing on HMDb as an example: 
 ```{r}
-Plot1_HMDB <- MetaProViz::count_id(MetaboliteIDs, "HMDB")
+Plot1_HMDB <- count_id(MetaboliteIDs, "HMDB")
 ```
 \
 Over 200 metabolites have no HMDB ID and if there is a HMDB ID assigned, we only have one HMDB ID. Here we assume the experimental setup does not account for stereoisomers and that other IDs are with different degrees of ambiguity are possible (e.g. L-Alanine HMDB ID is present and we will add D-Alanine HMDB ID, see PK vignette for more details). This enables us to assign additional potential HMDB IDs per feature.
@@ -360,7 +360,7 @@ Input_HMDB <- MetaboliteIDs %>%
   dplyr::select("Metabolite", "HMDB", "SUPER_PATHWAY") # only keep relevant columns
 
 # Add equivalent IDs:
-tissue_meta_AddIDs_HMDB <- MetaProViz::equivalent_id(data= Input_HMDB,
+tissue_meta_AddIDs_HMDB <- equivalent_id(data= Input_HMDB,
                                                            metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
                                                            from = "hmdb")
 # Let's see how this has changed the number of entries:
@@ -370,7 +370,7 @@ tissue_meta_AddIDs_HMDB <- merge(x=MetaboliteIDs,
                                        all.x=TRUE)
 
 # Plot 2 after equivalent IDs where added
-Plot2_HMDB <- MetaProViz::count_id(tissue_meta_AddIDs_HMDB, "AllIDs")
+Plot2_HMDB <- count_id(tissue_meta_AddIDs_HMDB, "AllIDs")
 ```
 \
 Additionally, for the metabolites without HMDB ID we can check if a HMDB ID is available using the other ID types. First we check if we have cases in which we do have no HMDB ID, but other available IDs:
@@ -395,10 +395,10 @@ summary_table%>%
 no_hmdb <- dplyr::filter(MetaboliteIDs, is.na(HMDB) & (!is.na(PUBCHEM) | !is.na(KEGG)))
 
 tissue_meta_translated_HMDB <-
-  MetaProViz::translate_id(no_hmdb, metadata_info = list(InputID = "PUBCHEM", grouping_variable = "SUPER_PATHWAY"), from = "pubchem", to = "hmdb") |>
+  translate_id(no_hmdb, metadata_info = list(InputID = "PUBCHEM", grouping_variable = "SUPER_PATHWAY"), from = "pubchem", to = "hmdb") |>
   extract2("TranslatedDF") |>
   rename(hmdb_from_pubchem = hmdb) |>
-  MetaProViz::translate_id(metadata_info = list(InputID = "KEGG", grouping_variable = "SUPER_PATHWAY"), from = "kegg", to = "hmdb") |>
+  translate_id(metadata_info = list(InputID = "KEGG", grouping_variable = "SUPER_PATHWAY"), from = "kegg", to = "hmdb") |>
   extract2("TranslatedDF") |>
   rename(hmdb_from_kegg = hmdb)
 
@@ -417,14 +417,14 @@ Tissue_MetaData_HMDB <-
   ungroup()
 
 # Plot 3:
-Plot3_HMDB <- MetaProViz::count_id(Tissue_MetaData_HMDB, "hmdb_combined")
+Plot3_HMDB <- count_id(Tissue_MetaData_HMDB, "hmdb_combined")
 ```
 \
 If we inspect the tables we can check that for example, 16-hydroxypalmitate certainly has an HMDB ID, yet was missing from the original metadata table. We can check the structures associated to it on [PubChem:10466](https://pubchem.ncbi.nlm.nih.gov/compound/10466) and [KEGG:C18218](https://www.genome.jp/entry/C18218) are indeed identical, and as we expect, the same structure is in HMDB too, under the ID [HMDB0006294](https://hmdb.ca/metabolites/HMDB0006294).\
 \
 We can of course do the same for other IDs, such as the KEGG IDs:
 ```{r}
-Plot1_KEGG <- MetaProViz::count_id(MetaboliteIDs, "KEGG")
+Plot1_KEGG <- count_id(MetaboliteIDs, "KEGG")
 
 ##################################################################################################################
 Input_KEGG <- Tissue_MetaData_HMDB %>%
@@ -432,7 +432,7 @@ Input_KEGG <- Tissue_MetaData_HMDB %>%
   dplyr::select("Metabolite", "KEGG", "SUPER_PATHWAY") # only keep relevant columns
 
 # Add equivalent IDs:
-tissue_meta_AddIDs_KEGG <- MetaProViz::equivalent_id(data= Input_KEGG,
+tissue_meta_AddIDs_KEGG <- equivalent_id(data= Input_KEGG,
                                                 metadata_info = c(InputID="KEGG"),# ID in the measured data, here we use the HMDB ID
                                                 from = "kegg")
 
@@ -442,16 +442,16 @@ tissue_meta_AddIDs_KEGG <- merge(x=Tissue_MetaData_HMDB,
                                  by="KEGG",
                                  all.x=TRUE)
 
-Plot2_KEGG <-  MetaProViz::count_id(tissue_meta_AddIDs_KEGG, "AllIDs")
+Plot2_KEGG <-  count_id(tissue_meta_AddIDs_KEGG, "AllIDs")
 
 ###################################################################################################################
 no_KEGG <- dplyr::filter(Tissue_MetaData_HMDB, is.na(KEGG) & (!is.na(PUBCHEM) | !is.na(HMDB)))
 
 tissue_meta_translated_KEGG <-
-  MetaProViz::translate_id(no_KEGG, metadata_info = list(InputID = "PUBCHEM", grouping_variable = "SUPER_PATHWAY"), from = "pubchem", to = "kegg") |>
+  translate_id(no_KEGG, metadata_info = list(InputID = "PUBCHEM", grouping_variable = "SUPER_PATHWAY"), from = "pubchem", to = "kegg") |>
   extract2("TranslatedDF") |>
   rename(kegg_from_pubchem = kegg) |>
-  MetaProViz::translate_id(metadata_info = list(InputID = "HMDB", grouping_variable = "SUPER_PATHWAY"), from = "hmdb", to = "kegg") |>
+  translate_id(metadata_info = list(InputID = "HMDB", grouping_variable = "SUPER_PATHWAY"), from = "hmdb", to = "kegg") |>
   extract2("TranslatedDF") |>
   rename(kegg_from_hmdb = kegg)
 
@@ -470,7 +470,7 @@ Tissue_MetaData_KEGG <-
   ungroup()
 
 # Lets see the count now:
-Plot3_KEGG <- MetaProViz::count_id(Tissue_MetaData_KEGG, "KEGG")
+Plot3_KEGG <- count_id(Tissue_MetaData_KEGG, "KEGG")
 ```
 \
 Lastly, we will have the new metadata table, which we can use for enrichment analysis:
@@ -481,7 +481,7 @@ Tissue_MetaData_Extended <-  Tissue_MetaData_KEGG[, c(1:10,19, 11:18)]%>%
     HMDB = ifelse(HMDB == "", NA, HMDB)
   )
 
-ccRCC_CompareIDs_Extended <- MetaProViz::compare_pk(data = list(Biocft = Tissue_MetaData_Extended |> dplyr::rename("Class"="SUPER_PATHWAY")),
+ccRCC_CompareIDs_Extended <- compare_pk(data = list(Biocft = Tissue_MetaData_Extended |> dplyr::rename("Class"="SUPER_PATHWAY")),
                                                     name_col = "Metabolite",
                                                     metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
                                                     plot_name = "Overlap of ID types in ccRCC data")
@@ -503,7 +503,7 @@ KEGG_Pathways <- metsigdb_kegg()
 
 #check mapping with metadata
 
-ccRCC_to_KEGGPathways <- MetaProViz::checkmatch_pk_to_data(data = Tissue_MetaData_Extended,
+ccRCC_to_KEGGPathways <- checkmatch_pk_to_data(data = Tissue_MetaData_Extended,
                                                            input_pk = KEGG_Pathways,
                                                            metadata_info = c(InputID = "KEGG", PriorID = "MetaboliteID", grouping_variable = "term"))
 
@@ -581,9 +581,9 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
     tibble::column_to_rownames("InputID_select")
   
   #Perform ORA
-  Res <- MetaProViz::standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
+  Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
                                  pathway_name=paste0("KEGG_", comparison, sep=""),
                                  min_gssize=3,
                                  max_gssize=1000,
@@ -599,7 +599,7 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
     filter(percentage_of_Pathway_detected>10)
 
   if(is.null(Res_Select)==FALSE){
-     MetaProViz::viz_volcano(plot_types="PEA",
+     viz_volcano(plot_types="PEA",
                        data= dma_res, #Must be the data you have used as an input for the pathway analysis
                        data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
@@ -639,9 +639,9 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
     tibble::column_to_rownames("InputID_select")
   
   #Perform ORA
-  Res <- MetaProViz::standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
+  Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
                                  pathway_name=paste0("KEGG_", comparison, sep=""),
                                  min_gssize=3,
                                  max_gssize=1000,
@@ -657,7 +657,7 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
     filter(percentage_of_Pathway_detected>10)
 
   if(is.null(Res_Select)==FALSE){
-     MetaProViz::viz_volcano(plot_types="PEA",
+     viz_volcano(plot_types="PEA",
                        data= dma_res, #Must be the data you have used as an input for the pathway analysis
                        data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
@@ -677,7 +677,7 @@ for(comparison in names(ResList)){#Res list includes the different comparisons w
 
 ## Biological regulated clustering
 to understand which metabolites are changing independent of the patients age, hence only due to tumour versus normal, and which metabolites change independent of tumour versus normal, hence due to the different age,
-we can use the `MetaProViz::mca_2cond()` function.\
+we can use the `mca_2cond()` function.\
 Metabolite Clustering Analysis (`MCA`) enables clustering of metabolites into groups based on logical regulatory rules. Here we set two different thresholds, one for the differential metabolite abundance (Log2FC) and one for the significance (e.g. p.adj). This will define if a feature (= metabolite) is assigned into:\
 1. “UP”, which means a metabolite is significantly up-regulated in the underlying comparison.\
 2. “DOWN”, which means a metabolite is significantly down-regulated in the underlying comparison.\
@@ -691,7 +691,7 @@ Thereby “No Change” is further subdivided into four states:\
 \
 For more information you can also check out the other vignettes.
 ```{r}
-MCAres <-  MetaProViz::mca_2cond(data_c1=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]],
+MCAres <-  mca_2cond(data_c1=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]],
                                  data_c2=ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]],
                                  metadata_info_c1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
                                  metadata_info_c2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
@@ -710,7 +710,7 @@ MetaData_Metab <- merge(x=Tissue_MetaData,
                    all.y=TRUE)%>%
   tibble::column_to_rownames("Row.names")
 
-MetaProViz::viz_volcano(plot_types="Compare",
+viz_volcano(plot_types="Compare",
                        data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="Young", data2= "Old"),
@@ -720,7 +720,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                        metadata_info = c(individual = "SUPER_PATHWAY",
                                         color = "RG2_Significant"))
 
-MetaProViz::viz_volcano(plot_types="Compare",
+viz_volcano(plot_types="Compare",
                        data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="Young", data2= "Old"),
@@ -740,7 +740,7 @@ MetaData_Metab <- merge(x=Tissue_MetaData,
                    all.y=TRUE)%>%
   tibble::column_to_rownames("Row.names")
 
-MetaProViz::viz_volcano(plot_types="Compare",
+viz_volcano(plot_types="Compare",
                        data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="Young", data2= "Old"),
@@ -751,7 +751,7 @@ MetaProViz::viz_volcano(plot_types="Compare",
                                         color = "RG2_Significant"),
                        color_palette = c(Cond1_DOWN="#0694B9", Cond2_DOWN="#38BEEF",Cond1_UP="#F1E644", Cond2_UP= "#DE963F", core_DOWN="#2F358B", core_UP="#BD1F2D", Opposite="#10AC8D", None="#969697"))
 
-MetaProViz::viz_volcano(plot_types="Compare",
+viz_volcano(plot_types="Compare",
                        data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
                        name_comparison= c(data="Young", data2= "Old"),
@@ -774,7 +774,7 @@ Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for ea
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+KEGG_Pathways <- metsigdb_kegg()
 
 for(comparison in names(ResList)){
   dma_res <- merge(x= Tissue_MetaData_Extended,
@@ -797,9 +797,9 @@ for(comparison in names(ResList)){
   
   
   #Perform ORA
-  Res <- MetaProViz::standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
+  Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
                                  pathway_name=paste0("KEGG_", comparison, sep=""),
                                  min_gssize=3,
                                  max_gssize=1000,
@@ -815,7 +815,7 @@ for(comparison in names(ResList)){
     filter(percentage_of_Pathway_detected>10)
 
   if(is.null(Res_Select)==FALSE){
-     MetaProViz::viz_volcano(plot_types="PEA",
+     viz_volcano(plot_types="PEA",
                        data= dma_res, #Must be the data you have used as an input for the pathway analysis
                        data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
@@ -834,7 +834,7 @@ for(comparison in names(ResList)){
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
-KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+KEGG_Pathways <- metsigdb_kegg()
 
 for(comparison in names(ResList)){
   #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
@@ -846,9 +846,9 @@ for(comparison in names(ResList)){
   DMA_Select <- dma%>%distinct(KEGG, .keep_all = TRUE)%>%remove_rownames()%>%tibble::column_to_rownames("KEGG")
 
   #Perform ORA
-  Res <- MetaProViz::standard_ora(data= DMA_Select, #Input data requirements: column `t.val` and column `Metabolite`
+  Res <- standard_ora(data= DMA_Select, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
                                  pathway_name=paste0("KEGG_", comparison, sep=""),
                                  min_gssize=3,
                                  max_gssize=1000,
@@ -864,7 +864,7 @@ for(comparison in names(ResList)){
     filter(percentage_of_Pathway_detected>10)
 
   if(is.null(Res_Select)==FALSE){
-     MetaProViz::viz_volcano(plot_types="PEA",
+     viz_volcano(plot_types="PEA",
                        data= DMA_Select, #Must be the data you have used as an input for the pathway analysis
                        data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
