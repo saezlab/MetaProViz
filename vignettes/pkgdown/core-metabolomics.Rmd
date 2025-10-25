@@ -367,7 +367,7 @@ heatmap <- pheatmap::pheatmap(
 )
 
 # Save
-Plot_Sized <- :plot_grob_heatmap(input_plot=heatmap, metadata_info=NULL, metadata_sample=NULL, metadata_feature=NULL,plot_name= "test")
+Plot_Sized <- MetaProViz:::plot_grob_heatmap(input_plot=heatmap, metadata_info=NULL, metadata_sample=NULL, metadata_feature=NULL,plot_name= "test")
 Plot_Sized %<>%
       {ggplot2::ggplot() + annotation_custom(.)} %>%
       add(theme(panel.background = element_rect(fill = "transparent")))
@@ -561,7 +561,7 @@ Plot_RG2 <- ggplot2::ggplot(Clustersummary_RG2 , ggplot2::aes(fill=`SiRCle clust
                        legend.position = "none")+
         ggplot2::labs(x = "SiRCle cluster", y = "Number of Metabolites")
 
-Plot_Sized <-  :plot_grob_superplot(input_plot=Plot_RG2, metadata_info=c(Conditions="Conditions"), metadata_sample=Clustersummary_RG2%>%dplyr::rename("Conditions"="SiRCle cluster Name"), plot_name = "SiRCle cluster for RG2_Significant", subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot_RG2, metadata_info=c(Conditions="Conditions"), metadata_sample=Clustersummary_RG2%>%dplyr::rename("Conditions"="SiRCle cluster Name"), plot_name = "SiRCle cluster for RG2_Significant", subtitle = NULL, plot_type="Bar")
 
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
@@ -583,7 +583,7 @@ Plot_RG3 <- ggplot2::ggplot(Clustersummary_RG3 , ggplot2::aes(fill=`SiRCle clust
                        legend.position = "none")+
         ggplot2::labs(x = "SiRCle cluster", y = "Number of Metabolites")
 
-Plot_Sized <-  :plot_grob_superplot(input_plot=Plot_RG3, metadata_info=c(Conditions="Conditions"), metadata_sample=Clustersummary_RG3%>%dplyr::rename("Conditions"="SiRCle cluster Name"), plot_name = "SiRCle cluster for RG3_Change", subtitle = NULL, plot_type="Bar")
+Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot_RG3, metadata_info=c(Conditions="Conditions"), metadata_sample=Clustersummary_RG3%>%dplyr::rename("Conditions"="SiRCle cluster Name"), plot_name = "SiRCle cluster for RG3_Change", subtitle = NULL, plot_type="Bar")
 
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
