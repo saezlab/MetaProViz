@@ -176,7 +176,7 @@ TissueTypeList <- MetaRes[["res_summary"]]%>%
 Input_Heatmap <- Tissue_Norm[ , names(Tissue_Norm) %in% TissueTypeList]#c("N1-methylguanosine", "N-acetylalanine", "lysylmethionine")
 
 # Heatmap: Metabolites that separate the demographics, like here TISSUE_TYPE
-:viz_heatmap(data = Input_Heatmap,
+viz_heatmap(data = Input_Heatmap,
                        metadata_sample = Tissue_Norm[,c(1:13)],
                        metadata_info = c(color_Sample = list("TISSUE_TYPE")),
                        scale ="column",

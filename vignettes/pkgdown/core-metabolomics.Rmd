@@ -909,7 +909,7 @@ viz_superplot(data =Input_Superplot%>%  select(any_of(metabolite_list)),#We just
 \
 Now, if we for instance prefer boxplots over bargraphs we can simply change the parameter `plot_type`:
 ```{r, eval=FALSE}
-:viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Box", #Bar, Box, Violin
@@ -919,7 +919,7 @@ Now, if we for instance prefer boxplots over bargraphs we can simply change the 
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-:viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Box", #Bar, Box, Violin
@@ -932,7 +932,7 @@ Now, if we for instance prefer boxplots over bargraphs we can simply change the 
 \
 We can also change it to violin plots:
 ```{r, eval=FALSE}
-:viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Violin", #Bar, Box, Violin
@@ -942,7 +942,7 @@ We can also change it to violin plots:
 
 <div class="vscroll-plot">
 ```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
-:viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
+viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
                                            plot_type = "Violin", #Bar, Box, Violin
