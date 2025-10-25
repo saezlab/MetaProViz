@@ -57,11 +57,13 @@ List with two elements: DF (including all output tables generated) and Plot (inc
 Modularised Normalization: 80\%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
 }
 \examples{
+data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
 ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
                                metadata_sample=Intra[-c(49:58), c(1:3)],
                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 
+data(medium_raw)
 Media <- medium_raw \%>\% tibble::column_to_rownames("Code")
 ResM <- processing(data = Media[-c(40:45), -c(1:3)],
                                metadata_sample = Media[-c(40:45), c(1:3)],

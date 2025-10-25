@@ -114,6 +114,7 @@ Within a Single data Frame)
 "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 # Here the "Class" column is used as the grouping variable
 in the UpSet plot.
+data(biocrates_features)
 data_single <- list(Biocft = biocrates_features)
 metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 

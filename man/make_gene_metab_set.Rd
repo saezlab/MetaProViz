@@ -30,6 +30,7 @@ List of two data frames: "GeneMetabSet" and "MetabSet".
 Gene to metabolite translation is based on mappings in Recon-3D (cosmosR).
 }
 \examples{
+data(hallmarks)
 make_gene_metab_set(hallmarks)
 
 }
