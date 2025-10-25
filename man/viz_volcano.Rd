@@ -87,6 +87,7 @@ This script allows you to perform different data visualizations using the result
 Volcano plot
 }
 \examples{
+data(intracell_dma)
 Intra <- intracell_dma\%>\%tibble::column_to_rownames("Metabolite")
 Res <- viz_volcano(data=Intra)
 

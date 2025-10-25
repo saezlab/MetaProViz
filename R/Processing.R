@@ -43,11 +43,13 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
 #'                                metadata_sample=Intra[-c(49:58), c(1:3)],
 #'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
+#' data(medium_raw)
 #' Media <- medium_raw %>% tibble::column_to_rownames("Code")
 #' ResM <- processing(data = Media[-c(40:45), -c(1:3)],
 #'                                metadata_sample = Media[-c(40:45), c(1:3)],
@@ -289,6 +291,7 @@ processing <- function(data,
 #' @return DF with the merged analytical replicates
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
 #'                                 metadata_sample=Intra[-c(49:58) , c(1:3)],
@@ -407,6 +410,7 @@ replicate_sum <- function(data,
 #' @return List with two elements: DF (including input and output table) and Plot (including all plots generated)
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- pool_estimation(data=Intra[ ,-c(1:3)],
 #'                                 metadata_sample=Intra[ , c(1:3)],
@@ -632,6 +636,7 @@ pool_estimation <- function(data,
 #' @return List with two elements: filtered matrix  and features filtered
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- feature_filtering(
 #'     data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
@@ -758,6 +763,7 @@ feature_filtering <-function(data,
 #' @return DF with imputed values
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- mvi_imputation(
 #'     data = Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
@@ -907,6 +913,7 @@ mvi_imputation <- function(data,
 #' @return List with two elements: DF (including output table) and Plot (including all plots generated)
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- tic_norm(
 #'     data=Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
@@ -1305,6 +1312,7 @@ core_norm <- function(data,
 #' @return List with two elements: : DF (including output tables) and Plot (including all plots generated)
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- outlier_detection(
 #'     data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),

@@ -353,6 +353,7 @@ translate_id <-
 #' @return Input DF with additional column including potential additional IDs.
 #'
 #' @examples
+#' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>% tidyr::drop_na()
 #' Res <- equivalent_id(
 #' data = DetectedIDs,
@@ -514,6 +515,7 @@ equivalent_id <-
 
   ## ------------------ Load manual table ----------------- ##
     if ((from == "kegg") == FALSE) {
+        data(equivalent_features)
         EquivalentFeatures <-
             equivalent_features %>%
       select(from)
@@ -1412,6 +1414,7 @@ mapping_ambiguity <-
 #' }
 #'
 #' @examples
+#' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>%
 #' dplyr::select("Metabolite", "HMDB") %>%
 #' tidyr::drop_na()
@@ -2556,6 +2559,7 @@ add_info <-
 #' "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 #' # Here the "Class" column is used as the grouping variable
 #' in the UpSet plot.
+#' data(biocrates_features)
 #' data_single <- list(Biocft = biocrates_features)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
@@ -2936,159 +2940,274 @@ compare_pk <-
 
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
-#' This function processes a data frame column by counting the number of entries within each cell.
-#' It considers both \code{NA} values and empty strings as zero entries, and categorizes each cell as
-#' "No ID", "Single ID", or "Multiple IDs" based on the count. A histogram is then generated to visualize
+#' This function processes a data frame column by counting the number of
+#' entries
+#' within each cell.
+#' It considers both \code{NA} values and empty strings as zero entries, and
+#' categorizes each cell as
+#' "No ID", "Single ID", or "Multiple IDs" based on the count. A histogram is
+#' then generated to visualize
 #' the distribution of entry counts.
 #'
 #' @param data A data frame containing the data to be analyzed.
-#' @param column A string specifying the name of the column in \code{data} to analyze.
-#' @param delimiter A string specifying the delimiter used to split cell values. Defaults to \code{","}.
-#' @param fill_colors A named character vector providing colors for each category. Defaults to
-#'   \code{c("No ID" = "#FB8072", "Single ID" = "#B3DE69", "Multiple IDs" = "#80B1D3")}.
-#' @param binwidth Numeric value specifying the bin width for the histogram. Defaults to \code{1}.
-#' @param title_prefix A string to use as the title of the plot. If \code{NULL} (default), the title
-#'   will be generated as "Number of <column> IDs per Biocrates Cell".
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param column A string specifying the name of the column in \code{data} to
+#' analyze.
+#' @param delimiter A string specifying the delimiter used to split cell
+#' values.
+#' Defaults to \code{","}.
+#' @param fill_colors A named character vector providing colors for each
+#' category. Defaults to
+#' \code{c("No ID" = "#FB8072", "Single ID" = "#B3DE69", "Multiple IDs" =
+#' "#80B1D3")}.
+#' @param binwidth Numeric value specifying the bin width for the histogram.
+#' Defaults to \code{1}.
+#' @param title_prefix A string to use as the title of the plot. If \code{NULL}
+#' (default), the title
+#' will be generated as "Number of <column> IDs per Biocrates Cell".
+#' @param save_plot \emph{Optional: } Select the file type of output plots.
+#' Options are svg, png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
+#' saved as an overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved
+#' at. \strong{Default = NULL}
 #'
 #' @examples
+#' data(biocrates_features)
 #' count_id(biocrates_features, "HMDB")
 #'
 #' @return A list with two elements:
-#'   \item{result}{A data frame that includes three additional columns: \code{was_na} (logical indicator
-#'                  of missing or empty cells), \code{entry_count} (number of entries in each cell), and
-#'                  \code{id_label} (a categorical label based on the entry count).}
-#'   \item{plot}{A \code{ggplot} object representing the histogram of entry counts.}
+#' \item{result}{A data frame that includes three additional columns:
+#' \code{was_na} (logical indicator
+#' of missing or empty cells), \code{entry_count} (number of entries in each
+#' cell), and
+#' \code{id_label} (a categorical label based on the entry count).}
+#' \item{plot}{A \code{ggplot} object representing the histogram of entry
+#' counts.}
 #'
 #' @importFrom dplyr case_when mutate rename
 #' @importFrom ggplot2 aes element_rect element_text expansion geom_bar
-#' @importFrom ggplot2 geom_histogram ggplot labs scale_fill_manual scale_x_continuous
+#' @importFrom ggplot2 geom_histogram ggplot labs scale_fill_manual
+#' scale_x_continuous
 #' @importFrom ggplot2 scale_y_continuous theme theme_classic
 #' @importFrom grid convertUnit
 #' @export
-count_id <- function(data,
-                      column,
-                      delimiter = ",",
-                      fill_colors = c("No ID" = "#FB8072",
-                                      "Single ID" = "#B3DE69",
-                                      "Multiple IDs" = "#80B1D3"),
-                      binwidth = 1,
-                      title_prefix = NULL,
-                      save_plot = "svg",
-                      save_table = "csv",
-                      print_plot = TRUE,
-                      path = NULL) {
-  #@Macabe:
-  #move named fill colors inside of the function. if the user provides other string of colors, we change them.
-  #we need to specify that NA is counted as none
-  #we need to check for duplications (i.e. is the trivialname duplicated in the data frame, remove this and give a warning)
-  #give the user the change to pass multiple columns to analyse, which would mean we create a plot for each column and label the plot with the column name
-  #add count_id function into Equivalent IDs: make a plot before and after equivalent IDs and put them side by side to return as the QC plot of the function
-  #add save_plot and save_table
-  #return both standard plot and Plot_Sized (=nice version of the plot which is saved. the other plot is still returned, since this is the ggplot version and can be changed further)
-  #create subtitle and not title prefix
+count_id <-
+    function(
+        data,
+        column,
+        delimiter = ",",
+        fill_colors = c(
+            "No ID" = "#FB8072",
+            "Single ID" = "#B3DE69",
+            "Multiple IDs" = "#80B1D3"
+        ),
+        binwidth = 1,
+        title_prefix = NULL,
+        save_plot = "svg",
+        save_table = "csv",
+        print_plot = TRUE,
+        path = NULL
+    ) {
+    # @Macabe:
+    # move named fill colors inside of the function. if the user provides other
+    # string of colors, we change them.
+    # we need to specify that NA is counted as none
+    # we need to check for duplications (i.e. is the trivialname duplicated in
+    # the data frame, remove this and give a warning)
+    # give the user the change to pass multiple columns to analyse, which would
+    # mean we create a plot for each column and label the plot with the column
+    # name
+    # add count_id function into Equivalent IDs: make a plot before and after
+    # equivalent IDs and put them side by side to return as the QC plot of the
+    # function
+    # add save_plot and save_table
+    # return both standard plot and Plot_Sized (=nice version of the plot which
+    # is saved. the other plot is still returned, since this is the ggplot
+    # version and can be changed further)
+    # create subtitle and not title prefix
 
+    ## ------------------  logger initiation ------------------- ##
 
-  ## ------------------  logger initiation ------------------- ##
+    ## ------------------  Checks ------------------- ##
 
+    ## ------------------  Create output folders and path ------------------- ##
+    if (is.null(save_table) == FALSE) {
+        folder <- save_path(
+            folder_name = "PK",
+            path = path
+        )
 
-  ## ------------------  Checks ------------------- ##
-
-
-  ## ------------------  Create output folders and path ------------------- ##
-  if(is.null(save_table)==FALSE ){
-    folder <- save_path(folder_name= "PK",
-                       path=path)
-
-    Subfolder <- file.path(folder, "CountIDs")
-    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
-  }
-
-  ## ------------------  data table ------------------- ##
-  # Process the data: count entries and label each cell based on the number of entries.
-  processed_data <- mutate(
-    data,
-    was_na = is.na(.data[[column]]) | .data[[column]] == "",
-    entry_count = map_int(
-      .data[[column]],
-      function(cell) {
-        if (is.na(cell) || cell == "") {
-          0L  # Treat NA or empty as 0 entries for counting
-        } else {
-          as.integer(length(unlist(strsplit(as.character(cell), delimiter))))
+        Subfolder <- file.path(folder, "CountIDs")
+        if (!dir.exists(Subfolder)) {
+            dir.create(Subfolder)
         }
-      }
-    ),
-    id_label = case_when(
-      entry_count == 0 ~ "No ID",
-      entry_count == 1 ~ "Single ID",
-      entry_count >= 2 ~ "Multiple IDs"
+    }
+
+    ## ------------------  data table ------------------- ##
+    # Process the data: count entries and label each cell based on the number of
+    # entries.
+    processed_data <-
+        mutate(
+            data,
+            was_na = is.na(.data[[column]]) | .data[[column]] == "",
+            entry_count = map_int(
+                .data[[column]],
+                function(cell) {
+                    if (is.na(cell) || cell == "") {
+                        0L
+                        # Treat NA or empty as 0 entries for counting
+                    } else {
+                        as.integer(length(unlist(strsplit(as.character(cell),
+                            delimiter))))
+                    }
+                }
+            ),
+            id_label = case_when(
+                entry_count == 0 ~ "No ID",
+                entry_count == 1 ~ "Single ID",
+                entry_count >= 2 ~ "Multiple IDs"
+            )
+        )
+
+
+    ## ------------------  plot ------------------- ##
+    # Generate the plot title if not provided
+    if (is.null(title_prefix)) {
+        plot_name <- paste("Number of", column, "IDs per measured peak.")
+    } else {
+        plot_name <- title_prefix
+    }
+
+    # Create the histogram plot using ggplot2
+    if (length(unique(processed_data$entry_count)) > 1) {
+        plot_obj <-
+            ggplot(
+                processed_data,
+                aes(
+                    x = entry_count,
+                    fill = id_label
+                )
+            ) +
+            geom_histogram(
+                binwidth = binwidth,
+                boundary = -0.5,
+                color = "black"
+            ) +
+            # Set axis to start at 0
+            scale_x_continuous(
+                expand = expansion(mult = c(0, 0.05))
+            ) +
+            scale_y_continuous(
+                expand = expansion(mult = c(0, 0.05))
+            )
+    } else {
+    # Create bargraph plot using ggplot2
+        plot_obj <-
+            ggplot(
+                processed_data,
+                aes(
+                    x = as.factor(entry_count),
+                    fill = id_label
+                )
+            ) +
+            geom_bar(
+                color = "black"
+            ) +
+            # Set axis to start at 0
+            scale_y_continuous(
+                expand = expansion(mult = c(0, 0.05))
+            )
+    }
+
+    plot_obj <-
+        plot_obj +
+        scale_fill_manual(
+            values = fill_colors
+        ) +
+        labs(
+            title = plot_name,
+            x = "Number of IDs",
+            y = "Frequency",
+            fill = paste0(column, " IDs", sep = "")
+        ) +
+        theme_classic() +
+        theme(
+            plot.title = element_text(hjust = 0.5, size = 12),
+            legend.position.inside = c(0.8, 0.8),
+            legend.justification = c("right", "top"),
+            legend.title = element_text(size = 12),
+            legend.text = element_text(size = 12)
+        )
+
+    # Make the nice plot:
+    Plot_Sized <-
+        plot_grob_superplot(
+            input_plot = plot_obj,
+            metadata_info = c(
+                Conditions = "id_label",
+                Superplot = TRUE
+            ),
+            metadata_sample = processed_data %>%
+                dplyr::rename("Conditions" = "entry_count"),
+            plot_name = plot_name,
+            subtitle = "",
+            plot_type = "Bar"
+        )
+
+    plot_height <-
+        convertUnit(
+            Plot_Sized$height,
+            "cm",
+            valueOnly = TRUE
+        )
+
+    plot_width <-
+        convertUnit(
+            Plot_Sized$width,
+            "cm",
+            valueOnly = TRUE
+        )
+
+    Plot_Sized %<>%
+        {
+            ggplot() +
+            annotation_custom(.)
+        } %>%
+        add(
+            theme(
+                panel.background = element_rect(fill = "transparent")
+            )
+        )
+
+    ## ------------------  save and return ------------------- ##
+    suppressMessages(
+        suppressWarnings(
+            save_res(
+                #  inputlist_df needs to be a list, also for single comparisons
+                inputlist_df = list("Table" = processed_data),
+                inputlist_plot = list("Plot_Sized" = Plot_Sized),
+                save_table = save_table,
+                save_plot = save_plot,
+                path = Subfolder,
+                file_name = "Count_MetaboliteIDs",
+                core = FALSE,
+                print_plot = print_plot
+            )
+        )
     )
-  )
 
+    OutputList <- list()
+    OutputList <-
+        list(
+            "Table" = processed_data,
+            "Plot" = plot_obj,
+            "Plot_Sized" = Plot_Sized
+        )
 
-  ## ------------------  plot ------------------- ##
-  # Generate the plot title if not provided
-  if (is.null(title_prefix)) {
-    plot_name <- paste("Number of", column, "IDs per measured peak.")
-  } else {
-    plot_name <- title_prefix
-  }
-
-  # Create plot using ggplot2
-  if(length(unique(processed_data$entry_count))>1){# Create the histogram plot using ggplot2
-    plot_obj <- ggplot(processed_data, aes(x = entry_count, fill = id_label)) +
-      geom_histogram(binwidth = binwidth, boundary = -0.5, color = "black")+# Set axis to start at 0
-      scale_x_continuous(expand = expansion(mult = c(0, 0.05)))+
-      scale_y_continuous(expand = expansion(mult = c(0, 0.05)))
-  }else{# Create bargraph plot using ggplot2
-    plot_obj <- ggplot(processed_data, aes(x = as.factor(entry_count), fill = id_label)) +
-      geom_bar(color = "black")+  # Set axis to start at 0
-     scale_y_continuous(expand = expansion(mult = c(0, 0.05)))
-
-  }
-
-  plot_obj <- plot_obj +
-    scale_fill_manual(values = fill_colors) +
-    labs(title = plot_name,
-                  x = "Number of IDs",
-                  y = "Frequency",
-                  fill = paste0(column, " IDs", sep="")) +
-    theme_classic() +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 12),
-      legend.position.inside = c(0.8, 0.8),
-      legend.justification = c("right", "top"),
-      legend.title = element_text(size = 12),
-      legend.text = element_text(size = 12)
+    # Return the processed data and the plot object as a list
+    return(
+        invisible(OutputList)
     )
-
-  # Make the nice plot:
-  Plot_Sized <-  plot_grob_superplot(input_plot=plot_obj, metadata_info= c(Conditions="id_label", Superplot = TRUE), metadata_sample= processed_data%>%dplyr::rename("Conditions"="entry_count") , plot_name = plot_name, subtitle = "", plot_type="Bar")
-  plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-  plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
-  Plot_Sized %<>%
-    {ggplot() + annotation_custom(.)} %>%
-    add(theme(panel.background = element_rect(fill = "transparent")))
-
-  ## ------------------  save and return ------------------- ##
-  suppressMessages(suppressWarnings(
-    save_res(inputlist_df=list("Table"=processed_data),#This needs to be a list, also for single comparisons
-            inputlist_plot=list("Plot_Sized"=Plot_Sized) ,
-            save_table= save_table,
-            save_plot=save_plot,
-            path= Subfolder,
-            file_name= "Count_MetaboliteIDs",
-            core=FALSE,
-            print_plot=print_plot)))
-
-  OutputList <- list()
-  OutputList <- list("Table"=processed_data, "Plot"=plot_obj, "Plot_Sized"=Plot_Sized)
-
-  # Return the processed data and the plot object as a list
-  return(invisible(OutputList))
 }
-

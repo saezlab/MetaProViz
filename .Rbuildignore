@@ -4,7 +4,7 @@
 ^Meta$
 ^vignettes/MetaProViz_Results$
 ^MetaProViz_Results$
-^\.bumpversion.cfg$
+^\.bumpversion\.cfg$
 ^\.Rbuildignore$
 ^\.Rprofile$
 ^\.Rhistory$
@@ -15,10 +15,11 @@
 ^\.gitignore$
 ^\.DS_Store$
 ^docs$
-^omnipathr-log$
-^metaproviz-log$
+^omnipathr-log.*$
+^metaproviz-log.*$
 ^_pkgdown.yml$
 ^pkgdown$
 ^vignettes/.*\.png$
 ^inst/doc/.*\.png$
 ^MetaProViz.BiocCheck$
+^inst/scripts/.*$

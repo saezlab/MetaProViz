@@ -194,6 +194,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #' @return List of two data frames: "GeneMetabSet" and "MetabSet".
 #'
 #' @examples
+#' data(hallmarks)
 #' make_gene_metab_set(hallmarks)
 #'
 #' @importFrom dplyr rename

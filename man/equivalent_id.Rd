@@ -35,6 +35,7 @@ Input DF with additional column including potential additional IDs.
 Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 }
 \examples{
+data(cellular_meta)
 DetectedIDs <- cellular_meta \%>\% tidyr::drop_na()
 Res <- equivalent_id(
 data = DetectedIDs,

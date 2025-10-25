@@ -93,13 +93,6 @@ jobs:
       - name: Install knitr
         run: Rscript -e 'install.packages("knitr", lib = Sys.getenv("R_LIBS_USER"))'
 
-
-      # Install CRAN dependencies to user library (fixes permissions error on Ubuntu and ensures all CRAN packages are available)
-      #- name: Install package dependencies
-      #  run: |
-      #    Rscript -e 'install.packages(c("broom", "DBI", "dplyr", "factoextra", "ggbeeswarm", "ggfortify", "ggplot2", "ggpubr", "ggrepel", "gridExtra", "gtools", "hash", "igraph", "inflection", "logger", "patchwork", "pheatmap", "Polychrome", "purrr", "qcc", "rappdirs", "readr", "rstatix", "stringr", "tibble", "tidyr", "tidyselect", "writexl", "kableExtra", "ggVennDiagram"), lib = Sys.getenv("R_LIBS_USER"))'
-
-
       - name: Install remotes
         run: |
           Rscript -e 'install.packages("remotes")'
@@ -111,13 +104,15 @@ jobs:
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
           Rscript -e 'BiocManager::install()'
           Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel")'
-          # Rscript -e 'BiocManager::install("OmnipathR")'
+
+      - name: Install EnhancedVolcano (not yet in Bioc 3.22)
+        run: |
+          Rscript -e 'remotes::install_github("kevinblighe/EnhancedVolcano")'
 
       # Set Bioconductor back to release and install other Bioconductor dependencies
       - name: Install other Bioconductor dependencies from release
         run: |
           Rscript -e 'remotes::install_deps(dependencies = TRUE)'
-          # Rscript -e 'BiocManager::install(c("cosmosR", "EnhancedVolcano", "limma", "qvalue", "SummarizedExperiment"))'
 
       # ComplexUpset should be installed after ggplot2 to ensure compatibility, especially on Linux/Ubuntu.
       - name: Install latest ggplot2

@@ -54,6 +54,7 @@ Check and summarize relationship between prixor knowledge to measured
 features
 }
 \examples{
+data(cellular_meta)
 DetectedIDs <- cellular_meta \%>\%
 dplyr::select("Metabolite", "HMDB") \%>\%
 tidyr::drop_na()

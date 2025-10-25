@@ -39,6 +39,7 @@ List with two elements: DF (including input and output table) and Plot (includin
 Find metabolites with high variability across total pool samples
 }
 \examples{
+data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
 Res <- pool_estimation(data=Intra[ ,-c(1:3)],
                                 metadata_sample=Intra[ , c(1:3)],

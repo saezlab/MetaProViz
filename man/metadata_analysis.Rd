@@ -67,6 +67,7 @@ results, results summary
 This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
 }
 \examples{
+data(tissue_norm)
 Res <- metadata_analysis(
     data = tissue_norm[,-c(2:14)]\%>\%tibble::column_to_rownames("Code"),
     metadata_sample = tissue_norm[,c(1,3,5:6,13:14)]\%>\%tibble::column_to_rownames("Code")

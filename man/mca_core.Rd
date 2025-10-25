@@ -41,7 +41,7 @@ List of two DFs: 1. summary of the cluster count and 2. the detailed information
 This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between Intracellular and culture media metabolomics (core experiment).
 }
 \examples{
-
+data(medium_raw)
 Media <- medium_raw \%>\% tibble::column_to_rownames("Code")
 ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,
@@ -54,6 +54,7 @@ MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4
                             pval ="aov",
                             core=TRUE)
 
+data(intracell_dma)
 IntraDMA <- intracell_dma
 
 Res <- MetaProViz::mca_core(
