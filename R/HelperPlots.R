@@ -582,7 +582,6 @@ plot_grob_pca <- function(input_plot, metadata_info,plot_name){
 #'
 #' @keywords Heatmap helper function
 #' @noRd
-
 plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metadata_feature,plot_name){
 
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
