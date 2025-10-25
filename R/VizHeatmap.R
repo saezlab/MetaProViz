@@ -53,6 +53,7 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw%>%tibble::column_to_rownames("Code")
 #' Res <- viz_heatmap(data=Intra[,-c(1:3)])
 #'

@@ -86,6 +86,7 @@
 #'         VolcanoPlot (Plots of each comparison).
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw[-c(49:58), ] %>% tibble::column_to_rownames("Code")
 #' ResI <- dma(
 #'     data = Intra[, -c(1:3)],
@@ -1215,7 +1216,7 @@ log2fc <- function(
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-dma_stat_single <- 
+dma_stat_single <-
     function(
         data,
         metadata_sample,
@@ -1246,7 +1247,7 @@ dma_stat_single <-
 
     # Comparisons
     comparisons <- matrix(c(
-      metadata_info[["Numerator"]], 
+      metadata_info[["Numerator"]],
       metadata_info[["Denominator"]]
       ))
 
@@ -1269,11 +1270,11 @@ dma_stat_single <-
     C2[is.na(C2)] <- 0
 
     #### 1. p.value and test statistics (=t.val)
-    T_C1vC2 <- 
+    T_C1vC2 <-
         mapply(
-            pval, 
-            x = as.data.frame(C2), 
-            y = as.data.frame(C1), 
+            pval,
+            x = as.data.frame(C2),
+            y = as.data.frame(C1),
             SIMPLIFY = FALSE
         )
 
@@ -1306,17 +1307,17 @@ dma_stat_single <-
     PVal_C1vC2 <- PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
 
     # perform adjustment
-    VecPADJ_C1vC2 <- 
+    VecPADJ_C1vC2 <-
         stats::p.adjust(
-            (PVal_C1vC2[, 2]), 
-            method = padj, 
+            (PVal_C1vC2[, 2]),
+            method = padj,
             n = length((PVal_C1vC2[, 2]))
             ) # p-adjusted
     Metabolite <- PVal_C1vC2[, 1]
     PADJ_C1vC2 <- data.frame(Metabolite, p.adj = VecPADJ_C1vC2)
     STAT_C1vC2 <- merge(
-        PVal_C1vC2, 
-        PADJ_C1vC2, 
+        PVal_C1vC2,
+        PADJ_C1vC2,
         by = "Metabolite"
         )
 
@@ -1328,10 +1329,10 @@ dma_stat_single <-
 
     # Add Log2FC
     if (is.null(log2fc_table) == FALSE) {
-        STAT_C1vC2 <- 
+        STAT_C1vC2 <-
             merge(
-                log2fc_table, 
-                STAT_C1vC2[, c(1:2, 4, 3)], 
+                log2fc_table,
+                STAT_C1vC2[, c(1:2, 4, 3)],
                 by = "Metabolite"
             )
     }
@@ -1351,29 +1352,29 @@ dma_stat_single <-
 ### ### ### aov: Internal Function to perform Anova  ### ### ###################
 ################################################################################
 
-#' This helper function to calculate One-vs-All or All-vs-All 
+#' This helper function to calculate One-vs-All or All-vs-All
 #' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite 
-#' numerical values in columns with metabolite 
+#' @param data DF with unique sample identifiers as row names and metabolite
+#' numerical values in columns with metabolite
 #' identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the 
-#' samples, which will be combined with your input data based on the unique 
+#' @param metadata_sample DF which contains metadata information about the
+#' samples, which will be combined with your input data based on the unique
 #' sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information
-#' about the conditions column information on numerator or denominator 
-#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", 
-#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will 
-#' specify which comparison(s) will be done (Here all-vs-one, all-vs-all), 
+#' about the conditions column information on numerator or denominator
+#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
+#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will
+#' specify which comparison(s) will be done (Here all-vs-one, all-vs-all),
 #' e.g. Denominator=NULL and Numerator =NULL selects all the condition and per-
 #' forms multiple comparison all-vs-all. \strong{Default = c(conditions=
 #' "Conditions", numerator = NULL, denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column 
-#' "MetaboliteID" and Log2FC or Log2(Distance). This is the output from 
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column
+#' "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
 #' MetaProViz:::log2fc. If NULL, the output statistics will not be added into the
 #' Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with 
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with
 #' p-value, t-value and adjusted p-value column and column with feature names
 #'
 #' @keywords Statistical testing, p-value, t-value
@@ -1385,13 +1386,13 @@ dma_stat_single <-
 #' @importFrom utils combn
 #'
 #' @noRd
-aov <- 
+aov <-
     function(
         data,
         metadata_sample,
         metadata_info = c(
-            Conditions = "Conditions", 
-            Numerator = NULL, 
+            Conditions = "Conditions",
+            Numerator = NULL,
             Denominator = NULL
             ),
         log2fc_table = NULL
@@ -1411,8 +1412,8 @@ aov <-
             metadata_sample[[metadata_info[["Conditions"]]]]
             )
         comparisons <- combn(
-            unique(conditions), 
-            2) %>% 
+            unique(conditions),
+            2) %>%
             as.matrix()
         # Settings:
         MultipleComparison <- TRUE
@@ -1428,7 +1429,7 @@ aov <-
         numerator <- numerator[!numerator %in% denominator]
         comparisons <- t(
             expand.grid(numerator, denominator)
-            ) %>% 
+            ) %>%
             as.data.frame()
         # Settings:
         MultipleComparison <- TRUE
@@ -1442,28 +1443,28 @@ aov <-
     ## 2. Tukey test p.adj
     posthoc.res <- lapply(aov.res, TukeyHSD, conf.level = 0.95)
     Tukey_res <- do.call(
-        "rbind", 
+        "rbind",
         lapply(
-            posthoc.res, 
+            posthoc.res,
             function(x) x[1][[1]][, "p adj"]
             )
-        ) %>% 
+        ) %>%
         as.data.frame()
 
     comps <- paste(
-        comparisons[1, ], 
-        comparisons[2, ], 
+        comparisons[1, ],
+        comparisons[2, ],
         sep = "-"
         ) # normal
 
     opp_comps <- paste(
-        comparisons[2, ], 
-        comparisons[1, ], 
+        comparisons[2, ],
+        comparisons[1, ],
         sep = "-"
         )
 
     # if opposite comparisons is true
-    if (sum(opp_comps %in% colnames(Tukey_res)) > 0) { 
+    if (sum(opp_comps %in% colnames(Tukey_res)) > 0) {
         for (comp in 1:length(opp_comps)) {
             colnames(Tukey_res)[colnames(Tukey_res) %in% opp_comps[comp]] <- comps[comp]
         }
@@ -1471,16 +1472,16 @@ aov <-
 
     ## 3. t.val
     Tukey_res_diff <- do.call(
-        "rbind", 
+        "rbind",
         lapply(
-            posthoc.res, 
+            posthoc.res,
             function(x) x[1][[1]][, "diff"]
             )
-        ) %>% 
+        ) %>%
         as.data.frame()
 
     # if oposite comparisons is true
-    if (sum(opp_comps %in% colnames(Tukey_res_diff)) > 0) { 
+    if (sum(opp_comps %in% colnames(Tukey_res_diff)) > 0) {
         for (comp in 1:length(opp_comps)) {
             colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opp_comps[comp]] <- comps[comp]
         }
@@ -1488,32 +1489,32 @@ aov <-
 
     # Make output DFs:
     Pval_table <- Tukey_res
-    Pval_table <- 
+    Pval_table <-
         rownames_to_column(
-            Pval_table, 
+            Pval_table,
             "Metabolite"
         )
 
-    Tval_table <- 
+    Tval_table <-
         rownames_to_column(
-            Tukey_res_diff, 
+            Tukey_res_diff,
             "Metabolite"
         )
 
-    common_col_names <- 
+    common_col_names <-
         setdiff(
-            names(Tukey_res_diff), 
+            names(Tukey_res_diff),
             "row.names"
         ) # Here we need to adapt for one_vs_all or all_vs_all
 
     results_list <- list()
     for (col_name in common_col_names) {
         # Create a new data frame by merging the two data frames
-        merged_df <- 
+        merged_df <-
             merge(
-                Pval_table[, c("Metabolite", col_name)], 
-                Tval_table[, c("Metabolite", col_name)], 
-                by = "Metabolite", 
+                Pval_table[, c("Metabolite", col_name)],
+                Tval_table[, c("Metabolite", col_name)],
+                by = "Metabolite",
                 all = TRUE
                 ) %>%
                 rename(
@@ -1523,24 +1524,24 @@ aov <-
 
         # We need to add _vs_ into the comparison col_name
         pattern <- paste(conditions, collapse = "|")
-        conditions_present <- 
+        conditions_present <-
             unique(
                 unlist(
                     regmatches(
-                        col_name, 
+                        col_name,
                         gregexpr(pattern, col_name)
                     )
                 )
             )
-        modified_col_name <- 
+        modified_col_name <-
             paste(
-                conditions_present[1], 
-                "vs", 
-                conditions_present[2], 
+                conditions_present[1],
+                "vs",
+                conditions_present[2],
                 sep = "_"
                 )
 
-        # Add the new data frame to the list with the column 
+        # Add the new data frame to the list with the column
         # name as the list element name
         results_list[[modified_col_name]] <- merged_df
     }
@@ -1554,9 +1555,9 @@ aov <-
             # Check if the data frames exist in both lists
             if (name %in% names(results_list) && name %in% names(log2fc_table)) {
                 merged_df <- merge(
-                    results_list[[name]], 
-                    log2fc_table[[name]], 
-                    by = "Metabolite", 
+                    results_list[[name]],
+                    log2fc_table[[name]],
+                    by = "Metabolite",
                     all = TRUE
                     )
                 # reorder the columns
@@ -1589,35 +1590,35 @@ aov <-
 ### ### ### kruskal: Internal Function to perform kruskal test  ### ### ###
 ###########################################################################
 
-#' This helper function to calculate One-vs-All or All-vs-All 
+#' This helper function to calculate One-vs-All or All-vs-All
 #' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite 
-#' numerical values in columns with metabolite identifiers as column names. 
+#' @param data DF with unique sample identifiers as row names and metabolite
+#' numerical values in columns with metabolite identifiers as column names.
 #' Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the 
-#' samples, which will be combined with your input data based on the unique 
+#' @param metadata_sample DF which contains metadata information about the
+#' samples, which will be combined with your input data based on the unique
 #' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the 
-#' information about the conditions column information on numerator or 
-#' denominator c(Conditions="ColumnName_SettingsFile", Numerator = 
-#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). 
-#' Denominator and Numerator will specify which comparison(s) will be done 
-#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator = NULL 
-#' selects all the condition and performs multiple comparison all-vs-all. 
-#' \strong{Default = c(conditions="Conditions", numerator = NULL, 
+#' @param metadata_info  \emph{Optional: } Named vector including the
+#' information about the conditions column information on numerator or
+#' denominator c(Conditions="ColumnName_SettingsFile", Numerator =
+#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#' Denominator and Numerator will specify which comparison(s) will be done
+#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator = NULL
+#' selects all the condition and performs multiple comparison all-vs-all.
+#' \strong{Default = c(conditions="Conditions", numerator = NULL,
 #' denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a 
-#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output 
-#' from MetaProViz:::log2fc. If NULL, the output statistics will not be 
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
+#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
+#' from MetaProViz:::log2fc. If NULL, the output statistics will not be
 #' added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param padj \emph{Optional: } String which contains an abbreviation of 
-#' the selected p.adjusted test for p.value correction for multiple 
-#' Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", 
+#' @param padj \emph{Optional: } String which contains an abbreviation of
+#' the selected p.adjusted test for p.value correction for multiple
+#' Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
 #' "bonferroni", "holm", etc.\strong{Default = "fdr"}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal)
-#' with p-value, t-value and adjusted p-value column and column with 
+#' with p-value, t-value and adjusted p-value column and column with
 #' feature names
 #'
 #' @keywords Statistical testing, p-value, t-value
@@ -1630,13 +1631,13 @@ aov <-
 #' @importFrom utils combn
 #'
 #' @noRd
-kruskal <- 
+kruskal <-
     function(
         data,
         metadata_sample,
         metadata_info = c(
-            Conditions = "Conditions", 
-            Numerator = NULL, 
+            Conditions = "Conditions",
+            Numerator = NULL,
             Denominator = NULL
             ),
         log2fc_table = NULL,
@@ -1657,8 +1658,8 @@ kruskal <-
         numerator <- unique(
             metadata_sample[[metadata_info[["Conditions"]]]]
             )
-        comparisons <- 
-            combn(unique(conditions), 2) %>% 
+        comparisons <-
+            combn(unique(conditions), 2) %>%
             as.matrix()
 
         # Settings:
@@ -1676,7 +1677,7 @@ kruskal <-
         numerator <- numerator[!numerator %in% denominator]
         comparisons <- t(
             expand.grid(numerator, denominator)
-            ) %>% 
+            ) %>%
             as.data.frame()
 
         # Settings:
@@ -1687,13 +1688,13 @@ kruskal <-
     #############################################################################################
     # kruskal test (p.val)
     aov.res <- apply(
-        data, 
-        2, 
+        data,
+        2,
         function(x) stats::kruskal.test(x ~ conditions)
         )
-    anova_res <- 
+    anova_res <-
         do.call(
-            "rbind", 
+            "rbind",
             lapply(
                 aov.res, function(x) {
                     x["p.value"]
@@ -1702,7 +1703,7 @@ kruskal <-
         )
     anova_res <- as.matrix(
         mutate_all(
-            as.data.frame(anova_res), 
+            as.data.frame(anova_res),
             function(x) as.numeric(as.character(x))
             )
         )
@@ -1719,10 +1720,10 @@ kruskal <-
         as.data.frame()
 
     # Applying a loop to obtain p.adj and t.val:
-    Dunn_Pres <- 
+    Dunn_Pres <-
         data.frame(
-            comparisons = paste(comparisons[1, ], 
-            comparisons[2, ], 
+            comparisons = paste(comparisons[1, ],
+            comparisons[2, ],
             sep = "_vs_")
         )
     Dunn_Tres <- Dunn_Pres
@@ -1731,7 +1732,7 @@ kruskal <-
         colnames(data)[2] <- gsub("^\\d+", "", colnames(data)[2])
 
         ## If a metabolite starts with number remove it
-        formula <- 
+        formula <-
             as.formula(
                 paste(
                     colnames(data)[2], "~ conditions"
@@ -1739,66 +1740,66 @@ kruskal <-
             )
         posthoc.res <- dunn_test(data, formula, p.adjust.method = padj)
 
-        pres <- 
+        pres <-
             data.frame(
                 comparisons = c(
-                    paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_"), 
+                    paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_"),
                     paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_")
                 )
             )
         pres[[colnames(Dunndata)[col]]] <- c(posthoc.res$p.adj, posthoc.res$p.adj)
         pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons, ] # take only the comparisons selected
-        Dunn_Pres <- 
+        Dunn_Pres <-
             merge(
-                Dunn_Pres, 
-                pres, 
+                Dunn_Pres,
+                pres,
                 by = "comparisons"
             )
 
         tres <- data.frame(
             comparisons = c(
-                paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_"), 
+                paste(posthoc.res$group1, posthoc.res$group2, sep = "_vs_"),
                 paste(posthoc.res$group2, posthoc.res$group1, sep = "_vs_"))
             )
         tres[[colnames(Dunndata)[col]]] <- c(posthoc.res$statistic, -posthoc.res$statistic)
         tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons, ] # take only the comparisons selected
-        Dunn_Tres <- 
+        Dunn_Tres <-
             merge(
-                Dunn_Tres, 
-                tres, 
+                Dunn_Tres,
+                tres,
                 by = "comparisons"
             )
     }
 
     # Make output DFs:
-    Dunn_Pres <- 
+    Dunn_Pres <-
         column_to_rownames(
-            Dunn_Pres, 
+            Dunn_Pres,
             "comparisons"
             ) %>%
             t() %>%
             as.data.frame()
-    Pval_table <- 
+    Pval_table <-
         as.matrix(
             mutate_all(
-                as.data.frame(Dunn_Pres), 
+                as.data.frame(Dunn_Pres),
                 function(x) as.numeric(as.character(x))
                 )
             ) %>%
             as.data.frame() %>%
             rownames_to_column("Metabolite")
 
-    Dunn_Tres <- 
+    Dunn_Tres <-
         column_to_rownames(
-            Dunn_Tres, 
+            Dunn_Tres,
             "comparisons"
             ) %>%
             t() %>%
             as.data.frame()
-    Tval_table <- 
+    Tval_table <-
         as.matrix(
             mutate_all(
-                as.data.frame(Dunn_Tres), 
+                as.data.frame(Dunn_Tres),
                 function(x) as.numeric(as.character(x))
                 )
             ) %>%
@@ -1810,11 +1811,11 @@ kruskal <-
     results_list <- list()
     for (col_name in common_col_names) {
         # Create a new data frame by merging the two data frames
-        merged_df <- 
+        merged_df <-
             merge(
-                Pval_table[, c("Metabolite", col_name)], 
-                Tval_table[, c("Metabolite", col_name)], 
-                by = "Metabolite", 
+                Pval_table[, c("Metabolite", col_name)],
+                Tval_table[, c("Metabolite", col_name)],
+                by = "Metabolite",
                 all = TRUE
                 ) %>%
                 rename(
@@ -1831,11 +1832,11 @@ kruskal <-
         for (name in common_col_names) {
             # Check if the data frames exist in both lists
             if (name %in% names(results_list) && name %in% names(log2fc_table)) {
-                merged_df <- 
+                merged_df <-
                     merge(
-                        results_list[[name]], 
-                        log2fc_table[[name]], 
-                        by = "Metabolite", 
+                        results_list[[name]],
+                        log2fc_table[[name]],
+                        by = "Metabolite",
                         all = TRUE
                     )
                 merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))] # reorder the columns
@@ -1859,27 +1860,27 @@ kruskal <-
 
 #' Calculate One-vs-All or All-vs-All comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite 
-#' numerical values in columns with metabolite identifiers as column names. 
+#' @param data DF with unique sample identifiers as row names and metabolite
+#' numerical values in columns with metabolite identifiers as column names.
 #' Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the 
-#' samples, which will be combined with your input data based on the unique 
+#' @param metadata_sample DF which contains metadata information about the
+#' samples, which will be combined with your input data based on the unique
 #' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the 
-#' information about the conditions column information on numerator or 
-#' denominator c(Conditions="ColumnName_SettingsFile", Numerator = 
-#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). 
-#' Denominator and Numerator will specify which comparison(s) will be done 
-#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL 
-#' selects all the condition and performs multiple comparison all-vs-all. 
-#' \strong{Default = c(conditions="Conditions", numerator = NULL, 
+#' @param metadata_info  \emph{Optional: } Named vector including the
+#' information about the conditions column information on numerator or
+#' denominator c(Conditions="ColumnName_SettingsFile", Numerator =
+#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#' Denominator and Numerator will specify which comparison(s) will be done
+#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL
+#' selects all the condition and performs multiple comparison all-vs-all.
+#' \strong{Default = c(conditions="Conditions", numerator = NULL,
 #' denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a 
-#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output 
-#' from MetaProViz:::log2fc. If NULL, the output statistics will not be 
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
+#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
+#' from MetaProViz:::log2fc. If NULL, the output statistics will not be
 #' added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal) with 
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with
 #' p-value, t-value and adjusted p-value column and column with feature names
 #'
 #' @keywords Statistical testing, p-value, t-value
@@ -1891,13 +1892,13 @@ kruskal <-
 #' @importFrom utils combn
 #'
 #' @noRd
-welch <- 
+welch <-
     function(
         data,
         metadata_sample,
         metadata_info = c(
-            Conditions = "Conditions", 
-            Numerator = NULL, 
+            Conditions = "Conditions",
+            Numerator = NULL,
             Denominator = NULL
             ),
         log2fc_table = NULL
@@ -1916,10 +1917,10 @@ welch <-
         numerator <- unique(
             metadata_sample[[metadata_info[["Conditions"]]]]
             )
-        comparisons <- 
+        comparisons <-
             combn(
                 unique(conditions), 2
-            ) %>% 
+            ) %>%
             as.matrix()
 
         # Settings:
@@ -1937,7 +1938,7 @@ welch <-
         numerator <- numerator[!numerator %in% denominator]
         comparisons <- t(
             expand.grid(numerator, denominator)
-            ) %>% 
+            ) %>%
             as.data.frame()
 
         # Settings:
@@ -1946,13 +1947,13 @@ welch <-
     }
 
     ###########################################################################
-    ## 1. welch's ANOVA using oneway.test is not used by the 
+    ## 1. welch's ANOVA using oneway.test is not used by the
     # Games post.hoc function
 
     # aov.res= apply(Input_data,2,function(x) oneway.test(x~conditions))
     games_data <- merge(
-        metadata_sample, 
-        data, 
+        metadata_sample,
+        data,
         by = 0
         ) %>%
         rename("conditions" = metadata_info[["Conditions"]])
@@ -1961,12 +1962,12 @@ welch <-
 
     ## 2. Games post hoc test
     for (col in names(data)) { # col = names(Input_data)[1]
-        posthoc.res <- 
+        posthoc.res <-
             games_howell_test(
-                data = games_data, 
-                detailed = TRUE, 
+                data = games_data,
+                detailed = TRUE,
                 formula = as.formula(paste0(`col`, " ~ ", "conditions"))
-                ) %>% 
+                ) %>%
                 as.data.frame()
 
         result.df <- rbind(
@@ -1974,8 +1975,8 @@ welch <-
                 p.adj = posthoc.res[, "p.adj"],
                 t.val = posthoc.res[, "statistic"],
                 row.names = paste(
-                    posthoc.res[["group1"]], 
-                    posthoc.res[["group2"]], 
+                    posthoc.res[["group1"]],
+                    posthoc.res[["group2"]],
                     sep = "-"
                     )
             ),
@@ -1983,50 +1984,50 @@ welch <-
                 p.adj = posthoc.res[, "p.adj"],
                 t.val = -posthoc.res[, "statistic"],
                 row.names = paste(
-                    posthoc.res[["group2"]], 
-                    posthoc.res[["group1"]], 
+                    posthoc.res[["group2"]],
+                    posthoc.res[["group1"]],
                     sep = "-"
                     )
             )
         )
         posthoc.res.list[[col]] <- result.df
     }
-    Games_Pres <- 
+    Games_Pres <-
         do.call(
-            "rbind", 
+            "rbind",
             lapply(posthoc.res.list, function(x) x[, "p.adj"])
-            ) %>% 
+            ) %>%
             as.data.frame()
     colnames(Games_Pres) <- rownames(posthoc.res.list[[1]])
     comps <- paste(
-        comparisons[1, ], 
-        comparisons[2, ], 
+        comparisons[1, ],
+        comparisons[2, ],
         sep = "-"
         ) # normal
-    Games_Pres <- Games_Pres[, colnames(Games_Pres) %in% comps] %>% 
+    Games_Pres <- Games_Pres[, colnames(Games_Pres) %in% comps] %>%
         rownames_to_column("Metabolite")
     # In case of p.adj =0 we change it to 10^-6
     Games_Pres[Games_Pres == 0] <- 0.000001
 
     ## 3. t.val
-    Games_Tres <- 
+    Games_Tres <-
         do.call(
-            "rbind", 
+            "rbind",
             lapply(posthoc.res.list, function(x) x[, "t.val"])
-            ) %>% 
+            ) %>%
             as.data.frame()
     colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
-    Games_Tres <- Games_Tres[, colnames(Games_Tres) %in% comps] %>% 
+    Games_Tres <- Games_Tres[, colnames(Games_Tres) %in% comps] %>%
         rownames_to_column("Metabolite")
 
     results_list <- list()
     for (col_name in colnames(Games_Pres)) {
         # Create a new data frame by merging the two data frames
-        merged_df <- 
+        merged_df <-
             merge(
-                Games_Pres[, c("Metabolite", col_name)], 
-                Games_Tres[, c("Metabolite", col_name)], 
-                by = "Metabolite", 
+                Games_Pres[, c("Metabolite", col_name)],
+                Games_Tres[, c("Metabolite", col_name)],
+                by = "Metabolite",
                 all = TRUE
                 ) %>%
                 rename(
@@ -2036,29 +2037,29 @@ welch <-
 
         # We need to add _vs_ into the comparison col_name
         pattern <- paste(conditions, collapse = "|")
-        conditions_present <- 
+        conditions_present <-
             unique(
                 unlist(
                     regmatches(
-                        col_name, 
+                        col_name,
                         gregexpr(pattern, col_name)
                         )
                     )
                 )
-        modified_col_name <- 
+        modified_col_name <-
             paste(
-                conditions_present[1], 
-                "vs", 
-                conditions_present[2], 
+                conditions_present[1],
+                "vs",
+                conditions_present[2],
                 sep = "_"
             )
 
-        # Add the new data frame to the list with the column name as the 
+        # Add the new data frame to the list with the column name as the
         # list element name
         results_list[[modified_col_name]] <- merged_df
     }
 
-    # Merge the data frames in list1 and list2 based on the 
+    # Merge the data frames in list1 and list2 based on the
     # "Metabolite" column
     if (is.null(log2fc_table) == FALSE) {
         list_names <- names(results_list)
@@ -2067,15 +2068,15 @@ welch <-
         for (name in list_names) {
             # Check if the data frames exist in both lists
             if (name %in% names(results_list) && name %in% names(log2fc_table)) {
-                merged_df <- 
+                merged_df <-
                     merge(
-                        results_list[[name]], 
-                        log2fc_table[[name]], 
-                        by = "Metabolite", 
+                        results_list[[name]],
+                        log2fc_table[[name]],
+                        by = "Metabolite",
                         all = TRUE
                         )
                 # reorder the columns
-                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))] 
+                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))]
                 merged_list[[name]] <- merged_df
             }
         }
@@ -2092,38 +2093,38 @@ welch <-
 ### ### ### dma helper function: Internal Function to perform limma ### ### ####
 ################################################################################
 
-#' This helper function to calculate One-vs-One, One-vs-All or All-vs-All 
+#' This helper function to calculate One-vs-One, One-vs-All or All-vs-All
 #' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite 
-#' numerical values in columns with metabolite identifiers as column names. Use 
+#' @param data DF with unique sample identifiers as row names and metabolite
+#' numerical values in columns with metabolite identifiers as column names. Use
 #' NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the 
-#' samples, which will be combined with your input data based on the unique 
+#' @param metadata_sample DF which contains metadata information about the
+#' samples, which will be combined with your input data based on the unique
 #' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the 
-#' information about the conditions column information on numerator or 
-#' denominator c(Conditions="ColumnName_SettingsFile", Numerator = 
-#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). 
-#' Denominator and Numerator will specify which comparison(s) will be done 
-#' (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator = 
-#' NULL selects all the condition and performs multiple comparison all-vs-all. 
-#' \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator 
+#' @param metadata_info  \emph{Optional: } Named vector including the
+#' information about the conditions column information on numerator or
+#' denominator c(Conditions="ColumnName_SettingsFile", Numerator =
+#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#' Denominator and Numerator will specify which comparison(s) will be done
+#' (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =
+#' NULL selects all the condition and performs multiple comparison all-vs-all.
+#' \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator
 #' = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a 
-#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from 
-#' MetaProViz:::log2fc. If NULL, the output statistics will not be added into 
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
+#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
+#' MetaProViz:::log2fc. If NULL, the output statistics will not be added into
 #' the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the 
-#' selected p.adjusted test for p.value correction for multiple Hypothesis 
-#' testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", 
+#' @param padj \emph{Optional: } String which contains an abbreviation of the
+#' selected p.adjusted test for p.value correction for multiple Hypothesis
+#' testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni",
 #' "holm", etc.\strong{Default = "fdr"}
 #' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
 #'  input is used. \strong{Default = FALSE}
-#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 
-#' transformed and log2 transformation will be performed within the limma 
-#' function and Log2FC calculation. If FALSE we expect the data to be log2 
-#' transformed as this impacts the Log2FC calculation and limma. 
+#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2
+#' transformed and log2 transformation will be performed within the limma
+#' function and Log2FC calculation. If FALSE we expect the data to be log2
+#' transformed as this impacts the Log2FC calculation and limma.
 #' \strong{Default= TRUE}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with
@@ -2137,13 +2138,13 @@ welch <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @noRd
-dma_stat_limma <- 
+dma_stat_limma <-
     function(
         data,
         metadata_sample,
         metadata_info = c(
-            Conditions = "Conditions", 
-            Numerator = NULL, 
+            Conditions = "Conditions",
+            Numerator = NULL,
             Denominator = NULL
             ),
         log2fc_table = NULL,
@@ -2167,7 +2168,7 @@ dma_stat_limma <-
         all_vs_all <- FALSE
     }
 
-    #### ------ Ensure that Input_data is ordered by conditions and sample 
+    #### ------ Ensure that Input_data is ordered by conditions and sample
     #### ------ names are the same as in Input_metadata_sample:
     targets <- metadata_sample %>%
         rownames_to_column("sample")
@@ -2175,7 +2176,7 @@ dma_stat_limma <-
         rename("condition" = 2) %>%
         arrange(sample) # Order the column "sample" alphabetically
     # make appropriate condition names accepted by limma
-    targets$condition_limma_compatible <- make.names(targets$condition) 
+    targets$condition_limma_compatible <- make.names(targets$condition)
 
     if (MultipleComparison == FALSE) {
         # subset the data:
@@ -2185,9 +2186,9 @@ dma_stat_limma <-
 
         Limma_input <- data %>% tibble::rownames_to_column("sample")
         Limma_input <- merge(
-            targets[, 1:2], 
-            Limma_input, 
-            by = "sample", 
+            targets[, 1:2],
+            Limma_input,
+            by = "sample",
             all.x = TRUE
             )
         Limma_input <- Limma_input[, -2] %>%
@@ -2214,9 +2215,9 @@ dma_stat_limma <-
         rename("condition" = "condition_limma_compatible")
 
     # We need to transpose the df to run limma. Also, if the data is not log2
-    # transformed, we will not calculate the Log2FC as limma just substracts 
+    # transformed, we will not calculate the Log2FC as limma just substracts
     # one condition from the other
-    Limma_input <- 
+    Limma_input <-
         as.data.frame(
             t(
                 Limma_input %>% tibble::column_to_rownames("sample")
@@ -2224,9 +2225,9 @@ dma_stat_limma <-
         )
 
     if (transform == TRUE) {
-        # communicate the log2 transformation --> how does limma deals with 
+        # communicate the log2 transformation --> how does limma deals with
         # NA when calculating the change?
-        Limma_input <- log2(Limma_input) 
+        Limma_input <- log2(Limma_input)
     }
 
     #### ------Run limma:
@@ -2234,10 +2235,10 @@ dma_stat_limma <-
     fcond <- as.factor(targets_limma$condition) # all versus all
 
     # Create the design matrix
-    design <- model.matrix(~ 0 + fcond) 
+    design <- model.matrix(~ 0 + fcond)
 
     # Give meaningful column names to the design matrix
-    colnames(design) <- levels(fcond) 
+    colnames(design) <- levels(fcond)
 
     #### Fit the linear model
     fit <- limma::lmFit(Limma_input, design)
@@ -2249,10 +2250,10 @@ dma_stat_limma <-
         # Create an empty contrast matrix
         num_conditions <- length(unique_conditions)
         num_comparisons <- num_conditions * (num_conditions - 1) / 2
-        cont.matrix <- 
+        cont.matrix <-
             matrix(
-                0, 
-                nrow = num_comparisons, 
+                0,
+                nrow = num_comparisons,
                 ncol = num_conditions
             )
 
@@ -2274,11 +2275,11 @@ dma_stat_limma <-
                 # Add the comparison vector to the contrast matrix
                 cont.matrix[i, ] <- comparison
                 # Set row name
-                rownames(cont.matrix)[i] <- 
+                rownames(cont.matrix)[i] <-
                     paste(
-                        unique_conditions[condition1], 
-                        "_vs_", 
-                        unique_conditions[condition2], 
+                        unique_conditions[condition1],
+                        "_vs_",
+                        unique_conditions[condition2],
                         sep = ""
                         )
                 i <- i + 1
@@ -2293,10 +2294,10 @@ dma_stat_limma <-
         # Create an empty contrast matrix
         num_conditions <- length(unique_conditions)
         num_comparisons <- num_conditions - 1
-        cont.matrix <- 
+        cont.matrix <-
             matrix(
-                0, 
-                nrow = num_comparisons, 
+                0,
+                nrow = num_comparisons,
                 ncol = num_conditions
             )
 
@@ -2318,11 +2319,11 @@ dma_stat_limma <-
                 # Add the comparison vector to the contrast matrix
                 cont.matrix[i, ] <- comparison
                 # Set row name
-                rownames(cont.matrix)[i] <- 
+                rownames(cont.matrix)[i] <-
                     paste(
-                        unique_conditions[condition], 
-                        "_vs_", 
-                        unique_conditions[1], 
+                        unique_conditions[condition],
+                        "_vs_",
+                        unique_conditions[1],
                         sep = ""
                         )
             } else {
@@ -2331,11 +2332,11 @@ dma_stat_limma <-
                 # Add the comparison vector to the contrast matrix
                 cont.matrix[i, ] <- comparison
                 # Set row name
-                rownames(cont.matrix)[i] <- 
+                rownames(cont.matrix)[i] <-
                     paste(
-                        unique_conditions[1], 
-                        "_vs_", 
-                        unique_conditions[condition], 
+                        unique_conditions[1],
+                        "_vs_",
+                        unique_conditions[condition],
                         sep = ""
                         )
             }
@@ -2344,20 +2345,20 @@ dma_stat_limma <-
         cont.matrix <- t(cont.matrix)
     } else if (all_vs_all == FALSE & MultipleComparison == FALSE) {
         Name_Comp <- paste(
-            make.names(metadata_info[["Numerator"]]), 
-            "-", 
-            make.names(metadata_info[["Denominator"]]), 
+            make.names(metadata_info[["Numerator"]]),
+            "-",
+            make.names(metadata_info[["Denominator"]]),
             sep = ""
             )
-        cont.matrix <- 
+        cont.matrix <-
             as.data.frame(
                 makeContrasts(contrasts = Name_Comp, levels = colnames(design))
             ) %>%
             rename(
                 !!paste(
-                    make.names(metadata_info[["Numerator"]]), 
-                    "_vs_", 
-                    make.names(metadata_info[["Denominator"]]), 
+                    make.names(metadata_info[["Numerator"]]),
+                    "_vs_",
+                    make.names(metadata_info[["Denominator"]]),
                     sep = ""
                     ) := 1
                 )
@@ -2375,12 +2376,12 @@ dma_stat_limma <-
     results_list <- list() # Create an empty list to store results data frames
     for (contrast_name in contrast_names) {
         # Extract results for the current contrast
-        res.t <- 
+        res.t <-
             topTable(
-                fit2, 
-                coef = contrast_name, 
-                n = Inf, 
-                sort.by = "n", 
+                fit2,
+                coef = contrast_name,
+                n = Inf,
+                sort.by = "n",
                 adjust.method = padj
                 ) %>% # coef= the comparison the test is done for!
                 rename(
@@ -2398,38 +2399,38 @@ dma_stat_limma <-
     }
 
     # Make the name_match_df
-    name_match_df <- 
+    name_match_df <-
         as.data.frame(names(results_list)) %>%
-            separate("names(results_list)", 
-                into = c("a", "b"), 
-                sep = "_vs_", 
+            separate("names(results_list)",
+                into = c("a", "b"),
+                sep = "_vs_",
                 remove = FALSE
             )
 
-    name_match_df <- 
+    name_match_df <-
         merge(
-            name_match_df, 
-            targets[, -c(1)], 
-            by.x = "a", 
-            by.y = "condition_limma_compatible", 
+            name_match_df,
+            targets[, -c(1)],
+            by.x = "a",
+            by.y = "condition_limma_compatible",
             all.x = TRUE
             ) %>%
             rename("Condition1" = 4)
 
-    name_match_df <- 
+    name_match_df <-
         merge(
-            name_match_df, 
-            targets[, -c(1)], 
-            by.x = "b", 
-            by.y = "condition_limma_compatible", 
+            name_match_df,
+            targets[, -c(1)],
+            by.x = "b",
+            by.y = "condition_limma_compatible",
             all.x = TRUE
             ) %>%
             rename("Condition2" = 5) %>%
             unite(
-                "New", 
-                "Condition1", 
-                "Condition2", 
-                sep = "_vs_", 
+                "New",
+                "Condition1",
+                "Condition2",
+                sep = "_vs_",
                 remove = FALSE
                 )
 
@@ -2445,8 +2446,8 @@ dma_stat_limma <-
     }
 
     if (is.null(log2fc_table) == FALSE) {
-        if (core == TRUE) { 
-            # If core=TRUE, we need to exchange the Log2FC with the Distance 
+        if (core == TRUE) {
+            # If core=TRUE, we need to exchange the Log2FC with the Distance
             # and we need to combine the lists
             # Merge the data frames in list1 and list2 based on the "Metabolite" column
             merged_list <- list()
@@ -2455,11 +2456,11 @@ dma_stat_limma <-
 
                 # Check if the data frames exist in both lists
                 if (list_dfs %in% names(results_list_new) && list_dfs %in% names(log2fc_table)) {
-                    merged_df <- 
+                    merged_df <-
                         merge(
-                            results_list_new[[list_dfs]], 
-                            log2fc_table[[list_dfs]], 
-                            by = "Metabolite", 
+                            results_list_new[[list_dfs]],
+                            log2fc_table[[list_dfs]],
+                            by = "Metabolite",
                             all = TRUE
                             )
                     merged_list[[list_dfs]] <- merged_df
@@ -2475,12 +2476,12 @@ dma_stat_limma <-
     Cond <- metadata_sample %>%
         rownames_to_column("Code")
 
-    InputReturn <- 
+    InputReturn <-
         merge(
-            Cond[, c("Code", metadata_info[["Conditions"]])], 
-            as.data.frame(t(Limma_input)), 
-            by.x = "Code", 
-            by.y = 0, 
+            Cond[, c("Code", metadata_info[["Conditions"]])],
+            as.data.frame(t(Limma_input)),
+            by.x = "Code",
+            by.y = 0,
             all.y = TRUE
             )
 
@@ -2493,30 +2494,30 @@ dma_stat_limma <-
                 get(metadata_info[["Conditions"]]) == C1 | get(metadata_info[["Conditions"]]) == C2
                 ) %>%
                 column_to_rownames("Code")
-        InputReturn_Filt <- 
+        InputReturn_Filt <-
             as.data.frame(
                 t(
                     InputReturn_Filt[, -c(1)]
                     )
                 )
 
-        if (transform == TRUE) { 
-            # Add prefix & suffix to each column since the data have 
+        if (transform == TRUE) {
+            # Add prefix & suffix to each column since the data have
             # been log2 transformed!
-            colnames(InputReturn_Filt) <- 
+            colnames(InputReturn_Filt) <-
                 paste0(
-                    "log2(", 
-                    colnames(InputReturn_Filt), 
+                    "log2(",
+                    colnames(InputReturn_Filt),
                     ")"
                 )
         }
 
-        InputReturn_Merge <- 
+        InputReturn_Merge <-
             merge(
-                STAT_C1vC2[[DFs]], 
-                InputReturn_Filt, 
-                by.x = "Metabolite", 
-                by.y = 0, 
+                STAT_C1vC2[[DFs]],
+                InputReturn_Filt,
+                by.x = "Metabolite",
+                by.y = 0,
                 all.x = TRUE
             )
 
@@ -2533,29 +2534,29 @@ dma_stat_limma <-
 
 #' Shapiro test and plots
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite 
-#' numerical values in columns with metabolite identifiers as column names. Use 
+#' @param data DF with unique sample identifiers as row names and metabolite
+#' numerical values in columns with metabolite identifiers as column names. Use
 #' NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the 
-#' samples, which will be combined with your input data based on the unique 
+#' @param metadata_sample DF which contains metadata information about the
+#' samples, which will be combined with your input data based on the unique
 #' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information 
-#' about the conditions column information on numerator or denominator 
-#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", 
-#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will 
-#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), 
-#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and 
+#' @param metadata_info  \emph{Optional: } Named vector including the information
+#' about the conditions column information on numerator or denominator
+#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
+#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will
+#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all),
+#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and
 #' performs multiple comparison all-vs-all. \strong{Default = c(conditions=
 #' "Conditions", numerator = NULL, denumerator = NULL)}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the 
-#' selected test to calculate p.value. For one-vs-one comparisons choose t.test, 
-#' wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all 
+#' @param pval \emph{Optional: } String which contains an abbreviation of the
+#' selected test to calculate p.value. For one-vs-one comparisons choose t.test,
+#' wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all
 #' comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default
 #'  = "t-test"}
-#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be 
+#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be
 #' plotted  \strong{default = TRUE}
 #'
-#' @return List with tewo entries: DF (including the results DF) and Plots 
+#' @return List with tewo entries: DF (including the results DF) and Plots
 #' (including the Density and QQ plots)
 #'
 #' @keywords shapiro test,Normality testing, Density plot, QQplot
@@ -2569,13 +2570,13 @@ dma_stat_limma <-
 #' @importFrom utils combn
 #'
 #' @noRd
-shapiro <- 
+shapiro <-
     function(
         data,
         metadata_sample,
         metadata_info = c(
-            Conditions = "Conditions", 
-            Numerator = NULL, 
+            Conditions = "Conditions",
+            Numerator = NULL,
             Denominator = NULL
             ),
         pval = "t-test",
@@ -2595,10 +2596,10 @@ shapiro <-
                 sep = ""
             )
         )
-        ColumnNameCondition_clean <- 
+        ColumnNameCondition_clean <-
             gsub(
-                "[[:space:]()-./\\\\]", 
-                "_", 
+                "[[:space:]()-./\\\\]",
+                "_",
                 metadata_info[["Conditions"]]
             )
         metadata_sample <- metadata_sample %>%
@@ -2620,10 +2621,10 @@ shapiro <-
         numerator <- unique(
             metadata_sample[[metadata_info[["Conditions"]]]]
             )
-        comparisons <- 
+        comparisons <-
             combn(
                 unique(conditions), 2
-                ) %>% 
+                ) %>%
                 as.matrix()
 
         # Settings:
@@ -2639,10 +2640,10 @@ shapiro <-
             )
         # Remove denom from num
         numerator <- numerator[!numerator %in% denominator]
-        comparisons <- 
+        comparisons <-
             t(
                 expand.grid(numerator, denominator)
-            ) %>% 
+            ) %>%
             as.data.frame()
 
         # Settings:
@@ -2653,10 +2654,10 @@ shapiro <-
         # one-vs-one: Generate the comparisons
         denominator <- metadata_info[["Denominator"]]
         numerator <- metadata_info[["Numerator"]]
-        comparisons <- 
+        comparisons <-
             matrix(
                 c(
-                    metadata_info[["Denominator"]], 
+                    metadata_info[["Denominator"]],
                     metadata_info[["Numerator"]]
                 )
             )
@@ -2669,38 +2670,38 @@ shapiro <-
     ############################################################################
     ## Check data normality and statistical test chosen and generate Output DF #
     # Before Hypothesis testing, we have to decide whether to use a parametric or
-    # a non parametric test. 
+    # a non parametric test.
     # We can test the data normality using the shapiro test.
 
     ## First: Load the data and perform the shapiro.test on each metabolite across
     # the samples of one condition. this needs to be repeated for each condition:
     # Prepare the input:
-    Input_shaptest <- 
+    Input_shaptest <-
         replace(
-            data, 
-            is.na(data), 
+            data,
+            is.na(data),
             0
             ) %>% # shapiro test can not handle NAs!
             filter(
                 metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
             ) %>%
             select_if(is.numeric)
-    
+
     ## before change to vapply:
-    # temp <- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x))  == 0 
-    temp <- 
+    # temp <- sapply(Input_shaptest, function(x, na.rm = TRUE) var(x))  == 0
+    temp <-
         vapply(
-            Input_shaptest, 
-            function(x) var(x, na.rm = TRUE), 
+            Input_shaptest,
+            function(x) var(x, na.rm = TRUE),
             FUN.VALUE = numeric(1)
-            ) == 0 
+            ) == 0
 
     temp <- temp[complete.cases(temp)] # Remove NAs from temp
     # Extract column names where temp is TRUE
-    columns_with_zero_variance <- names(temp[temp]) 
+    columns_with_zero_variance <- names(temp[temp])
 
-    if (length(Input_shaptest) == 1) { 
-        # handle a specific case where after filtering and selecting numeric 
+    if (length(Input_shaptest) == 1) {
+        # handle a specific case where after filtering and selecting numeric
         # variables, there's only one column left in Input_shaptest
         Input_shaptest <- data
     } else {
@@ -2712,41 +2713,41 @@ shapiro <-
                     "The following features have zero variance and are ",
                     "removed prior to performing the shaprio test: ",
                     sep = ""
-                ), 
+                ),
                 columns_with_zero_variance
             )
-            # drop = FALSE argument is used to ensure that the subset operation 
-            # doesn't simplify the result to a vector, preserving the data 
+            # drop = FALSE argument is used to ensure that the subset operation
+            # doesn't simplify the result to a vector, preserving the data
             # frame structure
-            Input_shaptest <- 
+            Input_shaptest <-
                 Input_shaptest[
-                    , 
+                    ,
                     !(names(Input_shaptest) %in% columns_with_zero_variance),
                     drop = FALSE
-                ] 
+                ]
         }
     }
 
-    Input_shaptest_Cond <- 
+    Input_shaptest_Cond <-
         merge(
             data.frame(
                 Conditions = metadata_sample[
-                    , 
-                    metadata_info[["Conditions"]], 
+                    ,
+                    metadata_info[["Conditions"]],
                     drop = FALSE
                     ]
-            ), 
-            Input_shaptest, 
-            by = 0, 
+            ),
+            Input_shaptest,
+            by = 0,
             all.y = TRUE
         )
 
     UniqueConditions <- metadata_sample %>%
         subset(
-            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator, 
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator,
             select = c(metadata_info[["Conditions"]])
         )
-    UniqueConditions <- 
+    UniqueConditions <-
         unique(
             UniqueConditions[[metadata_info[["Conditions"]]]]
         )
@@ -2761,16 +2762,16 @@ shapiro <-
                 get(metadata_info[["Conditions"]]) == i, select = -c(1)
                 )
 
-        # Check the sample size (shapiro.test(x) : sample size must be 
+        # Check the sample size (shapiro.test(x) : sample size must be
         # between 3 and 5000):
         if (nrow(subset_data) < 3) {
             warning(
                 paste(
                     "shapiro.test(x) : sample size must be between 3 and 5000.",
                     " You have provided <3 Samples for condition ",
-                     i, 
+                     i,
                      ". Hence Shaprio test can not be performed for ",
-                     "this condition.", 
+                     "this condition.",
                      sep = ""
                 ), sep = ""
             )
@@ -2778,26 +2779,26 @@ shapiro <-
             warning(
                 paste(
                     "shapiro.test(x) : sample size must be between 3 and 5000. ",
-                    "You have provided >5000 Samples for condition ", 
-                    i, 
+                    "You have provided >5000 Samples for condition ",
+                    i,
                     ". Hence Shaprio test will not be performed for ",
                     "this condition.",
                     sep = ""
-                ), 
+                ),
                 sep = ""
             )
         } else {
             # Apply shapiro-Wilk test to each feature in the subset
-            # shapiro_results[[i]] <- 
+            # shapiro_results[[i]] <-
             # as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
             shapiro_results[[i]] <- as.data.frame(
                 vapply(
-                    subset_data, 
-                    shapiro.test, 
+                    subset_data,
+                    shapiro.test,
                     FUN.VALUE = list(
-                        statistic = c(W = 0), 
-                        p.value = 0.0, 
-                        method = "", 
+                        statistic = c(W = 0),
+                        p.value = 0.0,
+                        method = "",
                         data.name = "")
                     )
             )
@@ -2806,11 +2807,11 @@ shapiro <-
 
     if (nrow(subset_data) >= 3 & nrow(subset_data) <= 5000) {
         # Make the output DF
-        DF_shapiro_results <- 
+        DF_shapiro_results <-
             as.data.frame(
                 matrix(
-                    NA, 
-                    nrow = length(UniqueConditions), 
+                    NA,
+                    nrow = length(UniqueConditions),
                     ncol = ncol(Input_shaptest)
                 )
             )
@@ -2818,19 +2819,19 @@ shapiro <-
         colnames(DF_shapiro_results) <- colnames(Input_shaptest)
         for (k in 1:length(UniqueConditions)) {
             for (l in 1:ncol(Input_shaptest)) {
-                DF_shapiro_results[k, l] <- 
+                DF_shapiro_results[k, l] <-
                     shapiro_results[[UniqueConditions[k]]][[l]]$p.value
             }
         }
-        colnames(DF_shapiro_results) <- 
+        colnames(DF_shapiro_results) <-
             paste(
-                "shapiro p.val(", colnames(DF_shapiro_results), 
-                ")", 
+                "shapiro p.val(", colnames(DF_shapiro_results),
+                ")",
                 sep = ""
             )
 
-        ## ------ Second: Give feedback to the user if the chosen test fits the 
-        # data distribution. The data are normal if the p-value of the 
+        ## ------ Second: Give feedback to the user if the chosen test fits the
+        # data distribution. The data are normal if the p-value of the
         # shapiro.test > 0.05.
         Density_plots <- list()
         if (qqplots == TRUE) {
@@ -2838,95 +2839,95 @@ shapiro <-
         }
         for (x in 1:nrow(DF_shapiro_results)) {
             #### Generate Results Table
-            transpose <- 
+            transpose <-
                 as.data.frame(
                     t(
                         DF_shapiro_results[x, ]
                     )
                 )
-            Norm <- 
+            Norm <-
                 format(
                     (round(
-                        sum(transpose[[1]] > 0.05) / nrow(transpose), 
+                        sum(transpose[[1]] > 0.05) / nrow(transpose),
                         4
-                    )) * 100, 
+                    )) * 100,
                     nsmall = 2
-                    ) # percentage of normally distributed metabolites 
+                    ) # percentage of normally distributed metabolites
                     # across samples
-            NotNorm <- 
+            NotNorm <-
                 format(
                     (round(
-                        sum(transpose[[1]] < 0.05) / nrow(transpose), 
+                        sum(transpose[[1]] < 0.05) / nrow(transpose),
                         4
-                    )) * 100, 
+                    )) * 100,
                     nsmall = 2
-                    ) # percentage of not-normally distributed metabolites 
+                    ) # percentage of not-normally distributed metabolites
                     # across samples
             if (pval == "kruskal.test" | pval == "wilcox.test") {
                 message(
-                    "For the condition ", 
-                    colnames(transpose), 
-                    " ", 
-                    Norm, 
-                    " % of the metabolites follow a normal distribution and ", 
-                    NotNorm, 
+                    "For the condition ",
+                    colnames(transpose),
+                    " ",
+                    Norm,
+                    " % of the metabolites follow a normal distribution and ",
+                    NotNorm,
                     " % of the metabolites are not-normally distributed ",
-                    "according to the shapiro test. You have chosen ", 
-                    paste(pval), 
+                    "according to the shapiro test. You have chosen ",
+                    paste(pval),
                     ", which is for non parametric Hypothesis testing. ",
                     "`shapiro.test` ignores missing values in the",
                     " calculation."
                 )
             } else {
                 message(
-                    "For the condition ", 
-                    colnames(transpose), 
-                    " ", 
-                    Norm, 
-                    " % of the metabolites follow a normal distribution and ", 
-                    NotNorm, 
+                    "For the condition ",
+                    colnames(transpose),
+                    " ",
+                    Norm,
+                    " % of the metabolites follow a normal distribution and ",
+                    NotNorm,
                     " % of the metabolites are not-normally distributed ",
-                    "according to the shapiro test. You have chosen ", 
-                    paste(pval), 
+                    "according to the shapiro test. You have chosen ",
+                    paste(pval),
                     ", which is for parametric Hypothesis testing. ",
                     "`shapiro.test` ignores missing values in the calculation."
                 )
             }
 
-            # Assign the calculated values to the corresponding 
+            # Assign the calculated values to the corresponding
             # rows in result_df
             DF_shapiro_results$`Metabolites with normal distribution [%]`[x] <- Norm
             DF_shapiro_results$`Metabolites with not-normal distribution [%]`[x] <- NotNorm
 
             # Reorder the DF:
             all_columns <- colnames(DF_shapiro_results)
-            include_columns <- 
+            include_columns <-
                 c(
-                    "Metabolites with normal distribution [%]", 
+                    "Metabolites with normal distribution [%]",
                     "Metabolites with not-normal distribution [%]"
                 )
-            exclude_columns <- 
+            exclude_columns <-
                 setdiff(
-                    all_columns, 
+                    all_columns,
                     include_columns
                 )
-            DF_shapiro_results <- 
+            DF_shapiro_results <-
                 DF_shapiro_results[, c(include_columns, exclude_columns)]
 
             #### Make Group wise data distribution plot and QQ plots
             subset_data <- Input_shaptest_Cond %>%
                 column_to_rownames("Row.names") %>%
                 subset(
-                    get(metadata_info[["Conditions"]]) == colnames(transpose), 
+                    get(metadata_info[["Conditions"]]) == colnames(transpose),
                     select = -c(1)
                 )
             all_data <- unlist(subset_data)
 
             plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
                 geom_histogram(
-                    aes(y = after_stat(density)), 
-                    binwidth = .5, 
-                    colour = "black", 
+                    aes(y = after_stat(density)),
+                    binwidth = .5,
+                    colour = "black",
                     fill = "white"
                 ) +
                 geom_density(alpha = 0.2, fill = "grey45")
@@ -2937,18 +2938,18 @@ shapiro <-
                 data.frame(x = all_data), aes(x = x)
                 ) +
                 geom_histogram(
-                    aes(y = after_stat(density)), 
-                    binwidth = .5, 
-                    colour = "black", 
+                    aes(y = after_stat(density)),
+                    binwidth = .5,
+                    colour = "black",
                     fill = "white"
                 ) +
                 geom_density(
-                    alpha = .2, 
+                    alpha = .2,
                     fill = "grey45"
                 ) +
                 scale_x_continuous(
                     limits = c(
-                        0, 
+                        0,
                         density_values$x[max(which(density_values$scaled >= 0.1))]
                         )
                 )
@@ -2956,35 +2957,35 @@ shapiro <-
             density_values2 <- ggplot_build(plot)$data[[2]]
 
             suppressWarnings(
-                sampleDist <- 
+                sampleDist <-
                     ggplot(
                         data.frame(x = all_data), aes(x = x)
                     ) +
                     geom_histogram(
-                        aes(y = after_stat(density)), 
-                        binwidth = .5, 
-                        colour = "black", 
+                        aes(y = after_stat(density)),
+                        binwidth = .5,
+                        colour = "black",
                         fill = "white"
                     ) +
                     geom_density(
-                        alpha = .2, 
+                        alpha = .2,
                         fill = "grey45"
                     ) +
                     scale_x_continuous(
                         limits = c(
-                            0, 
+                            0,
                             density_values$x[max(which(density_values$scaled >= 0.1))]
                         )
                     ) +
                     theme_minimal() +
                     labs(
-                        title = paste("data distribution ", colnames(transpose)), 
+                        title = paste("data distribution ", colnames(transpose)),
                         subtitle = paste(
-                            NotNorm, 
+                            NotNorm,
                             " of metabolites not normally distributed based on ",
                             "shapiro test"
-                        ), 
-                        x = "Abundance", 
+                        ),
+                        x = "Abundance",
                         y = "Density"
                     )
             )
@@ -2996,11 +2997,11 @@ shapiro <-
                 # Make folders
                 conds <- unique(c(numerator, denominator))
 
-                # QQ plots for each groups for each metabolite for normality 
+                # QQ plots for each groups for each metabolite for normality
                 # visual check
                 qq_plot_list <- list()
                 for (col_name in colnames(subset_data)) {
-                    qq_plot <- 
+                    qq_plot <-
                         ggplot(
                             data.frame(x = subset_data[[col_name]]), aes(sample = x)
                         ) +
@@ -3009,8 +3010,8 @@ shapiro <-
                             color = "red"
                         ) +
                         labs(
-                            title = paste("QQPlot for", col_name), 
-                            x = "Theoretical", 
+                            title = paste("QQPlot for", col_name),
+                            x = "Theoretical",
                             y = "Sample"
                         ) +
                         theme_minimal()
@@ -3020,7 +3021,7 @@ shapiro <-
                     qq_plot_list[[col_name]] <- recordPlot()
 
                     # remove "/" cause this can not be safed in a PDF name
-                    col_name2 <- (gsub("/", "_", col_name)) 
+                    col_name2 <- (gsub("/", "_", col_name))
                     col_name2 <- gsub("-", "", col_name2)
                     col_name2 <- gsub("/", "", col_name2)
                     col_name2 <- gsub(" ", "", col_name2)
@@ -3033,7 +3034,7 @@ shapiro <-
                     dev.off()
                 }
 
-                QQ_plots[[paste(colnames(transpose))]] <- 
+                QQ_plots[[paste(colnames(transpose))]] <-
                     qq_plot_list
             }
         }
@@ -3042,23 +3043,23 @@ shapiro <-
         ## -------- Return
         # Here we make a list
         if (qqplots == TRUE) {
-            Shapiro_output_list <- 
+            Shapiro_output_list <-
                 list(
                     "DF" = list(
-                        "Shapiro_result" = DF_shapiro_results %>% 
+                        "Shapiro_result" = DF_shapiro_results %>%
                             tibble::rownames_to_column("Code")
-                    ), 
+                    ),
                     "Plot" = list(
                         "Distributions" = Density_plots, "QQ_plots" = QQ_plots
                     )
                 )
         } else {
-            Shapiro_output_list <- 
+            Shapiro_output_list <-
                 list(
                     "DF" = list(
-                        "Shapiro_result" = DF_shapiro_results %>% 
+                        "Shapiro_result" = DF_shapiro_results %>%
                             tibble::rownames_to_column("Code")
-                    ), 
+                    ),
                     "Plot" = list(
                         "Distributions" = Density_plots
                     )
@@ -3077,22 +3078,22 @@ shapiro <-
 
 #' Bartlett test for variance homogeneity check across groups
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite 
-#' numerical values in columns with metabolite identifiers as column names. Use 
+#' @param data DF with unique sample identifiers as row names and metabolite
+#' numerical values in columns with metabolite identifiers as column names. Use
 #' NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the 
-#' samples, which will be combined with your input data based on the unique 
+#' @param metadata_sample DF which contains metadata information about the
+#' samples, which will be combined with your input data based on the unique
 #' sample identifiers used as rownames.
 #' @param metadata_info  \emph{Optional: } Named vector including the information
-#'  about the conditions column information on numerator or denominator 
+#'  about the conditions column information on numerator or denominator
 #' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
-#'  Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will 
-#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all), 
-#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and 
+#'  Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will
+#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all),
+#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and
 #' performs multiple comparison all-vs-all. \strong{Default = c(conditions=
 #' "Conditions", numerator = NULL, denumerator = NULL)}
 #'
-#' @return List with two entries: DF (including the results DF) and Plots 
+#' @return List with two entries: DF (including the results DF) and Plots
 #' (including the  histogramm plot)
 #'
 #' @keywords bartlett test,Normality testing, Density plot, QQplot
@@ -3103,7 +3104,7 @@ shapiro <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-bartlett <- 
+bartlett <-
     function(
         data,
         metadata_sample,
@@ -3117,20 +3118,20 @@ bartlett <-
     conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
 
     # Use Bartletts test
-    bartlett_res <- 
+    bartlett_res <-
         apply(
-            data, 
-            2, 
+            data,
+            2,
             function(x) bartlett.test(x ~ conditions)
         )
 
     # Make the output DF
-    DF_bartlett_results <- 
+    DF_bartlett_results <-
         as.data.frame(
             matrix(
-                NA, 
+                NA,
                 nrow = ncol(data)
-            ), 
+            ),
             ncol = 1
         )
     rownames(DF_bartlett_results) <- colnames(data)
@@ -3139,7 +3140,7 @@ bartlett <-
     for (l in 1:length(bartlett_res)) {
         DF_bartlett_results[l, 1] <- bartlett_res[[l]]$p.value
     }
-    DF_bartlett_results <- DF_bartlett_results %>% 
+    DF_bartlett_results <- DF_bartlett_results %>%
         mutate(
             `Var homogeneity` = case_when(
                 `bartlett p.val` < 0.05 ~ FALSE,
@@ -3148,8 +3149,8 @@ bartlett <-
         )
     # if p<0.05 then unequal variances
     message(
-        "For ", 
-        round(sum(DF_bartlett_results$`Var homogeneity`) / nrow(DF_bartlett_results), digits = 4) * 100, 
+        "For ",
+        round(sum(DF_bartlett_results$`Var homogeneity`) / nrow(DF_bartlett_results), digits = 4) * 100,
         "% of metabolites the group variances are equal."
         )
 
@@ -3160,18 +3161,18 @@ bartlett <-
 
     #### Plots:
     # Make density plots
-    Bartlettplot <- 
+    Bartlettplot <-
         ggplot(
-            data.frame(x = DF_Bartlett_results_out), 
+            data.frame(x = DF_Bartlett_results_out),
             aes(x = DF_Bartlett_results_out$`bartlett p.val`)
         ) +
         geom_histogram(
-            aes(y = ..density..), 
-            colour = "black", 
+            aes(y = ..density..),
+            colour = "black",
             fill = "white"
         ) +
         geom_density(
-            alpha = 0.2, 
+            alpha = 0.2,
             fill = "grey45"
         ) +
         ggtitle(
@@ -3187,7 +3188,7 @@ bartlett <-
     Bartlett_output_list <- list(
         "DF" = list(
             "Bartlett_result" = DF_Bartlett_results_out
-        ), 
+        ),
         "Plot" = list(
             "Histogram" = Bartlettplot
         )
@@ -3208,13 +3209,13 @@ bartlett <-
 #' Variance stabilizing transformation (vst)
 #'
 #' @param data data frame with unique sample identifiers
-# not true: no need to have row names, they are not used here, and in 
+# not true: no need to have row names, they are not used here, and in
 # general, # it is not a good practice to use row names
 #' as row names and metabolite numerical values in columns with metabolite
-#' identifiers as column names. Use NA for metabolites that were 
+#' identifiers as column names. Use NA for metabolites that were
 #' not detected.
 #'
-#' @return List with two entries: DF (including the results DF) 
+#' @return List with two entries: DF (including the results DF)
 #' and Plots (including the scedasticity_plot)
 #'
 #' @keywords Heteroscedasticity, variance stabilizing transformation
@@ -3229,7 +3230,7 @@ bartlett <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-vst <- 
+vst <-
     function(
         data
     ) {
@@ -3242,9 +3243,9 @@ vst <-
         pivot_longer(-1L, names_to = "variable") %>%
         group_by(variable) %>% # make a dataframe to save the values
         summarise(mean = mean(value), sd = sd(value))
-    # add a common group for the lm function to account for the whole 
+    # add a common group for the lm function to account for the whole
     # data together
-    het.data$lm <- 1 
+    het.data$lm <- 1
 
     invisible(
         het_plot <-
@@ -3286,7 +3287,7 @@ vst <-
             summarise(mean = mean(value), sd = sd(value))
     # add a common group for the lm function to account for the whole
     # data together
-    het.vst.data$lm <- 1 
+    het.vst.data$lm <- 1
 
     # plot variable stadard deviation as a function of the mean
     invisible(
@@ -3312,7 +3313,7 @@ vst <-
     return(
         invisible(
             list(
-                "DFs" = list("Corrected_data" = data.vst), 
+                "DFs" = list("Corrected_data" = data.vst),
                 "Plots" = list("scedasticity_plot" = scedasticity_plot)
             )
             )

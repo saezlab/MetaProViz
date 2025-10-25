@@ -54,6 +54,7 @@
 #' @return List of two DFs: 1. summary of the cluster count and 2. the detailed information of each metabolites in the clusters.
 #'
 #' @examples
+#' data(intracell_raw)
 #' Intra <- intracell_raw%>%tibble::column_to_rownames("Code")
 #' Input <- MetaProViz::dma(data=Intra[-c(49:58) ,-c(1:3)], metadata_sample=Intra[-c(49:58) , c(1:3)], metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator  = "HK2"))
 #'
@@ -443,7 +444,7 @@ mca_2cond <- function(data_c1,
 #' @return List of two DFs: 1. summary of the cluster count and 2. the detailed information of each metabolites in the clusters.
 #'
 #' @examples
-#'
+#' data(medium_raw)
 #' Media <- medium_raw %>% tibble::column_to_rownames("Code")
 #' ResM <- MetaProViz::processing(data = Media[-c(40:45) ,-c(1:3)],
 #'                                   metadata_sample = Media[-c(40:45) ,c(1:3)] ,

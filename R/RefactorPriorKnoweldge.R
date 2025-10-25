@@ -353,6 +353,7 @@ translate_id <-
 #' @return Input DF with additional column including potential additional IDs.
 #'
 #' @examples
+#' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>% tidyr::drop_na()
 #' Res <- equivalent_id(
 #' data = DetectedIDs,
@@ -514,6 +515,7 @@ equivalent_id <-
 
   ## ------------------ Load manual table ----------------- ##
     if ((from == "kegg") == FALSE) {
+        data(equivalent_features)
         EquivalentFeatures <-
             equivalent_features %>%
       select(from)
@@ -2556,6 +2558,7 @@ add_info <-
 #' "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
 #' # Here the "Class" column is used as the grouping variable
 #' in the UpSet plot.
+#' data(biocrates_features)
 #' data_single <- list(Biocft = biocrates_features)
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
@@ -2932,7 +2935,7 @@ compare_pk <-
 
 ################################################################################
 ### ### Helper function to count number of entries for an ID column value    ###
-### ### and plot                                                             ### 
+### ### and plot                                                             ###
 
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
@@ -2970,6 +2973,7 @@ compare_pk <-
 #' at. \strong{Default = NULL}
 #'
 #' @examples
+#' data(biocrates_features)
 #' count_id(biocrates_features, "HMDB")
 #'
 #' @return A list with two elements:
@@ -2988,7 +2992,7 @@ compare_pk <-
 #' @importFrom ggplot2 scale_y_continuous theme theme_classic
 #' @importFrom grid convertUnit
 #' @export
-count_id <- 
+count_id <-
     function(
         data,
         column,
@@ -3043,7 +3047,7 @@ count_id <-
     ## ------------------  data table ------------------- ##
     # Process the data: count entries and label each cell based on the number of
     # entries.
-    processed_data <- 
+    processed_data <-
         mutate(
             data,
             was_na = is.na(.data[[column]]) | .data[[column]] == "",
@@ -3077,7 +3081,7 @@ count_id <-
 
     # Create the histogram plot using ggplot2
     if (length(unique(processed_data$entry_count)) > 1) {
-        plot_obj <- 
+        plot_obj <-
             ggplot(
                 processed_data,
                 aes(
@@ -3099,7 +3103,7 @@ count_id <-
             )
     } else {
     # Create bargraph plot using ggplot2
-        plot_obj <- 
+        plot_obj <-
             ggplot(
                 processed_data,
                 aes(
@@ -3116,7 +3120,7 @@ count_id <-
             )
     }
 
-    plot_obj <- 
+    plot_obj <-
         plot_obj +
         scale_fill_manual(
             values = fill_colors
@@ -3137,31 +3141,31 @@ count_id <-
         )
 
     # Make the nice plot:
-    Plot_Sized <- 
+    Plot_Sized <-
         plot_grob_superplot(
             input_plot = plot_obj,
             metadata_info = c(
                 Conditions = "id_label",
                 Superplot = TRUE
             ),
-            metadata_sample = processed_data %>% 
+            metadata_sample = processed_data %>%
                 dplyr::rename("Conditions" = "entry_count"),
             plot_name = plot_name,
             subtitle = "",
             plot_type = "Bar"
         )
 
-    plot_height <- 
+    plot_height <-
         convertUnit(
-            Plot_Sized$height, 
-            "cm", 
+            Plot_Sized$height,
+            "cm",
             valueOnly = TRUE
         )
 
-    plot_width <- 
+    plot_width <-
         convertUnit(
-            Plot_Sized$width, 
-            "cm", 
+            Plot_Sized$width,
+            "cm",
             valueOnly = TRUE
         )
 
@@ -3194,7 +3198,7 @@ count_id <-
     )
 
     OutputList <- list()
-    OutputList <- 
+    OutputList <-
         list(
             "Table" = processed_data,
             "Plot" = plot_obj,
