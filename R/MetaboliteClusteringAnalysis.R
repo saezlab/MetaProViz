@@ -457,6 +457,7 @@ mca_2cond <- function(data_c1,
 #'                             pval ="aov",
 #'                             core=TRUE)
 #'
+#' data(intracell_dma)
 #' IntraDMA <- intracell_dma
 #'
 #' Res <- MetaProViz::mca_core(
