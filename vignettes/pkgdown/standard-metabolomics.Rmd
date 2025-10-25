@@ -8,7 +8,7 @@ author:
     affiliation:
     - Cologne University
 output:
-  html_document:
+  BiocStyle::html_document:
     self_contained: true
     toc: true
     toc_float: true
