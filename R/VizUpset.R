@@ -143,10 +143,7 @@ viz_upset <- function(df,
     intersect = intersect_cols,
     name = plot_name,
     base_annotations = base_annotation,
-    set_sizes = (
-      upset_set_size() +
-        theme(axis.text.y = element_text(size = 10))
-    )
+    set_sizes = upset_set_size()
   ) +
     theme_minimal(base_size = 14) +
     theme(
