@@ -54,6 +54,7 @@ MediaDMA <- MetaProViz::dma(data=ResM[["DF"]][["Preprocessing_output"]][ ,-c(1:4
                             pval ="aov",
                             core=TRUE)
 
+data(intracell_dma)
 IntraDMA <- intracell_dma
 
 Res <- MetaProViz::mca_core(
