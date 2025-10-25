@@ -103,6 +103,7 @@ viz_upset <- function(df,
   # If a class column is provided, process it for fill aesthetics
   if (!is.null(class_col)) {
     df[[class_col]] <- as.factor(df[[class_col]])
+    fill_scale <- scale_fill_viridis_d(option = "viridis")
     if(palette_type == "viridis"){
       fill_scale <- scale_fill_viridis_d(option = "viridis")
     } else if(palette_type == "polychrome"){
@@ -125,17 +126,13 @@ viz_upset <- function(df,
         counts = TRUE
       ) + fill_scale +
         theme(
-          legend.position = "right",
-          axis.text.x = element_text(angle = 90, hjust = 1)
+          legend.position = "right"
         )
     )
   } else {
     # No class column provided: use default annotation without fill mapping.
     base_annotation <- list(
-      "Intersection size" = intersection_size(counts = TRUE) +
-        theme(
-          axis.text.x = element_text(angle = 90, hjust = 1)
-        )
+      "Intersection size" = intersection_size(counts = TRUE)
     )
   }
 
