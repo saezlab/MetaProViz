@@ -315,7 +315,7 @@ translate_id <-
   #   print(pk_list)
   #   print(to)
     #   pk_comp_res <-
-    #       MetaProViz:::compare_pk(
+    #       compare_pk(
     #           data = pk_list,
     #           metadata_info = metadata_info,
     #           plot_name = "IDs available after
@@ -524,8 +524,7 @@ equivalent_id <-
         EquivalentFeatures <-
             "equivalent_features" %>%
             get(envir = environment()) %>%
-            equivalent_features %>%
-      select(from)
+            select(from)
   }
 
   ## ------------------ Translate from-to-to ------------------- ##
@@ -740,7 +739,7 @@ equivalent_id <-
   ## ------------------ Create count_id plot ------------------- ##
     # QC plot of before and after
     Before <-
-        MetaProViz:::count_id(
+        count_id(
             data = data,
             column = metadata_info[["InputID"]],
                                  save_plot = NULL,
@@ -750,7 +749,7 @@ equivalent_id <-
         )
 
     After <-
-        MetaProViz:::count_id(
+        count_id(
             data = OtherIDs,
             column = "AllIDs",
                                   save_plot = NULL,
@@ -2800,7 +2799,7 @@ compare_pk <-
 
     # Generate the UpSet plot.
         upset_plot <-
-            MetaProViz:::viz_upset(
+            viz_upset(
       df = df_summary,
       class_col = class_col,
       intersect_cols = c(intersect_cols, "None"),
@@ -2917,7 +2916,7 @@ compare_pk <-
 
     # Generate the UpSet plot.
         upset_plot <-
-            MetaProViz:::viz_upset(
+            viz_upset(
       df = df_binary,
       class_col = "Type",
       intersect_cols = resource_cols,
