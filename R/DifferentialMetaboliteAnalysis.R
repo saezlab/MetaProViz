@@ -2387,7 +2387,7 @@ dma_stat_limma <-
             topTable(
                 fit2,
                 coef = contrast_name,
-                n = Inf,
+                number = Inf,
                 sort.by = "n",
                 adjust.method = padj
                 ) %>% # coef= the comparison the test is done for!

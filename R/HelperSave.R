@@ -212,7 +212,7 @@ save_res <- function(inputlist_df= NULL,
         dev.off()
       } else {
         # Use ggsave for regular ggplot2 plots
-        ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = plot_obj, width = plot_width,  height = plot_height, unit=plot_unit)
+        ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = plot_obj, width = plot_width,  height = plot_height, units=plot_unit)
       }
 
       if(print_plot==TRUE){
