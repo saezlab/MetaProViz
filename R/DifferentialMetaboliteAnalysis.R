@@ -211,7 +211,7 @@ dma <- function(
             {
             Shapiro_output <-
               suppressWarnings(
-                  shapiro(
+                  mpv_shapiro(
                       data = data,
                       metadata_sample = metadata_sample,
                       metadata_info = metadata_info,
@@ -251,7 +251,7 @@ dma <- function(
                     {
                     Bartlett_output <-
                         suppressWarnings(
-                              bartlett(
+                              mpv_bartlett(
                                   data = data,
                                   metadata_sample = metadata_sample,
                                   metadata_info = metadata_info
@@ -319,7 +319,7 @@ dma <- function(
     } else { # MultipleComparison = TRUE
         # Correct data heteroscedasticity
         if (pval != "lmFit" & vst == TRUE) {
-            vst_res <- vst(data)
+            vst_res <- mpv_vst(data)
             data <- vst_res[["DFs"]][["Corrected_data"]]
         }
 
@@ -347,7 +347,7 @@ dma <- function(
 
         if (pval == "aov") {
             STAT_C1vC2 <-
-                aov(
+                mpv_aov(
                     data = data,
                     metadata_sample = metadata_sample,
                     metadata_info = metadata_info,
@@ -355,7 +355,7 @@ dma <- function(
                 )
         } else if (pval == "kruskal.test") {
             STAT_C1vC2 <-
-                kruskal(
+                mpv_kruskal(
                     data = data,
                     metadata_sample = metadata_sample,
                     metadata_info = metadata_info,
@@ -364,7 +364,7 @@ dma <- function(
                 )
         } else if (pval == "welch") {
             STAT_C1vC2 <-
-                welch(
+                mpv_welch(
                     data = data,
                     metadata_sample = metadata_sample,
                     metadata_info = metadata_info,
@@ -1393,7 +1393,7 @@ dma_stat_single <-
 #' @importFrom utils combn
 #'
 #' @noRd
-aov <-
+mpv_aov <-
     function(
         data,
         metadata_sample,
@@ -1638,7 +1638,7 @@ aov <-
 #' @importFrom utils combn
 #'
 #' @noRd
-kruskal <-
+mpv_kruskal <-
     function(
         data,
         metadata_sample,
@@ -1899,7 +1899,7 @@ kruskal <-
 #' @importFrom utils combn
 #'
 #' @noRd
-welch <-
+mpv_welch <-
     function(
         data,
         metadata_sample,
@@ -2577,7 +2577,7 @@ dma_stat_limma <-
 #' @importFrom utils combn
 #'
 #' @noRd
-shapiro <-
+mpv_shapiro <-
     function(
         data,
         metadata_sample,
@@ -3111,7 +3111,7 @@ shapiro <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-bartlett <-
+mpv_bartlett <-
     function(
         data,
         metadata_sample,
@@ -3237,7 +3237,7 @@ bartlett <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @noRd
-vst <-
+mpv_vst <-
     function(
         data
     ) {
