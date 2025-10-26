@@ -82,7 +82,7 @@ viz_superplot <- function(data,
                          path = NULL){
 
   # NSE vs. R CMD check workaround
-  Conditions <- sd <- Superplot <- Intensity <- comparisons_rev <- NULL
+  Conditions <- Superplot <- Intensity <- comparisons_rev <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
