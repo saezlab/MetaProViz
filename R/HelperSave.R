@@ -94,6 +94,7 @@ results_dir <- function(path = 'MetaProViz_Results') {
 #' @importFrom ggplot2 ggsave
 #' @importFrom readr write_csv write_delim
 #' @importFrom writexl write_xlsx
+#' @importFrom tidyselect where
 #' @noRd
 save_res <- function(inputlist_df= NULL,
                    inputlist_plot= NULL,

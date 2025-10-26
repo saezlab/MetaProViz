@@ -92,6 +92,9 @@ mpv_trace <- function() {#MPV=MetaProViz
 #' @importFrom utils packageVersion
 #' @noRd
 metaproviz_init <- function(){
+
+  # NSE vs. R CMD check workaround
+  OmnipathR <- init_config <- init_log <- .on_buildserver <- NULL
   # Only run the first time a MetaProViz function is used in an environment --> Creates log file
   if(is.null(metaproviz.env$init)){
     # Initial log

@@ -310,6 +310,9 @@ replicate_sum <- function(data,
                          metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
                          save_table = "csv",
                          path = NULL){
+
+  # NSE vs. R CMD check workaround
+  Biological_Replicates <- Conditions <- Analytical_Replicates <- UniqueID <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
@@ -424,6 +427,8 @@ replicate_sum <- function(data,
 #' @importFrom logger log_info log_trace
 #' @importFrom ggplot2 after_stat
 #' @importFrom ggrepel geom_text_repel
+#' @importFrom grDevices dev.new dev.off
+#' @importFrom stats sd
 #' @export
 pool_estimation <- function(data,
                            metadata_sample = NULL,
@@ -433,6 +438,9 @@ pool_estimation <- function(data,
                            save_table = "csv",
                            print_plot=TRUE,
                            path = NULL){
+
+  # NSE vs. R CMD check workaround
+  CV <- Sample_type <- density <- HighVar <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -777,12 +785,16 @@ feature_filtering <-function(data,
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble column_to_rownames
 #' @importFrom logger log_info
+#' @importFrom tidyselect everything where
 #' @noRd
 mvi_imputation <- function(data,
                           metadata_sample,
                           metadata_info,
                           core=FALSE,
                           mvi_percentage=50){
+
+  # NSE vs. R CMD check workaround
+  Conditions <- NULL
   ## ------------------ Prepare the data ------------------- ##
   filtered_matrix <- data%>%
     mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))#Make sure all 0 are changed to NAs
@@ -929,11 +941,17 @@ mvi_imputation <- function(data,
 #' @importFrom ggplot2 ggplot geom_boxplot geom_hline labs theme_classic
 #' @importFrom ggplot2 theme_minimal theme annotation_custom aes_string element_text
 #' @importFrom logger log_info log_trace
+#' @importFrom grDevices dev.new dev.off
+#' @importFrom stats median
+#' @importFrom tidyselect everything
 #' @noRd
 tic_norm <- function(data,
                    metadata_sample,
                    metadata_info,
                    tic=TRUE){
+
+  # NSE vs. R CMD check workaround
+  median <- NULL
   ## ------------------ Prepare the data ------------------- ##
   NA_removed_matrix <- data
   NA_removed_matrix[is.na(NA_removed_matrix)] <- 0#replace NA with 0
@@ -1057,10 +1075,15 @@ tic_norm <- function(data,
 #' @importFrom ggplot2 after_stat theme_classic geom_violin geom_dotplot
 #' @importFrom logger log_info log_trace
 #' @importFrom dplyr case_when summarise_all mutate rowwise mutate_all select filter pull
+#' @importFrom grDevices dev.new dev.off
+#' @importFrom stats fisher.test sd var
 #' @noRd
 core_norm <- function(data,
                     metadata_sample,
                     metadata_info){
+
+  # NSE vs. R CMD check workaround
+  Sample_type <- CV <- density <- HighVar <- NULL
   ## ------------------ Prepare the data ------------------- ##
   data_tic <- data
   data_tic[is.na(data_tic)] <- 0
@@ -1332,12 +1355,17 @@ core_norm <- function(data,
 #' @importFrom tibble rownames_to_column
 #' @importFrom hash values keys hash
 #' @importFrom logger log_info log_trace
+#' @importFrom grDevices dev.new dev.off
+#' @importFrom stats relevel var
 #' @noRd
 outlier_detection <- function(data,
                             metadata_sample,
                             metadata_info,
                             core=FALSE,
                             hotellins_confidence=0.99){
+
+  # NSE vs. R CMD check workaround
+  Samples <- `Group summary statistics` <- Outliers <- NULL
   # Message:
   message <- paste("Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). ",
                    "hotellins_confidence value selected: ", hotellins_confidence, sep= "")
@@ -1437,16 +1465,16 @@ outlier_detection <- function(data,
     hotelling_qcc <- mqcc(data_hot, type = "T2.single",labels = rownames(data_hot),confidence.level = hotellins_confidence, title = paste("Outlier filtering via HotellingT2 test filtering round ",loop,", with ",hotellins_confidence, "% Confidence",  sep = ""), plot = FALSE)
     HotellingT2plot_data <- as.data.frame(hotelling_qcc$statistics)
     HotellingT2plot_data <- rownames_to_column(HotellingT2plot_data, "Samples")
-    colnames(HotellingT2plot_data) <- c("Samples", "Group summary statisctics")
-    outlier <- HotellingT2plot_data %>% filter(HotellingT2plot_data$`Group summary statisctics`>hotelling_qcc$limits[2])
+    colnames(HotellingT2plot_data) <- c("Samples", "Group summary statistics")
+    outlier <- HotellingT2plot_data %>% filter(HotellingT2plot_data$`Group summary statistics`>hotelling_qcc$limits[2])
     limits <- as.data.frame(hotelling_qcc$limits)
     legend <- colnames(HotellingT2plot_data[2])
     LegendTitle = "Limits"
 
-    HotellingT2plot <- ggplot(HotellingT2plot_data, aes(x = Samples, y = `Group summary statisctics`, group = 1, fill = ))
+    HotellingT2plot <- ggplot(HotellingT2plot_data, aes(x = Samples, y = `Group summary statistics`, group = 1, fill = ))
     HotellingT2plot <- HotellingT2plot +
-      geom_point(aes(x = Samples,y = `Group summary statisctics`), color = 'blue', size = 2) +
-      geom_point(data = outlier, aes(x = Samples,y = `Group summary statisctics`), color = 'red',size = 3) +
+      geom_point(aes(x = Samples,y = `Group summary statistics`), color = 'blue', size = 2) +
+      geom_point(data = outlier, aes(x = Samples,y = `Group summary statistics`), color = 'red',size = 3) +
       geom_line(linetype = 2)
 
     #draw the horizontal lines corresponding to the LCL,UCL

@@ -68,6 +68,7 @@
 #'
 #' @importFrom logger log_info
 #' @importFrom dplyr rename select
+#' @importFrom stats aggregate
 #' @export
 cluster_ora <- function(data,
                        metadata_info=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
@@ -78,6 +79,10 @@ cluster_ora <- function(data,
                        max_gssize=1000 ,
                        save_table= "csv",
                        path = NULL){
+
+  # NSE vs. R CMD check workaround
+  Description <- Metabolites_in_Pathway <- term <- NULL
+
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
@@ -215,6 +220,7 @@ cluster_ora <- function(data,
 #' @return Saves results as individual .csv files.
 #'
 #' @importFrom dplyr rename
+#' @importFrom stats aggregate
 #' @export
 standard_ora <- function(data,
                         metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
@@ -228,6 +234,9 @@ standard_ora <- function(data,
                         path = NULL
 
 ){
+
+  # NSE vs. R CMD check workaround
+  Cluster_ChangedMetabolites <- Description <- term <- Metabolites_in_Pathway <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 

@@ -56,6 +56,9 @@ viz_stackedbar <- function(data,
                           x_label = "Frequency",
                           y_label = NULL,
                           legend_position = c(0.95, 0.05)) {
+
+  # NSE vs. R CMD check workaround
+  total <- NULL
   # Convert column names to symbols for tidy evaluation
   group_sym <- sym(group_col)
   fill_sym  <- sym(fill_col)

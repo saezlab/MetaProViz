@@ -397,6 +397,9 @@ viz_volcano_standard <- function(data,
                                 print_plot,
                                 folder){
 
+  # NSE vs. R CMD check workaround
+  individual <- NULL
+
   #Pass colours/shapes
   safe_colorblind_palette <- color_palette
   safe_shape_palette <- shape_palette
@@ -674,6 +677,7 @@ viz_volcano_standard <- function(data,
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column
 #' @importFrom logger log_trace
+#' @importFrom stats na.omit
 #' @noRd
 viz_volcano_compare <- function(data,
                                data2,
@@ -697,6 +701,9 @@ viz_volcano_compare <- function(data,
                                save_plot,
                                print_plot,
                                folder){
+
+  # NSE vs. R CMD check workaround
+  individual <- NULL
 
   #####################
   ##--- Check data
@@ -1068,6 +1075,9 @@ viz_volcano_pea <- function(data,
                            save_plot,
                            print_plot,
                            folder){
+
+  # NSE vs. R CMD check workaround
+  PEA_Pathway <- PEA_Feature <- NULL
   #####################
   ##--- Check PEA settings
   if(is.vector(metadata_info)==FALSE){

@@ -61,6 +61,7 @@
 #' @importFrom logger log_trace log_info
 #' @importFrom tidyselect all_of
 #' @importFrom purrr map_dbl
+#' @importFrom stats sd
 #' @export
 viz_superplot <- function(data,
                          metadata_sample,
@@ -79,6 +80,9 @@ viz_superplot <- function(data,
                          save_plot = "svg",
                          print_plot=TRUE,
                          path = NULL){
+
+  # NSE vs. R CMD check workaround
+  Conditions <- sd <- Superplot <- Intensity <- comparisons_rev <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()

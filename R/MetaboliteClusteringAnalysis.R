@@ -66,6 +66,7 @@
 #' @importFrom dplyr rename mutate case_when mutate_at count
 #' @importFrom tidyr replace_na
 #' @importFrom magrittr %>% %<>%
+#' @importFrom stats complete.cases
 #' @export
 mca_2cond <- function(data_c1,
                       data_c2,
@@ -76,6 +77,9 @@ mca_2cond <- function(data_c1,
                       method_background="C1&C2",
                       path=NULL
                       ){
+
+  # NSE vs. R CMD check workaround
+  Cond1_DF_Detected <- Cond1_DF_Cutoff <- Cond2_DF_Detected <- Cond2_DF_Cutoff <- Cond2_DF_Cutoff_Specific <- BG_method <- RG1_All <- RG2_Significant <- RG3_SignificantChange <- NULL
 
   ################################################################################################################################################################################################
   ## ------------ Check Input files ----------- ##
@@ -470,6 +474,7 @@ mca_2cond <- function(data_c1,
 #' @importFrom dplyr rename mutate case_when mutate_at count distinct group_by
 #' @importFrom tidyr replace_na
 #' @importFrom magrittr %>% %<>%
+#' @importFrom stats complete.cases
 #' @export
 mca_core <- function(data_intra,
                      data_core,
@@ -480,6 +485,9 @@ mca_core <- function(data_intra,
                      method_background="Intra&core",
                      path=NULL
                      ){
+
+  # NSE vs. R CMD check workaround
+  Intra_DF_Detected <- Intra_DF_Cutoff <- core_DF_Detected <- core_DF_Cutoff <- core_DF_Cutoff_Specific <- BG_method <- RG1_All <- RG2_Significant <- RG3_Change <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()

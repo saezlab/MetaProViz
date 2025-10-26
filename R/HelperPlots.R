@@ -749,6 +749,9 @@ plot_grob_superplot <- function(input_plot,
                                subtitle,
                                plot_name,
                                plot_type){
+
+  # NSE vs. R CMD check workaround
+  Conditions <- NULL
   # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
   X_Con <- metadata_sample%>%
     distinct(Conditions)

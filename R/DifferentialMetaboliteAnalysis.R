@@ -106,6 +106,7 @@
 #' @importFrom purrr map reduce
 #' @importFrom tibble column_to_rownames rownames_to_column
 #'
+#' @importFrom grDevices dev.new dev.off
 #' @export
 dma <- function(
     data,
@@ -128,6 +129,9 @@ dma <- function(
     print_plot = TRUE,
     path = NULL
     ) {
+
+  # NSE vs. R CMD check workaround
+  Metabolite <- NULL
 
     ## ------------ Create log file ----------- ##
     metaproviz_init()
@@ -686,6 +690,9 @@ log2fc <- function(
     core = FALSE,
     transform = TRUE
     ) {
+
+  # NSE vs. R CMD check workaround
+  `Log2(Distance)` <- C1_Adapted <- C2_Adapted <- NULL
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 

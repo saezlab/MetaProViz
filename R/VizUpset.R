@@ -71,6 +71,9 @@ viz_upset <- function(df,
                      print_plot=TRUE,
                      path = NULL) {
 
+  # NSE vs. R CMD check workaround
+  upset_plot <- NULL
+
   ###########################################################################
   ## ------------ Create log file ----------- ##
   metaproviz_init()

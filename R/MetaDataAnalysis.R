@@ -78,6 +78,7 @@
 #' @importFrom logger log_info
 #' @importFrom purrr map_lgl
 #'
+#' @importFrom tidyselect everything
 #' @export
 metadata_analysis <- function(data,
                          metadata_sample,
@@ -100,6 +101,9 @@ metadata_analysis <- function(data,
                          #column name of our main separator.
 
 ){
+
+  # NSE vs. R CMD check workaround
+  term <- PC <- tukeyHSD_p.adjusted <- feature <- Explained_Variance <- `Sum(Explained_Variance)` <- MainDriver <- `MainDriver_Sum(VarianceExplained)` <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 

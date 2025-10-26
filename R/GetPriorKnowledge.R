@@ -34,8 +34,12 @@
 #' @importFrom logger log_info
 #' @importFrom purrr map_chr map_lgl set_names
 #' @importFrom stringr str_replace str_split
+#' @importFrom tidyselect everything
 #' @export
 metsigdb_kegg <- function(){
+
+  # NSE vs. R CMD check workaround
+  name.x <- name.y <- id_a <- compound_name <- compound_names <- pathway_name <- compound <- pathway <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
@@ -108,6 +112,9 @@ metsigdb_kegg <- function(){
 metsigdb_chemicalclass <- function(version = "2.5.4",
                      save_table="csv",
                      path=NULL){
+
+  # NSE vs. R CMD check workaround
+  class_source_id <- chem_source_id <- class_level_name <- class_name <- common_name <- ClassyFire_class <- ClassyFire_super_class <- ClassyFire_sub_class <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
@@ -199,12 +206,16 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #'
 #' @importFrom dplyr rename
 #' @importFrom logger log_info
+#' @importFrom utils data
 #' @export
 make_gene_metab_set <- function(input_pk,
                               metadata_info=c(Target="gene"),
                               pk_name= NULL,
                               save_table = "csv",
                               path = NULL){
+
+  # NSE vs. R CMD check workaround
+  feature <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -334,6 +345,9 @@ metsigdb_metalinks <- function(types = NULL,
                           uniprot_ids = NULL,
                           save_table="csv",
                           path=NULL){
+
+  # NSE vs. R CMD check workaround
+  protein_type <- type <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
 
