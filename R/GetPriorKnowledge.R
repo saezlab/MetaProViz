@@ -207,6 +207,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 #' @importFrom dplyr rename
 #' @importFrom logger log_info
 #' @importFrom utils data
+#' @importFrom cosmosR default_CARNIVAL_options
 #' @export
 make_gene_metab_set <- function(input_pk,
                               metadata_info=c(Target="gene"),
@@ -255,8 +256,13 @@ make_gene_metab_set <- function(input_pk,
 
   ######################################################
   ##-------------- Cosmos PKN
-  #load the network from cosmos
-  data("meta_network", package = "cosmosR")
+
+  # R CMD check workaround:
+  nothing <- default_CARNIVAL_options("cbc")
+
+  # load the network from cosmos
+  data("meta_network", package = "cosmosR", envir = environment())
+  meta_network <- get("meta_network", envir = environment())
   meta_network <- meta_network[which(meta_network$source != meta_network$target),]
 
   #adapt to our needs extracting the metabolites:

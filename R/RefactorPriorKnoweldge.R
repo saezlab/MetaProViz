@@ -372,6 +372,7 @@ translate_id <-
 #' @importFrom OmnipathR id_types translate_ids
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
+#' @importFrom utils data
 #' @export
 equivalent_id <-
     function(
@@ -407,7 +408,7 @@ equivalent_id <-
     # other prior knowledge?
 
   # NSE vs. R CMD check workaround
-  equivalent_features <- InputID <- AdditionalID <- fromList <-
+  InputID <- AdditionalID <- fromList <-
       PotentialAdditionalIDs <- AllIDs <- AllIDs.x <- AllIDs.y <- NULL
 
   metaproviz_init()
@@ -519,8 +520,10 @@ equivalent_id <-
 
   ## ------------------ Load manual table ----------------- ##
     if ((from == "kegg") == FALSE) {
-        data(equivalent_features)
+        data(list = "equivalent_features", package = "MetaProViz", envir = environment())
         EquivalentFeatures <-
+            "equivalent_features" %>%
+            get(envir = environment()) %>%
             equivalent_features %>%
       select(from)
   }
@@ -1458,7 +1461,8 @@ checkmatch_pk_to_data <-
   # NSE vs. R CMD check workaround
   .data <- OriginalGroup_PK <- OriginalGroup_data <-
       Count_FeatureIDs_to_GroupingVariable <- GroupConflict_Notes <-
-      ActionRequired <- matches <- matches_count <- NULL
+      ActionRequired <- matches <- matches_count <- Group_Conflict_Notes <-
+      row_id <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -2084,7 +2088,7 @@ checkmatch_pk_to_data <-
 #' @importFrom dplyr bind_rows filter group_by left_join mutate
 #' @importFrom dplyr select summarize ungroup
 #' @importFrom igraph graph_from_adjacency_matrix components
-#' @importFrom stats cor as.dist cutree
+#' @importFrom stats cor as.dist cutree hclust
 #' @noRd
 cluster_pk <-
     function(
@@ -2619,6 +2623,9 @@ compare_pk <-
         print_plot = TRUE,
         path = NULL
     ) {
+
+  # NSE vs. R CMD check workaround
+  Type <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
