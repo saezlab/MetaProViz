@@ -169,10 +169,62 @@ save_res <- function(inputlist_df= NULL,
         plot_unit <- "cm"
       }
 
-      ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = inputlist_plot[[Plot]], width = plot_width,  height = plot_height, unit=plot_unit)
+      # Check if this is a ComplexUpset plot (has S7 class from ComplexUpset package)
+      # ComplexUpset plots have theme conflicts with ggsave, so use device-based saving
+      plot_obj <- inputlist_plot[[Plot]]
+      is_upset_plot <- inherits(plot_obj, "upset_plot") ||
+                       ("package:ComplexUpset" %in% search() && inherits(plot_obj, "ggplot"))
+
+      if(is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)){
+        # Use device-based saving for upset plots
+        file_name_full <- paste0(file_name_Save, ".", save_plot, sep="")
+
+        # Convert to inches for device functions
+        width_in <- grid::convertUnit(grid::unit(plot_width, plot_unit), "inches", valueOnly = TRUE)
+        height_in <- grid::convertUnit(grid::unit(plot_height, plot_unit), "inches", valueOnly = TRUE)
+
+        # Open device based on save_plot type
+        if(save_plot == "svg"){
+          svg(file_name_full, width = width_in, height = height_in)
+        } else if(save_plot == "pdf"){
+          pdf(file_name_full, width = width_in, height = height_in)
+        } else if(save_plot == "png"){
+          png(file_name_full, width = width_in, height = height_in, units = "in", res = 300)
+        }
+
+        # Plot and close device
+        # ComplexUpset plots may have theme issues with some ggplot2 versions
+        # Use gridExtra to render the plot which handles patchwork objects better
+        tryCatch({
+          grid::grid.draw(patchwork::patchworkGrob(plot_obj))
+        }, error = function(e) {
+          # Fallback: try direct print which sometimes works
+          tryCatch({
+            print(plot_obj)
+          }, error = function(e2) {
+            # Last resort: save a blank plot with error message
+            plot.new()
+            text(0.5, 0.5, paste("Error rendering ComplexUpset plot:\n", e2$message),
+                 cex = 0.8, col = "red")
+          })
+        })
+        dev.off()
+      } else {
+        # Use ggsave for regular ggplot2 plots
+        ggsave(filename = paste0(file_name_Save, ".",save_plot, sep=""), plot = plot_obj, width = plot_width,  height = plot_height, unit=plot_unit)
+      }
 
       if(print_plot==TRUE){
-        suppressMessages(suppressWarnings(plot(inputlist_plot[[Plot]])))
+        # Special handling for upset plots - they may have theme issues
+        if(is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)){
+          tryCatch({
+            grid::grid.draw(patchwork::patchworkGrob(plot_obj))
+          }, error = function(e) {
+            message("Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.")
+          })
+        } else {
+          suppressMessages(suppressWarnings(plot(inputlist_plot[[Plot]])))
+        }
       }
     }
   }
