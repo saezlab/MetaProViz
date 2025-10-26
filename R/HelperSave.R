@@ -95,6 +95,8 @@ results_dir <- function(path = 'MetaProViz_Results') {
 #' @importFrom readr write_csv write_delim
 #' @importFrom writexl write_xlsx
 #' @importFrom tidyselect where
+#' @importFrom grDevices svg png pdf
+#' @importFrom graphics plot.new text
 #' @noRd
 save_res <- function(inputlist_df= NULL,
                    inputlist_plot= NULL,

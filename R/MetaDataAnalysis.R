@@ -69,7 +69,7 @@
 #' @keywords PCA, annova, metadata
 #'
 #' @importFrom dplyr filter bind_rows rename mutate ungroup group_by summarise
-#' @importFrom dplyr select arrange rowwise mutate_all distinct left_join
+#' @importFrom dplyr select arrange rowwise mutate_all distinct left_join desc
 #' @importFrom magrittr %>% %<>%
 #' @importFrom stats as.formula aov TukeyHSD
 #' @importFrom broom tidy
@@ -77,7 +77,6 @@
 #' @importFrom tibble rownames_to_column
 #' @importFrom logger log_info
 #' @importFrom purrr map_lgl
-#'
 #' @importFrom tidyselect everything
 #' @export
 metadata_analysis <- function(data,
@@ -374,6 +373,9 @@ meta_pk <- function(data,
                    metadata_info=NULL,
                    save_table = "csv",
                    path = NULL){
+
+  # NSE vs. R CMD check workaround
+  SampleID <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()

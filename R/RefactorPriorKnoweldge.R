@@ -406,6 +406,10 @@ equivalent_id <-
     # Is it possible to do this at the moment without structures, but by using
     # other prior knowledge?
 
+  # NSE vs. R CMD check workaround
+  equivalent_features <- InputID <- AdditionalID <- fromList <-
+      PotentialAdditionalIDs <- AllIDs <- AllIDs.x <- AllIDs.y <- NULL
+
   metaproviz_init()
 
   ## ------------------  Check Input ------------------- ##
@@ -840,6 +844,9 @@ mapping_ambiguity <-
         save_table = "csv",
         path = NULL
 ) {
+
+  # NSE vs. R CMD check workaround
+  UniqueID <- NULL
 
   metaproviz_init()
   ## ------------------  Check Input ------------------- ##
@@ -1447,6 +1454,11 @@ checkmatch_pk_to_data <-
         save_table = "csv",
         path = NULL
         ) {
+
+  # NSE vs. R CMD check workaround
+  .data <- OriginalGroup_PK <- OriginalGroup_data <-
+      Count_FeatureIDs_to_GroupingVariable <- GroupConflict_Notes <-
+      ActionRequired <- matches <- matches_count <- NULL
 
   ## ------------ Create log file ----------- ##
   metaproviz_init()
@@ -2072,6 +2084,7 @@ checkmatch_pk_to_data <-
 #' @importFrom dplyr bind_rows filter group_by left_join mutate
 #' @importFrom dplyr select summarize ungroup
 #' @importFrom igraph graph_from_adjacency_matrix components
+#' @importFrom stats cor as.dist cutree
 #' @noRd
 cluster_pk <-
     function(
@@ -2098,6 +2111,9 @@ cluster_pk <-
     # provide different options for clustering (e.g. % of overlap, semantics
     # similarity) --> Ramp uses % of overlap, semnatics similarity:
     # https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html
+
+    # NSE vs. R CMD check workaround
+    Overlap <- Term1 <- Term2 <- distance_matrix <- cluster <- Type <- NULL
 
 
   ## ------------------ Check Input ------------------- ##
@@ -2258,7 +2274,7 @@ cluster_pk <-
     # Hierarchical clustering
         hclust_result <-
             hclust(
-                as.dist(distance_matrix),
+                as.dist(overlap_matrix),
                 method = "average"
             )
         # make methods into parameters!
@@ -2326,6 +2342,7 @@ cluster_pk <-
 #' returned or all .source in net.
 #'
 #' @importFrom tibble rownames_to_column
+#' @importFrom dplyr desc
 #' @noRd
 add_info <-
     function(
@@ -2336,11 +2353,9 @@ add_info <-
                     .target,
         complete = FALSE
     ) {
-  ## ------------------ Check Input ------------------- ##
 
-  ## ------------------ Create output folders and path ------------------- ##
-
-    ## ------------------ Add information to enrichment results
+  # NSE vs. R CMD check workaround
+  targets_detected_num <- score <- NULL
 
   # add number of Genes_targeted_by_TF_num
   net$Count <- 1
@@ -3028,9 +3043,8 @@ count_id <-
     # version and can be changed further)
     # create subtitle and not title prefix
 
-    ## ------------------  logger initiation ------------------- ##
-
-    ## ------------------  Checks ------------------- ##
+    # NSE vs. R CMD check workaround
+    .data <- entry_count <- id_label <- NULL
 
     ## ------------------  Create output folders and path ------------------- ##
     if (is.null(save_table) == FALSE) {

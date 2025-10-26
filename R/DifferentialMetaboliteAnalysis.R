@@ -2144,6 +2144,7 @@ mpv_welch <-
 #' @importFrom tidyr separate unite
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom stats model.matrix
 #' @noRd
 dma_stat_limma <-
     function(
@@ -2159,6 +2160,11 @@ dma_stat_limma <-
         core = FALSE,
         transform = TRUE
         ) {
+
+
+    # NSE vs. R CMD check workaround:
+    New <- NULL
+
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
@@ -2575,6 +2581,8 @@ dma_stat_limma <-
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom utils combn
+#' @importFrom grDevices recordPlot
+#' @importFrom graphics plot.new
 #'
 #' @noRd
 mpv_shapiro <-
@@ -2589,6 +2597,10 @@ mpv_shapiro <-
         pval = "t-test",
         qqplots = TRUE
         ) {
+
+    # NSE vs. R CMD check workaround
+    density <- NULL
+
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
@@ -3117,6 +3129,10 @@ mpv_bartlett <-
         metadata_sample,
         metadata_info
         ) {
+
+    # NSE vs. R CMD check workaround
+    ..density.. <- NULL
+
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
@@ -3241,6 +3257,11 @@ mpv_vst <-
     function(
         data
     ) {
+
+    # NSE vs. R CMD check workaround
+    value <- variable <- coef <- NULL
+
+
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 

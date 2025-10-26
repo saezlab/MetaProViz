@@ -348,7 +348,7 @@ viz_superplot <- function(data,
                           metadata_sample= metadata_sample,
                           log2fc_table=NULL)
         }else if(pval=="kruskal.test"){
-          STAT_C1vC2 <-kruskal(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
+          STAT_C1vC2 <- mpv_kruskal(data=data.frame("Intensity" = plotdata[,-c(2:3)]),
                                             metadata_info=c(Conditions="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
                                             metadata_sample= metadata_sample,
                                             log2fc_table=NULL)
