@@ -119,15 +119,13 @@ viz_upset <- function(df,
       my_palette_named <- setNames(my_palette[1:length(class_levels)], class_levels)
       fill_scale <- scale_fill_manual(values = my_palette_named)
     }
+
     # Build the base annotation with a mapping for fill based on the class column.
     base_annotation <- list(
       "Intersection size" = intersection_size(
         mapping = aes_string(fill = class_col),
         counts = TRUE
-      ) + fill_scale +
-        theme(
-          legend.position = "right"
-        )
+      ) + fill_scale
     )
   } else {
     # No class column provided: use default annotation without fill mapping.
@@ -144,22 +142,13 @@ viz_upset <- function(df,
     name = plot_name,
     base_annotations = base_annotation,
     set_sizes = upset_set_size()
-  ) +
-    theme_minimal(base_size = 14) +
-    theme(
-      plot.margin = margin(1, 1, 1, 1, "cm")
-    )
-
-  # If a class column was provided, hide the legend if there are too many unique terms
-  if (!is.null(class_col) && length(levels(df[[class_col]])) > max_legend_terms) {
-    p <- p + theme(legend.position = "none")
-  }
+  )
 
 
   ## ----------- Save and return -------------#
   suppressMessages(suppressWarnings(
     save_res(inputlist_df=NULL,
-             inputlist_plot= list(upset_plot = upset_plot),
+             inputlist_plot= list(upset_plot = p),
              save_table=NULL,
              save_plot=save_plot,
              path= folder,
