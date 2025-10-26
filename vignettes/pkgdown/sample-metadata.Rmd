@@ -196,44 +196,8 @@ We will perform multiple comparisons based on the different patient demographics
 4. Tumour versus Normal: Subset of `Young` patients
 5. Tumour versus Normal: Subset of `Old` patients
 \
-```{r Display_Not_Run, eval=FALSE}
-# Prepare the different selections
-EarlyStage <- Tissue_Norm %>%
-  filter(STAGE== "EARLY-STAGE")
-LateStage <- Tissue_Norm %>%
-  filter(STAGE=="LATE-STAGE")
-Old <- Tissue_Norm %>%
-  filter(AGE=="Old")
-Young <- Tissue_Norm%>%
-  filter(AGE=="Young")
-
-DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
-
-# Run dma
-ResList <- list()
-for(item in names(DFs)){
-  #Get the right DF:
-  data <- DFs[[item]]
-
-  message(paste("Running dma for", item))
-  #Create folder for saving each comparison
-  dir.create(paste(getwd(),"/MetaProViz_Results/dma/", sep=""), showWarnings = FALSE)
-  dir.create(paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""), showWarnings = FALSE)
-
-  #Perform dma
-  TvN <- dma(data =  data[,-c(1:13)],
-                   metadata_sample =  data[,c(1:13)],
-                   metadata_info = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
-                   shapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
-                   path = paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""))
-
-  #Add Results to list
-  ResList[[item]] <- TvN
-}
-```
-\
 <div class="vscroll-plot">
-```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r Run_not_Display, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Prepare the different selections
 EarlyStage <- Tissue_Norm %>%
   filter(STAGE== "EARLY-STAGE")
@@ -560,65 +524,8 @@ Tissue_MetaData_Extended <- merge(x= SelectedIDs %>%
 ```
 \
 For results with p.adjusted value < 0.1 and a minimum of 10% of the pathway detected will be visualized as Volcano plots:\
-```{r, eval=FALSE}
-# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
-DM_ORA_res<- list()
-
-for(comparison in names(ResList)){#Res list includes the different comparisons we performed above <-
-  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
-  dma_res <- merge(x= Tissue_MetaData_Extended,
-                   y= ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]],
-                   by="Metabolite",
-                   all=TRUE)
-
-  #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
-  dma_res <- dma_res[,c(3,21:25)]%>%
-    dplyr::mutate(InputID_select = if_else(
-      is.na(InputID_select),
-      paste0("NA_", cumsum(is.na(InputID_select))),
-      InputID_select
-      ))%>% #remove duplications and keep the higher Log2FC measurement
-    group_by(InputID_select) %>%
-    slice_max(order_by = Log2FC, n = 1, with_ties = FALSE) %>%
-    ungroup()%>%
-    remove_rownames()%>%
-    tibble::column_to_rownames("InputID_select")
-
-  #Perform ORA
-  Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
-                                 metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
-                                 pathway_name=paste0("KEGG_", comparison, sep=""),
-                                 min_gssize=3,
-                                 max_gssize=1000,
-                                 cutoff_stat=0.01,
-                                 cutoff_percentage=10)
-
-  DM_ORA_res[[comparison]] <- Res
-
-  #Select to plot:
-  Res_Select <- Res[["ClusterGosummary"]]%>%
-    filter(p.adjust<0.1)%>%
-    #filter(pvalue<0.05)%>%
-    filter(percentage_of_Pathway_detected>10)
-
-  if(is.null(Res_Select)==FALSE){
-     viz_volcano(plot_types="PEA",
-                       data= dma_res, #Must be the data you have used as an input for the pathway analysis
-                       data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
-                       metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
-                                       PEA_stat="p.adjust",#Column data2
-                                       PEA_score="GeneRatio",#Column data2
-                                       PEA_Feature="MetaboliteID"),# Column metadata_feature (needs to be the same as row names in data)
-                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
-                       plot_name= paste("KEGG_", comparison, sep=""),
-                       subtitle= "PEA" )
-  }
-}
-```
-\
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 

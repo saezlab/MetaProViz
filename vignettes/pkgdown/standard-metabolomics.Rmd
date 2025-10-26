@@ -153,19 +153,8 @@ Lastly, the function `Preprocessing()` performs outlier detection and adds a col
 \
 Since our example data contains pool samples, we will do `Pool_Estimation()` before applying the `Preprocessing()` function. This is important, since one should remove the features (=metabolites) that are too variable prior to performing any data transformations such as tic as part of the `Preprocessing()` function.\
 It is worth mentioning that the Coefficient of variation (CV) is calculated by dividing the standard deviation (SD) by the mean. Hence CV depends on the SD, which in turn works for normally distributed data.\
-```{r, eval=FALSE}
-#### Select Pool samples:
-# Get the Pool data
-PoolData <- intracell_raw %>%
-  subset(Conditions=="Pool", select = -c(1:3)) # we remove the columns "Conditions", "Analytical_Replicates" and "Biological_Replicates"
-
-# Check the metabolite variability
-Pool_Estimation_result<- pool_estimation(data = PoolData,
-                                                     cutoff_cv = 30)
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
+```{r, echo=TRUE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
 #### Select Pool samples:
 # Get the Pool data
 PoolData <- intracell_raw %>%
@@ -179,18 +168,8 @@ Pool_Estimation_result<- pool_estimation(data = PoolData,
 \
 \
 \
-```{r, eval=FALSE}
-#### Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_metadata_info
-Pool_Estimation_result<- pool_estimation(data = Intra[,-c(1:3)],
-                                                     metadata_sample = Intra[,1:3],
-                                                     metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"),
-                                                     cutoff_cv = 30)
-
-Pool_Estimation_result_DF_CV <-Pool_Estimation_result[["DF"]][["CV"]]
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
+```{r, echo=TRUE, warning=FALSE,  fig.width=6, fig.height=4.5, fig.align="left"}
 #--------------------------------------------------------------------
 #### Alternatively a full dataset can be added. Here, the Conditions and PoolSamples name have to be specified in the Input_metadata_info
 Pool_Estimation_result<- pool_estimation(data = Intra[,-c(1:3)],
@@ -214,29 +193,8 @@ Pool_Estimation_result_DF_CV[1:5,]%>%
 The results from the `Pool_Estimation()` is a table that has the CVs. If there is a high variability, one should consider to remove those features from the data. For the example data nothing needs to be removed. If you have used internal standard in your experiment you should specifically check their CV as this would indicate technical issues (here valine-d8 and hippuric acid-d5).\
 \
 Now we will apply the `Preprocessing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned and can be easily viewed.\
-```{r, eval=FALSE}
-PreprocessingResults <- processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
-                                                   metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
-                                                   metadata_info = c(Conditions = "Conditions",
-                                                                     Biological_Replicates = "Biological_Replicates"),
-                                                   featurefilt = "Modified",
-                                                   cutoff_featurefilt = 0.8,
-                                                   tic = TRUE,
-                                                   mvi = TRUE,
-                                                   hotellins_confidence = 0.99,# We perform outlier testing using 0.99 confidence intervall
-                                                   core = FALSE,
-                                                   save_plot = "svg",
-                                                   save_table= "csv",
-                                                   print_plot = TRUE,
-                                                   path = NULL)
-
-
-# This is the results table:
-Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE,   fig.width=6, fig.height=4.5, fig.align="left"}
+```{r, echo=TRUE,   fig.width=6, fig.height=4.5, fig.align="left"}
 PreprocessingResults <- processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
                                                   metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
                                                   metadata_info = c(Conditions = "Conditions",
@@ -305,22 +263,8 @@ Noteworthy, if you have not performed missing value imputation and hence your da
 It is important to mention that in case of `STAT_pval="lmFit"`, we perform log2 transformation of the data as prior to running limma to enable the calculation of the log2FC, hence do not provide log2 transformed data.\
 \
 Here, the example data we have four different cell lines, healthy (HK2) and cancer (ccRCC: 786-M1A, 786-M2A and 786-O), hence we can perform multiple different comparisons. The results can be automatically saved and all the results are returned in a list with the different data frames. If parameter Plot=TRUE, an overview Volcano plot is generated and saved.\
-```{r, eval=FALSE}
-# Perform multiple comparison All_vs_One using annova:
-DMA_Annova <- dma(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
-                              metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
-                              metadata_info = c(Conditions="Conditions", Numerator=NULL , Denominator = "HK2"),# we compare all_vs_HK2
-                              metadata_feature = MappingInfo,# Adds metadata for the metabolites such as KEGG_ID, Pathway, retention time,...
-                              pval ="aov",
-                              padj="fdr")
-
-# Inspect the dma results tables:
-DMA_786M1A_vs_HK2 <- DMA_Annova[["dma"]][["786-M1A_vs_HK2"]]
-shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
-```
-
 <div class="vscroll-plot">
-```{r, warning=FALSE, echo=FALSE, fig.width=7, fig.height=5, fig.align="left"}
+```{r, warning=FALSE, echo=TRUE, fig.width=7, fig.height=5, fig.align="left"}
 # Perform multiple comparison All_vs_One using annova:
 DMA_Annova <- dma(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
                               metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
@@ -604,18 +548,8 @@ viz_heatmap(data = Input_Heatmap,
 ```
 \
 Lastly, by generate individual plot for e.g. each pathway or the metabolite clusters by adding individual (`individual_Sample` or `individual_Metab`) to `Plot_metadata_info`. At the same time we can still maintain the metadata information for both, the samples and the metabolites. together this can help us to draw biological conclusions about the different pathways: Indeed, we can observe for the `D-Amino acid metabolism` many metabolites fall into the MCA-Cluster `core_DOWN`, meaning in comparison to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.
-```{r, eval=FALSE}
-# individual: One individual plot for each pathway, col annotation: Colour for samples
-viz_heatmap(data = Input_Heatmap,
-                       metadata_sample = MetaData_Sample,
-                       metadata_info = c(individual_Metab = "Pathway",
-                                        color_Sample = list("Conditions","Biological_Replicates"),
-                                        color_Metab = list("RG2_Significant")),
-                       metadata_feature =  MetaData_Metab,
-                      plot_name = "Pathway")
-```
 <div class="vscroll-plot">
-```{r, echo=FALSE, fig.width=9, fig.height=7.5, warning=FALSE, fig.align="left"}
+```{r, echo=TRUE, fig.width=9, fig.height=7.5, warning=FALSE, fig.align="left"}
 viz_heatmap(data = Input_Heatmap,
                        metadata_sample = MetaData_Sample,
                        metadata_info = c(individual_Metab = "Pathway",
@@ -643,18 +577,8 @@ Input_Superplot[,1:7]%>%
 ```
 We also need the Metadata as we will need to know which conditions to plot for together. If you have further information such as replicates or patient ID, we can use this for the colour of the plotted samples per condition as in the superplots style as described in by Lord et al [@Lord2020]. \
 \
-```{r, eval=FALSE}
-viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
-                                           metadata_sample =MetaData_Sample,
-                                           metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
-                                           plot_type = "Bar", #Bar, Box, Violin
-                                           plot_conditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
-                                           stat_comparison = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
-
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
@@ -683,17 +607,8 @@ viz_superplot(data =Input_Plot%>%select(all_of(Metabolite_list)),#We just plot s
 ```
 \
 Now, if we for instance prefer boxplots over bargraphs we can simply change the parameter `plot_type`:
-```{r, eval=FALSE}
-viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
-                                           metadata_sample =MetaData_Sample,
-                                           metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
-                                           plot_type = "Box", #Bar, Box, Violin
-                                           plot_conditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
-                                           stat_comparison = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
@@ -706,17 +621,8 @@ viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
 \
 \
 We can also change it to violin plots:
-```{r, eval=FALSE}
-viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
-                                           metadata_sample =MetaData_Sample,
-                                           metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
-                                           plot_type = "Violin", #Bar, Box, Violin
-                                           plot_conditions = c("HK2", "786-O", "786-M1A", "786-M2A"),#sets the order in which the samples should be plotted
-                                           stat_comparison = list(c(1,2),c(1,4)))#Stat comparisons to be included on the plot
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 viz_superplot(data =Input_Superplot[,c(1:6)],#We just plot six metabolites
                                            metadata_sample =MetaData_Sample,
                                            metadata_info = c(Conditions="Conditions", Superplot = "Biological_Replicates"),
@@ -814,18 +720,8 @@ viz_volcano(plot_types="Standard",
 ```
 \
 We immediately see that there are many pathways displayed on the plot, which can make it difficult to interpret. Hence, we will change our plot settings in order to get individual plots for each of the pathways:
-```{r Display_Not_Run, eval=FALSE}
-# Now we can generate a plot for each pathway and color for the metabolite clusters:
-viz_volcano(plot_types="Standard",
-                        metadata_info= c(color="RG2_Significant", individual="Pathway"),
-                        metadata_feature= MetaData_Metab,
-                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
-                        plot_name= "786M1A versus HK2",
-                        subtitle= "Results of dma. Colour for metabolic pathways." )
-```
-
 <div class="vscroll-plot">
-```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r Run_not_Display, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Now we can generate a plot for each pathway and color for the metabolite clusters:
 viz_volcano(plot_types="Standard",
                         metadata_info= c(color="RG2_Significant", individual="Pathway"),
@@ -851,18 +747,8 @@ viz_volcano(plot_types="Compare",
 ```
 
 Now we do individual plots again:
-```{r, eval=FALSE}
-viz_volcano(plot_types="Compare",
-                        metadata_info= c(individual="Pathway"),
-                        metadata_feature= MappingInfo,
-                        data=DMA_786M1A_vs_HK2%>%tibble::column_to_rownames("Metabolite"),
-                        data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%tibble::column_to_rownames("Metabolite"),
-                        plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
-                        subtitle= "Results of dma" )
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r, echo=TRUE, fig.align="left", fig.width=7, fig.height=5}
 viz_volcano(plot_types="Compare",
                         metadata_info= c(individual="Pathway"),
                         metadata_feature= MappingInfo,
@@ -895,22 +781,8 @@ InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
 ```
 \
 Now we can produce the plots:
-```{r, eval=FALSE}
-viz_volcano(plot_types="PEA",
-                       metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
-                                       PEA_stat="p.adjust",#Column data2
-                                       PEA_score="GeneRatio",#Column data2
-                                       PEA_Feature="Metabolite"),# Column metadata_feature (needs to be the same as row names in data)
-                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
-                       data= InputPEA, #Must be the data you have used as an input for the pathway analysis
-                       data2= InputPEA2, #Must be the results of the pathway analysis
-                       plot_name= "KEGG",
-                       subtitle= "PEA" ,
-                       select_label = NULL)
-```
-
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 viz_volcano(plot_types="PEA",
                        metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
                                        PEA_stat="p.adjust",#Column data2
