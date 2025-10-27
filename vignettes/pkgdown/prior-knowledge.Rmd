@@ -65,7 +65,7 @@ knitr::opts_chunk$set(
 \
 First if you have not done yet, install the required dependencies and load the libraries:
 
-```{r message=FALSE, warning=FALSE}
+```{r load-packages message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 # 2. Install the latest development version from GitHub using devtools
 # devtools::install_github("https://github.com/saezlab/MetaProViz")
@@ -106,7 +106,7 @@ library(tibble)
 `1.` Metadata of cell line experiment **(CellLine)**\
 Example datasets is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].\
 
-```{r}
+```{r load-data}
 # Load the Pre-processed intracellular data:
 data(cellular_meta)
 
@@ -118,7 +118,7 @@ FeatureMetadata_Cells <- cellular_meta%>%
 `2.` Metadata of patients tissue experiment **(Tissue)**\
 Example datasets is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
 
-```{r}
+```{r load-data-2}
 # Load the example data:
 data(tissue_meta)
 
@@ -131,7 +131,7 @@ FeatureMetadata_Tissue <- tissue_meta%>%
 `3.` Metadata of Biocrates kit **(Biocrates)**\
 Here we use the Biocrates kit feature information of the ["MxP® Quant 500 XL kit"](https://biocrates.com/mxp-quant-500-xl/) that covers more than 1,000 metabolites from various biochemical classes.
 
-```{r}
+```{r load-data-3}
 # Load the example data:
 data(biocrates_features)
 FeatureMetadata_Biocrates <- biocrates_features
@@ -160,7 +160,7 @@ One example is the metabolite Alanine, which can occur in its L- or D- form.
 If in an experiment those enantiomers have not been distinguished, the correct way would be to either assign two metabolite IDs (L- and D-Alanine) or a more general Alanine ID without chiral information.
 Yet, in reality this is not as trivial:\
 
-```{r, echo=FALSE}
+```{r code, echo=FALSE}
 # Create DF for Alanine:
 Alanine <- data.frame(
   TrivialName = c("D-Alanine", "L-Alanine", "Alanine", "Alanine zwitterion"),
@@ -179,7 +179,7 @@ Alanine%>%
 \
 Indeed, dependent on the database, the Alanine metabolite can have different IDs available:\
 
-```{r, echo=FALSE}
+```{r plot, echo=FALSE}
 # Print Plot:
 AlaninePlot <- Alanine%>%
   tidyr::pivot_longer(cols = c("HMDB", "ChEBI", "KEGG", "PubChem"),
@@ -215,7 +215,7 @@ The reason for this is that substrate chirality is critical to enzymatic process
 to showcase the severity of this problem, we can look at the occurrence of those metabolites in metabolic pathways across different databases.
 to do so we searched for those metabolite IDs in the RaMP database [@Braisted2023] and extracted the pathways they are part of:\
 
-```{r, echo=FALSE}
+```{r data-prep, echo=FALSE}
 data(alanine_pathways)
 
 Pathways <- alanine_pathways
@@ -242,7 +242,7 @@ Alanine%>%
 
 \
 
-```{r, echo=FALSE}
+```{r plot-2, echo=FALSE}
 # BarGraph
 Plot <- ggplot2::ggplot(Alanine, ggplot2::aes(fill=TrivialName, y=`PathwayCount`, x=Database)) +
         ggplot2::geom_bar(position="stack", stat="identity")+
@@ -267,7 +267,7 @@ Plot_Sized
 
 \
 
-```{r, eval=FALSE, include=FALSE}
+```{r plot-3, eval=FALSE, include=FALSE}
 # Make BarGraph per pathway and ID type
 Alanine_Path <- Pathways%>%
   tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",A", remove = FALSE)%>%
@@ -302,7 +302,7 @@ In some cases the chosen ID is correct in representing the degree of ambiguity i
 In both cases this can lead to missed maps to prior knowledge and hence a loss of information as discussed above.\
 Hence, we assign multiple IDs to a measured peak, where specificity in detection may not be given (i.e. amino acids).\
 
-```{r}
+```{r data-prep-2}
 # Example Cell-line data:
 Input_HMDB <- FeatureMetadata_Cells%>%
   dplyr::filter(!HMDB == "NA")%>% # ID in the measured data we want to use, hence we remove NA's
@@ -314,7 +314,7 @@ FeatureMetadata_Cells_AddIDs <- equivalent_id(data= Input_HMDB,
                                                           from = "hmdb")
 ```
 
-```{r, echo=FALSE}
+```{r code-2, echo=FALSE}
 # Check how our data looks like:
 FeatureMetadata_Cells_AddIDs [2:8, 1:3]%>%
   kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using equivalent_id() function.") %>%
@@ -347,14 +347,14 @@ We terme this collection of metabolite sets MetSigDB (Metabolite signature datab
 KEGG pathways that are loaded via KEGG API using the package `KEGGREST` and can be used to perform pathway analysis [@Kanehisa2000].
 **(KEGG_Pathways)**\
 
-```{r}
+```{r metsigdb-kegg}
 # This will use KEGGREST to query the KEGG API to load the pathways:
 KEGG_Pathways <- metsigdb_kegg()
 ```
 
 \
 
-```{r, echo=FALSE}
+```{r code-3, echo=FALSE}
 # Check how our data looks like:
 KEGG_Pathways[c(1:3,52:54),]%>%
   kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
@@ -367,13 +367,13 @@ The chemical class-metabolite sets are based on the classification of metabolite
 The chemical class-metabolite sets were curated by RaMP-DB, which used ClassyFire [@Braisted2023].
 Here we access them via OmnipathR.\
 
-```{r}
+```{r metsigdb-chemicalclass}
 ChemicalClass_MetabSet <- metsigdb_chemicalclass()
 ```
 
 \
 
-```{r, echo=FALSE}
+```{r code-4, echo=FALSE}
 # Check how our data looks like:
 ChemicalClass_MetabSet[c(1:5,80:83, 500:503),]%>%
   kableExtra::kbl(caption = "Preview of the DF `ChemicalClass_MetabSet`.") %>%
@@ -387,7 +387,7 @@ This function is useful if you want to perform pathway enrichment analysis on av
 Moreover, it enables you to perform combined pathway enrichment analysis on metabolite-gene sets, if you have other data types such as proteomics measuring the enzymes expression.\
 The Hallmarks [@Liberzon2015] gene-set and Gaude [@Gaude2016] gene-set is available in the package `MetaProViz` and can be loaded using the function `metsigdb_hallmarks()` and `metsigdb_gaude` respectively.\
 
-```{r}
+```{r load-data-4}
 # Load the example gene-sets:
 data(hallmarks)
 Hallmark_Pathways <- hallmarks
@@ -398,7 +398,7 @@ Gaude_Pathways <- gaude_pathways
 
 \
 
-```{r, echo=FALSE}
+```{r code-5, echo=FALSE}
 # Check how our data looks like:
 Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
   kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
@@ -407,7 +407,7 @@ Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
 
 \
 
-```{r, echo=FALSE}
+```{r code-6, echo=FALSE}
 # Check how our data looks like:
 Gaude_Pathways[c(486:490, 1504, 1507, 1531, 49:50, 779),]%>%
   kableExtra::kbl(caption = "Preview of the DF `gaude_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
@@ -417,7 +417,7 @@ Gaude_Pathways[c(486:490, 1504, 1507, 1531, 49:50, 779),]%>%
 \
 Now we can use the function `make_gene_metab_set` to translate the gene names to metabolite names.
 
-```{r}
+```{r make-gene-metab-set}
 # Translate gene names to metabolite names
 Hallmarks_GeneMetab <- make_gene_metab_set(input_pk=Hallmark_Pathways,
                                                      metadata_info=c(Target="gene"),
@@ -430,7 +430,7 @@ Gaude_GeneMetab <- make_gene_metab_set(input_pk=Gaude_Pathways,
 
 \
 
-```{r, echo=FALSE}
+```{r data-prep-3, echo=FALSE}
 # Check how our data looks like:
 Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
   dplyr::filter(term=="HALLMARK_GLYCOLYSIS")%>%
@@ -442,7 +442,7 @@ Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
 
 \
 
-```{r, echo=FALSE, include =FALSE}
+```{r code-7, echo=FALSE, include =FALSE}
 # plot out how the metabolite set size is different from the original gene-set size
 # Show bar graph of the size of the gene set versus the metabolite set --> Show both tables (pathways gene names and pathways metabolite names) and show the difference in size (e.g. 10% of the genes are translated to metabolites, 90% are not metabolic enzymes and hence only genes)
 
@@ -457,13 +457,13 @@ Yet, it is important to keep in mind that generally we detect less metabolites t
 
 The MetaLinks database is a manually curated database of metabolite-receptor and metabolite-transporter sets that can be used to study the connection of metabolites and receptors or transporters [@Farr_Dimitrov2024].\
 
-```{r}
+```{r metsigdb-metalinks}
 MetaLinksDB <- metsigdb_metalinks()
 ```
 
 \
 
-```{r, echo=FALSE}
+```{r data-prep-4, echo=FALSE}
 # Check how our data looks like:
 MetaLinksDB[
     c(12:13,17:18,432,466),
@@ -481,7 +481,7 @@ dplyr::filter(MetaLinksDB, !is.na(term_specific))[c(1,50, 90, 101),] %>%
 
 We have now loaded a number of different PK sources (details above) and aim to compare the overlap in coverage between these PK sources to understand if there are certain genes or metabolites covered by one PK resource but not the others.
 As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `compare_pk()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
-```{r}
+```{r compare-pk}
 # Compare the PK resources
 pk_comp_res <- compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMetab[["GeneMetabSet"]]),
                                                   Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
@@ -490,14 +490,14 @@ pk_comp_res <- compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMe
 ```
 \
 The table includes all features of the three PK resources we decided to compare. Additionally, it includes a column for each PK resource with value 1 if the feature is present in the PK resource and 0 if it is not. The column "Type" specifies with ID type the feature is corresponding to, here either metabolite (HMDB) or gene, which is used for visualisation purposes in the upset plot.\
-```{r, echo=FALSE}
+```{r code-8, echo=FALSE}
 # Check how our data looks like:
 pk_comp_res$summary_table[c(1:8),]%>%
   kableExtra::kbl(caption = "Preview of the DF `pk_comp_res$summary_table` showing coverage of features (genes or metabolites) across PK sources.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
-```{r, echo=FALSE, fig.width=8, fig.height=6}
+```{r code-9, echo=FALSE, fig.width=8, fig.height=6}
 pk_comp_res$upset_plot
 ```
 \
@@ -541,7 +541,7 @@ In the Biocrates data the available metabolite identifiers are mostly CHEBI, HMD
 Now we select these metabolite identifier columns to count the coverage and look at the combinations of the coverage grouped by the class of metabolite.
 This helps us to understand what to expect, when linking the data to prior knowledge.\
 
-```{r, fig.width=12, fig.height=9}
+```{r compare-pk-2, fig.width=12, fig.height=9}
 pk_comp_res_biocft <- compare_pk(data = list(Biocft = FeatureMetadata_Biocrates),
                                              metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
                                              plot_name = "Overlap of BioCrates Columns")
@@ -550,7 +550,7 @@ pk_comp_res_biocft <- compare_pk(data = list(Biocft = FeatureMetadata_Biocrates)
 
 \
 
-```{r, echo=FALSE}
+```{r code-10, echo=FALSE}
 # Check how our data looks like:
 pk_comp_res_biocft$summary_table[c(1:8),]%>%
   kableExtra::kbl(caption = "Preview of the DF `pk_comp_res_biocft$summary_table` showing coverage of identifiers.", row.names=FALSE) %>%
@@ -593,7 +593,7 @@ Often this choice is dictated by the prior knowledge resource as most of them us
 Here we will use MetalinksDB, which uses HMDB IDs as metabolite identifiers, hence it is best to use the HMDB IDs to link the Biocrates features to the resource.
 Noteworthy, in some cases the Biocrates metabolites have multiple HMDB IDs listed per metabolite:\
 
-```{r, fig.width=8, fig.height=6}
+```{r code-11, fig.width=8, fig.height=6}
 # Count entries and record NA information
 result_bioc_hmdb_count <- count_id(FeatureMetadata_Biocrates, "HMDB")
 # Access the processed data:
@@ -613,7 +613,7 @@ But for now, we will proceed with making the connections to the PK using all HMD
 
 Here we connect the experimental Biocrates table to the MetalinksDB PK using the HMDB IDs using the `checkmatch_pk_to_data()` function.\
 
-```{r}
+```{r load-data-5}
 Biocrates_to_MetalinksDB <- checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,
                                                               input_pk = MetaLinksDB,
                                                               metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
@@ -635,7 +635,7 @@ The `checkmatch_pk_to_data()` has been designed with this in mind, by default sp
 
 Let's take a look at the results:
 
-```{r, echo=FALSE}
+```{r data-prep-5, echo=FALSE}
 irrelevant_cols <- c('INCHI','SMILES','Key','IUPAC','Molecule','MESH','TrivialName_Prior2023', 'Detection','CID')
 
 # Check how our data looks like:
@@ -653,7 +653,7 @@ In any case we will certainly need to keep this in mind for downstream analysis 
 Let's turn back to consider the number of HMDB IDs we have in the Biocrates data and ask ourself a question: is it helpful or detrimental to have multiple IDs?
 To answer this, we will take only the first HMDB of each cell with multiple HMDB IDs and test to see this has worked.
 
-```{r}
+```{r data-prep-6}
 #Number of matches:
 MultipleIDs <- Biocrates_to_MetalinksDB$data_summary%>%
   summarise(total_matches_count = sum(matches_count, na.rm = TRUE))%>%
@@ -737,7 +737,7 @@ This is based on [OmniPathR](https://www.bioconductor.org/packages/release/bioc/
 \
 As an example we are translating the KEGG pathways we loaded with `metsigdb_kegg` into HMDB ids:\
 
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
+```{r code-12, echo=TRUE, message=FALSE, warning=FALSE}
 KEGG_Pathways_Translated <- translate_id(data= KEGG_Pathways,
                                                      metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
                                                      from = c("kegg"),
@@ -746,7 +746,7 @@ KEGG_Pathways_Translated <- translate_id(data= KEGG_Pathways,
 
 \
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r code-13, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
   kableExtra::kbl(caption = "Translation of KEGG IDs in KEGG pathways to HMDB & pubchem IDs") %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
@@ -756,7 +756,7 @@ KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
 Here we can immediately see that despite the ID translation, some of the translations between the KEGG MetaboliteID and the HMDB or PubChem IDs have failed, resulting in NA values.
 to get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.\
 
-```{r, echo=FALSE, fig.width=8, fig.height=6}
+```{r compare-pk-3, echo=FALSE, fig.width=8, fig.height=6}
 pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF),
                                                 metadata_info = list(kegg_translated = c("hmdb", "pubchem")),
                                                 plot_name = "IDs available after KEGG ID Translation")
@@ -785,13 +785,13 @@ Because of this complexity the output of `translate_id()` includes not only the 
 Indeed, the translation of e.g.
 KEGG to hmdb and pubchem includes multiple data frames including a summary of the mapping occurrences:\
 
-```{r}
+```{r code-14}
 names(KEGG_Pathways_Translated)
 ```
 
 \
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r code-15, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 KEGG_Pathways_Translated[["Mappingsummary_hmdb"]][c(1:3, 7:9),] %>%
   kableExtra::kbl(caption = "Mappingsummary_hmdb") %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
@@ -803,7 +803,7 @@ We also have the ability to extract a long version of the DF that includes a row
 Yet, this can become very large dependent on the amount of many-to-many mappings, hence by default we do not generate this summary.
 Within the `translate_id()` you can set the parameter `summary =TRUE` or in case you have a dataframe that includes both, original and translated ID, you can use the function `mapping_ambiguity()` to generate this long summary as well as the mapping summary in general.\
 
-```{r, eval=FALSE, include=TRUE}
+```{r code-16, eval=FALSE, include=TRUE}
 # Option 1:
 KEGG_Pathways_TranslatedSum <- translate_id(data= KEGG_Pathways,
                                                     metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
@@ -814,7 +814,7 @@ KEGG_Pathways_TranslatedSum <- translate_id(data= KEGG_Pathways,
 
 \
 
-```{r}
+```{r data-prep-7}
 # Option 2:
 MappingProblems <- mapping_ambiguity(
     data =
@@ -831,7 +831,7 @@ MappingProblems <- mapping_ambiguity(
 
 \
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r code-17, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 MappingProblems[["summary"]][c(1:2, 503, 505),c(2:6, 8:9,11)] %>%
   kableExtra::kbl(caption = "Long summary of mapping problems taking into account both directions, from-to-to and to-to-from.", row.names=FALSE) %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
@@ -842,7 +842,7 @@ In the table it is shown that the KEGG ID C00002 maps to 3 different HMDB IDs, a
 The other two HMDB Ids are also in the table and it is checked to how many KEGG IDs they map.
 Additionally, we have passed `grouping_variable = "term"` as we have pathways, which also means each of those mappings is checked within a pathway and across pathways (e.g. C00002 is shown twice, for two different terms).\
 
-```{r,echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r plot-4,echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 Plot <- MappingProblems[["summary"]]%>%
   filter(term == "Glycolysis / Gluconeogenesis")%>%
   filter(!KEGG=="NA")%>%
@@ -937,7 +937,7 @@ Enrichment analysis on standard differential analysis results.
 We offer ORA `standard_ora`, but there are many other statistical tests that can be used for enrichment analysis.
 The full scope of different methods is beyond the scope of MetaProViz, but are available in decoupleR [@Badia-I-Mompel2022] packages from our group.
 
-```{r, echo=FALSE, eval=FALSE}
+```{r code-18, echo=FALSE, eval=FALSE}
 # Future
 
 # Run metabolite-gene analysis - Maybe add cosmos data - this also has matched transcriptomics (otherwise there are also the CPTAC data for ccRCC) and Cissys data are to be published soon as well.
@@ -974,7 +974,7 @@ Here we choose an example datasets, which is publicly available on [metabolomics
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\
 We have performed pre-processing and differential analysis (details can be found in the vignette vignette [Standard Metabolomics](https://saezlab.github.io/MetaProViz/articles/Standard%20Metabolomics.html)) and and here we load the differential metabolite analysis results for the comparison of 786M-1A versus HK2.\
 
-```{r}
+```{r load-data-6}
 # Load the Pre-processed intracellular data:
 data(intracell_dma)
 
@@ -985,7 +985,7 @@ Intra_DMA_786M1A_vs_HK2 <- intracell_dma
 Here we chose publicly available data from the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.\
 We have performed differential analysis (details can be found in the vignette [Metadata Analysis](https://saezlab.github.io/MetaProViz/articles/Metadata%20Analysis.html)) and and here we load the differential metabolite analysis results for the comparison of Tumour versus Normal.\
 
-```{r}
+```{r load-data-7}
 # Load the example data:
 data(tissue_dma)
 Tissue_TvsN <- tissue_dma
