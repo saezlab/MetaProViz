@@ -28,7 +28,7 @@ Description: MetaProViz can analyse standard metabolomics and
     interpretable graphs and saves them in a publication ready format.
 URL: https://saezlab.github.io/MetaProViz
 BugReports: https://github.com/saezlab/MetaProViz/issues
-biocViews: Metabolomics, QualityControl, Software, SystemsBiology, Visualization
+biocViews: Clustering, Metabolomics, Pathways, QualityControl, Software, SystemsBiology, Visualization
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
