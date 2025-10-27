@@ -144,7 +144,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
   Structure <- ramp_table( "metabolite_class" , version = version)
   Class <- ramp_table( "chem_props" , version = version)
 
-  HMDB_ChemicalClass <- merge(Structure, Class[,c(1:3,10)], by="ramp_id", all.x=TRUE)%>%
+  HMDB_ChemicalClass <- merge(Structure, Class[,c(seq_len(3),10)], by="ramp_id", all.x=TRUE)%>%
     filter(str_starts(class_source_id, "hmdb:"))%>% # Select HMDB only!
     filter(str_starts(chem_source_id, "hmdb:"))%>% # Select HMDB only!
     select(-c("chem_data_source", "chem_source_id"))%>%
@@ -169,7 +169,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
 
   ##-------------- Save and return
   DF_List <- list("ChemicalClass_MetabSet"=HMDB_ChemicalClass)
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
             inputlist_plot= NULL,
             save_table=save_table,
@@ -177,7 +177,7 @@ metsigdb_chemicalclass <- function(version = "2.5.4",
             path= Subfolder,
             file_name= "ChemicalClass",
             core=FALSE,
-            print_plot=FALSE)))
+            print_plot=FALSE))
 
 	return(HMDB_ChemicalClass)
 
@@ -297,7 +297,7 @@ make_gene_metab_set <- function(input_pk,
   ##-------------- Save and return
   DF_List <- list("GeneMetabSet"=GeneMetabSet,
                   "MetabSet"=MetabSet)
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(inputlist_df= DF_List,#This needs to be a list, also for single comparisons
                          inputlist_plot= NULL,
                          save_table=save_table,
@@ -305,7 +305,7 @@ make_gene_metab_set <- function(input_pk,
                          path= Subfolder,
                          file_name= pk_name,
                          core=FALSE,
-                         print_plot=FALSE)))
+                         print_plot=FALSE))
 
   return(invisible(DF_List))
 }
@@ -409,41 +409,41 @@ metsigdb_metalinks <- function(types = NULL,
     if(length(Questions)>0){
       for(i in Questions){
         if(i==1){
-          print("Types:")
-          print(unique(MetalinksDB$type))
+          log_info("Types:")
+          log_info(unique(MetalinksDB$type))
         }
         if(i==2){
-          print("Cell Location:")
+          log_info("Cell Location:")
           CellLocation <- TablesList[["cell_location"]]
-          print(unique(CellLocation$cell_location))
+          log_info(unique(CellLocation$cell_location))
         }
         if(i==3){
-          print("Tissue Location:")
+          log_info("Tissue Location:")
           TissueLocation <- TablesList[["tissue_location"]]
-          print(unique(TissueLocation$tissue_location))
+          log_info(unique(TissueLocation$tissue_location))
         }
         if(i==4){
-          print("Biospecimen Location:")
+          log_info("Biospecimen Location:")
           BiospecimenLocation <- TablesList[["biospecimen_location"]]
-          print(unique(BiospecimenLocation$biospecimen_location))
+          log_info(unique(BiospecimenLocation$biospecimen_location))
         }
         if(i==5){
-          print("Disease:")
+          log_info("Disease:")
           Disease <- TablesList[["disease"]]
-          print(unique(Disease$disease))
+          log_info(unique(Disease$disease))
         }
         if(i==6){
-          print("Pathway:")
+          log_info("Pathway:")
           Pathway <- TablesList[["pathway"]]
-          print(unique(Pathway$pathway))
+          log_info(unique(Pathway$pathway))
         }
         if(i==7){
-          print("HMDB IDs:")
-          print(unique(MetalinksDB$hmdb))
+          log_info("HMDB IDs:")
+          log_info(unique(MetalinksDB$hmdb))
         }
         if(i==8){
-          print("UniProt IDs:")
-          print(unique(MetalinksDB$uniprot))
+          log_info("UniProt IDs:")
+          log_info(unique(MetalinksDB$uniprot))
         }
       }
     }
@@ -576,7 +576,7 @@ metsigdb_metalinks <- function(types = NULL,
   #------------------------------------------------------------------
   #Save results in folder
   ##-------------- Save and return
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(inputlist_df= list(MetalinksDB),#This needs to be a list, also for single comparisons
                          inputlist_plot= NULL,
                          save_table=save_table,
@@ -584,7 +584,7 @@ metsigdb_metalinks <- function(types = NULL,
                          path= Subfolder,
                          file_name= "MetaLinksDB",
                          core=FALSE,
-                         print_plot=FALSE)))
+                         print_plot=FALSE))
 
   return(MetalinksDB)
 

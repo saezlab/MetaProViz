@@ -149,18 +149,18 @@ viz_superplot <- function(data,
   if(is.null(plot_conditions)){
     Number_Cond <- length(unique(tolower(metadata_sample[["Conditions"]])))
     if(Number_Cond<=2){
-      MultipleComparison = FALSE
+      MultipleComparison <- FALSE
     }else{
-      MultipleComparison = TRUE
+      MultipleComparison <- TRUE
     }
   }else if(length(plot_conditions)>2){
-    MultipleComparison = TRUE
+    MultipleComparison <- TRUE
   }else if(length(plot_conditions)<=2){
     Number_Cond <- length(unique(tolower(metadata_sample[["Conditions"]])))
     if(Number_Cond<=2){
-      MultipleComparison = FALSE
+      MultipleComparison <- FALSE
     }else{
-      MultipleComparison = TRUE
+      MultipleComparison <- TRUE
     }
   }
 
@@ -247,7 +247,7 @@ viz_superplot <- function(data,
 
   for (i in colnames(data)){
     #Prepare the dfs:
-    suppressWarnings(
+    
       dataMeans <-
         data_merge %>%
         select(i, Conditions) %>%
@@ -259,20 +259,20 @@ viz_superplot <- function(data,
           )
         ) %>%
         as.data.frame()
-    )
+    
 
     names(dataMeans)[2] <- "Intensity"
 
     if("Superplot" %in% names(metadata_info)){
-      suppressWarnings(plotdata <- data_merge %>%
-                         select(i,Conditions, Superplot)
-                     %>%  group_by(Conditions)
-                     %>% as.data.frame() )
+      plotdata <- data_merge %>%
+                         select(i,Conditions, Superplot) %>%
+                         group_by(Conditions) %>%
+                         as.data.frame()
     }else{
-      suppressWarnings(plotdata <- data_merge %>%
-                         select(i,Conditions)
-                       %>%  group_by(Conditions)
-                       %>% as.data.frame() )
+      plotdata <- data_merge %>%
+                         select(i,Conditions) %>%
+                         group_by(Conditions) %>%
+                         as.data.frame()
     }
     names(plotdata)[1] <- c("Intensity")
     plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
@@ -422,7 +422,7 @@ viz_superplot <- function(data,
     SaveList <- list()
     SaveList[[cleaned_i]] <- Plot_Sized
     #----- Save
-    suppressMessages(suppressWarnings(
+    suppressWarnings(
       save_res(inputlist_df=NULL,
                            inputlist_plot= SaveList,
                            save_table=NULL,
@@ -433,7 +433,7 @@ viz_superplot <- function(data,
                            print_plot=print_plot,
                            plot_height=plot_height,
                            plot_width=plot_width,
-                           plot_unit="cm")))
+                           plot_unit="cm"))
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }

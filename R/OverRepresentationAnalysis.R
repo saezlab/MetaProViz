@@ -135,8 +135,8 @@ cluster_ora <- function(data,
   Pathway$Count <- NULL
 
   ## ------------ Run ----------- ##
-  df_list = list()# Make an empty list to store the created DFs
-  clusterGo_list = list()
+  df_list <- list()# Make an empty list to store the created DFs
+  clusterGo_list <- list()
   #Run ORA
   for(g in grps_labels){
     grpMetabolites <- subset(df, df[[metadata_info[["ClusterColumn"]]]] == g)
@@ -173,7 +173,7 @@ cluster_ora <- function(data,
     }
   }
   #Save files
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(inputlist_df=df_list,
                          inputlist_plot= NULL,
                          save_table=save_table,
@@ -181,7 +181,7 @@ cluster_ora <- function(data,
                          path= folder,
                          file_name= paste("ClusterGosummary",pathway_name, sep="_"),
                          core=FALSE,
-                         print_plot=FALSE)))
+                         print_plot=FALSE))
 
   #return <- clusterGosummary
   ORA_Output <- list("DF"= df_list, "ClusterGo"=clusterGo_list)
@@ -271,7 +271,7 @@ standard_ora <- function(data,
   value <- cutoff_percentage/100
 
   allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]),]# rank by t.val
-  selectMetabolites_DF <- allMetabolites_DF[c(1:(ceiling(value * nrow(allMetabolites_DF))),(nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))),]
+  selectMetabolites_DF <- allMetabolites_DF[c(seq_len(ceiling(value * nrow(allMetabolites_DF))),(nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))),]
   selectMetabolites_DF$`top/Bottom`<- "TRUE"
   selectMetabolites_DF <-merge(allMetabolites_DF,selectMetabolites_DF[,c("Metabolite", "top/Bottom")], by="Metabolite", all.x=TRUE)
 
@@ -333,7 +333,7 @@ standard_ora <- function(data,
   ORA_output_list <- list("InputSelection" = InputSelection , "ClusterGosummary" = clusterGosummary)
 
   #save:
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(inputlist_df=ORA_output_list,
                          inputlist_plot= NULL,
                          save_table=save_table,
@@ -341,7 +341,7 @@ standard_ora <- function(data,
                          path= folder,
                          file_name= paste(pathway_name),
                          core=FALSE,
-                         print_plot=FALSE)))
+                         print_plot=FALSE))
 
   #Return
   ORA_output_list <- c( ORA_output_list, list("ClusterGo"=clusterGo))

@@ -100,7 +100,7 @@
 #'           Normality testing
 #'
 #' @importFrom magrittr %>%
-#' @importFrom logger log_info
+#' @importFrom logger log_info log_error
 #' @importFrom dplyr full_join rename
 #' @importFrom logger log_info
 #' @importFrom purrr map reduce
@@ -200,17 +200,14 @@ dma <- function(
     if (shapiro == TRUE) {
         if (length(Settings[["Metabolites_Miss"]] >= 1)) {
 
-          message(
-              paste0(
-                "There are NA's/0s in the data. This can impact the output of ",
-                "the SHapiro-Wilk test for all metabolites that include NAs/0s."
-              )
-          )
+          msg <- "There are NA's/0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs/0s."
+          log_warn(msg)
+          warning(msg, call. = FALSE)
         }
         tryCatch(
             {
             Shapiro_output <-
-              suppressWarnings(
+              
                   mpv_shapiro(
                       data = data,
                       metadata_sample = metadata_sample,
@@ -218,16 +215,12 @@ dma <- function(
                       pval = pval,
                       qqplots = FALSE
                   )
-              )
+              
             },
             error = function(e) {
-                message(
-                    paste0(
-                      "Error occurred during shapiro that performs ",
-                      "the shapiro-Wilk test. Message:"
-                    ),
-                    conditionMessage(e)
-                )
+                msg <- sprintf("Error in shapiro (Shapiro-Wilk test): %s", conditionMessage(e))
+                log_error(msg)
+                stop(msg, call. = FALSE)
             }
         )
     }
@@ -250,22 +243,18 @@ dma <- function(
                 tryCatch(
                     {
                     Bartlett_output <-
-                        suppressWarnings(
+                        
                               mpv_bartlett(
                                   data = data,
                                   metadata_sample = metadata_sample,
                                   metadata_info = metadata_info
                               )
-                        )
+                        
                     },
                     error = function(e) {
-                        message(
-                            paste0(
-                                "Error occurred during bartlett that performs ",
-                                "the bartlett test. Message:"
-                            ),
-                            conditionMessage(e)
-                        )
+                        msg <- sprintf("Error in bartlett (Bartlett test): %s", conditionMessage(e))
+                        log_error(msg)
+                        stop(msg, call. = FALSE)
                     }
                 )
             }
@@ -333,16 +322,13 @@ dma <- function(
                 "."
             )
         } else { # for 1 vs all
-            message(
-                "No condition was specified as numerator and ",
+            msg <- sprintf(
+                "No condition was specified as numerator and %s was selected as a denominator. Performing multiple testing `all-vs-one` using %s.",
                 Settings[["denominator"]],
-                paste0(
-                    "was selected as a denominator. Performing ",
-                    "multiple testing `all-vs-one` using"
-                ),
-                paste(pval),
-                "."
+                pval
             )
+            log_info(msg)
+            message(msg)
         }
 
         if (pval == "aov") {
@@ -525,8 +511,8 @@ dma <- function(
     DMA_Output_List <- list()
     # Here we make a list in which we will save the outputs:
     if (shapiro == TRUE & exists("Shapiro_output") == TRUE) {
-        suppressMessages(
-            suppressWarnings(
+        
+            
                 save_res(
                     inputlist_df = Shapiro_output[["DF"]],
                     inputlist_plot = Shapiro_output[["Plot"]][["Distributions"]],
@@ -537,15 +523,15 @@ dma <- function(
                     core = core,
                     print_plot = print_plot
                 )
-            )
-    )
+            
+    
 
       DMA_Output_List <- list("ShapiroTest" = Shapiro_output)
     }
 
     if (bartlett == TRUE & exists("Bartlett_output") == TRUE) {
-        suppressMessages(
-            suppressWarnings(
+        
+            
                 save_res(
                     inputlist_df = Bartlett_output[["DF"]],
                     inputlist_plot = Bartlett_output[["Plot"]],
@@ -556,8 +542,8 @@ dma <- function(
                     core = core,
                     print_plot = print_plot
                 )
-            )
-        )
+            
+        
 
       DMA_Output_List <-
         c(
@@ -567,8 +553,8 @@ dma <- function(
     }
 
     if (vst == TRUE & exists("vst_res") == TRUE) {
-        suppressMessages(
-            suppressWarnings(
+        
+            
                 save_res(
                     inputlist_df = vst_res[["DF"]],
                     inputlist_plot = vst_res[["Plot"]],
@@ -579,15 +565,15 @@ dma <- function(
                     core = core,
                     print_plot = print_plot
                 )
-            )
-        )
+            
+        
 
       DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
     }
 
     if (core == TRUE) {
-        suppressMessages(
-            suppressWarnings(
+        
+            
                 save_res(
                     inputlist_df = list("Feature_Metadata" = Feature_Metadata),
                     inputlist_plot = NULL,
@@ -598,8 +584,8 @@ dma <- function(
                     core = core,
                     print_plot = print_plot
                 )
-            )
-        )
+            
+        
 
         DMA_Output_List <-
             c(
@@ -608,8 +594,8 @@ dma <- function(
             )
     }
 
-    suppressMessages(
-        suppressWarnings(
+    
+        
             save_res(
                 # This needs to be a list, also for single comparisons
                 inputlist_df = DMA_Output,
@@ -621,8 +607,8 @@ dma <- function(
                 core = core,
                 print_plot = print_plot
             )
-        )
-    )
+        
+    
 
     DMA_Output_List <-
         c(
@@ -757,7 +743,7 @@ log2fc <- function(
     ############################################################################
     ## ----------------- Log2FC ----------------------------
     log2fc_table <- list() # Create an empty list to store results data frames
-    for (column in 1:dim(comparisons)[2]) {
+    for (column in seq_len(dim)(comparisons)[2]) {
         # Numerator
         C1 <- data %>%
             filter(
@@ -891,7 +877,7 @@ log2fc <- function(
             temp2 <- Mean_C2
             # Add Info of core:
             core_info <- rbind(temp1, temp2, rep(0, length(temp1)))
-            for (i in 1:length(temp1)) {
+            for (i in seq_along(temp1)) {
                 if (temp1[i] > 0 & temp2[i] > 0) {
                     core_info[3, i] <- "Released"
                 } else if (temp1[i] < 0 & temp2[i] < 0) {
@@ -1259,7 +1245,7 @@ dma_stat_single <-
       ))
 
     ## ------------ Perform Hypothesis testing ----------- ##
-    for (column in 1:dim(comparisons)[2]) {
+    for (column in seq_len(dim)(comparisons)[2]) {
         C1 <- data %>% # Numerator
             filter(
               metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
@@ -1287,7 +1273,7 @@ dma_stat_single <-
 
     VecPVAL_C1vC2 <- c()
     VecTVAL_C1vC2 <- c()
-    for (i in 1:length(T_C1vC2)) {
+    for (i in seq_along(T_C1vC2)) {
         p_value <- unlist(T_C1vC2[[i]][3])
         t_value <- unlist(T_C1vC2[[i]])[1] # Extract the t-value
         VecPVAL_C1vC2[i] <- p_value
@@ -1310,8 +1296,8 @@ dma_stat_single <-
 
     #### 2. p.adjusted
     # Split data for p.value adjustment to exclude NA
-    PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(1:3)]
-    PVal_C1vC2 <- PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(1:3)]
+    PVal_NA <- PVal_C1vC2[is.na(PVal_C1vC2$p.val), c(seq_len(3))]
+    PVal_C1vC2 <- PVal_C1vC2[!is.na(PVal_C1vC2$p.val), c(seq_len(3))]
 
     # perform adjustment
     VecPADJ_C1vC2 <-
@@ -1339,7 +1325,7 @@ dma_stat_single <-
         STAT_C1vC2 <-
             merge(
                 log2fc_table,
-                STAT_C1vC2[, c(1:2, 4, 3)],
+                STAT_C1vC2[, c(seq_len(2), 4, 3)],
                 by = "Metabolite"
             )
     }
@@ -1472,7 +1458,7 @@ mpv_aov <-
 
     # if opposite comparisons is true
     if (sum(opp_comps %in% colnames(Tukey_res)) > 0) {
-        for (comp in 1:length(opp_comps)) {
+        for (comp in seq_along(opp_comps)) {
             colnames(Tukey_res)[colnames(Tukey_res) %in% opp_comps[comp]] <- comps[comp]
         }
     }
@@ -1489,7 +1475,7 @@ mpv_aov <-
 
     # if oposite comparisons is true
     if (sum(opp_comps %in% colnames(Tukey_res_diff)) > 0) {
-        for (comp in 1:length(opp_comps)) {
+        for (comp in seq_along(opp_comps)) {
             colnames(Tukey_res_diff)[colnames(Tukey_res_diff) %in% opp_comps[comp]] <- comps[comp]
         }
     }
@@ -2199,7 +2185,7 @@ dma_stat_limma <-
 
         Limma_input <- data %>% tibble::rownames_to_column("sample")
         Limma_input <- merge(
-            targets[, 1:2],
+            targets[, seq_len(2)],
             Limma_input,
             by = "sample",
             all.x = TRUE
@@ -2278,7 +2264,7 @@ dma_stat_limma <-
         rownames(cont.matrix) <- character(num_comparisons)
 
         # Loop through all pairwise combinations of unique conditions
-        for (condition1 in 1:(num_conditions - 1)) {
+        for (condition1 in seq_len(num_conditions - 1)) {
             for (condition2 in (condition1 + 1):num_conditions) {
                 # Create the pairwise comparison vector
                 comparison <- rep(0, num_conditions)
@@ -2452,7 +2438,7 @@ dma_stat_limma <-
 
     results_list_new <- list()
     # Match the lists using name_match_df
-    for (i in 1:nrow(name_match_df)) {
+    for (i in seq_len(nrow(name_match_df))) {
         old_name <- name_match_df$`names(results_list)`[i]
         new_name <- name_match_df$New[i]
         results_list_new[[new_name]] <- results_list[[old_name]]
@@ -2464,7 +2450,7 @@ dma_stat_limma <-
             # and we need to combine the lists
             # Merge the data frames in list1 and list2 based on the "Metabolite" column
             merged_list <- list()
-            for (i in 1:nrow(name_match_df)) {
+            for (i in seq_len(nrow(name_match_df))) {
                 list_dfs <- name_match_df$New[i]
 
                 # Check if the data frames exist in both lists
@@ -2836,8 +2822,8 @@ mpv_shapiro <-
             )
         rownames(DF_shapiro_results) <- UniqueConditions
         colnames(DF_shapiro_results) <- colnames(Input_shaptest)
-        for (k in 1:length(UniqueConditions)) {
-            for (l in 1:ncol(Input_shaptest)) {
+        for (k in seq_along(UniqueConditions)) {
+            for (l in seq_len(ncol(Input_shaptest))) {
                 DF_shapiro_results[k, l] <-
                     shapiro_results[[UniqueConditions[k]]][[l]]$p.value
             }
@@ -2856,7 +2842,7 @@ mpv_shapiro <-
         if (qqplots == TRUE) {
             QQ_plots <- list()
         }
-        for (x in 1:nrow(DF_shapiro_results)) {
+        for (x in seq_len(nrow(DF_shapiro_results))) {
             #### Generate Results Table
             transpose <-
                 as.data.frame(
@@ -2975,7 +2961,7 @@ mpv_shapiro <-
 
             density_values2 <- ggplot_build(plot)$data[[2]]
 
-            suppressWarnings(
+            
                 sampleDist <-
                     ggplot(
                         data.frame(x = all_data), aes(x = x)
@@ -3007,7 +2993,7 @@ mpv_shapiro <-
                         x = "Abundance",
                         y = "Density"
                     )
-            )
+            
 
             Density_plots[[paste(colnames(transpose))]] <- sampleDist
 
@@ -3085,7 +3071,7 @@ mpv_shapiro <-
                 )
         }
 
-        suppressWarnings(invisible(return(Shapiro_output_list)))
+        invisible(return(Shapiro_output_list))
     }
 }
 
@@ -3160,7 +3146,7 @@ mpv_bartlett <-
     rownames(DF_bartlett_results) <- colnames(data)
     colnames(DF_bartlett_results) <- "bartlett p.val"
 
-    for (l in 1:length(bartlett_res)) {
+    for (l in seq_along(bartlett_res)) {
         DF_bartlett_results[l, 1] <- bartlett_res[[l]]$p.value
     }
     DF_bartlett_results <- DF_bartlett_results %>%
@@ -3217,11 +3203,11 @@ mpv_bartlett <-
         )
     )
 
-    suppressWarnings(
+    
         invisible(
             return(Bartlett_output_list)
         )
-    )
+    
 }
 
 

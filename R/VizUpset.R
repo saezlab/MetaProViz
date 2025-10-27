@@ -119,7 +119,7 @@ viz_upset <- function(df,
 
         log_trace(paste("Warning ", message, sep=""))
       }
-      my_palette_named <- setNames(my_palette[1:length(class_levels)], class_levels)
+      my_palette_named <- setNames(my_palette[seq_along(class_levels)], class_levels)
       fill_scale <- scale_fill_manual(values = my_palette_named)
     }
 
@@ -149,7 +149,7 @@ viz_upset <- function(df,
 
 
   ## ----------- Save and return -------------#
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(inputlist_df=NULL,
              inputlist_plot= list(upset_plot = p),
              save_table=NULL,
@@ -157,7 +157,7 @@ viz_upset <- function(df,
              path= folder,
              file_name= "UpsetPlot",
              core=FALSE,
-             print_plot=print_plot)))
+             print_plot=print_plot))
 
   return(p)
 }

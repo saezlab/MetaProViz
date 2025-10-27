@@ -203,7 +203,7 @@ save_res <- function(inputlist_df= NULL,
         }, error = function(e) {
           # Fallback: try direct print which sometimes works
           tryCatch({
-            print(plot_obj)
+            log_info(plot_obj)
           }, error = function(e2) {
             # Last resort: save a blank plot with error message
             plot.new()
@@ -226,7 +226,7 @@ save_res <- function(inputlist_df= NULL,
             message("Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.")
           })
         } else {
-          suppressMessages(suppressWarnings(plot(inputlist_plot[[Plot]])))
+          suppressWarnings(plot(inputlist_plot[[Plot]]))
         }
       }
     }

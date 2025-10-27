@@ -417,10 +417,10 @@ viz_volcano_standard <- function(data,
 
       if(nrow(InputVolcano)>=1){
         if("color" %in% names(metadata_info)==TRUE ){
-          color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+          color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
           keyvals <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
             names(col) <- InputVolcano$color[row]
             keyvals <- c(keyvals, col)
@@ -432,10 +432,10 @@ viz_volcano_standard <- function(data,
         }
         #Prepare the shape scheme:
         if("shape" %in% names(metadata_info)==TRUE){
-          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
+          shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
           keyvalsshape <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
@@ -509,7 +509,7 @@ viz_volcano_standard <- function(data,
         SaveList[[cleaned_i]] <- Plot_Sized
 
         #----- Save
-        suppressMessages(suppressWarnings(
+        suppressWarnings(
           save_res(inputlist_df=NULL,
                                inputlist_plot= SaveList,
                                save_table=NULL,
@@ -520,7 +520,7 @@ viz_volcano_standard <- function(data,
                                print_plot=print_plot,
                                plot_height= plot_height,
                                plot_width=plot_width,
-                               plot_unit="cm")))
+                               plot_unit="cm"))
       }
     }
   }else if("individual" %in% names(metadata_info)==FALSE){
@@ -530,10 +530,10 @@ viz_volcano_standard <- function(data,
     InputVolcano <- data
     if(nrow(InputVolcano)>=1){
       if("color" %in% names(metadata_info)==TRUE ){
-        color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+        color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
         keyvals <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
           names(col) <- InputVolcano$color[row]
           keyvals <- c(keyvals, col)
@@ -545,10 +545,10 @@ viz_volcano_standard <- function(data,
       }
       #Prepare the shape scheme:
       if("shape" %in% names(metadata_info)==TRUE){
-        shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
+        shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
         keyvalsshape <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
           names(sha) <- InputVolcano$shape[row]
           keyvalsshape <- c(keyvalsshape, sha)
@@ -617,7 +617,7 @@ viz_volcano_standard <- function(data,
       PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
       #----- Save
-      suppressMessages(suppressWarnings(
+      suppressWarnings(
       save_res(inputlist_df=NULL,
                              inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              save_table=NULL,
@@ -628,7 +628,7 @@ viz_volcano_standard <- function(data,
                              print_plot=print_plot,
                              plot_height=plot_height,
                              plot_width=plot_width,
-                             plot_unit="cm")))
+                             plot_unit="cm"))
     }
   }
   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
@@ -761,19 +761,19 @@ viz_volcano_compare <- function(data,
       if(nrow(InputVolcano)>=1){
         #Prepare the colour scheme:
         if("color" %in% names(metadata_info)==TRUE){
-          color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+          color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
           keyvals <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
             names(col) <- InputVolcano$color[row]
             keyvals <- c(keyvals, col)
           }
         } else{#here we will use the conditions if no other color is provided!
-          color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$comparison))]
+          color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$comparison))]
 
           keyvals <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             col <- color_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
             names(col) <- InputVolcano$comparison[row]
             keyvals <- c(keyvals, col)
@@ -781,10 +781,10 @@ viz_volcano_compare <- function(data,
         }
         #Prepare the shape scheme:
         if("shape" %in% names(metadata_info)==TRUE & "color" %in% names(metadata_info)==FALSE){
-          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
+          shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
           keyvalsshape <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
@@ -792,19 +792,19 @@ viz_volcano_compare <- function(data,
         } else if("shape" %in% names(metadata_info)==TRUE & "color" %in% names(metadata_info)==TRUE){
           #Here we have already used color from metadata_info and we need to use shape for the conditions
           message("For Plot_setting= `Consitions`we can only use colour or shape from metadata_feature. We ignore shape and use it to label the Comparison_name.")
-          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
+          shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
           keyvalsshape <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
             names(sha) <- InputVolcano$comparison[row]
             keyvalsshape <- c(keyvalsshape, sha)
           }
         } else if("shape" %in% names(metadata_info)==FALSE & "color" %in% names(metadata_info)==FALSE | "shape" %in% names(metadata_info)==FALSE & "color" %in% names(metadata_info)==TRUE){
-          shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
+          shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
           keyvalsshape <- c()
-          for(row in 1:nrow(InputVolcano)){
+          for(row in seq_len(nrow(InputVolcano))){
             sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
             names(sha) <- InputVolcano$comparison[row]
             keyvalsshape <- c(keyvalsshape, sha)
@@ -869,7 +869,7 @@ viz_volcano_compare <- function(data,
         SaveList[[cleaned_i]] <- Plot_Sized
 
         #----- Save
-        suppressMessages(suppressWarnings(
+        suppressWarnings(
         save_res(inputlist_df=NULL,
                            inputlist_plot= SaveList,
                            save_table=NULL,
@@ -880,7 +880,7 @@ viz_volcano_compare <- function(data,
                            print_plot=print_plot,
                            plot_height=plot_height,
                            plot_width=plot_width,
-                           plot_unit="cm")))
+                           plot_unit="cm"))
       }
     }
 
@@ -893,19 +893,19 @@ viz_volcano_compare <- function(data,
       InputVolcano <- InputCompare
       #Prepare the colour scheme:
       if("color" %in% names(metadata_info)==TRUE){
-        color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+        color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
         keyvals <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
           names(col) <- InputVolcano$color[row]
           keyvals <- c(keyvals, col)
         }
       } else{#here we will use the conditions if no other color is provided!
-        color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$comparison))]
+        color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$comparison))]
 
         keyvals <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           col <- color_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
           names(col) <- InputVolcano$comparison[row]
           keyvals <- c(keyvals, col)
@@ -913,10 +913,10 @@ viz_volcano_compare <- function(data,
       }
       #Prepare the shape scheme:
       if("shape" %in% names(metadata_info)==TRUE & "color" %in% names(metadata_info)==FALSE){
-        shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
+        shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
         keyvalsshape <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
           names(sha) <- InputVolcano$shape[row]
           keyvalsshape <- c(keyvalsshape, sha)
@@ -924,19 +924,19 @@ viz_volcano_compare <- function(data,
       } else if("shape" %in% names(metadata_info)==TRUE & "color" %in% names(metadata_info)==TRUE){
         #Here we have already used color from metadata_info and we need to use shape for the conditions
         message("For plot_types Comparison we can only use colour or shape from metadata_feature. Hence, we ignore shape and use it to label the name_comparison.")
-        shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
+        shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
         keyvalsshape <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
           names(sha) <- InputVolcano$comparison[row]
           keyvalsshape <- c(keyvalsshape, sha)
         }
       } else if("shape" %in% names(metadata_info)==FALSE & "color" %in% names(metadata_info)==FALSE | "shape" %in% names(metadata_info)==FALSE & "color" %in% names(metadata_info)==TRUE){
-        shape_select <- safe_shape_palette[1:length(unique(InputVolcano$comparison))]
+        shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
         keyvalsshape <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
           names(sha) <- InputVolcano$comparison[row]
           keyvalsshape <- c(keyvalsshape, sha)
@@ -995,7 +995,7 @@ viz_volcano_compare <- function(data,
       PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
        #----- Save
-      suppressMessages(suppressWarnings(
+      suppressWarnings(
       save_res(inputlist_df=NULL,
                              inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
                              save_table=NULL,
@@ -1006,7 +1006,7 @@ viz_volcano_compare <- function(data,
                              print_plot=print_plot,
                              plot_height=plot_height,
                              plot_width=plot_width,
-                             plot_unit="cm")))
+                             plot_unit="cm"))
 
     }
   }
@@ -1144,10 +1144,10 @@ viz_volcano_pea <- function(data,
     if(nrow(InputVolcano)>=1){
       #Prepare the colour scheme:
       if("color" %in% names(metadata_info)==TRUE){
-        color_select <- safe_colorblind_palette[1:length(unique(InputVolcano$color))]
+        color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
         keyvals <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
           names(col) <- InputVolcano$color[row]
           keyvals <- c(keyvals, col)
@@ -1159,10 +1159,10 @@ viz_volcano_pea <- function(data,
       }
       #Prepare the shape scheme:
       if("shape" %in% names(metadata_info)==TRUE){
-        shape_select <- safe_shape_palette[1:length(unique(InputVolcano$shape))]
+        shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
         keyvalsshape <- c()
-        for(row in 1:nrow(InputVolcano)){
+        for(row in seq_len(nrow(InputVolcano))){
           sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
           names(sha) <- InputVolcano$shape[row]
           keyvalsshape <- c(keyvalsshape, sha)
@@ -1237,7 +1237,7 @@ viz_volcano_pea <- function(data,
       SaveList[[cleaned_i]] <- Plot_Sized
 
       #----- Save
-      suppressMessages(suppressWarnings(
+      suppressWarnings(
         save_res(inputlist_df=NULL,
                              inputlist_plot= SaveList,
                              save_table=NULL,
@@ -1248,7 +1248,7 @@ viz_volcano_pea <- function(data,
                              print_plot=print_plot,
                              plot_height=plot_height,
                              plot_width=plot_width,
-                             plot_unit="cm")))
+                             plot_unit="cm"))
 
     }
   }

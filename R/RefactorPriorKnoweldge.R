@@ -292,8 +292,8 @@ translate_id <-
 
 
   ## ------------------ Save the results ------------------- ##
-    suppressMessages(
-        suppressWarnings(
+    
+        
             save_res(
                 inputlist_df = ResList,
                 inputlist_plot = NULL,
@@ -304,8 +304,8 @@ translate_id <-
                 core = FALSE,
                 print_plot = FALSE
             )
-        )
-    )
+        
+    
 
   ## ------------------ Show Upset plot of the results ------------------- ##
   ## toDO: current issue with Lists vs doubles
@@ -765,8 +765,8 @@ equivalent_id <-
   ## ------------------ Save the results ------------------- ##
   ResList <- list("equivalent_id" = OutputDF)
 
-    suppressMessages(
-        suppressWarnings(
+    
+        
             save_res(
                 inputlist_df = ResList,
                 inputlist_plot = NULL,
@@ -777,8 +777,8 @@ equivalent_id <-
                 core = FALSE,
                 print_plot = FALSE
             )
-        )
-    )
+        
+    
 
   return(invisible(OutputDF))
 }
@@ -1364,8 +1364,8 @@ mapping_ambiguity <-
   }
 
   ## ------------------ Save the results ------------------- ##
-    suppressMessages(
-            suppressWarnings(
+    
+            
                 save_res(
                     inputlist_df = ResList,
                     inputlist_plot = NULL,
@@ -1376,8 +1376,8 @@ mapping_ambiguity <-
                     core = FALSE,
                     print_plot = FALSE
                 )
-            )
-        )
+            
+        
 
     # Return
     invisible(
@@ -2051,8 +2051,8 @@ checkmatch_pk_to_data <-
             "data_long" = merged_df
         )
 
-    suppressMessages(
-        suppressWarnings(
+    
+        
             save_res(
                 inputlist_df = ResList,
                 inputlist_plot = NULL,
@@ -2063,8 +2063,8 @@ checkmatch_pk_to_data <-
                 core = FALSE,
                 print_plot = FALSE
             )
-        )
-    )
+        
+    
 
     # Return
    invisible(return(ResList))
@@ -2931,8 +2931,8 @@ compare_pk <-
 
   ###########################################################################
     ### -------- Save and return ----------###
-    suppressMessages(
-        suppressWarnings(
+    
+        
             save_res(
                 inputlist_df = list(summary_table = summary_table),
                 inputlist_plot = list(upset_plot = upset_plot),
@@ -2943,8 +2943,8 @@ compare_pk <-
                 core = FALSE,
                 print_plot = print_plot
             )
-        )
-    )
+        
+    
 
     return(
         list(
@@ -3202,8 +3202,8 @@ count_id <-
         )
 
     ## ------------------  save and return ------------------- ##
-    suppressMessages(
-        suppressWarnings(
+    
+        
             save_res(
                 #  inputlist_df needs to be a list, also for single comparisons
                 inputlist_df = list("Table" = processed_data),
@@ -3215,8 +3215,8 @@ count_id <-
                 core = FALSE,
                 print_plot = print_plot
             )
-        )
-    )
+        
+    
 
     OutputList <- list()
     OutputList <-

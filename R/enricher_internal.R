@@ -67,12 +67,14 @@ enricher_internal <- function(gene,
         message("--> No gene can be mapped....")
         if (inherits(USER_DATA, "environment")) {
             p2e <- get("PATHID2EXTID", envir=USER_DATA)
-            sg <- unique(unlist(p2e[1:10]))
+            sg <- unique(unlist(p2e[seq_len(10)]))
         } else {
-            sg <- unique(USER_DATA@gsid2gene$gene[1:100])
+            sg <- unique(USER_DATA@gsid2gene$gene[seq_len(100)])
         }
         sg <- sample(sg, min(length(sg), 6))
-        message("--> Expected input gene ID: ", paste0(sg, collapse=','))
+        msg <- sprintf("--> Expected input gene ID: %s", paste0(sg, collapse=','))
+        log_info(msg)
+        message(msg)
 
         message("--> return NULL...")
         return(NULL)

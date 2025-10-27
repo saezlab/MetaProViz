@@ -177,7 +177,7 @@ viz_pca <- function(data,
   if("color" %in% names(metadata_sample)==TRUE){
     if(scale_color=="discrete"){
       InputPCA$color <- as.factor(InputPCA$color)
-      color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
+      color_select <- safe_colorblind_palette[seq_along(unique(InputPCA$color))]
     }else if(scale_color=="continuous"){
       if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
         InputPCA$color <- as.numeric(InputPCA$color)
@@ -187,7 +187,7 @@ viz_pca <- function(data,
         #Overwrite color pallette
         safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
         #color that will be used for distinct
-        color_select <- safe_colorblind_palette[1:length(unique(InputPCA$color))]
+        color_select <- safe_colorblind_palette[seq_along(unique(InputPCA$color))]
         #Overwrite color_scale
         scale_color <- "discrete"
         log_info("Warning: scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
@@ -199,7 +199,7 @@ viz_pca <- function(data,
   log_info("viz_pca scale_color: ", scale_color)
 
   if("shape" %in% names(metadata_sample)==TRUE){
-    shape_select <- safe_shape_palette[1:length(unique(InputPCA$shape))]
+    shape_select <- safe_shape_palette[seq_along(unique(InputPCA$shape))]
 
     if (!is.character(InputPCA$shape)) {
         # Convert the column to character
@@ -285,7 +285,7 @@ viz_pca <- function(data,
   #Here we make a list in which we will save the outputs:
   file_name <-plot_name %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
 
-  suppressMessages(suppressWarnings(
+  suppressWarnings(
     save_res(
       inputlist_df=NULL,
       inputlist_plot= PlotList_adaptedGrid,
@@ -298,7 +298,7 @@ viz_pca <- function(data,
       plot_height=plot_height,
       plot_width=plot_width,
       plot_unit="cm")
-  ))
+  )
 
   invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))
 }

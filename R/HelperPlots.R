@@ -491,13 +491,13 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
   )
 
   #Adjust the parameters:
-  suppressWarnings(suppressMessages(
+  suppressMessages(
     Plot_Sized <- input_plot %>%
       ggplotGrob %>%
       with_canvas_size(width = 12, height = 11) %>%
       adjust_layout(SUPER_PARAM) %>%
       adjust_title(c(plot_name))
-  ))
+  )
 
   Plot_Sized %<>%
     {ggplot() + annotation_custom(.)} %>%
@@ -614,7 +614,7 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
       names <- metadata_info[grepl("color_Sample", names(metadata_info))]
       colour_names <- NULL
       legend_names <- NULL
-      for (x in 1:length(names)){
+      for (x in seq_along(names)){
         names_sel <- names[[x]]
         legend_names[x] <- names_sel
         colour_names[x] <- metadata_sample[names[[x]]]
@@ -628,7 +628,7 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
       names <- metadata_info[grepl("color_Metab", names(metadata_info))]
       colour_names_M <- NULL
       legend_names_M <- NULL
-      for (x in 1:length(names)){
+      for (x in seq_along(names)){
         names_sel <- names[[x]]
         legend_names_M[x] <- names_sel
         colour_names_M[x] <- metadata_feature[names[[x]]]

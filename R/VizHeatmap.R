@@ -162,7 +162,7 @@ viz_heatmap <- function(data,
       col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
       col_annot<- NULL
       if(length(col_annot_vars)>0){
-        for (x in 1:length(col_annot_vars)){
+        for (x in seq_along(col_annot_vars)){
           annot_sel <- col_annot_vars[[x]]
           col_annot[x] <- metadata_sample %>% select(annot_sel) %>% as.data.frame()
           names(col_annot)[x] <- annot_sel
@@ -175,7 +175,7 @@ viz_heatmap <- function(data,
       row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
       row_annot<- NULL
       if(length(row_annot_vars)>0){
-        for (y in 1:length(row_annot_vars)){
+        for (y in seq_along(row_annot_vars)){
           annot_sel <- row_annot_vars[[y]]
           row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
           row_annot <- row_annot %>% as.data.frame()
@@ -246,7 +246,7 @@ viz_heatmap <- function(data,
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         #----- Save
-        suppressMessages(suppressWarnings(
+        suppressWarnings(
           save_res(inputlist_df=NULL,
                                inputlist_plot= PlotList_adaptedGrid,
                                save_table=NULL,
@@ -257,7 +257,7 @@ viz_heatmap <- function(data,
                                print_plot=print_plot,
                                plot_height=plot_height,
                                plot_width=plot_width,
-                               plot_unit="cm")))
+                               plot_unit="cm"))
 
       }else{
         message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
@@ -305,7 +305,7 @@ viz_heatmap <- function(data,
         col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
         col_annot<- NULL
         if(length(col_annot_vars)>0){
-          for (x in 1:length(col_annot_vars)){
+          for (x in seq_along(col_annot_vars)){
             annot_sel <- col_annot_vars[[x]]
             col_annot[x] <- selected_metadata_sample %>% select(annot_sel) %>% as.data.frame()
             names(col_annot)[x] <- annot_sel
@@ -318,7 +318,7 @@ viz_heatmap <- function(data,
         row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
         row_annot<- NULL
         if(length(row_annot_vars)>0){
-          for (y in 1:length(row_annot_vars)){
+          for (y in seq_along(row_annot_vars)){
             annot_sel <- row_annot_vars[[y]]
             row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
             row_annot <- row_annot %>% as.data.frame()
@@ -389,7 +389,7 @@ viz_heatmap <- function(data,
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         #----- Save
-        suppressMessages(suppressWarnings(
+        suppressWarnings(
           save_res(inputlist_df=NULL,
                                inputlist_plot= PlotList_adaptedGrid,
                                save_table=NULL,
@@ -400,7 +400,7 @@ viz_heatmap <- function(data,
                                print_plot=print_plot,
                                plot_height=plot_height,
                                plot_width=plot_width,
-                               plot_unit="cm")))
+                               plot_unit="cm"))
         }else{
           message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
           log_trace(paste("Message ", message, sep=""))
@@ -458,7 +458,7 @@ viz_heatmap <- function(data,
           row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
           row_annot<- NULL
           if(length(row_annot_vars)>0){
-            for (y in 1:length(row_annot_vars)){
+            for (y in seq_along(row_annot_vars)){
               annot_sel <- row_annot_vars[[y]]
               row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
               row_annot <- row_annot %>% as.data.frame()
@@ -485,7 +485,7 @@ viz_heatmap <- function(data,
             col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
             col_annot<- NULL
             if(length(col_annot_vars)>0){
-              for (x in 1:length(col_annot_vars)){
+              for (x in seq_along(col_annot_vars)){
                 annot_sel <- col_annot_vars[[x]]
                 col_annot[x] <- selected_metadata_sample %>% select(annot_sel) %>% as.data.frame()
                 names(col_annot)[x] <- annot_sel
@@ -558,7 +558,7 @@ viz_heatmap <- function(data,
             PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- Plot_Sized
 
             #----- Save
-            suppressMessages(suppressWarnings(
+            suppressWarnings(
               save_res(inputlist_df=NULL,
                                    inputlist_plot= PlotList_adaptedGrid,
                                    save_table=NULL,
@@ -569,7 +569,7 @@ viz_heatmap <- function(data,
                                    print_plot=print_plot,
                                    plot_height=plot_height,
                                    plot_width= plot_width,
-                                   plot_unit="cm")))
+                                   plot_unit="cm"))
 
 
             }
@@ -588,7 +588,7 @@ viz_heatmap <- function(data,
     col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
     col_annot<- NULL
     if(length(col_annot_vars)>0){
-      for (i in 1:length(col_annot_vars)){
+      for (i in seq_along(col_annot_vars)){
         annot_sel <- col_annot_vars[[i]]
         col_annot[i] <- metadata_sample %>% select(annot_sel) %>% as.data.frame()
         names(col_annot)[i] <- annot_sel
@@ -601,7 +601,7 @@ viz_heatmap <- function(data,
     row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
     row_annot<- NULL
     if(length(row_annot_vars)>0){
-      for (i in 1:length(row_annot_vars)){
+      for (i in seq_along(row_annot_vars)){
         annot_sel <- row_annot_vars[[i]]
         row_annot[i] <- metadata_feature %>% select(all_of(annot_sel))
         row_annot <- row_annot %>% as.data.frame()
@@ -672,7 +672,7 @@ viz_heatmap <- function(data,
     PlotList_adaptedGrid[[paste("Heatmap_",plot_name, sep="")]] <- Plot_Sized
 
     #----- Save
-    suppressMessages(suppressWarnings(
+    suppressWarnings(
       save_res(inputlist_df=NULL,
                            inputlist_plot= PlotList_adaptedGrid,
                            save_table=NULL,
@@ -683,7 +683,7 @@ viz_heatmap <- function(data,
                            print_plot=print_plot,
                            plot_height=plot_height,
                            plot_width=plot_width,
-                           plot_unit="cm")))
+                           plot_unit="cm"))
 
 
 

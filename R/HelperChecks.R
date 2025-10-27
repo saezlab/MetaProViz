@@ -456,32 +456,32 @@ check_param_dma <- function(data,
   # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
   if("Denominator" %in% names(metadata_info)==FALSE  & "Numerator" %in% names(metadata_info) ==FALSE){
     # all-vs-all: Generate all pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+    conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
     numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
     comparisons <- combn(unique(conditions), 2) %>% as.matrix()
     #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = TRUE
+    MultipleComparison <- TRUE
+    all_vs_all <- TRUE
   }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==FALSE){
     #all-vs-one: Generate the pairwise combinations
-    conditions = metadata_sample[[metadata_info[["Conditions"]]]]
+    conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <- metadata_info[["Denominator"]]
     numerator <-unique(metadata_sample[[metadata_info[["Conditions"]]]])
     # Remove denom from num
     numerator <- numerator[!numerator %in% denominator]
     comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
     #Settings:
-    MultipleComparison = TRUE
-    all_vs_all = FALSE
+    MultipleComparison <- TRUE
+    all_vs_all <- FALSE
   }else if("Denominator" %in% names(metadata_info)==TRUE  & "Numerator" %in% names(metadata_info)==TRUE){
     # one-vs-one: Generate the comparisons
     denominator <- metadata_info[["Denominator"]]
     numerator <- metadata_info[["Numerator"]]
     comparisons <- matrix(c(metadata_info[["Denominator"]], metadata_info[["Numerator"]]))
     #Settings:
-    MultipleComparison = FALSE
-    all_vs_all = FALSE
+    MultipleComparison <- FALSE
+    all_vs_all <- FALSE
   }
 
   ## ------------ Test statistics ----------- ##
