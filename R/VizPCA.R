@@ -63,126 +63,126 @@
 #' @importFrom logger log_info log_trace
 #' @export
 viz_pca <- function(data,
-                   metadata_info= NULL,
-                   metadata_sample = NULL,
-                   color_palette= NULL,
-                   scale_color="discrete",
-                   shape_palette=NULL,
-                   show_loadings = FALSE,
-                   scaling = TRUE,
-                   pcx=1,
-                   pcy=2,
-                   theme=NULL,#theme_classic()
-                   plot_name= '',
-                   save_plot = "svg",
-                   print_plot=TRUE,
-                   path = NULL
+                    metadata_info= NULL,
+                    metadata_sample = NULL,
+                    color_palette= NULL,
+                    scale_color="discrete",
+                    shape_palette=NULL,
+                    show_loadings = FALSE,
+                    scaling = TRUE,
+                    pcx=1,
+                    pcy=2,
+                    theme=NULL,#theme_classic()
+                    plot_name= '',
+                    save_plot = "svg",
+                    print_plot=TRUE,
+                    path = NULL
 ){
 
-  ###########################################################################
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
+    ###########################################################################
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-  log_info("viz_pca: PCA plot visualization")
-  ## ------------ Check Input files ----------- ##
-  # HelperFunction `check_param`
-  check_param(data=data,
-                          metadata_sample=metadata_sample,
-                          metadata_feature=NULL,
-                          metadata_info=metadata_info,
-                          save_plot=save_plot,
-                          save_table=NULL,
-                          core=FALSE,
-                          print_plot= print_plot)
+    log_info("viz_pca: PCA plot visualization")
+    ## ------------ Check Input files ----------- ##
+    # HelperFunction `check_param`
+    check_param(data=data,
+                            metadata_sample=metadata_sample,
+                            metadata_feature=NULL,
+                            metadata_info=metadata_info,
+                            save_plot=save_plot,
+                            save_table=NULL,
+                            core=FALSE,
+                            print_plot= print_plot)
 
-  # check_param` Specific
-  if(is.logical(show_loadings) == FALSE){
+    # check_param` Specific
+    if(is.logical(show_loadings) == FALSE){
     message <- paste("The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
     log_trace(paste("Error ", message, sep=""))
     stop(message)
-  }
-  if(is.logical(scaling) == FALSE){
+    }
+    if(is.logical(scaling) == FALSE){
     message <- paste("The scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
     log_trace(paste("Error ", message, sep=""))
     stop(message)
-  }
+    }
 
-  if(any(is.na(data))) {
-     data[is.na(data)] <- 0#replace NA with 0
-     message <- paste("NA values are included in data that were set to 0 prior to performing PCA.")
-     log_info(message)
-     message(message)
-  }
+    if(any(is.na(data))) {
+    data[is.na(data)] <- 0#replace NA with 0
+    message <- paste("NA values are included in data that were set to 0 prior to performing PCA.")
+    log_info(message)
+    message(message)
+    }
 
-  ## ------------ Create Results output folder ----------- ##
-  folder <- NULL
-  if(is.null(save_plot)==FALSE){
+    ## ------------ Create Results output folder ----------- ##
+    folder <- NULL
+    if(is.null(save_plot)==FALSE){
     folder <- save_path(folder_name= "PCAPlots",
                                     path=path)
-  }
-  log_info("viz_pca results saved at ", folder)
-
-  ###########################################################################
-  ## ----------- Set the plot parameters: ------------ ##
-  ##--- Prepare colour and shape palette
-  if(is.null(color_palette)){
-    if(scale_color=="discrete"){
-      safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
-    }else if(scale_color=="continuous"){
-      safe_colorblind_palette <- NULL
     }
-  } else{
+    log_info("viz_pca results saved at ", folder)
+
+    ###########################################################################
+    ## ----------- Set the plot parameters: ------------ ##
+    ##--- Prepare colour and shape palette
+    if(is.null(color_palette)){
+    if(scale_color=="discrete"){
+        safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
+    }else if(scale_color=="continuous"){
+        safe_colorblind_palette <- NULL
+    }
+    } else{
     safe_colorblind_palette <-color_palette
-  }
-  if(is.null(shape_palette)){
+    }
+    if(is.null(shape_palette)){
     safe_shape_palette <- c(15,17,16,18,6,7,8,11,12)
-  } else{
+    } else{
     safe_shape_palette <-shape_palette
-  }
+    }
 
-  log_info(paste("viz_pca colour:", paste(safe_colorblind_palette, collapse = ", ")))
-  log_info(paste("viz_pca shape:", paste(safe_shape_palette, collapse = ", ")))
+    log_info(paste("viz_pca colour:", paste(safe_colorblind_palette, collapse = ", ")))
+    log_info(paste("viz_pca shape:", paste(safe_shape_palette, collapse = ", ")))
 
-  ##--- Prepare the color scheme:
-  if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==TRUE){
+    ##--- Prepare the color scheme:
+    if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==TRUE){
     if((metadata_info[["shape"]] == metadata_info[["color"]])==TRUE){
-      metadata_sample$shape <- metadata_sample[,paste(metadata_info[["color"]])]
-      metadata_sample<- metadata_sample%>%
+        metadata_sample$shape <- metadata_sample[,paste(metadata_info[["color"]])]
+        metadata_sample<- metadata_sample%>%
         rename("color"=paste(metadata_info[["color"]]))
     }else{
-      metadata_sample <- metadata_sample%>%
-          rename("color"=paste(metadata_info[["color"]]),
+        metadata_sample <- metadata_sample%>%
+            rename("color"=paste(metadata_info[["color"]]),
                         "shape"=paste(metadata_info[["shape"]]))
-      }
- }else if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==FALSE){
-   if("color" %in% names(metadata_info)==TRUE){
-     metadata_sample <- metadata_sample%>%
+        }
+}else if("color" %in% names(metadata_info)==TRUE & "shape" %in% names(metadata_info)==FALSE){
+    if("color" %in% names(metadata_info)==TRUE){
+    metadata_sample <- metadata_sample%>%
         rename("color"=paste(metadata_info[["color"]]))
-   }
-   if("shape" %in% names(metadata_info)==TRUE){
-      metadata_sample <- metadata_sample%>%
+    }
+    if("shape" %in% names(metadata_info)==TRUE){
+        metadata_sample <- metadata_sample%>%
         rename("shape"=paste(metadata_info[["shape"]]))
-   }
- }
+    }
+}
 
-  ##--- Prepare Input data:
-  if(is.null(metadata_sample)==FALSE){
+    ##--- Prepare Input data:
+    if(is.null(metadata_sample)==FALSE){
     InputPCA  <- merge(x=metadata_sample%>%tibble::rownames_to_column("UniqueID") , y=data%>%tibble::rownames_to_column("UniqueID"), by="UniqueID", all.y=TRUE)%>%
-      column_to_rownames("UniqueID")
-  }else{
+        column_to_rownames("UniqueID")
+    }else{
     InputPCA  <- data
-  }
+    }
 
- ##--- Prepare the color and shape settings:
-  if("color" %in% names(metadata_sample)==TRUE){
+##--- Prepare the color and shape settings:
+    if("color" %in% names(metadata_sample)==TRUE){
     if(scale_color=="discrete"){
-      InputPCA$color <- as.factor(InputPCA$color)
-      color_select <- safe_colorblind_palette[seq_along(unique(InputPCA$color))]
+        InputPCA$color <- as.factor(InputPCA$color)
+        color_select <- safe_colorblind_palette[seq_along(unique(InputPCA$color))]
     }else if(scale_color=="continuous"){
-      if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
+        if(is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE){
         InputPCA$color <- as.numeric(InputPCA$color)
         color_select <- safe_colorblind_palette
-      }else{
+        }else{
         InputPCA$color <- as.factor(InputPCA$color)
         #Overwrite color pallette
         safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
@@ -192,113 +192,113 @@ viz_pca <- function(data,
         scale_color <- "discrete"
         log_info("Warning: scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
         warning("scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
-      }
+        }
     }
-  }
+    }
 
-  log_info("viz_pca scale_color: ", scale_color)
+    log_info("viz_pca scale_color: ", scale_color)
 
-  if("shape" %in% names(metadata_sample)==TRUE){
+    if("shape" %in% names(metadata_sample)==TRUE){
     shape_select <- safe_shape_palette[seq_along(unique(InputPCA$shape))]
 
     if (!is.character(InputPCA$shape)) {
         # Convert the column to character
         InputPCA$shape <- as.character(InputPCA$shape)
     }
-  }
+    }
 
-  ##---  #assign column and legend name
-  if("color" %in% names(metadata_sample)==TRUE){
+    ##---  #assign column and legend name
+    if("color" %in% names(metadata_sample)==TRUE){
     InputPCA  <- InputPCA%>%
-      rename(!!paste(metadata_info[["color"]]) :="color")
+        rename(!!paste(metadata_info[["color"]]) :="color")
     Param_Col <-paste(metadata_info[["color"]])
-  } else{
+    } else{
     color_select <- NULL
     Param_Col <- NULL
-  }
+    }
 
-  if("shape" %in% names(metadata_sample)==TRUE){
+    if("shape" %in% names(metadata_sample)==TRUE){
     InputPCA  <- InputPCA%>%
-      rename(!!paste(metadata_info[["shape"]]) :="shape")
+        rename(!!paste(metadata_info[["shape"]]) :="shape")
     Param_Sha <-paste(metadata_info[["shape"]])
-  } else{
+    } else{
     shape_select <-NULL
     Param_Sha <-NULL
-  }
+    }
 
-  ## ----------- Make the  plot based on the choosen parameters ------------ ##
-  PlotList <- list()#Empty list to store all the plots
-  PlotList_adaptedGrid <- list()
+    ## ----------- Make the  plot based on the choosen parameters ------------ ##
+    PlotList <- list()#Empty list to store all the plots
+    PlotList_adaptedGrid <- list()
 
-  #Make the plot:
-  PCA <- autoplot(prcomp(as.matrix(data), scale. = as.logical(scaling)),
-                  data= InputPCA,
-                  x= pcx ,
-                  y= pcy,
-                  colour = Param_Col,
-                  fill =  Param_Col,
-                  shape = Param_Sha,
-                  size = 3,
-                  alpha = 0.8,
-                  label = TRUE,
-                  label.size=2.5,
-                  label.repel = TRUE,
-                  loadings= as.logical(show_loadings), #draws Eigenvectors
-                  loadings.label = as.logical(show_loadings),
-                  loadings.label.vjust = 1.2,
-                  loadings.label.size=2.5,
-                  loadings.colour="grey10",
-                  loadings.label.colour="grey10" ) +
+    #Make the plot:
+    PCA <- autoplot(prcomp(as.matrix(data), scale. = as.logical(scaling)),
+                    data= InputPCA,
+                    x= pcx ,
+                    y= pcy,
+                    colour = Param_Col,
+                    fill =  Param_Col,
+                    shape = Param_Sha,
+                    size = 3,
+                    alpha = 0.8,
+                    label = TRUE,
+                    label.size=2.5,
+                    label.repel = TRUE,
+                    loadings= as.logical(show_loadings), #draws Eigenvectors
+                    loadings.label = as.logical(show_loadings),
+                    loadings.label.vjust = 1.2,
+                    loadings.label.size=2.5,
+                    loadings.colour="grey10",
+                    loadings.label.colour="grey10" ) +
     scale_shape_manual(values=shape_select)+
     ggtitle(paste(plot_name)) +
     geom_hline(yintercept=0,  color = "black", linewidth=0.1)+
     geom_vline(xintercept=0,  color = "black", linewidth=0.1)
 
     if(scale_color=="discrete"){
-      PCA <-PCA + scale_color_manual(values=color_select)
+        PCA <-PCA + scale_color_manual(values=color_select)
     }else if(scale_color=="continuous" & is.null(color_palette)){
-      PCA <-PCA + color_select
+        PCA <-PCA + color_select
     }
 
-  #Add the theme
-  if(is.null(theme)==FALSE){
+    #Add the theme
+    if(is.null(theme)==FALSE){
     PCA <- PCA+theme
-  }else{
+    }else{
     PCA <- PCA+theme_classic()
-  }
+    }
 
-  ## Store the plot in the 'plots' list
-  PlotList[["Plot"]] <- PCA
+    ## Store the plot in the 'plots' list
+    PlotList[["Plot"]] <- PCA
 
-  #Set the total heights and widths
-  PCA %<>% plot_grob_pca(metadata_info=metadata_info,plot_name=plot_name)
-  plot_height <- convertUnit(PCA$height, 'cm', valueOnly = TRUE)
-  plot_width <- convertUnit(PCA$width, 'cm', valueOnly = TRUE)
-  PCA %<>%
+    #Set the total heights and widths
+    PCA %<>% plot_grob_pca(metadata_info=metadata_info,plot_name=plot_name)
+    plot_height <- convertUnit(PCA$height, 'cm', valueOnly = TRUE)
+    plot_width <- convertUnit(PCA$width, 'cm', valueOnly = TRUE)
+    PCA %<>%
     {ggplot() + annotation_custom(.)} %>%
     add(theme(panel.background = element_rect(fill = "transparent")))
 
-  PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
+    PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
-  ###########################################################################
-  ##----- Save and Return
-  #Here we make a list in which we will save the outputs:
-  file_name <-plot_name %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
+    ###########################################################################
+    ##----- Save and Return
+    #Here we make a list in which we will save the outputs:
+    file_name <-plot_name %>% {`if`(nchar(.), sprintf('PCA_%s', .), 'PCA')}
 
-  suppressWarnings(
+    suppressWarnings(
     save_res(
-      inputlist_df=NULL,
-      inputlist_plot= PlotList_adaptedGrid,
-      save_table=NULL,
-      save_plot=save_plot,
-      path= folder,
-      file_name= file_name,
-      core=FALSE,
-      print_plot=print_plot,
-      plot_height=plot_height,
-      plot_width=plot_width,
-      plot_unit="cm")
-  )
+        inputlist_df=NULL,
+        inputlist_plot= PlotList_adaptedGrid,
+        save_table=NULL,
+        save_plot=save_plot,
+        path= folder,
+        file_name= file_name,
+        core=FALSE,
+        print_plot=print_plot,
+        plot_height=plot_height,
+        plot_width=plot_width,
+        plot_unit="cm")
+    )
 
-  invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))
+    invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))
 }

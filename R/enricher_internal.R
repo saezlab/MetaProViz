@@ -49,14 +49,14 @@
 ##' @author Guangchuang Yu \url{https://yulab-smu.top}
 ##' @noRd
 enricher_internal <- function(gene,
-                              pvalueCutoff,
-                              pAdjustMethod="BH",
-                              universe = NULL,
-                              min_gs_size=10,
-                              max_gs_size=500,
-                              qvalueCutoff=0.2,
-                              TERM2GENE,
-                              TERM2NAME){
+                                pvalueCutoff,
+                                pAdjustMethod="BH",
+                                universe = NULL,
+                                min_gs_size=10,
+                                max_gs_size=500,
+                                qvalueCutoff=0.2,
+                                TERM2GENE,
+                                TERM2NAME){
 
     ## query external ID to Term ID
     gene <- as.character(unique(gene))
@@ -82,12 +82,12 @@ enricher_internal <- function(gene,
 
     ## Term ID -- query external ID association list.
     qExtID2TermID.df <- data.frame(extID=rep(names(qExtID2TermID),
-                                             times=lapply(qExtID2TermID, length)),
-                                   termID=qTermID)
+                                            times=lapply(qExtID2TermID, length)),
+                                    termID=qTermID)
     qExtID2TermID.df <- unique(qExtID2TermID.df)
 
     qTermID2ExtID <- with(qExtID2TermID.df,
-                          split(as.character(extID), as.character(termID)))
+                            split(as.character(extID), as.character(termID)))
 
     extID <- ALLEXTID(USER_DATA)
     if (missing(universe))
@@ -140,15 +140,15 @@ enricher_internal <- function(gene,
     ## n <- rep(length(gene), length(M)) ## those genes that have no annotation should drop.
     n <- rep(length(qExtID2TermID), length(M))
     args.df <- data.frame(numWdrawn=k-1, ## White balls drawn
-                          numW=M,        ## White balls
-                          numB=N-M,      ## Black balls
-                          numDrawn=n)    ## balls drawn
+                            numW=M,        ## White balls
+                            numB=N-M,      ## Black balls
+                            numDrawn=n)    ## balls drawn
 
 
     ## calcute pvalues based on hypergeometric model
     pvalues <- apply(args.df, 1, function(n)
-                     phyper(n[1], n[2], n[3], n[4], lower.tail=FALSE)
-                     )
+                    phyper(n[1], n[2], n[3], n[4], lower.tail=FALSE)
+                    )
 
     ## gene ratio and background ratio
     #GeneRatio <- apply(data.frame(a=k, b=n), 1, function(x)
@@ -169,13 +169,13 @@ enricher_internal <- function(gene,
     sigma <- mu * (N - n) * (N - M) / N / (N-1)
     zScore <- (k - mu)/sqrt(sigma)
     Over <- data.frame(ID = as.character(qTermID),
-                       GeneRatio = GeneRatio,
-                       BgRatio = BgRatio,
-                       RichFactor = RichFactor,
-                       FoldEnrichment = FoldEnrichment,
-                       zScore = zScore,
-                       pvalue = pvalues,
-                       stringsAsFactors = FALSE)
+                        GeneRatio = GeneRatio,
+                        BgRatio = BgRatio,
+                        RichFactor = RichFactor,
+                        FoldEnrichment = FoldEnrichment,
+                        zScore = zScore,
+                        pvalue = pvalues,
+                        stringsAsFactors = FALSE)
 
     p.adj <- p.adjust(Over$pvalue, method=pAdjustMethod)
     qobj <- tryCatch(qvalue(p=Over$pvalue, lambda=0.05, pi0.method="bootstrap"), error=function(e) NULL)
@@ -190,11 +190,11 @@ enricher_internal <- function(gene,
     geneID <- vapply(qTermID2ExtID, function(i) paste(i, collapse="/"), FUN.VALUE = character(1))
     geneID <- geneID[qTermID]
     Over <- data.frame(Over,
-                       p.adjust = p.adj,
-                       qvalue = qvalues,
-                       geneID = geneID,
-                       Count = k,
-                       stringsAsFactors = FALSE)
+                        p.adjust = p.adj,
+                        qvalue = qvalues,
+                        geneID = geneID,
+                        Count = k,
+                        stringsAsFactors = FALSE)
 
     Description <- TERM2NAME(qTermID, USER_DATA)
 
@@ -352,35 +352,35 @@ get_geneSet_index <- function(gene_sets, min_gs_size, max_gs_size) {
 ##' @author Guangchuang Yu \url{https://yulab-smu.top}
 ##' @noRd
 build_Anno <- function(path2gene, path2name) {
-  if (!exists(".Anno_clusterProfiler_Env", envir = .GlobalEnv)) {
+    if (!exists(".Anno_clusterProfiler_Env", envir = .GlobalEnv)) {
     pos <- 1
     envir <- as.environment(pos)
     assign(".Anno_clusterProfiler_Env", new.env(), envir = envir)
-  }
-  Anno_clusterProfiler_Env <- get(".Anno_clusterProfiler_Env", envir= .GlobalEnv)
+    }
+    Anno_clusterProfiler_Env <- get(".Anno_clusterProfiler_Env", envir= .GlobalEnv)
 
-  # if(class(path2gene[[2]]) == 'list') {
-  if (inherits(path2gene[[2]], "list")){
+    # if(class(path2gene[[2]]) == 'list') {
+    if (inherits(path2gene[[2]], "list")){
     ## to compatible with tibble
     path2gene <- cbind(rep(path2gene[[1]],
-                           times = vapply(path2gene[[2]], length, numeric(1))),
-                       unlist(path2gene[[2]]))
-  }
+                            times = vapply(path2gene[[2]], length, numeric(1))),
+                        unlist(path2gene[[2]]))
+    }
 
-  path2gene <- as.data.frame(path2gene)
-  path2gene <- path2gene[!is.na(path2gene[,1]), ]
-  path2gene <- path2gene[!is.na(path2gene[,2]), ]
-  path2gene <- unique(path2gene)
+    path2gene <- as.data.frame(path2gene)
+    path2gene <- path2gene[!is.na(path2gene[,1]), ]
+    path2gene <- path2gene[!is.na(path2gene[,2]), ]
+    path2gene <- unique(path2gene)
 
-  PATHID2EXTID <- split(as.character(path2gene[,2]), as.character(path2gene[,1]))
-  EXTID2PATHID <- split(as.character(path2gene[,1]), as.character(path2gene[,2]))
+    PATHID2EXTID <- split(as.character(path2gene[,2]), as.character(path2gene[,1]))
+    EXTID2PATHID <- split(as.character(path2gene[,1]), as.character(path2gene[,2]))
 
-  assign("PATHID2EXTID", PATHID2EXTID, envir = Anno_clusterProfiler_Env)
-  assign("EXTID2PATHID", EXTID2PATHID, envir = Anno_clusterProfiler_Env)
+    assign("PATHID2EXTID", PATHID2EXTID, envir = Anno_clusterProfiler_Env)
+    assign("EXTID2PATHID", EXTID2PATHID, envir = Anno_clusterProfiler_Env)
 
-  if ( missing(path2name) || is.null(path2name) || all(is.na(path2name))) {
+    if ( missing(path2name) || is.null(path2name) || all(is.na(path2name))) {
     assign("PATHID2NAME", NULL, envir = Anno_clusterProfiler_Env)
-  } else {
+    } else {
     path2name <- as.data.frame(path2name)
     path2name <- path2name[!is.na(path2name[,1]), ]
     path2name <- path2name[!is.na(path2name[,2]), ]
@@ -388,7 +388,7 @@ build_Anno <- function(path2gene, path2name) {
     PATH2NAME <- as.character(path2name[,2])
     names(PATH2NAME) <- as.character(path2name[,1])
     assign("PATHID2NAME", PATH2NAME, envir = Anno_clusterProfiler_Env)
-  }
-  return(Anno_clusterProfiler_Env)
+    }
+    return(Anno_clusterProfiler_Env)
 }
 

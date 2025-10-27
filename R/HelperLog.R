@@ -31,8 +31,8 @@
 #' @export
 #' @seealso \code{\link{metaproviz_log}}
 metaproviz_logfile <- function(){
-  #Creates the path for the log file
-  logfile('MetaProViz')
+    #Creates the path for the log file
+    logfile('MetaProViz')
 }
 
 
@@ -51,7 +51,7 @@ metaproviz_logfile <- function(){
 #' @seealso \code{\link{metaproviz_logfile}}
 metaproviz_log <- function(){
 
-  read_log('MetaProViz')
+    read_log('MetaProViz')
 
 }
 
@@ -69,8 +69,8 @@ metaproviz_log <- function(){
 #' @importFrom OmnipathR set_loglevel
 #' @export
 metaproviz_set_loglevel <- function(level, target = 'logfile'){
-  #to change log-level e.g. to see all messages being printed
-  set_loglevel(level, target = target, pkg = 'MetaProViz')
+    #to change log-level e.g. to see all messages being printed
+    set_loglevel(level, target = target, pkg = 'MetaProViz')
 }
 
 
@@ -79,8 +79,8 @@ metaproviz_set_loglevel <- function(level, target = 'logfile'){
 #' @noRd
 mpv_trace <- function() {#MPV=MetaProViz
 
-  # Useful for debugging
-  metaproviz_set_loglevel('trace', target = 'console')
+    # Useful for debugging
+    metaproviz_set_loglevel('trace', target = 'console')
 
 }
 
@@ -93,10 +93,10 @@ mpv_trace <- function() {#MPV=MetaProViz
 #' @noRd
 metaproviz_init <- function(){
 
-  # NSE vs. R CMD check workaround
-  OmnipathR <- init_config <- init_log <- .on_buildserver <- NULL
-  # Only run the first time a MetaProViz function is used in an environment --> Creates log file
-  if(is.null(metaproviz.env$init)){
+    # NSE vs. R CMD check workaround
+    OmnipathR <- init_config <- init_log <- .on_buildserver <- NULL
+    # Only run the first time a MetaProViz function is used in an environment --> Creates log file
+    if(is.null(metaproviz.env$init)){
     # Initial log
     (OmnipathR%:::%init_config)(pkg = "MetaProViz")
     (OmnipathR%:::%init_log)(pkg = "MetaProViz")
@@ -107,9 +107,9 @@ metaproviz_init <- function(){
     buildserver <- (OmnipathR%:::%.on_buildserver)()
 
     if(buildserver){
-      set_loglevel('trace', target = 'console', pkg = "MetaProViz")
+        set_loglevel('trace', target = 'console', pkg = "MetaProViz")
     }
 
     metaproviz.env$init <- TRUE
-  }
+    }
 }

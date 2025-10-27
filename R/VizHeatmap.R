@@ -68,84 +68,84 @@
 #' @importFrom pheatmap pheatmap
 #' @export
 viz_heatmap <- function(data,
-                       metadata_info= NULL,
-                       metadata_sample=NULL,
-                       metadata_feature= NULL,
-                       plot_name= "",
-                       scale = "row",
-                       save_plot = "svg",
-                       enforce_featurenames= FALSE,
-                       enforce_samplenames= FALSE,
-                       print_plot=TRUE,
-                       path = NULL
+                        metadata_info= NULL,
+                        metadata_sample=NULL,
+                        metadata_feature= NULL,
+                        plot_name= "",
+                        scale = "row",
+                        save_plot = "svg",
+                        enforce_featurenames= FALSE,
+                        enforce_samplenames= FALSE,
+                        print_plot=TRUE,
+                        path = NULL
 ){
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-  ## ------------ Check Input files ----------- ##
-  # HelperFunction `check_param`
-  check_param(data=data,
-                          metadata_sample=metadata_sample,
-                          metadata_feature=metadata_feature,
-                          metadata_info=metadata_info,
-                          save_plot=save_plot,
-                          save_table=NULL,
-                          core=FALSE,
-                          print_plot= print_plot)
+    ## ------------ Check Input files ----------- ##
+    # HelperFunction `check_param`
+    check_param(data=data,
+                            metadata_sample=metadata_sample,
+                            metadata_feature=metadata_feature,
+                            metadata_info=metadata_info,
+                            save_plot=save_plot,
+                            save_table=NULL,
+                            core=FALSE,
+                            print_plot= print_plot)
 
-  # check_param` Specific
-  if(is.logical(enforce_featurenames) == FALSE | is.logical(enforce_samplenames) == FALSE){
+    # check_param` Specific
+    if(is.logical(enforce_featurenames) == FALSE | is.logical(enforce_samplenames) == FALSE){
     message <- paste0("Check input. The enforce_featurenames and enforce_samplenames value should be either =TRUE or = FALSE.")
     log_trace(paste("Error ", message, sep=""))
     stop(message)
-  }
+    }
 
-  scale_options <- c("row","column", "none")
-  if(scale %in% scale_options == FALSE){
+    scale_options <- c("row","column", "none")
+    if(scale %in% scale_options == FALSE){
     message <- paste0("Check input. The selected scale option is not valid. Please select one of the folowwing: ",paste(scale_options,collapse = ", "),"." )
     log_trace(paste("Error ", message, sep=""))
     stop(message)
     }
 
 
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(save_plot)==FALSE){
+    ## ------------ Create Results output folder ----------- ##
+    if(is.null(save_plot)==FALSE){
     folder <- save_path(folder_name= "Heatmap",
                                     path=path)
-  }
+    }
 
-  #####################################################
-  ## -------------- Load data --------------- ##
-  data <- data
+    #####################################################
+    ## -------------- Load data --------------- ##
+    data <- data
 
-  if(is.null(metadata_feature)==FALSE){#removes information about metabolites that are not included in the data
+    if(is.null(metadata_feature)==FALSE){#removes information about metabolites that are not included in the data
     metadata_feature <- merge(x=metadata_feature, y=as.data.frame(t(data)), by=0, all.y=TRUE)%>%
-      column_to_rownames("Row.names")
+        column_to_rownames("Row.names")
     metadata_feature <- metadata_feature[,-c((ncol(metadata_feature)-nrow(data)+1):ncol(metadata_feature))]
-  }
+    }
 
     if(is.null(metadata_sample)==FALSE){#removes information about samples that are not included in the data
-      metadata_sample <- merge(x=metadata_sample, y=data, by=0, all.y=TRUE)%>%
+        metadata_sample <- merge(x=metadata_sample, y=data, by=0, all.y=TRUE)%>%
         column_to_rownames("Row.names")
-      metadata_sample <- metadata_sample[,-c((ncol(metadata_sample)-ncol(data)+1):ncol(metadata_sample))]
+        metadata_sample <- metadata_sample[,-c((ncol(metadata_sample)-ncol(data)+1):ncol(metadata_sample))]
     }
 
 
-  ## -------------- Plot --------------- ##
-  if("individual_Metab" %in% names(metadata_info)==TRUE & "individual_Sample" %in% names(metadata_info)==FALSE){
+    ## -------------- Plot --------------- ##
+    if("individual_Metab" %in% names(metadata_info)==TRUE & "individual_Sample" %in% names(metadata_info)==FALSE){
     #Ensure that groups that are assigned NAs do not cause problems:
     metadata_feature[[metadata_info[["individual_Metab"]]]] <-ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
     unique_paths <- unique(metadata_feature[[metadata_info[["individual_Metab"]]]])
 
     for (i in unique_paths){# Check pathways with 1 metabolite
-      selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
-      selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-      if(length(selected_path_metabs)==1 ){
+        selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
+        selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
+        if(length(selected_path_metabs)==1 ){
         message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
         log_trace(paste("Warning ", message, sep=""))
         warning(message)
         unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
-      }
+        }
     }
 
     IndividualPlots <-unique_paths
@@ -154,82 +154,82 @@ viz_heatmap <- function(data,
     PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
     for (i in IndividualPlots){
-      selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
-      selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-      data_path <- data %>% select(all_of(selected_path_metabs))
+        selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
+        selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
+        data_path <- data %>% select(all_of(selected_path_metabs))
 
-      # Column annotation
-      col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
-      col_annot<- NULL
-      if(length(col_annot_vars)>0){
+        # Column annotation
+        col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
+        col_annot<- NULL
+        if(length(col_annot_vars)>0){
         for (x in seq_along(col_annot_vars)){
-          annot_sel <- col_annot_vars[[x]]
-          col_annot[x] <- metadata_sample %>% select(annot_sel) %>% as.data.frame()
-          names(col_annot)[x] <- annot_sel
+            annot_sel <- col_annot_vars[[x]]
+            col_annot[x] <- metadata_sample %>% select(annot_sel) %>% as.data.frame()
+            names(col_annot)[x] <- annot_sel
         }
         col_annot<- as.data.frame(col_annot)
         rownames(col_annot) <- rownames(data_path)
-      }
+        }
 
-      # Row annotation
-      row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
-      row_annot<- NULL
-      if(length(row_annot_vars)>0){
+        # Row annotation
+        row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
+        row_annot<- NULL
+        if(length(row_annot_vars)>0){
         for (y in seq_along(row_annot_vars)){
-          annot_sel <- row_annot_vars[[y]]
-          row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
-          row_annot <- row_annot %>% as.data.frame()
-          names(row_annot)[y] <- annot_sel
+            annot_sel <- row_annot_vars[[y]]
+            row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
+            row_annot <- row_annot %>% as.data.frame()
+            names(row_annot)[y] <- annot_sel
         }
         row_annot<- as.data.frame(row_annot)
         rownames(row_annot) <- rownames(metadata_feature)
-      }
+        }
 
-      #Check number of features:
-      Features <- as.data.frame(t(data_path))
-      if(enforce_featurenames==TRUE){
+        #Check number of features:
+        Features <- as.data.frame(t(data_path))
+        if(enforce_featurenames==TRUE){
         show_rownames <- TRUE
         cellheight_Feature <- 9
-      }else if(nrow(Features)>100){
+        }else if(nrow(Features)>100){
         show_rownames <- FALSE
         cellheight_Feature <- 1
-      }else{
+        }else{
         show_rownames <- TRUE
         cellheight_Feature <- 9
-      }
+        }
 
-      #Check number of samples
-      if(enforce_samplenames==TRUE){
+        #Check number of samples
+        if(enforce_samplenames==TRUE){
         show_colnames <- TRUE
         cellwidth_Sample <- 9
-      }else if(nrow(data_path)>50){
+        }else if(nrow(data_path)>50){
         show_colnames <- FALSE
         cellwidth_Sample <- 1
-      }else{
+        }else{
         show_colnames <- TRUE
         cellwidth_Sample <- 9
-      }
+        }
 
-      # Make the plot
-      if(nrow(t(data_path))>= 2){
+        # Make the plot
+        if(nrow(t(data_path))>= 2){
         # set.seed(1234)
 
         heatmap <- pheatmap(t(data_path),
-                                     show_rownames = as.logical(show_rownames),
-                                     show_colnames = as.logical(show_colnames),
-                                     clustering_method =  "complete",
-                                     scale = scale,
-                                     clustering_distance_rows = "correlation",
-                                     annotation_col = col_annot,
-                                     annotation_row = row_annot,
-                                     legend = TRUE,
-                                     cellwidth = cellwidth_Sample,
-                                     cellheight = cellheight_Feature,
-                                     fontsize_row= 10,
-                                     fontsize_col = 10,
-                                     fontsize=9,
-                                     main = paste(plot_name, " Metabolites: ", i, sep=" " ),
-                                     silent = TRUE)
+                                    show_rownames = as.logical(show_rownames),
+                                    show_colnames = as.logical(show_colnames),
+                                    clustering_method =  "complete",
+                                    scale = scale,
+                                    clustering_distance_rows = "correlation",
+                                    annotation_col = col_annot,
+                                    annotation_row = row_annot,
+                                    legend = TRUE,
+                                    cellwidth = cellwidth_Sample,
+                                    cellheight = cellheight_Feature,
+                                    fontsize_row= 10,
+                                    fontsize_col = 10,
+                                    fontsize=9,
+                                    main = paste(plot_name, " Metabolites: ", i, sep=" " ),
+                                    silent = TRUE)
 
         ## Store the plot in the 'plots' list
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -240,26 +240,26 @@ viz_heatmap <- function(data,
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
-          {ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = element_rect(fill = "transparent")))
+            {ggplot() + annotation_custom(.)} %>%
+            add(theme(panel.background = element_rect(fill = "transparent")))
 
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         #----- Save
         suppressWarnings(
-          save_res(inputlist_df=NULL,
-                               inputlist_plot= PlotList_adaptedGrid,
-                               save_table=NULL,
-                               save_plot=save_plot,
-                               path= folder,
-                               file_name=paste("Heatmap_",plot_name, sep=""),
-                               core=FALSE,
-                               print_plot=print_plot,
-                               plot_height=plot_height,
-                               plot_width=plot_width,
-                               plot_unit="cm"))
+            save_res(inputlist_df=NULL,
+                                inputlist_plot= PlotList_adaptedGrid,
+                                save_table=NULL,
+                                save_plot=save_plot,
+                                path= folder,
+                                file_name=paste("Heatmap_",plot_name, sep=""),
+                                core=FALSE,
+                                print_plot=print_plot,
+                                plot_height=plot_height,
+                                plot_width=plot_width,
+                                plot_unit="cm"))
 
-      }else{
+        }else{
         message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
         log_trace(paste("Message ", message, sep=""))
         message(message)
@@ -269,35 +269,35 @@ viz_heatmap <- function(data,
     return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 
     }else if("individual_Metab" %in% names(metadata_info)==FALSE & "individual_Sample" %in% names(metadata_info)==TRUE){
-      #Ensure that groups that are assigned NAs do not cause problems:
-      metadata_sample[[metadata_info[["individual_Sample"]]]] <-ifelse(is.na(metadata_sample[[metadata_info[["individual_Sample"]]]]), "NA", metadata_sample[[metadata_info[["individual_Sample"]]]])
+        #Ensure that groups that are assigned NAs do not cause problems:
+        metadata_sample[[metadata_info[["individual_Sample"]]]] <-ifelse(is.na(metadata_sample[[metadata_info[["individual_Sample"]]]]), "NA", metadata_sample[[metadata_info[["individual_Sample"]]]])
 
-      unique_paths_Sample <- unique(metadata_sample[[metadata_info[["individual_Sample"]]]])
+        unique_paths_Sample <- unique(metadata_sample[[metadata_info[["individual_Sample"]]]])
 
-      for (i in unique_paths_Sample){# Check pathways with 1 metabolite
+        for (i in unique_paths_Sample){# Check pathways with 1 metabolite
         selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == i)
         selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
         if(length(selected_path_metabs)==1 ){
-          message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
-          log_trace(paste("Warning ", message, sep=""))
-          warning(message)
-          unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
+            message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
+            log_trace(paste("Warning ", message, sep=""))
+            warning(message)
+            unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
         }
-      }
+        }
 
-      IndividualPlots <-unique_paths_Sample
-      PlotList <- list()#Empty list to store all the plots
-      PlotList_adaptedGrid <- list()#Empty list to store all the plots
+        IndividualPlots <-unique_paths_Sample
+        PlotList <- list()#Empty list to store all the plots
+        PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
-      for (i in IndividualPlots){
+        for (i in IndividualPlots){
         #Select the data:
         selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == i)%>%
-          rownames_to_column("UniqueID")
+            rownames_to_column("UniqueID")
         selected_path <- as.data.frame(selected_path[,1])%>%
-          rename("UniqueID"=1)
+            rename("UniqueID"=1)
         data_path <- merge(selected_path, data%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
         data_path <- data_path%>%
-          column_to_rownames("UniqueID")
+            column_to_rownames("UniqueID")
 
         # Column annotation
         selected_metadata_sample <- merge(selected_path, metadata_sample%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
@@ -305,52 +305,52 @@ viz_heatmap <- function(data,
         col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
         col_annot<- NULL
         if(length(col_annot_vars)>0){
-          for (x in seq_along(col_annot_vars)){
+            for (x in seq_along(col_annot_vars)){
             annot_sel <- col_annot_vars[[x]]
             col_annot[x] <- selected_metadata_sample %>% select(annot_sel) %>% as.data.frame()
             names(col_annot)[x] <- annot_sel
-          }
-          col_annot<- as.data.frame(col_annot)
-          rownames(col_annot) <- rownames(data_path)
+            }
+            col_annot<- as.data.frame(col_annot)
+            rownames(col_annot) <- rownames(data_path)
         }
 
         # Row annotation
         row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
         row_annot<- NULL
         if(length(row_annot_vars)>0){
-          for (y in seq_along(row_annot_vars)){
+            for (y in seq_along(row_annot_vars)){
             annot_sel <- row_annot_vars[[y]]
             row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
             row_annot <- row_annot %>% as.data.frame()
             names(row_annot)[y] <- annot_sel
-          }
-          row_annot<- as.data.frame(row_annot)
-          rownames(row_annot) <- rownames(metadata_feature)
+            }
+            row_annot<- as.data.frame(row_annot)
+            rownames(row_annot) <- rownames(metadata_feature)
         }
 
         #Check number of features:
         Features <- as.data.frame(t(data_path))
         if(enforce_featurenames==TRUE){
-          show_rownames <- TRUE
-          cellheight_Feature <- 9
+            show_rownames <- TRUE
+            cellheight_Feature <- 9
         }else if(nrow(Features)>100){
-          show_rownames <- FALSE
-          cellheight_Feature <- 1
+            show_rownames <- FALSE
+            cellheight_Feature <- 1
         }else{
-          show_rownames <- TRUE
-          cellheight_Feature <- 9
+            show_rownames <- TRUE
+            cellheight_Feature <- 9
         }
 
         #Check number of samples
         if(enforce_samplenames==TRUE){
-          show_colnames <- TRUE
-          cellwidth_Sample <- 9
+            show_colnames <- TRUE
+            cellwidth_Sample <- 9
         }else if(nrow(data_path)>50){
-          show_colnames <- FALSE
-          cellwidth_Sample <- 1
+            show_colnames <- FALSE
+            cellwidth_Sample <- 1
         }else{
-          show_colnames <- TRUE
-          cellwidth_Sample <- 9
+            show_colnames <- TRUE
+            cellwidth_Sample <- 9
         }
 
         # Make the plot
@@ -358,21 +358,21 @@ viz_heatmap <- function(data,
         # set.seed(1234)
 
         heatmap <- pheatmap(t(data_path),
-                                      show_rownames = as.logical(show_rownames),
-                                      show_colnames = as.logical(show_colnames),
-                                      clustering_method =  "complete",
-                                      scale = scale,
-                                      clustering_distance_rows = "correlation",
-                                      annotation_col = col_annot,
-                                      annotation_row = row_annot,
-                                      legend = TRUE,
-                                      cellwidth = cellwidth_Sample,
-                                      cellheight = cellheight_Feature,
-                                      fontsize_row= 10,
-                                      fontsize_col = 10,
-                                      fontsize=9,
-                                      main = paste(plot_name," Samples: ", i, sep=" " ),
-                                      silent = TRUE)
+                                        show_rownames = as.logical(show_rownames),
+                                        show_colnames = as.logical(show_colnames),
+                                        clustering_method =  "complete",
+                                        scale = scale,
+                                        clustering_distance_rows = "correlation",
+                                        annotation_col = col_annot,
+                                        annotation_row = row_annot,
+                                        legend = TRUE,
+                                        cellwidth = cellwidth_Sample,
+                                        cellheight = cellheight_Feature,
+                                        fontsize_row= 10,
+                                        fontsize_col = 10,
+                                        fontsize=9,
+                                        main = paste(plot_name," Samples: ", i, sep=" " ),
+                                        silent = TRUE)
 
         #----- Save
         cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -383,48 +383,48 @@ viz_heatmap <- function(data,
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
-          {ggplot() + annotation_custom(.)} %>%
-          add(theme(panel.background = element_rect(fill = "transparent")))
+            {ggplot() + annotation_custom(.)} %>%
+            add(theme(panel.background = element_rect(fill = "transparent")))
 
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         #----- Save
         suppressWarnings(
-          save_res(inputlist_df=NULL,
-                               inputlist_plot= PlotList_adaptedGrid,
-                               save_table=NULL,
-                               save_plot=save_plot,
-                               path= folder,
-                               file_name= paste("Heatmap_",plot_name, sep=""),
-                               core=FALSE,
-                               print_plot=print_plot,
-                               plot_height=plot_height,
-                               plot_width=plot_width,
-                               plot_unit="cm"))
+            save_res(inputlist_df=NULL,
+                                inputlist_plot= PlotList_adaptedGrid,
+                                save_table=NULL,
+                                save_plot=save_plot,
+                                path= folder,
+                                file_name= paste("Heatmap_",plot_name, sep=""),
+                                core=FALSE,
+                                print_plot=print_plot,
+                                plot_height=plot_height,
+                                plot_width=plot_width,
+                                plot_unit="cm"))
         }else{
-          message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
-          log_trace(paste("Message ", message, sep=""))
-          message(message)
+            message <- paste0(i , " includes <= 2 objects and is hence not plotted.")
+            log_trace(paste("Message ", message, sep=""))
+            message(message)
         }
         }
-      #Return if assigned:
-      return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+        #Return if assigned:
+        return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 
-      }else if("individual_Metab" %in% names(metadata_info)==TRUE & "individual_Sample" %in% names(metadata_info)==TRUE){
+        }else if("individual_Metab" %in% names(metadata_info)==TRUE & "individual_Sample" %in% names(metadata_info)==TRUE){
         #Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <-ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
 
         unique_paths <- unique(metadata_feature[[metadata_info[["individual_Metab"]]]])
 
         for (i in unique_paths){# Check pathways with 1 metabolite
-          selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
-          selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-          if(length(selected_path_metabs)==1 ){
+            selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
+            selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
+            if(length(selected_path_metabs)==1 ){
             message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
             log_trace(paste("Warning ", message, sep=""))
             warning(message)
             unique_paths <- unique_paths[!unique_paths %in% i] # Remove the pathway
-          }
+            }
         }
 
         #Ensure that groups that are assigned NAs do not cause problems:
@@ -433,14 +433,14 @@ viz_heatmap <- function(data,
         unique_paths_Sample <- unique(metadata_sample[[metadata_info[["individual_Sample"]]]])
 
         for (i in unique_paths_Sample){# Check pathways with 1 metabolite
-          selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == i)
-          selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-          if(length(selected_path_metabs)==1 ){
+            selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == i)
+            selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
+            if(length(selected_path_metabs)==1 ){
             message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
             log_trace(paste("Warning ", message, sep=""))
             warning(message)
             unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i] # Remove the pathway
-          }
+            }
         }
 
         IndividualPlots_Metab <-unique_paths
@@ -450,34 +450,34 @@ viz_heatmap <- function(data,
         PlotList_adaptedGrid <- list()#Empty list to store all the plots
 
         for (i in IndividualPlots_Metab){
-          selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
-          selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
-          data_path_metab <- data %>% select(all_of(selected_path_metabs))
+            selected_path <- metadata_feature %>% filter(get(metadata_info[["individual_Metab"]]) == i)
+            selected_path_metabs <-  colnames(data) [colnames(data) %in% row.names(selected_path)]
+            data_path_metab <- data %>% select(all_of(selected_path_metabs))
 
-          # Row annotation
-          row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
-          row_annot<- NULL
-          if(length(row_annot_vars)>0){
+            # Row annotation
+            row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
+            row_annot<- NULL
+            if(length(row_annot_vars)>0){
             for (y in seq_along(row_annot_vars)){
-              annot_sel <- row_annot_vars[[y]]
-              row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
-              row_annot <- row_annot %>% as.data.frame()
-              names(row_annot)[y] <- annot_sel
+                annot_sel <- row_annot_vars[[y]]
+                row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
+                row_annot <- row_annot %>% as.data.frame()
+                names(row_annot)[y] <- annot_sel
             }
             row_annot<- as.data.frame(row_annot)
             rownames(row_annot) <- rownames(metadata_feature)
-          }
+            }
 
-          #Col annotation:
-          for (s in IndividualPlots_Sample){
+            #Col annotation:
+            for (s in IndividualPlots_Sample){
             #Select the data:
             selected_path <- metadata_sample %>% filter(get(metadata_info[["individual_Sample"]]) == s)%>%
-              rownames_to_column("UniqueID")
+                rownames_to_column("UniqueID")
             selected_path <- as.data.frame(selected_path[,1])%>%
-              rename("UniqueID"=1)
+                rename("UniqueID"=1)
             data_path <- merge(selected_path, data_path_metab%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
             data_path <- data_path%>%
-              column_to_rownames("UniqueID")
+                column_to_rownames("UniqueID")
 
             # Column annotation
             selected_metadata_sample <- merge(selected_path, metadata_sample%>% rownames_to_column("UniqueID"), by="UniqueID", all.x=TRUE)
@@ -485,60 +485,60 @@ viz_heatmap <- function(data,
             col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
             col_annot<- NULL
             if(length(col_annot_vars)>0){
-              for (x in seq_along(col_annot_vars)){
+                for (x in seq_along(col_annot_vars)){
                 annot_sel <- col_annot_vars[[x]]
                 col_annot[x] <- selected_metadata_sample %>% select(annot_sel) %>% as.data.frame()
                 names(col_annot)[x] <- annot_sel
-              }
-              col_annot<- as.data.frame(col_annot)
-              rownames(col_annot) <- rownames(data_path)
+                }
+                col_annot<- as.data.frame(col_annot)
+                rownames(col_annot) <- rownames(data_path)
             }
 
             #Check number of features:
             Features <- as.data.frame(t(data_path))
             if(enforce_featurenames==TRUE){
-              show_rownames <- TRUE
-              cellheight_Feature <- 9
+                show_rownames <- TRUE
+                cellheight_Feature <- 9
             }else if(nrow(Features)>100){
-              show_rownames <- FALSE
-              cellheight_Feature <- 1
+                show_rownames <- FALSE
+                cellheight_Feature <- 1
             }else{
-              show_rownames <- TRUE
-              cellheight_Feature <- 9
+                show_rownames <- TRUE
+                cellheight_Feature <- 9
             }
 
             #Check number of samples
             if(enforce_samplenames==TRUE){
-              show_colnames <- TRUE
-              cellwidth_Sample <- 9
+                show_colnames <- TRUE
+                cellwidth_Sample <- 9
             }else if(nrow(data_path)>50){
-              show_colnames <- FALSE
-              cellwidth_Sample <- 1
+                show_colnames <- FALSE
+                cellwidth_Sample <- 1
             }else{
-              show_colnames <- TRUE
-              cellwidth_Sample <- 9
+                show_colnames <- TRUE
+                cellwidth_Sample <- 9
             }
 
             # Make the plot
             if(nrow(t(data_path))>= 2){
-              # set.seed(1234)
+                # set.seed(1234)
 
             heatmap <- pheatmap(t(data_path),
-                                          show_rownames = as.logical(show_rownames),
-                                          show_colnames = as.logical(show_colnames),
-                                          clustering_method =  "complete",
-                                          scale = scale,
-                                          clustering_distance_rows = "correlation",
-                                          annotation_col = col_annot,
-                                          annotation_row = row_annot,
-                                          legend = TRUE,
-                                          cellwidth = cellwidth_Sample,
-                                          cellheight = cellheight_Feature,
-                                          fontsize_row= 10,
-                                          fontsize_col = 10,
-                                          fontsize=9,
-                                          main = paste(plot_name," Metabolites: ", i, " Sample:", s, sep="" ),
-                                          silent = TRUE)
+                                            show_rownames = as.logical(show_rownames),
+                                            show_colnames = as.logical(show_colnames),
+                                            clustering_method =  "complete",
+                                            scale = scale,
+                                            clustering_distance_rows = "correlation",
+                                            annotation_col = col_annot,
+                                            annotation_row = row_annot,
+                                            legend = TRUE,
+                                            cellwidth = cellwidth_Sample,
+                                            cellheight = cellheight_Feature,
+                                            fontsize_row= 10,
+                                            fontsize_col = 10,
+                                            fontsize=9,
+                                            main = paste(plot_name," Metabolites: ", i, " Sample:", s, sep="" ),
+                                            silent = TRUE)
 
             ## Store the plot in the 'plots' list
             cleaned_i <- gsub("[[:space:],/\\\\]", "-", i)#removes empty spaces and replaces /,\ with -
@@ -547,36 +547,36 @@ viz_heatmap <- function(data,
 
             #-------- Plot width and heights
             #Width and height according to Sample and metabolite number
-           plot_name <- paste(cleaned_i,cleaned_s, sep="_")
+            plot_name <- paste(cleaned_i,cleaned_s, sep="_")
             Plot_Sized <- plot_grob_heatmap(input_plot=heatmap, metadata_info=metadata_info, metadata_sample=metadata_sample, metadata_feature=metadata_feature,plot_name=plot_name)
             plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
             plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
             Plot_Sized %<>%
-              {ggplot() + annotation_custom(.)} %>%
-              add(theme(panel.background = element_rect(fill = "transparent")))
+                {ggplot() + annotation_custom(.)} %>%
+                add(theme(panel.background = element_rect(fill = "transparent")))
 
             PlotList_adaptedGrid[[paste(cleaned_i,cleaned_s, sep="_")]] <- Plot_Sized
 
             #----- Save
             suppressWarnings(
-              save_res(inputlist_df=NULL,
-                                   inputlist_plot= PlotList_adaptedGrid,
-                                   save_table=NULL,
-                                   save_plot=save_plot,
-                                   path= folder,
-                                   file_name=paste("Heatmap_",plot_name, sep=""),
-                                   core=FALSE,
-                                   print_plot=print_plot,
-                                   plot_height=plot_height,
-                                   plot_width= plot_width,
-                                   plot_unit="cm"))
+                save_res(inputlist_df=NULL,
+                                    inputlist_plot= PlotList_adaptedGrid,
+                                    save_table=NULL,
+                                    save_plot=save_plot,
+                                    path= folder,
+                                    file_name=paste("Heatmap_",plot_name, sep=""),
+                                    core=FALSE,
+                                    print_plot=print_plot,
+                                    plot_height=plot_height,
+                                    plot_width= plot_width,
+                                    plot_unit="cm"))
 
 
             }
             else{
-              message(i , " includes <= 2 objects and is hence not plotted.")
+                message(i , " includes <= 2 objects and is hence not plotted.")
             }
-          }
+            }
         }
         return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
     } else if("individual_Metab" %in% names(metadata_info)==FALSE & "individual_Sample" %in% names(metadata_info)==FALSE){
@@ -588,52 +588,52 @@ viz_heatmap <- function(data,
     col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
     col_annot<- NULL
     if(length(col_annot_vars)>0){
-      for (i in seq_along(col_annot_vars)){
+        for (i in seq_along(col_annot_vars)){
         annot_sel <- col_annot_vars[[i]]
         col_annot[i] <- metadata_sample %>% select(annot_sel) %>% as.data.frame()
         names(col_annot)[i] <- annot_sel
-      }
-      col_annot<- as.data.frame(col_annot)
-      rownames(col_annot) <- rownames(data)
+        }
+        col_annot<- as.data.frame(col_annot)
+        rownames(col_annot) <- rownames(data)
     }
 
     # Row annotation
     row_annot_vars <- metadata_info[grepl("color_Metab", names(metadata_info))]
     row_annot<- NULL
     if(length(row_annot_vars)>0){
-      for (i in seq_along(row_annot_vars)){
+        for (i in seq_along(row_annot_vars)){
         annot_sel <- row_annot_vars[[i]]
         row_annot[i] <- metadata_feature %>% select(all_of(annot_sel))
         row_annot <- row_annot %>% as.data.frame()
         names(row_annot)[i] <- annot_sel
-      }
-      row_annot<- as.data.frame(row_annot)
-      rownames(row_annot) <- rownames(metadata_feature)
+        }
+        row_annot<- as.data.frame(row_annot)
+        rownames(row_annot) <- rownames(metadata_feature)
     }
 
     #Check number of features:
     Features <- as.data.frame(t(data))
     if(enforce_featurenames==TRUE){
-      show_rownames <- TRUE
-      cellheight_Feature <- 9
+        show_rownames <- TRUE
+        cellheight_Feature <- 9
     }else if(nrow(Features)>100){
-      show_rownames <- FALSE
-      cellheight_Feature <- 1
+        show_rownames <- FALSE
+        cellheight_Feature <- 1
     }else{
-      show_rownames <- TRUE
-      cellheight_Feature <- 9
+        show_rownames <- TRUE
+        cellheight_Feature <- 9
     }
 
     #Check number of samples
     if(enforce_samplenames==TRUE){
-      show_colnames <- TRUE
-      cellwidth_Sample <- 9
+        show_colnames <- TRUE
+        cellwidth_Sample <- 9
     }else if(nrow(data)>50){
-      show_colnames <- FALSE
-      cellwidth_Sample <- 1
+        show_colnames <- FALSE
+        cellwidth_Sample <- 1
     }else{
-      show_colnames <- TRUE
-      cellwidth_Sample <- 9
+        show_colnames <- TRUE
+        cellwidth_Sample <- 9
     }
 
     #Make the plot:
@@ -641,21 +641,21 @@ viz_heatmap <- function(data,
     # set.seed(1234)
 
     heatmap <- pheatmap(t(data),
-                                  show_rownames = as.logical(show_rownames),
-                                  show_colnames = as.logical(show_colnames),
-                                  clustering_method =  "complete",
-                                  scale = scale,
-                                  clustering_distance_rows = "correlation",
-                                  annotation_col = col_annot,
-                                  annotation_row = row_annot,
-                                  legend = TRUE,
-                                  cellwidth = cellwidth_Sample,
-                                  cellheight = cellheight_Feature,
-                                  fontsize_row= 10,
-                                  fontsize_col = 10,
-                                  fontsize=9,
-                                  main =plot_name,
-                                  silent = TRUE)
+                                    show_rownames = as.logical(show_rownames),
+                                    show_colnames = as.logical(show_colnames),
+                                    clustering_method =  "complete",
+                                    scale = scale,
+                                    clustering_distance_rows = "correlation",
+                                    annotation_col = col_annot,
+                                    annotation_row = row_annot,
+                                    legend = TRUE,
+                                    cellwidth = cellwidth_Sample,
+                                    cellheight = cellheight_Feature,
+                                    fontsize_row= 10,
+                                    fontsize_col = 10,
+                                    fontsize=9,
+                                    main =plot_name,
+                                    silent = TRUE)
 
     ## Store the plot in the 'plots' list
     PlotList[[plot_name]] <- heatmap
@@ -666,32 +666,32 @@ viz_heatmap <- function(data,
     plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
     plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
-      {ggplot() + annotation_custom(.)} %>%
-      add(theme(panel.background = element_rect(fill = "transparent")))
+        {ggplot() + annotation_custom(.)} %>%
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
     PlotList_adaptedGrid[[paste("Heatmap_",plot_name, sep="")]] <- Plot_Sized
 
     #----- Save
     suppressWarnings(
-      save_res(inputlist_df=NULL,
-                           inputlist_plot= PlotList_adaptedGrid,
-                           save_table=NULL,
-                           save_plot=save_plot,
-                           path= folder,
-                           file_name= paste("Heatmap_",plot_name, sep=""),
-                           core=FALSE,
-                           print_plot=print_plot,
-                           plot_height=plot_height,
-                           plot_width=plot_width,
-                           plot_unit="cm"))
+        save_res(inputlist_df=NULL,
+                            inputlist_plot= PlotList_adaptedGrid,
+                            save_table=NULL,
+                            save_plot=save_plot,
+                            path= folder,
+                            file_name= paste("Heatmap_",plot_name, sep=""),
+                            core=FALSE,
+                            print_plot=print_plot,
+                            plot_height=plot_height,
+                            plot_width=plot_width,
+                            plot_unit="cm"))
 
 
 
     }else{
-      message <- paste0(plot_name , " includes <= 2 objects and is hence not plotted.")
-      log_trace(paste("Message ", message, sep=""))
-      message(message)
+        message <- paste0(plot_name , " includes <= 2 objects and is hence not plotted.")
+        log_trace(paste("Message ", message, sep=""))
+        message(message)
     }
     }
-   return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+    return(invisible(list("Plot"=PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }

@@ -62,102 +62,102 @@
 #'
 #' @noRd
 viz_upset <- function(df,
-                     class_col = NULL,
-                     intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
-                     plot_name = "Metabolite IDs",
-                     palette_type = c("viridis", "polychrome"),
-                     max_legend_terms = 20,
-                     save_plot = "svg",
-                     print_plot=TRUE,
-                     path = NULL) {
+                    class_col = NULL,
+                    intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
+                    plot_name = "Metabolite IDs",
+                    palette_type = c("viridis", "polychrome"),
+                    max_legend_terms = 20,
+                    save_plot = "svg",
+                    print_plot=TRUE,
+                    path = NULL) {
 
-  # NSE vs. R CMD check workaround
-  upset_plot <- NULL
+    # NSE vs. R CMD check workaround
+    upset_plot <- NULL
 
-  ###########################################################################
-  ## ------------ Create log file ----------- ##
-  metaproviz_init()
+    ###########################################################################
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-  log_info("viz_upset: Upset plot visualization")
-  ## ------------ Check Input files ----------- ##
-  #
-  palette_type <- match.arg(palette_type,
+    log_info("viz_upset: Upset plot visualization")
+    ## ------------ Check Input files ----------- ##
+    #
+    palette_type <- match.arg(palette_type,
                             c("viridis", "polychrome"))
 
 
-  ## ------------ Create Results output folder ----------- ##
-  if(is.null(save_plot)==FALSE){
+    ## ------------ Create Results output folder ----------- ##
+    if(is.null(save_plot)==FALSE){
     folder <- save_path(folder_name= "UpsetPlots",
-                       path=path)
+                        path=path)
     log_info("viz_upset results saved at ", folder)
-  }
+    }
 
 
-  ###########################################################################
-  ## ----------- Check input data frame ----------- ##
-  # If either a list of DFs (different PK resources, same IDs) or a single DF but multiple ID columns or a combination of both!
-  # currently there is also the compare_pk function, but I think we could maybe use it in here too!
+    ###########################################################################
+    ## ----------- Check input data frame ----------- ##
+    # If either a list of DFs (different PK resources, same IDs) or a single DF but multiple ID columns or a combination of both!
+    # currently there is also the compare_pk function, but I think we could maybe use it in here too!
 
 
 
-  ## ----------- Set the plot parameters: ------------ ##
-  ##--- Prepare colour palette
+    ## ----------- Set the plot parameters: ------------ ##
+    ##--- Prepare colour palette
 
-  # If a class column is provided, process it for fill aesthetics
-  if (!is.null(class_col)) {
+    # If a class column is provided, process it for fill aesthetics
+    if (!is.null(class_col)) {
     df[[class_col]] <- as.factor(df[[class_col]])
     fill_scale <- scale_fill_viridis_d(option = "viridis")
     if(palette_type == "viridis"){
-      fill_scale <- scale_fill_viridis_d(option = "viridis")
+        fill_scale <- scale_fill_viridis_d(option = "viridis")
     } else if(palette_type == "polychrome"){
-      class_levels <- levels(df[[class_col]])
-      my_palette <- palette36.colors(n = 36)
-      if(length(my_palette) < length(class_levels)) {
+        class_levels <- levels(df[[class_col]])
+        my_palette <- palette36.colors(n = 36)
+        if(length(my_palette) < length(class_levels)) {
         fill_scale <- scale_fill_viridis_d(option = "viridis")
         message <- paste0("Not enough colors in the Polychrome palette for the number of classes. Hence viridis palette was used instead.")
         warning("Not enough colors in the Polychrome palette for the number of classes!")
 
         log_trace(paste("Warning ", message, sep=""))
-      }
-      my_palette_named <- setNames(my_palette[seq_along(class_levels)], class_levels)
-      fill_scale <- scale_fill_manual(values = my_palette_named)
+        }
+        my_palette_named <- setNames(my_palette[seq_along(class_levels)], class_levels)
+        fill_scale <- scale_fill_manual(values = my_palette_named)
     }
 
     # Build the base annotation with a mapping for fill based on the class column.
     base_annotation <- list(
-      "Intersection size" = intersection_size(
+        "Intersection size" = intersection_size(
         mapping = aes_string(fill = class_col),
         counts = TRUE
-      ) + fill_scale
+        ) + fill_scale
     )
-  } else {
+    } else {
     # No class column provided: use default annotation without fill mapping.
     base_annotation <- list(
-      "Intersection size" = intersection_size(counts = TRUE)
+        "Intersection size" = intersection_size(counts = TRUE)
     )
-  }
+    }
 
-  ## ----------- Make the  plot based on the choosen parameters ------------ ##
-  # Create the upset plot
-  p <- upset(
+    ## ----------- Make the  plot based on the choosen parameters ------------ ##
+    # Create the upset plot
+    p <- upset(
     data = df,
     intersect = intersect_cols,
     name = plot_name,
     base_annotations = base_annotation,
     set_sizes = upset_set_size()
-  )
+    )
 
 
-  ## ----------- Save and return -------------#
-  suppressWarnings(
+    ## ----------- Save and return -------------#
+    suppressWarnings(
     save_res(inputlist_df=NULL,
-             inputlist_plot= list(upset_plot = p),
-             save_table=NULL,
-             save_plot=save_plot,
-             path= folder,
-             file_name= "UpsetPlot",
-             core=FALSE,
-             print_plot=print_plot))
+            inputlist_plot= list(upset_plot = p),
+            save_table=NULL,
+            save_plot=save_plot,
+            path= folder,
+            file_name= "UpsetPlot",
+            core=FALSE,
+            print_plot=print_plot))
 
-  return(p)
+    return(p)
 }

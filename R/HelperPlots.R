@@ -24,7 +24,7 @@
 #' @noRd
 if_null <- function(value1, value2) {
 
-  value1 %||% value2
+    value1 %||% value2
 
 }
 
@@ -34,7 +34,7 @@ if_null <- function(value1, value2) {
 #' @noRd
 char2cm <- function(char) {
 
-  nchar(char) * .25 + .8
+    nchar(char) * .25 + .8
 
 }
 
@@ -45,7 +45,7 @@ char2cm <- function(char) {
 #' @noRd
 cm <- function(value) {
 
-  unit(value, 'cm')
+    unit(value, 'cm')
 
 }
 
@@ -235,7 +235,7 @@ parse_unit <- function(u) {
                 unit(1, 'null')
             }
         )},
-       `if`(is.numeric(.), cm(.), .)
+        `if`(is.numeric(.), cm(.), .)
     )}
 
 }
@@ -457,15 +457,15 @@ in_gtable <- function(name, gtbl) {
 
 plotGrob_Processing <- function(input_plot,plot_name, plot_type){
 
-  if(plot_type == "Scree"){
+    if(plot_type == "Scree"){
     UNIT <- unit(12, "cm")
-  }else if(plot_type == "Hotellings"){
+    }else if(plot_type == "Hotellings"){
     UNIT <- unit(12, "cm")#0.25*Sample
-  }else{#CV and Hist
+    }else{#CV and Hist
     UNIT <- unit(8, "cm")
-  }
-  # Make plot into nice format:
-  SUPER_PARAM <- list(widths = list(
+    }
+    # Make plot into nice format:
+    SUPER_PARAM <- list(widths = list(
     list("axis-b", UNIT),
     list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
     list("axis-l", "1cm"),
@@ -475,8 +475,8 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
     list("ylab-r", "0cm"),
     list("ylab-l", "1cm", offset = -1L),
     list("guide-box-right", "1cm")
-  ),
-  heights = list(
+    ),
+    heights = list(
     list("axis-l", "8cm"),
     list("axis-b", "0.5cm"),#This is adjusted for the x-axis ticks!
     list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
@@ -487,23 +487,23 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
     list("caption", "0.5cm"), #plots statistics information, space to bottom
     list("guide-box-top", "0cm"),
     list("xlab-t", "0cm", offset = -1L)
-  )
-  )
+    )
+    )
 
-  #Adjust the parameters:
-  suppressMessages(
+    #Adjust the parameters:
+    suppressMessages(
     Plot_Sized <- input_plot %>%
-      ggplotGrob %>%
-      with_canvas_size(width = 12, height = 11) %>%
-      adjust_layout(SUPER_PARAM) %>%
-      adjust_title(c(plot_name))
-  )
+        ggplotGrob %>%
+        with_canvas_size(width = 12, height = 11) %>%
+        adjust_layout(SUPER_PARAM) %>%
+        adjust_title(c(plot_name))
+    )
 
-  Plot_Sized %<>%
+    Plot_Sized %<>%
     {ggplot() + annotation_custom(.)} %>%
     add(theme(panel.background = element_rect(fill = "transparent")))
 
-  return(Plot_Sized)
+    return(Plot_Sized)
 }
 
 ##############################################################
@@ -522,51 +522,51 @@ plotGrob_Processing <- function(input_plot,plot_name, plot_type){
 #' @noRd
 plot_grob_pca <- function(input_plot, metadata_info,plot_name){
 
-  PCA_PARAM <- list(
+    PCA_PARAM <- list(
     widths = list(
-      list("axis-b", "8cm"),
-      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
-      list("axis-l", "1cm"),
-      list("ylab-l", "1cm"),
-      list("guide-box-left", "0cm"),
-      list("axis-r", "0cm"),
-      list("ylab-r", "0cm"),
-      list("ylab-l", "1cm", offset = -1L),
-      list("guide-box-right", "1cm")
+        list("axis-b", "8cm"),
+        list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+        list("axis-l", "1cm"),
+        list("ylab-l", "1cm"),
+        list("guide-box-left", "0cm"),
+        list("axis-r", "0cm"),
+        list("ylab-r", "0cm"),
+        list("ylab-l", "1cm", offset = -1L),
+        list("guide-box-right", "1cm")
     ),
     heights = list(
-      list("axis-l", "8cm"),
-      list("axis-b", "1cm"),
-      list("xlab-b", ".5cm"),
-      list("xlab-b", "1cm", offset = 1L),
-      list("title", "0cm", offset = -2L, ifempty = FALSE),
-      list("title", "0cm", offset = -1L),
-      list("title", "0.25cm"),# how much space is between title and y-axis label
-      list("subtitle", "0cm"),
-      list("guide-box-top", "0cm"),
-      list("xlab-t", "0cm", offset = -1L)
+        list("axis-l", "8cm"),
+        list("axis-b", "1cm"),
+        list("xlab-b", ".5cm"),
+        list("xlab-b", "1cm", offset = 1L),
+        list("title", "0cm", offset = -2L, ifempty = FALSE),
+        list("title", "0cm", offset = -1L),
+        list("title", "0.25cm"),# how much space is between title and y-axis label
+        list("subtitle", "0cm"),
+        list("guide-box-top", "0cm"),
+        list("xlab-t", "0cm", offset = -1L)
     )
-  )
+    )
 
-  Plot_Sized <- input_plot %>%
+    Plot_Sized <- input_plot %>%
     ggplotGrob %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(PCA_PARAM) %>%
     adjust_title(plot_name) %>%
     adjust_legend(
-      input_plot,
-      sections = c("color", "shape"),
-      metadata_info = metadata_info
+        input_plot,
+        sections = c("color", "shape"),
+        metadata_info = metadata_info
     )
 
-  log_trace(
+    log_trace(
     'Sum of heights: %.02f, sum of widths: %.02f',
     convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
     convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
-  )
+    )
 
-  #Return
-  Output <- Plot_Sized
+    #Return
+    Output <- Plot_Sized
 }
 
 
@@ -584,58 +584,58 @@ plot_grob_pca <- function(input_plot, metadata_info,plot_name){
 #' @noRd
 plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metadata_feature,plot_name){
 
-  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
-  HEAT_PARAM <- list(
+    # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+    HEAT_PARAM <- list(
     widths = list(
-      list("legend", "2cm")
+        list("legend", "2cm")
     ),
     heights = list(
-      list("main", "1cm")
+        list("main", "1cm")
     )
-  )
+    )
 
-  #If we plot feature names on the x-axis, we need to adjust the height of the plot:
-  #if(as.logical(show_rownames)==TRUE){
-  #  Rows <- nrow(t(data))
-  #}
+    #If we plot feature names on the x-axis, we need to adjust the height of the plot:
+    #if(as.logical(show_rownames)==TRUE){
+    #  Rows <- nrow(t(data))
+    #}
 
-  #Adjust the parameters:
-  Input <- input_plot$gtable
+    #Adjust the parameters:
+    Input <- input_plot$gtable
 
-  Plot_Sized <- Input  %>%
+    Plot_Sized <- Input  %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(HEAT_PARAM) %>%
     adjust_title(c(plot_name))
 
-  #Extract legend information and adjust:
-  color_entries <- grep("^color", names(metadata_info), value = TRUE)
-  if(length(color_entries)>0){#We need to adapt the plot Hights and widths
+    #Extract legend information and adjust:
+    color_entries <- grep("^color", names(metadata_info), value = TRUE)
+    if(length(color_entries)>0){#We need to adapt the plot Hights and widths
     if(sum(grepl("color_Sample", names(metadata_info)))>0){
-      names <- metadata_info[grepl("color_Sample", names(metadata_info))]
-      colour_names <- NULL
-      legend_names <- NULL
-      for (x in seq_along(names)){
+        names <- metadata_info[grepl("color_Sample", names(metadata_info))]
+        colour_names <- NULL
+        legend_names <- NULL
+        for (x in seq_along(names)){
         names_sel <- names[[x]]
         legend_names[x] <- names_sel
         colour_names[x] <- metadata_sample[names[[x]]]
-      }
+        }
     }else{
-      colour_names <- NULL
-      legend_names <- NULL
+        colour_names <- NULL
+        legend_names <- NULL
     }
 
     if(sum(grepl("color_Metab", names(metadata_info)))>0){
-      names <- metadata_info[grepl("color_Metab", names(metadata_info))]
-      colour_names_M <- NULL
-      legend_names_M <- NULL
-      for (x in seq_along(names)){
+        names <- metadata_info[grepl("color_Metab", names(metadata_info))]
+        colour_names_M <- NULL
+        legend_names_M <- NULL
+        for (x in seq_along(names)){
         names_sel <- names[[x]]
         legend_names_M[x] <- names_sel
         colour_names_M[x] <- metadata_feature[names[[x]]]
-      }
+        }
     }else{
-      colour_names_M <- NULL
-      legend_names_M <- NULL
+        colour_names_M <- NULL
+        legend_names_M <- NULL
     }
 
     legend_head <- c(legend_names, legend_names_M)
@@ -655,12 +655,12 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
 
     Plot_Sized$width %<>% add(legendWidth)
     if((convertUnit(legendHeights, 'cm', valueOnly = TRUE))>(convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE))){
-      Plot_Sized$height <- legendHeights
+        Plot_Sized$height <- legendHeights
     }
 
-  }
+    }
 
-  Output <- Plot_Sized
+    Output <- Plot_Sized
 
 }
 
@@ -679,53 +679,53 @@ plot_grob_heatmap <- function(input_plot, metadata_info, metadata_sample, metada
 #'
 
 plot_grob_volcano <- function(input_plot, metadata_info,plot_name, subtitle){
-  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
-  VOL_PARAM <- list(
+    # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+    VOL_PARAM <- list(
     widths = list(
-      list("axis-b", "6cm"),
-      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
-      list("axis-l", "1cm"),
-      list("ylab-l", "1cm"),
-      list("guide-box-left", "0cm"),
-      list("axis-r", "0cm"),
-      list("ylab-r", "0cm"),
-      list("ylab-l", "1cm", offset = -1L),
-      list("guide-box-right", "1cm")
+        list("axis-b", "6cm"),
+        list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+        list("axis-l", "1cm"),
+        list("ylab-l", "1cm"),
+        list("guide-box-left", "0cm"),
+        list("axis-r", "0cm"),
+        list("ylab-r", "0cm"),
+        list("ylab-l", "1cm", offset = -1L),
+        list("guide-box-right", "1cm")
     ),
     heights = list(
-      list("axis-l", "8cm"),
-      list("axis-b", "0.75cm"),#This is the distance to x-axis!
-      list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
-      #list("xlab-b", "1cm", offset = 1L),
-      list("title", "0cm", offset = -2L, ifempty = FALSE),
-      list("title", "0cm", offset = -1L),#Space above title
-      list("title", "0.25cm"),# how much space is between title and y-axis label
-      list("subtitle", "0cm"),
-      list("guide-box-top", "0cm"),
-      list("xlab-t", "0cm", offset = -1L)
+        list("axis-l", "8cm"),
+        list("axis-b", "0.75cm"),#This is the distance to x-axis!
+        list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+        #list("xlab-b", "1cm", offset = 1L),
+        list("title", "0cm", offset = -2L, ifempty = FALSE),
+        list("title", "0cm", offset = -1L),#Space above title
+        list("title", "0.25cm"),# how much space is between title and y-axis label
+        list("subtitle", "0cm"),
+        list("guide-box-top", "0cm"),
+        list("xlab-t", "0cm", offset = -1L)
     )
-  )
+    )
 
-  #Adjust the parameters:
-  Plot_Sized <- input_plot %>%
+    #Adjust the parameters:
+    Plot_Sized <- input_plot %>%
     ggplotGrob %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(VOL_PARAM) %>%
     adjust_title(c(plot_name, subtitle)) %>%#Fix this (if there is no subtitle!)
     adjust_legend(
-      input_plot,
-      sections = c("color", "shape"),
-      metadata_info = metadata_info
+        input_plot,
+        sections = c("color", "shape"),
+        metadata_info = metadata_info
     )
 
-  log_trace(
+    log_trace(
     'Sum of heights: %.02f, sum of widths: %.02f',
     convertUnit(sum(Plot_Sized$height), 'cm', valueOnly = TRUE),
     convertUnit(sum(Plot_Sized$width), 'cm', valueOnly = TRUE)
-  )
+    )
 
-  #Return
-  Output <- Plot_Sized
+    #Return
+    Output <- Plot_Sized
 }
 
 
@@ -744,66 +744,66 @@ plot_grob_volcano <- function(input_plot, metadata_info,plot_name, subtitle){
 #' @noRd
 
 plot_grob_superplot <- function(input_plot,
-                               metadata_info,
-                               metadata_sample,
-                               subtitle,
-                               plot_name,
-                               plot_type){
+                                metadata_info,
+                                metadata_sample,
+                                subtitle,
+                                plot_name,
+                                plot_type){
 
-  # NSE vs. R CMD check workaround
-  Conditions <- NULL
-  # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
-  X_Con <- metadata_sample%>%
+    # NSE vs. R CMD check workaround
+    Conditions <- NULL
+    # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
+    X_Con <- metadata_sample%>%
     distinct(Conditions)
 
-  X_tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
+    X_tick <- unit(X_Con[[1]] %>% char2cm %>% max * 0.6, "cm")
 
-  if(plot_type == "Bar"){
+    if(plot_type == "Bar"){
     UNIT <- unit(X_Con%>%nrow() * 0.5, "cm")
-  }else{
+    }else{
     UNIT <- unit(X_Con%>%nrow() * 1, "cm")
-  }
+    }
 
-  SUPER_PARAM <- list(
+    SUPER_PARAM <- list(
     widths = list(
-      list("axis-b", paste(UNIT)),
-      list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
-      list("axis-l", "1cm"),
-      list("ylab-l", "1cm"),
-      list("guide-box-left", "0cm"),
-      list("axis-r", "0cm"),
-      list("ylab-r", "0cm"),
-      list("ylab-l", "1cm", offset = -1L),
-      list("guide-box-right", "1cm")
+        list("axis-b", paste(UNIT)),
+        list("ylab-l", "0cm", offset = -4L, ifempty = FALSE),
+        list("axis-l", "1cm"),
+        list("ylab-l", "1cm"),
+        list("guide-box-left", "0cm"),
+        list("axis-r", "0cm"),
+        list("ylab-r", "0cm"),
+        list("ylab-l", "1cm", offset = -1L),
+        list("guide-box-right", "1cm")
     ),
     heights = list(
-      list("axis-l", "8cm"),
-      list("axis-b", X_tick),#This is adjusted for the x-axis ticks!
-      list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
-      list("title", "0cm", offset = -2L, ifempty = FALSE),
-      list("title", "0cm", offset = -1L),
-      list("title", "0.25cm"),# how much space is between title and y-axis label
-      list("subtitle", "0cm"),
-      list("caption", "0.5cm"), #plots statistics information, space to bottom
-      list("guide-box-top", "0cm"),
-      list("xlab-t", "0cm", offset = -1L)
+        list("axis-l", "8cm"),
+        list("axis-b", X_tick),#This is adjusted for the x-axis ticks!
+        list("xlab-b", "0.75cm"),#This gives us the distance of the caption to the x-axis label
+        list("title", "0cm", offset = -2L, ifempty = FALSE),
+        list("title", "0cm", offset = -1L),
+        list("title", "0.25cm"),# how much space is between title and y-axis label
+        list("subtitle", "0cm"),
+        list("caption", "0.5cm"), #plots statistics information, space to bottom
+        list("guide-box-top", "0cm"),
+        list("xlab-t", "0cm", offset = -1L)
     )
-  )
+    )
 
-  #Adjust the parameters:
-  Plot_Sized <- input_plot %>%
+    #Adjust the parameters:
+    Plot_Sized <- input_plot %>%
     ggplotGrob %>%
     with_canvas_size(width = 12, height = 11) %>%
     adjust_layout(SUPER_PARAM) %>%
     adjust_title(c(plot_name, subtitle)) %>%
     adjust_legend(
-      input_plot,
-      sections = c("Superplot"),#here we do not have colour and shape, but other parameters
-      metadata_info = metadata_info
+        input_plot,
+        sections = c("Superplot"),#here we do not have colour and shape, but other parameters
+        metadata_info = metadata_info
     )
 
-  #Return
-  Output <- Plot_Sized
+    #Return
+    Output <- Plot_Sized
 }
 
 

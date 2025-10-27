@@ -130,8 +130,8 @@ dma <- function(
     path = NULL
     ) {
 
-  # NSE vs. R CMD check workaround
-  Metabolite <- NULL
+    # NSE vs. R CMD check workaround
+    Metabolite <- NULL
 
     ## ------------ Create log file ----------- ##
     metaproviz_init()
@@ -180,7 +180,7 @@ dma <- function(
         }
 
         if (bartlett == TRUE) {
-          Subfolder_B <- file.path(folder, "bartlett")
+            Subfolder_B <- file.path(folder, "bartlett")
             if (!dir.exists(Subfolder_B)) {
                 dir.create(Subfolder_B)
             }
@@ -200,21 +200,21 @@ dma <- function(
     if (shapiro == TRUE) {
         if (length(Settings[["Metabolites_Miss"]] >= 1)) {
 
-          msg <- "There are NA's/0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs/0s."
-          log_warn(msg)
-          warning(msg, call. = FALSE)
+            msg <- "There are NA's/0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs/0s."
+            log_warn(msg)
+            warning(msg, call. = FALSE)
         }
         tryCatch(
             {
             Shapiro_output <-
               
-                  mpv_shapiro(
-                      data = data,
-                      metadata_sample = metadata_sample,
-                      metadata_info = metadata_info,
-                      pval = pval,
-                      qqplots = FALSE
-                  )
+                    mpv_shapiro(
+                        data = data,
+                        metadata_sample = metadata_sample,
+                        metadata_info = metadata_info,
+                        pval = pval,
+                        qqplots = FALSE
+                    )
               
             },
             error = function(e) {
@@ -244,11 +244,11 @@ dma <- function(
                     {
                     Bartlett_output <-
                         
-                              mpv_bartlett(
-                                  data = data,
-                                  metadata_sample = metadata_sample,
-                                  metadata_info = metadata_info
-                              )
+                                mpv_bartlett(
+                                    data = data,
+                                    metadata_sample = metadata_sample,
+                                    metadata_info = metadata_info
+                                )
                         
                     },
                     error = function(e) {
@@ -526,7 +526,7 @@ dma <- function(
             
     
 
-      DMA_Output_List <- list("ShapiroTest" = Shapiro_output)
+        DMA_Output_List <- list("ShapiroTest" = Shapiro_output)
     }
 
     if (bartlett == TRUE & exists("Bartlett_output") == TRUE) {
@@ -545,7 +545,7 @@ dma <- function(
             
         
 
-      DMA_Output_List <-
+        DMA_Output_List <-
         c(
             DMA_Output_List,
             list("BartlettTest" = Bartlett_output)
@@ -568,7 +568,7 @@ dma <- function(
             
         
 
-      DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
+        DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
     }
 
     if (core == TRUE) {
@@ -677,8 +677,8 @@ log2fc <- function(
     transform = TRUE
     ) {
 
-  # NSE vs. R CMD check workaround
-  `Log2(Distance)` <- C1_Adapted <- C2_Adapted <- NULL
+    # NSE vs. R CMD check workaround
+    `Log2(Distance)` <- C1_Adapted <- C2_Adapted <- NULL
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
@@ -1230,8 +1230,8 @@ dma_stat_single <-
 
     Denom <- data %>%
         filter(
-          metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]
-          ) %>%
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% metadata_info[["Denominator"]]
+            ) %>%
         select_if(is.numeric)
 
     Num_Miss <- Num[, colSums(Num == 0) > 0, drop = FALSE]
@@ -1240,21 +1240,21 @@ dma_stat_single <-
 
     # Comparisons
     comparisons <- matrix(c(
-      metadata_info[["Numerator"]],
-      metadata_info[["Denominator"]]
-      ))
+        metadata_info[["Numerator"]],
+        metadata_info[["Denominator"]]
+        ))
 
     ## ------------ Perform Hypothesis testing ----------- ##
     for (column in seq_len(dim)(comparisons)[2]) {
         C1 <- data %>% # Numerator
             filter(
-              metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
-              ) %>%
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
+                ) %>%
             select_if(is.numeric) # only keep numeric columns with metabolite values
         C2 <- data %>% # Denominator
             filter(
-              metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[2, column]
-              ) %>%
+                metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[2, column]
+                ) %>%
             select_if(is.numeric)
     }
 
@@ -2774,10 +2774,10 @@ mpv_shapiro <-
                 paste(
                     "shapiro.test(x) : sample size must be between 3 and 5000.",
                     " You have provided <3 Samples for condition ",
-                     i,
-                     ". Hence Shaprio test can not be performed for ",
-                     "this condition.",
-                     sep = ""
+                    i,
+                    ". Hence Shaprio test can not be performed for ",
+                    "this condition.",
+                    sep = ""
                 ), sep = ""
             )
         } else if (nrow(subset_data) > 5000) {

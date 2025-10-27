@@ -18,8 +18,8 @@
 
 
 .metaproviz_options_defaults <- list(
-  metaproviz.loglevel = 'trace',
-  metaproviz.console_loglevel = 'success'
+    metaproviz.loglevel = 'trace',
+    metaproviz.console_loglevel = 'success'
 )
 
 
@@ -118,7 +118,7 @@ metaproviz_load_config <- function(
 #' @seealso \code{\link{metaproviz_load_config}, \link{metaproviz_save_config}}
 metaproviz_reset_config <- function(save = NULL, reset_all = FALSE) {
 
-   reset_config(save = save, reset_all = reset_all, pkg = 'MetaProViz')
+    reset_config(save = save, reset_all = reset_all, pkg = 'MetaProViz')
 
 }
 
