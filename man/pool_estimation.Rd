@@ -16,9 +16,9 @@ pool_estimation(
 )
 }
 \arguments{
-\item{data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Can be either a full dataset or a dataset with only the pool samples.}
+\item{data}{SummarizedExperiment (se) file including assay and rowData. If se file is provided, metadata_sample is extracted from the rowData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
 
-\item{metadata_sample}{\emph{Optional: } DF which contains information about the samples when a full dataset is inserted as Input_data. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), has to exist.\strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}}
 
 \item{metadata_info}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_metadata_info, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
 
@@ -39,6 +39,10 @@ List with two elements: DF (including input and output table) and Plot (includin
 Find metabolites with high variability across total pool samples
 }
 \examples{
+data(intracell_raw_se)
+Res <- pool_estimation(data=intracell_raw_se,
+                       metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
+
 data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
 Res <- pool_estimation(data=Intra[ ,-c(1:3)],
