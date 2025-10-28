@@ -43,8 +43,8 @@
 #' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
 #'
 #' @examples
-#' Intra_se <- intracell_raw_se
-#' ResI <- processing(data=Intra_se,
+#' data(intracell_raw_se)
+#' ResI <- processing(data=intracell_raw_se,
 #'                    metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' data(intracell_raw)
