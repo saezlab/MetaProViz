@@ -42,6 +42,26 @@
 "intracell_raw"
 
 ####################################################
+#' intracell_raw_se
+#'
+#' Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
+#' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A
+#' converted into an se object.
+#'
+#' @format Se object with numeric columns containing raw metabolite intensities and rowdata with the following columns:
+#'  -`Conditions`: Character vector indicating cell line identity
+#'   - `Analytical_Replicate`: Integer replicate number for analytical replicates
+#'  -`Biological_Replicate`: Integer replicate number for biological replicates
+#'
+#' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
+#' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
+#'
+#' @examples
+#' data(intracell_raw_se)
+#' head(intracell_raw_se)
+"intracell_raw_se"
+
+####################################################
 #' intracell_dma
 #'
 #' Metabolomics workbench project PR001418, study ST002224 where we performed differential metabolite
