@@ -22,9 +22,9 @@ processing(
 )
 }
 \arguments{
-\item{data}{DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. Alternatively, if \code{se=TRUE}, provide a SummarizedExperiment object.}
+\item{data}{SummarizedExperiment (se) file including assay and rowData. If se file is provided, metadata_sample is extracted from the rowData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
 
-\item{metadata_sample}{DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition.}
+\item{metadata_sample}{Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition.}
 
 \item{metadata_info}{Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" (mandatory) with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" (optional) including numerical values. For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added. Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions.}
 
@@ -57,6 +57,10 @@ List with two elements: DF (including all output tables generated) and Plot (inc
 Modularised Normalization: 80\%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
 }
 \examples{
+data(intracell_raw_se)
+ResI <- processing(data=intracell_raw_se,
+                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+
 data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
 ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
