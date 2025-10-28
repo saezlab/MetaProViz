@@ -82,7 +82,8 @@ metadata_analysis <- function(
     data,
     metadata_sample,
     # by = NULL,
-    # Join specification between `data` and `metadata_sample`. See the docs of \code{left_join} for details. \strong{Default = NULL} scaling = TRUE,
+    # Join specification between `data` and `metadata_sample`. See the docs of \code{left_join} for details. \strong{Default = NULL}
+    scaling = TRUE,
     percentage = 0.1,
     cutoff_stat = 0.05,
     cutoff_variance = 1,

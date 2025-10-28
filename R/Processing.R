@@ -607,7 +607,7 @@ pool_estimation <- function(
                         geom_histogram(aes(y = after_stat(density)), color ="black", fill ="white")+
                         geom_vline(aes(xintercept = cutoff_cv),
                                     color ="darkred", linetype ="dashed", size = 1)+
-                        geom_density(alpha =.2, fill ="# FF6666") +
+                        geom_density(alpha =.2, fill ="#FF6666") +
                         labs(title ="CV for metabolites of Pool samples",x ="Coefficient of variation (CV%)", y = "Frequency")+
                         theme_classic())
 
@@ -621,7 +621,7 @@ pool_estimation <- function(
     mutate(HighVar = ifelse((CV > cutoff_cv) == TRUE, paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
 
     ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar, label = Plot_cv_result_df$Metabolite))+
-                            geom_violin(alpha = 0.5 , fill ="# FF6666")+
+                            geom_violin(alpha = 0.5 , fill ="#FF6666")+
                             geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                             geom_text_repel(
                                 aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
@@ -1214,7 +1214,7 @@ core_norm <- function(
                             geom_histogram(aes(y = after_stat(density)), color ="black", fill ="white")+
                             geom_vline(aes(xintercept = cutoff_cv),
                                     color ="darkred", linetype ="dashed", linewidth = 1)+
-                            geom_density(alpha =.2, fill ="# FF6666") +
+                            geom_density(alpha =.2, fill ="#FF6666") +
                             labs(title ="CV for metabolites of control media samples (no cells)",x ="Coefficient of variation (CV)", y = "Frequency")+
                             theme_classic())
 
@@ -1227,7 +1227,7 @@ core_norm <- function(
         mutate(HighVar = ifelse(HighVar == TRUE, "> CV 30", "< CV 30"))
 
     ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar, label = row.names(cv_result_df)))+
-                            geom_violin(alpha = 0.5 , fill ="# FF6666")+
+                            geom_violin(alpha = 0.5 , fill ="#FF6666")+
                             geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
                             geom_text_repel(
                                 aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,

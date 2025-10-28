@@ -1060,7 +1060,7 @@ function(
                     # If we have a grouping_variable we need to combine it with the
                     # MetaboliteID before merging
                     ResList[[from_to_long]] <-
-                        ResList[[from_to]] %>%
+                        ResList[[from_to_v2]] %>%
                             unnest( 
                             cols = all_of(Comp[[comp]]$from)
                         ) %>%
@@ -1287,7 +1287,7 @@ function(
                             "UniqueID",
                             paste0(from, "_to_", to),
                             paste0("Count(", from, "_to_", to, ")"),
-                            paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep = ""),
+                            paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep = "")
                         )
                     ],
                     y = ResList[[
@@ -1301,7 +1301,7 @@ function(
                             "UniqueID",
                             paste0(to, "_to_", from),
                             paste0("Count(", to, "_to_", from, ")"),
-                            paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep = ""),
+                            paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep = "")
                         )
                     ],
                     by = "UniqueID",
