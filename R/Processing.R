@@ -312,16 +312,16 @@ processing <- function(
 
     # find the "Outliers" column and split
     out_idx <- which(colnames(PreRes) == "Outliers")
-    rowdata_df <- PreRes[, seq_len(out_idx), drop = FALSE]
+    coldata_df <- PreRes[, seq_len(out_idx), drop = FALSE]
     assay_df <- PreRes[, (out_idx + 1):ncol(PreRes), drop = FALSE]
 
     # coerce assay to numeric matrix
-    assay_mat <- as.matrix(assay_df)
+    assay_mat <- as.matrix(t(assay_df))
 
     # build the SummarizedExperiment
     se_new <- SummarizedExperiment::SummarizedExperiment(
       assays = list(data = assay_mat),
-      rowData = S4Vectors::DataFrame(rowdata_df)
+      colData = S4Vectors::DataFrame(coldata_df)
     )
 
     #Make list of se files:
