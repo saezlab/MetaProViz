@@ -86,9 +86,9 @@ processing <- function(
   metaproviz_init()
 
   ## ------------- Check SummarizedExperiment file ---------- ##
+  input_data <- data
   if (inherits(data, "SummarizedExperiment"))  {
     log_info('Processing input SummarizedExperiment object.')
-     input_data <- data
      se_list <- process_se(data)
      data <- se_list$data
      metadata_sample <- se_list$metadata_sample
@@ -340,8 +340,8 @@ processing <- function(
 
 #' Merges the analytical replicates of an experiment
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains information about the samples Column "Conditions", "Biological_replicates" and "Analytical_Replicates has to exist.
+#' @param data SummarizedExperiment (se) file including assay and rowData. If se file is provided, metadata_sample is extracted from the rowData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
+#' @param metadata_sample  \emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}
 #' @param metadata_info  \emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_metadata_sample", Analytical_Replicates="ColumnName_metadata_sample").\strong{Default = NULL}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
@@ -349,6 +349,10 @@ processing <- function(
 #' @return DF with the merged analytical replicates
 #'
 #' @examples
+#' data(intracell_raw_se)
+#' Res <- replicate_sum(data=intracell_raw_se,
+#'                      metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+#'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
@@ -365,7 +369,7 @@ processing <- function(
 #' @export
 replicate_sum <- function(
     data,
-    metadata_sample,
+    metadata_sample = NULL,
     metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
     save_table = "csv",
     path = NULL
@@ -375,6 +379,16 @@ replicate_sum <- function(
   Biological_Replicates <- Conditions <- Analytical_Replicates <- UniqueID <- NULL
   ## ------------ Create log file ----------- ##
   metaproviz_init()
+
+
+  ## ------------- Check SummarizedExperiment file ---------- ##
+  input_data <- data
+  if (inherits(data, "SummarizedExperiment"))  {
+      log_info('Processing input SummarizedExperiment object.')
+      se_list <- process_se(data)
+      data <- se_list$data
+      metadata_sample <- se_list$metadata_sample
+  }
 
   ## ------------------ Check Input ------------------- ##
   # HelperFunction `check_param`
@@ -438,7 +452,7 @@ replicate_sum <- function(
     summarise_all("max") %>%
     ungroup() %>%
     select(Analytical_Replicates, Biological_Replicates, Conditions) %>%
-    rename("n_AnalyticalReplicates_Summed "= "Analytical_Replicates")
+    rename("n_AnalyticalReplicates_Summed"= "Analytical_Replicates")
 
   Input_data_numeric_summed <- merge(nReplicates,Input_data_numeric_summed, by = c("Conditions","Biological_Replicates")) %>%
     unite(UniqueID, c("Conditions","Biological_Replicates"), sep ="_", remove = FALSE) %>% # Create a uniqueID
@@ -455,11 +469,31 @@ replicate_sum <- function(
            print_plot = FALSE)
 
   # Return
-  invisible(return(Input_data_numeric_summed))
+  if (inherits(input_data, "SummarizedExperiment"))  {
+      PreRes <- Input_data_numeric_summed %>% tibble::rownames_to_column("Code")
+
+      # find the "Outliers" column and split
+      out_idx <- which(colnames(PreRes) == "n_AnalyticalReplicates_Summed")
+      coldata_df <- PreRes[, seq_len(out_idx), drop = FALSE]
+      assay_df <- PreRes[, (out_idx + 1):ncol(PreRes), drop = FALSE]
+
+      # coerce assay to numeric matrix
+      assay_mat <- as.matrix(t(assay_df))
+
+      # build the SummarizedExperiment
+      se_new <- SummarizedExperiment::SummarizedExperiment(
+          assays = list(data = assay_mat),
+          colData = S4Vectors::DataFrame(coldata_df)
+      )
+
+
+      #Return
+      invisible(return(se_new))
+  }else{
+      invisible(return(Input_data_numeric_summed))
+  }
+
 }
-
-
-
 
 ######################################################################################
 # # # # # # # # # Metabolite detection estimation using pool samples # # # # # # # # #
