@@ -7,6 +7,7 @@
 metadata_analysis(
   data,
   metadata_sample,
+  scaling = TRUE,
   percentage = 0.1,
   cutoff_stat = 0.05,
   cutoff_variance = 1,
@@ -33,6 +34,9 @@ repetitions of measurements, which will be summarised. Column
 names: "Conditions", "Biological_Replicates",
 "Analytical_Replicates".\strong{Default = NULL}}
 
+\item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is
+used \strong{Default = TRUE}}
+
 \item{percentage}{\emph{Optional: } percentage of top and bottom features to
 be displayed in the results summary. \strong{Default = 0.1}}
 
@@ -54,9 +58,6 @@ saved as an overview of the results. \strong{Default = TRUE}}
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved
 at. \strong{default: NULL}}
-
-\item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is
-used \strong{Default = TRUE}}
 }
 \value{
 List of DFs: prcomp results, loadings, top-Bottom features, annova
