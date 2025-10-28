@@ -71,6 +71,7 @@ Imports:
     rlang,
     rstatix,
     stringr,
+    SummarizedExperiment,
     tibble,
     tidyr,
     tidyselect,
