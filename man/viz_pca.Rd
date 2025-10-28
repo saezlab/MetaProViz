@@ -63,7 +63,7 @@ PCA plot visualization
 }
 \examples{
 data(intracell_raw)
-Intra <- intracell_raw[,-c(2:4)]\%>\%tibble::column_to_rownames("Code")
+Intra <- intracell_raw[, -c(2:4)] \%>\% tibble::column_to_rownames("Code")
 Res <- viz_pca(Intra)
 
 }

@@ -6,10 +6,10 @@
 \title{intracell_raw}
 \format{
 A data frame with the following columns:
+-\code{Conditions}: Character vector indicating cell line identity
 \itemize{
-\item \code{Conditions}: Character vector indicating cell line identity
 \item \code{Analytical_Replicate}: Integer replicate number for analytical replicates
-\item \code{Biological_Replicate}: Integer replicate number for biological replicates
+-\code{Biological_Replicate}: Integer replicate number for biological replicates
 \item Additional numeric columns (183 in total) containing raw metabolite intensities
 }
 }

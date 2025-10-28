@@ -7,7 +7,7 @@
 count_id(
   data,
   column,
-  delimiter = ",",
+  delimiter = ",\\n    ",
   fill_colors = c(`No ID` = "#FB8072", `Single ID` = "#B3DE69", `Multiple IDs` =
     "#80B1D3"),
   binwidth = 1,

@@ -49,9 +49,13 @@ Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
-Res <- translate_id(data = KEGG_Pathways, metadata_info = c(InputID =
-"MetaboliteID", grouping_variable = "term"), from = c("kegg"), to =
-c("pubchem", "hmdb"))
+Res <- translate_id(
+    data = KEGG_Pathways, metadata_info = c(
+        InputID =
+            "MetaboliteID", grouping_variable = "term"
+    ), from = c("kegg"), to =
+        c("pubchem", "hmdb")
+)
 
 }
 \keyword{IDs}

@@ -54,11 +54,17 @@ Create Mapping Ambiguities between two ID types
 }
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
-InputDF <- translate_id(data = KEGG_Pathways, metadata_info = c(InputID =
-"MetaboliteID", grouping_variable = "term"), from = c("kegg"), to =
-c("pubchem"))[["TranslatedDF"]]
-Res <- mapping_ambiguity(data = InputDF, from = "MetaboliteID", to =
-"pubchem", grouping_variable = "term", summary = TRUE)
+InputDF <- translate_id(
+    data = KEGG_Pathways, metadata_info = c(
+        InputID =
+            "MetaboliteID", grouping_variable = "term"
+    ), from = c("kegg"), to =
+        c("pubchem")
+)[["TranslatedDF"]]
+Res <- mapping_ambiguity(
+    data = InputDF, from = "MetaboliteID", to =
+        "pubchem", grouping_variable = "term", summary = TRUE
+)
 
 }
 \keyword{Mapping}

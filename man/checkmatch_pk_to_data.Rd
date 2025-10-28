@@ -56,14 +56,19 @@ features
 \examples{
 data(cellular_meta)
 DetectedIDs <- cellular_meta \%>\%
-dplyr::select("Metabolite", "HMDB") \%>\%
-tidyr::drop_na()
-input_pathway <- translate_id(data = metsigdb_kegg(), metadata_info =
-c(InputID = "MetaboliteID", grouping_variable = "term"), from = c("kegg"),
-to
-= c("hmdb"))[["TranslatedDF"]] \%>\% tidyr::drop_na()
-Res <- checkmatch_pk_to_data(data = DetectedIDs, input_pk = input_pathway,
-metadata_info = c(InputID = "HMDB", PriorID = "hmdb", grouping_variable =
-"term"))
+    dplyr::select("Metabolite", "HMDB") \%>\%
+    tidyr::drop_na()
+input_pathway <- translate_id(
+    data = metsigdb_kegg(), metadata_info =
+        c(InputID = "MetaboliteID", grouping_variable = "term"), from = c("kegg"),
+    to = c("hmdb")
+)[["TranslatedDF"]] \%>\% tidyr::drop_na()
+Res <- checkmatch_pk_to_data(
+    data = DetectedIDs, input_pk = input_pathway,
+    metadata_info = c(
+        InputID = "HMDB", PriorID = "hmdb", grouping_variable =
+            "term"
+    )
+)
 
 }

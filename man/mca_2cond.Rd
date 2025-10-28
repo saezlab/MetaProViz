@@ -2,10 +2,7 @@
 % Please edit documentation in R/MetaboliteClusteringAnalysis.R
 \name{mca_2cond}
 \alias{mca_2cond}
-\title{\subsection{---------------------------}{
-
-This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between conditions.
-}}
+\title{This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between conditions.}
 \usage{
 mca_2cond(
   data_c1,
@@ -41,10 +38,7 @@ mca_2cond(
 List of two DFs: 1. summary of the cluster count and 2. the detailed information of each metabolites in the clusters.
 }
 \description{
-\subsection{---------------------------}{
-
 This script performs metabolite clustering analysis and computes clusters of metabolites based on regulatory rules between conditions.
-}
 }
 \examples{
 data(intracell_raw)
