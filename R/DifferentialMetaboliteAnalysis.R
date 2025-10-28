@@ -2814,10 +2814,26 @@ mpv_shapiro <- function(
                 # Apply shapiro-Wilk test to each feature in the subset
                 # shapiro_results[[i]] <-
                 # as.data.frame(sapply(subset_data, function(x) shapiro.test(x)))
+                # Note: tryCatch handles cases where a feature has all identical
+                # values within this specific condition (even if it has variance
+                # across all conditions combined). shapiro.test() will fail with
+                # "all 'x' values are identical" in such cases, so we return NA.
                 shapiro_results[[i]] <- as.data.frame(
                     vapply(
                         subset_data,
-                        shapiro.test,
+                        function(x) {
+                            tryCatch(
+                                shapiro.test(x),
+                                error = function(e) {
+                                    list(
+                                        statistic = c(W = NA_real_),
+                                        p.value = NA_real_,
+                                        method = "Shapiro-Wilk normality test",
+                                        data.name = "x"
+                                    )
+                                }
+                            )
+                        },
                         FUN.VALUE = list(
                             statistic = c(W = 0),
                             p.value = 0.0,
