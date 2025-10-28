@@ -88,10 +88,10 @@ processing <- function(
   ## ------------- Check SummarizedExperiment file ---------- ##
   if (inherits(data, "SummarizedExperiment"))  {
     log_info('Processing input SummarizedExperiment object.')
-    input_data <- data
-    data <- SummarizedExperiment::assay(input_data)
-    metadata_sample <- SummarizedExperiment::rowData(input_data)
-    #metadata_feature <- SummarizedExperiment::colData(input_data)
+     input_data <- data
+     se_list <- process_se(data)
+     data <- se_list$data
+     metadata_sample <- se_list$metadata_sample
   }
 
   ## ------------------ Check Input ------------------- ##
