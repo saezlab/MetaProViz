@@ -28,9 +28,9 @@
 #' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
 #'
 #' @format A data frame with the following columns:
-#'   - `Conditions`: Character vector indicating cell line identity
+#'  -`Conditions`: Character vector indicating cell line identity
 #'   - `Analytical_Replicate`: Integer replicate number for analytical replicates
-#'   - `Biological_Replicate`: Integer replicate number for biological replicates
+#'  -`Biological_Replicate`: Integer replicate number for biological replicates
 #'   - Additional numeric columns (183 in total) containing raw metabolite intensities
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
@@ -245,7 +245,7 @@
 #' mca_twocond_rules
 #'
 #' Manually curated table defining the flow of information of the two condition biological regulatory clusters Regulatory labels
-#'from the different grouping methods.
+#' from the different grouping methods.
 #'
 #' @format Columns include Intra, core, core_Detection including state entries (e.g. up, down, etc.) and the Regulator Clustering
 #' columns (RG1-RG3)

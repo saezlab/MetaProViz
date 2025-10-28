@@ -16,25 +16,6 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
-#' ## ---------------------------
-##
-## Script name: MCA
-##
-## Purpose of script: Metabolite Clustering Analysis generates clusters of metabolites based on regulatory rules.
-##
-## Author: Christina Schmidt
-##
-## Date Created: 2022-10-28
-##
-## Copyright (c) Christina Schmidt
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
 
 ####################################################################
 ### ### ### Metabolite Clustering Analysis: 2 Conditions ### ### ###
@@ -124,7 +105,7 @@ mca_2cond <- function(data_c1,
     #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
     Cond1_DF <-Cond1_DF%>%
     mutate(Cutoff = case_when(Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol > as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'UP',
-                                Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol < - as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'DOWN',
+                                Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol < -as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'DOWN',
                                 TRUE ~ 'No Change'))%>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                         Cutoff == "DOWN" ~ 'DOWN',
@@ -135,7 +116,7 @@ mca_2cond <- function(data_c1,
 
     Cond2_DF <- Cond2_DF%>%
     mutate(Cutoff = case_when(Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol > as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'UP',
-                                Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol < - as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'DOWN',
+                                Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol < -as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'DOWN',
                                 TRUE ~ 'No Change')) %>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                         Cutoff == "DOWN" ~ 'DOWN',
@@ -539,7 +520,7 @@ mca_core <- function(data_intra,
     #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
     core_DF <- core_DF%>%
     mutate(Cutoff = case_when(core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol > as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'UP',
-                                core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol < - as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'DOWN',
+                                core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) & core_DF$ValueCol < -as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'DOWN',
                                 TRUE ~ 'No Change')) %>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                         Cutoff == "DOWN" ~ 'DOWN',
@@ -550,7 +531,7 @@ mca_core <- function(data_intra,
 
     Intra_DF <-Intra_DF%>%
     mutate(Cutoff = case_when(Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol > as.numeric(metadata_info_intra[["ValueCutoff"]]) ~ 'UP',
-                                Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol < - as.numeric(metadata_info_intra[["ValueCutoff"]]) ~ 'DOWN',
+                                Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) & Intra_DF$ValueCol < -as.numeric(metadata_info_intra[["ValueCutoff"]]) ~ 'DOWN',
                                 TRUE ~ 'No Change'))%>%
     mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
                                         Cutoff == "DOWN" ~ 'DOWN',

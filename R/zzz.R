@@ -20,15 +20,14 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @noRd
-.onLoad <- function(libname, pkgname) {
+.onLoad <- function(
+    libname,
+    pkgname
+) {
+    opr <- "OmnipathR"
+    ddb <- "disable_doctest_bypass"
 
-    opr <- 'OmnipathR'
-    ddb <- 'disable_doctest_bypass'
-
-    if (exists(ddb, where = asNamespace(opr), mode = 'function')) {
-
-        ((!!opr)%:::%(!!ddb))()
-
+    if (exists(ddb, where = asNamespace(opr), mode = "function")) {
+        ((!!opr) %:::% (!!ddb))()
     }
-
 }
