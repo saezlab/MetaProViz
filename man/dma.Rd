@@ -26,7 +26,7 @@ dma(
 \arguments{
 \item{data}{SummarizedExperiment (se) file including assay and colData.
 If se file is provided, metadata_sample is extracted from the colData
-of the se object. feature_metadata, if available, are extracted from
+of the se object. metadata_feature, if available, are extracted from
 the rowData. Alternatively provide a DF with unique sample identifiers
 as row names and metabolite numerical values in columns with
 metabolite identifiers as column names. Use NA for metabolites that
