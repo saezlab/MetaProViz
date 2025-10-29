@@ -27,6 +27,11 @@ process_se <- function(se_obj) {
     metadata_sample <- as.data.frame(SummarizedExperiment::colData(se_obj))   # sample metadata
     metadata_feature <- as.data.frame(SummarizedExperiment::rowData(se_obj))  # feature metadata
 
+    # treat "no columns" as empty
+    if (ncol(metadata_feature) == 0) metadata_feature <- NULL
+    if (ncol(metadata_sample) == 0) metadata_sample <- NULL
+
+    #return
     return(list(
         data = assay_data,
         metadata_sample = metadata_sample,
