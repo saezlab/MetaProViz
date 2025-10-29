@@ -26,9 +26,19 @@
 
 #' PCA plot visualization
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
+#' @param data SummarizedExperiment (se) file including assay and colData.
+#'        If se file is provided, metadata_sample is extracted from the colData
+#'        of the se object. metadata_feature, if available, are extracted from
+#'        the rowData. Alternatively provide a DF with unique sample identifiers
+#'        as row names and metabolite numerical values in columns with
+#'        metabolite identifiers as column names. Use NA for metabolites that
+#'        were not detected.
 #' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
-#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
+#' @param metadata_sample  \emph{Optional: } Only required if you did not
+#'        provide se file in parameter data. Provide DF which contains metadata
+#'        information about the samples, which will be combined with your input
+#'        data based on the unique sample identifiers used as rownames.
+#'        \strong{Default = NULL}
 #' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}
 #' @param scale_color \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
 #' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
@@ -45,6 +55,9 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
+#' data(intracell_raw_se)
+#' Res <- viz_pca(intracell_raw_se)
+#'
 #' data(intracell_raw)
 #' Intra <- intracell_raw[, -c(2:4)] %>% tibble::column_to_rownames("Code")
 #' Res <- viz_pca(Intra)
@@ -84,6 +97,16 @@ viz_pca <- function(
     metaproviz_init()
 
     log_info("viz_pca: PCA plot visualization")
+
+    # ------------- Check SummarizedExperiment file ---------- ##
+    input_data <- data
+    if (inherits(data, "SummarizedExperiment"))  {
+        log_info('Processing input SummarizedExperiment object.')
+        se_list <- process_se(data)
+        data <- se_list$data
+        metadata_sample <- se_list$metadata_sample
+    }
+
     # # ------------ Check Input files ----------- ##
     # HelperFunction `check_param`
     check_param(
@@ -153,11 +176,11 @@ viz_pca <- function(
             metadata_sample$shape <- metadata_sample[, paste(metadata_info[["color"]])]
             metadata_sample <-
                 metadata_sample %>%
-                    rename("color" = paste(metadata_info[["color"]])) 
+                    rename("color" = paste(metadata_info[["color"]]))
         } else {
             metadata_sample <-
                 metadata_sample %>%
-                    rename( 
+                    rename(
                     "color" = paste(metadata_info[["color"]]),
                     "shape" = paste(metadata_info[["shape"]])
                 )
@@ -166,12 +189,12 @@ viz_pca <- function(
         if ("color" %in% names(metadata_info) == TRUE) {
             metadata_sample <-
                 metadata_sample %>%
-                    rename("color" = paste(metadata_info[["color"]])) 
+                    rename("color" = paste(metadata_info[["color"]]))
         }
         if ("shape" %in% names(metadata_info) == TRUE) {
             metadata_sample <-
                 metadata_sample %>%
-                    rename("shape" = paste(metadata_info[["shape"]])) 
+                    rename("shape" = paste(metadata_info[["shape"]]))
         }
     }
 
@@ -181,7 +204,7 @@ viz_pca <- function(
             merge(x = metadata_sample %>%
                 tibble::rownames_to_column("UniqueID"), y = data %>%
                 tibble::rownames_to_column("UniqueID"), by = "UniqueID", all.y = TRUE) %>%
-                column_to_rownames("UniqueID") 
+                column_to_rownames("UniqueID")
     } else {
         InputPCA <- data
     }
@@ -224,7 +247,7 @@ viz_pca <- function(
     if ("color" %in% names(metadata_sample) == TRUE) {
         InputPCA <-
             InputPCA %>%
-                rename(!!paste(metadata_info[["color"]]) := "color") 
+                rename(!!paste(metadata_info[["color"]]) := "color")
         Param_Col <- paste(metadata_info[["color"]])
     } else {
         color_select <- NULL
@@ -234,7 +257,7 @@ viz_pca <- function(
     if ("shape" %in% names(metadata_sample) == TRUE) {
         InputPCA <-
             InputPCA %>%
-                rename(!!paste(metadata_info[["shape"]]) := "shape") 
+                rename(!!paste(metadata_info[["shape"]]) := "shape")
         Param_Sha <- paste(metadata_info[["shape"]])
     } else {
         shape_select <- NULL
@@ -295,7 +318,7 @@ viz_pca <- function(
             ggplot() +
                 annotation_custom(.)
         } %>%
-            add(theme(panel.background = element_rect(fill = "transparent"))) 
+            add(theme(panel.background = element_rect(fill = "transparent")))
 
     PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
@@ -304,7 +327,7 @@ viz_pca <- function(
     # Here we make a list in which we will save the outputs:
     file_name <-
         plot_name %>%
-            { 
+            {
             `if`(nchar(.), sprintf("PCA_%s", .), "PCA")
         }
 
