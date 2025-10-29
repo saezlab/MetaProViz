@@ -350,14 +350,12 @@ processing <- function(
 #'
 #' @examples
 #' data(intracell_raw_se)
-#' Res <- replicate_sum(data=intracell_raw_se,
-#'                      metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+#' Res <- replicate_sum(data=intracell_raw_se)
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
-#'                                 metadata_sample=Intra[-c(49:58) , c(1:3)],
-#'                                 metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+#'                                 metadata_sample=Intra[-c(49:58) , c(1:3)])
 #'
 #' @keywords Analytical Replicate Merge
 #'
@@ -476,6 +474,7 @@ replicate_sum <- function(
         out_idx <- which(colnames(PreRes) == "n_AnalyticalReplicates_Summed")
         coldata_df <- PreRes[, seq_len(out_idx), drop = FALSE]
         assay_df <- PreRes[, (out_idx + 1):ncol(PreRes), drop = FALSE]
+        rownames(assay_df) <- rownames(Input_data_numeric_summed)
 
         # coerce assay to numeric matrix
         assay_mat <- as.matrix(t(assay_df))
