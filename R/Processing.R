@@ -1478,7 +1478,7 @@ core_norm <- function(
     data_tic <- merge(metadata_sample, data_tic, by ="row.names") %>%
         filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>%
         column_to_rownames("Row.names") %>%
-        select(-1:-ncol(metadata_sample))
+        select(-seq_len(ncol(metadata_sample)))
 
     data_tic_coreNorm_Media <- as.data.frame(t( apply(t(data_tic),2, function(i) i-core_media_df$core_mediaMeans)))  #Subtract from each sample the core_media mean
     data_tic_coreNorm <- as.data.frame(apply(data_tic_coreNorm_Media, 2, function(i) i*core_norm_factor))
