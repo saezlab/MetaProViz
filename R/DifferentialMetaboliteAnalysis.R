@@ -3051,18 +3051,6 @@ mpv_shapiro <- function(
                     plot.new()
                     plot(qq_plot)
                     qq_plot_list[[col_name]] <- recordPlot()
-
-                    # remove "/" cause this can not be safed in a PDF name
-                    col_name2 <- (gsub("/", "_", col_name))
-                    col_name2 <- gsub("-", "", col_name2)
-                    col_name2 <- gsub("/", "", col_name2)
-                    col_name2 <- gsub(" ", "", col_name2)
-                    col_name2 <- gsub("\\*", "", col_name2)
-                    col_name2 <- gsub("\\+", "", col_name2)
-                    col_name2 <- gsub(", ", "", col_name2)
-                    col_name2 <- gsub("\\(", "", col_name2)
-                    col_name2 <- gsub("\\)", "", col_name2)
-
                     dev.off()
                 }
 
