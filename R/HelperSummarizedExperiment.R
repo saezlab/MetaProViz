@@ -10,11 +10,9 @@
 #'   \item{metadata_sample}{Data frame with sample metadata (samples as row names)}
 #'   \item{metadata_feature}{Data frame with feature metadata (metabolites as row names)}
 #'
-#' @examples
-#' data(intracell_raw_se)
-#' result <- process_se(intracell_raw_se)
-#' str(result)
+#' @importFrom SummarizedExperiment assay colData rowData
 #'
+#' @noRd
 process_se <- function(se_obj) {
     if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) {
         stop("SummarizedExperiment package is required.")
