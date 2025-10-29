@@ -32,14 +32,12 @@ Merges the analytical replicates of an experiment
 }
 \examples{
 data(intracell_raw_se)
-Res <- replicate_sum(data=intracell_raw_se,
-                     metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+Res <- replicate_sum(data=intracell_raw_se)
 
 data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
 Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
-                                metadata_sample=Intra[-c(49:58) , c(1:3)],
-                                metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+                                metadata_sample=Intra[-c(49:58) , c(1:3)])
 
 }
 \keyword{Analytical}
