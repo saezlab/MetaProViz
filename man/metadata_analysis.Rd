@@ -18,8 +18,8 @@ metadata_analysis(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and rowData.
-If se file is provided, metadata_sample is extracted from the rowData
+\item{data}{SummarizedExperiment (se) file including assay and colData.
+If se file is provided, metadata_sample is extracted from the colData
 of the se object. Alternatively provide a DF with unique sample
 identifiers as row names and metabolite numerical values in columns
 with metabolite identifiers as column names. Use NA for metabolites

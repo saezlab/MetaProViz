@@ -14,7 +14,7 @@ replicate_sum(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and rowData. If se file is provided, metadata_sample is extracted from the rowData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
+\item{data}{SummarizedExperiment (se) file including assay and colData. If se file is provided, metadata_sample is extracted from the colData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
 
 \item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}}
 
