@@ -329,24 +329,20 @@ dma <- function(
             data <- vst_res[["DFs"]][["Corrected_data"]]
         }
 
-        if (Settings[["all_vs_all"]] == TRUE) {
-            message(
-                paste0(
-                    "No conditions were specified as numerator or denumerator. ",
-                    "Performing multiple testing `all-vs-all` using"
-                ),
-                paste(pval),
-                "."
-            )
-        } else {  # for 1 vs all
-            msg <- sprintf(
-                "No condition was specified as numerator and %s was selected as a denominator. Performing multiple testing `all-vs-one` using %s.",
-                Settings[["denominator"]],
-                pval
-            )
-            log_info(msg)
-            message(msg)
-        }
+        msg <- sprintf(
+            paste0(
+                "No conditions were specified as numerator %s denumerator. ",
+                "Performing multiple testing `all-vs-%s` using `%s`."
+            ),
+            `if`(
+                Settings[["all_vs_all"]],
+                "or",
+                sprintf("and `%s` was selected as", Settings[["denominator"]])
+            ),
+            `if`(Settings[["all_vs_all"]], "all", "one"),
+            paste(pval)
+        )
+        log_info(msg)
 
         if (pval == "aov") {
             STAT_C1vC2 <-
@@ -2241,12 +2237,9 @@ dma_stat_limma <-
         # Check if the order of the "sample" column is the same in both data frames
         if (identical(targets$sample, Limma_input$sample) == FALSE) {
             stop(
-                paste(
-                    "The order of the 'sample' column is different in both data",
-                    " frames. Please make sure that Input_metadata_sample and ",
-                    "Input_data contain the same rownames and sample numbers.",
-                    sep = ""
-                )
+                "The order of the 'sample' column is different in both data ",
+                "frames. Please make sure that Input_metadata_sample and ",
+                "Input_data contain the same rownames and sample numbers."
             )
         }
 
@@ -2634,13 +2627,11 @@ mpv_shapiro <- function(
     if (grepl(
         "[[:space:]()-./\\\\]", metadata_info[["Conditions"]]
     ) == TRUE) {
-        message(
-            paste(
-                "In metadata_info=c(Conditions= ColumnName): ",
-                "ColumnName contains special charaters, hence this is renamed.",
-                sep = ""
-            )
+        msg <- paste0(
+            "In metadata_info=c(Conditions= ColumnName): ",
+            "ColumnName contains special charaters, hence this is renamed."
         )
+        log_info(msg)
         ColumnNameCondition_clean <-
             gsub(
                 "[[:space:]()-./\\\\]",
@@ -2752,14 +2743,14 @@ mpv_shapiro <- function(
         if (length(columns_with_zero_variance) == 0L) {
             Input_shaptest <- Input_shaptest
         } else {
-            message(
-                paste(
+            msg <- sprintf(
+                paste0(
                     "The following features have zero variance and are ",
-                    "removed prior to performing the shaprio test: ",
-                    sep = ""
+                    "removed prior to performing the shaprio test: %s"
                 ),
-                columns_with_zero_variance
+                paste(columns_with_zero_variance, collapse = ", ")
             )
+            log_info(msg)
             # drop = FALSE argument is used to ensure that the subset operation
             # doesn't simplify the result to a vector, preserving the data
             # frame structure
@@ -2811,30 +2802,18 @@ mpv_shapiro <- function(
 
         # Check the sample size (shapiro.test(x) : sample size must be
         # between 3 and 5000):
-        if (nrow(subset_data) < 3L) {
-            warning(
-                paste(
-                    "shapiro.test(x) : sample size must be between 3 and 5000.",
-                    " You have provided <3 Samples for condition ",
-                    i,
-                    ". Hence Shaprio test can not be performed for ",
-                    "this condition.",
-                    sep = ""
-                ),
-                sep = ""
-            )
-        } else if (nrow(subset_data) > 5000L) {
-            warning(
-                paste(
+        if (nrow(subset_data) < 3L || nrow(subset_data) > 5000L) {
+            msg <- sprintf(
+                paste0(
                     "shapiro.test(x) : sample size must be between 3 and 5000. ",
-                    "You have provided >5000 Samples for condition ",
-                    i,
-                    ". Hence Shaprio test will not be performed for ",
-                    "this condition.",
-                    sep = ""
+                    "You have provided %s Samples for condition %s. ",
+                    "Hence Shapiro test %s be performed for this condition."
                 ),
-                sep = ""
+                `if`(nrow(subset_data) < 3L, "<3", ">5000"),
+                i,
+                `if`(nrow(subset_data) < 3L, "can not", "will not")
             )
+            warning(msg)
         } else {
             # Apply shapiro-Wilk test to each feature in the subset
             # shapiro_results[[i]] <-
@@ -2928,36 +2907,23 @@ mpv_shapiro <- function(
                     nsmall = 2
                 )  # percentage of not-normally distributed metabolites
             # across samples
-            if (pval == "kruskal.test" | pval == "wilcox.test") {
-                message(
-                    "For the condition ",
-                    colnames(transpose),
-                    " ",
-                    Norm,
-                    " % of the metabolites follow a normal distribution and ",
-                    NotNorm,
-                    " % of the metabolites are not-normally distributed ",
-                    "according to the shapiro test. You have chosen ",
-                    paste(pval),
-                    ", which is for non parametric Hypothesis testing. ",
-                    "`shapiro.test` ignores missing values in the",
-                    " calculation."
-                )
-            } else {
-                message(
-                    "For the condition ",
-                    colnames(transpose),
-                    " ",
-                    Norm,
-                    " % of the metabolites follow a normal distribution and ",
-                    NotNorm,
-                    " % of the metabolites are not-normally distributed ",
-                    "according to the shapiro test. You have chosen ",
-                    paste(pval),
-                    ", which is for parametric Hypothesis testing. ",
-                    "`shapiro.test` ignores missing values in the calculation."
-                )
-            }
+            msg <- sprintf(
+                paste0(
+                       "For the condition %s, %s %% of the metabolites ",
+                       "follow a normal distribution and %s %% of the ",
+                       "metabolites are not-normally distributed according ",
+                       "to the Shapiro-test. You have chosen %s, which is ",
+                       "for %sparametric hypothesis testing. ",
+                       "`shapiro.test` ignores missing values in the ",
+                       "calculation."
+                ),
+                colnames(transpose),
+                Norm,
+                NotNorm,
+                pval,
+                `if`(pval == "t.test", "", "non-")
+            )
+            log_info(msg)
 
             # Assign the calculated values to the corresponding
             # rows in result_df
