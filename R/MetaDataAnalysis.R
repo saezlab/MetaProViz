@@ -91,15 +91,15 @@ metadata_analysis <- function(
     save_plot = "svg",
     print_plot = TRUE,
     path = NULL
-  # SettingInfo= c(MainSeparator = "TISSUE_TYPE),
-  #
-  # enable this parameter in the function --> main
-  # separator: Often a combination of demographics is is
-  # of paricular interest, e.g. comparing "Tumour versus
-  # Normal" for early stage patients and for late stage
-  # patients independently. If this is the case, we can
-  # use the parameter `metadata_info` and provide the
-  # column name of our main separator.
+    # SettingInfo= c(MainSeparator = "TISSUE_TYPE),
+    #
+    # enable this parameter in the function --> main
+    # separator: Often a combination of demographics is is
+    # of paricular interest, e.g. comparing "Tumour versus
+    # Normal" for early stage patients and for late stage
+    # patients independently. If this is the case, we can
+    # use the parameter `metadata_info` and provide the
+    # column name of our main separator.
 ) {
     # NSE vs. R CMD check workaround
     term <- PC <- tukeyHSD_p.adjusted <- feature <- Explained_Variance <- `Sum(Explained_Variance)` <- MainDriver <- `MainDriver_Sum(VarianceExplained)` <- NULL

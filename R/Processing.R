@@ -17,8 +17,6 @@
 #
 
 
-
-
 # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
 # # # # # # # # # Metabolomics pre-processing # # # # # # # # #
 # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
@@ -320,9 +318,9 @@ processing <- function(
         assay_mat <- as.matrix(t(assay_df))
 
         # build the SummarizedExperiment
-        se_new <- SummarizedExperiment::SummarizedExperiment(
+        se_new <- SummarizedExperiment(
             assays = list(data = assay_mat),
-            colData = S4Vectors::DataFrame(coldata_df)
+            colData = DataFrame(coldata_df)
         )
 
         #Make list of se files:
@@ -460,18 +458,20 @@ replicate_sum <- function(
         column_to_rownames("UniqueID")# set UniqueID to rownames
 
     # --------------- return ------------------ # #
-    save_res(inputlist_df = list("Sum_AnalyticalReplicates"= Input_data_numeric_summed %>% tibble::rownames_to_column("Code")),
-             inputlist_plot = NULL,
-             save_table = save_table,
-             save_plot = NULL,
-             path = Subfolder,
-             file_name = "Sum_AnalyticalReplicates",
-             core = FALSE,
-             print_plot = FALSE)
+    save_res(
+        inputlist_df = list("Sum_AnalyticalReplicates" = Input_data_numeric_summed %>% tibble::rownames_to_column("Code")),
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = Subfolder,
+        file_name = "Sum_AnalyticalReplicates",
+        core = FALSE,
+        print_plot = FALSE
+    )
 
     # Return
-    if (inherits(input_data, "SummarizedExperiment"))  {
-        PreRes <- Input_data_numeric_summed %>% tibble::rownames_to_column("Code")
+    if (inherits(input_data, "SummarizedExperiment")) {
+        PreRes <- Input_data_numeric_summed %>% rownames_to_column("Code")
 
         # find the "Outliers" column and split
         out_idx <- which(colnames(PreRes) == "n_AnalyticalReplicates_Summed")
@@ -483,15 +483,13 @@ replicate_sum <- function(
         assay_mat <- as.matrix(t(assay_df))
 
         # build the SummarizedExperiment
-        se_new <- SummarizedExperiment::SummarizedExperiment(
+        se_new <- SummarizedExperiment(
             assays = list(data = assay_mat),
-            colData = S4Vectors::DataFrame(coldata_df)
+            colData = DataFrame(coldata_df)
         )
 
-
-        #Return
         invisible(return(se_new))
-    }else{
+    } else {
         invisible(return(Input_data_numeric_summed))
     }
 
@@ -681,7 +679,7 @@ pool_estimation <- function(
                                         TRUE ~ "Sample")
             )
 
-        pca_QC_pool <- invisible(viz_pca(data = pca_data %>% dplyr::select(-all_of(metadata_info[["Conditions"]]), -Sample_type),
+        pca_QC_pool <- invisible(viz_pca(data = pca_data %>% select(-all_of(metadata_info[["Conditions"]]), -Sample_type),
                                          metadata_info = c(color ="Sample_type"),
                                          metadata_sample = pca_data,
                                          plot_name = "QC Pool samples",
@@ -762,19 +760,19 @@ pool_estimation <- function(
         print_plot = print_plot
     )
 
-    # Return
     log_info('Finished pool estimation.')
+
     if (inherits(input_data, "SummarizedExperiment"))  {
         assay_mat <- as.matrix(t(as.data.frame(ResList[["DF"]][["data"]])))
 
-        coldata_df <- as.data.frame(SummarizedExperiment::colData(input_data))
+        coldata_df <- as.data.frame(colData(input_data))
         rowdata_df <- as.data.frame(ResList[["DF"]][["CV"]])%>% tibble::column_to_rownames("Metabolite")
 
         # build the SummarizedExperiment
-        se_new <- SummarizedExperiment::SummarizedExperiment(
+        se_new <- SummarizedExperiment(
             assays = list(data = assay_mat),
-            colData = S4Vectors::DataFrame(coldata_df),
-            rowData = S4Vectors::DataFrame(rowdata_df)
+            colData = DataFrame(coldata_df),
+            rowData = DataFrame(rowdata_df)
         )
 
         #Add to ResList:
@@ -783,10 +781,10 @@ pool_estimation <- function(
         #Return
         invisible(return(ResList))
 
-
     }else{
         invisible(return(ResList))
     }
+
 }
 
 #################################################################################

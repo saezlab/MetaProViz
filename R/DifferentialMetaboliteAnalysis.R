@@ -436,10 +436,12 @@ dma <- function(
                     # Filter only columns where the part after "core_"
                     # is in valid_conditions
                     core_col <-
-                        core_col[str_remove(core_col, "^core_") %in%
-                                     unique(
-                                         metadata_sample[[metadata_info[["Conditions"]]]]
-                                     )]
+                        core_col[
+                            str_remove(core_col, "^core_") %in%
+                            unique(
+                                metadata_sample[[metadata_info[["Conditions"]]]]
+                            )
+                        ]
 
                     # Select only the relevant columns
                     df_selected <- df %>%
@@ -2432,10 +2434,11 @@ dma_stat_limma <-
         # Make the name_match_df
         name_match_df <-
             as.data.frame(names(results_list)) %>%
-            separate("names(results_list)",
-                     into = c("a", "b"),
-                     sep = "_vs_",
-                     remove = FALSE
+            separate(
+                "names(results_list)",
+                 into = c("a", "b"),
+                 sep = "_vs_",
+                 remove = FALSE
             )
 
         name_match_df <-

@@ -82,7 +82,9 @@ set_size <- function(
     offset = 0L,
     ifempty = offset != 0L,
     callback = partial(switch, TRUE),
-                     grow = FALSE) {
+    grow = FALSE
+) {
+
     callback %<>% {
         `if`(is.character(.), get(.), .)
     }
