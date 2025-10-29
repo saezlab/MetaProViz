@@ -23,20 +23,18 @@
 
 #' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
 #'
-#' @param data DF where rows are unique samples and columns are features, with
-#'     numerical values in columns, and metabolite identifiers as column names. Use
-#'     NA for metabolites that were not detected. Includes experimental design and
-#'     outlier column.
-#' @param metadata_sample \emph{Optional: } DF which contains information about
-#'     the samples, which will be combined with your input data based on the
-#'     join specification in `by`. Column "Conditions" with information
-#'     about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can
-#'     be used for feature filtering and colour coding in the PCA. Column
-#'     "AnalyticalReplicate" including numerical values, defines technical
-#'     repetitions of measurements, which will be summarised. Column
-#'     "BiologicalReplicates" including numerical values. Please use the following
-#'     names: "Conditions", "Biological_Replicates",
-#'     "Analytical_Replicates".\strong{Default = NULL}
+#' @param data SummarizedExperiment (se) file including assay and rowData.
+#'        If se file is provided, metadata_sample is extracted from the rowData
+#'        of the se object. Alternatively provide a DF with unique sample
+#'        identifiers as row names and metabolite numerical values in columns
+#'        with metabolite identifiers as column names. Use NA for metabolites
+#'        that were not detected.
+#'
+#' @param metadata_sample  \emph{Optional: } Only required if you did not
+#'        provide se file in parameter data. Provide DF which contains metadata
+#'        information about the samples, which will be combined with your input
+#'        data based on the unique sample identifiers used as rownames.
+#'        \strong{Default = NULL}
 #' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is
 #' used \strong{Default = TRUE}
 #' @param percentage \emph{Optional: } percentage of top and bottom features to
@@ -59,6 +57,9 @@
 #' results, results summary
 #'
 #' @examples
+#' data(tissue_norm_se)
+#' Res <- metadata_analysis(data = tissue_norm_se)
+#'
 #' data(tissue_norm)
 #' Res <- metadata_analysis(
 #'     data = tissue_norm[, -c(2:14)] %>% tibble::column_to_rownames("Code"),
@@ -80,7 +81,7 @@
 #' @export
 metadata_analysis <- function(
     data,
-    metadata_sample,
+    metadata_sample=NULL,
     # by = NULL,
     # Join specification between `data` and `metadata_sample`. See the docs of \code{left_join} for details. \strong{Default = NULL}
     scaling = TRUE,
@@ -92,7 +93,7 @@ metadata_analysis <- function(
     print_plot = TRUE,
     path = NULL
   # SettingInfo= c(MainSeparator = "TISSUE_TYPE),
-  # 
+  #
   # enable this parameter in the function --> main
   # separator: Often a combination of demographics is is
   # of paricular interest, e.g. comparing "Tumour versus
@@ -107,6 +108,15 @@ metadata_analysis <- function(
     metaproviz_init()
 
     # ###############################################################################################################################################################################################
+    ## ------------- Check SummarizedExperiment file ---------- ##
+    input_data <- data
+    if (inherits(data, "SummarizedExperiment"))  {
+        log_info('Processing input SummarizedExperiment object.')
+        se_list <- process_se(data)
+        data <- se_list$data
+        metadata_sample <- se_list$metadata_sample
+    }
+
     # # ------------ Check Input files ----------- ##
     # HelperFunction `check_param`
     check_param(
@@ -149,7 +159,7 @@ metadata_analysis <- function(
 
     # Extract loadings for each PC
     PCA.res_Loadings <- as.data.frame(PCA.res$rotation) %>%
-        rownames_to_column("feature") 
+        rownames_to_column("feature")
 
     # --- 2. Merge with demographics
     # PCA.res_Info %<>% left_join(metadata_sample, by = by)
@@ -159,7 +169,7 @@ metadata_analysis <- function(
         by = "UniqueID",
         all.y = TRUE
     ) %>%
-        column_to_rownames("UniqueID") 
+        column_to_rownames("UniqueID")
 
     # --- 3. convert columns that are not numeric to factor:
     # # Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
@@ -218,7 +228,7 @@ metadata_analysis <- function(
         as.data.frame(((PCA.res[["sdev"]])^2 / sum((PCA.res[["sdev"]])^2)) * 100) %>%  # to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
         rownames_to_column("PC") %>%
             mutate(PC = paste("PC", PC, sep = "")) %>%
-            rename("Explained_Variance" = 2) 
+            rename("Explained_Variance" = 2)
 
     Stat_results <- merge(Stat_results, prop_var_ex, by = "PC", all.x = TRUE)
 
@@ -235,16 +245,16 @@ metadata_analysis <- function(
 
         top_features <-
             as.data.frame(head(arrange(pc_loadings, desc(!!sym(names(pc_loadings)[2]))), n_selected)$feature) %>%
-                rename(!!paste("Features_", "(top", percentage, "%)", sep = "") := 1) 
+                rename(!!paste("Features_", "(top", percentage, "%)", sep = "") := 1)
         bottom_features <- as.data.frame(head(arrange(pc_loadings, !!sym(names(pc_loadings)[2])), n_selected)$feature) %>%
-            rename(!!paste("Features_", "(Bottom", percentage, "%)", sep = "") := 1) 
+            rename(!!paste("Features_", "(Bottom", percentage, "%)", sep = "") := 1)
 
         # Return
         res <-
             cbind(data.frame(PC = paste("PC", i, sep = "")), top_features, bottom_features)
     }) %>%
         bind_rows(.id = "PC") %>%
-        mutate(PC = paste("PC", PC, sep = "")) 
+        mutate(PC = paste("PC", PC, sep = ""))
 
 
     # # ---------- Final DF 1------------##
@@ -254,7 +264,7 @@ metadata_analysis <- function(
         topBottom_Features %>%
             group_by(PC) %>%
             summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
-            ungroup(),         by = "PC", 
+            ungroup(),         by = "PC",
         all.x = TRUE
     )
 
@@ -263,22 +273,22 @@ metadata_analysis <- function(
         Stat_results %>%
             filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
             separate_rows(paste("Features_", "(top", percentage, "%)", sep = ""), sep = ", ") %>%
-            # Separate 'Features (top 0.1%)' 
+            # Separate 'Features (top 0.1%)'
         rename("feature" := paste("Features_", "(top", percentage, "%)", sep = "")) %>%
-            select(-paste("Features_", "(Bottom", percentage, "%)", sep = "")) 
+            select(-paste("Features_", "(Bottom", percentage, "%)", sep = ""))
 
     Res_Bottom <-
         Stat_results %>%
             filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
             separate_rows(paste("Features_", "(Bottom", percentage, "%)", sep = ""), sep = ", ") %>%
-            # Separate 'Features (Bottom 0.1%)' 
+            # Separate 'Features (Bottom 0.1%)'
         rename("feature" := paste("Features_", "(Bottom", percentage, "%)", sep = "")) %>%
-            select(-paste("Features_", "(top", percentage, "%)", sep = "")) 
+            select(-paste("Features_", "(top", percentage, "%)", sep = ""))
 
     Res <-
         rbind(Res_top, Res_Bottom) %>%
             group_by(feature, term) %>%
-            # Group by feature and term 
+            # Group by feature and term
         summarise(
             PC = paste(unique(PC), collapse = ", "),  # Concatenate unique PC entries with commas
             `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE)
@@ -291,14 +301,14 @@ metadata_analysis <- function(
     Res_summary <-
         Res %>%
             group_by(feature) %>%
-            summarise( 
+            summarise(
             term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
             `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
             MainDriver = paste(MainDriver, collapse = ", ")
         ) %>%  # Extract the term where MainDriver is TRUE
         ungroup() %>%
             rowwise() %>%
-            mutate(  # Extract the term where MainDriver is TRUE 
+            mutate(  # Extract the term where MainDriver is TRUE
             MainDriver_Term = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
                 strsplit(term, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]],
                 NA
@@ -310,7 +320,7 @@ metadata_analysis <- function(
             )
         ) %>%
             ungroup() %>%
-            arrange(desc(`MainDriver_Sum(VarianceExplained)`)) 
+            arrange(desc(`MainDriver_Sum(VarianceExplained)`))
 
     # ##############################################################################################################################################################################################################
     # # ---------- Plot ------------##
@@ -318,13 +328,13 @@ metadata_analysis <- function(
     data_Heat <-
         Stat_results %>%
             filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
-            # Filter for significant results 
+            # Filter for significant results
         filter(Explained_Variance > cutoff_variance) %>%  # Exclude Residuals row
         distinct(term, PC, .keep_all = TRUE) %>%  # only keep unique term~PC combinations AND STATS
         select(term, PC, Explained_Variance) %>%
             pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
             column_to_rownames("term") %>%
-            mutate_all(~ replace(., is.na(.), 0L)) 
+            mutate_all(~ replace(., is.na(.), 0L))
 
     if (nrow(data_Heat) > 2L) {
         # Plot
@@ -435,20 +445,20 @@ meta_pk <- function(
             names(metadata_sample)
         metadata_sample_subset <-
             metadata_sample %>%
-                rownames_to_column("SampleID") 
+                rownames_to_column("SampleID")
     } else {
         Metadata <-
             metadata_info
         metadata_sample_subset <-
             metadata_sample[, Metadata, drop = FALSE] %>%
-                rownames_to_column("SampleID") 
+                rownames_to_column("SampleID")
     }
 
     # Convert into a pathway DF
     Metadata_df <-
         metadata_sample_subset %>%
             pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry") %>%
-            unite("term", c("ColumnName", "ColumnEntry"), sep = "_") 
+            unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
     Metadata_df$mor <- 1
 
     # Run ULM using decoupleR (input=PCs from prcomp and pkn=Metadata_df)
