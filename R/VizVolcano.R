@@ -527,18 +527,17 @@ viz_volcano_standard <- function(
         SaveList[[cleaned_i]] <- Plot_Sized
 
         # ----- Save
-        suppressWarnings(
-            save_res(inputlist_df=NULL,
-            inputlist_plot= SaveList,
-            save_table=NULL,
-            save_plot=save_plot,
-            path= folder,
-            file_name= paste("Volcano_",plot_name, sep=""),
-            core=FALSE,
-            print_plot=print_plot,
-            plot_height= plot_height,
-            plot_width=plot_width,
-            plot_unit="cm")
+        save_res(inputlist_df = NULL,
+            inputlist_plot = SaveList,
+            save_table = NULL,
+            save_plot = save_plot,
+            path = folder,
+            file_name = paste("Volcano_",plot_name, sep=""),
+            core = FALSE,
+            print_plot = print_plot,
+            plot_height = plot_height,
+            plot_width = plot_width,
+            plot_unit = "cm"
         )
         }
     }
@@ -639,18 +638,17 @@ viz_volcano_standard <- function(
         PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
         # ----- Save
-        suppressWarnings(
-            save_res(inputlist_df=NULL,
-            inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
-            save_table=NULL,
-            save_plot=save_plot,
-            path= folder,
-            file_name= paste("Volcano_",plot_name, sep=""),
-            core=FALSE,
-            print_plot=print_plot,
-            plot_height=plot_height,
-            plot_width=plot_width,
-            plot_unit="cm")
+        save_res(inputlist_df = NULL,
+            inputlist_plot = list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
+            save_table = NULL,
+            save_plot = save_plot,
+            path = folder,
+            file_name = paste("Volcano_",plot_name, sep=""),
+            core = FALSE,
+            print_plot = print_plot,
+            plot_height = plot_height,
+            plot_width = plot_width,
+            plot_unit = "cm"
         )
     }
     }
@@ -899,18 +897,17 @@ viz_volcano_compare <- function(
         SaveList[[cleaned_i]] <- Plot_Sized
 
         # ----- Save
-        suppressWarnings(
-            save_res(inputlist_df=NULL,
-            inputlist_plot= SaveList,
-            save_table=NULL,
-            save_plot=save_plot,
-            path= folder,
-            file_name= paste("Volcano_",plot_name, sep=""),
-            core=FALSE,
-            print_plot=print_plot,
-            plot_height=plot_height,
-            plot_width=plot_width,
-            plot_unit="cm")
+        save_res(inputlist_df = NULL,
+            inputlist_plot = SaveList,
+            save_table = NULL,
+            save_plot = save_plot,
+            path = folder,
+            file_name = paste("Volcano_",plot_name, sep=""),
+            core = FALSE,
+            print_plot = print_plot,
+            plot_height = plot_height,
+            plot_width = plot_width,
+            plot_unit = "cm"
         )
         }
     }
@@ -1029,18 +1026,17 @@ viz_volcano_compare <- function(
         PlotList_adaptedGrid[["Plot_Sized"]] <- Plot_Sized
 
         # ----- Save
-        suppressWarnings(
-            save_res(inputlist_df=NULL,
-            inputlist_plot= list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
-            save_table=NULL,
-            save_plot=save_plot,
-            path= folder,
-            file_name= paste("Volcano_",plot_name, sep=""),
-            core=FALSE,
-            print_plot=print_plot,
-            plot_height=plot_height,
-            plot_width=plot_width,
-            plot_unit="cm")
+        save_res(inputlist_df = NULL,
+            inputlist_plot = list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
+            save_table = NULL,
+            save_plot = save_plot,
+            path = folder,
+            file_name = paste("Volcano_",plot_name, sep=""),
+            core = FALSE,
+            print_plot = print_plot,
+            plot_height = plot_height,
+            plot_width = plot_width,
+            plot_unit = "cm"
         )
 
     }
@@ -1283,18 +1279,17 @@ viz_volcano_pea <- function(
         SaveList[[cleaned_i]] <- Plot_Sized
 
         # ----- Save
-        suppressWarnings(
-            save_res(inputlist_df=NULL,
-            inputlist_plot= SaveList,
-            save_table=NULL,
-            save_plot=save_plot,
-            path= folder,
-            file_name= paste("Volcano_",plot_name, sep=""),
-            core=FALSE,
-            print_plot=print_plot,
-            plot_height=plot_height,
-            plot_width=plot_width,
-            plot_unit="cm")
+        save_res(inputlist_df = NULL,
+            inputlist_plot = SaveList,
+            save_table = NULL,
+            save_plot = save_plot,
+            path = folder,
+            file_name = paste("Volcano_",plot_name, sep=""),
+            core = FALSE,
+            print_plot = print_plot,
+            plot_height = plot_height,
+            plot_width = plot_width,
+            plot_unit = "cm"
         )
 
     }

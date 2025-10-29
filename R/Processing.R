@@ -295,15 +295,14 @@ processing <- function(
     DFList[["data_Rawdata"]] <- DFList[["data_Rawdata"]] %>% tibble::rownames_to_column("Code")
     DFList[["Preprocessing_output"]] <- DFList[["Preprocessing_output"]] %>% tibble::rownames_to_column("Code")
 
-    suppressWarnings(
-        save_res(inputlist_df=DFList,
-                 inputlist_plot= PlotList,
-                 save_table=save_table,
-                 save_plot=save_plot,
-                 path= Subfolder_P,
-                 file_name= "processing",
-                 core=core,
-                 print_plot=print_plot)
+    save_res(inputlist_df = DFList,
+        inputlist_plot = PlotList,
+        save_table = save_table,
+        save_plot = save_plot,
+        path = Subfolder_P,
+        file_name = "processing",
+        core = core,
+        print_plot = print_plot
     )
 
 

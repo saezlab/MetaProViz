@@ -179,15 +179,14 @@ cluster_ora <- function(
     }
     }
     # Save files
-    suppressWarnings(
-        save_res(inputlist_df=df_list,
-        inputlist_plot= NULL,
-        save_table=save_table,
-        save_plot=NULL,
-        path= folder,
-        file_name= paste("ClusterGosummary",pathway_name, sep="_"),
-        core=FALSE,
-        print_plot=FALSE)
+    save_res(inputlist_df = df_list,
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = folder,
+        file_name = paste("ClusterGosummary",pathway_name, sep="_"),
+        core = FALSE,
+        print_plot = FALSE
     )
 
     # return <- clusterGosummary
@@ -348,15 +347,14 @@ standard_ora <- function(
     ORA_output_list <- list("InputSelection" = InputSelection , "ClusterGosummary" = clusterGosummary)
 
     # save:
-    suppressWarnings(
-        save_res(inputlist_df=ORA_output_list,
-        inputlist_plot= NULL,
-        save_table=save_table,
-        save_plot=NULL,
-        path= folder,
-        file_name= paste(pathway_name),
-        core=FALSE,
-        print_plot=FALSE)
+    save_res(inputlist_df = ORA_output_list,
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = folder,
+        file_name = paste(pathway_name),
+        core = FALSE,
+        print_plot = FALSE
     )
 
     # Return

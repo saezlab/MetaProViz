@@ -507,14 +507,12 @@ plotGrob_Processing <- function(
     )
 
     # Adjust the parameters:
-    suppressMessages(
-        Plot_Sized <-
-            input_plot %>%
-                ggplotGrob() %>%
-                with_canvas_size(width = 12, height = 11) %>%
-                adjust_layout(SUPER_PARAM) %>%
-                adjust_title(c(plot_name))
-    )
+    Plot_Sized <-
+        input_plot %>%
+            ggplotGrob() %>%
+            with_canvas_size(width = 12, height = 11) %>%
+            adjust_layout(SUPER_PARAM) %>%
+            adjust_title(c(plot_name))
 
     Plot_Sized %<>%
         {

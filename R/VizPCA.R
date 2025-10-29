@@ -331,20 +331,18 @@ viz_pca <- function(
             `if`(nchar(.), sprintf("PCA_%s", .), "PCA")
         }
 
-    suppressWarnings(
-        save_res(
-            inputlist_df = NULL,
-            inputlist_plot = PlotList_adaptedGrid,
-            save_table = NULL,
-            save_plot = save_plot,
-            path = folder,
-            file_name = file_name,
-            core = FALSE,
-            print_plot = print_plot,
-            plot_height = plot_height,
-            plot_width = plot_width,
-            plot_unit = "cm"
-        )
+    save_res(
+        inputlist_df = NULL,
+        inputlist_plot = PlotList_adaptedGrid,
+        save_table = NULL,
+        save_plot = save_plot,
+        path = folder,
+        file_name = file_name,
+        core = FALSE,
+        print_plot = print_plot,
+        plot_height = plot_height,
+        plot_width = plot_width,
+        plot_unit = "cm"
     )
 
     invisible(list(Plot = PlotList, Plot_Sized = PlotList_adaptedGrid))

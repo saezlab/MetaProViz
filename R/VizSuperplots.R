@@ -449,18 +449,17 @@ viz_superplot <- function(
     SaveList <- list()
     SaveList[[cleaned_i]] <- Plot_Sized
     # ----- Save
-    suppressWarnings(
-        save_res(inputlist_df=NULL,
-        inputlist_plot= SaveList,
-        save_table=NULL,
-        save_plot=save_plot,
-        path= folder,
-        file_name= paste(plot_type, "Plots_",plot_name, sep=""),
-        core=FALSE,
-        print_plot=print_plot,
-        plot_height=plot_height,
-        plot_width=plot_width,
-        plot_unit="cm")
+    save_res(inputlist_df = NULL,
+        inputlist_plot = SaveList,
+        save_table = NULL,
+        save_plot = save_plot,
+        path = folder,
+        file_name = paste(plot_type, "Plots_",plot_name, sep=""),
+        core = FALSE,
+        print_plot = print_plot,
+        plot_height = plot_height,
+        plot_width = plot_width,
+        plot_unit = "cm"
     )
     }
     return(invisible(list("Plot"= PlotList,"Plot_Sized" = PlotList_adaptedGrid)))

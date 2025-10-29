@@ -176,15 +176,14 @@ metsigdb_chemicalclass <- function(
 
     # # -------------- Save and return
     DF_List <- list("ChemicalClass_MetabSet"= HMDB_ChemicalClass)
-    suppressWarnings(
-        save_res(inputlist_df= DF_List, # This needs to be a list, also for single comparisons
-        inputlist_plot= NULL,
-        save_table=save_table,
-        save_plot=NULL,
-        path= Subfolder,
-        file_name= "ChemicalClass",
-        core=FALSE,
-        print_plot=FALSE)
+    save_res(inputlist_df = DF_List, # This needs to be a list, also for single comparisons
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = Subfolder,
+        file_name = "ChemicalClass",
+        core = FALSE,
+        print_plot = FALSE
     )
 
     return(HMDB_ChemicalClass)
@@ -311,15 +310,14 @@ make_gene_metab_set <- function(
         "GeneMetabSet"= GeneMetabSet,
         "MetabSet"= MetabSet
     )
-    suppressWarnings(
-        save_res(inputlist_df= DF_List, # This needs to be a list, also for single comparisons
-        inputlist_plot= NULL,
-        save_table=save_table,
-        save_plot=NULL,
-        path= Subfolder,
-        file_name= pk_name,
-        core=FALSE,
-        print_plot=FALSE)
+    save_res(inputlist_df = DF_List, # This needs to be a list, also for single comparisons
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = Subfolder,
+        file_name = pk_name,
+        core = FALSE,
+        print_plot = FALSE
     )
 
     return(invisible(DF_List))
@@ -599,15 +597,14 @@ metsigdb_metalinks <- function(
     # ------------------------------------------------------------------
     # Save results in folder
     # # -------------- Save and return
-    suppressWarnings(
-        save_res(inputlist_df= list(MetalinksDB), # This needs to be a list, also for single comparisons
-        inputlist_plot= NULL,
-        save_table=save_table,
-        save_plot=NULL,
-        path= Subfolder,
-        file_name= "MetaLinksDB",
-        core=FALSE,
-        print_plot=FALSE)
+    save_res(inputlist_df = list(MetalinksDB), # This needs to be a list, also for single comparisons
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = Subfolder,
+        file_name = "MetaLinksDB",
+        core = FALSE,
+        print_plot = FALSE
     )
 
     return(MetalinksDB)

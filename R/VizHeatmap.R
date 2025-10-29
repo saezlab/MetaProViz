@@ -285,20 +285,18 @@ viz_heatmap <- function(
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
                 # ----- Save
-                suppressWarnings(
-                    save_res(
-                        inputlist_df = NULL,
-                        inputlist_plot = PlotList_adaptedGrid,
-                        save_table = NULL,
-                        save_plot = save_plot,
-                        path = folder,
-                        file_name = paste("Heatmap_", plot_name, sep = ""),
-                        core = FALSE,
-                        print_plot = print_plot,
-                        plot_height = plot_height,
-                        plot_width = plot_width,
-                        plot_unit = "cm"
-                    )
+                save_res(
+                    inputlist_df = NULL,
+                    inputlist_plot = PlotList_adaptedGrid,
+                    save_table = NULL,
+                    save_plot = save_plot,
+                    path = folder,
+                    file_name = paste("Heatmap_", plot_name, sep = ""),
+                    core = FALSE,
+                    print_plot = print_plot,
+                    plot_height = plot_height,
+                    plot_width = plot_width,
+                    plot_unit = "cm"
                 )
             } else {
                 message <- paste0(i, " includes <= 2L objects and is hence not plotted.")
@@ -445,20 +443,18 @@ viz_heatmap <- function(
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
                 # ----- Save
-                suppressWarnings(
-                    save_res(
-                        inputlist_df = NULL,
-                        inputlist_plot = PlotList_adaptedGrid,
-                        save_table = NULL,
-                        save_plot = save_plot,
-                        path = folder,
-                        file_name = paste("Heatmap_", plot_name, sep = ""),
-                        core = FALSE,
-                        print_plot = print_plot,
-                        plot_height = plot_height,
-                        plot_width = plot_width,
-                        plot_unit = "cm"
-                    )
+                save_res(
+                    inputlist_df = NULL,
+                    inputlist_plot = PlotList_adaptedGrid,
+                    save_table = NULL,
+                    save_plot = save_plot,
+                    path = folder,
+                    file_name = paste("Heatmap_", plot_name, sep = ""),
+                    core = FALSE,
+                    print_plot = print_plot,
+                    plot_height = plot_height,
+                    plot_width = plot_width,
+                    plot_unit = "cm"
                 )
             } else {
                 message <- paste0(i, " includes <= 2L objects and is hence not plotted.")
@@ -637,20 +633,18 @@ viz_heatmap <- function(
                     PlotList_adaptedGrid[[paste(cleaned_i, cleaned_s, sep = "_")]] <- Plot_Sized
 
                     # ----- Save
-                    suppressWarnings(
-                        save_res(
-                            inputlist_df = NULL,
-                            inputlist_plot = PlotList_adaptedGrid,
-                            save_table = NULL,
-                            save_plot = save_plot,
-                            path = folder,
-                            file_name = paste("Heatmap_", plot_name, sep = ""),
-                            core = FALSE,
-                            print_plot = print_plot,
-                            plot_height = plot_height,
-                            plot_width = plot_width,
-                            plot_unit = "cm"
-                        )
+                    save_res(
+                        inputlist_df = NULL,
+                        inputlist_plot = PlotList_adaptedGrid,
+                        save_table = NULL,
+                        save_plot = save_plot,
+                        path = folder,
+                        file_name = paste("Heatmap_", plot_name, sep = ""),
+                        core = FALSE,
+                        print_plot = print_plot,
+                        plot_height = plot_height,
+                        plot_width = plot_width,
+                        plot_unit = "cm"
                     )
                 } else {
                     message(i, " includes <= 2L objects and is hence not plotted.")
@@ -760,20 +754,18 @@ viz_heatmap <- function(
             PlotList_adaptedGrid[[paste("Heatmap_", plot_name, sep = "")]] <- Plot_Sized
 
             # ----- Save
-            suppressWarnings(
-                save_res(
-                    inputlist_df = NULL,
-                    inputlist_plot = PlotList_adaptedGrid,
-                    save_table = NULL,
-                    save_plot = save_plot,
-                    path = folder,
-                    file_name = paste("Heatmap_", plot_name, sep = ""),
-                    core = FALSE,
-                    print_plot = print_plot,
-                    plot_height = plot_height,
-                    plot_width = plot_width,
-                    plot_unit = "cm"
-                )
+            save_res(
+                inputlist_df = NULL,
+                inputlist_plot = PlotList_adaptedGrid,
+                save_table = NULL,
+                save_plot = save_plot,
+                path = folder,
+                file_name = paste("Heatmap_", plot_name, sep = ""),
+                core = FALSE,
+                print_plot = print_plot,
+                plot_height = plot_height,
+                plot_width = plot_width,
+                plot_unit = "cm"
             )
         } else {
             message <- paste0(plot_name, " includes <= 2L objects and is hence not plotted.")

@@ -253,7 +253,7 @@ save_res <- function(
                         }
                     )
                 } else {
-                    suppressWarnings(plot(inputlist_plot[[Plot]]))
+                    plot(inputlist_plot[[Plot]])
                 }
             }
         }

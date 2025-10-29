@@ -396,15 +396,15 @@ mca_2cond <- function(data_c1,
     #Here we make a list in which we will save the outputs:
     DF_List <- list("MCA_2Cond_summary"=Clustersummary, "MCA_2Cond_Results"=MergeDF_Rearrange)
 
-    suppressWarnings(
-    save_res(inputlist_df=DF_List,
-                        inputlist_plot= NULL,
-                        save_table=save_table,
-                        save_plot=NULL,
-                        path= folder,
-                        file_name= "mca_2cond",
-                        core=FALSE,
-                        print_plot=FALSE))
+    save_res(inputlist_df = DF_List,
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = folder,
+        file_name = "mca_2cond",
+        core = FALSE,
+        print_plot = FALSE
+    )
 
     #Return:
     invisible(return(DF_List))
@@ -1034,15 +1034,15 @@ mca_core <- function(data_intra,
     #Here we make a list in which we will save the outputs:
     DF_List <- list("MCA_core_summary"=Clustersummary, "MCA_core_Results"=MergeDF_Rearrange)
 
-    suppressWarnings(
-    save_res(inputlist_df=DF_List,
-                        inputlist_plot= NULL,
-                        save_table=save_table,
-                        save_plot=NULL,
-                        path= folder,
-                        file_name= "mca_2cond",
-                        core=FALSE,
-                        print_plot=FALSE))
+    save_res(inputlist_df = DF_List,
+        inputlist_plot = NULL,
+        save_table = save_table,
+        save_plot = NULL,
+        path = folder,
+        file_name = "mca_2cond",
+        core = FALSE,
+        print_plot = FALSE
+    )
 
     invisible(return(DF_List))
 }

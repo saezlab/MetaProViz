@@ -151,17 +151,15 @@ viz_upset <- function(
 
 
     # # ----------- Save and return -------------#
-    suppressWarnings(
-        save_res(
-            inputlist_df = NULL,
-            inputlist_plot = list(upset_plot = p),
-            save_table = NULL,
-            save_plot = save_plot,
-            path = folder,
-            file_name = "UpsetPlot",
-            core = FALSE,
-            print_plot = print_plot
-        )
+    save_res(
+        inputlist_df = NULL,
+        inputlist_plot = list(upset_plot = p),
+        save_table = NULL,
+        save_plot = save_plot,
+        path = folder,
+        file_name = "UpsetPlot",
+        core = FALSE,
+        print_plot = print_plot
     )
 
     return(p)
