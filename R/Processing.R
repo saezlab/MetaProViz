@@ -65,6 +65,8 @@
 #' @importFrom dplyr mutate_all full_join
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
 #' @export
 processing <- function(
         data,
@@ -364,6 +366,8 @@ processing <- function(
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang !! :=
 #' @importFrom tidyr unite
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
 #' @export
 replicate_sum <- function(
         data,
@@ -532,6 +536,8 @@ replicate_sum <- function(
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom grDevices dev.new dev.off
 #' @importFrom stats sd
+#' @importFrom SummarizedExperiment colData SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
 #' @export
 pool_estimation <- function(
         data,
