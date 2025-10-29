@@ -48,7 +48,7 @@
 #' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A
 #' converted into an se object.
 #'
-#' @format Se object with numeric columns containing raw metabolite intensities and rowdata with the following columns:
+#' @format Se object with numeric columns containing raw metabolite intensities and coldata with the following columns:
 #'  -`Conditions`: Character vector indicating cell line identity
 #'   - `Analytical_Replicate`: Integer replicate number for analytical replicates
 #'  -`Biological_Replicate`: Integer replicate number for biological replicates
@@ -130,6 +130,23 @@
 #' data(tissue_norm)
 #' head(tissue_norm)
 "tissue_norm"
+
+####################################################
+#' tissue_norm_se
+#'
+#' This is median normalised data from the supplementary table 2 of Hakimi et al with metabolomic
+#' profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
+#'
+#' @format Se object with numeric columns containing rmeasured metabolite (normalised data) intensities and
+#' coldata include patient metadata (e.g. age, gender, sage, etc.)
+#'
+#' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
+#' \doi{10.1016/j.ccell.2015.12.004}
+#'
+#' @examples
+#' data(tissue_norm_se)
+#' head(tissue_norm_se)
+"tissue_norm_se"
 
 ####################################################
 #' Tissue_Metadata
