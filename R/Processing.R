@@ -760,29 +760,29 @@ pool_estimation <- function(
     # Return
     log_info('Finished pool estimation.')
     if (inherits(input_data, "SummarizedExperiment"))  {
-        assay_mat <- as.matrix(t(DF_list[["DF"]][["data"]]))
+        assay_mat <- as.matrix(t(as.data.frame(ResList[["DF"]][["data"]])))
 
-        #coldata_df <- as.data.frame(SummarizedExperiment::colData(input_data)) #remove Pool sample column
-        rowdata_df <- DF_list[["DF"]][["CV"]]%>% tibble::column_to_rownames("Metabolite")
-
+        coldata_df <- as.data.frame(SummarizedExperiment::colData(input_data))
+        rowdata_df <- as.data.frame(ResList[["DF"]][["CV"]])%>% tibble::column_to_rownames("Metabolite")
 
         # build the SummarizedExperiment
         se_new <- SummarizedExperiment::SummarizedExperiment(
             assays = list(data = assay_mat),
-            #colData = S4Vectors::DataFrame(rowdata_df),
+            colData = S4Vectors::DataFrame(coldata_df),
             rowData = S4Vectors::DataFrame(rowdata_df)
         )
 
+        #Add to ResList:
+        ResList <- list("SE"= se_new, "DF"= ResList[["DF"]], "Plot"=  ResList[["Plot"]])
+
         #Return
-        invisible(return(se_new))
+        invisible(return(ResList))
+
+
     }else{
-        invisible(return(Input_data_numeric_summed))
+        invisible(return(ResList))
     }
-
-
-    invisible(return(ResList))
 }
-
 
 #################################################################################
 # # # # # # # # # processing helper function: feature_filtering # # # # # # # # #
