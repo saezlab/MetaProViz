@@ -20,8 +20,18 @@
 
 #' Bar, Box or Violin plot in Superplot style visualization
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Includes experimental design and outlier column.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".
+#' @param data SummarizedExperiment (se) file including assay and colData.
+#'        If se file is provided, metadata_sample is extracted from the colData
+#'        of the se object. metadata_feature, if available, are extracted from
+#'        the rowData. Alternatively provide a DF with unique sample identifiers
+#'        as row names and metabolite numerical values in columns with
+#'        metabolite identifiers as column names. Use NA for metabolites that
+#'        were not detected.
+#' @param metadata_sample  \emph{Optional: } Only required if you did not
+#'        provide se file in parameter data. Provide DF which contains metadata
+#'        information about the samples, which will be combined with your input
+#'        data based on the unique sample identifiers used as rownames.
+#'        \strong{Default = NULL}
 #' @param metadata_info Named vector including at least information on the conditions column: c(Conditions="ColumnName_metadata_sample"). Additionally Superplots can be made by adding Superplot ="ColumnName_metadata_sample", which are usually biological replicates or patient IDs. \strong{Default = c(Conditions="Conditions", Superplot = NULL)}
 #' @param plot_type String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the plot.
@@ -41,9 +51,12 @@
 #' @return List with two elements: Plot and Plot_Sized
 #'
 #' @examples
+#' data(intracell_raw_se)
+#' Res <- viz_superplot(data=intracell_raw_se[1:2, , drop = FALSE])#only plot the first 2 metabolites
+#'
 #' data(intracell_raw)
 #' Intra <- intracell_raw[,c(1:6)]%>%tibble::column_to_rownames("Code")
-#' Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)], metadata_info = c(Conditions="Conditions", Superplot = NULL))
+#' Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)])
 #'
 #' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
@@ -64,7 +77,7 @@
 #' @export
 viz_superplot <- function(
     data,
-    metadata_sample,
+    metadata_sample = NULL,
     metadata_info = c(Conditions="Conditions", Superplot = NULL),
     plot_type = "Box",  # Bar, Box, Violin,
     plot_name = "",
@@ -89,6 +102,15 @@ viz_superplot <- function(
     metaproviz_init()
 
     log_info("viz_superplot: Superplot visualization")
+
+    ## ------------- Check SummarizedExperiment file ---------- ##
+    input_data <- data
+    if (inherits(data, "SummarizedExperiment"))  {
+        log_info('Processing input SummarizedExperiment object.')
+        se_list <- process_se(data)
+        data <- se_list$data
+        metadata_sample <- se_list$metadata_sample
+    }
 
     ## ------------ Check Input files ----------- ##
     # HelperFunction `check_param`
