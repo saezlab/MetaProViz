@@ -70,6 +70,7 @@ Imports:
     readr,
     rlang,
     rstatix,
+    S4Vectors,
     stringr,
     SummarizedExperiment,
     tibble,
