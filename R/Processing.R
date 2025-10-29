@@ -1144,8 +1144,8 @@ tic_norm <- function(
     RLA_data_long <- pivot_longer(RLA_data_raw, cols = everything(), names_to = "Group")
     names(RLA_data_long)<- c("Samples", "Intensity")
     RLA_data_long <- as.data.frame(RLA_data_long)
-    RLA_data_long <<- RLA_data_long
-    metadata_sample <<- metadata_sample
+    RLA_data_long <- RLA_data_long
+    metadata_sample <- metadata_sample
     for (row in seq_len(nrow(RLA_data_long))) { # add conditions
         RLA_data_long[row, metadata_info[["Conditions"]]] <- metadata_sample[rownames(metadata_sample) %in%RLA_data_long[row,1],metadata_info[["Conditions"]]]
     }
