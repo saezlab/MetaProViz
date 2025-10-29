@@ -23,13 +23,12 @@
 
 #' This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
 #'
-#' @param data SummarizedExperiment (se) file including assay and rowData.
-#'        If se file is provided, metadata_sample is extracted from the rowData
+#' @param data SummarizedExperiment (se) file including assay and colData.
+#'        If se file is provided, metadata_sample is extracted from the colData
 #'        of the se object. Alternatively provide a DF with unique sample
 #'        identifiers as row names and metabolite numerical values in columns
 #'        with metabolite identifiers as column names. Use NA for metabolites
 #'        that were not detected.
-#'
 #' @param metadata_sample  \emph{Optional: } Only required if you did not
 #'        provide se file in parameter data. Provide DF which contains metadata
 #'        information about the samples, which will be combined with your input
@@ -381,15 +380,32 @@ metadata_analysis <- function(
 
 #' Meta prior-knowledge
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.
-#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".\strong{Default = NULL}
-#' @param metadata_info \emph{Optional: } NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param data SummarizedExperiment (se) file including assay and colData.
+#'        If se file is provided, metadata_sample is extracted from the colData
+#'        of the se object. Alternatively provide a DF with unique sample
+#'        identifiers as row names and metabolite numerical values in columns
+#'        with metabolite identifiers as column names. Use NA for metabolites
+#'        that were not detected.
+#'
+#' @param metadata_sample  \emph{Optional: } Only required if you did not
+#'        provide se file in parameter data. Provide DF which contains metadata
+#'        information about the samples, which will be combined with your input
+#'        data based on the unique sample identifiers used as rownames.
+#'        \strong{Default = NULL}
+#' @param metadata_info \emph{Optional: } NULL or vector with column names that
+#'        should be used, i.e. c("Age", "gender", "Tumour-stage").
+#'        \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#'        "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved
+#'        at. \strong{default: NULL}
 #'
 #' @return DF with prior knowledge based on patient metadata
 #'
 #' @examples
+#' data(tissue_norm_se)
+#' Res <- meta_pk(tissue_norm_se)
+#'
 #' data(tissue_norm)
 #' Tissue_Norm <- tissue_norm %>% tibble::column_to_rownames("Code")
 #' Res <- meta_pk(
@@ -425,6 +441,15 @@ meta_pk <- function(
     # *Advantage/disadvantage: Not specific-with annova PC we get granularity e.g. smoker-ExSmoker-PC5, whilst here we only get smoking in generall as parameter
 
     # ###############################################################################################################################################################################################
+    ## ------------- Check SummarizedExperiment file ---------- ##
+    input_data <- data
+    if (inherits(data, "SummarizedExperiment"))  {
+        log_info('Processing input SummarizedExperiment object.')
+        se_list <- process_se(data)
+        data <- se_list$data
+        metadata_sample <- se_list$metadata_sample
+    }
+
     # # ------------ Check Input files ----------- ##
     # HelperFunction `check_param`
 
@@ -480,5 +505,5 @@ meta_pk <- function(
     # ##############################################################################################################################################################################################################
     # # ---------- Save ------------##
     # Add to results DF
-    Res <- list(Metadata_prior_knowledge = Metadata_df)
+    Res <- Metadata_df
 }
