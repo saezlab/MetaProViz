@@ -5,7 +5,7 @@
 \alias{intracell_raw_se}
 \title{intracell_raw_se}
 \format{
-Se object with numeric columns containing raw metabolite intensities and rowdata with the following columns:
+Se object with numeric columns containing raw metabolite intensities and coldata with the following columns:
 -\code{Conditions}: Character vector indicating cell line identity
 \itemize{
 \item \code{Analytical_Replicate}: Integer replicate number for analytical replicates
