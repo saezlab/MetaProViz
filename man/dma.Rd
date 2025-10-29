@@ -7,7 +7,7 @@ obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.}
 \usage{
 dma(
   data,
-  metadata_sample,
+  metadata_sample = NULL,
   metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
   pval = "lmFit",
   padj = "fdr",
@@ -24,13 +24,18 @@ dma(
 )
 }
 \arguments{
-\item{data}{DF with unique sample identifiers as row names and metabolite
-numerical values in columns with metabolite identifiers as column
-names. Use NA for metabolites that were not detected.}
+\item{data}{SummarizedExperiment (se) file including assay and rowData.
+If se file is provided, metadata_sample is extracted from the rowData
+of the se object. Alternatively provide a DF with unique sample
+identifiers as row names and metabolite numerical values in columns
+with metabolite identifiers as column names. Use NA for metabolites
+that were not detected.}
 
-\item{metadata_sample}{DF which contains metadata information about the
-samples, which will be combined with your input data based on the
-unique sample identifiers used as rownames.}
+\item{metadata_sample}{\emph{Optional: } Only required if you did not
+provide se file in parameter data. Provide DF which contains metadata
+information about the samples, which will be combined with your input
+data based on the unique sample identifiers used as rownames.
+\strong{Default = NULL}}
 
 \item{metadata_info}{\emph{Optional: } Named vector including the
 information about the conditions column information on numerator or
@@ -55,9 +60,10 @@ selected p.adjusted test for p.value correction for multiple
 Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
 "bonferroni", "holm", etc.\strong{Default = "fdr"}}
 
-\item{metadata_feature}{\emph{Optional: } DF which contains the metadata
-information , i.e. pathway information, retention time,..., for each
-metabolite. The row names must match the metabolite names in the
+\item{metadata_feature}{\emph{Optional: } To provide metadata information ,
+i.e. pathway information, retention time,..., for each metabolite.
+Only used if you did not provide se file in parameter data. Provide
+DF where the row names must match the metabolite names in the
 columns of the data. \strong{Default = NULL}}
 
 \item{core}{\emph{Optional: } TRUE or FALSE for whether a Consumption/Release
@@ -103,6 +109,14 @@ This function allows you to perform differential metabolite analysis to
 obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
 }
 \examples{
+data(intracell_raw_se)
+ResI <- dma(
+    data = intracell_raw_se,
+    metadata_info = c(
+        Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+    )
+)
+
 data(intracell_raw)
 Intra <- intracell_raw[-c(49:58), ] \%>\% tibble::column_to_rownames("Code")
 ResI <- dma(
