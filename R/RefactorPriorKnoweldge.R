@@ -1445,10 +1445,10 @@ function(
     data,
     input_pk,
     metadata_info = c(
-                 InputID = "HMDB",
-                 PriorID = "HMDB",
-                 grouping_variable = "term"
-             ),
+        InputID = "HMDB",
+        PriorID = "HMDB",
+        grouping_variable = "term"
+        ),
     save_table = "csv",
     path = NULL
 ) {
@@ -2094,9 +2094,9 @@ cluster_pk <-
 function(
     data,
     metadata_info = c(
-                 InputID = "MetaboliteID",
-                 grouping_variable = "term"
-             ),
+        InputID = "MetaboliteID",
+        grouping_variable = "term"
+        ),
     clust = "Graph",
     matrix = "percentage",
     min = 2
@@ -3033,10 +3033,10 @@ function(
     delimiter = ",
     ",
     fill_colors = c(
-                 "No ID" = "#FB8072",
-                 "Single ID" = "#B3DE69",
-                 "Multiple IDs" = "#80B1D3"
-             ),
+        "No ID" = "#FB8072",
+        "Single ID" = "#B3DE69",
+        "Multiple IDs" = "#80B1D3"
+        ),
     binwidth = 1,
     title_prefix = NULL,
     save_plot = "svg",

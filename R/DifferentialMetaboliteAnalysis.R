@@ -2436,9 +2436,9 @@ dma_stat_limma <-
             as.data.frame(names(results_list)) %>%
             separate(
                 "names(results_list)",
-                 into = c("a", "b"),
-                 sep = "_vs_",
-                 remove = FALSE
+                into = c("a", "b"),
+                sep = "_vs_",
+                remove = FALSE
             )
 
         name_match_df <-
@@ -2912,13 +2912,13 @@ mpv_shapiro <- function(
             # across samples
             msg <- sprintf(
                 paste0(
-                       "For the condition %s, %s %% of the metabolites ",
-                       "follow a normal distribution and %s %% of the ",
-                       "metabolites are not-normally distributed according ",
-                       "to the Shapiro-test. You have chosen %s, which is ",
-                       "for %sparametric hypothesis testing. ",
-                       "`shapiro.test` ignores missing values in the ",
-                       "calculation."
+                    "For the condition %s, %s %% of the metabolites ",
+                    "follow a normal distribution and %s %% of the ",
+                    "metabolites are not-normally distributed according ",
+                    "to the Shapiro-test. You have chosen %s, which is ",
+                    "for %sparametric hypothesis testing. ",
+                    "`shapiro.test` ignores missing values in the ",
+                    "calculation."
                 ),
                 colnames(transpose),
                 Norm,
