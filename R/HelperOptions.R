@@ -18,8 +18,8 @@
 
 
 .metaproviz_options_defaults <- list(
-  metaproviz.loglevel = 'trace',
-  metaproviz.console_loglevel = 'success'
+    metaproviz.loglevel = "trace",
+    metaproviz.console_loglevel = "success"
 )
 
 
@@ -39,20 +39,18 @@
 #' \dontrun{
 #' # after this, all downloads will default to commercial licenses
 #' # i.e. the resources that allow only academic use will be excluded:
-#' options(metaproviz.console_loglevel = 'trace')
+#' options(metaproviz.console_loglevel = "trace")
 #' metaproviz_save_config()
 #' }
 #'
 #' @importFrom OmnipathR save_config
 #' @export
 metaproviz_save_config <- function(
-        path = NULL,
-        title = 'default',
-        local = FALSE
-    ){
-
-    save_config(path = path, title = title, local = local, pkg = 'MetaProViz')
-
+    path = NULL,
+    title = "default",
+    local = FALSE
+) {
+    save_config(path = path, title = title, local = local, pkg = "MetaProViz")
 }
 
 
@@ -73,26 +71,24 @@ metaproviz_save_config <- function(
 #' @examples
 #' \dontrun{
 #' # load the config from a custom config file:
-#' metaproviz_load_config(path = 'my_custom_metaproviz_config.yml')
+#' metaproviz_load_config(path = "my_custom_metaproviz_config.yml")
 #' }
 #'
 #' @importFrom OmnipathR load_config
 #' @export
 metaproviz_load_config <- function(
-        path = NULL,
-        title = 'default',
-        user = FALSE,
-        ...
-    ){
-
+    path = NULL,
+    title = "default",
+    user = FALSE,
+    ...
+) {
     metaproviz_load_config(
         path = path,
         title = title,
         user = user,
-        pkg = 'MetaProViz',
+        pkg = "MetaProViz",
         ...
     )
-
 }
 
 
@@ -116,10 +112,11 @@ metaproviz_load_config <- function(
 #' @export
 #' @importFrom OmnipathR reset_config
 #' @seealso \code{\link{metaproviz_load_config}, \link{metaproviz_save_config}}
-metaproviz_reset_config <- function(save = NULL, reset_all = FALSE) {
-
-   reset_config(save = save, reset_all = reset_all, pkg = 'MetaProViz')
-
+metaproviz_reset_config <- function(
+    save = NULL,
+    reset_all = FALSE
+) {
+    reset_config(save = save, reset_all = reset_all, pkg = "MetaProViz")
 }
 
 
@@ -135,8 +132,8 @@ metaproviz_reset_config <- function(save = NULL, reset_all = FALSE) {
 #'
 #' @importFrom OmnipathR config_path
 #' @export
-metaproviz_config_path <- function(user = FALSE){
-
-    config_path(user = user, pkg = 'MetaProViz')
-
+metaproviz_config_path <- function(
+    user = FALSE
+) {
+    config_path(user = user, pkg = "MetaProViz")
 }

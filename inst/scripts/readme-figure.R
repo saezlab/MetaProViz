@@ -1,7 +1,24 @@
 #!/usr/bin/env Rscript
 
-suppressMessages(suppressWarnings(library(tidyverse)))
-suppressMessages(suppressWarnings(library(MetaProViz)))
+# Load the MetaProViz package from the current directory
+# If running from package root, load it; otherwise try to install and load
+if(requireNamespace("devtools", quietly = TRUE)) {
+  suppressMessages(suppressWarnings(devtools::load_all(quiet = TRUE)))
+} else {
+  suppressMessages(suppressWarnings(library(MetaProViz)))
+}
+
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(tidyr)))
+suppressMessages(suppressWarnings(library(tibble)))
+suppressMessages(suppressWarnings(library(ggplot2)))
+suppressMessages(suppressWarnings(library(gridExtra)))
+suppressMessages(suppressWarnings(library(magrittr)))
+
+# Load the example datasets
+data(tissue_norm)
+data(intracell_raw)
+data(medium_raw)
 
 # Create an overview of the example data
 TissuePlot <- tissue_norm%>%
@@ -52,7 +69,7 @@ CellPlot_Media <- medium_raw%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',#https://www.mdpi.com/1422-0067/24/7/6447
                                Conditions=="786-O" ~ 'PrimaryTumour',
                                Conditions=="OSRC2" ~ 'PrimaryTumour',
-                               Conditions=="RFX6" ~ 'PrimaryTumour',
+                               Conditions=="RFX631" ~ 'PrimaryTumour',
                                TRUE ~ 'MetastaticTumour'))#OSLM1
 
 
@@ -115,4 +132,12 @@ Plot_Sized %<>%
 
 Plot_Sized_Media <- Plot_Sized
 
+# Combine all three plots into one figure and save to vignettes/
+output_file <- "vignettes/readme-example-data.png"
+
+# Create the combined plot and save it
+png(output_file, width = 2400, height = 800, res = 150)
 gridExtra::grid.arrange(Plot_Sized_Tissue, Plot_Sized_Intra, Plot_Sized_Media, ncol=3)
+dev.off()
+
+cat("Figure saved to:", output_file, "\n")

@@ -1,9 +1,11 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 3.99.7
+Version: 3.99.11
 Authors@R: c(
-    person("Christina", "Schmidt",  email = "christina.schmidt.science@gmail.com", role = c("aut", "cre"),
+    person("Christina", "Schmidt",
+           email = "christina.schmidt.science@gmail.com",
+           role = c("aut", "cre", "fnd"),
            comment = c(ORCID = "0000-0002-3867-0881")),
     person("Denes", "Turei", role = "aut",
            comment = c(ORCID = "0000-0002-7249-9379")),
@@ -26,7 +28,7 @@ Description: MetaProViz can analyse standard metabolomics and
     interpretable graphs and saves them in a publication ready format.
 URL: https://saezlab.github.io/MetaProViz
 BugReports: https://github.com/saezlab/MetaProViz/issues
-biocViews: Metabolomics, QualityControl, Software, SystemsBiology, Visualization
+biocViews: Clustering, Metabolomics, Pathways, QualityControl, Software, SystemsBiology, Visualization
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
@@ -58,7 +60,6 @@ Imports:
     magrittr,
     methods,
     OmnipathR (>= 3.17.4),
-    SummarizedExperiment,
     patchwork,
     pheatmap,
     Polychrome,
@@ -69,7 +70,9 @@ Imports:
     readr,
     rlang,
     rstatix,
+    S4Vectors,
     stringr,
+    SummarizedExperiment,
     tibble,
     tidyr,
     tidyselect,

@@ -2,8 +2,7 @@
 % Please edit documentation in R/VizVolcano.R
 \name{viz_volcano}
 \alias{viz_volcano}
-\title{This script allows you to perform different data visualizations using the results of the MetaProViz analysis
-Volcano plot}
+\title{Volcano plot}
 \usage{
 viz_volcano(
   plot_types = "Standard",
@@ -83,7 +82,6 @@ device.}
 List with two elements: Plot and Plot_Sized
 }
 \description{
-This script allows you to perform different data visualizations using the results of the MetaProViz analysis
 Volcano plot
 }
 \examples{

@@ -28,9 +28,9 @@
 #' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
 #'
 #' @format A data frame with the following columns:
-#'   - `Conditions`: Character vector indicating cell line identity
+#'  -`Conditions`: Character vector indicating cell line identity
 #'   - `Analytical_Replicate`: Integer replicate number for analytical replicates
-#'   - `Biological_Replicate`: Integer replicate number for biological replicates
+#'  -`Biological_Replicate`: Integer replicate number for biological replicates
 #'   - Additional numeric columns (183 in total) containing raw metabolite intensities
 #'
 #' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
@@ -40,6 +40,26 @@
 #' data(intracell_raw)
 #' head(intracell_raw)
 "intracell_raw"
+
+####################################################
+#' intracell_raw_se
+#'
+#' Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
+#' peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A
+#' converted into an se object.
+#'
+#' @format Se object with numeric columns containing raw metabolite intensities and coldata with the following columns:
+#'  -`Conditions`: Character vector indicating cell line identity
+#'   - `Analytical_Replicate`: Integer replicate number for analytical replicates
+#'  -`Biological_Replicate`: Integer replicate number for biological replicates
+#'
+#' @source Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
+#' nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
+#'
+#' @examples
+#' data(intracell_raw_se)
+#' head(intracell_raw_se)
+"intracell_raw_se"
 
 ####################################################
 #' intracell_dma
@@ -110,6 +130,23 @@
 #' data(tissue_norm)
 #' head(tissue_norm)
 "tissue_norm"
+
+####################################################
+#' tissue_norm_se
+#'
+#' This is median normalised data from the supplementary table 2 of Hakimi et al with metabolomic
+#' profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
+#'
+#' @format Se object with numeric columns containing rmeasured metabolite (normalised data) intensities and
+#' coldata include patient metadata (e.g. age, gender, sage, etc.)
+#'
+#' @source Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
+#' \doi{10.1016/j.ccell.2015.12.004}
+#'
+#' @examples
+#' data(tissue_norm_se)
+#' head(tissue_norm_se)
+"tissue_norm_se"
 
 ####################################################
 #' Tissue_Metadata
@@ -245,7 +282,7 @@
 #' mca_twocond_rules
 #'
 #' Manually curated table defining the flow of information of the two condition biological regulatory clusters Regulatory labels
-#'from the different grouping methods.
+#' from the different grouping methods.
 #'
 #' @format Columns include Intra, core, core_Detection including state entries (e.g. up, down, etc.) and the Regulator Clustering
 #' columns (RG1-RG3)

@@ -27,7 +27,7 @@ Save the current package configuration
 \dontrun{
 # after this, all downloads will default to commercial licenses
 # i.e. the resources that allow only academic use will be excluded:
-options(metaproviz.console_loglevel = 'trace')
+options(metaproviz.console_loglevel = "trace")
 metaproviz_save_config()
 }
 

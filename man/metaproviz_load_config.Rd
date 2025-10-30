@@ -29,7 +29,7 @@ Load the package configuration from a config file
 \examples{
 \dontrun{
 # load the config from a custom config file:
-metaproviz_load_config(path = 'my_custom_metaproviz_config.yml')
+metaproviz_load_config(path = "my_custom_metaproviz_config.yml")
 }
 
 }

@@ -47,7 +47,7 @@ Tissue metabolomics experiment is a standard metabolomics experiment using tissu
 * Find the main metabolite drivers that separate patients based on their demographics like age, gender and tumour stage.\
 \
 First if you have not done yet, install the required dependencies and load the libraries:
-```{r message=FALSE, warning=FALSE}
+```{r load-packages, message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 # 2. Install the latest development version from GitHub using devtools
 # devtools::install_github("https://github.com/saezlab/MetaProViz")
@@ -63,7 +63,6 @@ library(tibble)
 library(stringr)
 
 # Please install the Biocmanager Dependencies:
-# BiocManager::install("clusterProfiler")
 # BiocManager::install("EnhancedVolcano")
 ```
 \
@@ -83,14 +82,14 @@ Here we choose an example datasets, which is publicly available in the [paper](h
 #<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
 `1.` Tissue experiment **(Intra)** \
 We can access the built-in dataset `tissue_norm`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
-```{r}
+```{r load-data}
 # Load the example data:
 data(tissue_norm)
 
 Tissue_Norm <- tissue_norm%>%
   column_to_rownames("Code")
 ```
-```{r, echo=FALSE}
+```{r code, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 # Check how our data looks like:
 Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
@@ -100,13 +99,13 @@ Tissue_Norm[1:5, c(2,4,6, 8,12:15)]%>%
 ```
 
 `2.` Additional information mapping the trivial metabolite names to KEGG IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)** \
-```{r}
+```{r load-data-2}
 data(tissue_meta)
 
 Tissue_MetaData <- tissue_meta%>%
   column_to_rownames("Metabolite")
 ```
-```{r, echo=FALSE}
+```{r code-2, echo=FALSE}
 # Check how our data looks like:
 Tissue_MetaData[1:5,c(1:2, 7:10)] %>%
   kableExtra::kbl(caption = "Preview of the DF `Tissue_MetaData` including the trivial metabolite identifiers used in the experiment as well as IDs and pathway information.") %>%
@@ -137,7 +136,7 @@ We can use the patient's metadata to find the main metabolite drivers that separ
 Here the metadata analysis is based on principal component analysis (PCA), which is a dimensionality reduction method that reduces all the measured features (=metabolites) of one sample into a few features in the different principal components, whereby each principal component can explain a certain percentage of the variance between the different samples. Hence, this enables interpretation of sample clustering based on the measured features (=metabolites).\
 The `metadata_analysis()` function will perform PCA to extract the different PCs followed by annova to find the main metabolite drivers that separate patients based on their demographics.\
 \
-```{r}
+```{r code-3}
 MetaRes <- metadata_analysis(data=Tissue_Norm[,-c(1:13)],
                                      metadata_sample= Tissue_Norm[,c(2,4:5,12:13)],
                                      scaling = TRUE,
@@ -149,7 +148,7 @@ MetaRes <- metadata_analysis(data=Tissue_Norm[,-c(1:13)],
 Ultimately, this is leading to clusters of metabolites that are driving the separation of the different demographics.\
 \
 We generated the general anova output DF:\
-```{r, echo=FALSE}
+```{r code-4, echo=FALSE}
 # Check how our data looks like:
 MetaRes[["res_aov"]][c(1:2, 1777:1778, 3191:3192), -c(10:11)]%>%
   kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_aov`]] including the main metabolite drivers that separate patients based on their demographics.") %>%
@@ -157,14 +156,14 @@ MetaRes[["res_aov"]][c(1:2, 1777:1778, 3191:3192), -c(10:11)]%>%
 ```
 \
 We generated the summarised results output DF, where each feature (=metabolite) was assigned a main demographics parameter this feature is separating:\
-```{r, echo=FALSE}
+```{r code-5, echo=FALSE}
 # Check how our data looks like:
 MetaRes[["res_summary"]][c(1:6), ]%>%
   kableExtra::kbl(caption = "Preview of the DF MetaRes[[`res_summary`]] including the metabolite drivers in rows and list the patients demographics they can separate.") %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
-```{r, fig.align="left", fig.width=10, fig.height=5}
+```{r viz-heatmap, fig.align="left", fig.width=10, fig.height=5}
 ##1. Tissue_Type
 TissueTypeList <- MetaRes[["res_summary"]]%>%
   filter(MainDriver_Term == "TISSUE_TYPE")%>%
@@ -196,44 +195,8 @@ We will perform multiple comparisons based on the different patient demographics
 4. Tumour versus Normal: Subset of `Young` patients
 5. Tumour versus Normal: Subset of `Old` patients
 \
-```{r Display_Not_Run, eval=FALSE}
-# Prepare the different selections
-EarlyStage <- Tissue_Norm %>%
-  filter(STAGE== "EARLY-STAGE")
-LateStage <- Tissue_Norm %>%
-  filter(STAGE=="LATE-STAGE")
-Old <- Tissue_Norm %>%
-  filter(AGE=="Old")
-Young <- Tissue_Norm%>%
-  filter(AGE=="Young")
-
-DFs <- list("TissueType"= Tissue_Norm,"EarlyStage"= EarlyStage, "LateStage"= LateStage, "Old"= Old, "Young"=Young)
-
-# Run dma
-ResList <- list()
-for(item in names(DFs)){
-  #Get the right DF:
-  data <- DFs[[item]]
-
-  message(paste("Running dma for", item))
-  #Create folder for saving each comparison
-  dir.create(paste(getwd(),"/MetaProViz_Results/dma/", sep=""), showWarnings = FALSE)
-  dir.create(paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""), showWarnings = FALSE)
-
-  #Perform dma
-  TvN <- dma(data =  data[,-c(1:13)],
-                   metadata_sample =  data[,c(1:13)],
-                   metadata_info = c(Conditions="TISSUE_TYPE", Numerator="TUMOR" , Denominator = "NORMAL"),
-                   shapiro=FALSE, #The data have been normalized by the company that provided the results and include metabolites with zero variance as they were all imputed with the same missing value.
-                   path = paste(getwd(),"/MetaProViz_Results/dma/", item, sep=""))
-
-  #Add Results to list
-  ResList[[item]] <- TvN
-}
-```
-\
 <div class="vscroll-plot">
-```{r Run_not_Display, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r Run_not_Display, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Prepare the different selections
 EarlyStage <- Tissue_Norm %>%
   filter(STAGE== "EARLY-STAGE")
@@ -281,7 +244,7 @@ for(item in names(DFs)){
 
 We can see from the different Volcano plots have smaller p.adjusted values and differences in Log2FC range.\
 Here we can also use the `MetaproViz::viz_volcano()` function to plot comparisons together on the same plot, such as Tumour versus Normal of young and old patients:\
-```{r}
+```{r viz-volcano}
 # Early versus Late Stage
 viz_volcano(plot_types="Compare",
                        data=ResList[["EarlyStage"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
@@ -301,7 +264,7 @@ viz_volcano(plot_types="Compare",
 \
 Here we can observe that Tumour versus Normal has lower significance values for the Young patients compared to the Old patients. This can be due to higher variance in the metabolite measurements from Young patients compared to the Old patients.\
 We can also check if the top changed metabolites comparing Tumour versus Normal correlate with the main metabolite drivers that separate patients based on their `TISSUE_TYPE`, which are Tumour or Normal.\
-```{r}
+```{r viz-volcano-2}
 # Get the top changed metabolites
 top_entries <- ResList[["TissueType"]][["dma"]][["TUMOR_vs_NORMAL"]] %>%
   arrange(desc(t.val)) %>%
@@ -339,7 +302,7 @@ viz_volcano(plot_types="Standard",
 
 ## Metabolite ID QC
 Before we perform enrichment analysis,it is important to check the availability of metabolite IDs that we aim to use. We can first create an overview plot:
-```{r}
+```{r compare-pk, eval=FALSE}
 #Load the feature metadata:
 MetaboliteIDs <- Tissue_MetaData %>%
   rownames_to_column("Metabolite")%>%
@@ -351,14 +314,17 @@ ccRCC_CompareIDs <- compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rena
                                            metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
                                            plot_name = "Overlap of ID types in ccRCC data")
 ```
+```{r, echo=FALSE}
+knitr::include_graphics("sample-metadata.Rmd_compare-pk chunk.svg")
+```
 \
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to understand the missing IDs focusing on HMDb as an example:
-```{r}
+```{r code-6}
 Plot1_HMDB <- count_id(MetaboliteIDs, "HMDB")
 ```
 \
 Over 200 metabolites have no HMDB ID and if there is a HMDB ID assigned, we only have one HMDB ID. Here we assume the experimental setup does not account for stereoisomers and that other IDs are with different degrees of ambiguity are possible (e.g. L-Alanine HMDB ID is present and we will add D-Alanine HMDB ID, see PK vignette for more details). This enables us to assign additional potential HMDB IDs per feature.
-```{r}
+```{r data-prep}
 Input_HMDB <- MetaboliteIDs %>%
   dplyr::filter(!is.na(HMDB)) %>% # ID in the measured data we want to use, hence we remove NA's
   dplyr::select("Metabolite", "HMDB", "SUPER_PATHWAY") # only keep relevant columns
@@ -378,7 +344,7 @@ Plot2_HMDB <- count_id(tissue_meta_AddIDs_HMDB, "AllIDs")
 ```
 \
 Additionally, for the metabolites without HMDB ID we can check if a HMDB ID is available using the other ID types. First we check if we have cases in which we do have no HMDB ID, but other available IDs:
-```{r, echo=FALSE}
+```{r data-prep-2, echo=FALSE}
 summary_table <-
   tissue_meta |>
   dplyr::filter(is.na(Group_HMDB) & (!is.na(PUBCHEM) | !is.na(KEGG))) |>
@@ -395,7 +361,7 @@ summary_table%>%
 
 ```
 
-```{r}
+```{r data-prep-3}
 no_hmdb <- dplyr::filter(MetaboliteIDs, is.na(HMDB) & (!is.na(PUBCHEM) | !is.na(KEGG)))
 
 tissue_meta_translated_HMDB <-
@@ -427,7 +393,7 @@ Plot3_HMDB <- count_id(Tissue_MetaData_HMDB, "hmdb_combined")
 If we inspect the tables we can check that for example, 16-hydroxypalmitate certainly has an HMDB ID, yet was missing from the original metadata table. We can check the structures associated to it on [PubChem:10466](https://pubchem.ncbi.nlm.nih.gov/compound/10466) and [KEGG:C18218](https://www.genome.jp/entry/C18218) are indeed identical, and as we expect, the same structure is in HMDB too, under the ID [HMDB0006294](https://hmdb.ca/metabolites/HMDB0006294).\
 \
 We can of course do the same for other IDs, such as the KEGG IDs:
-```{r}
+```{r data-prep-4}
 Plot1_KEGG <- count_id(MetaboliteIDs, "KEGG")
 
 ##################################################################################################################
@@ -478,7 +444,7 @@ Plot3_KEGG <- count_id(Tissue_MetaData_KEGG, "KEGG")
 ```
 \
 Lastly, we will have the new metadata table, which we can use for enrichment analysis:
-```{r}
+```{r compare-pk-2, eval=FALSE}
 Tissue_MetaData_Extended <-  Tissue_MetaData_KEGG[, c(1:10,19, 11:18)]%>%
   mutate(
     KEGG = ifelse(KEGG == "", NA, KEGG),
@@ -490,18 +456,21 @@ ccRCC_CompareIDs_Extended <- compare_pk(data = list(Biocft = Tissue_MetaData_Ext
                                                     metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
                                                     plot_name = "Overlap of ID types in ccRCC data")
 ```
+```{r, echo=FALSE}
+knitr::include_graphics("sample-metadata.Rmd_compare-pk-2 chunk.svg")
+```
 \
 If we compare the results to the upset plot from the original metadata we can see that initially 251 metabolites had a pubchem, HMDB and KEGG ID, whilst after adding the equivalent IDs and translating the IDs, we now have 285 metabolites with all three IDs. 135 metabolite had only a Pubchem ID, whilst now we have found HMDB and/or KEGG IDs for half of these metabolites with only 65 metabolites remaining with only a Pubchem ID.
 
 ## ORA
 We can perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison and plot significant pathways. Noteworthy, since not all metabolites have KEGG IDs, we will lose information.\
-```{r, eval=FALSE, echo=FALSE}
+```{r code-7, eval=FALSE, echo=FALSE}
 # https://www.nature.com/articles/s41588-024-01662-5
 # https://github.com/AndersonHu85/ccRCC_multiomics/tree/main
 ```
 \
 Given that in some cases we have multiple KEGG IDs for a measured feature, we will check if this causes mapping to multiple, different entries in the KEGG pathway-metabolite sets:
-```{r}
+```{r metsigdb-kegg}
 #Load Kegg pathways:
 KEGG_Pathways <- metsigdb_kegg()
 
@@ -514,26 +483,26 @@ ccRCC_to_KEGGPathways <- checkmatch_pk_to_data(data = Tissue_MetaData_Extended,
 problems_terms <- ccRCC_to_KEGGPathways[["GroupingVariable_summary"]]%>%
   filter(!Group_Conflict_Notes== "None")
 ```
-```{r, echo=FALSE}
+```{r code-8, echo=FALSE}
 problems_terms[,c(1,5:8)]%>%
   kableExtra::kbl(caption = "Terms in KEGG pathways where the same measured feature mapps with more than one ID, which will inflate the enrichment analysis.") %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its moire likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge.
-```{r}
+```{r data-prep-5}
 # Select the cases where a feature has multiple IDs
 multipleIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
   filter(original_count>1)
 ```
-```{r, echo=FALSE}
+```{r code-9, echo=FALSE}
 multipleIDs[,c(1,12, 5:6, 3, 9, 11, 13)]%>%
   kableExtra::kbl(caption = "Terms in KEGG pathways where the same measured feature mapps with more than one ID, which may inflate the enrichment analysis.") %>%
   kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 In case of `ActionRequired=="Check"`, we can look into the column `Action_Specific` which contains additional information. In case of the entry `KeepEachID`, multiple matches to the prior knowledge were found, yet the features are in different pathways (=GroupingVariable). Yet, in case of `KeepOneID`, the different IDs map to the same pathway in the prior knowledge for at least one case and therefore keeping both would inflate the enrichment analysis.\
-```{r}
+```{r data-prep-6}
 SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
   #Expand rows where Action == KeepEachID by splitting `matches`
   dplyr::mutate(matches_split = if_else(Action_Specific == "KeepEachID", matches, NA_character_)) %>%
@@ -551,7 +520,7 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
 ```
 \
 Lastly, we need to add the column including our selected IDs to the metadata table:
-```{r}
+```{r data-prep-7}
 Tissue_MetaData_Extended <- merge(x= SelectedIDs %>%
                                         dplyr::select(KEGG, InputID_select),
                                   y= Tissue_MetaData_Extended,
@@ -560,65 +529,8 @@ Tissue_MetaData_Extended <- merge(x= SelectedIDs %>%
 ```
 \
 For results with p.adjusted value < 0.1 and a minimum of 10% of the pathway detected will be visualized as Volcano plots:\
-```{r, eval=FALSE}
-# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
-DM_ORA_res<- list()
-
-for(comparison in names(ResList)){#Res list includes the different comparisons we performed above <-
-  #Ensure that the Metabolite names match with KEGG IDs or KEGG trivial names.
-  dma_res <- merge(x= Tissue_MetaData_Extended,
-                   y= ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]],
-                   by="Metabolite",
-                   all=TRUE)
-
-  #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
-  dma_res <- dma_res[,c(3,21:25)]%>%
-    dplyr::mutate(InputID_select = if_else(
-      is.na(InputID_select),
-      paste0("NA_", cumsum(is.na(InputID_select))),
-      InputID_select
-      ))%>% #remove duplications and keep the higher Log2FC measurement
-    group_by(InputID_select) %>%
-    slice_max(order_by = Log2FC, n = 1, with_ties = FALSE) %>%
-    ungroup()%>%
-    remove_rownames()%>%
-    tibble::column_to_rownames("InputID_select")
-
-  #Perform ORA
-  Res <- standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
-                                 metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
-                                 pathway_name=paste0("KEGG_", comparison, sep=""),
-                                 min_gssize=3,
-                                 max_gssize=1000,
-                                 cutoff_stat=0.01,
-                                 cutoff_percentage=10)
-
-  DM_ORA_res[[comparison]] <- Res
-
-  #Select to plot:
-  Res_Select <- Res[["ClusterGosummary"]]%>%
-    filter(p.adjust<0.1)%>%
-    #filter(pvalue<0.05)%>%
-    filter(percentage_of_Pathway_detected>10)
-
-  if(is.null(Res_Select)==FALSE){
-     viz_volcano(plot_types="PEA",
-                       data= dma_res, #Must be the data you have used as an input for the pathway analysis
-                       data2=as.data.frame(Res_Select )%>%dplyr::rename("term"="ID"),
-                       metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
-                                       PEA_stat="p.adjust",#Column data2
-                                       PEA_score="GeneRatio",#Column data2
-                                       PEA_Feature="MetaboliteID"),# Column metadata_feature (needs to be the same as row names in data)
-                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
-                       plot_name= paste("KEGG_", comparison, sep=""),
-                       subtitle= "PEA" )
-  }
-}
-```
-\
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r viz-volcano-3, echo=TRUE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
@@ -694,7 +606,7 @@ Thereby “No Change” is further subdivided into four states:\
 4. “Significant negative”, which means a metabolite is significant in the underlying comparison and the differential metabolite abundance is negative, yet does not meet the threshold set for “DOWN”.\
 \
 For more information you can also check out the other vignettes.
-```{r}
+```{r mca-2cond}
 MCAres <-  mca_2cond(data_c1=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]],
                                  data_c2=ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]],
                                  metadata_info_c1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
@@ -706,7 +618,7 @@ MCAres <-  mca_2cond(data_c1=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]],
 ```
 \
 Now we can use this information to colour code our volcano plot. We will plot individual vocano plots for each metabolite pathway as defined by the feature metadata provided as part of the data in [@Hakimi2016].
-```{r, eval=FALSE}
+```{r viz-volcano-4, eval=FALSE}
 # Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
                    y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
@@ -736,7 +648,7 @@ viz_volcano(plot_types="Compare",
 ```
 \
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r viz-volcano-5, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
                    y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
@@ -774,7 +686,7 @@ viz_volcano(plot_types="Compare",
 
 ## Pathway enrichment
 Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
-```{r, eval=FALSE}
+```{r viz-volcano-6, eval=FALSE}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
@@ -834,7 +746,7 @@ for(comparison in names(ResList)){
 ```
 \
 <div class="vscroll-plot">
-```{r, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
+```{r viz-volcano-7, echo=FALSE, warning=FALSE, fig.align="left", fig.width=7, fig.height=5}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
 DM_ORA_res<- list()
 
