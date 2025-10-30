@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^doc$
 ^Meta$
+^vignettes/pkgdown$
 ^vignettes/MetaProViz_Results$
 ^MetaProViz_Results$
 ^\.bumpversion\.cfg$
