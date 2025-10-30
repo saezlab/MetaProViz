@@ -111,7 +111,7 @@ Example datasets is publicly available on [metabolomics workbench project PR0014
 data(cellular_meta)
 
 FeatureMetadata_Cells <- cellular_meta%>%
-  column_to_rownames("Metabolite")
+column_to_rownames("Metabolite")
 ```
 
 \
@@ -123,7 +123,7 @@ Example datasets is publicly available in the [paper](https://www.cell.com/cance
 data(tissue_meta)
 
 FeatureMetadata_Tissue <- tissue_meta%>%
-  column_to_rownames("Metabolite")
+column_to_rownames("Metabolite")
 
 ```
 
@@ -163,17 +163,17 @@ Yet, in reality this is not as trivial:\
 ```{r code, echo=FALSE}
 # Create DF for Alanine:
 Alanine <- data.frame(
-  TrivialName = c("D-Alanine", "L-Alanine", "Alanine", "Alanine zwitterion"),
-  HMDB= c("HMDB0001310",  "HMDB0000161", NA, NA),
-  ChEBI = c("15570", "16977", "16449", "66916" ),
-  KEGG = c("C00133", "C00041", "C01401", NA ),
-  PubChem = c("71080" , "5950", "602", "57383916"),
-  stringsAsFactors = FALSE)
+    TrivialName = c("D-Alanine", "L-Alanine", "Alanine", "Alanine zwitterion"),
+    HMDB= c("HMDB0001310",  "HMDB0000161", NA, NA),
+    ChEBI = c("15570", "16977", "16449", "66916" ),
+    KEGG = c("C00133", "C00041", "C01401", NA ),
+    PubChem = c("71080" , "5950", "602", "57383916"),
+    stringsAsFactors = FALSE)
 
 # Print table:
 Alanine%>%
-  kableExtra::kbl(caption = "Available Alanine IDs in HMDB and ChEBI.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Available Alanine IDs in HMDB and ChEBI.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -182,10 +182,10 @@ Indeed, dependent on the database, the Alanine metabolite can have different IDs
 ```{r plot, echo=FALSE}
 # Print Plot:
 AlaninePlot <- Alanine%>%
-  tidyr::pivot_longer(cols = c("HMDB", "ChEBI", "KEGG", "PubChem"),
-                               names_to = "Conditions",
-                               values_to = "ID")%>%
-  tidyr::drop_na()
+tidyr::pivot_longer(cols = c("HMDB", "ChEBI", "KEGG", "PubChem"),
+names_to = "Conditions",
+values_to = "ID")%>%
+tidyr::drop_na()
 AlaninePlot$`IDs in Database` <- as.numeric(1)
 
 Plot <- ggplot2::ggplot(AlaninePlot, ggplot2::aes(fill=TrivialName, y=`IDs in Database`, x=Conditions)) +
@@ -201,8 +201,8 @@ Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
-      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
-      add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+{ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
 # ggplot2::ggsave(filename = "AlaninePlot.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
@@ -221,23 +221,23 @@ data(alanine_pathways)
 Pathways <- alanine_pathways
 
 Count <- Pathways %>%
-  tidyr::unite(Pathway, c("pathwaySource", "pathwayName"), sep = ": ")%>%
-  dplyr::group_by(inputId) %>%
-  dplyr::summarise(PathwayCount = dplyr::n_distinct(Pathway), .groups = 'drop')%>%
-  tidyr::separate(inputId, into = c("Database", "ID"), sep = ":", remove = TRUE)
+tidyr::unite(Pathway, c("pathwaySource", "pathwayName"), sep = ": ")%>%
+dplyr::group_by(inputId) %>%
+dplyr::summarise(PathwayCount = dplyr::n_distinct(Pathway), .groups = 'drop')%>%
+tidyr::separate(inputId, into = c("Database", "ID"), sep = ":", remove = TRUE)
 
 Alanine <- merge(x = AlaninePlot%>%dplyr::rename("Database"="Conditions") ,
-                 y= Count[,2:3],
-                 by = "ID",
-                 all.x=TRUE)%>%
-  dplyr::mutate(PathwayCount = replace(PathwayCount, is.na(PathwayCount), 0))%>%
-  dplyr::arrange(desc( TrivialName)) %>%
-  dplyr::select(TrivialName, ID, Database, PathwayCount)
+y= Count[,2:3],
+by = "ID",
+all.x=TRUE)%>%
+dplyr::mutate(PathwayCount = replace(PathwayCount, is.na(PathwayCount), 0))%>%
+dplyr::arrange(desc( TrivialName)) %>%
+dplyr::select(TrivialName, ID, Database, PathwayCount)
 
 # Print table:
 Alanine%>%
-  kableExtra::kbl(caption = "Alanine IDs in HMDB and ChEBI mapped to pathways from wiki, KEGG and Reactome using RamP.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Alanine IDs in HMDB and ChEBI mapped to pathways from wiki, KEGG and Reactome using RamP.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -257,8 +257,8 @@ Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=Plot, metadata_info=c
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
-      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
-      add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+{ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
 # ggplot2::ggsave(filename = "AlaninePlot_Pathways.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
@@ -270,12 +270,12 @@ Plot_Sized
 ```{r plot-3, eval=FALSE, include=FALSE}
 # Make BarGraph per pathway and ID type
 Alanine_Path <- Pathways%>%
-  tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",A", remove = FALSE)%>%
-  tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",D", remove = FALSE)%>%
-  dplyr::group_by(pathwaySource, commonName) %>%
-  dplyr::summarise(PathwayCount = dplyr::n_distinct(pathwayName),
-                   commonNames = paste(unique(commonName), collapse = ", "),
-                   .groups = 'drop')
+tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",A", remove = FALSE)%>%
+tidyr::separate(commonName, into = c("commonName", "secondaryName"), sep = ",D", remove = FALSE)%>%
+dplyr::group_by(pathwaySource, commonName) %>%
+dplyr::summarise(PathwayCount = dplyr::n_distinct(pathwayName),
+commonNames = paste(unique(commonName), collapse = ", "),
+.groups = 'drop')
 
 
 # BarGraph
@@ -305,20 +305,20 @@ Hence, we assign multiple IDs to a measured peak, where specificity in detection
 ```{r data-prep-2}
 # Example Cell-line data:
 Input_HMDB <- FeatureMetadata_Cells%>%
-  dplyr::filter(!HMDB == "NA")%>% # ID in the measured data we want to use, hence we remove NA's
-  dplyr::select("HMDB", "Pathway") # only keep relevant columns
+dplyr::filter(!HMDB == "NA")%>% # ID in the measured data we want to use, hence we remove NA's
+dplyr::select("HMDB", "Pathway") # only keep relevant columns
 
 # Add equivalent IDs:
 FeatureMetadata_Cells_AddIDs <- equivalent_id(data= Input_HMDB,
-                                                          metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
-                                                          from = "hmdb")
+metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
+from = "hmdb")
 ```
 
 ```{r code-2, echo=FALSE}
 # Check how our data looks like:
 FeatureMetadata_Cells_AddIDs [2:8, 1:3]%>%
-  kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using equivalent_id() function.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `FeatureMetadata_Cells_AddIDs` including new columns with potential additional HMDB IDs assign using equivalent_id() function.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 :::: {.progress .progress-striped .active}
@@ -357,8 +357,8 @@ KEGG_Pathways <- metsigdb_kegg()
 ```{r code-3, echo=FALSE}
 # Check how our data looks like:
 KEGG_Pathways[c(1:3,52:54),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `KEGG_Pathways`.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ## Chemical class-metabolite sets
@@ -376,8 +376,8 @@ ChemicalClass_MetabSet <- metsigdb_chemicalclass()
 ```{r code-4, echo=FALSE}
 # Check how our data looks like:
 ChemicalClass_MetabSet[c(1:5,80:83, 500:503),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `ChemicalClass_MetabSet`.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `ChemicalClass_MetabSet`.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ## Create pathway-metabolite sets
@@ -401,8 +401,8 @@ Gaude_Pathways <- gaude_pathways
 ```{r code-5, echo=FALSE}
 # Check how our data looks like:
 Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `Hallmarks_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -410,8 +410,8 @@ Hallmark_Pathways[c(997:998,2916:2917, 2916:2918),]%>%
 ```{r code-6, echo=FALSE}
 # Check how our data looks like:
 Gaude_Pathways[c(486:490, 1504, 1507, 1531, 49:50, 779),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `gaude_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `gaude_Pathways` including gene-sets usable for pathway enrichment analysis.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -420,12 +420,12 @@ Now we can use the function `make_gene_metab_set` to translate the gene names to
 ```{r make-gene-metab-set}
 # Translate gene names to metabolite names
 Hallmarks_GeneMetab <- make_gene_metab_set(input_pk=Hallmark_Pathways,
-                                                     metadata_info=c(Target="gene"),
-                                                     pk_name="Hallmarks")
+metadata_info=c(Target="gene"),
+pk_name="Hallmarks")
 
 Gaude_GeneMetab <- make_gene_metab_set(input_pk=Gaude_Pathways,
-                                                     metadata_info=c(Target="gene"),
-                                                     pk_name="Gaude")
+metadata_info=c(Target="gene"),
+pk_name="Gaude")
 ```
 
 \
@@ -433,10 +433,10 @@ Gaude_GeneMetab <- make_gene_metab_set(input_pk=Gaude_Pathways,
 ```{r data-prep-3, echo=FALSE}
 # Check how our data looks like:
 Hallmarks_GeneMetab[["GeneMetabSet"]]%>%
-  dplyr::filter(term=="HALLMARK_GLYCOLYSIS")%>%
-  dplyr::slice(c(59,142,193, 201:203))%>%
-  kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+dplyr::filter(term=="HALLMARK_GLYCOLYSIS")%>%
+dplyr::slice(c(59,142,193, 201:203))%>%
+kableExtra::kbl(caption = "Preview of the DF `Hallmarks_GeneMetab` including gene-sets usable for pathway enrichment analysis.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 ```
 
@@ -468,13 +468,13 @@ MetaLinksDB <- metsigdb_metalinks()
 MetaLinksDB[
     c(12:13,17:18,432,466),
     c(1:2,6:8, 12:15)
-  ] %>%
-  kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB` including metabolite-receptor sets.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+    ] %>%
+    kableExtra::kbl(caption = "Preview of the DF `MetaLinksDB` including metabolite-receptor sets.", row.names=FALSE) %>%
+    kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 dplyr::filter(MetaLinksDB, !is.na(term_specific))[c(1,50, 90, 101),] %>%
-  kableExtra::kbl(caption = "Preview of the metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the metabolite-receptor and metabolite-transporter sets.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ## Comparison of PK coverage
@@ -484,9 +484,9 @@ As an example, we will compare the resources containing gene-metabolite sets (Ha
 ```{r compare-pk, eval=FALSE}
 # Compare the PK resources
 pk_comp_res <- compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMetab[["GeneMetabSet"]]),
-                                                  Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
-                                                  MetalinksDB = as.data.frame(MetaLinksDB))
-                                     )
+Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
+MetalinksDB = as.data.frame(MetaLinksDB))
+)
 ```
 ```{r, echo=FALSE}
 knitr::include_graphics("prior-knowledge.Rmd_compare-pk chunk.svg")
@@ -496,8 +496,8 @@ The table includes all features of the three PK resources we decided to compare.
 ```{r code-8, echo=FALSE}
 # Check how our data looks like:
 pk_comp_res$summary_table[c(1:8),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `pk_comp_res$summary_table` showing coverage of features (genes or metabolites) across PK sources.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `pk_comp_res$summary_table` showing coverage of features (genes or metabolites) across PK sources.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 ```{r code-9, echo=FALSE, fig.width=8, fig.height=6}
@@ -546,8 +546,8 @@ This helps us to understand what to expect, when linking the data to prior knowl
 
 ```{r compare-pk-2, eval=FALSE}
 pk_comp_res_biocft <- compare_pk(data = list(Biocft = FeatureMetadata_Biocrates),
-                                             metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
-                                             plot_name = "Overlap of BioCrates Columns")
+metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
+plot_name = "Overlap of BioCrates Columns")
 
 ```
 ```{r, echo=FALSE}
@@ -558,8 +558,8 @@ knitr::include_graphics("prior-knowledge.Rmd_compare-pk-2 chunk.svg")
 ```{r code-10, echo=FALSE}
 # Check how our data looks like:
 pk_comp_res_biocft$summary_table[c(1:8),]%>%
-  kableExtra::kbl(caption = "Preview of the DF `pk_comp_res_biocft$summary_table` showing coverage of identifiers.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the DF `pk_comp_res_biocft$summary_table` showing coverage of identifiers.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -620,8 +620,8 @@ Here we connect the experimental Biocrates table to the MetalinksDB PK using the
 
 ```{r load-data-5}
 Biocrates_to_MetalinksDB <- checkmatch_pk_to_data(data = FeatureMetadata_Biocrates,
-                                                              input_pk = MetaLinksDB,
-                                                              metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
+input_pk = MetaLinksDB,
+metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 ```
 
 \
@@ -645,9 +645,9 @@ irrelevant_cols <- c('INCHI','SMILES','Key','IUPAC','Molecule','MESH','TrivialNa
 
 # Check how our data looks like:
 Biocrates_to_MetalinksDB$data_summary[c(1:8),-c(2,4)] %>%
-  dplyr::select(-any_of(irrelevant_cols)) %>%
-  kableExtra::kbl(caption = "Preview of the DF `data_Matched` showing coverage of identifiers (some columns hidden)", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+dplyr::select(-any_of(irrelevant_cols)) %>%
+kableExtra::kbl(caption = "Preview of the DF `data_Matched` showing coverage of identifiers (some columns hidden)", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 
@@ -661,22 +661,22 @@ To answer this, we will take only the first HMDB of each cell with multiple HMDB
 ```{r data-prep-6}
 #Number of matches:
 MultipleIDs <- Biocrates_to_MetalinksDB$data_summary%>%
-  summarise(total_matches_count = sum(matches_count, na.rm = TRUE))%>%
-  mutate(Name = "MultipleIDs")
+summarise(total_matches_count = sum(matches_count, na.rm = TRUE))%>%
+mutate(Name = "MultipleIDs")
 
 ######################################
 # Extract first ID:
 extract_first_id <- function(id_col) {
-  map_chr(as.character(id_col), function(x) {
+    map_chr(as.character(id_col), function(x) {
     # Check for NA or empty string
     if (is.na(x) || x == "") {
-      return(NA)
+        return(NA)
     }
     # Split on comma (adjust the delimiter if needed)
     parts <- unlist(strsplit(x, split = ","))
     # Return the first value after trimming any whitespace
     return(trimws(parts[1]))
-  })
+    })
 }
 
 # Create a copy of the df
@@ -690,20 +690,20 @@ result_bioc_hmdb_count_single <- count_id(FeatureMetadata_Biocrates_singleHMDB, 
 
 # Check the macthes:
 Biocrates_to_MetalinksDB_singleHMDB <- checkmatch_pk_to_data(data = FeatureMetadata_Biocrates_singleHMDB,
-                                                                         input_pk = MetaLinksDB,
-                                                                         metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
+input_pk = MetaLinksDB,
+metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL))
 
 
 #Number of matches:
 SingleIDs <- Biocrates_to_MetalinksDB_singleHMDB$data_summary%>%
-  summarise(total_matches_count = sum(matches_count, na.rm = TRUE))%>%
-  mutate(Name = "SingleID")
+summarise(total_matches_count = sum(matches_count, na.rm = TRUE))%>%
+mutate(Name = "SingleID")
 
 ##############################
 #Compare:
 bind_rows(MultipleIDs, SingleIDs)%>%
-  kableExtra::kbl(caption = "Comparison of IDs found in MetalinksDB PK when having multiple versus a random single HMDB ID in the measured data.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Comparison of IDs found in MetalinksDB PK when having multiple versus a random single HMDB ID in the measured data.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 ```
 
@@ -744,17 +744,17 @@ As an example we are translating the KEGG pathways we loaded with `metsigdb_kegg
 
 ```{r code-12, echo=TRUE, message=FALSE, warning=FALSE}
 KEGG_Pathways_Translated <- translate_id(data= KEGG_Pathways,
-                                                     metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
-                                                     from = c("kegg"),
-                                                     to = c("hmdb", "pubchem"))
+metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
+from = c("kegg"),
+to = c("hmdb", "pubchem"))
 ```
 
 \
 
 ```{r code-13, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
-  kableExtra::kbl(caption = "Translation of KEGG IDs in KEGG pathways to HMDB & pubchem IDs") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Translation of KEGG IDs in KEGG pathways to HMDB & pubchem IDs") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -800,8 +800,8 @@ names(KEGG_Pathways_Translated)
 
 ```{r code-15, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 KEGG_Pathways_Translated[["Mappingsummary_hmdb"]][c(1:3, 7:9),] %>%
-  kableExtra::kbl(caption = "Mappingsummary_hmdb") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Mappingsummary_hmdb") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -840,8 +840,8 @@ MappingProblems <- mapping_ambiguity(
 
 ```{r code-17, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 MappingProblems[["summary"]][c(1:2, 503, 505),c(2:6, 8:9,11)] %>%
-  kableExtra::kbl(caption = "Long summary of mapping problems taking into account both directions, from-to-to and to-to-from.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Long summary of mapping problems taking into account both directions, from-to-to and to-to-from.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 \
@@ -851,10 +851,10 @@ Additionally, we have passed `grouping_variable = "term"` as we have pathways, w
 
 ```{r plot-4,echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 Plot <- MappingProblems[["summary"]]%>%
-  filter(term == "Glycolysis / Gluconeogenesis")%>%
-  filter(!KEGG=="NA")%>%
-  distinct(KEGG, .keep_all = TRUE) %>%
-  dplyr::select(term, KEGG,  KEGG_to_hmdb, `Count(KEGG_to_hmdb)`, `AcrossGroupMappingIssue(KEGG_to_hmdb)`, hmdb_to_KEGG, `Count(hmdb_to_KEGG)`, `AcrossGroupMappingIssue(hmdb_to_KEGG)`, Mapping)
+filter(term == "Glycolysis / Gluconeogenesis")%>%
+filter(!KEGG=="NA")%>%
+distinct(KEGG, .keep_all = TRUE) %>%
+dplyr::select(term, KEGG,  KEGG_to_hmdb, `Count(KEGG_to_hmdb)`, `AcrossGroupMappingIssue(KEGG_to_hmdb)`, hmdb_to_KEGG, `Count(hmdb_to_KEGG)`, `AcrossGroupMappingIssue(hmdb_to_KEGG)`, Mapping)
 Plot$Count <- 1
 
 PlotA <- ggplot2::ggplot(Plot, ggplot2::aes(fill=Mapping, y=Count, x=as.character(`Count(KEGG_to_hmdb)`))) +
@@ -870,8 +870,8 @@ Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=PlotA, metadata_info=
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
-      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
-       magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+{ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 Plot_Sized_A <- Plot_Sized
 # ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_KEGG-to-HMDB.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
@@ -888,8 +888,8 @@ Plot_Sized <-  MetaProViz:::plot_grob_superplot(input_plot=PlotB, metadata_info=
 plot_height <- grid::convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
 plot_width <- grid::convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 Plot_Sized %<>%
-      {ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
-       magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
+{ggplot2::ggplot() + ggplot2::annotation_custom(.)} %>%
+magrittr::add(ggplot2::theme(panel.background = ggplot2::element_rect(fill = "transparent")))
 
 # ggplot2::ggsave(filename = "KEGG_Glycolysis-Gluconeogenesis_HMDB-to-KEGG.svg", plot = Plot_Sized, width = plot_width,  height = plot_height, unit="cm")
 
