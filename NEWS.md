@@ -1,6 +1,10 @@
 # MetaProViz 3.99.10 (2025-10-28)
 
-- SummarizedExperiment support
+- SummarizedExperiment support:
+  - Implemention of se objects support as default input for `processing()`, `replicate_sum()`, `pool_estimation()`, `dma()`, `metadata_analysis()`, `meta_pk()`, `viz_heatmap()` and `viz_pca()`#
+  - Implemention of se object output for `processing()`, `replicate_sum()` and `pool_estimation()`
+  - Generation of example data se objects `intracell_raw_se.rda` and `tissue_norm_se.rda` in /data folder
+
 - First candidate for Bioconductor submission
 
 # MetaProViz 3.99.1 (2025-10-08)
