@@ -2,8 +2,7 @@
 % Please edit documentation in R/DifferentialMetaboliteAnalysis.R
 \name{dma}
 \alias{dma}
-\title{This function allows you to perform differential metabolite analysis to
-obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.}
+\title{Differential metabolite analysis}
 \usage{
 dma(
   data,
@@ -24,90 +23,79 @@ dma(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and colData.
-If se file is provided, metadata_sample is extracted from the colData
-of the se object. metadata_feature, if available, are extracted from
-the rowData. Alternatively provide a DF with unique sample identifiers
-as row names and metabolite numerical values in columns with
-metabolite identifiers as column names. Use NA for metabolites that
-were not detected.}
+\item{data}{SummarizedExperiment or data frame. If SummarizedExperiment,
+metadata_sample is extracted from colData and metadata_feature from
+rowData. If data frame, provide unique sample identifiers as row names
+and metabolite numerical values in columns with metabolite identifiers
+as column names. Use NA for undetected metabolites.}
 
-\item{metadata_sample}{\emph{Optional: } Only required if you did not
-provide se file in parameter data. Provide DF which contains metadata
-information about the samples, which will be combined with your input
-data based on the unique sample identifiers used as rownames.
-\strong{Default = NULL}}
+\item{metadata_sample}{Data frame (optional). Only required if data is not a
+SummarizedExperiment. Contains metadata information about samples,
+combined with input data based on unique sample identifiers used as row
+names. Default: NULL.}
 
-\item{metadata_info}{\emph{Optional: } Named vector including the
-information about the conditions column information on numerator or
-denominator c(Conditions="ColumnName_SettingsFile", Numerator =
-"ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-Denominator and Numerator will specify which comparison(s) will be
-done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
-Numerator =NULL selects all the condition and performs multiple
-comparison all-vs-all. Log2FC are obtained by dividing the numerator
-by the denominator, thus positive Log2FC values mean higher expression
-in the numerator. \strong{Default = c(conditions="Conditions",
-numerator = NULL, denumerator = NULL)}}
+\item{metadata_info}{Named character vector (optional). Includes conditions column
+information on numerator or denominator: c(Conditions="ColumnName",
+Numerator="ColumnName", Denominator="ColumnName"). Denominator and
+Numerator specify which comparisons are performed (one-vs-one,
+all-vs-one, all-vs-all). Denominator=NULL and Numerator=NULL selects all
+conditions and performs multiple all-vs-all comparisons. Log2FC values
+are obtained by dividing numerator by denominator, thus positive Log2FC
+values indicate higher expression in numerator. Default:
+c(conditions="Conditions", numerator=NULL, denumerator=NULL).}
 
-\item{pval}{\emph{Optional: } String which contains an abbreviation of the
-selected test to calculate p.value. For one-vs-one comparisons choose
-t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for
-one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch
-anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}}
+\item{pval}{Character (optional). Abbreviation of the selected test to calculate
+p-value. For one-vs-one comparisons choose t.test, wilcox.test,
+chisq.test, cor.test, or lmFit (limma). For one-vs-all or all-vs-all
+comparisons choose aov (anova), welch (welch anova), kruskal.test, or
+lmFit (limma). Default: "lmFit".}
 
-\item{padj}{\emph{Optional: } String which contains an abbreviation of the
-selected p.adjusted test for p.value correction for multiple
-Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
-"bonferroni", "holm", etc.\strong{Default = "fdr"}}
+\item{padj}{Character (optional). Abbreviation of the selected p-value adjustment
+method for multiple hypothesis testing correction. See ?p.adjust for
+methods: "BH", "fdr", "bonferroni", "holm", etc. Default: "fdr".}
 
-\item{metadata_feature}{\emph{Optional: } To provide metadata information ,
-i.e. pathway information, retention time,..., for each metabolite.
-Only used if you did not provide se file in parameter data. Provide
-DF where the row names must match the metabolite names in the
-columns of the data. \strong{Default = NULL}}
+\item{metadata_feature}{Data frame (optional). Provides metadata information (e.g., pathway,
+retention time) for each metabolite. Only used if data is not a
+SummarizedExperiment. Row names must match metabolite names in data
+columns. Default: NULL.}
 
-\item{core}{\emph{Optional: } TRUE or FALSE for whether a Consumption/Release
-input is used. \strong{Default = FALSE}}
+\item{core}{Logical (optional). Whether consumption/release input is used. Default:
+FALSE.}
 
-\item{vst}{TRUE or FALSE for whether to use variance stabilizing
-transformation on the data when linear modeling is used for hypothesis
-testing. \strong{Default = FALSE}}
+\item{vst}{Logical. Whether to use variance stabilizing transformation on data when
+linear modeling is used for hypothesis testing. Default: FALSE.}
 
-\item{shapiro}{TRUE or FALSE for whether to perform the shapiro.test and get
-informed about data distribution (normal versus not-normal
-distribution. \strong{Default = TRUE}}
+\item{shapiro}{Logical. Whether to perform Shapiro-Wilk test to assess data
+distribution (normal versus non-normal). Default: TRUE.}
 
-\item{bartlett}{TRUE or FALSE for whether to perform the bartlett.test.
-\strong{Default = TRUE}}
+\item{bartlett}{Logical. Whether to perform Bartlett's test. Default: TRUE.}
 
-\item{transform}{TRUE or FALSE. If TRUE we expect the data to be not log2
-transformed and log2 transformation will be performed within the limma
-function and Log2FC calculation. If FALSE we expect the data to be
-log2 transformed as this impacts the Log2FC calculation and limma.
-\strong{Default= TRUE}}
+\item{transform}{Logical. If TRUE, data is expected to be non-log2-transformed and log2
+transformation will be performed within limma and Log2FC calculation. If
+FALSE, data is expected to be log2-transformed as this impacts Log2FC
+calculation and limma. Default: TRUE.}
 
-\item{save_plot}{\emph{Optional: } Select the file type of output plots.
-Options are svg, png, pdf. \strong{Default = svg}}
+\item{save_plot}{Character (optional). File type of output plots: "svg", "png", "pdf".
+Default: "svg".}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are:
-"csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{Character (optional). File type for analysis results: "csv", "xlsx",
+"txt". Default: "csv".}
 
-\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
-saved as an overview of the results. \strong{Default = TRUE}}
+\item{print_plot}{Logical (optional). Whether volcano plot is printed as overview of
+results. Default: TRUE.}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved
-at. \strong{Default = NULL}}
+\item{path}{Character (optional). Path to folder where results should be saved.
+Default: NULL.}
 }
 \value{
-Dependent on parameter settings, list of lists will be returned for
-dma (DF of each comparison), shapiro (Includes DF and Plot), bartlett
-(Includes DF and Histogram), vst (Includes DF and Plot) and
-VolcanoPlot (Plots of each comparison).
+List of lists. Depending on parameter settings, returns dma (data frame
+of each comparison), shapiro (includes data frame and plot), bartlett
+(includes data frame and histogram), vst (includes data frame and plot),
+and VolcanoPlot (plots of each comparison).
 }
 \description{
-This function allows you to perform differential metabolite analysis to
-obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+Performs differential metabolite analysis to obtain Log2FC, p-value,
+adjusted p-value, and t-value when comparing two or multiple conditions.
 }
 \examples{
 data(intracell_raw_se)
@@ -129,11 +117,3 @@ ResI <- dma(
 )
 
 }
-\keyword{Analysis,}
-\keyword{Differential}
-\keyword{Hypothesis}
-\keyword{Metabolite}
-\keyword{Multiple}
-\keyword{Normality}
-\keyword{testing}
-\keyword{testing,}

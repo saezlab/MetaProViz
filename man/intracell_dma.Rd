@@ -5,22 +5,21 @@
 \alias{intracell_dma}
 \title{intracell_dma}
 \format{
-Columns include Log2FC, stats, metabolite identifiers, metabolite pathways and normalised
-metabolite values used as input with row names being metabolitetrivial names.
-}
-\source{
-Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
-nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 179 rows and 14 columns.
 }
 \usage{
 intracell_dma
 }
 \description{
-Metabolomics workbench project PR001418, study ST002224 where we performed differential metabolite
-analysis comparing intracellular metabolomics of 786-M1A versus HK2 cells.
+Metabolomics workbench project PR001418, study ST002224 where we performed
+differential metabolite analysis comparing intracellular metabolomics of
+786-M1A versus HK2 cells. metabolite values used as input with row names
+being metabolitetrivial names. nitrogen supports renal cancer progression ,
+Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
 }
 \examples{
 data(intracell_dma)
 head(intracell_dma)
+
 }
 \keyword{datasets}

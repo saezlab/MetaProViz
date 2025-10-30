@@ -2,7 +2,7 @@
 % Please edit documentation in R/MetaDataAnalysis.R
 \name{metadata_analysis}
 \alias{metadata_analysis}
-\title{This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.}
+\title{PCA-based metadata analysis}
 \usage{
 metadata_analysis(
   data,
@@ -18,50 +18,49 @@ metadata_analysis(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and colData.
-If se file is provided, metadata_sample is extracted from the colData
-of the se object. Alternatively provide a DF with unique sample
-identifiers as row names and metabolite numerical values in columns
-with metabolite identifiers as column names. Use NA for metabolites
-that were not detected.}
+\item{data}{SummarizedExperiment (se) file including assay and colData. If se file
+is provided, metadata_sample is extracted from the colData of the se
+object. Alternatively provide a DF with unique sample identifiers as row
+names and metabolite numerical values in columns with metabolite
+identifiers as column names. Use NA for metabolites that were not
+detected.}
 
-\item{metadata_sample}{\emph{Optional: } Only required if you did not
-provide se file in parameter data. Provide DF which contains metadata
-information about the samples, which will be combined with your input
-data based on the unique sample identifiers used as rownames.
-\strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in
+parameter data. Provide DF which contains metadata information about the
+samples, which will be combined with your input data based on the unique
+sample identifiers used as rownames. \strong{Default = NULL}}
 
-\item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is
-used \strong{Default = TRUE}}
+\item{scaling}{\emph{Optional: } TRUE or FALSE for whether a data scaling is used
+\strong{Default = TRUE}}
 
-\item{percentage}{\emph{Optional: } percentage of top and bottom features to
-be displayed in the results summary. \strong{Default = 0.1}}
+\item{percentage}{\emph{Optional: } percentage of top and bottom features to be displayed
+in the results summary. \strong{Default = 0.1}}
 
-\item{cutoff_stat}{\emph{Optional: } Cutoff for the adjusted p-value of the
-ANOVA test for the results summary and on the heatmap. \strong{Default =
-0.05}}
+\item{cutoff_stat}{\emph{Optional: } Cutoff for the adjusted p-value of the ANOVA test for
+the results summary and on the heatmap. \strong{Default = 0.05}}
 
-\item{cutoff_variance}{\emph{Optional: } Cutoff for the PCs variance that
-should be displayed on the heatmap. \strong{Default = 1}}
+\item{cutoff_variance}{\emph{Optional: } Cutoff for the PCs variance that should be displayed
+on the heatmap. \strong{Default = 1}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are:
-"csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt". \strong{Default = "csv"}}
 
-\item{save_plot}{\emph{Optional: } Select the file type of output plots.
-Options are svg, png, pdf. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg,
+png, pdf. \strong{Default = svg}}
 
-\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
-saved as an overview of the results. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an
+overview of the results. \strong{Default = TRUE}}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved
-at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at.
+\strong{default: NULL}}
 }
 \value{
 List of DFs: prcomp results, loadings, top-Bottom features, annova
 results, results summary
 }
 \description{
-This function performs a PCA analysis on the input data and combines it with the sample metadata to perform an ANOVA test to identify significant differences between the groups.
+Performs PCA analysis on input data and combines it with sample metadata to
+run ANOVA tests for identifying significant differences between groups.
 }
 \examples{
 data(tissue_norm_se)
@@ -74,6 +73,3 @@ Res <- metadata_analysis(
 )
 
 }
-\keyword{PCA,}
-\keyword{annova,}
-\keyword{metadata}

@@ -5,21 +5,20 @@
 \alias{biocrates_features}
 \title{biocrates_features}
 \format{
-Columns include metabolite trivial name, metabolite class, metabolite IDs (HMDB, KEGG, etc.), metabolite structural
-information (INCHI, Key, etc.).
-}
-\source{
-Biocrates MxP® Quant 500 XL kit, https://biocrates.com/mxp-quant-500-xl/
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 1019 rows and 14 columns.
 }
 \usage{
 biocrates_features
 }
 \description{
-Biocrates kit feature information of the "MxP Quant 500 XL kit" that covers more than 1,000 metabolites with biochemical
-class information and the exported different metabolite IDs (HMDB, KEGG, etc.).
+Biocrates kit feature information of the "MxP Quant 500 XL kit" that covers
+more than 1,000 metabolites with biochemical class information and the
+exported different metabolite IDs (HMDB, KEGG, etc.). information (INCHI,
+Key, etc.).
 }
 \examples{
 data(biocrates_features)
 head(biocrates_features)
+
 }
 \keyword{datasets}

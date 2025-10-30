@@ -5,22 +5,19 @@
 \alias{tissue_meta}
 \title{Tissue_Metadata}
 \format{
-Columns include Metabolite IDs (HMDB, KEGG, etc), platform, mass, metabolic pathway with
-row names being metabolite trivial names.
-}
-\source{
-Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
-\doi{10.1016/j.ccell.2015.12.004}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 877 rows and 11 columns.
 }
 \usage{
 tissue_meta
 }
 \description{
-In Hakimi et. al. metabolites were assigned to metabolite IDs, pathways, platform, mass and other
-fetaure metainformation.
+In Hakimi et. al. metabolites were assigned to metabolite IDs, pathways,
+platform, mass and other fetaure metainformation. row names being metabolite
+trivial names. \doi{10.1016/j.ccell.2015.12.004}
 }
 \examples{
 data(tissue_meta)
 head(tissue_meta)
+
 }
 \keyword{datasets}

@@ -5,27 +5,24 @@
 \alias{intracell_raw_se}
 \title{intracell_raw_se}
 \format{
-Se object with numeric columns containing raw metabolite intensities and coldata with the following columns:
--\code{Conditions}: Character vector indicating cell line identity
-\itemize{
-\item \code{Analytical_Replicate}: Integer replicate number for analytical replicates
--\code{Biological_Replicate}: Integer replicate number for biological replicates
-}
-}
-\source{
-Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
-nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
+An object of class \code{SummarizedExperiment} with 182 rows and 58 columns.
 }
 \usage{
 intracell_raw_se
 }
 \description{
-Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
-peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A
-converted into an se object.
+Metabolomics workbench project PR001418, study ST002224 where we exported
+integrated raw peak values of intracellular metabolomics of HK2 and ccRCC
+cell lines 786-O, 786-M1A and 786-M2A converted into an se object.
+-\code{Conditions}: Character vector indicating cell line identity -
+\code{Analytical_Replicate}: Integer replicate number for analytical replicates
+-\code{Biological_Replicate}: Integer replicate number for biological replicates
+nitrogen supports renal cancer progression, Nature Communications 2022,
+DOI:10.1038/s41467-022-35036-4.
 }
 \examples{
 data(intracell_raw_se)
 head(intracell_raw_se)
+
 }
 \keyword{datasets}

@@ -5,20 +5,19 @@
 \alias{alanine_pathways}
 \title{alanine_pathways}
 \format{
-Columns include pathway_name, pathwayId and pathwaySource as well as inputID  and commonName.
-}
-\source{
-Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 204 rows and 5 columns.
 }
 \usage{
 alanine_pathways
 }
 \description{
-Manually curated table for the amino acid alanine toshowcase pathways (wiki, reactome, etc.) and alanine IDs (chebi, hmdb, etc.)
-included in those pathways
+Manually curated table for the amino acid alanine toshowcase pathways (wiki,
+reactome, etc.) and alanine IDs (chebi, hmdb, etc.) included in those
+pathways
 }
 \examples{
 data(alanine_pathways)
 head(alanine_pathways)
+
 }
 \keyword{datasets}

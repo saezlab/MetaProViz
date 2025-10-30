@@ -5,22 +5,20 @@
 \alias{cellular_meta}
 \title{cellular_meta}
 \format{
-Columns include Metabolite IDs (HMDB, KEGG), Main metabolic pathway with row names being
-metabolite trivial names.
-}
-\source{
-Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
-nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 199 rows and 5 columns.
 }
 \usage{
 cellular_meta
 }
 \description{
-Metabolomics workbench project PR001418, study ST002226 and ST002224 measured metabolites were assigned
-HMDB and KEGG IDs as well as one main metabolic pathway.
+Metabolomics workbench project PR001418, study ST002226 and ST002224
+measured metabolites were assigned HMDB and KEGG IDs as well as one main
+metabolic pathway. metabolite trivial names. nitrogen supports renal cancer
+progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
 }
 \examples{
 data(cellular_meta)
 head(cellular_meta)
+
 }
 \keyword{datasets}

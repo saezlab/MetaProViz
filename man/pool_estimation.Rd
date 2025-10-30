@@ -16,43 +16,63 @@ pool_estimation(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and colData. If se file is provided, metadata_sample is extracted from the colData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
+\item{data}{SummarizedExperiment (se) file including assay and colData. If se file
+is provided, metadata_sample is extracted from the colData of the se
+object. Alternatively provide a DF which contains unique sample
+identifiers as row names and metabolite numerical values in columns with
+metabolite identifiers as column names. Use NA for metabolites that were
+not detected.}
 
-\item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in
+parameter data. Provide DF which contains information about the samples,
+which will be combined with the input data based on the unique sample
+identifiers used as rownames. Must contain column with Conditions. If
+you do not have multiple conditions in your experiment assign all
+samples into the same condition. \strong{Default = NULL}}
 
-\item{metadata_info}{\emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_metadata_info, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}}
+\item{metadata_info}{\emph{Optional: } NULL or Named vector including the Conditions and
+PoolSample information (Name of the Conditions column and Name of the
+pooled samples in the Conditions in the Input_SettingsFile)  :
+c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no
+Conditions is added in the Input_metadata_info, it is assumed that the
+conditions column is named 'Conditions' in the Input_SettingsFile. ).
+\strong{Default = NULL}}
 
-\item{cutoff_cv}{\emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 30}}
+\item{cutoff_cv}{\emph{Optional: } Filtering cutoff for high variance metabolites using
+the Coefficient of Variation. \strong{Default = 30}}
 
-\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg,
+png, pdf or NULL. \strong{Default = svg}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt", ot NULL \strong{default: "csv"}}
 
-\item{print_plot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } If TRUE prints an overview of resulting plots.
+\strong{Default = TRUE}}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at.
+\strong{default: NULL}}
 }
 \value{
-List with two elements: DF (including input and output table) and Plot (including all plots generated)
+List with two elements: DF (including input and output table) and Plot
+(including all plots generated)
 }
 \description{
 Find metabolites with high variability across total pool samples
 }
 \examples{
 data(intracell_raw_se)
-Res <- pool_estimation(data=intracell_raw_se,
-                       metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
+Res <- pool_estimation(
+    data = intracell_raw_se,
+    metadata_info = c(PoolSamples = "Pool", Conditions = "Conditions")
+)
 
 data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
-Res <- pool_estimation(data=Intra[ ,-c(1:3)],
-                                metadata_sample=Intra[ , c(1:3)],
-                                metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
+Res <- pool_estimation(
+    data = Intra[, -c(1:3)],
+    metadata_sample = Intra[, c(1:3)],
+    metadata_info = c(PoolSamples = "Pool", Conditions = "Conditions")
+)
 
 }
-\keyword{Coefficient}
-\keyword{Variation,}
-\keyword{high}
-\keyword{metabolites}
-\keyword{of}
-\keyword{variance}

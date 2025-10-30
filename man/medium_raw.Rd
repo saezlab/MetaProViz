@@ -5,23 +5,22 @@
 \alias{medium_raw}
 \title{medium_raw}
 \format{
-Columns include Conditions (=Cell lines, blanks),Biological_Replicate, GrowthFactor and
-a numeric column for each measured metabolite (raw data)
-}
-\source{
-Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
-nitrogen supports renal cancer progression , Nature Communications 2022, \doi{10.1038/s41467-022-35036-4}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 44 rows and 77 columns.
 }
 \usage{
 medium_raw
 }
 \description{
-Metabolomics workbench project PR001418, study ST002226 where we exported integrated raw
-peak values of intracellular metabolomics of HK2 and cccRCC cell lines 786-O, 786-M1A,
-786-M2A, OS-RC-2, OS-LM1 and RFX-631.
+Metabolomics workbench project PR001418, study ST002226 where we exported
+integrated raw peak values of intracellular metabolomics of HK2 and cccRCC
+cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631. a numeric
+column for each measured metabolite (raw data) nitrogen supports renal
+cancer progression , Nature Communications 2022,
+\doi{10.1038/s41467-022-35036-4}
 }
 \examples{
 data(medium_raw)
 head(medium_raw)
+
 }
 \keyword{datasets}

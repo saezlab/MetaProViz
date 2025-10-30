@@ -13,15 +13,20 @@ make_gene_metab_set(
 )
 }
 \arguments{
-\item{input_pk}{dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.}
+\item{input_pk}{dataframe with two columns for source (=term) and Target (=gene), e.g.
+Hallmarks.}
 
-\item{metadata_info}{\emph{Optional: }  Column name of Target in input_pk. \strong{Default = c(Target="gene")}}
+\item{metadata_info}{\emph{Optional: }  Column name of Target in input_pk. \strong{Default =
+c(Target="gene")}}
 
-\item{pk_name}{\emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}}
+\item{pk_name}{\emph{Optional: } Name of the prior knowledge resource. \strong{default:
+NULL}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt". \strong{Default = "csv"}}
 
-\item{path}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
+\item{path}{{Optional:} String which is added to the resulting folder name
+\strong{default: NULL}}
 }
 \value{
 List of two data frames: "GeneMetabSet" and "MetabSet".

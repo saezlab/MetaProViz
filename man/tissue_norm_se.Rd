@@ -5,22 +5,20 @@
 \alias{tissue_norm_se}
 \title{tissue_norm_se}
 \format{
-Se object with numeric columns containing rmeasured metabolite (normalised data) intensities and
-coldata include patient metadata (e.g. age, gender, sage, etc.)
-}
-\source{
-Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
-\doi{10.1016/j.ccell.2015.12.004}
+An object of class \code{SummarizedExperiment} with 570 rows and 276 columns.
 }
 \usage{
 tissue_norm_se
 }
 \description{
-This is median normalised data from the supplementary table 2 of Hakimi et al with metabolomic
-profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
+This is median normalised data from the supplementary table 2 of Hakimi et
+al with metabolomic profiling on 138 matched clear cell renal cell carcinoma
+(ccRCC)/normal tissue pairs. coldata include patient metadata (e.g. age,
+gender, sage, etc.) \doi{10.1016/j.ccell.2015.12.004}
 }
 \examples{
 data(tissue_norm_se)
 head(tissue_norm_se)
+
 }
 \keyword{datasets}

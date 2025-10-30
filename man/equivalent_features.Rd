@@ -5,20 +5,19 @@
 \alias{equivalent_features}
 \title{equivalent_features}
 \format{
-Columns include metabolite trivial names, metabolite IDs (HMDB, KEGG, etc.), metabolite structural information (=INCHI).
-}
-\source{
-Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 34 rows and 7 columns.
 }
 \usage{
 equivalent_features
 }
 \description{
-Manually curated list of aminoacids and aminoacid-related metabolites with corresponding metabolite
-identifiers (HMDB, KEGG, etc.) irrespective of chirality.
+Manually curated list of aminoacids and aminoacid-related metabolites with
+corresponding metabolite identifiers (HMDB, KEGG, etc.) irrespective of
+chirality.
 }
 \examples{
 data(equivalent_features)
 head(equivalent_features)
+
 }
 \keyword{datasets}

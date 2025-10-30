@@ -9,14 +9,13 @@ metaproviz_load_config(path = NULL, title = "default", user = FALSE, ...)
 \arguments{
 \item{path}{Path to the config file.}
 
-\item{title}{Load the config under this title. One config file might
-contain multple configurations, each identified by a title. If the
-title is not available the first section of the config file will be
-used.}
+\item{title}{Load the config under this title. One config file might contain multple
+configurations, each identified by a title. If the title is not
+available the first section of the config file will be used.}
 
-\item{user}{Force to use the user level config even if a config file
-exists in the current directory. By default, the local config files
-have prioroty over the user level config.}
+\item{user}{Force to use the user level config even if a config file exists in the
+current directory. By default, the local config files have prioroty over
+the user level config.}
 
 \item{...}{Passed to \code{yaml.load_file}.}
 }

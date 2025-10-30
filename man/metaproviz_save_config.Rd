@@ -7,15 +7,15 @@
 metaproviz_save_config(path = NULL, title = "default", local = FALSE)
 }
 \arguments{
-\item{path}{Path to the config file. Directories and the file will be
-created if don't exist.}
+\item{path}{Path to the config file. Directories and the file will be created if
+don't exist.}
 
-\item{title}{Save the config under this title. One config file might
-contain multiple configurations, each identified by a title.}
+\item{title}{Save the config under this title. One config file might contain multiple
+configurations, each identified by a title.}
 
-\item{local}{Save into a config file in the current directory instead of
-a user level config file. When loading, the config in the current
-directory has priority over the user level config.}
+\item{local}{Save into a config file in the current directory instead of a user level
+config file. When loading, the config in the current directory has
+priority over the user level config.}
 }
 \value{
 Returns \code{NULL}.

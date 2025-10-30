@@ -2,8 +2,7 @@
 % Please edit documentation in R/RefactorPriorKnoweldge.R
 \name{compare_pk}
 \alias{compare_pk}
-\title{Compare Prior Knowledge Resources and/or Columns within a Single Resource
-and Generate an UpSet Plot}
+\title{Compare Prior Knowledge Resources and/or Columns within a Single Resource}
 \usage{
 compare_pk(
   data,
@@ -19,91 +18,76 @@ compare_pk(
 )
 }
 \arguments{
-\item{data}{A named list where each element corresponds to a prior knowledge
-(PK) resource. Each element can be:
-\itemize{
-\item   A data frame containing gene/metabolite identifiers (and
-additional columns for within-resource comparison),
-\item   A character string indicating the resource name. Recognized names
-include (but are not limited to): \code{"Hallmarks"},
+\item{data}{A named list where each element corresponds to a prior knowledge (PK)
+resource. Each element can be: \itemize{ \item   A data frame containing
+gene/metabolite identifiers (and additional columns for within-resource
+comparison), \item   A character string indicating the resource name.
+Recognized names include (but are not limited to): \code{"Hallmarks"},
 \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or
-\code{"metsigdb_chemicalclass"}). In the latter case, the
-function will attempt to load the corresponding data
-automatically.
-}}
+\code{"metsigdb_chemicalclass"}). In the latter case, the function will
+attempt to load the corresponding data automatically. }}
 
-\item{metadata_info}{A named list (with names matching those in \code{data})
-where each element is either a character string or a
-character vector indicating the column name(s) to extract features. For
-multiple-resource comparisons, these refer to the columns
-containing feature identifiers. For within-resource comparisons, the vector
-should list the columns to compare (e.g., \code{c("CHEBI", "HMDB",
-"LIMID")}).
-In within-resource mode, the input data frame is expected to contain a
-column named \code{"Class"} (or a grouping column specified via the
-\code{class_col} attribute). \emph{If no grouping column is found, a default
-grouping column named \code{"Group"} (with all rows assigned the same value)
-is created.}}
+\item{metadata_info}{A named list (with names matching those in \code{data}) where each
+element is either a character string or a character vector indicating
+the column name(s) to extract features. For multiple-resource
+comparisons, these refer to the columns containing feature identifiers.
+For within-resource comparisons, the vector should list the columns to
+compare (e.g., \code{c("CHEBI", "HMDB", "LIMID")}). In within-resource
+mode, the input data frame is expected to contain a column named
+\code{"Class"} (or a grouping column specified via the \code{class_col}
+attribute). \emph{If no grouping column is found, a default grouping
+column named \code{"Group"} (with all rows assigned the same value) is
+created.}}
 
-\item{filter_by}{Character. Optional filter for the resulting features when
-comparing multiple resources.
-Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}.
-This parameter is ignored in within-resource mode.}
+\item{filter_by}{Character. Optional filter for the resulting features when comparing
+multiple resources. Options are: \code{"both"} (default), \code{"gene"},
+or \code{"metabolite"}. This parameter is ignored in within-resource
+mode.}
 
-\item{plot_name}{\emph{Optional: } String which is added to the output files
-of the Upsetplot \strong{Default = ""}}
+\item{plot_name}{\emph{Optional: } String which is added to the output files of the
+Upsetplot \strong{Default = ""}}
 
-\item{name_col}{\emph{Optional: } column name including the feature names.
-Default is \code{"TrivialName"}.}
+\item{name_col}{\emph{Optional: } column name including the feature names. Default is
+\code{"TrivialName"}.}
 
-\item{palette_type}{Character. Color palette to be used in the plot. Default
-is \code{"polychrome"}.}
+\item{palette_type}{Character. Color palette to be used in the plot. Default is
+\code{"polychrome"}.}
 
-\item{save_plot}{\emph{Optional: } Select the file type of output plots.
-Options are svg, png, pdf. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg,
+png, pdf. \strong{Default = svg}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are:
-"csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt". \strong{Default = "csv"}}
 
-\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
-saved as an overview of the results. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an
+overview of the results. \strong{Default = TRUE}}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved
-at. \strong{Default = NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at.
+\strong{Default = NULL}}
 }
 \value{
-A list containing two elements:
-\itemize{
-\item{summary_table: A data frame representing either:
-\itemize{
-\item{the binary summary matrix of feature presence/absence across
-multiple resources, or}
-\item{the original data frame (augmented with binary columns and a
-\code{None} column) in within-resource mode.}
-}
-}
-\item{upset_plot: The UpSet plot object generated by the function.}
-}
+A list containing two elements: \itemize{ \item{summary_table: A data
+frame representing either: \itemize{ \item{the binary summary matrix of
+feature presence/absence across multiple resources, or} \item{the
+original data frame (augmented with binary columns and a \code{None}
+column) in within-resource mode.} } } \item{upset_plot: The UpSet plot
+object generated by the function.} }
 }
 \description{
-This function compares gene and/or metabolite features across multiple prior
-knowledge (PK) resources or,
-if a single resource is provided with a vector of column names in
-\code{metadata_info}, compares columns within that resource.
-}
-\details{
-In the multi-resource mode, each element in \code{data} represents a PK
-resource (either as a data frame or a recognized resource name)
-from which a set of features is extracted. A binary summary table is then
-constructed and used to create an UpSet plot.
-
+and Generate an UpSet Plot This function compares gene and/or metabolite
+features across multiple prior knowledge (PK) resources or, if a single
+resource is provided with a vector of column names in \code{metadata_info},
+compares columns within that resource. In the multi-resource mode, each
+element in \code{data} represents a PK resource (either as a data frame or a
+recognized resource name) from which a set of features is extracted. A
+binary summary table is then constructed and used to create an UpSet plot.
 In the within-resource mode, a single data frame is provided (with
-\code{data} containing one element) and its \code{metadata_info} entry
-is a vector of column names to compare (e.g., binary indicators for
-different annotations). In this case, the function expects the data frame
-to have a grouping column named \code{"Class"} (or, alternatively, a column
-specified via the \code{class_col} attribute in \code{metadata_info})
-that is used for grouping in the UpSet plot.
+\code{data} containing one element) and its \code{metadata_info} entry is a
+vector of column names to compare (e.g., binary indicators for different
+annotations). In this case, the function expects the data frame to have a
+grouping column named \code{"Class"} (or, alternatively, a column specified
+via the \code{class_col} attribute in \code{metadata_info}) that is used for
+grouping in the UpSet plot.
 }
 \examples{
 \dontrun{
@@ -116,43 +100,43 @@ data_single <- list(Biocft = biocrates_features)
 metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 
 res_single <-
-    compare_pk(
-        data = data_single, metadata_info = metadata_info_single,
-        plot_name = "Overlap of BioCrates Columns"
-    )
+compare_pk(
+data = data_single, metadata_info = metadata_info_single,
+plot_name = "Overlap of BioCrates Columns"
+)
 
 ## Example 2: Custom data Frames with Custom Column Names
 
 # Example with preloaded data frames and custom column names:
 hallmarks_df <- data.frame(
-    feature = c("HMDB0001", "GENE1", "GENE2"),
-    stringsAsFactors = FALSE
+feature = c("HMDB0001", "GENE1", "GENE2"),
+stringsAsFactors = FALSE
 )
 gaude_df <- data.frame(
-    feature = c("GENE2", "GENE3"),
-    stringsAsFactors = FALSE
+feature = c("GENE2", "GENE3"),
+stringsAsFactors = FALSE
 )
 metalinks_df <- data.frame(
-    hmdb = c("HMDB0001", "HMDB0002"),
-    gene_symbol = c("GENE1", "GENE4"),
-    stringsAsFactors = FALSE
+hmdb = c("HMDB0001", "HMDB0002"),
+gene_symbol = c("GENE1", "GENE4"),
+stringsAsFactors = FALSE
 )
 ramp_df <- data.frame(
-    class_source_id = c("HMDB0001", "HMDB0003"),
-    stringsAsFactors = FALSE
+class_source_id = c("HMDB0001", "HMDB0003"),
+stringsAsFactors = FALSE
 )
 data <- list(
-    Hallmarks = hallmarks_df, Gaude = gaude_df,
-    MetalinksDB = metalinks_df, RAMP = ramp_df
+Hallmarks = hallmarks_df, Gaude = gaude_df,
+MetalinksDB = metalinks_df, RAMP = ramp_df
 )
 metadata_info <- list(
-    Hallmarks = "feature", Gaude = "feature",
-    MetalinksDB = c("hmdb", "gene_symbol"),
-    RAMP = "class_source_id"
+Hallmarks = "feature", Gaude = "feature",
+MetalinksDB = c("hmdb", "gene_symbol"),
+RAMP = "class_source_id"
 )
 res <- compare_pk(
-    data = data, metadata_info = metadata_info,
-    filter_by = "metabolite"
+data = data, metadata_info = metadata_info,
+filter_by = "metabolite"
 )
 }
 

@@ -5,22 +5,21 @@
 \alias{tissue_dma}
 \title{tissue_dma}
 \format{
-Columns include Log2FC, stats, metabolite identifiers, metabolite pathways and normalised
-metabolite values used as input with row names being metabolite trivial names.
-}
-\source{
-Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
-\doi{10.1016/j.ccell.2015.12.004}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 570 rows and 17 columns.
 }
 \usage{
 tissue_dma
 }
 \description{
-We performed differential metabolite analysis comparing ccRCC tissue versus adjacent normal tissue using
-median normalised data from the supplementary table 2 of Hakimi et. al.(="Tissue_Norm").
+We performed differential metabolite analysis comparing ccRCC tissue versus
+adjacent normal tissue using median normalised data from the supplementary
+table 2 of Hakimi et. al.(="Tissue_Norm"). metabolite values used as input
+with row names being metabolite trivial names.
+\doi{10.1016/j.ccell.2015.12.004}
 }
 \examples{
 data(tissue_dma)
 head(tissue_dma)
+
 }
 \keyword{datasets}

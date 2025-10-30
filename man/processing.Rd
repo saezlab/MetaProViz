@@ -2,7 +2,7 @@
 % Please edit documentation in R/Processing.R
 \name{processing}
 \alias{processing}
-\title{Modularised Normalization: 80\%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.}
+\title{Data preprocessing and normalization}
 \usage{
 processing(
   data,
@@ -22,73 +22,112 @@ processing(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and colData. If se file is provided, metadata_sample is extracted from the colData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.}
+\item{data}{SummarizedExperiment or data frame. If SummarizedExperiment,
+metadata_sample is extracted from colData. If data frame, provide unique
+sample identifiers as row names and metabolite numerical values in
+columns with metabolite identifiers as column names. Use NA for
+undetected metabolites.}
 
-\item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}}
+\item{metadata_sample}{Data frame (optional). Only required if data is not a
+SummarizedExperiment. Contains information about samples, combined with
+input data based on unique sample identifiers used as row names. Must
+contain Conditions column. If experiment has no multiple conditions,
+assign all samples to same condition. Default: NULL.}
 
-\item{metadata_info}{\emph{Optional: }Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" (mandatory) with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" (optional) including numerical values. For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added. Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions. \strong{Default = c(Conditions="Conditions")}}
+\item{metadata_info}{Named character vector (optional). Contains names of experimental
+parameters: c(Conditions="ColumnName",
+Biological_Replicates="ColumnName"). Column "Conditions" (mandatory)
+contains sample conditions (e.g., "N"/"T" or "Normal"/"Tumor"), used for
+feature filtering and PCA color coding. Column "BiologicalReplicates"
+(optional) contains numerical values. For core=TRUE, must also add
+core_norm_factor="ColumnName" and core_media="ColumnName". Column
+core_norm_factor is used for normalization; core_media specifies media
+controls in Conditions. Default: c(Conditions="Conditions").}
 
-\item{featurefilt}{\emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80\%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}}
+\item{featurefilt}{Character (optional). If NULL, no feature filtering is performed. If
+"Standard", applies 80\% filtering rule (Bijlsma et al., 2006) on
+metabolite features across whole dataset. If "Modified", filtering is
+done per condition and Conditions column must be provided (Yang et al.,
+2015). Default: "Standard".}
 
-\item{cutoff_featurefilt}{\emph{Optional: } percentage of feature filtering. \strong{Default = 0.8}}
+\item{cutoff_featurefilt}{Numeric (optional). Percentage threshold for feature filtering. Default:
+0.8.}
 
-\item{tic}{\emph{Optional: } If TRUE, total Ion Count normalization is performed. \strong{Default = TRUE}}
+\item{tic}{Logical (optional). Whether total ion count normalization is performed.
+Default: TRUE.}
 
-\item{mvi}{\emph{Optional: } If TRUE, Missing Value Imputation (mvi) based on half minimum is performed \strong{Default = TRUE}}
+\item{mvi}{Logical (optional). Whether missing value imputation (MVI) based on half
+minimum is performed. Default: TRUE.}
 
-\item{mvi_percentage}{\emph{Optional: } percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}}
+\item{mvi_percentage}{Numeric (optional). Percentage (0-100) of imputed value based on minimum
+value. Default: 50.}
 
-\item{hotellins_confidence}{\emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}}
+\item{hotellins_confidence}{Numeric (optional). Confidence level for outlier identification in
+Hotelling's T2 test. Default: 0.99.}
 
-\item{core}{\emph{Optional: } If TRUE, a consumption-release experiment has been performed and the core value will be calculated. Please consider providing a Normalisation factor column called "core_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "core_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}}
+\item{core}{Logical (optional). Whether consumption-release experiment was performed
+and core value should be calculated. If TRUE, provide normalization
+factor column "core_norm_factor" in metadata_sample where Conditions
+column matches. The normalization factor must be numerical value from
+growth rate (growth curve) or growth factor (ratio of cell count/protein
+quantification at start vs. end point). Additionally, control media
+samples must be available in data and defined as "core_media" in
+Conditions column of metadata_sample. Default: FALSE.}
 
-\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. If set to NULL, plots are not saved. \strong{Default = svg}}
+\item{save_plot}{Character (optional). File type of output plots: "svg", "png", "pdf". If
+NULL, plots are not saved. Default: "svg".}
 
-\item{save_table}{\emph{Optional: } Select the file type of output table. Options are "csv", "xlsx", "txt". If set to NULL, plots are not saved. \strong{Default = "csv"}}
+\item{save_table}{Character (optional). File type of output table: "csv", "xlsx", "txt".
+If NULL, tables are not saved. Default: "csv".}
 
-\item{print_plot}{\emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}}
+\item{print_plot}{Logical (optional). Whether to print overview of resulting plots.
+Default: TRUE.}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{Character (optional). Path to folder where results should be saved.
+Default: NULL.}
 }
 \value{
-List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
+List with two elements: DF (all output tables generated) and Plot (all
+plots generated).
 }
 \description{
-Modularised Normalization: 80\%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
+Applies modular normalization including 80\% filtering rule, total-ion count
+normalization, missing value imputation, and outlier detection using
+Hotelling's T2 test.
 }
 \examples{
 data(intracell_raw_se)
-ResI <- processing(data=intracell_raw_se,
-                   metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+ResI <- processing(
+    data = intracell_raw_se,
+    metadata_info = c(
+        Conditions = "Conditions",
+        Biological_Replicates = "Biological_Replicates"
+    )
+)
 
 data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
-ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
-                               metadata_sample=Intra[-c(49:58), c(1:3)],
-                               metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+ResI <- processing(
+    data = Intra[-c(49:58), -c(1:3)],
+    metadata_sample = Intra[-c(49:58), c(1:3)],
+    metadata_info = c(
+        Conditions = "Conditions",
+        Biological_Replicates = "Biological_Replicates"
+    )
+)
 
 data(medium_raw)
 Media <- medium_raw \%>\% tibble::column_to_rownames("Code")
-ResM <- processing(data = Media[-c(40:45), -c(1:3)],
-                               metadata_sample = Media[-c(40:45), c(1:3)],
-                               metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
-                               core=TRUE)
+ResM <- processing(
+    data = Media[-c(40:45), -c(1:3)],
+    metadata_sample = Media[-c(40:45), c(1:3)],
+    metadata_info = c(
+        Conditions = "Conditions",
+        Biological_Replicates = "Biological_Replicates",
+        core_norm_factor = "GrowthFactor",
+        core_media = "blank"
+    ),
+    core = TRUE
+)
 
 }
-\keyword{80}
-\keyword{Count}
-\keyword{HotellingT2,}
-\keyword{Imputation,}
-\keyword{Ion}
-\keyword{Missing}
-\keyword{PCA,}
-\keyword{Value}
-\keyword{charts}
-\keyword{control}
-\keyword{filtering}
-\keyword{multivariate}
-\keyword{normalization,}
-\keyword{percent}
-\keyword{quality}
-\keyword{rule,}
-\keyword{total}

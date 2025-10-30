@@ -7,12 +7,11 @@
 metaproviz_reset_config(save = NULL, reset_all = FALSE)
 }
 \arguments{
-\item{save}{If a path, the restored config will be also saved
-to this file. If TRUE, the config will be saved to the current default
-config path (see \code{\link{metaproviz_config_path}}).}
+\item{save}{If a path, the restored config will be also saved to this file. If TRUE,
+the config will be saved to the current default config path (see
+\code{\link{metaproviz_config_path}}).}
 
-\item{reset_all}{Reset to their defaults also the options already set in
-the R options.}
+\item{reset_all}{Reset to their defaults also the options already set in the R options.}
 }
 \value{
 The config as a list.

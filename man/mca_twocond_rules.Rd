@@ -5,21 +5,19 @@
 \alias{mca_twocond_rules}
 \title{mca_twocond_rules}
 \format{
-Columns include Intra, core, core_Detection including state entries (e.g. up, down, etc.) and the Regulator Clustering
-columns (RG1-RG3)
-}
-\source{
-Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 36 rows and 5 columns.
 }
 \usage{
 mca_twocond_rules
 }
 \description{
-Manually curated table defining the flow of information of the two condition biological regulatory clusters Regulatory labels
-from the different grouping methods.
+Manually curated table defining the flow of information of the two condition
+biological regulatory clusters Regulatory labels from the different grouping
+methods. columns (RG1-RG3)
 }
 \examples{
 data(mca_twocond_rules)
 head(mca_twocond_rules)
+
 }
 \keyword{datasets}

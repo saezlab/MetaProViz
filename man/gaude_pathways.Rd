@@ -5,10 +5,7 @@
 \alias{gaude_pathways}
 \title{gaude_pathways}
 \format{
-Data frame with columns: term, gene
-}
-\source{
-Omnipath
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 1932 rows and 3 columns.
 }
 \usage{
 gaude_pathways
@@ -19,5 +16,6 @@ gaude_pathways
 \examples{
 data(gaude_pathways)
 head(gaude_pathways)
+
 }
 \keyword{datasets}

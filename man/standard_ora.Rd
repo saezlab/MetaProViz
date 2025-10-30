@@ -19,15 +19,28 @@ standard_ora(
 )
 }
 \arguments{
-\item{data}{DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.}
+\item{data}{DF with metabolite names/metabolite IDs as row names. Metabolite
+names/IDs need to match the identifier type (e.g. HMDB IDs) in the
+input_pathway.}
 
-\item{metadata_info}{\emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage. Also pass ColumnName for input_pathway including term and feature names. (pvalColumn = ColumnName data, percentageColumn= ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}}
+\item{metadata_info}{\emph{Optional: } Pass ColumnName of the column including parameters to
+use for cutoff_stat and cutoff_percentage. Also pass ColumnName for
+input_pathway including term and feature names. (pvalColumn = ColumnName
+data, percentageColumn= ColumnName data, PathwayTerm= ColumnName
+input_pathway, PathwayFeature= ColumnName input_pathway)
+\strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm=
+"term", PathwayFeature= "Metabolite")}}
 
-\item{cutoff_stat}{\emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}}
+\item{cutoff_stat}{\emph{Optional: } p-adjusted value cutoff from ORA results. Must be a
+numeric value. \strong{default: 0.05}}
 
-\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom \% of selected percentage Column, usually t.val or Log2FC \strong{default: 10}}
+\item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be
+considered for ORA. Selects top/Bottom \% of selected percentage Column,
+usually t.val or Log2FC \strong{default: 10}}
 
-\item{input_pathway}{DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.}
+\item{input_pathway}{DF that must include column "term" with the pathway name, column
+"Metabolite" with the Metabolite name or ID and column "Description"
+with pathway description that will be depicted on the plots.}
 
 \item{pathway_name}{\emph{Optional: } Name of the input_pathway used \strong{default: ""}}
 
@@ -35,9 +48,11 @@ standard_ora(
 
 \item{max_gssize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt" \strong{default: "csv"}}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at.
+\strong{default: NULL}}
 }
 \value{
 Saves results as individual .csv files.
@@ -49,8 +64,13 @@ requires a pathway list (from databases).
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
 data(intracell_dma) # loads the object into your environment
-DMAres <- intracell_dma \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
-RES <- MetaProViz::standard_ora(data= DMAres,
-input_pathway=KEGG_Pathways)
+DMAres <- intracell_dma \%>\%
+    dplyr::filter(!is.na(KEGGCompound)) \%>\%
+    tibble::column_to_rownames("KEGGCompound") \%>\%
+    dplyr::select(-"Metabolite")
+RES <- standard_ora(
+    data = DMAres,
+    input_pathway = KEGG_Pathways
+)
 
 }

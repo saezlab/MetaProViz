@@ -7,8 +7,8 @@
 metaproviz_config_path(user = FALSE)
 }
 \arguments{
-\item{user}{Logical: prioritize the user level config even if a config in
-the current working directory is available.}
+\item{user}{Logical: prioritize the user level config even if a config in the
+current working directory is available.}
 }
 \value{
 Character: path to the config file.

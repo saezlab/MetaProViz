@@ -5,23 +5,22 @@
 \alias{tissue_tvn_proteomics}
 \title{tissue_tvn_proteomics}
 \format{
-Columns include Log2FC, stats, gene name and SiRCle cluster information that summarises genes based
-on their regulation
-}
-\source{
-Mora & Schmidt, SiRCle (Signature Regulatory Clustering) model integration reveals mechanisms of phenotype
-regulation in renal cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al, Integrated
-proteogenomic characterization of clear cell renal cell carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 8769 rows and 10 columns.
 }
 \usage{
 tissue_tvn_proteomics
 }
 \description{
-The processed proteomics data was downloaded from the supplementary table 3 of Mora & Schmidt et. al., which
-used the study from Clark et. al. under Proteomics data Commons PDC000127.
+The processed proteomics data was downloaded from the supplementary table 3
+of Mora & Schmidt et. al., which used the study from Clark et. al. under
+Proteomics data Commons PDC000127. on their regulation regulation in renal
+cancer, Genome Medicine 2024, \doi{10.1186/s13073-024-01415-3} Clark et. al,
+Integrated proteogenomic characterization of clear cell renal cell
+carcinoma, Cell 2019, \doi{10.1016/j.cell.2019.10.007}
 }
 \examples{
 data(tissue_tvn_proteomics)
 head(tissue_tvn_proteomics)
+
 }
 \keyword{datasets}

@@ -7,11 +7,14 @@
 metsigdb_chemicalclass(version = "2.5.4", save_table = "csv", path = NULL)
 }
 \arguments{
-\item{version}{\emph{Optional: } Version of the RaMP database loaded from OmniPathR. \strong{default: "2.5.4"}}
+\item{version}{\emph{Optional: } Version of the RaMP database loaded from OmniPathR.
+\strong{default: "2.5.4"}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt". \strong{Default = "csv"}}
 
-\item{path}{{Optional:} String which is added to the resulting folder name \strong{default: NULL}}
+\item{path}{{Optional:} String which is added to the resulting folder name
+\strong{default: NULL}}
 }
 \value{
 A data frame containing the Prior Knowledge.

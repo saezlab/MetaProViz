@@ -5,22 +5,20 @@
 \alias{tissue_norm}
 \title{tissue_norm}
 \format{
-Columns include patient metadata (e.g. age, gender, sage, etc.) a numeric column for each
-measured metabolite (normalised data)
-}
-\source{
-Hakimi et. al, An integrated metabolic atlas of clear cell renal cell carcinoma, Cancer Cell 2016,
-\doi{10.1016/j.ccell.2015.12.004}
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 276 rows and 584 columns.
 }
 \usage{
 tissue_norm
 }
 \description{
-This is median normalised data from the supplementary table 2 of Hakimi et al with metabolomic
-profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs.
+This is median normalised data from the supplementary table 2 of Hakimi et
+al with metabolomic profiling on 138 matched clear cell renal cell carcinoma
+(ccRCC)/normal tissue pairs. measured metabolite (normalised data)
+\doi{10.1016/j.ccell.2015.12.004}
 }
 \examples{
 data(tissue_norm)
 head(tissue_norm)
+
 }
 \keyword{datasets}

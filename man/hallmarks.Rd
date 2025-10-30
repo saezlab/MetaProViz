@@ -5,10 +5,7 @@
 \alias{hallmarks}
 \title{hallmarks}
 \format{
-Data frame with columns: term, gene
-}
-\source{
-Omnipath
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 7322 rows and 2 columns.
 }
 \usage{
 hallmarks
@@ -19,5 +16,6 @@ hallmarks
 \examples{
 data(hallmarks)
 head(hallmarks)
+
 }
 \keyword{datasets}

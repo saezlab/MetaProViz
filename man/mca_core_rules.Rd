@@ -5,21 +5,20 @@
 \alias{mca_core_rules}
 \title{mca_core_rules}
 \format{
-Columns include Intra, core, core_Detection including state entries (e.g. up, down, etc.) and the Regulator Clustering
-columns (RG1-RG3)
-}
-\source{
-Schmidt et al, MetaProViz: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation version 2.1.7, GitHub 2025.
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 108 rows and 7 columns.
 }
 \usage{
 mca_core_rules
 }
 \description{
-Manually curated table defining the flow of information of the Conusuption-Release and Intracellular metabolomics biological
-regulatory clusters Regulatory labels from the different grouping methods.
+Manually curated table defining the flow of information of the
+Conusuption-Release and Intracellular metabolomics biological regulatory
+clusters Regulatory labels from the different grouping methods. columns
+(RG1-RG3)
 }
 \examples{
 data(mca_core_rules)
 head(mca_core_rules)
+
 }
 \keyword{datasets}

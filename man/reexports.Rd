@@ -6,7 +6,8 @@
 \alias{\%>\%}
 \title{Objects exported from other packages}
 \value{
-The left-hand side object, passed into the function on the right-hand side.
+The left-hand side object, passed into the function on the right-hand
+side.
 }
 \keyword{internal}
 \description{

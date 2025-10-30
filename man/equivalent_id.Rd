@@ -13,17 +13,17 @@ equivalent_id(
 )
 }
 \arguments{
-\item{data}{dataframe with at least one column with the detected metabolite
-IDs (one ID per row).}
+\item{data}{dataframe with at least one column with the detected metabolite IDs (one
+ID per row).}
 
-\item{metadata_info}{\emph{Optional: } Column name of metabolite IDs.
-\strong{Default = list(InputID="MetaboliteID")}}
+\item{metadata_info}{\emph{Optional: } Column name of metabolite IDs. \strong{Default =
+list(InputID="MetaboliteID")}}
 
-\item{from}{ID type that is present in your data. Choose between "kegg",
-"pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}}
+\item{from}{ID type that is present in your data. Choose between "kegg", "pubchem",
+"chebi", "hmdb". \strong{Default = "hmdb"}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are:
-"csv", "xlsx", "txt". \strong{Default = "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt". \strong{Default = "csv"}}
 
 \item{path}{{Optional:} Path to the folder the results should be saved at.
 \strong{Default = NULL}}
@@ -44,11 +44,3 @@ Res <- equivalent_id(
 )
 
 }
-\keyword{Find}
-\keyword{IDs}
-\keyword{additional}
-\keyword{for}
-\keyword{identifier}
-\keyword{metabolite}
-\keyword{one}
-\keyword{potential}

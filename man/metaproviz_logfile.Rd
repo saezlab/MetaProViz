@@ -7,8 +7,8 @@
 metaproviz_logfile()
 }
 \value{
-Character: path to the current logfile, or \code{NULL} if no
-logfile is available.
+Character: path to the current logfile, or \code{NULL} if no logfile is
+available.
 }
 \description{
 Path to the current MetaProViz log file

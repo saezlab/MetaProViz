@@ -3,8 +3,6 @@
 \name{cluster_ora}
 \alias{cluster_ora}
 \title{\subsection{---------------------------}{
-
-Overrepresentation analysis by cluster
 }}
 \usage{
 cluster_ora(
@@ -21,13 +19,28 @@ cluster_ora(
 )
 }
 \arguments{
-\item{data}{DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.}
+\item{data}{DF with metabolite names/metabolite IDs as row names. Metabolite
+names/IDs need to match the identifier type (e.g. HMDB IDs) in the
+input_pathway.}
 
-\item{metadata_info}{\emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if remove_background=TRUE. Also pass ColumnName for input_pathway including term and feature names. (ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite")}}
+\item{metadata_info}{\emph{Optional: } Pass ColumnName of the column including the cluster
+names that ORA should be performed on (=ClusterColumn). BackgroundColumn
+passes the column name needed if remove_background=TRUE. Also pass
+ColumnName for input_pathway including term and feature names.
+(ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data,
+PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName
+input_pathway) \strong{c(FeatureName="Metabolite",
+ClusterColumn="RG2_Significant", BackgroundColumn="BG_method",
+PathwayTerm= "term", PathwayFeature= "Metabolite")}}
 
-\item{remove_background}{\emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in metadata_info, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. mca_2cond are removed from the universe. \strong{default: TRUE}}
+\item{remove_background}{\emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in
+metadata_info, which includes TRUE/FALSE for each metabolite to fall
+into background based on the chosen Background method for e.g. mca_2cond
+are removed from the universe. \strong{default: TRUE}}
 
-\item{input_pathway}{DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.}
+\item{input_pathway}{DF that must include column "term" with the pathway name, column
+"Feature" with the Metabolite name or ID and column "Description" with
+pathway description.}
 
 \item{pathway_name}{\emph{Optional: } Name of the pathway list used \strong{default: ""}}
 
@@ -35,23 +48,38 @@ cluster_ora(
 
 \item{max_gssize}{\emph{Optional: } maximum group size in ORA \strong{default: 1000}}
 
-\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}}
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt" \strong{default: "csv"}}
 
-\item{path}{\emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}}
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at.
+\strong{default: NULL}}
 }
 \value{
 Saves results as individual .csv files.
 }
 \description{
-Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
+Overrepresentation analysis by cluster
+}
+\details{
+Uses enricher to run ORA on each of the metabolite cluster from any of the
+MCA functions using a pathway list
 }
 \examples{
 KEGG_Pathways <- metsigdb_kegg()
 data(intracell_dma) # loads the object into your environment
-DMAres <- intracell_dma \%>\% dplyr::filter(!is.na(KEGGCompound))\%>\%tibble::column_to_rownames("KEGGCompound")\%>\%dplyr::select(- "Metabolite")
-RES <- MetaProViz::cluster_ora(data= DMAres,
-metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-input_pathway=KEGG_Pathways,
-remove_background=FALSE)
+DMAres <- intracell_dma \%>\%
+    dplyr::filter(!is.na(KEGGCompound)) \%>\%
+    tibble::column_to_rownames("KEGGCompound") \%>\%
+    dplyr::select(-"Metabolite")
+RES <- cluster_ora(
+    data = DMAres,
+    metadata_info = c(
+        ClusterColumn = "Pathway",
+        PathwayTerm = "term",
+        PathwayFeature = "Metabolite"
+    ),
+    input_pathway = KEGG_Pathways,
+    remove_background = FALSE
+)
 
 }

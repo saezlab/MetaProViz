@@ -5,27 +5,24 @@
 \alias{intracell_raw}
 \title{intracell_raw}
 \format{
-A data frame with the following columns:
--\code{Conditions}: Character vector indicating cell line identity
-\itemize{
-\item \code{Analytical_Replicate}: Integer replicate number for analytical replicates
--\code{Biological_Replicate}: Integer replicate number for biological replicates
-\item Additional numeric columns (183 in total) containing raw metabolite intensities
-}
-}
-\source{
-Sciacovelli & Dugourd et. al., Dynamic partitioning of branched-chain amino acids-derived
-nitrogen supports renal cancer progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 58 rows and 186 columns.
 }
 \usage{
 intracell_raw
 }
 \description{
-Metabolomics workbench project PR001418, study ST002224 where we exported integrated raw
-peak values of intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A.
+Metabolomics workbench project PR001418, study ST002224 where we exported
+integrated raw peak values of intracellular metabolomics of HK2 and ccRCC
+cell lines 786-O, 786-M1A and 786-M2A. -\code{Conditions}: Character vector
+indicating cell line identity - \code{Analytical_Replicate}: Integer replicate
+number for analytical replicates -\code{Biological_Replicate}: Integer replicate
+number for biological replicates - Additional numeric columns (183 in total)
+containing raw metabolite intensities nitrogen supports renal cancer
+progression, Nature Communications 2022, DOI:10.1038/s41467-022-35036-4.
 }
 \examples{
 data(intracell_raw)
 head(intracell_raw)
+
 }
 \keyword{datasets}

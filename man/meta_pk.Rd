@@ -13,28 +13,26 @@ meta_pk(
 )
 }
 \arguments{
-\item{data}{SummarizedExperiment (se) file including assay and colData.
-If se file is provided, metadata_sample is extracted from the colData
-of the se object. Alternatively provide a DF with unique sample
-identifiers as row names and metabolite numerical values in columns
-with metabolite identifiers as column names. Use NA for metabolites
-that were not detected.}
+\item{data}{SummarizedExperiment (se) file including assay and colData. If se file
+is provided, metadata_sample is extracted from the colData of the se
+object. Alternatively provide a DF with unique sample identifiers as row
+names and metabolite numerical values in columns with metabolite
+identifiers as column names. Use NA for metabolites that were not
+detected.}
 
-\item{metadata_sample}{\emph{Optional: } Only required if you did not
-provide se file in parameter data. Provide DF which contains metadata
-information about the samples, which will be combined with your input
-data based on the unique sample identifiers used as rownames.
-\strong{Default = NULL}}
+\item{metadata_sample}{\emph{Optional: } Only required if you did not provide se file in
+parameter data. Provide DF which contains metadata information about the
+samples, which will be combined with your input data based on the unique
+sample identifiers used as rownames. \strong{Default = NULL}}
 
-\item{metadata_info}{\emph{Optional: } NULL or vector with column names that
-should be used, i.e. c("Age", "gender", "Tumour-stage").
+\item{metadata_info}{\emph{Optional: } NULL or vector with column names that should be used,
+i.e. c("Age", "gender", "Tumour-stage"). \strong{default: NULL}}
+
+\item{save_table}{\emph{Optional: } File types for the analysis results are: "csv",
+"xlsx", "txt". \strong{Default = "csv"}}
+
+\item{path}{\emph{Optional:} Path to the folder the results should be saved at.
 \strong{default: NULL}}
-
-\item{save_table}{\emph{Optional: } File types for the analysis results are:
-"csv", "xlsx", "txt". \strong{Default = "csv"}}
-
-\item{path}{\emph{Optional:} Path to the folder the results should be saved
-at. \strong{default: NULL}}
 }
 \value{
 DF with prior knowledge based on patient metadata
@@ -54,6 +52,3 @@ Res <- meta_pk(
 )
 
 }
-\keyword{knowledge,}
-\keyword{metadata}
-\keyword{prior}
