@@ -75,15 +75,15 @@ We can access the built-in dataset `intracell_raw`, which includes columns with 
 data(intracell_raw)
 
 Intra <- intracell_raw%>%
-  column_to_rownames("Code")
+column_to_rownames("Code")
 ```
 ```{r show_data_preview, echo=FALSE}
 # https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 # Check how our data looks like:
 Intra[1:5, c(1:4,21,44)]%>%
-  kableExtra::kbl(caption = "Preview of the DF `Intra` including columns with sample information and metabolite ids with their measured values.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
-  #kableExtra::scroll_box(width = "100%", height = "200px")
+kableExtra::kbl(caption = "Preview of the DF `Intra` including columns with sample information and metabolite ids with their measured values.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
+#kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 \
@@ -110,19 +110,19 @@ If your data contain pool samples, you can do `pool_estimation()` before applyin
 Now we will apply the `processing()` function to example data and have a look at the output produced. You will notice that all the chosen parameters and results are documented in messages. All the results data tables, the Quality Control (QC) plots and outlier detection plots are returned and can be easily viewed.\
 ```{r processing, fig.width=6, fig.height=4.5, fig.align="left"}
 PreprocessingResults <- processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
-                                                   metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
-                                                   metadata_info = c(Conditions = "Conditions",
-                                                                     Biological_Replicates = "Biological_Replicates"),
-                                                   featurefilt = "Modified",
-                                                   cutoff_featurefilt = 0.8,
-                                                   tic = TRUE,
-                                                   mvi = TRUE,
-                                                   hotellins_confidence = 0.99,# We perform outlier testing using 0.99 confidence intervall
-                                                   core = FALSE,
-                                                   save_plot = "svg",
-                                                   save_table= "csv",
-                                                   print_plot = TRUE,
-                                                   path = NULL)
+metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
+metadata_info = c(Conditions = "Conditions",
+Biological_Replicates = "Biological_Replicates"),
+featurefilt = "Modified",
+cutoff_featurefilt = 0.8,
+tic = TRUE,
+mvi = TRUE,
+hotellins_confidence = 0.99,# We perform outlier testing using 0.99 confidence intervall
+core = FALSE,
+save_plot = "svg",
+save_table= "csv",
+print_plot = TRUE,
+path = NULL)
 
 
 # This is the results table:
@@ -135,9 +135,9 @@ Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
 ```{r show_preprocessing_results, echo=FALSE}
 # Check how our data looks like:
 Intra_Preprocessed[29:32, 1:9]%>%
-  kableExtra::kbl(caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.") %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
-  #kableExtra::scroll_box(width = "100%", height = "200px")
+kableExtra::kbl(caption = "Preview of the pre-processing results, which has an additional column `Outlier` including the results of Hotellins T2.") %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12) #%>%
+#kableExtra::scroll_box(width = "100%", height = "200px")
 ```
 \
 In the output table you can now see the column "Outliers" and for the Condition 786-M2A, we can see that based on Hotellin's T2 test, one sample was detected as an outlier in the first round of filtering.\
@@ -146,14 +146,14 @@ As part of the `processing()` function several plots are generated  and saved. A
 Before we proceed, we will remove the outlier:\
 ```{r remove_outliers}
 Intra_Preprocessed <- Intra_Preprocessed%>%
-  filter(Outliers=="no")#remove MS55_29
+filter(Outliers=="no")#remove MS55_29
 ```
 \
 As you may have noticed, in this example dataset we have several biological replicates that were injected (=measured) several times, which can be termed as analytical replicates. The **MetaProViz** pre-processing module includes the function `replicate_sum()`, which will do this task and save the results:\
 ```{r replicate_sum}
 Intra_Preprocessed <- replicate_sum(data=Intra_Preprocessed[,-c(1:4)],
-                                               metadata_sample=Intra_Preprocessed[,c(1:4)],
-                                               metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
+metadata_sample=Intra_Preprocessed[,c(1:4)],
+metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
 ```
 \
 \
@@ -171,11 +171,11 @@ Here the different cell lines are either control or cancerous, so we can display
 ```{r pca_plot, fig.align="left", fig.width=6, fig.height=4.5, fig.cap="Figure: Do the samples cluster for the Cell type?"}
 #Create the metadata file:
 MetaData_Sample <- Intra_Preprocessed[,c(1:2)]%>%
-   mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
-                               Conditions=="786-O" ~ 'Primary Tumour',
-                               TRUE ~ 'Metastatic Tumour'))%>%
-   mutate(Status = case_when(Conditions=="HK2" ~ 'Healthy',
-                               TRUE ~ 'Cancer'))
+mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
+Conditions=="786-O" ~ 'Primary Tumour',
+TRUE ~ 'Metastatic Tumour'))%>%
+mutate(Status = case_when(Conditions=="HK2" ~ 'Healthy',
+TRUE ~ 'Cancer'))
 #Make PCA plot
 viz_pca(metadata_info= c(color="Celltype", shape="Status"),
                     metadata_sample= MetaData_Sample,
@@ -221,10 +221,10 @@ Here, the example data we have four different cell lines, healthy (HK2) and canc
 ```{r dma, fig.width=7, fig.height=5, fig.align="left"}
 # Perform multiple comparison All_vs_One using annova:
 DMA_Res <- dma(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
-                              metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
-                              metadata_info = c(Conditions="Conditions", Numerator="786-M1A" , Denominator = "HK2"),# we compare 786-M1A_vs_HK2
-                              pval ="t.test",
-                              padj="fdr")
+metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
+metadata_info = c(Conditions="Conditions", Numerator="786-M1A" , Denominator = "HK2"),# we compare 786-M1A_vs_HK2
+pval ="t.test",
+padj="fdr")
 
 # Inspect the dma results tables:
 DMA_786M1A_vs_HK2 <- DMA_Res[["dma"]][["786-M1A _vs_ HK2"]]
@@ -236,8 +236,8 @@ DMA_786M1A_vs_HK2 <- DMA_Res[["dma"]][["786-M1A _vs_ HK2"]]
 ```{r show_dma_results, echo=FALSE}
 # Check how our data looks like:
 DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
-  kableExtra::kbl(caption = "2. Preview of the dma results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "2. Preview of the dma results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
 In case you have performed a Consumption-Release (core) metabolomics experiment, which usually refers to a cell culture experiment where metabolomics is performed on the cell culture media, you will also need to set the parameter `core=TRUE` in the `dma()` function. In a core experiment the normalized metabolite values can be either a negative value, if the metabolite has been consumed from the media, or a positive value, if the metabolite has been released from the cell into the culture media. Since we can not calculate a Log2FC using negative values, we calculate the absolute difference between the mean of Condition 1 versus the mean of Condition 2. The absolute difference is log2 transformed in order to make the values comparable between the different metabolites, resulting in the Log2Dist. The result doesn't consider whether one product is larger than the other; it only looks at the magnitude of their difference. to reflect the direction of change between the two conditions we multiply with -1 if C1 < C2. By setting the paramteter core = TRUE, instead of calclulating the Log2FC, the Log2 Distance is calculated.
@@ -280,12 +280,12 @@ MappingInfo <- cellular_meta
 
 # 2. Merge with our differential results (FYI: you can also do this automatically as part of the dma function using the parameter metadata_feature)
 ORA_Input <- merge(DMA_786M1A_vs_HK2,
-                   MappingInfo,
-                   by= "Metabolite",
-                   all.x=TRUE)%>%
-  dplyr::filter(!is.na(KEGGCompound))%>%#remove features without KEGG ID
-  tibble::column_to_rownames("KEGGCompound")%>%
-  dplyr::select(-Metabolite)
+MappingInfo,
+by= "Metabolite",
+all.x=TRUE)%>%
+dplyr::filter(!is.na(KEGGCompound))%>%#remove features without KEGG ID
+tibble::column_to_rownames("KEGGCompound")%>%
+dplyr::select(-Metabolite)
 
 #--------Load KEGG pathways:
 KEGG_Pathways <- metsigdb_kegg()
@@ -299,9 +299,9 @@ In general, the `input_pathway` requirements are column "term", "Metabolite" and
 ```{r run_ora}
 #Perform ORA
 DM_ORA_res <- standard_ora(data= ORA_Input , #Input data requirements: column `t.val` and column `Metabolite`
-                                       metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-                                       input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
-                                       pathway_name="KEGG")
+metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
+input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
+pathway_name="KEGG")
 
 
 # Lets check how the results look like:
@@ -310,8 +310,8 @@ DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["ClusterGosummary"]]
 ```{r show_ora_results, echo=FALSE}
 # Check how our data looks like:
 DM_ORA_786M1A_vs_HK2[c(1:5),-1]%>%
-  kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 ## Volcano plot
@@ -320,20 +320,20 @@ For this we need to prepare the correct input data including the pathways used t
 ```{r volcano_pea}
 #Here we select only a few pathways to make only the most important plots:
 InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
-  filter(!is.na(GeneRatio)) %>%
-  filter(pvalue <= 0.1)%>%
-  dplyr::rename("term"="ID")
+filter(!is.na(GeneRatio)) %>%
+filter(pvalue <= 0.1)%>%
+dplyr::rename("term"="ID")
 
 viz_volcano(plot_types="PEA",
                         metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
-                                         PEA_stat="pvalue",#Column data2
-                                         PEA_score="GeneRatio",#Column data2
-                                         PEA_Feature="Metabolite"),# Column metadata_feature (needs to be the same as row names in data)
-                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
-                       data= ORA_Input, #Must be the data you have used as an input for the pathway analysis
-                       data2= InputPEA2, #Must be the results of the pathway analysis
-                       plot_name= "KEGG",
-                       select_label = NULL)
+                        PEA_stat="pvalue",#Column data2
+                        PEA_score="GeneRatio",#Column data2
+                        PEA_Feature="Metabolite"),# Column metadata_feature (needs to be the same as row names in data)
+                        metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
+                        data= ORA_Input, #Must be the data you have used as an input for the pathway analysis
+                        data2= InputPEA2, #Must be the results of the pathway analysis
+                        plot_name= "KEGG",
+                        select_label = NULL)
 ```
 
 
@@ -384,8 +384,8 @@ MCA2Cond_Rules <- mca_twocond_rules
 ```{r show_mca_2cond_rules, echo=FALSE}
 # Check how our data looks like:
 MCA2Cond_Rules%>%
-  kableExtra::kbl(caption ="Metabolite Clustering Analysis: 2 Conditions.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption ="Metabolite Clustering Analysis: 2 Conditions.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
 # easyalluvial::alluvial_wide(mca_2cond[,c(1:2,4)], fill_by = 'last_variable' )
 # easyalluvial::alluvial_wide(mca_2cond[,c(1:2,5)], fill_by = 'last_variable' )
@@ -440,8 +440,8 @@ MCA_CoRe_Rule <- mca_core_rules
 ```{r show_mca_core_rules, echo=FALSE}
 # Check how our data looks like:
 MCA_CoRe_Rule[,1:6]%>%
-  kableExtra::kbl(caption ="Metabolite Clustering Analysis: core.", row.names=FALSE) %>%
-  kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
+kableExtra::kbl(caption ="Metabolite Clustering Analysis: core.", row.names=FALSE) %>%
+kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 </div>
 \
