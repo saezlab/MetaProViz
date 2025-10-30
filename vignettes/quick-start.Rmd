@@ -56,13 +56,13 @@ library(tibble)
 \
 \
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
 # 1. Loading the example data
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 \
 Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022]. Here we use the integrated raw peak data as example data using the trivial metabolite name in combination with the KEGG ID as the metabolite identifiers.\
@@ -88,13 +88,13 @@ kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size =
 \
 \
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 # 2. Pre-processing
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 **MetaProViz** includes a pre-processing module with the function `processing()` that has multiple parameters to perform customize data processing.\
@@ -191,13 +191,13 @@ viz_heatmap(data = Intra_Preprocessed[,-c(1:4)],
 ```
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 # 3. Differential Metabolite Analysis
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 Differential Metabolite Analysis (`dma`) is used to compare two conditions (e.g. Tumour versus Healthy) by calculating the Log2FC, p-value, adjusted p-value and t-value. With the different parameters `pval` and `padj` one can choose the statistical tests such as t.test, wilcoxon test, limma, annova, kruskal walles, etc. (see function reference for more information).\
@@ -256,13 +256,13 @@ Using the dma results, we can now use the **MetaProViz** visualization module an
 For detailed exaples check out `3. Run MetaProViz Visualisation` in the vignettes [Standard metabolomics data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#run-metaproviz-visualisation) or [Consumption-Release (CoRe) metabolomics data from cell culture media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#run-metaproviz-visualisation)\
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 # 3. Enrichment Analysis and Prior knowledge
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 Over Representation Analysis (ORA) is a enrichment method that determines if a set of features (i.e. metabolic pathways) are over-represented in the selection of features (=metabolites) from the data in comparison to all measured features (metabolites) using the Fishers exact test. The selection of metabolites are usually the most altered metabolites in the data, which can be selected by the top and bottom t-values. Before we can perform ORA on the dma results, we have to ensure that the metabolite names match with the metabolite IDs of the prior knowledge (PK). \
@@ -338,13 +338,13 @@ viz_volcano(plot_types="PEA",
 
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 # 4. Metabolite Clustering Analysis
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
 </div>
 
 Metabolite Clustering Analysis (`MCA`) is a module, which includes different functions to enable clustering of metabolites into groups either based on logical regulatory rules. This can be particularly useful if one has multiple conditions and aims to find patterns in the data.
@@ -472,7 +472,7 @@ For a detailed example of the visualisation functions visit the extended vignett
 
 
 <div class="progress progress-striped active">
-  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+    <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
 
