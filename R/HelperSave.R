@@ -23,12 +23,12 @@
 
 #' save_path is the helper function to create the folder structure and path
 #'
-#' @param folder_name Name of the folder, which can not contain any special characters. Created within  the individual MetaProViz functions and can not be changed by the user.
+#' Create folder and path
+#'
+#' @param folder_name Name of the folder, which can not contain any special characters.
+#'     Created within  the individual MetaProViz functions and can not be
+#'     changed by the user.
 #' @param path Passed to main function by the user
-#'
-#' @description Create folder and path
-#'
-#' @keywords folder, path
 #'
 #' @noRd
 save_path <- function(
@@ -94,19 +94,25 @@ results_dir <- function(
 
 #' save_res is the helper function to save the plots and tables
 #'
-#' @param inputlist_df \emph{Optional: } Generated within the MetaProViz function. Contains named DFs. If not avalailable can be set to NULL.\strong{Default = NULL}
-#' @param inputlist_plot \emph{Optional: } Generated within the MetaProViz function. Contains named Plots. If not avalailable can be set to NULL.\strong{Default = NULL}
-#' @param save_table \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = NULL}
-#' @param save_plot \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL. \strong{Default = NULL}
+#' @param inputlist_df \emph{Optional: } Generated within the MetaProViz function. Contains
+#'     named DFs. If not avalailable can be set to NULL.\strong{Default = NULL}
+#' @param inputlist_plot \emph{Optional: } Generated within the MetaProViz function. Contains
+#'     named Plots. If not avalailable can be set to NULL.\strong{Default =
+#'     NULL}
+#' @param save_table \emph{Optional: } Passed to main function by the user. If not
+#'     avalailable can be set to NULL.\strong{Default = NULL}
+#' @param save_plot \emph{Optional: } Passed to main function by the user. If not
+#'     avalailable can be set to NULL. \strong{Default = NULL}
 #' @param path Passed to main function by the user.
 #' @param file_name Passed to main function by the user.
-#' @param core \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = FALSE}
-#' @param print_plot \emph{Optional: } Passed to main function by the user. If not avalailable can be set to NULL.\strong{Default = TRUE}
+#' @param core \emph{Optional: } Passed to main function by the user. If not
+#'     avalailable can be set to NULL.\strong{Default = FALSE}
+#' @param print_plot \emph{Optional: } Passed to main function by the user. If not
+#'     avalailable can be set to NULL.\strong{Default = TRUE}
 #' @param plot_height \emph{Optional: } Parameter for ggsave.\strong{Default = NULL}
 #' @param plot_width \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
 #' @param plot_unit \emph{Optional: } Parameter for ggsave. \strong{Default = NULL}
 #'
-#' @keywords Save
 #' @importFrom ggplot2 ggsave
 #' @importFrom readr write_csv write_delim
 #' @importFrom writexl write_xlsx

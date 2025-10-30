@@ -52,18 +52,18 @@ cm <- function(
 #'
 #' @param gtbl A TableGrob (gtable) object.
 #' @param name Character or integer: Name or index of the element or row.
-#' @param size Character, numeric or unit: the new size optinally with its
-#'     unit, e.g. ``2.3`` or ``2.3cm`` ``unit(2.3, "cm")``.
+#' @param size Character, numeric or unit: the new size optinally with its unit, e.g.
+#'     ``2.3`` or ``2.3cm`` ``unit(2.3, "cm")``.
 #' @param dim Character: either ``'heights'`` or ``'widths'``.
 #' @param offset Integer: offset from ``name``.
-#' @param ifempty Logical: set the size only if the index looked up by ``name``
-#'     and ``offset`` can not be found in the ``l`` or ``t`` column of the
-#'     layout table, which means, no grob starts in that column or row.
-#' @param callback Function: called with the new and the original value as
-#'     arguments, and its value will override the new value. By default it is
+#' @param ifempty Logical: set the size only if the index looked up by ``name`` and
+#'     ``offset`` can not be found in the ``l`` or ``t`` column of the layout
+#'     table, which means, no grob starts in that column or row.
+#' @param callback Function: called with the new and the original value as arguments, and
+#'     its value will override the new value. By default it is
 #'     ``partial(switch, TRUE)``, which ignores the original value.
-#' @param grow Logical or numeric: if the total width or height is stored in
-#'     the plottable in the slots added by ``with_canvas_size``, increase the
+#' @param grow Logical or numeric: if the total width or height is stored in the
+#'     plottable in the slots added by ``with_canvas_size``, increase the
 #'     relevant dimension. By default, the increment is identical to the
 #'     increase of the size adjusted here; if a number is provided, it will be
 #'     added to the existing value.
@@ -193,7 +193,6 @@ adjust_layout <- function(
 #' @importFrom purrr reduce
 #' @importFrom rlang !!!
 #' @importFrom rlang exec
-#'
 #' @noRd
 set_sizes <- function(
     gtbl,
@@ -306,8 +305,8 @@ gtable_col <- function(
 #' Adjust gtable paremeters to accommodate title(s)
 #'
 #' @param gtbl A TableGrob (gtable) object.
-#' @param titles Character: titles to be added to the plot. Most commonly we
-#'     have one title and a subtitle
+#' @param titles Character: titles to be added to the plot. Most commonly we have one
+#'     title and a subtitle
 #'
 #' @importFrom magrittr %<>% %>% add
 #' @importFrom logger log_trace
@@ -441,6 +440,14 @@ titles_from_legend <- function(
 }
 
 
+#' Check if element exists in gtable layout
+#'
+#' @param name Character or numeric. Name or index of element to check.
+#' @param gtbl gtable object to search in.
+#'
+#' @return Character. Name of the first matching element, or the input
+#'      if not found.
+#'
 #' @importFrom utils head
 #' @importFrom magrittr %>%
 #' @noRd
@@ -459,16 +466,16 @@ in_gtable <- function(
 ### ### ### Plot helper function: Processing ### ### ###
 ##############################################################
 
-#' @param input_plot This is the ggplot object generated within the in any of the processing functions function.
+#' Format processing plots as grobs
+#'
+#' @param input_plot This is the ggplot object generated within the in any of the processing
+#'     functions function.
 #' @param plot_name Generated within the processing functions.
 #' @param plot_type Generated within the processing functions.
 #'
-#' @keywords Plot helper function
 #' @importFrom ggplot2 annotation_custom theme
 #' @importFrom magrittr %>% %<>% add
 #' @noRd
-#'
-
 plotGrob_Processing <- function(
     input_plot,
     plot_name,
@@ -536,7 +543,6 @@ plotGrob_Processing <- function(
 #' @param metadata_info Passed to viz_pca
 #' @param plot_name Passed to viz_pca
 #'
-#' @keywords PCA helper function
 #' @importFrom ggplot2 ggplotGrob
 #' @importFrom magrittr %>%
 #' @noRd
@@ -598,13 +604,14 @@ plot_grob_pca <- function(
 ### ### ### Plot helper function: Heatmap ### ### ###
 ##############################################################
 
+#' Format heatmap plots as grobs
+#'
 #' @param input_plot This is the ggplot object generated within the viz_heatmap function.
 #' @param metadata_info Passed to viz_heatmap
 #' @param metadata_sample Passed to viz_heatmap
 #' @param metadata_feature Passed to viz_heatmap
 #' @param plot_name Passed to viz_heatmap
 #'
-#' @keywords Heatmap helper function
 #' @noRd
 plot_grob_heatmap <- function(
     input_plot,
@@ -696,15 +703,14 @@ plot_grob_heatmap <- function(
 ### ### ### Plot helper function: Volcano   ### ### ###
 ##############################################################
 
+#' Format volcano plots as grobs
+#'
 #' @param input_plot This is the ggplot object generated within the viz_volcano function.
 #' @param metadata_info Passed to viz_volcano
 #' @param plot_name Passed to viz_volcano
-#' @param subtitle
+#' @param subtitle 
 #'
-#' @keywords Volcano helper function
 #' @noRd
-#'
-
 plot_grob_volcano <- function(
     input_plot,
     metadata_info,
@@ -767,6 +773,8 @@ plot_grob_volcano <- function(
 ### ### ### Plot helper function: Superplots  ### ### ###
 #####################################################################
 
+#' Format superplots as grobs
+#'
 #' @param input_plot This is the ggplot object generated within the VizSuperplots function.
 #' @param metadata_info Passed to VizSuperplots
 #' @param metadata_sample Passed to VizSuperplots
@@ -774,9 +782,7 @@ plot_grob_volcano <- function(
 #' @param plot_name Passed to VizSuperplots
 #' @param plot_type Passed to VizSuperplots
 #'
-#' @keywords PCA helper function
 #' @noRd
-
 plot_grob_superplot <- function(
     input_plot,
     metadata_info,

@@ -17,6 +17,8 @@
 #
 
 
+#' Package initialization hook
+#'
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @noRd

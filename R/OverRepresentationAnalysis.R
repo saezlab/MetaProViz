@@ -16,7 +16,8 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
-#'## ---------------------------
+#' ## ---------------------------
+#'
 ##
 ## Script name: Over representation Analysis (ORA)
 ##
@@ -41,19 +42,40 @@
 # # # # # # # # # cluster_ora # # # # # # # # #
 # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # #
 
+
 #' Overrepresentation analysis by cluster
 #'
-#' Uses enricher to run ORA on each of the metabolite cluster from any of the MCA functions using a pathway list
+#' Uses enricher to run ORA on each of the metabolite cluster from any of the
+#' MCA functions using a pathway list
 #'
-#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
-#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including the cluster names that ORA should be performed on (=ClusterColumn). BackgroundColumn passes the column name needed if remove_background=TRUE. Also pass ColumnName for input_pathway including term and feature names. (ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(FeatureName="Metabolite", ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite")}
-#' @param remove_background \emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in metadata_info, which includes TRUE/FALSE for each metabolite to fall into background based on the chosen Background method for e.g. mca_2cond are removed from the universe. \strong{default: TRUE}
-#' @param input_pathway DF that must include column "term" with the pathway name, column "Feature" with the Metabolite name or ID and column "Description" with pathway description.
+#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite
+#'     names/IDs need to match the identifier type (e.g. HMDB IDs) in the
+#'     input_pathway.
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including the cluster
+#'     names that ORA should be performed on (=ClusterColumn). BackgroundColumn
+#'     passes the column name needed if remove_background=TRUE. Also pass
+#'     ColumnName for input_pathway including term and feature names.
+#'     (ClusterColumn= ColumnName data, BackgroundColumn = ColumnName data,
+#'     PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName
+#'     input_pathway) \strong{c(FeatureName="Metabolite",
+#'     ClusterColumn="RG2_Significant", BackgroundColumn="BG_method",
+#'     PathwayTerm= "term", PathwayFeature= "Metabolite")}
+#' @param remove_background \emph{Optional: } If TRUE, column BackgroundColumn  name needs to be in
+#'     metadata_info, which includes TRUE/FALSE for each metabolite to fall
+#'     into background based on the chosen Background method for e.g. mca_2cond
+#'     are removed from the universe. \strong{default: TRUE}
+#' @param input_pathway DF that must include column "term" with the pathway name, column
+#'     "Feature" with the Metabolite name or ID and column "Description" with
+#'     pathway description.
 #' @param pathway_name \emph{Optional: } Name of the pathway list used \strong{default: ""}
 #' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param max_gssize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt" \strong{default: "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
+#'
+#' @return Saves results as individual .csv files.
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
@@ -64,7 +86,6 @@
 #' input_pathway=KEGG_Pathways,
 #' remove_background=FALSE)
 #'
-#' @return Saves results as individual .csv files.
 #'
 #' @importFrom logger log_info
 #' @importFrom dplyr rename select
@@ -205,16 +226,33 @@ cluster_ora <- function(
 #' Can be applied on the result of differential metabolite analysis (DMA),
 #' requires a pathway list (from databases).
 #'
-#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
-#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage. Also pass ColumnName for input_pathway including term and feature names. (pvalColumn = ColumnName data, percentageColumn= ColumnName data, PathwayTerm= ColumnName input_pathway, PathwayFeature= ColumnName input_pathway) \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
-#' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
-#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom % of selected percentage Column, usually t.val or Log2FC \strong{default: 10}
-#' @param input_pathway DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
+#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite
+#'     names/IDs need to match the identifier type (e.g. HMDB IDs) in the
+#'     input_pathway.
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to
+#'     use for cutoff_stat and cutoff_percentage. Also pass ColumnName for
+#'     input_pathway including term and feature names. (pvalColumn = ColumnName
+#'     data, percentageColumn= ColumnName data, PathwayTerm= ColumnName
+#'     input_pathway, PathwayFeature= ColumnName input_pathway)
+#'     \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm=
+#'     "term", PathwayFeature= "Metabolite")}
+#' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a
+#'     numeric value. \strong{default: 0.05}
+#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be
+#'     considered for ORA. Selects top/Bottom % of selected percentage Column,
+#'     usually t.val or Log2FC \strong{default: 10}
+#' @param input_pathway DF that must include column "term" with the pathway name, column
+#'     "Metabolite" with the Metabolite name or ID and column "Description"
+#'     with pathway description that will be depicted on the plots.
 #' @param pathway_name \emph{Optional: } Name of the input_pathway used \strong{default: ""}
 #' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param max_gssize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt" \strong{default: "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
+#'
+#' @return Saves results as individual .csv files.
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
@@ -223,7 +261,6 @@ cluster_ora <- function(
 #' RES <- MetaProViz::standard_ora(data= DMAres,
 #' input_pathway=KEGG_Pathways)
 #'
-#' @return Saves results as individual .csv files.
 #'
 #' @importFrom dplyr rename
 #' @importFrom stats aggregate
@@ -368,7 +405,5 @@ standard_ora <- function(
 # # # # # # # # # Helper Fishers exact test # # # # # # # # #
 # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # #
 #'
-#'
-
 # perform test on n groups of features. DF with column feature and column group
 # output list of DFs named after groups

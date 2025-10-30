@@ -21,35 +21,39 @@
 ### ### ### Function to create complex upset plots to visualise PK coverage ### ### ###
 ##########################################################################################
 
-#' Generate Complex Upset Plot for PK Coverage (Optional Class Grouping)
+#' Generate upset plot for set intersections
 #'
-#' This function creates a complex upset plot.
-#' It is mostly intended to visualize Prior Knowledge (PK) coverage by displaying the intersections among
-#' a set of metabolite ID columns, but its use could be extended too. If a class column is provided,
-#' the data is grouped by that column and a color palette ("viridis" or "polychrome") is used to represent
-#' the class levels, along with a corresponding legend (which can be hidden if there are too many unique classes).
-#' If no class column is provided (\code{class_col = NULL}), a basic upset plot is generated.
+#' Visualizes Prior Knowledge (PK) coverage by displaying intersections
+#' among a set of metabolite ID columns. If a class column is provided,
+#' data is grouped by that column and a color palette ("viridis" or
+#' "polychrome") is used to represent class levels, with a corresponding
+#' legend (hidden if too many unique classes). If no class column is
+#' provided, a basic upset plot is generated.
 #'
-#' @param df A data frame containing the data to be plotted.
-#' @param class_col \emph{Optional: } An optional string specifying the name of the column in \code{df} that represents the class
-#'                  of each observation. This column is coerced to a factor if provided. \strong{Default = NULL}
-#' @param intersect_cols \emph{Optional: } A character vector specifying the names of the columns in \code{df} to be used for generating intersections.
-#'                       \strong{Default = c("LIMID", "HMDB", "CHEBI", "None")}.
-#' @param plot_name \emph{Optional: } String which is added to the output files of the Upsetplot\strong{Default = ""}
-#' @param palette_type \emph{Optional: } A string specifying the color palette to use for the fill aesthetic when \code{class_col} is provided.
-#'                     Options are \code{"viridis"} and \code{"polychrome"}. \strong{Default = c("viridis", "polychrome")}
-#' @param max_legend_terms \emph{Optional: } Numeric value specifying the maximum number of unique terms in \code{class_col}
-#'                         for which the legend should be displayed. If the number of levels exceeds this value,
-#'                         the legend will be hidden. Ignored if \code{class_col} is \code{NULL}. \strong{Default = 20}.
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default= NULL}
-
+#' @param df Data frame containing the data to be plotted.
+#' @param class_col Character (optional). Name of the column in df that
+#'      represents the class of each observation. This column is coerced
+#'      to a factor if provided. Default: NULL.
+#' @param intersect_cols Character vector (optional). Names of the
+#'      columns in df to be used for generating intersections. Default:
+#'      c("LIMID", "HMDB", "CHEBI", "None").
+#' @param plot_name Character (optional). String added to output files
+#'      of the upset plot. Default: "".
+#' @param palette_type Character (optional). Color palette to use for
+#'      fill aesthetic when class_col is provided. Options are "viridis"
+#'      and "polychrome". Default: c("viridis", "polychrome").
+#' @param max_legend_terms Numeric (optional). Maximum number of unique
+#'      terms in class_col for which legend should be displayed. If
+#'      number of levels exceeds this value, legend will be hidden.
+#'      Ignored if class_col is NULL. Default: 20.
+#' @param save_plot Character (optional). File type of output plots:
+#'      "svg", "png", "pdf", or NULL. Default: "svg".
+#' @param print_plot Logical (optional). Whether volcano plot is saved
+#'      as overview of results. Default: TRUE.
+#' @param path Character (optional). Path to folder where results
+#'      should be saved. Default: NULL.
 #'
-#' @return A \code{ggplot} object representing the generated upset plot.
-#'
-#'
-#' @keywords upset plot, complex upset
+#' @return ggplot object representing the generated upset plot.
 #'
 #' @importFrom ggplot2 scale_fill_manual scale_fill_viridis_d element_text theme
 #' @importFrom ggplot2 aes_string theme_minimal margin labs
@@ -58,7 +62,6 @@
 #' @importFrom logger log_info log_trace
 #' @importFrom stats setNames
 #' @importFrom grid convertUnit
-#'
 #' @noRd
 viz_upset <- function(
     df,
@@ -79,7 +82,7 @@ viz_upset <- function(
 
     log_info("viz_upset: Upset plot visualization")
     # # ------------ Check Input files ----------- ##
-    # 
+    #
     palette_type <- match.arg(
         palette_type,
         c("viridis", "polychrome")

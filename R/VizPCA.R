@@ -16,41 +16,58 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
+#' This script allows you to perform PCA plot visualization using the results
+#' of the MetaProViz analysis
 #'
-#' This script allows you to perform PCA plot visualization using the results of the MetaProViz analysis
-
-
 #################################
 ### ### ### PCA Plots ### ### ###
 #################################
 
+
 #' PCA plot visualization
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData.
-#'        If se file is provided, metadata_sample is extracted from the colData
-#'        of the se object. metadata_feature, if available, are extracted from
-#'        the rowData. Alternatively provide a DF with unique sample identifiers
-#'        as row names and metabolite numerical values in columns with
-#'        metabolite identifiers as column names. Use NA for metabolites that
-#'        were not detected.
-#' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those three information : c(color="ColumnName_Plot_SettingsFile", shape= "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
-#' @param metadata_sample  \emph{Optional: } Only required if you did not
-#'        provide se file in parameter data. Provide DF which contains metadata
-#'        information about the samples, which will be combined with your input
-#'        data based on the unique sample identifiers used as rownames.
-#'        \strong{Default = NULL}
-#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. For continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high = "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",  "#332288")\strong{Default = NULL}
-#' @param scale_color \emph{Optional: } Either "continuous" or "discrete" colour scale. For numeric or integer you can choose either, for character you have to choose discrete. \strong{Default = NULL}
-#' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
-#' @param show_loadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also plotted on the PCA (biplot) \strong{Default = FALSE}
-#' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used \strong{Default = TRUE}
-#' @param pcx \emph{Optional: } Numeric value of the PC that should be plotted on the x-axis \strong{Default = 1}
-#' @param pcy \emph{Optional: } Numeric value of the PC that should be plotted on the y-axis \strong{Default = 2}
-#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we use theme_classic(). \strong{Default = "discrete"}
-#' @param plot_name \emph{Optional: } String which is added to the output files of the PCA \strong{Default = ""}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param data SummarizedExperiment (se) file including assay and colData. If se file
+#'     is provided, metadata_sample is extracted from the colData of the se
+#'     object. metadata_feature, if available, are extracted from the rowData.
+#'     Alternatively provide a DF with unique sample identifiers as row names
+#'     and metabolite numerical values in columns with metabolite identifiers
+#'     as column names. Use NA for metabolites that were not detected.
+#' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those
+#'     three information : c(color="ColumnName_Plot_SettingsFile", shape=
+#'     "ColumnName_Plot_SettingsFile"). \strong{Default = NULL}
+#' @param metadata_sample \emph{Optional: } Only required if you did not provide se file in
+#'     parameter data. Provide DF which contains metadata information about the
+#'     samples, which will be combined with your input data based on the unique
+#'     sample identifiers used as rownames. \strong{Default = NULL}
+#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. For
+#'     continuous scale use e.g. scale_color_gradient(low = "#88CCEE", high =
+#'     "red") and for discrete scale c("#88CCEE",  "#DDCC77","#661100",
+#'     "#332288")\strong{Default = NULL}
+#' @param scale_color \emph{Optional: } Either "continuous" or "discrete" colour scale. For
+#'     numeric or integer you can choose either, for character you have to
+#'     choose discrete. \strong{Default = NULL}
+#' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format.
+#'     \strong{Default = NULL}
+#' @param show_loadings \emph{Optional: } TRUE or FALSE for whether PCA loadings are also
+#'     plotted on the PCA (biplot) \strong{Default = FALSE}
+#' @param scaling \emph{Optional: } TRUE or FALSE for whether a data scaling is used
+#'     \strong{Default = TRUE}
+#' @param pcx \emph{Optional: } Numeric value of the PC that should be plotted on the
+#'     x-axis \strong{Default = 1}
+#' @param pcy \emph{Optional: } Numeric value of the PC that should be plotted on the
+#'     y-axis \strong{Default = 2}
+#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You
+#'     can check for complete themes here:
+#'     https://ggplot2.tidyverse.org/reference/ggtheme.html. If default=NULL we
+#'     use theme_classic(). \strong{Default = "discrete"}
+#' @param plot_name \emph{Optional: } String which is added to the output files of the PCA
+#'     \strong{Default = ""}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     png, pdf or NULL. \strong{Default = svg}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an
+#'     overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -62,7 +79,6 @@
 #' Intra <- intracell_raw[, -c(2:4)] %>% tibble::column_to_rownames("Code")
 #' Res <- viz_pca(Intra)
 #'
-#' @keywords PCA
 #'
 #' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
 #' @importFrom ggplot2 scale_color_manual theme_classic annotation_custom

@@ -25,13 +25,13 @@
 
 #' Save the current package configuration
 #'
-#' @param path Path to the config file. Directories and the file will be
-#'     created if don't exist.
-#' @param title Save the config under this title. One config file might
-#'     contain multiple configurations, each identified by a title.
-#' @param local Save into a config file in the current directory instead of
-#'     a user level config file. When loading, the config in the current
-#'     directory has priority over the user level config.
+#' @param path Path to the config file. Directories and the file will be created if
+#'     don't exist.
+#' @param title Save the config under this title. One config file might contain multiple
+#'     configurations, each identified by a title.
+#' @param local Save into a config file in the current directory instead of a user level
+#'     config file. When loading, the config in the current directory has
+#'     priority over the user level config.
 #'
 #' @return Returns `NULL`.
 #'
@@ -42,6 +42,7 @@
 #' options(metaproviz.console_loglevel = "trace")
 #' metaproviz_save_config()
 #' }
+#'
 #'
 #' @importFrom OmnipathR save_config
 #' @export
@@ -57,13 +58,12 @@ metaproviz_save_config <- function(
 #' Load the package configuration from a config file
 #'
 #' @param path Path to the config file.
-#' @param title Load the config under this title. One config file might
-#'     contain multple configurations, each identified by a title. If the
-#'     title is not available the first section of the config file will be
-#'     used.
-#' @param user Force to use the user level config even if a config file
-#'     exists in the current directory. By default, the local config files
-#'     have prioroty over the user level config.
+#' @param title Load the config under this title. One config file might contain multple
+#'     configurations, each identified by a title. If the title is not
+#'     available the first section of the config file will be used.
+#' @param user Force to use the user level config even if a config file exists in the
+#'     current directory. By default, the local config files have prioroty over
+#'     the user level config.
 #' @param ... Passed to \code{yaml.load_file}.
 #'
 #' @return Invisibly returns the config as a list.
@@ -73,6 +73,7 @@ metaproviz_save_config <- function(
 #' # load the config from a custom config file:
 #' metaproviz_load_config(path = "my_custom_metaproviz_config.yml")
 #' }
+#'
 #'
 #' @importFrom OmnipathR load_config
 #' @export
@@ -94,11 +95,12 @@ metaproviz_load_config <- function(
 
 #' Restore the built-in default values of all config parameters of MetaProViz
 #'
-#' @param save If a path, the restored config will be also saved
-#'     to this file. If TRUE, the config will be saved to the current default
-#'     config path (see \code{\link{metaproviz_config_path}}).
-#' @param reset_all Reset to their defaults also the options already set in
-#'     the R options.
+#' @param save If a path, the restored config will be also saved to this file. If TRUE,
+#'     the config will be saved to the current default config path (see
+#'     \code{\link{metaproviz_config_path}}).
+#' @param reset_all Reset to their defaults also the options already set in the R options.
+#'
+#' @return The config as a list.
 #'
 #' @examples
 #' \dontrun{
@@ -107,11 +109,12 @@ metaproviz_load_config <- function(
 #' metaproviz_save_config()
 #' }
 #'
-#' @return The config as a list.
 #'
-#' @export
+#' @seealso
+#' \code{\link{metaproviz_load_config}, \link{metaproviz_save_config}}
+#'
 #' @importFrom OmnipathR reset_config
-#' @seealso \code{\link{metaproviz_load_config}, \link{metaproviz_save_config}}
+#' @export
 metaproviz_reset_config <- function(
     save = NULL,
     reset_all = FALSE
@@ -122,13 +125,14 @@ metaproviz_reset_config <- function(
 
 #' Current config file path of MetaProViz
 #'
-#' @param user Logical: prioritize the user level config even if a config in
-#'     the current working directory is available.
+#' @param user Logical: prioritize the user level config even if a config in the
+#'     current working directory is available.
 #'
 #' @return Character: path to the config file.
 #'
 #' @examples
 #' metaproviz_config_path()
+#'
 #'
 #' @importFrom OmnipathR config_path
 #' @export

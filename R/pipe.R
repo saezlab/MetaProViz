@@ -16,7 +16,10 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
+#'
+#' @return The left-hand side object, passed into the function on the right-hand
+#'     side.
+#'
 #' @importFrom magrittr %>%
-#' @return The left-hand side object, passed into the function on the right-hand side.
 #' @export
 magrittr::`%>%`

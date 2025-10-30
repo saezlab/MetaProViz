@@ -19,16 +19,19 @@
 
 #' Path to the current MetaProViz log file
 #'
-#' @return Character: path to the current logfile, or \code{NULL} if no
-#'     logfile is available.
+#' @return Character: path to the current logfile, or \code{NULL} if no logfile is
+#'     available.
 #'
 #' @examples
 #' metaproviz_logfile()
 #' # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 #'
+#'
+#' @seealso
+#' \code{\link{metaproviz_log}}
+#'
 #' @importFrom OmnipathR logfile
 #' @export
-#' @seealso \code{\link{metaproviz_log}}
 metaproviz_logfile <- function() {
     # Creates the path for the log file
     logfile("MetaProViz")
@@ -45,9 +48,12 @@ metaproviz_logfile <- function() {
 #' # then you can browse the log file, and exit with `q`
 #' }
 #'
+#'
+#' @seealso
+#' \code{\link{metaproviz_logfile}}
+#'
 #' @importFrom OmnipathR read_log
 #' @export
-#' @seealso \code{\link{metaproviz_logfile}}
 metaproviz_log <- function() {
     read_log("MetaProViz")
 }
@@ -62,6 +68,7 @@ metaproviz_log <- function() {
 #'
 #' @examples
 #' metaproviz_set_loglevel(logger::FATAL, target = "console")
+#'
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @export

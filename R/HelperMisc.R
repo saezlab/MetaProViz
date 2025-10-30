@@ -24,7 +24,7 @@
 #' @noRd
 .nse_ensure_str <- function(arg) {
     enquo(arg) %>%
-        { 
+        {
             `if`(
                 is_symbol(quo_get_expr(.)),
                 quo_text(.),
@@ -32,7 +32,7 @@
             )
         } %>%
             str_remove("`$") %>%
-            str_remove("^`") 
+            str_remove("^`")
 }
 
 

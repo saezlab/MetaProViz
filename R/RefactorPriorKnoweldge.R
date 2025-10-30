@@ -26,39 +26,38 @@
 
 #' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 #'
-#' @param data dataframe with at least one column with the target (e.g.
-#' metabolite), you can add other columns such as source (e.g. term). Must be
-#' "long" DF, meaning one ID per row.
-#' @param metadata_info \emph{Optional: } Column name of Target in input_pk.
-#' \strong{Default = list(InputID="MetaboliteID" , grouping_variable="term")}
-#' @param from ID type that is present in your data. Choose between "kegg",
-#' "pubchem", "chebi", "hmdb". \strong{Default = "kegg"}
+#' @param data dataframe with at least one column with the target (e.g. metabolite),
+#'     you can add other columns such as source (e.g. term). Must be "long" DF,
+#'     meaning one ID per row.
+#' @param metadata_info \emph{Optional: } Column name of Target in input_pk. \strong{Default =
+#'     list(InputID="MetaboliteID" , grouping_variable="term")}
+#' @param from ID type that is present in your data. Choose between "kegg", "pubchem",
+#'     "chebi", "hmdb". \strong{Default = "kegg"}
 #' @param to One or multiple ID types to which you want to translate your data.
-#' Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default =
-#' c("pubchem","chebi","hmdb")}
+#'     Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default =
+#'     c("pubchem","chebi","hmdb")}
 #' @param summary \emph{Optional: } If TRUE a long summary tables are created.
-#' \strong{Default = FALSE}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#'     \strong{Default = FALSE}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at.
-#' \strong{Default = NULL}
+#'     \strong{Default = NULL}
 #'
 #' @return List with at least three DFs: 1) Original data and the new column of
-#' translated ids spearated by comma. 2) Mapping information between Original
-#' ID
-#' to Translated ID. 3) Mapping summary between Original ID to Translated ID.
+#'     translated ids spearated by comma. 2) Mapping information between
+#'     Original ID to Translated ID. 3) Mapping summary between Original ID to
+#'     Translated ID.
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
 #' Res <- translate_id(
-#'     data = KEGG_Pathways, metadata_info = c(
-#'         InputID =
-#'             "MetaboliteID", grouping_variable = "term"
-#'     ), from = c("kegg"), to =
-#'         c("pubchem", "hmdb")
+#' data = KEGG_Pathways, metadata_info = c(
+#' InputID =
+#' "MetaboliteID", grouping_variable = "term"
+#' ), from = c("kegg"), to =
+#' c("pubchem", "hmdb")
 #' )
 #'
-#' @keywords Translate metabolite IDs
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across n
 #' @importFrom tidyselect all_of starts_with
@@ -136,13 +135,13 @@ function(
 
         unknown_types <-
             id_types() %>%
-                select( 
+                select(
                 starts_with("in_")
             ) %>%
                 unlist() %>%
                 unique() %>%
                 str_to_lower() %>%
-                setdiff( 
+                setdiff(
                 union(from, to), .
             )
 
@@ -161,21 +160,21 @@ function(
         # ask if they forget to set groupings column
         doublons <-
             data %>%
-                filter( 
+                filter(
                 !is.na(
                     !!sym(
                         metadata_info[["InputID"]]
                     )
                 )
             ) %>%
-                group_by( 
+                group_by(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                filter( 
+                filter(
                 n() > 1L
             ) %>%
-                summarize() 
+                summarize()
 
         if (nrow(doublons) > 0L) {
             message <-
@@ -228,20 +227,20 @@ function(
         # # translatedID columns
         DF_subset <-
             TranslatedDF %>%
-                select( 
+                select(
                 all_of(intersect(names(.), names(data))), all_of(to)
             ) %>%
-                mutate( 
+                mutate(
                 across(
                     all_of(to),
                     ~ map_chr(., ~ paste(unique(.), collapse = ", "))
                 )
             ) %>%
-                group_by( 
+                group_by(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                mutate( 
+                mutate(
                 across(all_of(to),
                     ~ paste(unique(.),
                         collapse = ", "
@@ -251,7 +250,7 @@ function(
             ) %>%
                 ungroup() %>%
                 distinct() %>%
-                mutate( 
+                mutate(
                 across(
                     all_of(to),
                     ~ ifelse(. == "0", NA, .)
@@ -267,7 +266,7 @@ function(
         for (item in to) {
             summaryDF <-
                 TranslatedDF %>%
-                    attr( 
+                    attr(
                     paste0(
                         "ambiguity_",
                         metadata_info[["InputID"]],
@@ -347,16 +346,18 @@ function(
 
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
-#' @param data dataframe with at least one column with the detected metabolite
-#' IDs (one ID per row).
-#' @param metadata_info \emph{Optional: } Column name of metabolite IDs.
-#' \strong{Default = list(InputID="MetaboliteID")}
-#' @param from ID type that is present in your data. Choose between "kegg",
-#' "pubchem", "chebi", "hmdb". \strong{Default = "hmdb"}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' rowwise if_else
+#'
+#' @param data dataframe with at least one column with the detected metabolite IDs (one
+#'     ID per row).
+#' @param metadata_info \emph{Optional: } Column name of metabolite IDs. \strong{Default =
+#'     list(InputID="MetaboliteID")}
+#' @param from ID type that is present in your data. Choose between "kegg", "pubchem",
+#'     "chebi", "hmdb". \strong{Default = "hmdb"}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at.
-#' \strong{Default = NULL}
+#'     \strong{Default = NULL}
 #'
 #' @return Input DF with additional column including potential additional IDs.
 #'
@@ -364,15 +365,13 @@ function(
 #' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>% tidyr::drop_na()
 #' Res <- equivalent_id(
-#'     data = DetectedIDs,
-#'     metadata_info = c(InputID = "HMDB"),
-#'     from = "hmdb"
+#' data = DetectedIDs,
+#' metadata_info = c(InputID = "HMDB"),
+#' from = "hmdb"
 #' )
 #'
-#' @keywords Find potential additional IDs for one metabolite identifier
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across
-#' rowwise if_else
 #' @importFrom tidyr separate_rows unnest
 #' @importFrom purrr map_chr map_lgl map_int
 #' @importFrom tidyselect all_of starts_with
@@ -449,13 +448,13 @@ function(
 
         unknown_types <-
             id_types() %>%
-                select( 
+                select(
                 starts_with("in_")
             ) %>%
                 unlist() %>%
                 unique() %>%
                 str_to_lower() %>%
-                setdiff(from, .) 
+                setdiff(from, .)
 
         if (length(unknown_types) > 0L) {
             msg <-
@@ -475,7 +474,7 @@ function(
         if (nrow(doublons) > 0L) {
             data <-
                 data %>%
-                    distinct( 
+                    distinct(
                     !!sym(metadata_info[["InputID"]]),
                     .keep_all = TRUE
                 )
@@ -532,7 +531,7 @@ function(
             EquivalentFeatures <-
                 "equivalent_features" %>%
                     get(envir = environment()) %>%
-                    select(from) 
+                    select(from)
         }
 
         # # ------------------ Translate from-to-to ------------------- ##
@@ -549,21 +548,21 @@ function(
                 ambiguity_groups = NULL,  # Can not be set to FALSE!
                 ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
             ) %>%
-                select( 
+                select(
                 all_of(intersect(names(.), names(data))), all_of(to)
             ) %>%
-                mutate( 
+                mutate(
                 across(all_of(to), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))
             ) %>%
-                group_by( 
+                group_by(
                 !!sym(metadata_info[["InputID"]])
             ) %>%
-                mutate( 
+                mutate(
                 across(all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")
             ) %>%
                 ungroup() %>%
                 distinct() %>%
-                mutate( 
+                mutate(
                 across(all_of(to), ~ ifelse(. == "0", NA, .))
             )
 
@@ -571,20 +570,20 @@ function(
         # # ------------------ Translate to-to-from ------------------- ##
         TranslatedDF_Long <-
             TranslatedDF %>%
-                select( 
+                select(
                 !!sym(metadata_info[["InputID"]]), !!sym(to)
             ) %>%
-                rename( 
+                rename(
                 "InputID" = !!sym(metadata_info[["InputID"]])
             ) %>%
-                separate_rows( 
+                separate_rows(
                 !!sym(to),
                 sep = ", "
             ) %>%
-                mutate( 
+                mutate(
                 across(all_of(to), ~ trimws(.))
             ) %>%
-                filter(  # Remove extra spaces 
+                filter(  # Remove extra spaces
                 !!sym(to) != ""
             )
         # Remove empty entries
@@ -601,31 +600,31 @@ function(
                 ambiguity_groups = NULL,  # Can not be set to FALSE!
                 ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
             ) %>%
-                select( 
+                select(
                 "InputID", !!sym(to), !!sym(from)
             ) %>%
-                distinct( 
+                distinct(
                 InputID, !!sym(from),
                 .keep_all = TRUE
             ) %>%
-                # Remove duplicates based on InputID and from 
+                # Remove duplicates based on InputID and from
             mutate(
                 AdditionalID = if_else(InputID == !!sym(from), FALSE, TRUE)
             ) %>%
-                select( 
+                select(
                 "InputID", !!sym(from), "AdditionalID"
             ) %>%
-                filter( 
+                filter(
                 AdditionalID == TRUE
             ) %>%
-                mutate( 
+                mutate(
                 across(
                     all_of(from),
                     ~ map_chr(., ~ paste(unique(.), collapse = ", "))
                 )
             ) %>%
                 rowwise() %>%
-                mutate( 
+                mutate(
                 fromList = list(str_split(!!sym(from), ", \\s*")[[1]]),
                 # Wrap in list
                 SameAsInput = ifelse(
@@ -641,10 +640,10 @@ function(
             # Combine other IDs
             ) %>%
                 ungroup() %>%
-                select( 
+                select(
                 InputID, PotentialAdditionalIDs, !!sym(from)
             ) %>%
-                # Final selection 
+                # Final selection
             rename(
                 "AllIDs" = from
             )
@@ -665,7 +664,7 @@ function(
             EquivalentFeatures$AllIDs <- EquivalentFeatures[[from]]
             EquivalentFeatures_Long <-
                 EquivalentFeatures %>%
-                    separate_rows( 
+                    separate_rows(
                     !!sym(from),
                     sep = ", "
                 )
@@ -679,7 +678,7 @@ function(
                     all.x = TRUE
                 ) %>%
                     rowwise() %>%
-                    mutate( 
+                    mutate(
                     AllIDs = paste(
                         unique(
                             na.omit(
@@ -704,7 +703,7 @@ function(
                 ) %>%
                     ungroup() %>%
                     rowwise() %>%
-                    mutate( 
+                    mutate(
                     PotentialAdditionalIDs = paste(
                         setdiff(
                             unlist(
@@ -723,7 +722,7 @@ function(
                     )
                 ) %>%
                     ungroup() %>%
-                    select( 
+                    select(
                     -AllIDs.x,
                     -AllIDs.y
                 )
@@ -732,14 +731,14 @@ function(
         # # ------------------- Fill empty cells -------------- ##
         OtherIDs <-
             OtherIDs %>%
-                mutate( 
+                mutate(
                 PotentialAdditionalIDs = ifelse(
                     is.na(PotentialAdditionalIDs) | PotentialAdditionalIDs == "",
                     NA,
                     PotentialAdditionalIDs
                 )
             ) %>%
-                mutate( 
+                mutate(
                 AllIDs = ifelse(
                     is.na(AllIDs) | AllIDs == "",
                     !!sym(metadata_info[["InputID"]]),
@@ -798,49 +797,49 @@ function(
 
 #' Create Mapping Ambiguities between two ID types
 #'
-#' @param data Translated DF from translate_id reults or dataframe with at
-#' least
-#' one column with the target metabolite ID and another MetaboliteID type. One
-#' of the IDs can only have one ID per row, the other ID can be either
+#' @param data Translated DF from translate_id reults or dataframe with at least one
+#'     column with the target metabolite ID and another MetaboliteID type. One
+#'     of the IDs can only have one ID per row, the other ID can be either
+#'
 # separated
+
+
 #' by comma or a list. Optional: add other columns such as source (e.g. term).
-#' @param to Column name of original metabolite identifier in data. Here should
-#' only have one ID per row.
-#' @param from Column name of the secondary or translated metabolite identifier
-#' in data. Here can be multiple IDs per row either separated by comma " ," or
-#' a
-#' list of IDs.
-#' @param grouping_variable \emph{Optional: } If NULL no groups are used. If
-#' TRUE provide column name in data containing the grouping_variable and
-#' features are grouped. \strong{Default = NULL}
+#'
+#' @param to Column name of original metabolite identifier in data. Here should only
+#'     have one ID per row.
+#' @param from Column name of the secondary or translated metabolite identifier in
+#'     data. Here can be multiple IDs per row either separated by comma " ," or
+#'     a list of IDs.
+#' @param grouping_variable \emph{Optional: } If NULL no groups are used. If TRUE provide column
+#'     name in data containing the grouping_variable and features are grouped.
+#'     \strong{Default = NULL}
 #' @param summary \emph{Optional: } If TRUE a long summary tables are created.
-#' \strong{Default = FALSE}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#'     \strong{Default = FALSE}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at.
-#' \strong{Default = NULL}
+#'     \strong{Default = NULL}
 #'
 #' @return List with at least 4 DFs: 1-3) from-to-to: 1. MappingIssues, 2.
-#' MappingIssues summary, 3. Long summary (If summary=TRUE) & 4-6) to-to-from:
-#' 4. MappingIssues, 5. MappingIssues summary, 6. Long summary (If
-#' summary=TRUE)
-#' & 7) Combined summary table (If summary=TRUE)
+#'     MappingIssues summary, 3. Long summary (If summary=TRUE) & 4-6)
+#'     to-to-from: 4. MappingIssues, 5. MappingIssues summary, 6. Long summary
+#'     (If summary=TRUE) & 7) Combined summary table (If summary=TRUE)
 #'
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
 #' InputDF <- translate_id(
-#'     data = KEGG_Pathways, metadata_info = c(
-#'         InputID =
-#'             "MetaboliteID", grouping_variable = "term"
-#'     ), from = c("kegg"), to =
-#'         c("pubchem")
+#' data = KEGG_Pathways, metadata_info = c(
+#' InputID =
+#' "MetaboliteID", grouping_variable = "term"
+#' ), from = c("kegg"), to =
+#' c("pubchem")
 #' )[["TranslatedDF"]]
 #' Res <- mapping_ambiguity(
-#'     data = InputDF, from = "MetaboliteID", to =
-#'         "pubchem", grouping_variable = "term", summary = TRUE
+#' data = InputDF, from = "MetaboliteID", to =
+#' "pubchem", grouping_variable = "term", summary = TRUE
 #' )
 #'
-#' @keywords Mapping ambiguity
 #'
 #' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom rlang !!! !! := sym syms
@@ -849,7 +848,6 @@ function(
 #' @importFrom tidyr unnest
 #' @importFrom purrr map_chr map_int map_lgl
 #' @importFrom dplyr first
-#'
 #' @export
 mapping_ambiguity <-
 function(
@@ -973,7 +971,7 @@ function(
             data[[to]] <-
                 data[[to]] %>%
                     strsplit(", ") %>%
-                    lapply(as.character) 
+                    lapply(as.character)
         }
 
         # # ------------------  Perform ambiguity mapping ------------------- ##
@@ -995,15 +993,15 @@ function(
                     sep = ""
                 )
             ]] <- data %>%
-                unnest(  # unlist the columns in case they are not expaned 
+                unnest(  # unlist the columns in case they are not expaned
                     cols = all_of(Comp[[comp]]$from)
                 ) %>%
-                    filter(  # Remove NA values, otherwise they are counted as column is character 
+                    filter(  # Remove NA values, otherwise they are counted as column is character
                     !is.na(
                         !!sym(Comp[[comp]]$from)
                     )
                 ) %>%
-                    ambiguity( 
+                    ambiguity(
                     from_col = !!sym(Comp[[comp]]$from),
                     to_col = !!sym(Comp[[comp]]$to),
                     groups = grouping_variable,
@@ -1034,7 +1032,7 @@ function(
                     sep = ""
                 )
             ]] %>%
-                attr( 
+                attr(
                 paste0(
                     "ambiguity_",
                     Comp[[comp]]$from,
@@ -1061,10 +1059,10 @@ function(
                     # MetaboliteID before merging
                     ResList[[from_to_long]] <-
                         ResList[[from_to_v2]] %>%
-                            unnest( 
+                            unnest(
                             cols = all_of(Comp[[comp]]$from)
                         ) %>%
-                            mutate( 
+                            mutate(
                             !!sym(from_to_acr_grp) := case_when(
                                 (
                                     !!sym(from_to_amb_bg) !=
@@ -1073,11 +1071,11 @@ function(
                                 TRUE ~ "FALSE"
                             )
                         ) %>%
-                            group_by( 
+                            group_by(
                             !!sym(Comp[[comp]]$from),
                             !!sym(grouping_variable)
                         ) %>%
-                            mutate( 
+                            mutate(
                             !!sym(
                                 Comp[[comp]]$to
                             ) := ifelse(
@@ -1089,7 +1087,7 @@ function(
                                 )
                             )
                         ) %>%
-                            mutate( 
+                            mutate(
                             !!sym(from_to_count) := ifelse(
                                 all(!!sym(Comp[[comp]]$to) == 0L),
                                 0L,
@@ -1098,7 +1096,7 @@ function(
                         ) %>%
                             ungroup() %>%
                             distinct() %>%
-                            unite( 
+                            unite(
                             !!sym(from_to_v3),
                             c(
                                 Comp[[comp]]$from,
@@ -1107,17 +1105,17 @@ function(
                             sep = " --> ",
                             remove = FALSE
                         ) %>%
-                            separate_rows( 
+                            separate_rows(
                             !!sym(Comp[[comp]]$to),
                             sep = ", "
                         ) %>%
-                            unite( 
+                            unite(
                             UniqueID,
                             c(from, to, grouping_variable),
                             sep = "_",
                             remove = FALSE
                         ) %>%
-                            distinct() 
+                            distinct()
                 } else {
                     ResList[[paste0(
                         Comp[[comp]]$from,
@@ -1132,13 +1130,13 @@ function(
                             Comp[[comp]]$to,
                             sep = ""
                         )]] %>%
-                            unnest( 
+                            unnest(
                             cols = all_of(Comp[[comp]]$from)
                         ) %>%
-                            group_by( 
+                            group_by(
                             !!sym(Comp[[comp]]$from)
                         ) %>%
-                            mutate( 
+                            mutate(
                             !!sym(
                                 Comp[[comp]]$to
                             ) := ifelse(
@@ -1150,7 +1148,7 @@ function(
                                 )
                             )
                         ) %>%
-                            mutate( 
+                            mutate(
                             !!sym(
                                 paste0(
                                     "Count(",
@@ -1167,7 +1165,7 @@ function(
                         ) %>%
                             ungroup() %>%
                             distinct() %>%
-                            unite( 
+                            unite(
                             !!sym(
                                 paste0(
                                     Comp[[comp]]$from,
@@ -1182,18 +1180,18 @@ function(
                             sep = " --> ",
                             remove = FALSE
                         ) %>%
-                            separate_rows( 
+                            separate_rows(
                             !!sym(Comp[[comp]]$to),
                             sep = ", "
                         ) %>%
-                            unite( 
+                            unite(
                             UniqueID,
                             c(from, to),
                             sep = "_",
                             remove = FALSE
                         ) %>%
                             distinct() %>%
-                            mutate( 
+                            mutate(
                             !!sym(
                                 paste0(
                                     "AcrossGroupMappingIssue(",
@@ -1211,10 +1209,10 @@ function(
             # Add NA metabolite maps back if they do exist:
             Removed <-
                 data %>%
-                    unnest(  # unlist the columns in case they are not expaned 
+                    unnest(  # unlist the columns in case they are not expaned
                     cols = all_of(Comp[[comp]]$from)
                 ) %>%
-                    filter( 
+                    filter(
                     is.na(!!sym(Comp[[comp]]$from))
                 )
 
@@ -1234,7 +1232,7 @@ function(
                         )]],
                         test <-
                             Removed %>%
-                                bind_cols( 
+                                bind_cols(
                                 setNames(
                                     as.list(
                                         rep(
@@ -1307,18 +1305,18 @@ function(
                     by = "UniqueID",
                     all = TRUE
                 ) %>%
-                    separate( 
+                    separate(
                     UniqueID,
                     into = c(from, to, grouping_variable),
                     sep = "_",
                     remove = FALSE
                 ) %>%
-                    distinct() 
+                    distinct()
 
             # Add relevant mapping information
             summary <-
                 summary %>%
-                    mutate( 
+                    mutate(
                     Mapping = case_when(
                         !!sym(paste0("Count(", from, "_to_", to, ")")) == 1L & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L ~ "one-to-one",
                         !!sym(paste0("Count(", from, "_to_", to, ")")) > 1L & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L ~ "one-to-many",
@@ -1331,7 +1329,7 @@ function(
                         TRUE ~ NA
                     )
                 ) %>%
-                    mutate( 
+                    mutate(
                     !!sym(
                         paste0("Count(", from, "_to_", to, ")")
                     ) := replace_na(
@@ -1341,7 +1339,7 @@ function(
                         0L
                     )
                 ) %>%
-                    mutate( 
+                    mutate(
                     !!sym(
                         paste0("Count(", to, "_to_", from, ")")
                     ) := replace_na(
@@ -1381,55 +1379,52 @@ function(
 ################################################################################
 
 #' Check and summarize relationship between prixor knowledge to measured
+#'
 #' features
 #'
-#' @param data dataframe with at least one column with the detected metabolite
-#' IDs (e.g. HMDB). If there are multiple IDs per detected peak, please
-#' separate
-#' them by comma ("," or ", " or chr list). If there is a main ID and
-#' additional
-#' IDs, please provide them in separate columns.
-#' @param input_pk dataframe with at least one column with the metabolite ID
-#' (e.g. HMDB) that need to match data metabolite IDs "source" (e.g. term). If
-#' there are multiple IDs, as the original pathway IDs (e.g. KEGG) where
-#' translated (e.g. to HMDB), please separate them by comma ("," or ", " or chr
-#' list).
-#' @param metadata_info Colum name of Metabolite IDs in data and input_pk as
-#' well as column name of grouping_variable in input_pk. \strong{Default =
-#' c(InputID="HMDB", PriorID="HMDB", grouping_variable="term")}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#' "csv", "xlsx", "txt". \strong{Default = "csv"}
+#' @param data dataframe with at least one column with the detected metabolite IDs
+#'     (e.g. HMDB). If there are multiple IDs per detected peak, please
+#'     separate them by comma ("," or ", " or chr list). If there is a main ID
+#'     and additional IDs, please provide them in separate columns.
+#' @param input_pk dataframe with at least one column with the metabolite ID (e.g. HMDB)
+#'     that need to match data metabolite IDs "source" (e.g. term). If there
+#'     are multiple IDs, as the original pathway IDs (e.g. KEGG) where
+#'     translated (e.g. to HMDB), please separate them by comma ("," or ", " or
+#'     chr list).
+#' @param metadata_info Colum name of Metabolite IDs in data and input_pk as well as column name
+#'     of grouping_variable in input_pk. \strong{Default = c(InputID="HMDB",
+#'     PriorID="HMDB", grouping_variable="term")}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at.
-#' \strong{Default = NULL}
+#'     \strong{Default = NULL}
 #'
-#' @return A \code{list} with three elements:
-#' \itemize{
-#' \item \code{data_summary} — a data frame summarising matching results per
-#' input ID, including counts, conflicts, and recommended actions.
-#' \item \code{GroupingVariable_summary} — a detailed data frame showing
-#' matches
-#' grouped by the specified variable, with conflict annotations.
-#' \item \code{data_long} — a merged data frame of prior knowledge IDs and
-#' detected IDs in long format.
-#' }
+#' @return A \code{list} with three elements: \itemize{ \item \code{data_summary} —
+#'     a data frame summarising matching results per input ID, including
+#'     counts, conflicts, and recommended actions. \item
+#'     \code{GroupingVariable_summary} — a detailed data frame showing matches
+#'     grouped by the specified variable, with conflict annotations. \item
+#'     \code{data_long} — a merged data frame of prior knowledge IDs and
+#'     detected IDs in long format. }
 #'
 #' @examples
 #' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>%
-#'     dplyr::select("Metabolite", "HMDB") %>%
-#'     tidyr::drop_na()
+#' dplyr::select("Metabolite", "HMDB") %>%
+#' tidyr::drop_na()
 #' input_pathway <- translate_id(
-#'     data = metsigdb_kegg(), metadata_info =
-#'         c(InputID = "MetaboliteID", grouping_variable = "term"), from = c("kegg"),
-#'     to = c("hmdb")
+#' data = metsigdb_kegg(), metadata_info =
+#' c(InputID = "MetaboliteID", grouping_variable = "term"), from = c("kegg"),
+#' to = c("hmdb")
 #' )[["TranslatedDF"]] %>% tidyr::drop_na()
 #' Res <- checkmatch_pk_to_data(
-#'     data = DetectedIDs, input_pk = input_pathway,
-#'     metadata_info = c(
-#'         InputID = "HMDB", PriorID = "hmdb", grouping_variable =
-#'             "term"
-#'     )
+#' data = DetectedIDs, input_pk = input_pathway,
+#' metadata_info = c(
+#' InputID = "HMDB", PriorID = "hmdb", grouping_variable =
+#' "term"
 #' )
+#' )
+#'
 #'
 #' @importFrom dplyr cur_group_id filter mutate n_distinct row_number select
 #' @importFrom logger log_trace
@@ -1509,7 +1504,7 @@ function(
 
             data <-
                 data %>%
-                    filter( 
+                    filter(
                     !is.na(.data[[metadata_info[["InputID"]]]])
                 )
 
@@ -1530,7 +1525,7 @@ function(
 
             data <-
                 data %>%
-                    distinct( 
+                    distinct(
                     .data[[metadata_info[["InputID"]]]],
                     .keep_all = TRUE
                 )
@@ -1604,7 +1599,7 @@ function(
 
             input_pk <-
                 input_pk %>%
-                    filter( 
+                    filter(
                     !is.na(.data[[metadata_info[["PriorID"]]]])
                 )
 
@@ -1654,22 +1649,22 @@ function(
 
             input_pk <-
                 input_pk %>%
-                    distinct( 
+                    distinct(
                     .data[[metadata_info[["PriorID"]]]],
                     !!sym(metadata_info[["grouping_variable"]]),
                     .keep_all = TRUE
                 ) %>%
-                    group_by( 
+                    group_by(
                     !!sym(metadata_info[["PriorID"]])
                 ) %>%
-                    mutate( 
+                    mutate(
                     across(
                         everything(),
                         ~ if (is.character(.)) paste(unique(.), collapse = ", ")
                     )
                 ) %>%
                     ungroup() %>%
-                    distinct( 
+                    distinct(
                     .data[[metadata_info[["PriorID"]]]],
                     .keep_all = TRUE
                 )
@@ -1726,25 +1721,25 @@ function(
             df_name
         ) {
                 df %>%
-                    mutate( 
+                    mutate(
                     row_id = row_number()
                 ) %>%
-                    mutate(  # Store original values 
+                    mutate(  # Store original values
                     !!paste0("OriginalEntry_", df_name, sep = "") :=
                         !!sym(id_col)
                 ) %>%
-                    separate_rows( 
+                    separate_rows(
                     !!sym(id_col),
                     sep = ", \\s*"
                 ) %>%
-                    group_by( 
+                    group_by(
                     row_id
                 ) %>%
-                    mutate( 
+                    mutate(
                     !!(paste0("OriginalGroup_", df_name, sep = "")) :=
                         paste0(df_name, "_", cur_group_id())
                 ) %>%
-                    ungroup() 
+                    ungroup()
             }
 
         if (data_MultipleIDs) {
@@ -1754,7 +1749,7 @@ function(
                     metadata_info[["InputID"]],
                     "data"
                 ) %>%
-                    select( 
+                    select(
                     metadata_info[["InputID"]],
                     "OriginalEntry_data",
                     OriginalGroup_data
@@ -1762,10 +1757,10 @@ function(
         } else {
             data_long <-
                 data %>%
-                    mutate( 
+                    mutate(
                     OriginalGroup_data := paste0("data_", row_number())
                 ) %>%
-                    select( 
+                    select(
                     metadata_info[["InputID"]],
                     OriginalGroup_data
                 )
@@ -1780,7 +1775,7 @@ function(
                     metadata_info[["PriorID"]],
                     "PK"
                 ) %>%
-                    select( 
+                    select(
                     metadata_info[["PriorID"]],
                     "OriginalEntry_PK",
                     OriginalGroup_PK,
@@ -1789,10 +1784,10 @@ function(
         } else {
             PK_long <-
                 input_pk %>%
-                    mutate( 
+                    mutate(
                     OriginalGroup_PK := paste0("PK_", row_number())
                 ) %>%
-                    select( 
+                    select(
                     metadata_info[["PriorID"]],
                     OriginalGroup_PK,
                     metadata_info[["grouping_variable"]]
@@ -1809,7 +1804,7 @@ function(
                 by.y = metadata_info[["InputID"]],
                 all = TRUE
             ) %>%
-                distinct( 
+                distinct(
                 !!sym(metadata_info[["PriorID"]]),
                 OriginalGroup_data,
                 !!sym(metadata_info[["grouping_variable"]]),
@@ -1885,24 +1880,24 @@ function(
             merge(
                 x = summary_df,
                 y = merged_df %>%
-                    select( 
+                    select(
                         -c(OriginalGroup_PK, OriginalGroup_data)
                     ),
                 by.x = metadata_info[["InputID"]],
                 by.y = "OriginalEntry_data",
                 all.x = TRUE
             ) %>%
-                group_by( 
+                group_by(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                mutate( 
+                mutate(
                 Count_FeatureIDs_to_GroupingVariable = case_when(
                     is.na(!!sym(metadata_info[["grouping_variable"]])) ~ NA_integer_,
                     TRUE ~ n_distinct(!!sym(metadata_info[["PriorID"]]), na.rm = TRUE)
                 )
             ) %>%
-                mutate( 
+                mutate(
                 Group_Conflict_Notes = case_when(
                     any(
                         Count_FeatureIDs_to_GroupingVariable > 1L,
@@ -1925,16 +1920,16 @@ function(
                 )
             ) %>%
                 ungroup() %>%
-                mutate( 
+                mutate(
                 matches = ifelse(matches == "", NA, matches)
             )
 
         summary_df_short <-
             summary_df %>%
-                group_by( 
+                group_by(
                 !!sym(metadata_info[["InputID"]])
             ) %>%
-                mutate( 
+                mutate(
                 Unique_GroupingVariable_count = n_distinct(
                     !!sym(metadata_info["grouping_variable"]),
                     na.rm = TRUE
@@ -1944,12 +1939,12 @@ function(
                 Group_Conflict_Notes = paste(unique(Group_Conflict_Notes), collapse = " || ")
             ) %>%
                 ungroup() %>%
-                distinct( 
+                distinct(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]]),
                 .keep_all = TRUE
             ) %>%
-                mutate( 
+                mutate(
                 ActionRequired = case_when(
                     original_count >= 1L & matches_count == 1L & Unique_GroupingVariable_count >= 1L ~ "None",
                     original_count >= 1L & matches_count == 0L & Unique_GroupingVariable_count >= 0L ~ "None",
@@ -1958,10 +1953,10 @@ function(
                     TRUE ~ NA_character_
                 )
             ) %>%
-                select( 
+                select(
                 -!!sym(metadata_info[["PriorID"]])
             ) %>%
-                mutate( 
+                mutate(
                 matches = ifelse(matches == "", NA, matches),
                 !!sym(metadata_info[["grouping_variable"]]) :=
                     ifelse(
@@ -1970,7 +1965,7 @@ function(
                         !!sym(metadata_info[["grouping_variable"]])
                     )
             ) %>%
-                mutate( 
+                mutate(
                 InputID_select = case_when(
                     original_count == 1L & matches_count <= 1L ~ metadata_info[["InputID"]],
                     original_count >= 2L & matches_count == 0L ~ str_split(metadata_info[["InputID"]], ", \\s*") %>% map_chr(first),
@@ -2078,12 +2073,13 @@ function(
 
 #' Deal with pathway overlap in prior knowledge
 #'
-#' @param data dataframe with at least one column with the target (e.g.
-#' metabolite) and a column source (e.g. term).
+#' @param data dataframe with at least one column with the target (e.g. metabolite) and
+#'     a column source (e.g. term).
 #' @param metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
 #'
 #' @examples
 #' metsigdb_kegg()
+#'
 #'
 #' @importFrom dplyr bind_rows filter group_by left_join mutate
 #' @importFrom dplyr select summarize ungroup
@@ -2129,17 +2125,17 @@ function(
         # 1. Create a list of unique MetaboliteIDs for each term
         term_metabolites <-
             data %>%
-                group_by( 
+                group_by(
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                summarize( 
+                summarize(
                 MetaboliteIDs = list(
                     unique(
                         !!sym(metadata_info[["InputID"]])
                     )
                 )
             ) %>%
-                ungroup() 
+                ungroup()
 
         # 2. Create the overlap matrix based on different methods:
         if (matrix == "percentage") {
@@ -2166,7 +2162,7 @@ function(
                     },
                     simplify = FALSE
                 ) %>%
-                    bind_rows() 
+                    bind_rows()
 
             # Create overlap matrix: An overlap matrix is typically used to quantify
             # the degree of overlap between two sets or groups.
@@ -2241,10 +2237,10 @@ function(
 
         term_clusters <-
             term_overlap %>%
-                filter( 
+                filter(
                 Overlap >= threshold
             ) %>%
-                select( 
+                select(
                 Term1,
                 Term2
             )
@@ -2302,15 +2298,15 @@ function(
         # 5. Merge cluster group information back to the original data
         df <-
             data %>%
-                left_join( 
+                left_join(
                 term_metabolites %>%
-                    select( 
+                    select(
                         !!sym(metadata_info[["grouping_variable"]]),
                         cluster
                     ),
                 by = metadata_info[["grouping_variable"]]
             ) %>%
-                mutate( 
+                mutate(
                 cluster = ifelse(
                     is.na(cluster),
                     "None",
@@ -2342,8 +2338,8 @@ function(
 #' @param res Results returned from the enrichment analysis
 #' @param .source used as input for enrichment analysis
 #' @param .target used as input for enrichment analysis
-#' @param complete TRUE or FALSE, weather only .source with results should be
-#' returned or all .source in net.
+#' @param complete TRUE or FALSE, weather only .source with results should be returned or
+#'     all .source in net.
 #'
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr desc
@@ -2368,7 +2364,7 @@ function(
                 by = list(source = net[[.source]]),
                 FUN = sum
             ) %>%
-                rename("targets_num" = 2) 
+                rename("targets_num" = 2)
 
         if (complete == TRUE) {
             res_Add <-
@@ -2394,7 +2390,7 @@ function(
                 net[[.target]] ~ net[[.source]],
                 FUN = toString
             ) %>%
-                rename( 
+                rename(
                 "source" = 1,
                 "targets_chr" = 2
             )
@@ -2419,7 +2415,7 @@ function(
                 by.y = .target,
                 all.x = TRUE
             ) %>%
-                filter( 
+                filter(
                 !is.na(
                     across(
                         all_of(.source)
@@ -2433,7 +2429,7 @@ function(
                 by = list(source = Detected[[.source]]),
                 FUN = sum
             ) %>%
-                rename("targets_detected_num" = 2) 
+                rename("targets_detected_num" = 2)
 
         res_Add <-
             merge(
@@ -2442,7 +2438,7 @@ function(
                 by = "source",
                 all.x = TRUE
             ) %>%
-                mutate( 
+                mutate(
                 targets_detected_num = replace_na(targets_detected_num, 0)
             )
 
@@ -2452,7 +2448,7 @@ function(
                 Detected$Symbol ~ Detected[[.source]],
                 FUN = toString
             ) %>%
-                rename( 
+                rename(
                 "source" = 1,
                 "targets_detected_chr" = 2
             )
@@ -2475,7 +2471,7 @@ function(
         # sort by score
         res_Add <-
             res_Add %>%
-                arrange( 
+                arrange(
                 desc(
                     as.numeric(
                         as.character(score)
@@ -2493,81 +2489,66 @@ function(
 ################################################################################
 
 #' Compare Prior Knowledge Resources and/or Columns within a Single Resource
-#' and Generate an UpSet Plot
 #'
-#' This function compares gene and/or metabolite features across multiple prior
-#' knowledge (PK) resources or,
-#' if a single resource is provided with a vector of column names in
-#' \code{metadata_info}, compares columns within that resource.
-#'
-#' In the multi-resource mode, each element in \code{data} represents a PK
-#' resource (either as a data frame or a recognized resource name)
-#' from which a set of features is extracted. A binary summary table is then
-#' constructed and used to create an UpSet plot.
-#'
+#' and Generate an UpSet Plot This function compares gene and/or metabolite
+#' features across multiple prior knowledge (PK) resources or, if a single
+#' resource is provided with a vector of column names in \code{metadata_info},
+#' compares columns within that resource. In the multi-resource mode, each
+#' element in \code{data} represents a PK resource (either as a data frame or a
+#' recognized resource name) from which a set of features is extracted. A
+#' binary summary table is then constructed and used to create an UpSet plot.
 #' In the within-resource mode, a single data frame is provided (with
-#' \code{data} containing one element) and its \code{metadata_info} entry
-#' is a vector of column names to compare (e.g., binary indicators for
-#' different annotations). In this case, the function expects the data frame
-#' to have a grouping column named \code{"Class"} (or, alternatively, a column
-#' specified via the \code{class_col} attribute in \code{metadata_info})
-#' that is used for grouping in the UpSet plot.
+#' \code{data} containing one element) and its \code{metadata_info} entry is a
+#' vector of column names to compare (e.g., binary indicators for different
+#' annotations). In this case, the function expects the data frame to have a
+#' grouping column named \code{"Class"} (or, alternatively, a column specified
+#' via the \code{class_col} attribute in \code{metadata_info}) that is used for
+#' grouping in the UpSet plot.
 #'
-#' @param data A named list where each element corresponds to a prior knowledge
-#' (PK) resource. Each element can be:
-#' \itemize{
-#'      \item   A data frame containing gene/metabolite identifiers (and
-#'              additional columns for within-resource comparison),
-#'      \item   A character string indicating the resource name. Recognized names
-#'              include (but are not limited to): \code{"Hallmarks"},
-#'              \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or
-#'              \code{"metsigdb_chemicalclass"}). In the latter case, the
-#'              function will attempt to load the corresponding data
-#'              automatically.
-#' }
-#' @param metadata_info A named list (with names matching those in \code{data})
-#' where each element is either a character string or a
-#' character vector indicating the column name(s) to extract features. For
-#' multiple-resource comparisons, these refer to the columns
-#' containing feature identifiers. For within-resource comparisons, the vector
-#' should list the columns to compare (e.g., \code{c("CHEBI", "HMDB",
-#' "LIMID")}).
-#' In within-resource mode, the input data frame is expected to contain a
-#' column named \code{"Class"} (or a grouping column specified via the
-#' \code{class_col} attribute). \emph{If no grouping column is found, a default
-#' grouping column named \code{"Group"} (with all rows assigned the same value)
-#' is created.}
-#' @param filter_by Character. Optional filter for the resulting features when
-#' comparing multiple resources.
-#' Options are: \code{"both"} (default), \code{"gene"}, or \code{"metabolite"}.
-#' This parameter is ignored in within-resource mode.
-#' @param plot_name \emph{Optional: } String which is added to the output files
-#' of the Upsetplot \strong{Default = ""}
-#' @param name_col \emph{Optional: } column name including the feature names.
-#' Default is \code{"TrivialName"}.
-#' @param palette_type Character. Color palette to be used in the plot. Default
-#' is \code{"polychrome"}.
-#' @param save_plot \emph{Optional: } Select the file type of output plots.
-#' Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#' "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
-#' saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved
-#' at. \strong{Default = NULL}
+#' @param data A named list where each element corresponds to a prior knowledge (PK)
+#'     resource. Each element can be: \itemize{ \item   A data frame containing
+#'     gene/metabolite identifiers (and additional columns for within-resource
+#'     comparison), \item   A character string indicating the resource name.
+#'     Recognized names include (but are not limited to): \code{"Hallmarks"},
+#'     \code{"Gaude"}, \code{"MetalinksDB"}, and \code{"RAMP"} (or
+#'     \code{"metsigdb_chemicalclass"}). In the latter case, the function will
+#'     attempt to load the corresponding data automatically. }
+#' @param metadata_info A named list (with names matching those in \code{data}) where each
+#'     element is either a character string or a character vector indicating
+#'     the column name(s) to extract features. For multiple-resource
+#'     comparisons, these refer to the columns containing feature identifiers.
+#'     For within-resource comparisons, the vector should list the columns to
+#'     compare (e.g., \code{c("CHEBI", "HMDB", "LIMID")}). In within-resource
+#'     mode, the input data frame is expected to contain a column named
+#'     \code{"Class"} (or a grouping column specified via the \code{class_col}
+#'     attribute). \emph{If no grouping column is found, a default grouping
+#'     column named \code{"Group"} (with all rows assigned the same value) is
+#'     created.}
+#' @param filter_by Character. Optional filter for the resulting features when comparing
+#'     multiple resources. Options are: \code{"both"} (default), \code{"gene"},
+#'     or \code{"metabolite"}. This parameter is ignored in within-resource
+#'     mode.
+#' @param plot_name \emph{Optional: } String which is added to the output files of the
+#'     Upsetplot \strong{Default = ""}
+#' @param name_col \emph{Optional: } column name including the feature names. Default is
+#'     \code{"TrivialName"}.
+#' @param palette_type Character. Color palette to be used in the plot. Default is
+#'     \code{"polychrome"}.
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an
+#'     overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{Default = NULL}
 #'
-#' @return A list containing two elements:
-#' \itemize{
-#'     \item{summary_table: A data frame representing either:
-#'         \itemize{
-#'             \item{the binary summary matrix of feature presence/absence across
-#'                 multiple resources, or}
-#'             \item{the original data frame (augmented with binary columns and a
-#'                 \code{None} column) in within-resource mode.}
-#'         }
-#'     }
-#'     \item{upset_plot: The UpSet plot object generated by the function.}
-#' }
+#' @return A list containing two elements: \itemize{ \item{summary_table: A data
+#'     frame representing either: \itemize{ \item{the binary summary matrix of
+#'     feature presence/absence across multiple resources, or} \item{the
+#'     original data frame (augmented with binary columns and a \code{None}
+#'     column) in within-resource mode.} } } \item{upset_plot: The UpSet plot
+#'     object generated by the function.} }
 #'
 #' @examples
 #' \dontrun{
@@ -2580,45 +2561,46 @@ function(
 #' metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
 #'
 #' res_single <-
-#'     compare_pk(
-#'         data = data_single, metadata_info = metadata_info_single,
-#'         plot_name = "Overlap of BioCrates Columns"
-#'     )
+#' compare_pk(
+#' data = data_single, metadata_info = metadata_info_single,
+#' plot_name = "Overlap of BioCrates Columns"
+#' )
 #'
 #' ## Example 2: Custom data Frames with Custom Column Names
 #'
 #' # Example with preloaded data frames and custom column names:
 #' hallmarks_df <- data.frame(
-#'     feature = c("HMDB0001", "GENE1", "GENE2"),
-#'     stringsAsFactors = FALSE
+#' feature = c("HMDB0001", "GENE1", "GENE2"),
+#' stringsAsFactors = FALSE
 #' )
 #' gaude_df <- data.frame(
-#'     feature = c("GENE2", "GENE3"),
-#'     stringsAsFactors = FALSE
+#' feature = c("GENE2", "GENE3"),
+#' stringsAsFactors = FALSE
 #' )
 #' metalinks_df <- data.frame(
-#'     hmdb = c("HMDB0001", "HMDB0002"),
-#'     gene_symbol = c("GENE1", "GENE4"),
-#'     stringsAsFactors = FALSE
+#' hmdb = c("HMDB0001", "HMDB0002"),
+#' gene_symbol = c("GENE1", "GENE4"),
+#' stringsAsFactors = FALSE
 #' )
 #' ramp_df <- data.frame(
-#'     class_source_id = c("HMDB0001", "HMDB0003"),
-#'     stringsAsFactors = FALSE
+#' class_source_id = c("HMDB0001", "HMDB0003"),
+#' stringsAsFactors = FALSE
 #' )
 #' data <- list(
-#'     Hallmarks = hallmarks_df, Gaude = gaude_df,
-#'     MetalinksDB = metalinks_df, RAMP = ramp_df
+#' Hallmarks = hallmarks_df, Gaude = gaude_df,
+#' MetalinksDB = metalinks_df, RAMP = ramp_df
 #' )
 #' metadata_info <- list(
-#'     Hallmarks = "feature", Gaude = "feature",
-#'     MetalinksDB = c("hmdb", "gene_symbol"),
-#'     RAMP = "class_source_id"
+#' Hallmarks = "feature", Gaude = "feature",
+#' MetalinksDB = c("hmdb", "gene_symbol"),
+#' RAMP = "class_source_id"
 #' )
 #' res <- compare_pk(
-#'     data = data, metadata_info = metadata_info,
-#'     filter_by = "metabolite"
+#' data = data, metadata_info = metadata_info,
+#' filter_by = "metabolite"
 #' )
 #' }
+#'
 #'
 #' @importFrom dplyr mutate select
 #' @importFrom logger log_trace
@@ -2974,55 +2956,46 @@ function(
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
 #' This function processes a data frame column by counting the number of
-#' entries
-#' within each cell.
-#' It considers both \code{NA} values and empty strings as zero entries, and
-#' categorizes each cell as
-#' "No ID", "Single ID", or "Multiple IDs" based on the count. A histogram is
-#' then generated to visualize
-#' the distribution of entry counts.
+#' entries within each cell. It considers both \code{NA} values and empty
+#' strings as zero entries, and categorizes each cell as "No ID", "Single ID",
+#' or "Multiple IDs" based on the count. A histogram is then generated to
+#' visualize the distribution of entry counts. scale_x_continuous
 #'
 #' @param data A data frame containing the data to be analyzed.
-#' @param column A string specifying the name of the column in \code{data} to
-#' analyze.
-#' @param delimiter A string specifying the delimiter used to split cell
-#' values.
-#' Defaults to \code{","}.
-#' @param fill_colors A named character vector providing colors for each
-#' category. Defaults to
-#' \code{c("No ID" = "#FB8072", "Single ID" = "#B3DE69", "Multiple IDs" =
-#' "#80B1D3")}.
-#' @param binwidth Numeric value specifying the bin width for the histogram.
-#' Defaults to \code{1}.
-#' @param title_prefix A string to use as the title of the plot. If \code{NULL}
-#' (default), the title
-#' will be generated as "Number of <column> IDs per Biocrates Cell".
-#' @param save_plot \emph{Optional: } Select the file type of output plots.
-#' Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#' "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
-#' saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved
-#' at. \strong{Default = NULL}
+#' @param column A string specifying the name of the column in \code{data} to analyze.
+#' @param delimiter A string specifying the delimiter used to split cell values. Defaults to
+#'     \code{","}.
+#' @param fill_colors A named character vector providing colors for each category. Defaults to
+#'     \code{c("No ID" = "#FB8072", "Single ID" = "#B3DE69", "Multiple IDs" =
+#'     "#80B1D3")}.
+#' @param binwidth Numeric value specifying the bin width for the histogram. Defaults to
+#'     \code{1}.
+#' @param title_prefix A string to use as the title of the plot. If \code{NULL} (default), the
+#'     title will be generated as "Number of <column> IDs per Biocrates Cell".
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     png, pdf. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is saved as an
+#'     overview of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{Default = NULL}
+#'
+#' @return A list with two elements: \item{result}{A data frame that includes three
+#'     additional columns: \code{was_na} (logical indicator of missing or empty
+#'     cells), \code{entry_count} (number of entries in each cell), and
+#'     \code{id_label} (a categorical label based on the entry count).}
+#'     \item{plot}{A \code{ggplot} object representing the histogram of entry
+#'     counts.}
 #'
 #' @examples
 #' data(biocrates_features)
 #' count_id(biocrates_features, "HMDB")
 #'
-#' @return A list with two elements:
-#' \item{result}{A data frame that includes three additional columns:
-#' \code{was_na} (logical indicator
-#' of missing or empty cells), \code{entry_count} (number of entries in each
-#' cell), and
-#' \code{id_label} (a categorical label based on the entry count).}
-#' \item{plot}{A \code{ggplot} object representing the histogram of entry
-#' counts.}
 #'
 #' @importFrom dplyr case_when mutate rename
 #' @importFrom ggplot2 aes element_rect element_text expansion geom_bar
 #' @importFrom ggplot2 geom_histogram ggplot labs scale_fill_manual
-#' scale_x_continuous
 #' @importFrom ggplot2 scale_y_continuous theme theme_classic
 #' @importFrom grid convertUnit
 #' @export
@@ -3185,7 +3158,7 @@ function(
                     Superplot = TRUE
                 ),
                 metadata_sample = processed_data %>%
-                    dplyr::rename("Conditions" = "entry_count"), 
+                    dplyr::rename("Conditions" = "entry_count"),
                 plot_name = plot_name,
                 subtitle = "",
                 plot_type = "Bar"
@@ -3210,7 +3183,7 @@ function(
                 ggplot() +
                 annotation_custom(.)
             } %>%
-                add( 
+                add(
                 theme(
                     panel.background = element_rect(fill = "transparent")
                 )

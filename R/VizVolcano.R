@@ -25,30 +25,70 @@
 
 #' Volcano plot
 #'
-#' @param plot_types \emph{Optional: } Choose between "Standard" (data), "Compare" (plot two comparisons together data and data2) or "PEA" (Pathway Enrichment Analysis) \strong{Default = "Standard"}
-#' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those three information for Settings="Standard" or "Compare": c(color ="ColumnName_metadata_feature", shape = "ColumnName_metadata_feature", individual="ColumnName_metadata_feature"). For Settings="PEA" a named vector with: PEA_Pathway="ColumnName_data2"=each pathway will be plotted, PEA_score="ColumnName_data2", PEA_stat= "ColumnName_data2"= usually p.adj column, "PEA_Feature="ColumnName_data2"= usually Metabolites), optionally you can additionally include c(color_Metab="ColumnName_metadata_feature", shape= "ColumnName_metadata_feature").\strong{Default = NULL}
-#' @param metadata_feature \emph{Optional: } DF with column including the Metabolite names (needs to match Metabolite names and Metabolite column name of data) and other columns with required plot_typeInfo. \strong{Default = NULL}
-#' @param data DF with metabolites as row names and columns including Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data2 \emph{Optional: } DF to compare to main Input_data with the same column names x and y (Settings="Compare") and metabolites as row names or Pathway enrichment analysis results (Settings="PEA"). \strong{Default = NULL}
-#' @param y \emph{Optional: } Column name including the values that should be used for y-axis. Usually this would include the p.adjusted value. \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Column name including the values that should be used for x-axis. Usually this would include the Log2FC value. \strong{Default = "Log2FC"}
-#' @param plot_name \emph{Optional: } String which is added to the output files of the plot. \strong{Default = ""}
-#' @param name_comparison \emph{Optional: } Named vector including those information about the two datasets that are compared on the plots when choosing Settings= "Compare". \strong{Default = c(data="Cond1", data2= "Cond2")}
-#' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
-#' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
-#' @param cutoff_x \emph{Optional: } Number of the desired log fold change cutoff for assessing significance. \strong{Default = 0.5}
-#' @param cutoff_y \emph{Optional: } Number of the desired p value cutoff for assessing significance. \strong{Default = 0.05}
-#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format. \strong{Default = NULL}
-#' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format. \strong{Default = NULL}
-#' @param select_label \emph{Optional: } If set to NULL, feature labels will be plotted randomly. If vector is provided, e.g. c("MetaboliteName1", "MetaboliteName2"), selected names will be plotted. If set to default "", no feature names will be plotted. \strong{Default = ""}
-#' @param connectors \emph{Optional: } TRUE or FALSE for whether connectors from names to points are to be added to the plot. \strong{Default =  FALSE}
+#' @param plot_types \emph{Optional: } Choose between "Standard" (data), "Compare" (plot two
+#'     comparisons together data and data2) or "PEA" (Pathway Enrichment
+#'     Analysis) \strong{Default = "Standard"}
+#' @param metadata_info \emph{Optional: } NULL or Named vector including at least one of those
+#'     three information for Settings="Standard" or "Compare": c(color
+#'     ="ColumnName_metadata_feature", shape = "ColumnName_metadata_feature",
+#'     individual="ColumnName_metadata_feature"). For Settings="PEA" a named
+#'     vector with: PEA_Pathway="ColumnName_data2"=each pathway will be
+#'     plotted, PEA_score="ColumnName_data2", PEA_stat= "ColumnName_data2"=
+#'     usually p.adj column, "PEA_Feature="ColumnName_data2"= usually
+#'     Metabolites), optionally you can additionally include
+#'     c(color_Metab="ColumnName_metadata_feature", shape=
+#'     "ColumnName_metadata_feature").\strong{Default = NULL}
+#' @param metadata_feature \emph{Optional: } DF with column including the Metabolite names (needs
+#'     to match Metabolite names and Metabolite column name of data) and other
+#'     columns with required plot_typeInfo. \strong{Default = NULL}
+#' @param data DF with metabolites as row names and columns including Log2FC and stat
+#'     (p-value, p.adjusted) value columns.
+#' @param data2 \emph{Optional: } DF to compare to main Input_data with the same column
+#'     names x and y (Settings="Compare") and metabolites as row names or
+#'     Pathway enrichment analysis results (Settings="PEA"). \strong{Default =
+#'     NULL}
+#' @param y \emph{Optional: } Column name including the values that should be used
+#'     for y-axis. Usually this would include the p.adjusted value.
+#'     \strong{Default = "p.adj"}
+#' @param x \emph{Optional: } Column name including the values that should be used
+#'     for x-axis. Usually this would include the Log2FC value. \strong{Default
+#'     = "Log2FC"}
+#' @param plot_name \emph{Optional: } String which is added to the output files of the plot.
+#'     \strong{Default = ""}
+#' @param name_comparison \emph{Optional: } Named vector including those information about the two
+#'     datasets that are compared on the plots when choosing Settings=
+#'     "Compare". \strong{Default = c(data="Cond1", data2= "Cond2")}
+#' @param xlab \emph{Optional: } String to replace x-axis label in plot.
+#'     \strong{Default = NULL}
+#' @param ylab \emph{Optional: } String to replace y-axis label in plot.
+#'     \strong{Default = NULL}
+#' @param cutoff_x \emph{Optional: } Number of the desired log fold change cutoff for
+#'     assessing significance. \strong{Default = 0.5}
+#' @param cutoff_y \emph{Optional: } Number of the desired p value cutoff for assessing
+#'     significance. \strong{Default = 0.05}
+#' @param color_palette \emph{Optional: } Provide customiced color-palette in vector format.
+#'     \strong{Default = NULL}
+#' @param shape_palette \emph{Optional: } Provide customiced shape-palette in vector format.
+#'     \strong{Default = NULL}
+#' @param select_label \emph{Optional: } If set to NULL, feature labels will be plotted
+#'     randomly. If vector is provided, e.g. c("MetaboliteName1",
+#'     "MetaboliteName2"), selected names will be plotted. If set to default
+#'     "", no feature names will be plotted. \strong{Default = ""}
+#' @param connectors \emph{Optional: } TRUE or FALSE for whether connectors from names to
+#'     points are to be added to the plot. \strong{Default =  FALSE}
 #' @param subtitle \emph{Optional: } \strong{Default = ""}
-#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param path {Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
-#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "metabolites"}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
-#' @param print_plot \emph{Optional: } print the plots to the active graphic
-#' device.
+#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You
+#'     can check for complete themes here:
+#'     https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default =
+#'     NULL}
+#' @param path {Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g.
+#'     "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default =
+#'     "metabolites"}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     pdf, png or NULL. \strong{Default = "svg"}
+#' @param print_plot \emph{Optional: } print the plots to the active graphic device.
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -57,7 +97,6 @@
 #' Intra <- intracell_dma%>%tibble::column_to_rownames("Metabolite")
 #' Res <- viz_volcano(data=Intra)
 #'
-#' @keywords Volcano plot, pathways
 #'
 #' @importFrom dplyr rename filter mutate rename_with
 #' @importFrom magrittr %>% %<>%
@@ -362,27 +401,42 @@ viz_volcano <- function(
 #' @param data Passed to main function viz_volcano()
 #' @param metadata_feature Passed to main function viz_volcano()
 #' @param metadata_info Passed to main function viz_volcano()
-#' @param y \emph{Optional: } Passed to main function viz_volcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function viz_volcano() \strong{Default = "Log2FC"}
-#' @param plot_name \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function viz_volcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function viz_volcano() \strong{Default = NULL}
-#' @param cutoff_x \emph{Optional: } Passed to main function viz_volcano() \strong{Default = 0.5}
-#' @param cutoff_y \emph{Optional: } Passed to main function viz_volcano() \strong{Default = 0.05}
-#' @param select_label \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param connectors \emph{Optional: } Passed to main function viz_volcano() \strong{Default =  FALSE}
-#' @param subtitle \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param color_palette Created in viz_volcano() based on color_palette passed to main function viz_volcano()
-#' @param shape_palette Created in viz_volcano() based on shape_palette passed to main function viz_volcano()
-#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param y \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = "Log2FC"}
+#' @param plot_name \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param xlab \emph{Optional: } Passed to main function viz_volcano()  \strong{Default
+#'     = NULL}
+#' @param ylab \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = NULL}
+#' @param cutoff_x \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = 0.5}
+#' @param cutoff_y \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = 0.05}
+#' @param select_label \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param connectors \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     =  FALSE}
+#' @param subtitle \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param color_palette Created in viz_volcano() based on color_palette passed to main function
+#'     viz_volcano()
+#' @param shape_palette Created in viz_volcano() based on shape_palette passed to main function
+#'     viz_volcano()
+#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You
+#'     can check for complete themes here:
+#'     https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default =
+#'     NULL}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g.
+#'     "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default =
+#'     "Metabolites"}
 #' @param save_plot Passed to main function viz_volcano()
 #' @param print_plot Passed to main function viz_volcano()
 #' @param folder Created in viz_volcano(). Path to the folder where files are saved.
 #'
 #' @return List with two elements: Plot and Plot_Sized
-#'
-#' @keywords Standard volcano plots
 #'
 #' @importFrom magrittr %>% %<>%
 #' @importFrom EnhancedVolcano EnhancedVolcano
@@ -668,28 +722,43 @@ viz_volcano_standard <- function(
 #' @param data2 Passed to main function viz_volcano()
 #' @param metadata_feature Passed to main function viz_volcano()
 #' @param metadata_info Passed to main function viz_volcano()
-#' @param y \emph{Optional: } Passed to main function viz_volcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function viz_volcano() \strong{Default = "Log2FC"}
-#' @param plot_name \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function viz_volcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function viz_volcano() \strong{Default = NULL}
-#' @param cutoff_x \emph{Optional: } Passed to main function viz_volcano() \strong{Default = 0.5}
-#' @param cutoff_y \emph{Optional: } Passed to main function viz_volcano() \strong{Default = 0.05}
-#' @param select_label \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param connectors \emph{Optional: } Passed to main function viz_volcano() \strong{Default =  FALSE}
-#' @param subtitle \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param color_palette Created in viz_volcano() based on color_palette passed to main function viz_volcano()
-#' @param shape_palette Created in viz_volcano() based on shape_palette passed to main function viz_volcano()
-#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param y \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = "Log2FC"}
+#' @param plot_name \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param xlab \emph{Optional: } Passed to main function viz_volcano()  \strong{Default
+#'     = NULL}
+#' @param ylab \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = NULL}
+#' @param cutoff_x \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = 0.5}
+#' @param cutoff_y \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = 0.05}
+#' @param select_label \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param connectors \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     =  FALSE}
+#' @param subtitle \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param color_palette Created in viz_volcano() based on color_palette passed to main function
+#'     viz_volcano()
+#' @param shape_palette Created in viz_volcano() based on shape_palette passed to main function
+#'     viz_volcano()
+#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You
+#'     can check for complete themes here:
+#'     https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default =
+#'     NULL}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g.
+#'     "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default =
+#'     "Metabolites"}
 #' @param name_comparison Passed to main function viz_volcano()
 #' @param save_plot Passed to main function viz_volcano()
 #' @param print_plot Passed to main function viz_volcano()
 #' @param folder Created in viz_volcano(). Path to the folder where files are saved.
 #'
 #' @return List with two elements: Plot and Plot_Sized
-#'
-#' @keywords Compare volcano plots
 #'
 #' @importFrom ggplot2 ggplot theme element_rect
 #' @importFrom dplyr filter mutate
@@ -1056,27 +1125,42 @@ viz_volcano_compare <- function(
 #' @param data2 Passed to main function viz_volcano()
 #' @param metadata_feature Passed to main function viz_volcano()
 #' @param metadata_info Passed to main function viz_volcano()
-#' @param y \emph{Optional: } Passed to main function viz_volcano() \strong{Default = "p.adj"}
-#' @param x \emph{Optional: } Passed to main function viz_volcano() \strong{Default = "Log2FC"}
-#' @param plot_name \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param xlab \emph{Optional: } Passed to main function viz_volcano()  \strong{Default = NULL}
-#' @param ylab \emph{Optional: } Passed to main function viz_volcano() \strong{Default = NULL}
-#' @param cutoff_x \emph{Optional: } Passed to main function viz_volcano() \strong{Default = 0.5}
-#' @param cutoff_y \emph{Optional: } Passed to main function viz_volcano() \strong{Default = 0.05}
-#' @param select_label \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param connectors \emph{Optional: } Passed to main function viz_volcano() \strong{Default =  FALSE}
-#' @param subtitle \emph{Optional: } Passed to main function viz_volcano() \strong{Default = ""}
-#' @param color_palette Created in viz_volcano() based on color_palette passed to main function viz_volcano()
-#' @param shape_palette Created in viz_volcano() based on shape_palette passed to main function viz_volcano()
-#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g. "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default = "Metabolites"}
+#' @param y \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = "p.adj"}
+#' @param x \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = "Log2FC"}
+#' @param plot_name \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param xlab \emph{Optional: } Passed to main function viz_volcano()  \strong{Default
+#'     = NULL}
+#' @param ylab \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = NULL}
+#' @param cutoff_x \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = 0.5}
+#' @param cutoff_y \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = 0.05}
+#' @param select_label \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param connectors \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     =  FALSE}
+#' @param subtitle \emph{Optional: } Passed to main function viz_volcano() \strong{Default
+#'     = ""}
+#' @param color_palette Created in viz_volcano() based on color_palette passed to main function
+#'     viz_volcano()
+#' @param shape_palette Created in viz_volcano() based on shape_palette passed to main function
+#'     viz_volcano()
+#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You
+#'     can check for complete themes here:
+#'     https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default =
+#'     NULL}
+#' @param feature \emph{Optional: } Name of the feature that are plotted, e.g.
+#'     "Metabolites", "RNA", "Proteins", "Genes", etc. \strong{Default =
+#'     "Metabolites"}
 #' @param save_plot Passed to main function viz_volcano()
 #' @param print_plot Passed to main function viz_volcano()
 #' @param folder Created in viz_volcano(). Path to the folder where files are saved.
 #'
 #' @return List with two elements: Plot and Plot_Sized
-#'
-#' @keywords Volcano plots of pathway enrichment results
 #'
 #' @importFrom ggplot2 ggplot theme element_rect
 #' @importFrom EnhancedVolcano EnhancedVolcano

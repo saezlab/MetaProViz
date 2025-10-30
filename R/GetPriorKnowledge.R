@@ -29,6 +29,7 @@
 #' @examples
 #' metsigdb_kegg()
 #'
+#'
 #' @importFrom OmnipathR kegg_conv kegg_link kegg_list
 #' @importFrom dplyr filter inner_join mutate rename
 #' @importFrom logger log_info
@@ -94,14 +95,18 @@ metsigdb_kegg <- function() {
 
 #' Metabolite chemical classes from RaMP DB
 #'
-#' @param version \emph{Optional: } Version of the RaMP database loaded from OmniPathR. \strong{default: "2.5.4"}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+#' @param version \emph{Optional: } Version of the RaMP database loaded from OmniPathR.
+#'     \strong{default: "2.5.4"}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} String which is added to the resulting folder name
+#'     \strong{default: NULL}
 #'
 #' @return A data frame containing the Prior Knowledge.
 #'
 #' @examples
 #' ChemicalClass <- metsigdb_chemicalclass()
+#'
 #'
 #' @importFrom OmnipathR ramp_table
 #' @importFrom dplyr filter group_by mutate select summarise
@@ -199,17 +204,23 @@ metsigdb_chemicalclass <- function(
 #'
 #' Gene to metabolite translation is based on mappings in Recon-3D (cosmosR).
 #'
-#' @param input_pk dataframe with two columns for source (=term) and Target (=gene), e.g. Hallmarks.
-#' @param metadata_info \emph{Optional: }  Column name of Target in input_pk. \strong{Default = c(Target="gene")}
-#' @param pk_name \emph{Optional: } Name of the prior knowledge resource. \strong{default: NULL}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+#' @param input_pk dataframe with two columns for source (=term) and Target (=gene), e.g.
+#'     Hallmarks.
+#' @param metadata_info \emph{Optional: }  Column name of Target in input_pk. \strong{Default =
+#'     c(Target="gene")}
+#' @param pk_name \emph{Optional: } Name of the prior knowledge resource. \strong{default:
+#'     NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
+#' @param path {Optional:} String which is added to the resulting folder name
+#'     \strong{default: NULL}
 #'
 #' @return List of two data frames: "GeneMetabSet" and "MetabSet".
 #'
 #' @examples
 #' data(hallmarks)
 #' make_gene_metab_set(hallmarks)
+#'
 #'
 #' @importFrom dplyr rename
 #' @importFrom logger log_info
@@ -328,25 +339,50 @@ make_gene_metab_set <- function(
 ####################################################################
 # # # # # # # # # Load MetaLinksDB prior knowledge # # # # # # # # #
 ####################################################################
-#'
 #' Annotated metabolite-protein interactions from MetalinksDB
 #'
-#' @param types Desired edge types. Options are: "lr", "pd", where 'lr' stands for 'ligand-receptor' and 'pd' stands for 'production-degradation'.\strong{default: NULL}
-#' @param cell_location Desired metabolite cell locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Cytoplasm", "Endoplasmic reticulum", "Extracellular", "Lysosome" , "Mitochondria", "Peroxisome", "Membrane", "Nucleus", "Golgi apparatus" , "Inner mitochondrial membrane". \strong{default: NULL}
-#' @param tissue_location Desired metabolite tissue locations. Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". Options are: "Placenta", "Adipose Tissue","Bladder", "Brain", "Epidermis","Kidney", "Liver", "Neuron", "Pancreas", "Prostate", "Skeletal Muscle", "Spleen", "Testis", "Thyroid Gland", "Adrenal Medulla", "Erythrocyte","Fibroblasts", "Intestine", "Ovary", "Platelet", "All Tissues", "Semen", "Adrenal Gland", "Adrenal Cortex", "Heart", "Lung", "Hair", "Eye Lens", "Leukocyte", Retina", "Smooth Muscle", "Gall Bladder", "Bile",  "Bone Marrow", "Blood", "Basal Ganglia", "Cartilage". \strong{default: NULL}
-#' @param biospecimen_location Desired metabolite biospecimen locations.Pass selection using c("Select1", "Select2", "Selectn").View options setting "?".  "Blood", "Feces", "Saliva", "Sweat", "Urine", "Breast Milk", "Cellular Cytoplasm", "Cerebrospinal Fluid (CSF)", "Amniotic Fluid" , "Aqueous Humour", "Ascites Fluid", "Lymph", "Tears", "Breath", "Bile", "Semen", "Pericardial Effusion".\strong{default: NULL}
-#' @param disease Desired metabolite diseases.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?". \strong{default: NULL}
-#' @param pathway Desired metabolite pathways.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
-#' @param hmdb_ids Desired HMDB IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
-#' @param uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2", "Selectn"). View options setting "?".\strong{default: NULL}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
-#'
+#' @param types Desired edge types. Options are: "lr", "pd", where 'lr' stands for
+#'     'ligand-receptor' and 'pd' stands for
+#'     'production-degradation'.\strong{default: NULL}
+#' @param cell_location Desired metabolite cell locations. Pass selection using c("Select1",
+#'     "Select2", "Selectn"). View options setting "?". Options are:
+#'     "Cytoplasm", "Endoplasmic reticulum", "Extracellular", "Lysosome" ,
+#'     "Mitochondria", "Peroxisome", "Membrane", "Nucleus", "Golgi apparatus" ,
+#'     "Inner mitochondrial membrane". \strong{default: NULL}
+#' @param tissue_location Desired metabolite tissue locations. Pass selection using c("Select1",
+#'     "Select2", "Selectn"). View options setting "?". Options are:
+#'     "Placenta", "Adipose Tissue","Bladder", "Brain", "Epidermis","Kidney",
+#'     "Liver", "Neuron", "Pancreas", "Prostate", "Skeletal Muscle", "Spleen",
+#'     "Testis", "Thyroid Gland", "Adrenal Medulla",
+#'     "Erythrocyte","Fibroblasts", "Intestine", "Ovary", "Platelet", "All
+#'     Tissues", "Semen", "Adrenal Gland", "Adrenal Cortex", "Heart", "Lung",
+#'     "Hair", "Eye Lens", "Leukocyte", Retina", "Smooth Muscle", "Gall
+#'     Bladder", "Bile",  "Bone Marrow", "Blood", "Basal Ganglia", "Cartilage".
+#'     \strong{default: NULL}
+#' @param biospecimen_location Desired metabolite biospecimen locations.Pass selection using
+#'     c("Select1", "Select2", "Selectn").View options setting "?".  "Blood",
+#'     "Feces", "Saliva", "Sweat", "Urine", "Breast Milk", "Cellular
+#'     Cytoplasm", "Cerebrospinal Fluid (CSF)", "Amniotic Fluid" , "Aqueous
+#'     Humour", "Ascites Fluid", "Lymph", "Tears", "Breath", "Bile", "Semen",
+#'     "Pericardial Effusion".\strong{default: NULL}
+#' @param disease Desired metabolite diseases.Pass selection using c("Select1", "Select2",
+#'     "Selectn"). View options setting "?". \strong{default: NULL}
+#' @param pathway Desired metabolite pathways.Pass selection using c("Select1", "Select2",
+#'     "Selectn"). View options setting "?".\strong{default: NULL}
+#' @param hmdb_ids Desired HMDB IDs.Pass selection using c("Select1", "Select2",
+#'     "Selectn"). View options setting "?".\strong{default: NULL}
+#' @param uniprot_ids Desired UniProt IDs.Pass selection using c("Select1", "Select2",
+#'     "Selectn"). View options setting "?".\strong{default: NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt". \strong{Default = "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
 #'
 #' @return A data frame of metabolite-protein interactions from MetalinksDB.
 #'
 #' @examples
 #' metsigdb_metalinks()
+#'
 #'
 #' @importFrom DBI dbListTables dbDisconnect dbGetQuery
 #' @importFrom OmnipathR metalinksdb_sqlite

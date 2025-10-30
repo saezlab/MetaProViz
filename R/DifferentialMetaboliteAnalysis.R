@@ -21,104 +21,91 @@
 ### ### ### Differential Metabolite Analysis ### ### ###
 ########################################################
 
-#' This function allows you to perform differential metabolite analysis to
-#' obtain a Log2FC, pval, padj and tval comparing two or multiple conditions.
+#' Differential metabolite analysis
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData.
-#'        If se file is provided, metadata_sample is extracted from the colData
-#'        of the se object. metadata_feature, if available, are extracted from
-#'        the rowData. Alternatively provide a DF with unique sample identifiers
-#'        as row names and metabolite numerical values in columns with
-#'        metabolite identifiers as column names. Use NA for metabolites that
-#'        were not detected.
-#' @param metadata_sample  \emph{Optional: } Only required if you did not
-#'        provide se file in parameter data. Provide DF which contains metadata
-#'        information about the samples, which will be combined with your input
-#'        data based on the unique sample identifiers used as rownames.
-#'        \strong{Default = NULL}
-#' @param metadata_info  \emph{Optional: } Named vector including the
-#'        information about the conditions column information on numerator or
-#'        denominator c(Conditions="ColumnName_SettingsFile", Numerator =
-#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-#'        Denominator and Numerator will specify which comparison(s) will be
-#'        done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
-#'        Numerator =NULL selects all the condition and performs multiple
-#'        comparison all-vs-all. Log2FC are obtained by dividing the numerator
-#'        by the denominator, thus positive Log2FC values mean higher expression
-#'        in the numerator. \strong{Default = c(conditions="Conditions",
-#'        numerator = NULL, denumerator = NULL)}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the
-#'        selected test to calculate p.value. For one-vs-one comparisons choose
-#'        t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for
-#'        one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch
-#'        anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the
-#'        selected p.adjusted test for p.value correction for multiple
-#'        Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
-#'        "bonferroni", "holm", etc.\strong{Default = "fdr"}
-#' @param metadata_feature \emph{Optional: } To provide metadata information ,
-#'        i.e. pathway information, retention time,..., for each metabolite.
-#'        Only used if you did not provide se file in parameter data. Provide
-#'        DF where the row names must match the metabolite names in the
-#'        columns of the data. \strong{Default = NULL}
-#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
-#'        input is used. \strong{Default = FALSE}
-#' @param vst TRUE or FALSE for whether to use variance stabilizing
-#'        transformation on the data when linear modeling is used for hypothesis
-#'        testing. \strong{Default = FALSE}
-#' @param shapiro TRUE or FALSE for whether to perform the shapiro.test and get
-#'        informed about data distribution (normal versus not-normal
-#'        distribution. \strong{Default = TRUE}
-#' @param bartlett TRUE or FALSE for whether to perform the bartlett.test.
-#'        \strong{Default = TRUE}
-#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2
-#'        transformed and log2 transformation will be performed within the limma
-#'        function and Log2FC calculation. If FALSE we expect the data to be
-#'        log2 transformed as this impacts the Log2FC calculation and limma.
-#'        \strong{Default= TRUE}
-#' @param save_plot \emph{Optional: } Select the file type of output plots.
-#'        Options are svg, png, pdf. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are:
-#'        "csv", "xlsx", "txt". \strong{Default = "csv"}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE Volcano plot is
-#'        saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved
-#'        at. \strong{Default = NULL}
+#' Performs differential metabolite analysis to obtain Log2FC, p-value,
+#' adjusted p-value, and t-value when comparing two or multiple conditions.
 #'
-#' @return Dependent on parameter settings, list of lists will be returned for
-#'         dma (DF of each comparison), shapiro (Includes DF and Plot), bartlett
-#'         (Includes DF and Histogram), vst (Includes DF and Plot) and
-#'         VolcanoPlot (Plots of each comparison).
+#' @param data SummarizedExperiment or data frame. If SummarizedExperiment,
+#'     metadata_sample is extracted from colData and metadata_feature from
+#'     rowData. If data frame, provide unique sample identifiers as row names
+#'     and metabolite numerical values in columns with metabolite identifiers
+#'     as column names. Use NA for undetected metabolites.
+#' @param metadata_sample Data frame (optional). Only required if data is not a
+#'     SummarizedExperiment. Contains metadata information about samples,
+#'     combined with input data based on unique sample identifiers used as row
+#'     names. Default: NULL.
+#' @param metadata_info Named character vector (optional). Includes conditions column
+#'     information on numerator or denominator: c(Conditions="ColumnName",
+#'     Numerator="ColumnName", Denominator="ColumnName"). Denominator and
+#'     Numerator specify which comparisons are performed (one-vs-one,
+#'     all-vs-one, all-vs-all). Denominator=NULL and Numerator=NULL selects all
+#'     conditions and performs multiple all-vs-all comparisons. Log2FC values
+#'     are obtained by dividing numerator by denominator, thus positive Log2FC
+#'     values indicate higher expression in numerator. Default:
+#'     c(conditions="Conditions", numerator=NULL, denumerator=NULL).
+#' @param pval Character (optional). Abbreviation of the selected test to calculate
+#'     p-value. For one-vs-one comparisons choose t.test, wilcox.test,
+#'     chisq.test, cor.test, or lmFit (limma). For one-vs-all or all-vs-all
+#'     comparisons choose aov (anova), welch (welch anova), kruskal.test, or
+#'     lmFit (limma). Default: "lmFit".
+#' @param padj Character (optional). Abbreviation of the selected p-value adjustment
+#'     method for multiple hypothesis testing correction. See ?p.adjust for
+#'     methods: "BH", "fdr", "bonferroni", "holm", etc. Default: "fdr".
+#' @param metadata_feature Data frame (optional). Provides metadata information (e.g., pathway,
+#'     retention time) for each metabolite. Only used if data is not a
+#'     SummarizedExperiment. Row names must match metabolite names in data
+#'     columns. Default: NULL.
+#' @param core Logical (optional). Whether consumption/release input is used. Default:
+#'     FALSE.
+#' @param vst Logical. Whether to use variance stabilizing transformation on data when
+#'     linear modeling is used for hypothesis testing. Default: FALSE.
+#' @param shapiro Logical. Whether to perform Shapiro-Wilk test to assess data
+#'     distribution (normal versus non-normal). Default: TRUE.
+#' @param bartlett Logical. Whether to perform Bartlett's test. Default: TRUE.
+#' @param transform Logical. If TRUE, data is expected to be non-log2-transformed and log2
+#'     transformation will be performed within limma and Log2FC calculation. If
+#'     FALSE, data is expected to be log2-transformed as this impacts Log2FC
+#'     calculation and limma. Default: TRUE.
+#' @param save_plot Character (optional). File type of output plots: "svg", "png", "pdf".
+#'     Default: "svg".
+#' @param save_table Character (optional). File type for analysis results: "csv", "xlsx",
+#'     "txt". Default: "csv".
+#' @param print_plot Logical (optional). Whether volcano plot is printed as overview of
+#'     results. Default: TRUE.
+#' @param path Character (optional). Path to folder where results should be saved.
+#'     Default: NULL.
+#'
+#' @return List of lists. Depending on parameter settings, returns dma (data frame
+#'     of each comparison), shapiro (includes data frame and plot), bartlett
+#'     (includes data frame and histogram), vst (includes data frame and plot),
+#'     and VolcanoPlot (plots of each comparison).
 #'
 #' @examples
 #' data(intracell_raw_se)
 #' ResI <- dma(
-#'     data = intracell_raw_se,
-#'     metadata_info = c(
-#'         Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
-#'     )
+#' data = intracell_raw_se,
+#' metadata_info = c(
+#' Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+#' )
 #' )
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw[-c(49:58), ] %>% tibble::column_to_rownames("Code")
 #' ResI <- dma(
-#'     data = Intra[, -c(1:3)],
-#'     metadata_sample = Intra[, c(1:3)],
-#'     metadata_info = c(
-#'         Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
-#'     )
+#' data = Intra[, -c(1:3)],
+#' metadata_sample = Intra[, c(1:3)],
+#' metadata_info = c(
+#' Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+#' )
 #' )
 #'
-#' @keywords Differential Metabolite Analysis, Multiple Hypothesis testing,
-#'           Normality testing
 #'
 #' @importFrom magrittr %>%
 #' @importFrom logger log_info log_error
 #' @importFrom dplyr full_join rename
-#' @importFrom logger log_info
 #' @importFrom purrr map reduce
 #' @importFrom tibble column_to_rownames rownames_to_column
-#'
 #' @importFrom grDevices dev.new dev.off
 #' @export
 dma <- function(
@@ -627,46 +614,42 @@ dma <- function(
 ###############################
 
 #' This helper function calculates the Log2(FoldChange) or in case of
+#'
 #' core Log2(Distance).
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#'        numerical values in columns with metabolite identifiers as column
-#'        names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#'        samples, which will be combined with your input data based on the
-#'        unique sample identifiers used as rownames.
-#' @param metadata_info \emph{Optional: } Named vector including the information
-#'        about the conditions column information on numerator or denominator
-#'        c(Conditions="ColumnName_SettingsFile", Numerator =
-#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-#'        Denominator and Numerator will specify which comparison(s) will be
-#'        done (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
-#'        Numerator =NULL selects all the condition and performs multiple
-#'        comparison all-vs-all. Log2FC are obtained by dividing the numerator
-#'        by the denominator, thus positive Log2FC values mean higher expression
-#'        in the numerator. \strong{Default = c(conditions="Conditions",
-#'        numerator = NULL, denumerator = NULL)}
-#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
-#'        input is used \strong{default = FALSE}
-#' @param transform \emph{Optional: } If TRUE we expect the data to be not log2
-#'        transformed and log2 transformation will be performed within the limma
-#'        function and Log2FC calculation. If FALSE we expect the data to be
-#'        log2 transformed as this impacts the Log2FC calculation and
-#'        limma.\strong{default = TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (one-vs-one, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'     Numerator =NULL selects all the condition and performs multiple
+#'     comparison all-vs-all. Log2FC are obtained by dividing the numerator by
+#'     the denominator, thus positive Log2FC values mean higher expression in
+#'     the numerator. \strong{Default = c(conditions="Conditions", numerator =
+#'     NULL, denumerator = NULL)}
+#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release input
+#'     is used \strong{default = FALSE}
+#' @param transform \emph{Optional: } If TRUE we expect the data to be not log2 transformed
+#'     and log2 transformation will be performed within the limma function and
+#'     Log2FC calculation. If FALSE we expect the data to be log2 transformed
+#'     as this impacts the Log2FC calculation and limma.\strong{default = TRUE}
 #'
 #' @return List of DFs named after comparison (e.g. Tumour versus Normal) with
-#'         Log2FC or Log2(Distance) column and column with feature names
-#'
-#' @keywords Log2FC, core, Distance
+#'     Log2FC or Log2(Distance) column and column with feature names
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter mutate rename select_if summarise_all
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils combn
-#'
 #' @noRd
-#'
 log2fc <- function(
         data,
         metadata_sample,
@@ -1204,36 +1187,33 @@ log2fc <- function(
 
 #' Calculate One-vs-One comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#'        numerical values in columns with metabolite identifiers as column
-#'        names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#'        samples, which will be combined with your input data based on the
-#'        unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector including the information about the
-#'        conditions column information on numerator or denominator
-#'        c(Conditions="ColumnName_SettingsFile", Numerator =
-#'        "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-#'        Denominator and Numerator will specify which comparison(s) will be
-#'        done (here one-vs-one).
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
-#'        column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
-#'        from MetaProViz:::log2fc. If NULL, the output statistics will not be
-#'        added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the
-#'        selected test to calculate p.value. For one-vs-one comparisons choose
-#'        t.test, wilcox.test, "chisq.test" or "cor.test", \strong{Default =
-#'        "t.test"}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the
-#'        selected p.adjusted test for p.value correction for multiple
-#'        Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
-#'        "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info Named vector including the information about the conditions column
+#'     information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (here one-vs-one).
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column
+#'     "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
+#'     MetaProViz:::log2fc. If NULL, the output statistics will not be added
+#'     into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the selected
+#'     test to calculate p.value. For one-vs-one comparisons choose t.test,
+#'     wilcox.test, "chisq.test" or "cor.test", \strong{Default = "t.test"}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the selected
+#'     p.adjusted test for p.value correction for multiple Hypothesis testing.
+#'     Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm",
+#'     etc.\strong{Default = "fdr"}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with
-#'         p-value, t-value and adjusted p-value column and column with feature
-#'         names
-#'
-#' @keywords Statistical testing, p-value, t-value
+#'     p-value, t-value and adjusted p-value column and column with feature
+#'     names
 #'
 #' @importFrom stats p.adjust
 #' @importFrom dplyr summarise_all filter mutate rename select_if
@@ -1384,38 +1364,38 @@ dma_stat_single <-
 ################################################################################
 
 #' This helper function to calculate One-vs-All or All-vs-All
+#'
 #' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#' numerical values in columns with metabolite
-#' identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#' samples, which will be combined with your input data based on the unique
-#' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information
-#' about the conditions column information on numerator or denominator
-#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
-#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will
-#' specify which comparison(s) will be done (Here all-vs-one, all-vs-all),
-#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and per-
-#' forms multiple comparison all-vs-all. \strong{Default = c(conditions=
-#' "Conditions", numerator = NULL, denumerator = NULL)}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL
+#'     selects all the condition and per- forms multiple comparison all-vs-all.
+#'     \strong{Default = c(conditions= "Conditions", numerator = NULL,
+#'     denumerator = NULL)}
 #' @param log2fc_table \emph{Optional: } This is a List of DFs including a column
-#' "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
-#' MetaProViz:::log2fc. If NULL, the output statistics will not be added into the
-#' Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#'     "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
+#'     MetaProViz:::log2fc. If NULL, the output statistics will not be added
+#'     into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with
-#' p-value, t-value and adjusted p-value column and column with feature names
-#'
-#' @keywords Statistical testing, p-value, t-value
+#'     p-value, t-value and adjusted p-value column and column with feature
+#'     names
 #'
 #' @importFrom stats aov TukeyHSD
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils combn
-#'
 #' @noRd
 mpv_aov <- function(
         data,
@@ -1622,37 +1602,36 @@ mpv_aov <- function(
 ###########################################################################
 
 #' This helper function to calculate One-vs-All or All-vs-All
+#'
 #' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#' numerical values in columns with metabolite identifiers as column names.
-#' Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#' samples, which will be combined with your input data based on the unique
-#' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the
-#' information about the conditions column information on numerator or
-#' denominator c(Conditions="ColumnName_SettingsFile", Numerator =
-#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-#' Denominator and Numerator will specify which comparison(s) will be done
-#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator = NULL
-#' selects all the condition and performs multiple comparison all-vs-all.
-#' \strong{Default = c(conditions="Conditions", numerator = NULL,
-#' denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
-#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
-#' from MetaProViz:::log2fc. If NULL, the output statistics will not be
-#' added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param padj \emph{Optional: } String which contains an abbreviation of
-#' the selected p.adjusted test for p.value correction for multiple
-#' Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr",
-#' "bonferroni", "holm", etc.\strong{Default = "fdr"}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =
+#'     NULL selects all the condition and performs multiple comparison
+#'     all-vs-all. \strong{Default = c(conditions="Conditions", numerator =
+#'     NULL, denumerator = NULL)}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column
+#'     "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
+#'     MetaProViz:::log2fc. If NULL, the output statistics will not be added
+#'     into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the selected
+#'     p.adjusted test for p.value correction for multiple Hypothesis testing.
+#'     Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm",
+#'     etc.\strong{Default = "fdr"}
 #'
-#' @return List of DFs named after comparison (e.g. tumour versus Normal)
-#' with p-value, t-value and adjusted p-value column and column with
-#' feature names
-#'
-#' @keywords Statistical testing, p-value, t-value
+#' @return List of DFs named after comparison (e.g. tumour versus Normal) with
+#'     p-value, t-value and adjusted p-value column and column with feature
+#'     names
 #'
 #' @importFrom stats kruskal.test
 #' @importFrom rstatix dunn_test
@@ -1660,7 +1639,6 @@ mpv_aov <- function(
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom utils combn
-#'
 #' @noRd
 mpv_kruskal <- function(
         data,
@@ -1890,37 +1868,35 @@ mpv_kruskal <- function(
 
 #' Calculate One-vs-All or All-vs-All comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#' numerical values in columns with metabolite identifiers as column names.
-#' Use NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#' samples, which will be combined with your input data based on the unique
-#' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the
-#' information about the conditions column information on numerator or
-#' denominator c(Conditions="ColumnName_SettingsFile", Numerator =
-#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-#' Denominator and Numerator will specify which comparison(s) will be done
-#' (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL
-#' selects all the condition and performs multiple comparison all-vs-all.
-#' \strong{Default = c(conditions="Conditions", numerator = NULL,
-#' denumerator = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
-#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output
-#' from MetaProViz:::log2fc. If NULL, the output statistics will not be
-#' added into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (Here all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =NULL
+#'     selects all the condition and performs multiple comparison all-vs-all.
+#'     \strong{Default = c(conditions="Conditions", numerator = NULL,
+#'     denumerator = NULL)}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column
+#'     "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
+#'     MetaProViz:::log2fc. If NULL, the output statistics will not be added
+#'     into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with
-#' p-value, t-value and adjusted p-value column and column with feature names
-#'
-#' @keywords Statistical testing, p-value, t-value
+#'     p-value, t-value and adjusted p-value column and column with feature
+#'     names
 #'
 #' @importFrom rstatix games_howell_test
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils combn
-#'
 #' @noRd
 mpv_welch <- function(
         data,
@@ -2122,43 +2098,42 @@ mpv_welch <- function(
 ################################################################################
 
 #' This helper function to calculate One-vs-One, One-vs-All or All-vs-All
+#'
 #' comparison statistics
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#' numerical values in columns with metabolite identifiers as column names. Use
-#' NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#' samples, which will be combined with your input data based on the unique
-#' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the
-#' information about the conditions column information on numerator or
-#' denominator c(Conditions="ColumnName_SettingsFile", Numerator =
-#' "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
-#' Denominator and Numerator will specify which comparison(s) will be done
-#' (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and Numerator =
-#' NULL selects all the condition and performs multiple comparison all-vs-all.
-#' \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator
-#' = NULL)}
-#' @param log2fc_table \emph{Optional: } This is a List of DFs including a
-#' column "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
-#' MetaProViz:::log2fc. If NULL, the output statistics will not be added into
-#' the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the
-#' selected p.adjusted test for p.value correction for multiple Hypothesis
-#' testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni",
-#' "holm", etc.\strong{Default = "fdr"}
-#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release
-#'  input is used. \strong{Default = FALSE}
-#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2
-#' transformed and log2 transformation will be performed within the limma
-#' function and Log2FC calculation. If FALSE we expect the data to be log2
-#' transformed as this impacts the Log2FC calculation and limma.
-#' \strong{Default= TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'     Numerator = NULL selects all the condition and performs multiple
+#'     comparison all-vs-all. \strong{Default = c(conditions="Conditions",
+#'     numerator = NULL, denumerator = NULL)}
+#' @param log2fc_table \emph{Optional: } This is a List of DFs including a column
+#'     "MetaboliteID" and Log2FC or Log2(Distance). This is the output from
+#'     MetaProViz:::log2fc. If NULL, the output statistics will not be added
+#'     into the Log2FC/Log2(Distance) DFs. \strong{Default = NULL}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the selected
+#'     p.adjusted test for p.value correction for multiple Hypothesis testing.
+#'     Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm",
+#'     etc.\strong{Default = "fdr"}
+#' @param core \emph{Optional: } TRUE or FALSE for whether a Consumption/Release input
+#'     is used. \strong{Default = FALSE}
+#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and
+#'     log2 transformation will be performed within the limma function and
+#'     Log2FC calculation. If FALSE we expect the data to be log2 transformed
+#'     as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
 #'
 #' @return List of DFs named after comparison (e.g. tumour versus Normal) with
-#' p-value, t-value and adjusted p-value column and column with feature names
-#'
-#' @keywords Statistical testing, p-value, t-value
+#'     p-value, t-value and adjusted p-value column and column with feature
+#'     names
 #'
 #' @importFrom limma lmFit makeContrasts contrasts.fit eBayes topTable
 #' @importFrom dplyr rename arrange filter distinct
@@ -2571,32 +2546,31 @@ dma_stat_limma <-
 
 #' Shapiro test and plots
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#' numerical values in columns with metabolite identifiers as column names. Use
-#' NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#' samples, which will be combined with your input data based on the unique
-#' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information
-#' about the conditions column information on numerator or denominator
-#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
-#' Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will
-#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all),
-#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and
-#' performs multiple comparison all-vs-all. \strong{Default = c(conditions=
-#' "Conditions", numerator = NULL, denumerator = NULL)}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the
-#' selected test to calculate p.value. For one-vs-one comparisons choose t.test,
-#' wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all
-#' comparison choose aov (=annova), kruskal.test or lmFit (=limma) \strong{Default
-#'  = "t-test"}
-#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be
-#' plotted  \strong{default = TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'     Numerator =NULL selects all the condition and performs multiple
+#'     comparison all-vs-all. \strong{Default = c(conditions= "Conditions",
+#'     numerator = NULL, denumerator = NULL)}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the selected
+#'     test to calculate p.value. For one-vs-one comparisons choose t.test,
+#'     wilcox.test, "chisq.test" or "cor.test", for one-vs-all or all-vs-all
+#'     comparison choose aov (=annova), kruskal.test or lmFit (=limma)
+#'     \strong{Default = "t-test"}
+#' @param qqplots \emph {Optional: } TRUE or FALSE for whether QQ plots should be plotted
+#'     \strong{default = TRUE}
 #'
 #' @return List with tewo entries: DF (including the results DF) and Plots
-#' (including the Density and QQ plots)
-#'
-#' @keywords shapiro test,Normality testing, Density plot, QQplot
+#'     (including the Density and QQ plots)
 #'
 #' @importFrom stats shapiro.test
 #' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous
@@ -2607,7 +2581,6 @@ dma_stat_limma <-
 #' @importFrom utils combn
 #' @importFrom grDevices recordPlot
 #' @importFrom graphics plot.new
-#'
 #' @noRd
 mpv_shapiro <- function(
         data,
@@ -3100,25 +3073,24 @@ mpv_shapiro <- function(
 
 #' Bartlett test for variance homogeneity check across groups
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite
-#' numerical values in columns with metabolite identifiers as column names. Use
-#' NA for metabolites that were not detected.
-#' @param metadata_sample DF which contains metadata information about the
-#' samples, which will be combined with your input data based on the unique
-#' sample identifiers used as rownames.
-#' @param metadata_info  \emph{Optional: } Named vector including the information
-#'  about the conditions column information on numerator or denominator
-#' c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile",
-#'  Denominator  = "ColumnName_SettingsFile"). Denominator and Numerator will
-#' specify which comparison(s) will be done (one-vs-all, all-vs-one, all-vs-all),
-#' e.g. Denominator=NULL and Numerator =NULL selects all the condition and
-#' performs multiple comparison all-vs-all. \strong{Default = c(conditions=
-#' "Conditions", numerator = NULL, denumerator = NULL)}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names. Use NA
+#'     for metabolites that were not detected.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info \emph{Optional: } Named vector including the information about the
+#'     conditions column information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     Denominator and Numerator will specify which comparison(s) will be done
+#'     (one-vs-all, all-vs-one, all-vs-all), e.g. Denominator=NULL and
+#'     Numerator =NULL selects all the condition and performs multiple
+#'     comparison all-vs-all. \strong{Default = c(conditions= "Conditions",
+#'     numerator = NULL, denumerator = NULL)}
 #'
 #' @return List with two entries: DF (including the results DF) and Plots
-#' (including the  histogramm plot)
-#'
-#' @keywords bartlett test,Normality testing, Density plot, QQplot
+#'     (including the  histogramm plot)
 #'
 #' @importFrom stats bartlett.test
 #' @importFrom ggplot2 ggplot geom_histogram geom_density ggtitle xlab geom_vline
@@ -3235,16 +3207,17 @@ mpv_bartlett <- function(
 #' Variance stabilizing transformation (vst)
 #'
 #' @param data data frame with unique sample identifiers
+#'
 # not true: no need to have row names, they are not used here, and in
 # general, # it is not a good practice to use row names
+
+
 #' as row names and metabolite numerical values in columns with metabolite
-#' identifiers as column names. Use NA for metabolites that were
-#' not detected.
 #'
-#' @return List with two entries: DF (including the results DF)
-#' and Plots (including the scedasticity_plot)
+#' identifiers as column names. Use NA for metabolites that were not detected.
 #'
-#' @keywords Heteroscedasticity, variance stabilizing transformation
+#' @return List with two entries: DF (including the results DF) and Plots
+#'     (including the scedasticity_plot)
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom stats lm

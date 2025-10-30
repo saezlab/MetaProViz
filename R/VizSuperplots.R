@@ -16,37 +16,62 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
-#' This script allows you to perform different visualizations (bar, box, violin plots) using the results of the MetaProViz analysis
+#' This script allows you to perform different visualizations (bar, box, violin
+#' plots) using the results of the MetaProViz analysis
+#'
+
 
 #' Bar, Box or Violin plot in Superplot style visualization
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData.
-#'        If se file is provided, metadata_sample is extracted from the colData
-#'        of the se object. metadata_feature, if available, are extracted from
-#'        the rowData. Alternatively provide a DF with unique sample identifiers
-#'        as row names and metabolite numerical values in columns with
-#'        metabolite identifiers as column names. Use NA for metabolites that
-#'        were not detected.
-#' @param metadata_sample  \emph{Optional: } Only required if you did not
-#'        provide se file in parameter data. Provide DF which contains metadata
-#'        information about the samples, which will be combined with your input
-#'        data based on the unique sample identifiers used as rownames.
-#'        \strong{Default = NULL}
-#' @param metadata_info Named vector including at least information on the conditions column: c(Conditions="ColumnName_metadata_sample"). Additionally Superplots can be made by adding Superplot ="ColumnName_metadata_sample", which are usually biological replicates or patient IDs. \strong{Default = c(Conditions="Conditions", Superplot = NULL)}
-#' @param plot_type String with the information of the Graph style. Available options are Bar. Box and Violin  \strong{Default = Box}
+#' @param data SummarizedExperiment (se) file including assay and colData. If se file
+#'     is provided, metadata_sample is extracted from the colData of the se
+#'     object. metadata_feature, if available, are extracted from the rowData.
+#'     Alternatively provide a DF with unique sample identifiers as row names
+#'     and metabolite numerical values in columns with metabolite identifiers
+#'     as column names. Use NA for metabolites that were not detected.
+#' @param metadata_sample \emph{Optional: } Only required if you did not provide se file in
+#'     parameter data. Provide DF which contains metadata information about the
+#'     samples, which will be combined with your input data based on the unique
+#'     sample identifiers used as rownames. \strong{Default = NULL}
+#' @param metadata_info Named vector including at least information on the conditions column:
+#'     c(Conditions="ColumnName_metadata_sample"). Additionally Superplots can
+#'     be made by adding Superplot ="ColumnName_metadata_sample", which are
+#'     usually biological replicates or patient IDs. \strong{Default =
+#'     c(Conditions="Conditions", Superplot = NULL)}
+#' @param plot_type String with the information of the Graph style. Available options are
+#'     Bar. Box and Violin  \strong{Default = Box}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the plot.
-#' @param plot_conditions Vector with names of selected Conditions for the plot. Can also be used to order the Conditions in the way they should be displayed on the x-axis of the plot. \strong{Default = NULL}
-#' @param stat_comparison List of numeric vectors containing Condition pairs to compare based on the order of the plot_conditions vector. \strong{Default = NULL}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test or wilcox.test , for one-vs-all or all-vs-all comparison choose aov (=anova) or kruskal.test \strong{Default = NULL}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = NULL}
-#' @param xlab \emph{Optional: } String to replace x-axis label in plot. \strong{Default = NULL}
-#' @param ylab \emph{Optional: } String to replace y-axis label in plot. \strong{Default = NULL}
-#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default = NULL}
-#' @param color_palette \emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}
-#' @param color_palette_dot \emph{Optional: } Provide customized color_palette in vector format. \strong{Default = NULL}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = svg}
-#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview of the results. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{Default = NULL}
+#' @param plot_conditions Vector with names of selected Conditions for the plot. Can also be used
+#'     to order the Conditions in the way they should be displayed on the
+#'     x-axis of the plot. \strong{Default = NULL}
+#' @param stat_comparison List of numeric vectors containing Condition pairs to compare based on
+#'     the order of the plot_conditions vector. \strong{Default = NULL}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the selected
+#'     test to calculate p.value. For one-vs-one comparisons choose t.test or
+#'     wilcox.test , for one-vs-all or all-vs-all comparison choose aov
+#'     (=anova) or kruskal.test \strong{Default = NULL}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the selected
+#'     p.adjusted test for p.value correction for multiple Hypothesis testing.
+#'     Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm",
+#'     etc.\strong{Default = NULL}
+#' @param xlab \emph{Optional: } String to replace x-axis label in plot.
+#'     \strong{Default = NULL}
+#' @param ylab \emph{Optional: } String to replace y-axis label in plot.
+#'     \strong{Default = NULL}
+#' @param theme \emph{Optional: } Selection of theme for plot, e.g. theme_grey(). You
+#'     can check for complete themes here:
+#'     https://ggplot2.tidyverse.org/reference/ggtheme.html. \strong{Default =
+#'     NULL}
+#' @param color_palette \emph{Optional: } Provide customized color_palette in vector format.
+#'     \strong{Default = NULL}
+#' @param color_palette_dot \emph{Optional: } Provide customized color_palette in vector format.
+#'     \strong{Default = NULL}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     pdf, png or NULL. \strong{Default = svg}
+#' @param print_plot \emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview
+#'     of the results. \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{Default = NULL}
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -58,7 +83,6 @@
 #' Intra <- intracell_raw[,c(1:6)]%>%tibble::column_to_rownames("Code")
 #' Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)])
 #'
-#' @keywords Barplot, Boxplot, Violinplot, Superplot
 #'
 #' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot
 #' @importFrom ggplot2 position_dodge element_text theme_classic

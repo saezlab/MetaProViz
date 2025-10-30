@@ -21,44 +21,84 @@
 # # # # # # # # # Metabolomics pre-processing # # # # # # # # #
 # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
 
-#' Modularised Normalization: 80%-filtering rule, total-ion count normalization, missing value imputation and Outlier Detection: HotellingT2.
+#' Data preprocessing and normalization
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData. If se file is provided, metadata_sample is extracted from the colData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample  \emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}
-#' @param metadata_info   \emph{Optional: }Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" (mandatory) with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" (optional) including numerical values. For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added. Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions. \strong{Default = c(Conditions="Conditions")}
-#' @param featurefilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
-#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default = 0.8}
-#' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed. \strong{Default = TRUE}
-#' @param mvi \emph{Optional: } If TRUE, Missing Value Imputation (mvi) based on half minimum is performed \strong{Default = TRUE}
-#' @param mvi_percentage \emph{Optional: } percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}
-#' @param hotellins_confidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
-#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been performed and the core value will be calculated. Please consider providing a Normalisation factor column called "core_norm_factor" in your "Input_SettingsFile" DF, where the column "Conditions" matches. The normalisation factor must be a numerical value obtained from growth rate that has been obtained from a growth curve or growth factor that was obtained by the ratio of cell count/protein quantification at the start point to cell count/protein quantification at the end point.. Additionally control media samples have to be available in the "Input" DF and defined as "core_media" samples in the "Conditions" column in the "Input_SettingsFile" DF. \strong{Default = FALSE}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. If set to NULL, plots are not saved. \strong{Default = svg}
-#' @param save_table \emph{Optional: } Select the file type of output table. Options are "csv", "xlsx", "txt". If set to NULL, plots are not saved. \strong{Default = "csv"}
-#' @param print_plot  \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' Applies modular normalization including 80% filtering rule, total-ion count
+#' normalization, missing value imputation, and outlier detection using
+#' Hotelling's T2 test.
 #'
-#' @return List with two elements: DF (including all output tables generated) and Plot (including all plots generated)
+#' @param data SummarizedExperiment or data frame. If SummarizedExperiment,
+#'     metadata_sample is extracted from colData. If data frame, provide unique
+#'     sample identifiers as row names and metabolite numerical values in
+#'     columns with metabolite identifiers as column names. Use NA for
+#'     undetected metabolites.
+#' @param metadata_sample Data frame (optional). Only required if data is not a
+#'     SummarizedExperiment. Contains information about samples, combined with
+#'     input data based on unique sample identifiers used as row names. Must
+#'     contain Conditions column. If experiment has no multiple conditions,
+#'     assign all samples to same condition. Default: NULL.
+#' @param metadata_info Named character vector (optional). Contains names of experimental
+#'     parameters: c(Conditions="ColumnName",
+#'     Biological_Replicates="ColumnName"). Column "Conditions" (mandatory)
+#'     contains sample conditions (e.g., "N"/"T" or "Normal"/"Tumor"), used for
+#'     feature filtering and PCA color coding. Column "BiologicalReplicates"
+#'     (optional) contains numerical values. For core=TRUE, must also add
+#'     core_norm_factor="ColumnName" and core_media="ColumnName". Column
+#'     core_norm_factor is used for normalization; core_media specifies media
+#'     controls in Conditions. Default: c(Conditions="Conditions").
+#' @param featurefilt Character (optional). If NULL, no feature filtering is performed. If
+#'     "Standard", applies 80% filtering rule (Bijlsma et al., 2006) on
+#'     metabolite features across whole dataset. If "Modified", filtering is
+#'     done per condition and Conditions column must be provided (Yang et al.,
+#'     2015). Default: "Standard".
+#' @param cutoff_featurefilt Numeric (optional). Percentage threshold for feature filtering. Default:
+#'     0.8.
+#' @param tic Logical (optional). Whether total ion count normalization is performed.
+#'     Default: TRUE.
+#' @param mvi Logical (optional). Whether missing value imputation (MVI) based on half
+#'     minimum is performed. Default: TRUE.
+#' @param mvi_percentage Numeric (optional). Percentage (0-100) of imputed value based on minimum
+#'     value. Default: 50.
+#' @param hotellins_confidence Numeric (optional). Confidence level for outlier identification in
+#'     Hotelling's T2 test. Default: 0.99.
+#' @param core Logical (optional). Whether consumption-release experiment was performed
+#'     and core value should be calculated. If TRUE, provide normalization
+#'     factor column "core_norm_factor" in metadata_sample where Conditions
+#'     column matches. The normalization factor must be numerical value from
+#'     growth rate (growth curve) or growth factor (ratio of cell count/protein
+#'     quantification at start vs. end point). Additionally, control media
+#'     samples must be available in data and defined as "core_media" in
+#'     Conditions column of metadata_sample. Default: FALSE.
+#' @param save_plot Character (optional). File type of output plots: "svg", "png", "pdf". If
+#'     NULL, plots are not saved. Default: "svg".
+#' @param save_table Character (optional). File type of output table: "csv", "xlsx", "txt".
+#'     If NULL, tables are not saved. Default: "csv".
+#' @param print_plot Logical (optional). Whether to print overview of resulting plots.
+#'     Default: TRUE.
+#' @param path Character (optional). Path to folder where results should be saved.
+#'     Default: NULL.
+#'
+#' @return List with two elements: DF (all output tables generated) and Plot (all
+#'     plots generated).
 #'
 #' @examples
 #' data(intracell_raw_se)
 #' ResI <- processing(data=intracell_raw_se,
-#'                    metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
-#'                                metadata_sample=Intra[-c(49:58), c(1:3)],
-#'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' metadata_sample=Intra[-c(49:58), c(1:3)],
+#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
 #'
 #' data(medium_raw)
 #' Media <- medium_raw %>% tibble::column_to_rownames("Code")
 #' ResM <- processing(data = Media[-c(40:45), -c(1:3)],
-#'                                metadata_sample = Media[-c(40:45), c(1:3)],
-#'                                metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
-#'                                core=TRUE)
+#' metadata_sample = Media[-c(40:45), c(1:3)],
+#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
+#' core=TRUE)
 #'
-#' @keywords 80  percent filtering rule, Missing Value Imputation, total Ion Count normalization, PCA, HotellingT2, multivariate quality control charts
 #'
 #' @importFrom dplyr mutate_all full_join
 #' @importFrom magrittr %>% %<>%
@@ -339,11 +379,27 @@ processing <- function(
 
 #' Merges the analytical replicates of an experiment
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData. If se file is provided, metadata_sample is extracted from the colData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample  \emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}
-#' @param metadata_info  \emph{Optional: } Named vector including the Conditions and Replicates information: c(Conditions="ColumnNameConditions", Biological_Replicates="ColumnName_metadata_sample", Analytical_Replicates="ColumnName_metadata_sample").\strong{Default = NULL}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param data SummarizedExperiment (se) file including assay and colData. If se file
+#'     is provided, metadata_sample is extracted from the colData of the se
+#'     object. Alternatively provide a DF which contains unique sample
+#'     identifiers as row names and metabolite numerical values in columns with
+#'     metabolite identifiers as column names. Use NA for metabolites that were
+#'     not detected.
+#' @param metadata_sample \emph{Optional: } Only required if you did not provide se file in
+#'     parameter data. Provide DF which contains information about the samples,
+#'     which will be combined with the input data based on the unique sample
+#'     identifiers used as rownames. Must contain column with Conditions. If
+#'     you do not have multiple conditions in your experiment assign all
+#'     samples into the same condition. \strong{Default = NULL}
+#' @param metadata_info \emph{Optional: } Named vector including the Conditions and Replicates
+#'     information: c(Conditions="ColumnNameConditions",
+#'     Biological_Replicates="ColumnName_metadata_sample",
+#'     Analytical_Replicates="ColumnName_metadata_sample").\strong{Default =
+#'     NULL}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt", ot NULL \strong{default: "csv"}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
 #'
 #' @return DF with the merged analytical replicates
 #'
@@ -354,9 +410,8 @@ processing <- function(
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
-#'                                 metadata_sample=Intra[-c(49:58) , c(1:3)])
+#' metadata_sample=Intra[-c(49:58) , c(1:3)])
 #'
-#' @keywords Analytical Replicate Merge
 #'
 #' @importFrom dplyr mutate_all summarise_all select rename ungroup group_by
 #' @importFrom magrittr %>% %<>%
@@ -501,29 +556,50 @@ replicate_sum <- function(
 
 #' Find metabolites with high variability across total pool samples
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData. If se file is provided, metadata_sample is extracted from the colData of the se object. Alternatively provide a DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected.
-#' @param metadata_sample  \emph{Optional: } Only required if you did not provide se file in parameter data. Provide DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. Must contain column with Conditions. If you do not have multiple conditions in your experiment assign all samples into the same condition. \strong{Default = NULL}
-#' @param metadata_info  \emph{Optional: } NULL or Named vector including the Conditions and PoolSample information (Name of the Conditions column and Name of the pooled samples in the Conditions in the Input_SettingsFile)  : c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no Conditions is added in the Input_metadata_info, it is assumed that the conditions column is named 'Conditions' in the Input_SettingsFile. ). \strong{Default = NULL}
-#' @param cutoff_cv \emph{Optional: } Filtering cutoff for high variance metabolites using the Coefficient of Variation. \strong{Default = 30}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf or NULL. \strong{Default = svg}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt", ot NULL \strong{default: "csv"}
-#' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting plots. \strong{Default = TRUE}
-#' @param path \emph{Optional:} Path to the folder the results should be saved at. \strong{default: NULL}
+#' @param data SummarizedExperiment (se) file including assay and colData. If se file
+#'     is provided, metadata_sample is extracted from the colData of the se
+#'     object. Alternatively provide a DF which contains unique sample
+#'     identifiers as row names and metabolite numerical values in columns with
+#'     metabolite identifiers as column names. Use NA for metabolites that were
+#'     not detected.
+#' @param metadata_sample \emph{Optional: } Only required if you did not provide se file in
+#'     parameter data. Provide DF which contains information about the samples,
+#'     which will be combined with the input data based on the unique sample
+#'     identifiers used as rownames. Must contain column with Conditions. If
+#'     you do not have multiple conditions in your experiment assign all
+#'     samples into the same condition. \strong{Default = NULL}
+#' @param metadata_info \emph{Optional: } NULL or Named vector including the Conditions and
+#'     PoolSample information (Name of the Conditions column and Name of the
+#'     pooled samples in the Conditions in the Input_SettingsFile)  :
+#'     c(Conditions="ColumnNameConditions, PoolSamples=NamePoolCondition. If no
+#'     Conditions is added in the Input_metadata_info, it is assumed that the
+#'     conditions column is named 'Conditions' in the Input_SettingsFile. ).
+#'     \strong{Default = NULL}
+#' @param cutoff_cv \emph{Optional: } Filtering cutoff for high variance metabolites using
+#'     the Coefficient of Variation. \strong{Default = 30}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     png, pdf or NULL. \strong{Default = svg}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt", ot NULL \strong{default: "csv"}
+#' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting plots.
+#'     \strong{Default = TRUE}
+#' @param path \emph{Optional:} Path to the folder the results should be saved at.
+#'     \strong{default: NULL}
 #'
-#' @return List with two elements: DF (including input and output table) and Plot (including all plots generated)
+#' @return List with two elements: DF (including input and output table) and Plot
+#'     (including all plots generated)
 #'
 #' @examples
 #' data(intracell_raw_se)
 #' Res <- pool_estimation(data=intracell_raw_se,
-#'                        metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
+#' metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- pool_estimation(data=Intra[ ,-c(1:3)],
-#'                                 metadata_sample=Intra[ , c(1:3)],
-#'                                 metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
+#' metadata_sample=Intra[ , c(1:3)],
+#' metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
 #'
-#' @keywords Coefficient of Variation, high variance metabolites
 #'
 #' @importFrom dplyr case_when select rowwise mutate
 #' @importFrom magrittr %>% %<>%
@@ -793,12 +869,35 @@ pool_estimation <- function(
 
 #' Filter features
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "BiologicalReplicates" including numerical values. For core = TRUE add core_media = "Columnname_Input_SettingsFile", which specifies the name of the media controls in the Conditions.
-#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been performed.Should not be normalised to media blank. Provide information about control media sample names via metadata_info "core_media" samples. \strong{Default = FALSE}
-#' @param featurefilt \emph{Optional: } If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = Modified}
-#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default = 0.8}
+#' @param data DF which contains unique sample identifiers as row names and metabolite
+#'     numerical values in columns with metabolite identifiers as column names.
+#'     Use NA for metabolites that were not detected and consider converting
+#'     any zeros to NA unless they are true zeros.
+#' @param metadata_sample DF which contains information about the samples, which will be combined
+#'     with the input data based on the unique sample identifiers used as
+#'     rownames.
+#' @param metadata_info Named vector containing the information about the names of the
+#'     experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile",
+#'     Biological_Replicates="ColumnName_Plot_SettingsFile"). Column
+#'     "Conditions" with information about the sample conditions (e.g. "N" and
+#'     "T" or "Normal" and "Tumor"), can be used for feature filtering and
+#'     colour coding in the PCA. Column "BiologicalReplicates" including
+#'     numerical values. For core = TRUE add core_media =
+#'     "Columnname_Input_SettingsFile", which specifies the name of the media
+#'     controls in the Conditions.
+#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been
+#'     performed.Should not be normalised to media blank. Provide information
+#'     about control media sample names via metadata_info "core_media" samples.
+#'     \strong{Default = FALSE}
+#' @param featurefilt \emph{Optional: } If NULL, no feature filtering is performed. If set to
+#'     "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al.,
+#'     2006) on the metabolite features on the whole dataset. If is set to
+#'     "Modified",filtering is done based on the different conditions, thus a
+#'     column named "Conditions" must be provided in the Input_SettingsFile
+#'     input file including the individual conditions you want to apply the
+#'     filtering to (Yang, J et al., 2015). \strong{Default = Modified}
+#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default =
+#'     0.8}
 #'
 #' @return List with two elements: filtered matrix  and features filtered
 #'
@@ -806,12 +905,11 @@ pool_estimation <- function(
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- feature_filtering(
-#'     data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'     metadata_sample = Intra[-c(49:58), c(1:3)],
-#'     metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#' data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' metadata_sample = Intra[-c(49:58), c(1:3)],
+#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
 #' )
 #'
-#' @keywords feature filtering or modified feature filtering
 #'
 #' @importFrom dplyr filter mutate_all
 #' @importFrom magrittr %>% %<>%
@@ -925,11 +1023,26 @@ feature_filtering <- function(
 
 #' Missing Value Imputation using half minimum value
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile", core_media = "Columnname_Input_SettingsFile"). Column "Conditions" with information about the sample conditions, Column "BiologicalReplicates" including numerical values and Column "Columnname_Input_SettingsFile" is used to specify the name of the media controls in the Conditions.
-#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been performed. Should not be normalised to media blank. Provide information about control media sample names via metadata_info "core_media" samples.\strong{Default = FALSE}
-#' @param mvi_percentage \emph{Optional: } percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}
+#' @param data DF which contains unique sample identifiers as row names and metabolite
+#'     numerical values in columns with metabolite identifiers as column names.
+#'     Use NA for metabolites that were not detected and consider converting
+#'     any zeros to NA unless they are true zeros.
+#' @param metadata_sample DF which contains information about the samples, which will be combined
+#'     with the input data based on the unique sample identifiers used as
+#'     rownames.
+#' @param metadata_info Named vector containing the information about the names of the
+#'     experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile",
+#'     Biological_Replicates="ColumnName_Plot_SettingsFile", core_media =
+#'     "Columnname_Input_SettingsFile"). Column "Conditions" with information
+#'     about the sample conditions, Column "BiologicalReplicates" including
+#'     numerical values and Column "Columnname_Input_SettingsFile" is used to
+#'     specify the name of the media controls in the Conditions.
+#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been
+#'     performed. Should not be normalised to media blank. Provide information
+#'     about control media sample names via metadata_info "core_media"
+#'     samples.\strong{Default = FALSE}
+#' @param mvi_percentage \emph{Optional: } percentage 0-100 of imputed value based on the minimum
+#'     value. \strong{Default = 50}
 #'
 #' @return DF with imputed values
 #'
@@ -937,12 +1050,11 @@ feature_filtering <- function(
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- mvi_imputation(
-#'     data = Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'     metadata_sample = Intra[-c(49:58), c(1:3)],
-#'     metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#' data = Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' metadata_sample = Intra[-c(49:58), c(1:3)],
+#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
 #' )
 #'
-#' @keywords Half minimum missing value imputation
 #'
 #' @importFrom dplyr select mutate group_by filter mutate_all
 #' @importFrom magrittr %>% %<>%
@@ -1084,23 +1196,30 @@ mvi_imputation <- function(
 
 #' Total ion count normalization
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile").
-#' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed. If FALSE, only RLA QC plots are returned. \strong{Default = TRUE}
+#' @param data DF which contains unique sample identifiers as row names and metabolite
+#'     numerical values in columns with metabolite identifiers as column names.
+#'     Use NA for metabolites that were not detected and consider converting
+#'     any zeros to NA unless they are true zeros.
+#' @param metadata_sample DF which contains information about the samples, which will be combined
+#'     with the input data based on the unique sample identifiers used as
+#'     rownames.
+#' @param metadata_info Named vector containing the information about the names of the
+#'     experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile").
+#' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed.
+#'     If FALSE, only RLA QC plots are returned. \strong{Default = TRUE}
 #'
-#' @return List with two elements: DF (including output table) and Plot (including all plots generated)
+#' @return List with two elements: DF (including output table) and Plot (including
+#'     all plots generated)
 #'
 #' @examples
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- tic_norm(
-#'     data=Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'     metadata_sample = Intra[-c(49:58), c(1:3)],
-#'     metadata_info = c(Conditions = "Conditions")
+#' data=Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' metadata_sample = Intra[-c(49:58), c(1:3)],
+#' metadata_info = c(Conditions = "Conditions")
 #' )
 #'
-#' @keywords total ion count normalisation
 #'
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tidyr pivot_longer
@@ -1217,25 +1336,35 @@ tic_norm <- function(
 
 #' Normalize consumption release data
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", core_norm_factor = "Columnname_Input_SettingsFile", core_media = "Columnname_Input_SettingsFile"). Column core_norm_factor is used for normalization and core_media is used to specify the name of the media controls in the Conditions.
+#' @param data DF which contains unique sample identifiers as row names and metabolite
+#'     numerical values in columns with metabolite identifiers as column names.
+#'     Use NA for metabolites that were not detected and consider converting
+#'     any zeros to NA unless they are true zeros.
+#' @param metadata_sample DF which contains information about the samples, which will be combined
+#'     with the input data based on the unique sample identifiers used as
+#'     rownames.
+#' @param metadata_info Named vector containing the information about the names of the
+#'     experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile",
+#'     core_norm_factor = "Columnname_Input_SettingsFile", core_media =
+#'     "Columnname_Input_SettingsFile"). Column core_norm_factor is used for
+#'     normalization and core_media is used to specify the name of the media
+#'     controls in the Conditions.
 #'
-#' @return List with two elements: DF (including output table) and Plot (including all plots generated)
+#' @return List with two elements: DF (including output table) and Plot (including
+#'     all plots generated)
 #'
 #' @examples
 #' Media <-
-#'     medium_raw %>%
-#'     tibble::column_to_rownames("Code") %>%
-#'     subset(!Conditions =="Pool") %>%
-#'     dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+#' medium_raw %>%
+#' tibble::column_to_rownames("Code") %>%
+#' subset(!Conditions =="Pool") %>%
+#' dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 #' Res <- core_norm(
-#'     data = Media[, -c(1:3)],
-#'     metadata_sample = Media[, c(1:3)],
-#'     metadata_info = c(Conditions = "Conditions", core_norm_factor = "GrowthFactor", core_media = "blank")
+#' data = Media[, -c(1:3)],
+#' metadata_sample = Media[, c(1:3)],
+#' metadata_info = c(Conditions = "Conditions", core_norm_factor = "GrowthFactor", core_media = "blank")
 #' )
 #'
-#' @keywords Consumption Release Metaqbolomics, Normalisation, Exometabolomics
 #'
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -1504,24 +1633,39 @@ core_norm <- function(
 
 #' outlier_detection
 #'
-#' @param data DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected and consider converting any zeros to NA unless they are true zeros.
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info  Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile", core_media = "Columnname_Input_SettingsFile"). Column "Conditions" with information about the sample conditions, Column "BiologicalReplicates" including numerical values and Column "Columnname_Input_SettingsFile" is used to specify the name of the media controls in the Conditions.
-#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been performed. If not normalised yet, provide information about control media sample names via metadata_info "core_media" samples. \strong{Default = FALSE}
-#' @param hotellins_confidence \emph{Optional: } Confidence level for Hotellin's T2 test. \strong{Default = 0.99}
+#' @param data DF which contains unique sample identifiers as row names and metabolite
+#'     numerical values in columns with metabolite identifiers as column names.
+#'     Use NA for metabolites that were not detected and consider converting
+#'     any zeros to NA unless they are true zeros.
+#' @param metadata_sample DF which contains information about the samples, which will be combined
+#'     with the input data based on the unique sample identifiers used as
+#'     rownames.
+#' @param metadata_info Named vector containing the information about the names of the
+#'     experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile",
+#'     Biological_Replicates="ColumnName_Plot_SettingsFile", core_media =
+#'     "Columnname_Input_SettingsFile"). Column "Conditions" with information
+#'     about the sample conditions, Column "BiologicalReplicates" including
+#'     numerical values and Column "Columnname_Input_SettingsFile" is used to
+#'     specify the name of the media controls in the Conditions.
+#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been
+#'     performed. If not normalised yet, provide information about control
+#'     media sample names via metadata_info "core_media" samples.
+#'     \strong{Default = FALSE}
+#' @param hotellins_confidence \emph{Optional: } Confidence level for Hotellin's T2 test.
+#'     \strong{Default = 0.99}
 #'
-#' @return List with two elements: : DF (including output tables) and Plot (including all plots generated)
+#' @return List with two elements: : DF (including output tables) and Plot
+#'     (including all plots generated)
 #'
 #' @examples
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
 #' Res <- outlier_detection(
-#'     data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#'     metadata_sample = Intra[-c(49:58), c(1:3)],
-#'     metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#' data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
+#' metadata_sample = Intra[-c(49:58), c(1:3)],
+#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
 #' )
 #'
-#' @keywords Hotellins T2 outlier detection
 #'
 #' @importFrom dplyr relocate case_when mutate mutate_all select
 #' @importFrom inflection uik

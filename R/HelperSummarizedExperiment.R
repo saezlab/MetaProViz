@@ -17,20 +17,20 @@
 #
 
 
-#' Process SummarizedExperiment object to extract assay, sample, and feature metadata
+#' Process SummarizedExperiment objects
 #'
-#' This helper function extracts the numeric data matrix, sample metadata, and feature metadata from a SummarizedExperiment object.
-#' If the input is not a SummarizedExperiment, an error is thrown.
+#' This helper function extracts the numeric data matrix, sample metadata, and
+#' feature metadata from a SummarizedExperiment object. If the input is not a
+#' SummarizedExperiment, an error is thrown.
 #'
 #' @param se_obj A SummarizedExperiment object.
 #'
-#' @return A list with elements:
-#'   \item{data}{Numeric matrix with metabolites as columns and samples as rows}
-#'   \item{metadata_sample}{Data frame with sample metadata (samples as row names)}
-#'   \item{metadata_feature}{Data frame with feature metadata (metabolites as row names)}
+#' @return A list with elements: \item{data}{Numeric matrix with metabolites as
+#'     columns and samples as rows} \item{metadata_sample}{Data frame with
+#'     sample metadata (samples as row names)} \item{metadata_feature}{Data
+#'     frame with feature metadata (metabolites as row names)}
 #'
 #' @importFrom SummarizedExperiment assay colData rowData
-#'
 #' @noRd
 process_se <- function(se_obj) {
     if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) {

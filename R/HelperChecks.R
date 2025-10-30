@@ -24,21 +24,38 @@
 
 #' Check input general parameters
 #'
-#' @param data Passed to MetaProViz functions. Usually DF which contains unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. But can also be differential expression results or other data.
-#' @param data_num  \emph{Optional: } If data must be numeric \strong{Default = TRUE}
-#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames. If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param metadata_feature \emph{Optional: } DF which contains information about the features. If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param metadata_info \emph{Optional: } Passed to MetaProViz functions. Usually named vector containing the information about the names of the experimental parameters in metadata_sample, metadata_feature or data. \strong{Default = NULL}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, png, pdf. If set to NULL, plots are not saved.\strong{Default = NULL}
-#' @param save_table \emph{Optional: } Select the file type of output table. Options are "csv", "xlsx", "txt". If set to NULL, plots are not saved. \strong{Default = NULL}
-#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been performed. If not avaliable can be set to NULL. \strong{Default = FALSE}
-#' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting plots. If not avaliable can be set to NULL. \strong{Default = FALSE}
-#' @param theme \emph{Optional: } Can be set for VizX functions. If not avaliable can be set to NULL. \strong{Default = NULL}
-#' @param plot_types \emph{Optional: } Needs to be set for VizX functions. Options are "Sample", "Feature", Both". This refers to metadata_info color, shape, individual as for some plots we have both feature and sample settings. \strong{Default = NULL}
+#' @param data Passed to MetaProViz functions. Usually DF which contains unique sample
+#'     identifiers as row names and metabolite numerical values in columns with
+#'     metabolite identifiers as column names. But can also be differential
+#'     expression results or other data.
+#' @param data_num \emph{Optional: } If data must be numeric \strong{Default = TRUE}
+#' @param metadata_sample \emph{Optional: } DF which contains information about the samples, which
+#'     will be combined with the input data based on the unique sample
+#'     identifiers used as rownames. If not avaliable can be set to NULL.
+#'     \strong{Default = NULL}
+#' @param metadata_feature \emph{Optional: } DF which contains information about the features. If
+#'     not avaliable can be set to NULL. \strong{Default = NULL}
+#' @param metadata_info \emph{Optional: } Passed to MetaProViz functions. Usually named vector
+#'     containing the information about the names of the experimental
+#'     parameters in metadata_sample, metadata_feature or data. \strong{Default
+#'     = NULL}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     png, pdf. If set to NULL, plots are not saved.\strong{Default = NULL}
+#' @param save_table \emph{Optional: } Select the file type of output table. Options are
+#'     "csv", "xlsx", "txt". If set to NULL, plots are not saved.
+#'     \strong{Default = NULL}
+#' @param core \emph{Optional: } If TRUE, a consumption-release experiment has been
+#'     performed. If not avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting plots. If not
+#'     avaliable can be set to NULL. \strong{Default = FALSE}
+#' @param theme \emph{Optional: } Can be set for VizX functions. If not avaliable can be
+#'     set to NULL. \strong{Default = NULL}
+#' @param plot_types \emph{Optional: } Needs to be set for VizX functions. Options are
+#'     "Sample", "Feature", Both". This refers to metadata_info color, shape,
+#'     individual as for some plots we have both feature and sample settings.
+#'     \strong{Default = NULL}
 #'
 #' @return returns warnings and errors if input is not correct
-#'
-#' @keywords Input check
 #'
 #' @importFrom logger log_trace
 #' @noRd
@@ -329,19 +346,35 @@ check_param <- function(
 
 #' Check specific input parameters for processing()
 #'
-#' @param metadata_sample DF which contains information about the samples, which will be combined with the input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info Named vector containing the information about the names of the experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile", Biological_Replicates="ColumnName_Plot_SettingsFile"). For core = TRUE a core_norm_factor = "Columnname_Input_SettingsFile" and core_media = "Columnname_Input_SettingsFile", have to also be added.
-#' @param  \emph{Optional: }core If TRUE, a consumption-release experiment has been performed and the core value will be calculated.\strong{Default = FALSE}
-#' @param featurefilt \emph{Optional: }If NULL, no feature filtering is performed. If set to "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al., 2006) on the metabolite features on the whole dataset. If is set to "Modified",filtering is done based on the different conditions, thus a column named "Conditions" must be provided in the Input_SettingsFile input file including the individual conditions you want to apply the filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
-#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default = 0.8}
-#' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed. \strong{Default = TRUE}
-#' @param mvi \emph{Optional: } If TRUE, Missing Value Imputation (mvi) based on half minimum is performed \strong{Default = TRUE}
-#' @param mvi_percentage \emph{Optional: } percentage 0-100 of imputed value based on the minimum value. \strong{Default = 50}
-#' @param hotellins_confidence \emph{Optional: } Defines the Confidence of Outlier identification in HotellingT2 test. Must be numeric.\strong{Default = 0.99}
+#' @param metadata_sample DF which contains information about the samples, which will be combined
+#'     with the input data based on the unique sample identifiers used as
+#'     rownames.
+#' @param metadata_info Named vector containing the information about the names of the
+#'     experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile",
+#'     Biological_Replicates="ColumnName_Plot_SettingsFile"). For core = TRUE a
+#'     core_norm_factor = "Columnname_Input_SettingsFile" and core_media =
+#'     "Columnname_Input_SettingsFile", have to also be added.
+#' @param \emph{Optional: }core If TRUE, a consumption-release experiment has been performed and
+#'     the core value will be calculated.\strong{Default = FALSE}
+#' @param featurefilt \emph{Optional: }If NULL, no feature filtering is performed. If set to
+#'     "Standard" then it applies the 80%-filtering rule (Bijlsma S. et al.,
+#'     2006) on the metabolite features on the whole dataset. If is set to
+#'     "Modified",filtering is done based on the different conditions, thus a
+#'     column named "Conditions" must be provided in the Input_SettingsFile
+#'     input file including the individual conditions you want to apply the
+#'     filtering to (Yang, J et al., 2015). \strong{Default = "Standard"}
+#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default =
+#'     0.8}
+#' @param tic \emph{Optional: } If TRUE, total Ion Count normalization is performed.
+#'     \strong{Default = TRUE}
+#' @param mvi \emph{Optional: } If TRUE, Missing Value Imputation (mvi) based on half
+#'     minimum is performed \strong{Default = TRUE}
+#' @param mvi_percentage \emph{Optional: } percentage 0-100 of imputed value based on the minimum
+#'     value. \strong{Default = 50}
+#' @param hotellins_confidence \emph{Optional: } Defines the Confidence of Outlier identification in
+#'     HotellingT2 test. Must be numeric.\strong{Default = 0.99}
 #'
 #' @return returns warnings and errors if input is not correct
-#'
-#' @keywords Input check for processing
 #'
 #' @importFrom logger log_trace
 #' @noRd
@@ -420,19 +453,40 @@ check_param_processing <- function(
 
 #' Check input parameters of dma
 #'
-#' @param data DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names.
-#' @param metadata_sample DF which contains metadata information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames.
-#' @param metadata_info Named vector including the information about the conditions column information on numerator or denominator c(Conditions="ColumnName_SettingsFile", Numerator = "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile"). \strong{Default = c(conditions="Conditions", numerator = NULL, denumerator = NULL)}
-#' @param pval \emph{Optional: } String which contains an abbreviation of the selected test to calculate p.value. For one-vs-one comparisons choose t.test, wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all or all-vs-all comparison choose aov (=anova), welch(=welch anova), kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
-#' @param padj \emph{Optional: } String which contains an abbreviation of the selected p.adjusted test for p.value correction for multiple Hypothesis testing. Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm", etc.\strong{Default = "fdr"}
-#' @param vst TRUE or FALSE for whether to use variance stabilizing transformation on the data when linear modeling is used for hypothesis testing. \strong{Default = FALSE}
-#' @param shapiro TRUE or FALSE for whether to perform the shapiro.test and get informed about data distribution (normal versus not-normal distribution. \strong{Default = TRUE}
-#' @param bartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default = TRUE}
-#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and log2 transformation will be performed within the limma function and Log2FC calculation. If FALSE we expect the data to be log2 transformed as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
+#' @param data DF with unique sample identifiers as row names and metabolite numerical
+#'     values in columns with metabolite identifiers as column names.
+#' @param metadata_sample DF which contains metadata information about the samples, which will be
+#'     combined with your input data based on the unique sample identifiers
+#'     used as rownames.
+#' @param metadata_info Named vector including the information about the conditions column
+#'     information on numerator or denominator
+#'     c(Conditions="ColumnName_SettingsFile", Numerator =
+#'     "ColumnName_SettingsFile", Denominator  = "ColumnName_SettingsFile").
+#'     \strong{Default = c(conditions="Conditions", numerator = NULL,
+#'     denumerator = NULL)}
+#' @param pval \emph{Optional: } String which contains an abbreviation of the selected
+#'     test to calculate p.value. For one-vs-one comparisons choose t.test,
+#'     wilcox.test, "chisq.test", "cor.test" or lmFit (=limma), for one-vs-all
+#'     or all-vs-all comparison choose aov (=anova), welch(=welch anova),
+#'     kruskal.test or lmFit (=limma) \strong{Default = "lmFit"}
+#' @param padj \emph{Optional: } String which contains an abbreviation of the selected
+#'     p.adjusted test for p.value correction for multiple Hypothesis testing.
+#'     Search: ?p.adjust for more methods:"BH", "fdr", "bonferroni", "holm",
+#'     etc.\strong{Default = "fdr"}
+#' @param vst TRUE or FALSE for whether to use variance stabilizing transformation on
+#'     the data when linear modeling is used for hypothesis testing.
+#'     \strong{Default = FALSE}
+#' @param shapiro TRUE or FALSE for whether to perform the shapiro.test and get informed
+#'     about data distribution (normal versus not-normal distribution.
+#'     \strong{Default = TRUE}
+#' @param bartlett TRUE or FALSE for whether to perform the bartlett.test. \strong{Default
+#'     = TRUE}
+#' @param transform TRUE or FALSE. If TRUE we expect the data to be not log2 transformed and
+#'     log2 transformation will be performed within the limma function and
+#'     Log2FC calculation. If FALSE we expect the data to be log2 transformed
+#'     as this impacts the Log2FC calculation and limma. \strong{Default= TRUE}
 #'
 #' @return Returns: 1. warnings and errors if input is not correct, 2. Settings
-#'
-#' @keywords Input check for dma
 #'
 #' @importFrom logger log_trace log_info
 #' @importFrom dplyr filter select_if
@@ -619,20 +673,31 @@ check_param_dma <- function(
 
 #' Check input parameters of ORA
 #'
-#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite names/IDs need to match the identifier type (e.g. HMDB IDs) in the input_pathway.
-#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to use for cutoff_stat and cutoff_percentage, ColumnName for input_pathway. For cluster_ora also BackgroundColumn. \strong{c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite")}
-#' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a numeric value. \strong{default: 0.05}
-#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be considered for ORA. Selects top/Bottom % of selected percentageColumn, usually t.val or Log2FC \strong{default: 10}
-#' @param input_pathway DF that must include column "term" with the pathway name, column "Metabolite" with the Metabolite name or ID and column "Description" with pathway description that will be depicted on the plots.
+#' @param data DF with metabolite names/metabolite IDs as row names. Metabolite
+#'     names/IDs need to match the identifier type (e.g. HMDB IDs) in the
+#'     input_pathway.
+#' @param metadata_info \emph{Optional: } Pass ColumnName of the column including parameters to
+#'     use for cutoff_stat and cutoff_percentage, ColumnName for input_pathway.
+#'     For cluster_ora also BackgroundColumn. \strong{c(pvalColumn="p.adj",
+#'     percentageColumn="t.val", PathwayTerm= "term", PathwayFeature=
+#'     "Metabolite")}
+#' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a
+#'     numeric value. \strong{default: 0.05}
+#' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be
+#'     considered for ORA. Selects top/Bottom % of selected percentageColumn,
+#'     usually t.val or Log2FC \strong{default: 10}
+#' @param input_pathway DF that must include column "term" with the pathway name, column
+#'     "Metabolite" with the Metabolite name or ID and column "Description"
+#'     with pathway description that will be depicted on the plots.
 #' @param pathway_name \emph{Optional: } Name of the input_pathway used \strong{default: ""}
 #' @param min_gssize \emph{Optional: } minimum group size in ORA \strong{default: 10}
 #' @param max_gssize \emph{Optional: } maximum group size in ORA \strong{default: 1000}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
-#' @param remove_background For cluster_ora the Background Settings are passed, for standard_ora set to FALSE.
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt" \strong{default: "csv"}
+#' @param remove_background For cluster_ora the Background Settings are passed, for standard_ora set
+#'     to FALSE.
 #'
 #' @return Returns: 1. warnings and errors if input is not correct, 2. Pathway file
-#'
-#' @keywords Input check standard_ora and cluster_ora
 #'
 #' @importFrom logger log_trace
 #' @importFrom dplyr rename
@@ -805,21 +870,49 @@ check_param_ora <- function(
 
 #' Check input parameters of MCA
 #'
-#' @param data_intra For mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_core For mca_core, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns. Here we additionally require
-#' @param metadata_info_intra For mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the intracellular metabolomics including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_intra,StatCol=ColumnName_data_intra, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_core  For mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the consumption-release metabolomics including the direction column, the value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(DirectionCol= ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param data_c1 For mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param data_c2 For mca_2cond, otherwise NULL. DF for your data (results from e.g. dma) containing metabolites in rows with corresponding Log2FC and stat (p-value, p.adjusted) value columns.
-#' @param metadata_info_c1  For mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_c1,StatCol=ColumnName_data_c1, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param metadata_info_c2 For mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This must include: c(ValueCol=ColumnName_data_c2,StatCol=ColumnName_data_c2, cutoff_stat= NumericValue, ValueCutoff=NumericValue)
-#' @param feature \emph{Optional: } Column name of Column including the Metabolite identifiers. This MUST BE THE SAME in each of your Input files. \strong{Default="Metabolite"}
-#' @param method_background \emph{Optional: } Background method `Intra |core, Intra&core, core, Intra or * \strong{Default="Intra&core"}
-#' @param save_table \emph{Optional: } File types for the analysis results are: "csv", "xlsx", "txt" \strong{default: "csv"}
+#' @param data_intra For mca_core, otherwise NULL. DF for your data (results from e.g. dma)
+#'     containing metabolites in rows with corresponding Log2FC and stat
+#'     (p-value, p.adjusted) value columns.
+#' @param data_core For mca_core, otherwise NULL. DF for your data (results from e.g. dma)
+#'     containing metabolites in rows with corresponding Log2FC and stat
+#'     (p-value, p.adjusted) value columns. Here we additionally require
+#' @param metadata_info_intra For mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the
+#'     intracellular metabolomics including the value column (e.g. Log2FC,
+#'     Log2Diff, t.val, etc) and the stats column (e.g. p.adj, p.val). This
+#'     must include:
+#'     c(ValueCol=ColumnName_data_intra,StatCol=ColumnName_data_intra,
+#'     cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_core For mca_core, otherwise NULL. Pass ColumnNames and Cutoffs for the
+#'     consumption-release metabolomics including the direction column, the
+#'     value column (e.g. Log2Diff, t.val, etc) and the stats column (e.g.
+#'     p.adj, p.val). This must include: c(DirectionCol=
+#'     ColumnName_data_core,ValueCol=ColumnName_data_core,StatCol=ColumnName_data_core,
+#'     cutoff_stat= NumericValue, ValueCutoff=NumericValue)
+#' @param data_c1 For mca_2cond, otherwise NULL. DF for your data (results from e.g. dma)
+#'     containing metabolites in rows with corresponding Log2FC and stat
+#'     (p-value, p.adjusted) value columns.
+#' @param data_c2 For mca_2cond, otherwise NULL. DF for your data (results from e.g. dma)
+#'     containing metabolites in rows with corresponding Log2FC and stat
+#'     (p-value, p.adjusted) value columns.
+#' @param metadata_info_c1 For mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for
+#'     condition 1 including the value column (e.g. Log2FC, Log2Diff, t.val,
+#'     etc) and the stats column (e.g. p.adj, p.val). This must include:
+#'     c(ValueCol=ColumnName_data_c1,StatCol=ColumnName_data_c1, cutoff_stat=
+#'     NumericValue, ValueCutoff=NumericValue)
+#' @param metadata_info_c2 For mca_2cond, otherwise NULL. Pass ColumnNames and Cutoffs for
+#'     condition 2 includingthe value column (e.g. Log2FC, Log2Diff, t.val,
+#'     etc) and the stats column (e.g. p.adj, p.val). This must include:
+#'     c(ValueCol=ColumnName_data_c2,StatCol=ColumnName_data_c2, cutoff_stat=
+#'     NumericValue, ValueCutoff=NumericValue)
+#' @param feature \emph{Optional: } Column name of Column including the Metabolite
+#'     identifiers. This MUST BE THE SAME in each of your Input files.
+#'     \strong{Default="Metabolite"}
+#' @param method_background \emph{Optional: } Background method `Intra |core, Intra&core, core,
+#'     Intra or * \strong{Default="Intra&core"}
+#' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
+#'     "xlsx", "txt" \strong{default: "csv"}
 #'
 #' @return Returns warnings and errors if input is not correct
-#'
-#' @keywords Input check mca_2cond and mca_core
 #'
 #' @importFrom logger log_trace
 #' @noRd

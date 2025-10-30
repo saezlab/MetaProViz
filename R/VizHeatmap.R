@@ -22,37 +22,40 @@
 
 #' Heatmap visualization
 #'
-#' @param data SummarizedExperiment (se) file including assay and colData.
-#'        If se file is provided, metadata_sample is extracted from the colData
-#'        of the se object. metadata_feature, if available, are extracted from
-#'        the rowData. Alternatively provide a DF with unique sample identifiers
-#'        as row names and metabolite numerical values in columns with
-#'        metabolite identifiers as column names. Use NA for metabolites that
-#'        were not detected.
-#' @param metadata_info  \emph{Optional: } NULL or Named vector where you can
-#' include vectors or lists for annotation c(individual_Metab=
-#' "ColumnName_metadata_feature",individual_Sample=
-#' "ColumnName_metadata_sample",
-#' color_Metab="ColumnName_metadata_feature", color_Sample=
-#' list("ColumnName_metadata_sample",
-#' "ColumnName_metadata_sample",...)).\strong{Default = NULL}
-#' @param metadata_sample  \emph{Optional: } Only required if you did not
-#'        provide se file in parameter data. Provide DF which contains metadata
-#'        information about the samples, which will be combined with your input
-#'        data based on the unique sample identifiers used as rownames.
-#'        \strong{Default = NULL}
-#' @param metadata_feature \emph{Optional: } To provide metadata information
-#'        for each metabolite. Only used if you did not provide se file in
-#'        parameter data. Provide DF where the row names must match the
-#'        metabolite names in the columns of the data. \strong{Default = NULL}
+#' @param data SummarizedExperiment (se) file including assay and colData. If se file
+#'     is provided, metadata_sample is extracted from the colData of the se
+#'     object. metadata_feature, if available, are extracted from the rowData.
+#'     Alternatively provide a DF with unique sample identifiers as row names
+#'     and metabolite numerical values in columns with metabolite identifiers
+#'     as column names. Use NA for metabolites that were not detected.
+#' @param metadata_info \emph{Optional: } NULL or Named vector where you can include vectors or
+#'     lists for annotation c(individual_Metab=
+#'     "ColumnName_metadata_feature",individual_Sample=
+#'     "ColumnName_metadata_sample", color_Metab="ColumnName_metadata_feature",
+#'     color_Sample= list("ColumnName_metadata_sample",
+#'     "ColumnName_metadata_sample",...)).\strong{Default = NULL}
+#' @param metadata_sample \emph{Optional: } Only required if you did not provide se file in
+#'     parameter data. Provide DF which contains metadata information about the
+#'     samples, which will be combined with your input data based on the unique
+#'     sample identifiers used as rownames. \strong{Default = NULL}
+#' @param metadata_feature \emph{Optional: } To provide metadata information for each metabolite.
+#'     Only used if you did not provide se file in parameter data. Provide DF
+#'     where the row names must match the metabolite names in the columns of
+#'     the data. \strong{Default = NULL}
 #' @param plot_name \emph{Optional: } String which is added to the output files of the plot
-#' @param scale \emph{Optional: } String with the information for scale row, column or none. \strong{Default = row}
-#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg, pdf, png or NULL. \strong{Default = "svg"}
-#' @param enforce_featurenames \emph{Optional: } If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
-#' @param enforce_samplenames \emph{Optional: } If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. \strong{Default = FALSE}
-#' @param print_plot \emph{Optional: } print the plots to the active graphic
-#'     device.
-#' @param path {Optional:} String which is added to the resulting folder name \strong{default: NULL}
+#' @param scale \emph{Optional: } String with the information for scale row, column or
+#'     none. \strong{Default = row}
+#' @param save_plot \emph{Optional: } Select the file type of output plots. Options are svg,
+#'     pdf, png or NULL. \strong{Default = "svg"}
+#' @param enforce_featurenames \emph{Optional: } If there are more than 100 features no rownames will
+#'     be shown, which is due to readability. You can Enforce this by setting
+#'     this parameter to TRUE. \strong{Default = FALSE}
+#' @param enforce_samplenames \emph{Optional: } If there are more than 50 sampless no colnames will be
+#'     shown, which is due to readability. You can Enforce this by setting this
+#'     parameter to TRUE. \strong{Default = FALSE}
+#' @param print_plot \emph{Optional: } print the plots to the active graphic device.
+#' @param path {Optional:} String which is added to the resulting folder name
+#'     \strong{default: NULL}
 #'
 #' @return List with two elements: Plot and Plot_Sized
 #'
@@ -64,7 +67,6 @@
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- viz_heatmap(data = Intra[, -c(1:3)])
 #'
-#' @keywords Heatmap
 #'
 #' @importFrom ggplot2 ggplot theme element_rect
 #' @importFrom grid convertUnit

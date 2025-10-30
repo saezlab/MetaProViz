@@ -26,9 +26,10 @@
 
 #' Generate Stacked Bar Plot, e.g. for PK Coverage
 #'
-#' This function creates a stacked bar plot, for example to visualize Prior Knowledge (PK) coverage.
-#' The plot groups data by a specified column and fills the bars according to another column,
-#' allowing you to inspect the distribution of match statuses (or any categorical variable).
+#' This function creates a stacked bar plot, for example to visualize Prior
+#' Knowledge (PK) coverage. The plot groups data by a specified column and
+#' fills the bars according to another column, allowing you to inspect the
+#' distribution of match statuses (or any categorical variable).
 #'
 #' @param data A data frame containing the data to be plotted.
 #' @param group_col A string specifying the name of the column to group the data by.
@@ -37,9 +38,10 @@
 #' @param fill_labels A vector of labels corresponding to the fill levels for the legend.
 #' @param plot_name A string specifying the title of the plot.
 #' @param x_label A string for the x-axis label. Defaults to "Frequency".
-#' @param y_label A string for the y-axis label. If \code{NULL}, the value of \code{group_col} is used.
-#' @param legend_position A numeric vector of length 2 specifying the (x, y) position of the legend.
-#'                        Defaults to \code{c(0.95, 0.05)}.
+#' @param y_label A string for the y-axis label. If \code{NULL}, the value of
+#'     \code{group_col} is used.
+#' @param legend_position A numeric vector of length 2 specifying the (x, y) position of the
+#'     legend. Defaults to \code{c(0.95, 0.05)}.
 #'
 #' @return A \code{ggplot} object representing the stacked bar plot.
 #'
@@ -71,13 +73,13 @@ viz_stackedbar <- function(
         group_by(!!group_sym) %>%
         summarise(total = n(), .groups = "drop") %>%
         arrange(total) %>%
-        pull(!!group_sym) 
+        pull(!!group_sym)
 
     # Summarize data by group and fill status, then reorder the group factor
     summary_data <- data %>%
         group_by(!!group_sym, !!fill_sym) %>%
         summarise(count = n(), .groups = "drop") %>%
-        mutate(!!group_sym := factor(!!group_sym, levels = group_order)) 
+        mutate(!!group_sym := factor(!!group_sym, levels = group_order))
 
     # If y_label is not provided, use the grouping column name
     if (is.null(y_label)) {
