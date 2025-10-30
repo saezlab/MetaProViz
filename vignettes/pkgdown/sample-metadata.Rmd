@@ -47,7 +47,7 @@ Tissue metabolomics experiment is a standard metabolomics experiment using tissu
 * Find the main metabolite drivers that separate patients based on their demographics like age, gender and tumour stage.\
 \
 First if you have not done yet, install the required dependencies and load the libraries:
-```{r load-packages message=FALSE, warning=FALSE}
+```{r load-packages, message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 # 2. Install the latest development version from GitHub using devtools
 # devtools::install_github("https://github.com/saezlab/MetaProViz")
@@ -63,7 +63,6 @@ library(tibble)
 library(stringr)
 
 # Please install the Biocmanager Dependencies:
-# BiocManager::install("clusterProfiler")
 # BiocManager::install("EnhancedVolcano")
 ```
 \
@@ -303,7 +302,7 @@ viz_volcano(plot_types="Standard",
 
 ## Metabolite ID QC
 Before we perform enrichment analysis,it is important to check the availability of metabolite IDs that we aim to use. We can first create an overview plot:
-```{r compare-pk}
+```{r compare-pk, eval=FALSE}
 #Load the feature metadata:
 MetaboliteIDs <- Tissue_MetaData %>%
   rownames_to_column("Metabolite")%>%
@@ -314,6 +313,9 @@ ccRCC_CompareIDs <- compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rena
                                            name_col = "Metabolite",
                                            metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
                                            plot_name = "Overlap of ID types in ccRCC data")
+```
+```{r, echo=FALSE}
+knitr::include_graphics("sample-metadata.Rmd_compare-pk chunk.svg")
 ```
 \
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to understand the missing IDs focusing on HMDb as an example:
@@ -442,7 +444,7 @@ Plot3_KEGG <- count_id(Tissue_MetaData_KEGG, "KEGG")
 ```
 \
 Lastly, we will have the new metadata table, which we can use for enrichment analysis:
-```{r compare-pk-2}
+```{r compare-pk-2, eval=FALSE}
 Tissue_MetaData_Extended <-  Tissue_MetaData_KEGG[, c(1:10,19, 11:18)]%>%
   mutate(
     KEGG = ifelse(KEGG == "", NA, KEGG),
