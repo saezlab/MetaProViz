@@ -64,12 +64,12 @@ viz_upset <- function(
     df,
     class_col = NULL,
     intersect_cols = c("LIMID", "HMDB", "CHEBI", "None"),
-                      plot_name = "Metabolite IDs",
-                      palette_type = c("viridis", "polychrome"),
-                      max_legend_terms = 20,
-                      save_plot = "svg",
-                      print_plot = TRUE,
-                      path = NULL) {
+    plot_name = "Metabolite IDs",
+    palette_type = c("viridis", "polychrome"),
+    max_legend_terms = 20,
+    save_plot = "svg",
+    print_plot = TRUE,
+    path = NULL) {
     # NSE vs. R CMD check workaround
     upset_plot <- NULL
 

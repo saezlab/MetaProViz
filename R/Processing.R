@@ -431,8 +431,8 @@ replicate_sum <- function(
 
     ## ------------  Load data and process  ----------- ##
     Input <- merge(x = metadata_sample %>% select(!!metadata_info[["Conditions"]], !!metadata_info[["Biological_Replicates"]], !!metadata_info[["Analytical_Replicates"]]),
-                   y = data,
-                   by ="row.names") %>%
+    y = data,
+    by ="row.names") %>%
         column_to_rownames("Row.names") %>%
         rename(
             "Conditions"= metadata_info[["Conditions"]],
@@ -442,8 +442,8 @@ replicate_sum <- function(
 
     # Make the replicate Sums
     Input_data_numeric_summed <- as.data.frame(Input %>%
-                                                   group_by(Biological_Replicates, Conditions) %>%
-                                                   summarise_all("mean") %>% select(-Analytical_Replicates))
+    group_by(Biological_Replicates, Conditions) %>%
+    summarise_all("mean") %>% select(-Analytical_Replicates))
 
     # Make a number of merged replicates column
     nReplicates <-  Input %>%
@@ -680,10 +680,10 @@ pool_estimation <- function(
             )
 
         pca_QC_pool <- invisible(viz_pca(data = pca_data %>% select(-all_of(metadata_info[["Conditions"]]), -Sample_type),
-                                         metadata_info = c(color ="Sample_type"),
-                                         metadata_sample = pca_data,
-                                         plot_name = "QC Pool samples",
-                                         save_plot =  NULL))
+        metadata_info = c(color ="Sample_type"),
+        metadata_sample = pca_data,
+        plot_name = "QC Pool samples",
+        save_plot =  NULL))
     }
     dev.off()
     PlotList [["PCAPlot_PoolSamples"]] <- pca_QC_pool[["Plot_Sized"]][["Plot_Sized"]]
@@ -694,7 +694,7 @@ pool_estimation <- function(
     HistCV <- invisible(ggplot(result_df_final_out, aes(CV)) +
                             geom_histogram(aes(y = after_stat(density)), color ="black", fill ="white")+
                             geom_vline(aes(xintercept = cutoff_cv),
-                                       color ="darkred", linetype ="dashed", size = 1)+
+                            color ="darkred", linetype ="dashed", size = 1)+
                             geom_density(alpha =.2, fill ="#FF6666") +
                             labs(title ="CV for metabolites of Pool samples",x ="Coefficient of variation (CV%)", y = "Frequency")+
                             theme_classic())
@@ -709,21 +709,21 @@ pool_estimation <- function(
         mutate(HighVar = ifelse((CV > cutoff_cv) == TRUE, paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
 
     ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar, label = Plot_cv_result_df$Metabolite))+
-                              geom_violin(alpha = 0.5 , fill ="#FF6666")+
-                              geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-                              geom_text_repel(
-                                  aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
-                                                     as.character(Plot_cv_result_df$Metabolite), '')),
-                                  hjust = 0,
-                                  vjust = 0,
-                                  box.padding = 0.5,
-                                  # space between text and point
-                                  point.padding = 0.5,
-                                  # space around points
-                                  max.overlaps = Inf
-                              ) + # allow for many labels
-                              labs(title ="CV for metabolites of Pool samples",x ="Metabolites", y = "Coefficient of variation (CV%)")+
-                              theme_classic())
+    geom_violin(alpha = 0.5 , fill ="#FF6666")+
+    geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
+    geom_text_repel(
+        aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
+        as.character(Plot_cv_result_df$Metabolite), '')),
+        hjust = 0,
+        vjust = 0,
+        box.padding = 0.5,
+        # space between text and point
+        point.padding = 0.5,
+        # space around points
+        max.overlaps = Inf
+        ) + # allow for many labels
+        labs(title ="CV for metabolites of Pool samples",x ="Metabolites", y = "Coefficient of variation (CV%)")+
+        theme_classic())
 
     ViolinCV_Sized <- plotGrob_Processing(input_plot = ViolinCV,plot_name = "CV for metabolites of Pool samples", plot_type = "Violin")
 
@@ -1195,8 +1195,8 @@ tic_norm <- function(
         # Combine Plots
         dev.new()
         norm_plots <- grid.arrange(RLA_data_raw+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                   RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
-                                   ncol = 2)
+        RLA_data_norm+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+ theme(legend.position = "none"),
+        ncol = 2)
         dev.off()
         norm_plots <- ggplot() +theme_minimal()+ annotation_custom(norm_plots)
 
@@ -1286,10 +1286,10 @@ core_norm <- function(
 
         dev.new()
         pca_QC_media <- invisible(viz_pca(data = media_pca_data %>% dplyr::select(-metadata_info[["Conditions"]], -Sample_type),
-                                          metadata_info = c(color ="Sample_type"),
-                                          metadata_sample = media_pca_data,
-                                          plot_name = "QC Media_samples",
-                                          save_plot =  NULL))
+        metadata_info = c(color ="Sample_type"),
+        metadata_sample = media_pca_data,
+        plot_name = "QC Media_samples",
+        save_plot =  NULL))
         dev.off()
 
         PlotList[["PCA_coreMediaSamples"]] <- pca_QC_media[["Plot_Sized"]][["QC Media_samples"]]
@@ -1322,7 +1322,7 @@ core_norm <- function(
         HistCV <- invisible(ggplot(cv_result_df, aes(CV)) +
                                 geom_histogram(aes(y = after_stat(density)), color ="black", fill ="white")+
                                 geom_vline(aes(xintercept = cutoff_cv),
-                                           color ="darkred", linetype ="dashed", linewidth = 1)+
+                                color ="darkred", linetype ="dashed", linewidth = 1)+
                                 geom_density(alpha =.2, fill ="#FF6666") +
                                 labs(title ="CV for metabolites of control media samples (no cells)",x ="Coefficient of variation (CV)", y = "Frequency")+
                                 theme_classic())
@@ -1336,21 +1336,21 @@ core_norm <- function(
             mutate(HighVar = ifelse(HighVar == TRUE, "> CV 30", "< CV 30"))
 
         ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar, label = row.names(cv_result_df)))+
-                                  geom_violin(alpha = 0.5 , fill ="#FF6666")+
-                                  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-                                  geom_text_repel(
-                                      aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
-                                                         as.character(row.names(Plot_cv_result_df)), '')),
-                                      hjust = 0,
-                                      vjust = 0,
-                                      box.padding = 0.5,
-                                      # space between text and point
-                                      point.padding = 0.5,
-                                      # space around points
-                                      max.overlaps = Inf
-                                  ) + # allow for many labels
-                                  labs(title ="CV for metabolites of control media samples (no cells)",x ="Metabolites", y = "Coefficient of variation (CV)")+
-                                  theme_classic())
+        geom_violin(alpha = 0.5 , fill ="#FF6666")+
+        geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
+        geom_text_repel(
+            aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
+            as.character(row.names(Plot_cv_result_df)), '')),
+            hjust = 0,
+            vjust = 0,
+            box.padding = 0.5,
+            # space between text and point
+            point.padding = 0.5,
+            # space around points
+            max.overlaps = Inf
+            ) + # allow for many labels
+            labs(title ="CV for metabolites of control media samples (no cells)",x ="Metabolites", y = "Coefficient of variation (CV)")+
+            theme_classic())
 
         ViolinCV_Sized <- plotGrob_Processing(input_plot = ViolinCV,plot_name = "CV for metabolites of control media samples (no cells)", plot_type = "Violin")
         PlotList[["core_Media_CV_Violin"]] <- ViolinCV_Sized
@@ -1548,7 +1548,7 @@ outlier_detection <- function(
     Samples <- `Group summary statistics` <- Outliers <- NULL
     # Message:
     message <- paste("Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). ",
-                     "hotellins_confidence value selected: ", hotellins_confidence, sep = "")
+    "hotellins_confidence value selected: ", hotellins_confidence, sep = "")
     log_info(message)
     message(message)
 
@@ -1781,11 +1781,11 @@ outlier_detection <- function(
     Metadata_Sample <- data_norm_filtered_full %>%
         mutate(
             Outliers = case_when(Outliers == "no" ~ 'no',
-                                 Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
-                                 Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
-                                 Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
-                                 Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
-                                 TRUE ~ 'Outlier_filtering_round = or > 5')
+            Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
+            Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',
+            Outliers == "Outlier_filtering_round_3" ~ ' Outlier_filtering_round = 3',
+            Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
+            TRUE ~ 'Outlier_filtering_round = or > 5')
         )
     Metadata_Sample$Outliers <- relevel(as.factor(Metadata_Sample$Outliers), ref ="no")
 
@@ -1805,10 +1805,10 @@ outlier_detection <- function(
     if ("Biological_Replicates" %in% names(metadata_info)) {
         dev.new()
         pca_QC_repl <- invisible(viz_pca(data = as.data.frame(data) %>% dplyr::select(-zero_var_metab_export_df$Metabolite),
-                                         metadata_info = c(color = metadata_info[["Conditions"]], shape = metadata_info[["Biological_Replicates"]]),
-                                         metadata_sample = Metadata_Sample,
-                                         plot_name =  "Quality Control PCA replicate spread check",
-                                         save_plot =  NULL))
+        metadata_info = c(color = metadata_info[["Conditions"]], shape = metadata_info[["Biological_Replicates"]]),
+        metadata_sample = Metadata_Sample,
+        plot_name =  "Quality Control PCA replicate spread check",
+        save_plot =  NULL))
         dev.off()
 
         outlier_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
