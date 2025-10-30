@@ -315,7 +315,7 @@ metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
 plot_name = "Overlap of ID types in ccRCC data")
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("sample-metadata.Rmd_compare-pk chunk.svg")
+knitr::include_graphics("sample-metadata.Rmd_compare-pk.svg")
 ```
 \
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to understand the missing IDs focusing on HMDb as an example:
@@ -457,7 +457,7 @@ ccRCC_CompareIDs_Extended <- compare_pk(data = list(Biocft = Tissue_MetaData_Ext
                                                     plot_name = "Overlap of ID types in ccRCC data")
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("sample-metadata.Rmd_compare-pk-2 chunk.svg")
+knitr::include_graphics("sample-metadata.Rmd_compare-pk-2.svg")
 ```
 \
 If we compare the results to the upset plot from the original metadata we can see that initially 251 metabolites had a pubchem, HMDB and KEGG ID, whilst after adding the equivalent IDs and translating the IDs, we now have 285 metabolites with all three IDs. 135 metabolite had only a Pubchem ID, whilst now we have found HMDB and/or KEGG IDs for half of these metabolites with only 65 metabolites remaining with only a Pubchem ID.
