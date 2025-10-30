@@ -77,12 +77,11 @@
 #'
 #' @examples
 #' data(intracell_raw_se)
-#' Res <- viz_superplot(data=intracell_raw_se[1:2, , drop = FALSE])#only plot the first 2 metabolites
+#' Res <- viz_superplot(data = intracell_raw_se[1:2, , drop = FALSE]) # only plot the first 2 metabolites
 #'
 #' data(intracell_raw)
-#' Intra <- intracell_raw[,c(1:6)]%>%tibble::column_to_rownames("Code")
-#' Res <- viz_superplot(data=Intra[,-c(1:3)], metadata_sample=Intra[,c(1:3)])
-#'
+#' Intra <- intracell_raw[, c(1:6)] %>% tibble::column_to_rownames("Code")
+#' Res <- viz_superplot(data = Intra[, -c(1:3)], metadata_sample = Intra[, c(1:3)])
 #'
 #' @importFrom ggplot2 ggplot theme geom_violin stat_summary geom_boxplot
 #' @importFrom ggplot2 position_dodge element_text theme_classic

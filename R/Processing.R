@@ -83,22 +83,38 @@
 #'
 #' @examples
 #' data(intracell_raw_se)
-#' ResI <- processing(data=intracell_raw_se,
-#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' ResI <- processing(
+#'     data = intracell_raw_se,
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         Biological_Replicates = "Biological_Replicates"
+#'     )
+#' )
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
-#' ResI <- processing(data=Intra[-c(49:58), -c(1:3)],
-#' metadata_sample=Intra[-c(49:58), c(1:3)],
-#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates"))
+#' ResI <- processing(
+#'     data = Intra[-c(49:58), -c(1:3)],
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         Biological_Replicates = "Biological_Replicates"
+#'     )
+#' )
 #'
 #' data(medium_raw)
 #' Media <- medium_raw %>% tibble::column_to_rownames("Code")
-#' ResM <- processing(data = Media[-c(40:45), -c(1:3)],
-#' metadata_sample = Media[-c(40:45), c(1:3)],
-#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", core_norm_factor = "GrowthFactor", core_media = "blank"),
-#' core=TRUE)
-#'
+#' ResM <- processing(
+#'     data = Media[-c(40:45), -c(1:3)],
+#'     metadata_sample = Media[-c(40:45), c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         Biological_Replicates = "Biological_Replicates",
+#'         core_norm_factor = "GrowthFactor",
+#'         core_media = "blank"
+#'     ),
+#'     core = TRUE
+#' )
 #'
 #' @importFrom dplyr mutate_all full_join
 #' @importFrom magrittr %>% %<>%
@@ -405,13 +421,14 @@ processing <- function(
 #'
 #' @examples
 #' data(intracell_raw_se)
-#' Res <- replicate_sum(data=intracell_raw_se)
+#' Res <- replicate_sum(data = intracell_raw_se)
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
-#' Res <- replicate_sum(data=Intra[-c(49:58) ,-c(1:3)],
-#' metadata_sample=Intra[-c(49:58) , c(1:3)])
-#'
+#' Res <- replicate_sum(
+#'     data = Intra[-c(49:58), -c(1:3)],
+#'     metadata_sample = Intra[-c(49:58), c(1:3)]
+#' )
 #'
 #' @importFrom dplyr mutate_all summarise_all select rename ungroup group_by
 #' @importFrom magrittr %>% %<>%
@@ -591,15 +608,18 @@ replicate_sum <- function(
 #'
 #' @examples
 #' data(intracell_raw_se)
-#' Res <- pool_estimation(data=intracell_raw_se,
-#' metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
+#' Res <- pool_estimation(
+#'     data = intracell_raw_se,
+#'     metadata_info = c(PoolSamples = "Pool", Conditions = "Conditions")
+#' )
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
-#' Res <- pool_estimation(data=Intra[ ,-c(1:3)],
-#' metadata_sample=Intra[ , c(1:3)],
-#' metadata_info = c(PoolSamples = "Pool", Conditions="Conditions"))
-#'
+#' Res <- pool_estimation(
+#'     data = Intra[, -c(1:3)],
+#'     metadata_sample = Intra[, c(1:3)],
+#'     metadata_info = c(PoolSamples = "Pool", Conditions = "Conditions")
+#' )
 #'
 #' @importFrom dplyr case_when select rowwise mutate
 #' @importFrom magrittr %>% %<>%
@@ -903,13 +923,19 @@ pool_estimation <- function(
 #'
 #' @examples
 #' data(intracell_raw)
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- feature_filtering(
-#' data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#' metadata_sample = Intra[-c(49:58), c(1:3)],
-#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#'     data =
+#'         Intra[-c(49:58), -c(1:3)] %>%
+#'         dplyr::mutate_all(
+#'             ~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)
+#'         ),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         Biological_Replicates = "Biological_Replicates"
+#'     )
 #' )
-#'
 #'
 #' @importFrom dplyr filter mutate_all
 #' @importFrom magrittr %>% %<>%
@@ -1048,13 +1074,19 @@ feature_filtering <- function(
 #'
 #' @examples
 #' data(intracell_raw)
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- mvi_imputation(
-#' data = Intra[-c(49:58), -c(1:3)]%>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#' metadata_sample = Intra[-c(49:58), c(1:3)],
-#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#'     data =
+#'         Intra[-c(49:58), -c(1:3)] %>%
+#'         dplyr::mutate_all(
+#'             ~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)
+#'         ),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         Biological_Replicates = "Biological_Replicates"
+#'     )
 #' )
-#'
 #'
 #' @importFrom dplyr select mutate group_by filter mutate_all
 #' @importFrom magrittr %>% %<>%
@@ -1213,13 +1245,16 @@ mvi_imputation <- function(
 #'
 #' @examples
 #' data(intracell_raw)
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- tic_norm(
-#' data=Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#' metadata_sample = Intra[-c(49:58), c(1:3)],
-#' metadata_info = c(Conditions = "Conditions")
+#'     data =
+#'         Intra[-c(49:58), -c(1:3)] %>%
+#'         dplyr::mutate_all(
+#'             ~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)
+#'         ),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(Conditions = "Conditions")
 #' )
-#'
 #'
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tidyr pivot_longer
@@ -1355,16 +1390,19 @@ tic_norm <- function(
 #'
 #' @examples
 #' Media <-
-#' medium_raw %>%
-#' tibble::column_to_rownames("Code") %>%
-#' subset(!Conditions =="Pool") %>%
-#' dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+#'     medium_raw %>%
+#'     tibble::column_to_rownames("Code") %>%
+#'     subset(!Conditions == "Pool") %>%
+#'     dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 #' Res <- core_norm(
-#' data = Media[, -c(1:3)],
-#' metadata_sample = Media[, c(1:3)],
-#' metadata_info = c(Conditions = "Conditions", core_norm_factor = "GrowthFactor", core_media = "blank")
+#'     data = Media[, -c(1:3)],
+#'     metadata_sample = Media[, c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         core_norm_factor = "GrowthFactor",
+#'         core_media = "blank"
+#'     )
 #' )
-#'
 #'
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -1659,13 +1697,19 @@ core_norm <- function(
 #'
 #' @examples
 #' data(intracell_raw)
-#' Intra <- intracell_raw %>%tibble::column_to_rownames("Code")
+#' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- outlier_detection(
-#' data = Intra[-c(49:58), -c(1:3)] %>% dplyr::mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)),
-#' metadata_sample = Intra[-c(49:58), c(1:3)],
-#' metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates")
+#'     data =
+#'         Intra[-c(49:58), -c(1:3)] %>%
+#'         dplyr::mutate_all(
+#'             ~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)
+#'         ),
+#'     metadata_sample = Intra[-c(49:58), c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions",
+#'         Biological_Replicates = "Biological_Replicates"
+#'     )
 #' )
-#'
 #'
 #' @importFrom dplyr relocate case_when mutate mutate_all select
 #' @importFrom inflection uik

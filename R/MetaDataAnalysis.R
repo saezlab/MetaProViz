@@ -62,10 +62,9 @@
 #'
 #' data(tissue_norm)
 #' Res <- metadata_analysis(
-#' data = tissue_norm[, -c(2:14)] %>% tibble::column_to_rownames("Code"),
-#' metadata_sample = tissue_norm[, c(1, 3, 5:6, 13:14)] %>% tibble::column_to_rownames("Code")
+#'     data = tissue_norm[, -c(2:14)] %>% tibble::column_to_rownames("Code"),
+#'     metadata_sample = tissue_norm[, c(1, 3, 5:6, 13:14)] %>% tibble::column_to_rownames("Code")
 #' )
-#'
 #'
 #' @importFrom dplyr filter bind_rows rename mutate ungroup group_by summarise
 #' @importFrom dplyr select arrange rowwise mutate_all distinct left_join desc
@@ -406,10 +405,9 @@ metadata_analysis <- function(
 #' data(tissue_norm)
 #' Tissue_Norm <- tissue_norm %>% tibble::column_to_rownames("Code")
 #' Res <- meta_pk(
-#' data = Tissue_Norm[, -c(1:13)],
-#' metadata_sample = Tissue_Norm[, c(2, 4:5, 12:13)]
+#'     data = Tissue_Norm[, -c(1:13)],
+#'     metadata_sample = Tissue_Norm[, c(2, 4:5, 12:13)]
 #' )
-#'
 #'
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer unite

@@ -79,7 +79,6 @@
 #' Intra <- intracell_raw[, -c(2:4)] %>% tibble::column_to_rownames("Code")
 #' Res <- viz_pca(Intra)
 #'
-#'
 #' @importFrom ggplot2 ggplot theme element_rect autoplot scale_shape_manual geom_hline geom_vline ggtitle
 #' @importFrom ggplot2 scale_color_manual theme_classic annotation_custom
 #' @importFrom grid convertUnit

@@ -84,22 +84,21 @@
 #' @examples
 #' data(intracell_raw_se)
 #' ResI <- dma(
-#' data = intracell_raw_se,
-#' metadata_info = c(
-#' Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
-#' )
+#'     data = intracell_raw_se,
+#'     metadata_info = c(
+#'         Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+#'     )
 #' )
 #'
 #' data(intracell_raw)
 #' Intra <- intracell_raw[-c(49:58), ] %>% tibble::column_to_rownames("Code")
 #' ResI <- dma(
-#' data = Intra[, -c(1:3)],
-#' metadata_sample = Intra[, c(1:3)],
-#' metadata_info = c(
-#' Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+#'     data = Intra[, -c(1:3)],
+#'     metadata_sample = Intra[, c(1:3)],
+#'     metadata_info = c(
+#'         Conditions = "Conditions", Numerator = NULL, Denominator = "HK2"
+#'     )
 #' )
-#' )
-#'
 #'
 #' @importFrom magrittr %>%
 #' @importFrom logger log_info log_error

@@ -94,9 +94,8 @@
 #'
 #' @examples
 #' data(intracell_dma)
-#' Intra <- intracell_dma%>%tibble::column_to_rownames("Metabolite")
-#' Res <- viz_volcano(data=Intra)
-#'
+#' Intra <- intracell_dma %>% tibble::column_to_rownames("Metabolite")
+#' Res <- viz_volcano(data = Intra)
 #'
 #' @importFrom dplyr rename filter mutate rename_with
 #' @importFrom magrittr %>% %<>%

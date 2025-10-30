@@ -29,7 +29,6 @@
 #' @examples
 #' metsigdb_kegg()
 #'
-#'
 #' @importFrom OmnipathR kegg_conv kegg_link kegg_list
 #' @importFrom dplyr filter inner_join mutate rename
 #' @importFrom logger log_info
@@ -106,7 +105,6 @@ metsigdb_kegg <- function() {
 #'
 #' @examples
 #' ChemicalClass <- metsigdb_chemicalclass()
-#'
 #'
 #' @importFrom OmnipathR ramp_table
 #' @importFrom dplyr filter group_by mutate select summarise
@@ -220,7 +218,6 @@ metsigdb_chemicalclass <- function(
 #' @examples
 #' data(hallmarks)
 #' make_gene_metab_set(hallmarks)
-#'
 #'
 #' @importFrom dplyr rename
 #' @importFrom logger log_info
@@ -382,7 +379,6 @@ make_gene_metab_set <- function(
 #'
 #' @examples
 #' metsigdb_metalinks()
-#'
 #'
 #' @importFrom DBI dbListTables dbDisconnect dbGetQuery
 #' @importFrom OmnipathR metalinksdb_sqlite

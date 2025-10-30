@@ -51,13 +51,14 @@
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
 #' Res <- translate_id(
-#' data = KEGG_Pathways, metadata_info = c(
-#' InputID =
-#' "MetaboliteID", grouping_variable = "term"
-#' ), from = c("kegg"), to =
-#' c("pubchem", "hmdb")
+#'     data = KEGG_Pathways,
+#'     metadata_info = c(
+#'         InputID = "MetaboliteID",
+#'         grouping_variable = "term"
+#'     ),
+#'     from = c("kegg"),
+#'     to = c("pubchem", "hmdb")
 #' )
-#'
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across n
 #' @importFrom tidyselect all_of starts_with
@@ -346,8 +347,6 @@ function(
 
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
-#' rowwise if_else
-#'
 #' @param data dataframe with at least one column with the detected metabolite IDs (one
 #'     ID per row).
 #' @param metadata_info \emph{Optional: } Column name of metabolite IDs. \strong{Default =
@@ -365,13 +364,13 @@ function(
 #' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>% tidyr::drop_na()
 #' Res <- equivalent_id(
-#' data = DetectedIDs,
-#' metadata_info = c(InputID = "HMDB"),
-#' from = "hmdb"
+#'     data = DetectedIDs,
+#'     metadata_info = c(InputID = "HMDB"),
+#'     from = "hmdb"
 #' )
 #'
-#'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across
+#' @importFrom dplyr rowwise if_else
 #' @importFrom tidyr separate_rows unnest
 #' @importFrom purrr map_chr map_lgl map_int
 #' @importFrom tidyselect all_of starts_with
@@ -829,17 +828,21 @@ function(
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
 #' InputDF <- translate_id(
-#' data = KEGG_Pathways, metadata_info = c(
-#' InputID =
-#' "MetaboliteID", grouping_variable = "term"
-#' ), from = c("kegg"), to =
-#' c("pubchem")
+#'     data = KEGG_Pathways,
+#'     metadata_info = c(
+#'         InputID = "MetaboliteID",
+#'         grouping_variable = "term"
+#'     ),
+#'     from = c("kegg"),
+#'     to = c("pubchem")
 #' )[["TranslatedDF"]]
 #' Res <- mapping_ambiguity(
-#' data = InputDF, from = "MetaboliteID", to =
-#' "pubchem", grouping_variable = "term", summary = TRUE
+#'     data = InputDF,
+#'     from = "MetaboliteID",
+#'     to = "pubchem",
+#'     grouping_variable = "term",
+#'     summary = TRUE
 #' )
-#'
 #'
 #' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom rlang !!! !! := sym syms
@@ -1410,21 +1413,26 @@ function(
 #' @examples
 #' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>%
-#' dplyr::select("Metabolite", "HMDB") %>%
-#' tidyr::drop_na()
+#'     dplyr::select("Metabolite", "HMDB") %>%
+#'     tidyr::drop_na()
 #' input_pathway <- translate_id(
-#' data = metsigdb_kegg(), metadata_info =
-#' c(InputID = "MetaboliteID", grouping_variable = "term"), from = c("kegg"),
-#' to = c("hmdb")
+#'     data = metsigdb_kegg(),
+#'     metadata_info = c(
+#'         InputID = "MetaboliteID",
+#'         grouping_variable = "term"
+#'     ),
+#'     from = c("kegg"),
+#'     to = c("hmdb")
 #' )[["TranslatedDF"]] %>% tidyr::drop_na()
 #' Res <- checkmatch_pk_to_data(
-#' data = DetectedIDs, input_pk = input_pathway,
-#' metadata_info = c(
-#' InputID = "HMDB", PriorID = "hmdb", grouping_variable =
-#' "term"
+#'     data = DetectedIDs,
+#'     input_pk = input_pathway,
+#'     metadata_info = c(
+#'         InputID = "HMDB",
+#'         PriorID = "hmdb",
+#'         grouping_variable = "term"
+#'     )
 #' )
-#' )
-#'
 #'
 #' @importFrom dplyr cur_group_id filter mutate n_distinct row_number select
 #' @importFrom logger log_trace
@@ -2080,7 +2088,6 @@ function(
 #' @examples
 #' metsigdb_kegg()
 #'
-#'
 #' @importFrom dplyr bind_rows filter group_by left_join mutate
 #' @importFrom dplyr select summarize ungroup
 #' @importFrom igraph graph_from_adjacency_matrix components
@@ -2601,7 +2608,6 @@ function(
 #' )
 #' }
 #'
-#'
 #' @importFrom dplyr mutate select
 #' @importFrom logger log_trace
 #' @export
@@ -2991,7 +2997,6 @@ function(
 #' @examples
 #' data(biocrates_features)
 #' count_id(biocrates_features, "HMDB")
-#'
 #'
 #' @importFrom dplyr case_when mutate rename
 #' @importFrom ggplot2 aes element_rect element_text expansion geom_bar

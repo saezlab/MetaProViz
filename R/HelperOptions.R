@@ -43,7 +43,6 @@
 #' metaproviz_save_config()
 #' }
 #'
-#'
 #' @importFrom OmnipathR save_config
 #' @export
 metaproviz_save_config <- function(
@@ -73,7 +72,6 @@ metaproviz_save_config <- function(
 #' # load the config from a custom config file:
 #' metaproviz_load_config(path = "my_custom_metaproviz_config.yml")
 #' }
-#'
 #'
 #' @importFrom OmnipathR load_config
 #' @export
@@ -109,7 +107,6 @@ metaproviz_load_config <- function(
 #' metaproviz_save_config()
 #' }
 #'
-#'
 #' @seealso
 #' \code{\link{metaproviz_load_config}, \link{metaproviz_save_config}}
 #'
@@ -132,7 +129,6 @@ metaproviz_reset_config <- function(
 #'
 #' @examples
 #' metaproviz_config_path()
-#'
 #'
 #' @importFrom OmnipathR config_path
 #' @export

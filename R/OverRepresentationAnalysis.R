@@ -80,12 +80,20 @@
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
 #' data(intracell_dma) # loads the object into your environment
-#' DMAres <- intracell_dma %>% dplyr::filter(!is.na(KEGGCompound))%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
-#' RES <- MetaProViz::cluster_ora(data= DMAres,
-#' metadata_info=c(ClusterColumn="Pathway", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-#' input_pathway=KEGG_Pathways,
-#' remove_background=FALSE)
-#'
+#' DMAres <- intracell_dma %>%
+#'     dplyr::filter(!is.na(KEGGCompound)) %>%
+#'     tibble::column_to_rownames("KEGGCompound") %>%
+#'     dplyr::select(-"Metabolite")
+#' RES <- cluster_ora(
+#'     data = DMAres,
+#'     metadata_info = c(
+#'         ClusterColumn = "Pathway",
+#'         PathwayTerm = "term",
+#'         PathwayFeature = "Metabolite"
+#'     ),
+#'     input_pathway = KEGG_Pathways,
+#'     remove_background = FALSE
+#' )
 #'
 #' @importFrom logger log_info
 #' @importFrom dplyr rename select
@@ -257,10 +265,14 @@ cluster_ora <- function(
 #' @examples
 #' KEGG_Pathways <- metsigdb_kegg()
 #' data(intracell_dma) # loads the object into your environment
-#' DMAres <- intracell_dma %>% dplyr::filter(!is.na(KEGGCompound))%>%tibble::column_to_rownames("KEGGCompound")%>%dplyr::select(- "Metabolite")
-#' RES <- MetaProViz::standard_ora(data= DMAres,
-#' input_pathway=KEGG_Pathways)
-#'
+#' DMAres <- intracell_dma %>%
+#'     dplyr::filter(!is.na(KEGGCompound)) %>%
+#'     tibble::column_to_rownames("KEGGCompound") %>%
+#'     dplyr::select(-"Metabolite")
+#' RES <- standard_ora(
+#'     data = DMAres,
+#'     input_pathway = KEGG_Pathways
+#' )
 #'
 #' @importFrom dplyr rename
 #' @importFrom stats aggregate

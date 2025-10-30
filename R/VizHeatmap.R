@@ -67,7 +67,6 @@
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
 #' Res <- viz_heatmap(data = Intra[, -c(1:3)])
 #'
-#'
 #' @importFrom ggplot2 ggplot theme element_rect
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select

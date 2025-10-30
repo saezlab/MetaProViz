@@ -26,7 +26,6 @@
 #' metaproviz_logfile()
 #' # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 #'
-#'
 #' @seealso
 #' \code{\link{metaproviz_log}}
 #'
@@ -48,7 +47,6 @@ metaproviz_logfile <- function() {
 #' # then you can browse the log file, and exit with `q`
 #' }
 #'
-#'
 #' @seealso
 #' \code{\link{metaproviz_logfile}}
 #'
@@ -68,7 +66,6 @@ metaproviz_log <- function() {
 #'
 #' @examples
 #' metaproviz_set_loglevel(logger::FATAL, target = "console")
-#'
 #'
 #' @importFrom OmnipathR set_loglevel
 #' @export
