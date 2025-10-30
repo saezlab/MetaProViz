@@ -65,7 +65,7 @@ knitr::opts_chunk$set(
 \
 First if you have not done yet, install the required dependencies and load the libraries:
 
-```{r load-packages message=FALSE, warning=FALSE}
+```{r load-packages, message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 # 2. Install the latest development version from GitHub using devtools
 # devtools::install_github("https://github.com/saezlab/MetaProViz")
