@@ -481,12 +481,15 @@ dplyr::filter(MetaLinksDB, !is.na(term_specific))[c(1,50, 90, 101),] %>%
 
 We have now loaded a number of different PK sources (details above) and aim to compare the overlap in coverage between these PK sources to understand if there are certain genes or metabolites covered by one PK resource but not the others.
 As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `compare_pk()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
-```{r compare-pk}
+```{r compare-pk, eval=FALSE}
 # Compare the PK resources
 pk_comp_res <- compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMetab[["GeneMetabSet"]]),
                                                   Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
                                                   MetalinksDB = as.data.frame(MetaLinksDB))
                                      )
+```
+```{r, echo=FALSE}
+knitr::include_graphics("prior-knowledge.Rmd_compare-pk chunk.svg")
 ```
 \
 The table includes all features of the three PK resources we decided to compare. Additionally, it includes a column for each PK resource with value 1 if the feature is present in the PK resource and 0 if it is not. The column "Type" specifies with ID type the feature is corresponding to, here either metabolite (HMDB) or gene, which is used for visualisation purposes in the upset plot.\
@@ -541,13 +544,15 @@ In the Biocrates data the available metabolite identifiers are mostly CHEBI, HMD
 Now we select these metabolite identifier columns to count the coverage and look at the combinations of the coverage grouped by the class of metabolite.
 This helps us to understand what to expect, when linking the data to prior knowledge.\
 
-```{r compare-pk-2, fig.width=12, fig.height=9}
+```{r compare-pk-2, eval=FALSE}
 pk_comp_res_biocft <- compare_pk(data = list(Biocft = FeatureMetadata_Biocrates),
                                              metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
                                              plot_name = "Overlap of BioCrates Columns")
 
 ```
-
+```{r, echo=FALSE}
+knitr::include_graphics("prior-knowledge.Rmd_compare-pk-2 chunk.svg")
+```
 \
 
 ```{r code-10, echo=FALSE}
@@ -756,12 +761,14 @@ KEGG_Pathways_Translated[["TranslatedDF"]][c(1:3, 300:301,600:602),] %>%
 Here we can immediately see that despite the ID translation, some of the translations between the KEGG MetaboliteID and the HMDB or PubChem IDs have failed, resulting in NA values.
 to get a better understanding of the combinations of these, let's visualise the translation for each of the ID types.\
 
-```{r compare-pk-3, echo=FALSE, fig.width=8, fig.height=6}
+```{r compare-pk-3, eval=FALSE}
 pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_Translated$TranslatedDF),
                                                 metadata_info = list(kegg_translated = c("hmdb", "pubchem")),
                                                 plot_name = "IDs available after KEGG ID Translation")
 ```
-
+```{r, echo=FALSE}
+knitr::include_graphics("prior-knowledge.Rmd_compare-pk-3 chunk.svg")
+```
 \
 We can also note from the previous table that it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping.
 In fact it is very common that an ID from one format will have a genuine one-to-many relationship with the other format (e.g. one KEGG ID maps to multiple HMDB IDs) or even a many-to-many relationship, where some of the IDs from the new format link back to multiple IDs in the original format (e.g. two different KEGG IDs map to multiple HMDS IDs, some of which are shared between them).\
