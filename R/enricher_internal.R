@@ -73,7 +73,11 @@ enricher_internal <- function(
             sg <- unique(USER_DATA@gsid2gene$gene[seq_len(100L)])
         }
         sg <- sample(sg, min(length(sg), 6))
-        msg <- sprintf("--> Expected input gene ID: %s", paste0(sg, collapse = ", "))
+        msg <-
+            sprintf(
+                "--> Expected input gene ID: %s",
+                paste0(sg, collapse = ", ")
+            )
         log_info(msg)
         message(msg)
 
@@ -127,7 +131,14 @@ enricher_internal <- function(
     idx <- get_geneSet_index(termID2ExtID, min_gs_size, max_gs_size)
 
     if (sum(idx) == 0L) {
-        msg <- paste("No gene sets have size between", min_gs_size, "and", max_gs_size, "...")
+        msg <-
+            paste(
+                "No gene sets have size between",
+                min_gs_size,
+                "and",
+                max_gs_size,
+                "..."
+            )
         message(msg)
         message("--> return NULL...")
         return(NULL)
@@ -189,7 +200,11 @@ enricher_internal <- function(
     )
 
     p.adj <- p.adjust(Over$pvalue, method = pAdjustMethod)
-    qobj <- tryCatch(qvalue(p = Over$pvalue, lambda = 0.05, pi0.method = "bootstrap"), error = function(e) NULL)
+    qobj <-
+        tryCatch(
+            qvalue(p = Over$pvalue, lambda = 0.05, pi0.method = "bootstrap"),
+            error = function(e) NULL
+        )
 
     # if (class(qobj) == "qvalue") {
     if (inherits(qobj, "qvalue")) {
@@ -198,7 +213,12 @@ enricher_internal <- function(
         qvalues <- NA
     }
 
-    geneID <- vapply(qTermID2ExtID, function(i) paste(i, collapse = "/"), FUN.VALUE = character(1))
+    geneID <-
+        vapply(
+            qTermID2ExtID,
+            function(i) paste(i, collapse = "/"),
+            FUN.VALUE = character(1)
+        )
     geneID <- geneID[qTermID]
     Over <- data.frame(Over,
         p.adjust = p.adj,
@@ -389,7 +409,11 @@ build_Anno <- function(
         envir <- as.environment(pos)
         assign(".Anno_clusterProfiler_Env", new.env(), envir = envir)
     }
-    Anno_clusterProfiler_Env <- get(".Anno_clusterProfiler_Env", envir = .GlobalEnv)
+    Anno_clusterProfiler_Env <-
+        get(
+            ".Anno_clusterProfiler_Env",
+            envir = .GlobalEnv
+        )
 
     # if(class(path2gene[[2]]) == 'list') {
     if (inherits(path2gene[[2]], "list")) {
@@ -407,8 +431,16 @@ build_Anno <- function(
     path2gene <- path2gene[!is.na(path2gene[, 2]), ]
     path2gene <- unique(path2gene)
 
-    PATHID2EXTID <- split(as.character(path2gene[, 2]), as.character(path2gene[, 1]))
-    EXTID2PATHID <- split(as.character(path2gene[, 1]), as.character(path2gene[, 2]))
+    PATHID2EXTID <-
+        split(
+            as.character(path2gene[, 2]),
+            as.character(path2gene[, 1])
+        )
+    EXTID2PATHID <-
+        split(
+            as.character(path2gene[, 1]),
+            as.character(path2gene[, 2])
+        )
 
     assign("PATHID2EXTID", PATHID2EXTID, envir = Anno_clusterProfiler_Env)
     assign("EXTID2PATHID", EXTID2PATHID, envir = Anno_clusterProfiler_Env)
