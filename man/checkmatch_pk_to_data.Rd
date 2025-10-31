@@ -47,6 +47,7 @@ detected IDs in long format. }
 features
 }
 \examples{
+\dontrun{
 data(cellular_meta)
 DetectedIDs <- cellular_meta \%>\%
     dplyr::select("Metabolite", "HMDB") \%>\%
@@ -69,5 +70,6 @@ Res <- checkmatch_pk_to_data(
         grouping_variable = "term"
     )
 )
+}
 
 }

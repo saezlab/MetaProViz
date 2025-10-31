@@ -48,6 +48,7 @@ Translated ID.
 Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 }
 \examples{
+\dontrun{
 KEGG_Pathways <- metsigdb_kegg()
 Res <- translate_id(
     data = KEGG_Pathways,
@@ -58,5 +59,6 @@ Res <- translate_id(
     from = c("kegg"),
     to = c("pubchem", "hmdb")
 )
+}
 
 }

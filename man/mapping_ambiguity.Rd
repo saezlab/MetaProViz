@@ -51,6 +51,7 @@ to-to-from: 4. MappingIssues, 5. MappingIssues summary, 6. Long summary
 Create Mapping Ambiguities between two ID types
 }
 \examples{
+\dontrun{
 KEGG_Pathways <- metsigdb_kegg()
 InputDF <- translate_id(
     data = KEGG_Pathways,
@@ -68,5 +69,6 @@ Res <- mapping_ambiguity(
     grouping_variable = "term",
     summary = TRUE
 )
+}
 
 }
