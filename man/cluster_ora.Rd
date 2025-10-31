@@ -2,8 +2,7 @@
 % Please edit documentation in R/OverRepresentationAnalysis.R
 \name{cluster_ora}
 \alias{cluster_ora}
-\title{\subsection{---------------------------}{
-}}
+\title{Overrepresentation analysis by cluster}
 \usage{
 cluster_ora(
   data,
@@ -58,9 +57,6 @@ pathway description.}
 Saves results as individual .csv files.
 }
 \description{
-Overrepresentation analysis by cluster
-}
-\details{
 Uses enricher to run ORA on each of the metabolite cluster from any of the
 MCA functions using a pathway list
 }
