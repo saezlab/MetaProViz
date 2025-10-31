@@ -78,7 +78,12 @@ metsigdb_kegg <- function() {
         ~intersect(.x, to_remove) %>% length() == 0
     )
     ) %>%
-    rename(term = pathway_name, Metabolite = compound_name, MetaboliteID = compound, Description = pathway) #Update vignettes and remove rename
+    rename(
+        term = pathway_name,
+        Metabolite = compound_name,
+        MetaboliteID = compound,
+        Description = pathway
+    ) #Update vignettes and remove rename
 
 
     # Return into environment
@@ -150,7 +155,13 @@ metsigdb_chemicalclass <- function(
     Structure <- ramp_table( "metabolite_class" , version = version)
     Class <- ramp_table( "chem_props" , version = version)
 
-    HMDB_ChemicalClass <- merge(Structure, Class[,c(seq_len(3),10)], by ="ramp_id", all.x = TRUE) %>%
+    HMDB_ChemicalClass <-
+        merge(
+            Structure,
+            Class[,c(seq_len(3),10)],
+            by ="ramp_id",
+            all.x = TRUE
+        ) %>%
     filter(str_starts(class_source_id, "hmdb:")) %>% # Select HMDB only!
     filter(str_starts(chem_source_id, "hmdb:")) %>% # Select HMDB only!
     select(-c("chem_data_source", "chem_source_id")) %>%
@@ -168,11 +179,20 @@ metsigdb_chemicalclass <- function(
         .groups = "drop"  # Ungroup after summarising
     ) %>%
     mutate(class_source_id = str_remove(class_source_id, "^hmdb:")) %>% # Remove 'hmdb:' prefix
-    select(class_source_id, common_name, ClassyFire_class, ClassyFire_super_class, ClassyFire_sub_class) # Reorder columns
+    select(
+        class_source_id,
+        common_name,
+        ClassyFire_class,
+        ClassyFire_super_class,
+        ClassyFire_sub_class
+    ) # Reorder columns
 
     # Save the results as an RDS file in the Cache directory of R
     if (!dir.exists(directory)) {dir.create(directory)}
-        saveRDS(HMDB_ChemicalClass, file = paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep =""))
+        saveRDS(
+            HMDB_ChemicalClass,
+            file = paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep ="")
+        )
 
     }
 
@@ -247,7 +267,11 @@ make_gene_metab_set <- function(
     # 2. Target:
     if ("Target" %in% names(metadata_info)) {
         if (metadata_info[["Target"]] %in% colnames(input_pk) == FALSE) {
-        stop("The ", metadata_info[["Target"]], " column selected as Conditions in metadata_info was not found in input_pk. Please check your input.")
+        stop(
+            "The ",
+            metadata_info[["Target"]],
+            " column selected as Conditions in metadata_info was not found in input_pk. Please check your input."
+        )
     }
     } else {
     stop("Please provide a column name for the Target in metadata_info.")
@@ -301,7 +325,13 @@ make_gene_metab_set <- function(
 
     # # -------------- Combine with input_pk
     # add pathway names --> File that can be used for metabolite pathway analysis
-    MetabSet <- merge(meta_network_metabs,input_pk, by.x ="gene", by.y = metadata_info[["Target"]])
+    MetabSet <-
+        merge(
+            meta_network_metabs,
+            input_pk,
+            by.x ="gene",
+            by.y = metadata_info[["Target"]]
+        )
 
     # combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
     GeneMetabSet <- unique(as.data.frame(rbind(input_pk %>% dplyr::rename("feature"= metadata_info[["Target"]]), MetabSet[,-1] %>% dplyr::rename("feature"= 1))))
@@ -580,10 +610,22 @@ metsigdb_metalinks <- function(
     # ------------------------------------------------------------------
     # Add other ID types:
     ## Metabolite Name
-    MetalinksDB <- merge(MetalinksDB, TablesList[["metabolites"]], by ="hmdb", all.x = TRUE)
+    MetalinksDB <-
+        merge(
+            MetalinksDB,
+            TablesList[["metabolites"]],
+            by ="hmdb",
+            all.x = TRUE
+        )
 
     ## Gene Name
-    MetalinksDB <- merge(MetalinksDB, TablesList[["proteins"]], by ="uniprot", all.x = TRUE)
+    MetalinksDB <-
+        merge(
+            MetalinksDB,
+            TablesList[["proteins"]],
+            by ="uniprot",
+            all.x = TRUE
+        )
 
 
     ## Rearrange columns:

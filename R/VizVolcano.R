@@ -194,7 +194,12 @@ viz_volcano <- function(
 
     Plot_options <- c("Standard", "Compare", "PEA")
     if (plot_types %in% Plot_options == FALSE) {
-        message <- paste0("plot_types option is incorrect. The allowed options are the following: ",paste(Plot_options, collapse = ", "),"." )
+        message <-
+            paste0(
+                "plot_types option is incorrect. The allowed options are the following: ",
+                paste(Plot_options, collapse = ", "),
+                "."
+            )
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
@@ -239,7 +244,11 @@ viz_volcano <- function(
     common_columns <- character(0)  # Initialize an empty character vector
     for (col_name in colnames(data[, c(x, y)])) {
         if (col_name %in% colnames(metadata_feature)) {
-            common_columns <- c(common_columns, col_name)  # Add the common column name to the vector
+            common_columns <-
+                c(
+                    common_columns,
+                    col_name
+                )  # Add the common column name to the vector
         }
     }
 
@@ -257,12 +266,25 @@ viz_volcano <- function(
     }
 
     if (plot_types =="PEA") {
-        Volcanodata <- merge(x = metadata_feature ,y = data[, c(x, y)], by.x = metadata_info[["PEA_Feature"]] , by.y = 0, all.y = TRUE) %>%
+        Volcanodata <-
+            merge(
+                x = metadata_feature,
+                y = data[, c(x, y)],
+                by.x = metadata_info[["PEA_Feature"]],
+                by.y = 0,
+                all.y = TRUE
+            ) %>%
         remove_rownames() %>%
         mutate(FeatureNames = metadata_info[["PEA_Feature"]]) %>%
         filter(!is.na(x) | !is.na(x))
     } else {
-    Volcanodata <- merge(x = metadata_feature ,y = data[, c(x, y)], by = 0, all.y = TRUE) %>%
+    Volcanodata <-
+        merge(
+            x = metadata_feature,
+            y = data[, c(x, y)],
+            by = 0,
+            all.y = TRUE
+        ) %>%
         remove_rownames() %>%
         column_to_rownames("Row.names") %>%
         mutate(FeatureNames = rownames(data)) %>%
@@ -292,7 +314,27 @@ viz_volcano <- function(
     # # --- Prepare colour and shape palette
     if (is.null(color_palette)) {
         if ("color" %in% names(metadata_info) == TRUE) {
-        safe_colorblind_palette <- c("#88CCEE",  "#DDCC77","#661100",  "#332288", "#AA4499","#999933",  "#44AA99", "#882215",  "#6699CC", "#117733", "#888888","#CC6677", "black","gold1","darkorchid4","red","orange", "blue")
+        safe_colorblind_palette <-
+            c(
+                "#88CCEE",
+                "#DDCC77",
+                "#661100",
+                "#332288",
+                "#AA4499",
+                "#999933",
+                "#44AA99",
+                "#882215",
+                "#6699CC",
+                "#117733",
+                "#888888",
+                "#CC6677",
+                "black",
+                "gold1",
+                "darkorchid4",
+                "red",
+                "orange",
+                "blue"
+            )
     } else {
         safe_colorblind_palette <- c("#888888", "#44AA99", "#44AA99","#CC6677")
     }
@@ -569,14 +611,25 @@ viz_volcano_standard <- function(
 
         # Set the total heights and widths
         PlotTitle <- paste(plot_name, ": ", i, sep ="")
-        Plot_Sized <-  plot_grob_volcano(input_plot = Plot, metadata_info = metadata_info, plot_name = PlotTitle, subtitle = subtitle)
+        Plot_Sized <-
+            plot_grob_volcano(
+                input_plot = Plot,
+                metadata_info = metadata_info,
+                plot_name = PlotTitle,
+                subtitle = subtitle
+            )
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
             {ggplot() + annotation_custom(.)} %>%
             add(theme(panel.background = element_rect(fill = "transparent")))
 
-        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i) # removes empty spaces and replaces /,\ with -
+        cleaned_i <-
+            gsub(
+                "[[:space:],/\\\\]",
+                "-",
+                i
+            ) # removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
@@ -684,7 +737,13 @@ viz_volcano_standard <- function(
         PlotList[["Plot"]] <- Plot
 
         # Set the total heights and widths
-        Plot_Sized <-  plot_grob_volcano(input_plot = Plot, metadata_info = metadata_info, plot_name = plot_name, subtitle = subtitle)
+        Plot_Sized <-
+            plot_grob_volcano(
+                input_plot = Plot,
+                metadata_info = metadata_info,
+                plot_name = plot_name,
+                subtitle = subtitle
+            )
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
@@ -803,7 +862,14 @@ viz_volcano_compare <- function(
     # # --- Check data
     if (is.data.frame(data2) == FALSE) {
         if (paste(x) %in% colnames(data2) == FALSE | paste(y) %in% colnames(data2) == FALSE) {
-        message <- paste("Check your data2. The column name of ", x, " and/or ", y, " does not exist in data2.")
+        message <-
+            paste(
+                "Check your data2. The column name of ",
+                x,
+                " and/or ",
+                y,
+                " does not exist in data2."
+            )
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
@@ -821,7 +887,13 @@ viz_volcano_compare <- function(
 
     # # --- Prepare Input data
     if (is.null(metadata_feature) == FALSE) {
-        data2 <- merge(x = metadata_feature %>% tibble::rownames_to_column("FeatureNames") , y = data2[, c(x, y)] %>% tibble::rownames_to_column("FeatureNames") , by ="FeatureNames", all.y = TRUE) %>%
+        data2 <-
+            merge(
+                x = metadata_feature %>% tibble::rownames_to_column("FeatureNames"),
+                y = data2[, c(x, y)] %>% tibble::rownames_to_column("FeatureNames"),
+                by ="FeatureNames",
+                all.y = TRUE
+            ) %>%
         filter(!is.na(x) | !is.na(x))
         data[,"comparison"]  <- as.character(paste(name_comparison[["data"]]))
         data2[,"comparison"]  <- as.character(paste(name_comparison[["data2"]]))
@@ -835,7 +907,11 @@ viz_volcano_compare <- function(
     # Combine DFs and add appropriate column names
     data[,"comparison"]  <- as.character(paste(name_comparison[["data"]]))
     data2[,"comparison"]  <- as.character(paste(name_comparison[["data2"]]))
-    InputCompare  <- rbind(data[,c("FeatureNames", x, y, "comparison")],data2[,c("FeatureNames", x, y, "comparison")])
+    InputCompare  <-
+        rbind(
+            data[,c("FeatureNames", x, y, "comparison")],
+            data2[,c("FeatureNames", x, y, "comparison")]
+        )
     }
 
 
@@ -951,14 +1027,25 @@ viz_volcano_compare <- function(
 
         # Set the total heights and widths
         PlotTitle <- paste(plot_name, ": ", i, sep ="")
-        Plot_Sized <-  plot_grob_volcano(input_plot = Plot, metadata_info = metadata_info, plot_name = PlotTitle, subtitle = subtitle)
+        Plot_Sized <-
+            plot_grob_volcano(
+                input_plot = Plot,
+                metadata_info = metadata_info,
+                plot_name = PlotTitle,
+                subtitle = subtitle
+            )
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
             {ggplot() + annotation_custom(.)} %>%
             add(theme(panel.background = element_rect(fill = "transparent")))
 
-        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i) # removes empty spaces and replaces /,\ with -
+        cleaned_i <-
+            gsub(
+                "[[:space:],/\\\\]",
+                "-",
+                i
+            ) # removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
@@ -1084,7 +1171,13 @@ viz_volcano_compare <- function(
         ## Store the plot in the 'plots' list
         PlotList[["Plot"]] <- Plot
 
-        Plot_Sized <-  plot_grob_volcano(input_plot = Plot, metadata_info = metadata_info, plot_name = plot_name, subtitle = subtitle)
+        Plot_Sized <-
+            plot_grob_volcano(
+                input_plot = Plot,
+                metadata_info = metadata_info,
+                plot_name = plot_name,
+                subtitle = subtitle
+            )
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
         Plot_Sized %<>%
@@ -1258,7 +1351,13 @@ viz_volcano_pea <- function(
     metadata_feature_Select <- metadata_feature %>%
         filter(PEA_Pathway == paste(i))
 
-    InputVolcano <- merge(metadata_feature_Select, data, by ="PEA_Feature", all.x = TRUE) %>%
+    InputVolcano <-
+        merge(
+            metadata_feature_Select,
+            data,
+            by ="PEA_Feature",
+            all.x = TRUE
+        ) %>%
         distinct(PEA_Feature, .keep_all = TRUE) %>%
         filter(!is.na(!!sym(y)) & !is.na(!!sym(x)))
 
@@ -1346,7 +1445,13 @@ viz_volcano_pea <- function(
 
         # Set the total heights and widths
         PlotTitle <- paste(plot_name, ": ", i, sep ="")
-        Plot_Sized <-  plot_grob_volcano(input_plot = Plot, metadata_info = metadata_info, plot_name = PlotTitle, subtitle = subtitle)
+        Plot_Sized <-
+            plot_grob_volcano(
+                input_plot = Plot,
+                metadata_info = metadata_info,
+                plot_name = PlotTitle,
+                subtitle = subtitle
+            )
         plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
         plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
 
@@ -1354,7 +1459,12 @@ viz_volcano_pea <- function(
         {ggplot() + annotation_custom(.)} %>%
         add(theme(panel.background = element_rect(fill = "transparent")))
 
-        cleaned_i <- gsub("[[:space:],/\\\\]", "-", i) # removes empty spaces and replaces /,\ with -
+        cleaned_i <-
+            gsub(
+                "[[:space:],/\\\\]",
+                "-",
+                i
+            ) # removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()

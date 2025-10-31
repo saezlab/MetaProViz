@@ -524,7 +524,11 @@ function(
 
         # # ------------------ Load manual table ----------------- ##
         if ((from == "kegg") == FALSE) {
-            data(list = "equivalent_features", package = "MetaProViz", envir = environment())
+            data(
+                list = "equivalent_features",
+                package = "MetaProViz",
+                envir = environment()
+            )
             EquivalentFeatures <-
                 "equivalent_features" %>%
                     get(envir = environment()) %>%
@@ -549,13 +553,20 @@ function(
                 all_of(intersect(names(.), names(data))), all_of(to)
             ) %>%
                 mutate(
-                across(all_of(to), ~ map_chr(., ~ paste(unique(.), collapse = ", ")))
+                across(
+                    all_of(to),
+                    ~ map_chr(., ~ paste(unique(.), collapse = ", "))
+                )
             ) %>%
                 group_by(
                 !!sym(metadata_info[["InputID"]])
             ) %>%
                 mutate(
-                across(all_of(to), ~ paste(unique(.), collapse = ", "), .names = "{.col}")
+                across(
+                    all_of(to),
+                    ~ paste(unique(.), collapse = ", "),
+                    .names = "{.col}"
+                )
             ) %>%
                 ungroup() %>%
                 distinct() %>%
@@ -1047,13 +1058,32 @@ mapping_ambiguity <- function(
             # #######################################################################
             if (summary == TRUE) {
                 if (is.null(grouping_variable) == FALSE) {
-                    from_to_v1 <- sprintf('%s_%s', Comp[[comp]]$from, Comp[[comp]]$to)
-                    from_to_v2 <- sprintf('%s-to-%s', Comp[[comp]]$from, Comp[[comp]]$to)
-                    from_to_v3 <- sprintf('%s_to_%s', Comp[[comp]]$from, Comp[[comp]]$to)
+                    from_to_v1 <-
+                        sprintf(
+                            '%s_%s',
+                            Comp[[comp]]$from,
+                            Comp[[comp]]$to
+                        )
+                    from_to_v2 <-
+                        sprintf(
+                            '%s-to-%s',
+                            Comp[[comp]]$from,
+                            Comp[[comp]]$to
+                        )
+                    from_to_v3 <-
+                        sprintf(
+                            '%s_to_%s',
+                            Comp[[comp]]$from,
+                            Comp[[comp]]$to
+                        )
                     from_to_amb <- sprintf('%s_ambiguity_bygroup', from_to_v1)
                     from_to_amb_bg <- sprintf('%s_ambiguity', from_to_v1)
                     from_to_long <- sprintf('%s_Long', from_to_v2)
-                    from_to_acr_grp <- sprintf('AcrossGroupMappingIssue(%s)', from_to_v3)
+                    from_to_acr_grp <-
+                        sprintf(
+                            'AcrossGroupMappingIssue(%s)',
+                            from_to_v3
+                        )
                     from_to_count <- sprintf('Count(%s)', from_to_v3)
                     # Add further information we need to summarise the table and
                     # combine Original-to-Translated and Translated-to-Original
@@ -1287,7 +1317,14 @@ mapping_ambiguity <- function(
                             "UniqueID",
                             paste0(from, "_to_", to),
                             paste0("Count(", from, "_to_", to, ")"),
-                            paste0("AcrossGroupMappingIssue(", from, "_to_", to, ")", sep = "")
+                            paste0(
+                                "AcrossGroupMappingIssue(",
+                                from,
+                                "_to_",
+                                to,
+                                ")",
+                                sep = ""
+                            )
                         )
                     ],
                     y = ResList[[
@@ -1301,7 +1338,14 @@ mapping_ambiguity <- function(
                             "UniqueID",
                             paste0(to, "_to_", from),
                             paste0("Count(", to, "_to_", from, ")"),
-                            paste0("AcrossGroupMappingIssue(", to, "_to_", from, ")", sep = "")
+                            paste0(
+                                "AcrossGroupMappingIssue(",
+                                to,
+                                "_to_",
+                                from,
+                                ")",
+                                sep = ""
+                            )
                         )
                     ],
                     by = "UniqueID",
@@ -1543,7 +1587,10 @@ checkmatch_pk_to_data <- function(
 
         data_MultipleIDs <-
             any(
-                grepl(", \\s*", data[[metadata_info[["InputID"]]]]) |  # Comma-separated
+                grepl(
+                    ", \\s*",
+                    data[[metadata_info[["InputID"]]]]
+                ) |  # Comma-separated
                     map_lgl(
                         data[[metadata_info[["InputID"]]]],
                         function(x) {
@@ -2317,7 +2364,10 @@ function(
                 cluster = ifelse(
                     is.na(cluster),
                     "None",
-                    paste0("cluster", cluster)  # Convert numeric IDs to descriptive labels
+                    paste0(
+                        "cluster",
+                        cluster
+                    )  # Convert numeric IDs to descriptive labels
                 )
             )
 

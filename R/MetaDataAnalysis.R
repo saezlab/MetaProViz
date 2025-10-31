@@ -191,7 +191,11 @@ metadata_analysis <- function(
 
             anova_result <- stats::aov(Formula, data = PCA.res_Info)  # Perform ANOVA
             anova_result_tidy <- tidy(anova_result)  # tidy --> convert statistics into table
-            anova_row <- filter(anova_result_tidy, term != "Residuals")  # Exclude Residuals row
+            anova_row <-
+                filter(
+                    anova_result_tidy,
+                    term != "Residuals"
+                )  # Exclude Residuals row
 
             tukey_result <- TukeyHSD(anova_result)  # Perform Tukey test
             tukey_result_tidy <- tidy(tukey_result)  # tidy --> convert statistics into table
@@ -249,7 +253,11 @@ metadata_analysis <- function(
 
         # Return
         res <-
-            cbind(data.frame(PC = paste("PC", i, sep = "")), top_features, bottom_features)
+            cbind(
+                data.frame(PC = paste("PC", i, sep = "")),
+                top_features,
+                bottom_features
+            )
     }) %>%
         bind_rows(.id = "PC") %>%
         mutate(PC = paste("PC", PC, sep = ""))
@@ -270,7 +278,10 @@ metadata_analysis <- function(
     Res_top <-
         Stat_results %>%
             filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
-            separate_rows(paste("Features_", "(top", percentage, "%)", sep = ""), sep = ", ") %>%
+            separate_rows(
+                paste("Features_", "(top", percentage, "%)", sep = ""),
+                sep = ", "
+            ) %>%
             # Separate 'Features (top 0.1%)'
         rename("feature" := paste("Features_", "(top", percentage, "%)", sep = "")) %>%
             select(-paste("Features_", "(Bottom", percentage, "%)", sep = ""))
@@ -278,7 +289,10 @@ metadata_analysis <- function(
     Res_Bottom <-
         Stat_results %>%
             filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
-            separate_rows(paste("Features_", "(Bottom", percentage, "%)", sep = ""), sep = ", ") %>%
+            separate_rows(
+                paste("Features_", "(Bottom", percentage, "%)", sep = ""),
+                sep = ", "
+            ) %>%
             # Separate 'Features (Bottom 0.1%)'
         rename("feature" := paste("Features_", "(Bottom", percentage, "%)", sep = "")) %>%
             select(-paste("Features_", "(top", percentage, "%)", sep = ""))
@@ -308,7 +322,10 @@ metadata_analysis <- function(
             rowwise() %>%
             mutate(  # Extract the term where MainDriver is TRUE
             MainDriver_Term = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
-                strsplit(term, ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE")[1]],
+                strsplit(
+                    term,
+                    ", ")[[1]][which(strsplit(MainDriver, ", ")[[1]] == "TRUE"
+                )[1]],
                 NA
             ),
             # Extract the Sum(Explained_Variance) where MainDriver is TRUE
@@ -328,7 +345,11 @@ metadata_analysis <- function(
             filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
             # Filter for significant results
         filter(Explained_Variance > cutoff_variance) %>%  # Exclude Residuals row
-        distinct(term, PC, .keep_all = TRUE) %>%  # only keep unique term~PC combinations AND STATS
+        distinct(
+            term,
+            PC,
+            .keep_all = TRUE
+        ) %>%  # only keep unique term~PC combinations AND STATS
         select(term, PC, Explained_Variance) %>%
             pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
             column_to_rownames("term") %>%
@@ -345,7 +366,14 @@ metadata_analysis <- function(
             path = folder
         ))
     } else {
-        message <- paste0("cutoff_stat of ", cutoff_stat, " and cutoff_variance of ", cutoff_variance, " do only return <= 2L cases, hence no heatmap is plotted.")
+        message <-
+            paste0(
+                "cutoff_stat of ",
+                cutoff_stat,
+                " and cutoff_variance of ",
+                cutoff_variance,
+                " do only return <= 2L cases, hence no heatmap is plotted."
+            )
         log_info("warning: ", message)
         warning(message)
     }
@@ -354,7 +382,14 @@ metadata_analysis <- function(
     # ##############################################################################################################################################################################################################
     # # ---------- Return ------------##
     # Make list of Output DFs: 1. prcomp results, 2. Loadings result, 3. topBottom Features, 4. aov
-    ResList <- list(res_prcomp = PCA.res_Info, res_loadings = PCA.res_Loadings, res_topBottomFeatures = topBottom_Features, res_aov = Stat_results, res_summary = Res_summary)
+    ResList <-
+        list(
+            res_prcomp = PCA.res_Info,
+            res_loadings = PCA.res_Loadings,
+            res_topBottomFeatures = topBottom_Features,
+            res_aov = Stat_results,
+            res_summary = Res_summary
+        )
 
     # Save the results
     save_res(
@@ -474,7 +509,11 @@ meta_pk <- function(
     # Convert into a pathway DF
     Metadata_df <-
         metadata_sample_subset %>%
-            pivot_longer(cols = -SampleID, names_to = "ColumnName", values_to = "ColumnEntry") %>%
+            pivot_longer(
+                cols = -SampleID,
+                names_to = "ColumnName",
+                values_to = "ColumnEntry"
+            ) %>%
             unite("term", c("ColumnName", "ColumnEntry"), sep = "_")
     Metadata_df$mor <- 1
 
