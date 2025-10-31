@@ -23,6 +23,6 @@
 ^vignettes/.*\.png$
 ^inst/doc/.*\.png$
 ^MetaProViz.BiocCheck$
-^inst/scripts/.*$
+^inst/scripts$
 ^README\.Rmd\.bak$
 ^README\.md\.bak$
