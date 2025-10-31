@@ -26,28 +26,28 @@
 # License: Artistic 2.0 (GPL compatible)
 #
 
-##' interal method for enrichment analysis
-##'
-##' using the hypergeometric model
-##' @title enrich.internal
-##' @param gene a vector of entrez gene id.
-##' @param pvalueCutoff Cutoff value of pvalue.
-##' @param pAdjustMethod one of "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
-##' @param universe background genes, default is the intersection of the 'universe' with genes that have annotations.
-##' Users can set `options(enrichment_force_universe = TRUE)` to force the 'universe' untouched.
-##' @param min_gs_size minimal size of genes annotated by Ontology term for testing.
-##' @param max_gs_size maximal size of each geneSet for analyzing
-##' @param qvalueCutoff cutoff of qvalue
-##' @param USER_DATA ontology information
-##' @return \code{enrichResult} instance.
-##' @importClassesFrom methods data.frame
-##' @importFrom qvalue qvalue
-##' @importFrom methods new
-##' @importFrom stats phyper
-##' @importFrom stats p.adjust
-##' @keywords manip
-##' @author Guangchuang Yu \url{https://yulab-smu.top}
-##' @noRd
+#' interal method for enrichment analysis
+#'
+#' using the hypergeometric model
+#' @title enrich.internal
+#' @param gene a vector of entrez gene id.
+#' @param pvalueCutoff Cutoff value of pvalue.
+#' @param pAdjustMethod one of "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+#' @param universe background genes, default is the intersection of the 'universe' with genes that have annotations.
+#' Users can set `options(enrichment_force_universe = TRUE)` to force the 'universe' untouched.
+#' @param min_gs_size minimal size of genes annotated by Ontology term for testing.
+#' @param max_gs_size maximal size of each geneSet for analyzing
+#' @param qvalueCutoff cutoff of qvalue
+#' @param USER_DATA ontology information
+#' @return \code{enrichResult} instance.
+#' @importClassesFrom methods data.frame
+#' @importFrom qvalue qvalue
+#' @importFrom methods new
+#' @importFrom stats phyper
+#' @importFrom stats p.adjust
+#' @keywords manip
+#' @author Guangchuang Yu \url{https://yulab-smu.top}
+#' @noRd
 enricher_internal <- function(
     gene,
     pvalueCutoff,
@@ -373,7 +373,6 @@ get_geneSet_index <- function(
 # Updated: 2024-06-13
 # License: Artistic 2.0 (GPL compatible)
 #
-
 ##' interal method for enrichment analysis
 ##'
 ##' @param path2gene Pathwaywith "term", "gene"# term and MetaboliteID (MetaboliteID= gene as syntax required for enricher)

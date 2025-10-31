@@ -19,10 +19,9 @@
 #' This script allows you to perform PCA plot visualization using the results
 #' of the MetaProViz analysis
 #'
-#################################
-### ### ### PCA Plots ### ### ###
-#################################
-
+#
+# PCA Plots
+#
 
 #' PCA plot visualization
 #'

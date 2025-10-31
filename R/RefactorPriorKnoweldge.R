@@ -18,11 +18,8 @@
 
 
 #
-
-
-################################################################################
-### ### ### Translate IDs to/from KEGG, PubChem, Chebi, HMDB ### ### ###
-################################################################################
+# Translate IDs to/from KEGG, PubChem, Chebi, HMDB
+#
 
 #' Translate IDs to/from KEGG, PubChem, Chebi, HMDB
 #'
@@ -341,9 +338,9 @@ function(
     }
 
 
-################################################################################
-### ### ###             Find additional potential IDs                ### ### ###
-################################################################################
+#
+# Find additional potential IDs
+#
 
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
@@ -790,9 +787,9 @@ function(
         return(invisible(OutputDF))
     }
 
-################################################################################
-### ### ###                    Mapping Ambiguity                     ### ### ###
-################################################################################
+#
+# Mapping Ambiguity
+#
 
 #' Create Mapping Ambiguities between two ID types
 #'
@@ -1377,9 +1374,9 @@ function(
         )
     }
 
-################################################################################
-### ### ### Check Measured ID's in prior knowledge ### ### ###
-################################################################################
+#
+# Check Measured ID's in prior knowledge
+#
 
 #' Check and summarize relationship between prixor knowledge to measured
 #'
@@ -2075,9 +2072,9 @@ function(
     }
 
 
-################################################################################
-### ### ### cluster Prior Knowledge ### ### ###
-################################################################################
+#
+# cluster Prior Knowledge
+#
 
 #' Deal with pathway overlap in prior knowledge
 #'
@@ -2326,13 +2323,12 @@ function(
     # # ------------------ Save and return ------------------- ##
     }
 
-################################################################################
-### ###     Helper function to add term information to Enrichment Results    ###
-################################################################################
+#
+# Helper function to add term information to Enrichment Results
+#
 
 # Better function Name and parameter names needed
 # Use in ORA functions and showcase in vignette with decoupleR output
-
 #' Adds extra columns to enrichment output
 #'
 #' These columns inform about 1. The amount of genes associated with term in
@@ -2491,9 +2487,9 @@ function(
     }
 
 
-################################################################################
-###   Compare Prior Knowledge resources against each other or themselves     ###
-################################################################################
+#
+# Compare Prior Knowledge resources against each other or themselves
+#
 
 #' Compare Prior Knowledge Resources and/or Columns within a Single Resource
 #'
@@ -2958,7 +2954,6 @@ function(
 ################################################################################
 ### ### Helper function to count number of entries for an ID column value    ###
 ### ### and plot                                                             ###
-
 #' Count Entries and Generate a Histogram Plot for a Specified Column
 #'
 #' This function processes a data frame column by counting the number of

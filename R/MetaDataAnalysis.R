@@ -17,9 +17,9 @@
 #
 
 
-###############################################
-### ### ### metadata_analysis ### ### ###
-###############################################
+#
+# metadata_analysis
+#
 
 #' PCA-based metadata analysis
 #'
@@ -373,9 +373,9 @@ metadata_analysis <- function(
 }
 
 
-###############################################
-### ### ### MetaPriorKnowlegde ### ### ###
-###############################################
+#
+# MetaPriorKnowlegde
+#
 
 #' Meta prior-knowledge
 #'

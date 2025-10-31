@@ -17,9 +17,9 @@
 #
 
 
-##########################################################################################
-### ### ### Function to create complex upset plots to visualise PK coverage ### ### ###
-##########################################################################################
+#
+# Function to create complex upset plots to visualise PK coverage
+#
 
 #' Generate upset plot for set intersections
 #'

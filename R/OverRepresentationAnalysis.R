@@ -16,32 +16,16 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
-#' ## ---------------------------
-#'
-##
-## Script name: Over representation Analysis (ORA)
-##
-## Purpose of script: Run ORA on MetaProViz metabolite clusters from MCA or diffeential results from dma
-##
-## Author: Christina Schmidt
-##
-## Date Created: 2023-07-03
-##
-## Copyright (c)
-## Email:
-##
-## ---------------------------
-##
-## Notes:
-##
-##
-## ---------------------------
+#
+# Over representation Analysis (ORA)
+#
+# Purpose: Run ORA on MetaProViz metabolite clusters from MCA
+# or differential results from dma
+#
 
-
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # #
-# # # # # # # # # cluster_ora # # # # # # # # #
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # #
-
+#
+# cluster_ora
+#
 
 #' Overrepresentation analysis by cluster
 #'
@@ -225,9 +209,9 @@ cluster_ora <- function(
 }
 
 
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ###
-# # # # # # # # # standard_ora # # # # # # # # #
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ###
+#
+# standard_ora
+#
 
 #' Overrepresentation analysis of metabolite sets in pathways
 #'
@@ -413,9 +397,9 @@ standard_ora <- function(
     }
 
 
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # #
-# # # # # # # # # Helper Fishers exact test # # # # # # # # #
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # #
-#'
+#
+# Helper Fishers exact test
+#
+
 # perform test on n groups of features. DF with column feature and column group
 # output list of DFs named after groups

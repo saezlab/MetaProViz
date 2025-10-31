@@ -17,9 +17,9 @@
 #
 
 
-########################################################
-### ### ### Differential Metabolite Analysis ### ### ###
-########################################################
+#
+# Differential Metabolite Analysis
+#
 
 #' Differential metabolite analysis
 #'
@@ -608,9 +608,9 @@ dma <- function(
 }
 
 
-###############################
-### ### ### Log2FC  ### ### ###
-###############################
+#
+# Log2FC
+#
 
 #' This helper function calculates the Log2(FoldChange) or in case of
 #'
@@ -1180,9 +1180,9 @@ log2fc <- function(
 }
 
 
-################################################################################
-### ### dma helper function: Internal Function to perform single comparison  ###
-################################################################################
+#
+# dma helper function: Internal Function to perform single comparison
+#
 
 #' Calculate One-vs-One comparison statistics
 #'
@@ -1358,9 +1358,9 @@ dma_stat_single <-
     }
 
 
-################################################################################
-### ### ### aov: Internal Function to perform Anova  ### ### ###################
-################################################################################
+#
+# aov: Internal Function to perform Anova
+#
 
 #' This helper function to calculate One-vs-All or All-vs-All
 #'
@@ -1596,9 +1596,9 @@ mpv_aov <- function(
     return(invisible(STAT_C1vC2))
 }
 
-###########################################################################
-### ### ### kruskal: Internal Function to perform kruskal test  ### ### ###
-###########################################################################
+#
+# kruskal: Internal Function to perform kruskal test
+#
 
 #' This helper function to calculate One-vs-All or All-vs-All
 #'
@@ -1864,7 +1864,6 @@ mpv_kruskal <- function(
 ### ### ### welch: Internal Function to perform anova for unequal ### ### ### ##
 ### ### ### variance groups                                       ### ### ### ##
 ################################################################################
-
 #' Calculate One-vs-All or All-vs-All comparison statistics
 #'
 #' @param data DF with unique sample identifiers as row names and metabolite numerical
@@ -2092,9 +2091,9 @@ mpv_welch <- function(
 }
 
 
-################################################################################
-### ### ### dma helper function: Internal Function to perform limma ### ### ####
-################################################################################
+#
+# dma helper function: Internal Function to perform limma
+#
 
 #' This helper function to calculate One-vs-One, One-vs-All or All-vs-All
 #'
@@ -2539,9 +2538,9 @@ dma_stat_limma <-
     }
 
 
-################################################################################
-###   shapiro function: Internal Function to perform shapiro test and plots  ###
-################################################################################
+#
+# shapiro function: Internal Function to perform shapiro test and plots
+#
 
 #' Shapiro test and plots
 #'
@@ -3066,9 +3065,9 @@ mpv_shapiro <- function(
 }
 
 
-################################################################################
-### bartlett function: Internal Function to perform bartlett test and plots  ###
-################################################################################
+#
+# bartlett function: Internal Function to perform bartlett test and plots
+#
 
 #' Bartlett test for variance homogeneity check across groups
 #'
@@ -3199,9 +3198,9 @@ mpv_bartlett <- function(
 }
 
 
-################################################################
-### ### ### Variance stabilizing transformation function ### ###
-################################################################
+#
+# Variance stabilizing transformation function
+#
 
 #' Variance stabilizing transformation (vst)
 #'

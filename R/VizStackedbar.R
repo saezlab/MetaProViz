@@ -18,11 +18,8 @@
 
 
 #
-
-
-##########################################################################################
-### ### ### Function to create stacked bar plots to visualise PK coverage ### ### ###
-##########################################################################################
+# Function to create stacked bar plots to visualise PK coverage
+#
 
 #' Generate Stacked Bar Plot, e.g. for PK Coverage
 #'

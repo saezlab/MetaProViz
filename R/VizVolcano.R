@@ -18,10 +18,12 @@
 
 #
 # This script allows you to perform different data visualizations using the results of the MetaProViz analysis
+#
 
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ##
-# # # # # # # # # Volcano Plots # # # # # # # # #
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ##
+
+#
+# Volcano Plots
+#
 
 #' Volcano plot
 #'
@@ -391,9 +393,10 @@ viz_volcano <- function(
     return(invisible(VolcanoRes))
 }
 
-##########################################################################################################
-# # # # # # # # # viz_volcano helper function: Internal Function for plot_types Standard # # # # # # # # #
-##########################################################################################################
+
+#
+# viz_volcano helper function: Internal Function for plot_types Standard
+#
 
 #' viz_volcano_standard
 #'
@@ -709,11 +712,9 @@ viz_volcano_standard <- function(
 }
 
 
-
-
-#########################################################################################################
-# # # # # # # # # viz_volcano helper function: Internal Function for plot_types Compare # # # # # # # # #
-#########################################################################################################
+#
+# viz_volcano helper function: Internal Function for plot_types Compare
+#
 
 #' Check input parameters
 #'
@@ -836,7 +837,6 @@ viz_volcano_compare <- function(
     data2[,"comparison"]  <- as.character(paste(name_comparison[["data2"]]))
     InputCompare  <- rbind(data[,c("FeatureNames", x, y, "comparison")],data2[,c("FeatureNames", x, y, "comparison")])
     }
-
 
 
     # # ## # ## # ## # ## # ## # ## # #
@@ -1113,10 +1113,9 @@ viz_volcano_compare <- function(
 }
 
 
-
-#####################################################################################################
-# # # # # # # # # viz_volcano helper function: Internal Function for plot_types PEA # # # # # # # # #
-#####################################################################################################
+#
+# viz_volcano helper function: Internal Function for plot_types PEA
+#
 
 #' Check input parameters
 #'

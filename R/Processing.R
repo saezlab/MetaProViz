@@ -17,9 +17,9 @@
 #
 
 
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
-# # # # # # # # # Metabolomics pre-processing # # # # # # # # #
-# # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
+#
+# Metabolomics pre-processing
+#
 
 #' Data preprocessing and normalization
 #'
@@ -389,9 +389,9 @@ processing <- function(
     }
 }
 
-##########################################################################
-# # # # # # # Merge analytical replicates function # # # # # # # # #
-##########################################################################
+#
+# Merge analytical replicates function   # #
+#
 
 #' Merges the analytical replicates of an experiment
 #'
@@ -567,9 +567,10 @@ replicate_sum <- function(
 
 }
 
-######################################################################################
-# # # # # # # # # Metabolite detection estimation using pool samples # # # # # # # # #
-######################################################################################
+
+#
+# Metabolite detection estimation using pool samples
+#
 
 #' Find metabolites with high variability across total pool samples
 #'
@@ -883,9 +884,10 @@ pool_estimation <- function(
 
 }
 
-#################################################################################
-# # # # # # # # # processing helper function: feature_filtering # # # # # # # # #
-#################################################################################
+
+#
+# processing helper function: feature_filtering
+#
 
 #' Filter features
 #'
@@ -1042,10 +1044,9 @@ feature_filtering <- function(
 }
 
 
-
-########################################################################################
-# # # # # # # # # processing helper function: Missing Value imputation # # # # # # # # #
-########################################################################################
+#
+# processing helper function: Missing Value imputation
+#
 
 #' Missing Value Imputation using half minimum value
 #'
@@ -1222,9 +1223,9 @@ mvi_imputation <- function(
 }
 
 
-#############################################################################################
-# # # # # # # # # processing helper function: total ion Count Normalization # # # # # # # # #
-#############################################################################################
+#
+# processing helper function: total ion Count Normalization
+#
 
 #' Total ion count normalization
 #'
@@ -1365,9 +1366,10 @@ tic_norm <- function(
     }
 }
 
-#################################################################################
-# # # # # # # # # processing helper function: core nomalisation # # # # # # # # #
-#################################################################################
+
+#
+# processing helper function: core nomalisation
+#
 
 #' Normalize consumption release data
 #'
@@ -1665,9 +1667,9 @@ core_norm <- function(
 }
 
 
-#################################################################################
-# # # # # # # # # processing helper function: Outlier detection # # # # # # # # #
-#################################################################################
+#
+# processing helper function: Outlier detection
+#
 
 #' outlier_detection
 #'
@@ -2001,7 +2003,6 @@ outlier_detection <- function(
 
         outlier_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
     }
-
 
 
     # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #

@@ -17,10 +17,9 @@
 #
 
 
-
-##############################################################################################
-# # # # # # # # # Helper function: Internal Function to check function input # # # # # # # # #
-##############################################################################################
+#
+# Helper function: Internal Function to check function input
+#
 
 #' Check input general parameters
 #'
@@ -340,9 +339,10 @@ check_param <- function(
     }
 }
 
-#########################################################################################################
-# # # # # # # # # processing helper function: Internal Function to check function input # # # # # # # # #
-#########################################################################################################
+
+#
+# processing helper function: Internal Function to check function input
+#
 
 #' Check specific input parameters for processing()
 #'
@@ -447,9 +447,10 @@ check_param_processing <- function(
     }
 }
 
-##################################################################################################
-# # # # # # # # # dma helper function: Internal Function to check function input # # # # # # # # #
-##################################################################################################
+
+#
+# dma helper function: Internal Function to check function input
+#
 
 #' Check input parameters of dma
 #'
@@ -667,9 +668,10 @@ check_param_dma <- function(
     return(invisible(Settings))
 }
 
-##################################################################################################
-# # # # # # # # # ORA helper function: Internal Function to check function input # # # # # # # # #
-##################################################################################################
+
+#
+# ORA helper function: Internal Function to check function input
+#
 
 #' Check input parameters of ORA
 #'
@@ -864,9 +866,9 @@ check_param_ora <- function(
 }
 
 
-##################################################################################################
-# # # # # # # # # MCA Helper function: Internal Function to check function input # # # # # # # # #
-##################################################################################################
+#
+# MCA Helper function: Internal Function to check function input
+#
 
 #' Check input parameters of MCA
 #'

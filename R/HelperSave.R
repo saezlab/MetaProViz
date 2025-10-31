@@ -17,9 +17,9 @@
 #
 
 
-################################################################################################
-### ### ### General helper function: Save folder path ### ### ###
-################################################################################################
+#
+# General helper function: Save folder path
+#
 
 #' save_path is the helper function to create the folder structure and path
 #'
@@ -88,9 +88,9 @@ results_dir <- function(
 }
 
 
-################################################################################################
-### ### ### General helper function: Save tables and plot ### ### ###
-################################################################################################
+#
+# General helper function: Save tables and plot
+#
 
 #' save_res is the helper function to save the plots and tables
 #'

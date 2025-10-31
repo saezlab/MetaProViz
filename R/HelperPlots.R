@@ -462,9 +462,9 @@ in_gtable <- function(
 }
 
 
-##############################################################
-### ### ### Plot helper function: Processing ### ### ###
-##############################################################
+#
+# Plot helper function: Processing
+#
 
 #' Format processing plots as grobs
 #'
@@ -533,9 +533,9 @@ plotGrob_Processing <- function(
     return(Plot_Sized)
 }
 
-##############################################################
-### ### ### Plot helper function: PCA ### ### ###
-##############################################################
+#
+# Plot helper function: PCA
+#
 
 #' PCA helper function: Internal Function
 #'
@@ -600,9 +600,9 @@ plot_grob_pca <- function(
 }
 
 
-##############################################################
-### ### ### Plot helper function: Heatmap ### ### ###
-##############################################################
+#
+# Plot helper function: Heatmap
+#
 
 #' Format heatmap plots as grobs
 #'
@@ -699,9 +699,9 @@ plot_grob_heatmap <- function(
 }
 
 
-##############################################################
-### ### ### Plot helper function: Volcano   ### ### ###
-##############################################################
+#
+# Plot helper function: Volcano
+#
 
 #' Format volcano plots as grobs
 #'
@@ -769,9 +769,9 @@ plot_grob_volcano <- function(
 }
 
 
-#####################################################################
-### ### ### Plot helper function: Superplots  ### ### ###
-#####################################################################
+#
+# Plot helper function: Superplots
+#
 
 #' Format superplots as grobs
 #'

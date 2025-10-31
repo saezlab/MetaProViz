@@ -17,9 +17,9 @@
 #
 
 
-####################################################################
-### ### ### Metabolite Clustering Analysis: 2 Conditions ### ### ###
-####################################################################
+#
+# Metabolite Clustering Analysis: 2 Conditions
+#
 
 #' Metabolite clustering analysis for two conditions
 #'
@@ -155,7 +155,6 @@ mca_2cond <- function(data_c1,
                                         Cutoff == "No Change" & Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol < 0 ~ 'Significant Negative',
                                         Cutoff == "No Change" & Cond2_DF$PadjCol > as.numeric(metadata_info_c2[["cutoff_stat"]]) ~ 'Not Significant',
                                         TRUE ~ 'NA'))
-
 
 
     #Merge the dataframes together: Merge the supplied Cond1 and Cond2 dataframes together.
@@ -442,9 +441,9 @@ mca_2cond <- function(data_c1,
 }
 
 
-######################################################
-### ### ### Metabolite Clustering Analysis ### ### ###
-######################################################
+#
+# Metabolite Clustering Analysis
+#
 
 #' Metabolite clustering analysis for core experiments
 #'

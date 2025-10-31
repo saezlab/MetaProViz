@@ -17,10 +17,9 @@
 #
 
 
-
-############################################################
-# # # # # # # # # Get KEGG prior knowledge # # # # # # # # #
-############################################################
+#
+# Get KEGG prior knowledge
+#
 
 #' KEGG pathways
 #'
@@ -88,9 +87,9 @@ metsigdb_kegg <- function() {
 }
 
 
-#############################################################
-# # # # # # # # # Load RaMP prior knowledge # # # # # # # # #
-#############################################################
+#
+# Load RaMP prior knowledge
+#
 
 #' Metabolite chemical classes from RaMP DB
 #'
@@ -194,9 +193,9 @@ metsigdb_chemicalclass <- function(
 }
 
 
-########################################################################################
-# # # # # # # # # Get Metabolite Pathways using Cosmos prior knowledge # # # # # # # # #
-########################################################################################
+#
+# Get Metabolite Pathways using Cosmos prior knowledge
+#
 
 #' Create metabolite sets from existing genesets
 #'
@@ -332,10 +331,10 @@ make_gene_metab_set <- function(
 }
 
 
+#
+# Load MetaLinksDB prior knowledge
+#
 
-####################################################################
-# # # # # # # # # Load MetaLinksDB prior knowledge # # # # # # # # #
-####################################################################
 #' Annotated metabolite-protein interactions from MetalinksDB
 #'
 #' @param types Desired edge types. Options are: "lr", "pd", where 'lr' stands for
@@ -410,7 +409,6 @@ metsigdb_metalinks <- function(
     # ------------------------------------------------------------------
     if ((any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) =="?")) == FALSE) {
     # Check Input parameters
-
 
 
     }
@@ -643,9 +641,11 @@ metsigdb_metalinks <- function(
 
 }
 
-##############################################################################################################################
-# # # # # # # # # Helper: Load compound lists of ions, xenobiotics, cofactors (not detectable by LC-MS), etc # # # # # # # # #
-##############################################################################################################################
+#
+# Helper: Load compound lists of ions, xenobiotics, cofactors (not detectable
+# by LC-MS), etc
+#
+
 
 # This is needed to remove ions, xenobiotics, cofactors, etc. from the metabolite list for any of the functions above.
 
