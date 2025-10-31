@@ -134,13 +134,13 @@ translate_id <- function(
 
         unknown_types <-
             id_types() %>%
-                select(
+            select(
                 starts_with("in_")
             ) %>%
-                unlist() %>%
-                unique() %>%
-                str_to_lower() %>%
-                setdiff(
+            unlist() %>%
+            unique() %>%
+            str_to_lower() %>%
+            setdiff(
                 union(from, to), .
             )
 
@@ -159,21 +159,21 @@ translate_id <- function(
         # ask if they forget to set groupings column
         doublons <-
             data %>%
-                filter(
+            filter(
                 !is.na(
                     !!sym(
                         metadata_info[["InputID"]]
                     )
                 )
             ) %>%
-                group_by(
+            group_by(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                filter(
+            filter(
                 n() > 1L
             ) %>%
-                summarize()
+            summarize()
 
         if (nrow(doublons) > 0L) {
             message <-
@@ -226,20 +226,20 @@ translate_id <- function(
         # # translatedID columns
         DF_subset <-
             TranslatedDF %>%
-                select(
+            select(
                 all_of(intersect(names(.), names(data))), all_of(to)
             ) %>%
-                mutate(
+            mutate(
                 across(
                     all_of(to),
                     ~ map_chr(., ~ paste(unique(.), collapse = ", "))
                 )
             ) %>%
-                group_by(
+            group_by(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                mutate(
+            mutate(
                 across(all_of(to),
                     ~ paste(unique(.),
                         collapse = ", "
@@ -247,9 +247,9 @@ translate_id <- function(
                     .names = "{.col}"
                 )
             ) %>%
-                ungroup() %>%
-                distinct() %>%
-                mutate(
+            ungroup() %>%
+            distinct() %>%
+            mutate(
                 across(
                     all_of(to),
                     ~ ifelse(. == "0", NA, .)
@@ -265,7 +265,7 @@ translate_id <- function(
         for (item in to) {
             summaryDF <-
                 TranslatedDF %>%
-                    attr(
+                attr(
                     paste0(
                         "ambiguity_",
                         metadata_info[["InputID"]],
@@ -445,13 +445,13 @@ function(
 
         unknown_types <-
             id_types() %>%
-                select(
+            select(
                 starts_with("in_")
             ) %>%
-                unlist() %>%
-                unique() %>%
-                str_to_lower() %>%
-                setdiff(from, .)
+            unlist() %>%
+            unique() %>%
+            str_to_lower() %>%
+            setdiff(from, .)
 
         if (length(unknown_types) > 0L) {
             msg <-
@@ -471,7 +471,7 @@ function(
         if (nrow(doublons) > 0L) {
             data <-
                 data %>%
-                    distinct(
+                distinct(
                     !!sym(metadata_info[["InputID"]]),
                     .keep_all = TRUE
                 )
@@ -531,8 +531,8 @@ function(
             )
             EquivalentFeatures <-
                 "equivalent_features" %>%
-                    get(envir = environment()) %>%
-                    select(from)
+                get(envir = environment()) %>%
+                select(from)
         }
 
         # # ------------------ Translate from-to-to ------------------- ##
@@ -549,28 +549,28 @@ function(
                 ambiguity_groups = NULL,  # Can not be set to FALSE!
                 ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
             ) %>%
-                select(
+            select(
                 all_of(intersect(names(.), names(data))), all_of(to)
             ) %>%
-                mutate(
+            mutate(
                 across(
                     all_of(to),
                     ~ map_chr(., ~ paste(unique(.), collapse = ", "))
                 )
             ) %>%
-                group_by(
+            group_by(
                 !!sym(metadata_info[["InputID"]])
             ) %>%
-                mutate(
+            mutate(
                 across(
                     all_of(to),
                     ~ paste(unique(.), collapse = ", "),
                     .names = "{.col}"
                 )
             ) %>%
-                ungroup() %>%
-                distinct() %>%
-                mutate(
+            ungroup() %>%
+            distinct() %>%
+            mutate(
                 across(all_of(to), ~ ifelse(. == "0", NA, .))
             )
 
@@ -578,20 +578,20 @@ function(
         # # ------------------ Translate to-to-from ------------------- ##
         TranslatedDF_Long <-
             TranslatedDF %>%
-                select(
+            select(
                 !!sym(metadata_info[["InputID"]]), !!sym(to)
             ) %>%
-                rename(
+            rename(
                 "InputID" = !!sym(metadata_info[["InputID"]])
             ) %>%
-                separate_rows(
+            separate_rows(
                 !!sym(to),
                 sep = ", "
             ) %>%
-                mutate(
+            mutate(
                 across(all_of(to), ~ trimws(.))
             ) %>%
-                filter(  # Remove extra spaces
+            filter(  # Remove extra spaces
                 !!sym(to) != ""
             )
         # Remove empty entries
@@ -608,31 +608,31 @@ function(
                 ambiguity_groups = NULL,  # Can not be set to FALSE!
                 ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
             ) %>%
-                select(
+            select(
                 "InputID", !!sym(to), !!sym(from)
             ) %>%
-                distinct(
+            distinct(
                 InputID, !!sym(from),
                 .keep_all = TRUE
             ) %>%
-                # Remove duplicates based on InputID and from
+            # Remove duplicates based on InputID and from
             mutate(
                 AdditionalID = if_else(InputID == !!sym(from), FALSE, TRUE)
             ) %>%
-                select(
+            select(
                 "InputID", !!sym(from), "AdditionalID"
             ) %>%
-                filter(
+            filter(
                 AdditionalID == TRUE
             ) %>%
-                mutate(
+            mutate(
                 across(
                     all_of(from),
                     ~ map_chr(., ~ paste(unique(.), collapse = ", "))
                 )
             ) %>%
-                rowwise() %>%
-                mutate(
+            rowwise() %>%
+            mutate(
                 fromList = list(str_split(!!sym(from), ", \\s*")[[1]]),
                 # Wrap in list
                 SameAsInput = ifelse(
@@ -647,11 +647,11 @@ function(
                 )
             # Combine other IDs
             ) %>%
-                ungroup() %>%
-                select(
+            ungroup() %>%
+            select(
                 InputID, PotentialAdditionalIDs, !!sym(from)
             ) %>%
-                # Final selection
+            # Final selection
             rename(
                 "AllIDs" = from
             )
@@ -672,7 +672,7 @@ function(
             EquivalentFeatures$AllIDs <- EquivalentFeatures[[from]]
             EquivalentFeatures_Long <-
                 EquivalentFeatures %>%
-                    separate_rows(
+                separate_rows(
                     !!sym(from),
                     sep = ", "
                 )
@@ -685,8 +685,8 @@ function(
                     by.y = "hmdb",
                     all.x = TRUE
                 ) %>%
-                    rowwise() %>%
-                    mutate(
+                rowwise() %>%
+                mutate(
                     AllIDs = paste(
                         unique(
                             na.omit(
@@ -709,9 +709,9 @@ function(
                         collapse = ", "
                     )
                 ) %>%
-                    ungroup() %>%
-                    rowwise() %>%
-                    mutate(
+                ungroup() %>%
+                rowwise() %>%
+                mutate(
                     PotentialAdditionalIDs = paste(
                         setdiff(
                             unlist(
@@ -729,8 +729,8 @@ function(
                         collapse = ", "  # Combine the remaining IDs back into a comma-separated string
                     )
                 ) %>%
-                    ungroup() %>%
-                    select(
+                ungroup() %>%
+                select(
                     -AllIDs.x,
                     -AllIDs.y
                 )
@@ -739,14 +739,14 @@ function(
         # # ------------------- Fill empty cells -------------- ##
         OtherIDs <-
             OtherIDs %>%
-                mutate(
+            mutate(
                 PotentialAdditionalIDs = ifelse(
                     is.na(PotentialAdditionalIDs) | PotentialAdditionalIDs == "",
                     NA,
                     PotentialAdditionalIDs
                 )
             ) %>%
-                mutate(
+            mutate(
                 AllIDs = ifelse(
                     is.na(AllIDs) | AllIDs == "",
                     !!sym(metadata_info[["InputID"]]),
@@ -983,8 +983,8 @@ mapping_ambiguity <- function(
         if (is.character(data[[to]]) == TRUE) {
             data[[to]] <-
                 data[[to]] %>%
-                    strsplit(", ") %>%
-                    lapply(as.character)
+                strsplit(", ") %>%
+                lapply(as.character)
         }
 
         # # ------------------  Perform ambiguity mapping ------------------- ##
@@ -1006,15 +1006,15 @@ mapping_ambiguity <- function(
                     sep = ""
                 )
             ]] <- data %>%
-                unnest(  # unlist the columns in case they are not expaned
+            unnest(  # unlist the columns in case they are not expaned
                     cols = all_of(Comp[[comp]]$from)
                 ) %>%
-                    filter(  # Remove NA values, otherwise they are counted as column is character
+                filter(  # Remove NA values, otherwise they are counted as column is character
                     !is.na(
                         !!sym(Comp[[comp]]$from)
                     )
                 ) %>%
-                    ambiguity(
+                ambiguity(
                     from_col = !!sym(Comp[[comp]]$from),
                     to_col = !!sym(Comp[[comp]]$to),
                     groups = grouping_variable,
@@ -1045,7 +1045,7 @@ mapping_ambiguity <- function(
                     sep = ""
                 )
             ]] %>%
-                attr(
+            attr(
                 paste0(
                     "ambiguity_",
                     Comp[[comp]]$from,
@@ -1091,10 +1091,10 @@ mapping_ambiguity <- function(
                     # MetaboliteID before merging
                     ResList[[from_to_long]] <-
                         ResList[[from_to_v2]] %>%
-                            unnest(
+                        unnest(
                             cols = all_of(Comp[[comp]]$from)
                         ) %>%
-                            mutate(
+                        mutate(
                             !!sym(from_to_acr_grp) := case_when(
                                 (
                                     !!sym(from_to_amb_bg) !=
@@ -1103,11 +1103,11 @@ mapping_ambiguity <- function(
                                 TRUE ~ "FALSE"
                             )
                         ) %>%
-                            group_by(
+                        group_by(
                             !!sym(Comp[[comp]]$from),
                             !!sym(grouping_variable)
                         ) %>%
-                            mutate(
+                        mutate(
                             !!sym(
                                 Comp[[comp]]$to
                             ) := ifelse(
@@ -1119,16 +1119,16 @@ mapping_ambiguity <- function(
                                 )
                             )
                         ) %>%
-                            mutate(
+                        mutate(
                             !!sym(from_to_count) := ifelse(
                                 all(!!sym(Comp[[comp]]$to) == 0L),
                                 0L,
                                 n()
                             )
                         ) %>%
-                            ungroup() %>%
-                            distinct() %>%
-                            unite(
+                        ungroup() %>%
+                        distinct() %>%
+                        unite(
                             !!sym(from_to_v3),
                             c(
                                 Comp[[comp]]$from,
@@ -1137,17 +1137,17 @@ mapping_ambiguity <- function(
                             sep = " --> ",
                             remove = FALSE
                         ) %>%
-                            separate_rows(
+                        separate_rows(
                             !!sym(Comp[[comp]]$to),
                             sep = ", "
                         ) %>%
-                            unite(
+                        unite(
                             UniqueID,
                             c(from, to, grouping_variable),
                             sep = "_",
                             remove = FALSE
                         ) %>%
-                            distinct()
+                        distinct()
                 } else {
                     ResList[[paste0(
                         Comp[[comp]]$from,
@@ -1162,13 +1162,13 @@ mapping_ambiguity <- function(
                             Comp[[comp]]$to,
                             sep = ""
                         )]] %>%
-                            unnest(
+                        unnest(
                             cols = all_of(Comp[[comp]]$from)
                         ) %>%
-                            group_by(
+                        group_by(
                             !!sym(Comp[[comp]]$from)
                         ) %>%
-                            mutate(
+                        mutate(
                             !!sym(
                                 Comp[[comp]]$to
                             ) := ifelse(
@@ -1180,7 +1180,7 @@ mapping_ambiguity <- function(
                                 )
                             )
                         ) %>%
-                            mutate(
+                        mutate(
                             !!sym(
                                 paste0(
                                     "Count(",
@@ -1195,9 +1195,9 @@ mapping_ambiguity <- function(
                                 n()
                             )
                         ) %>%
-                            ungroup() %>%
-                            distinct() %>%
-                            unite(
+                        ungroup() %>%
+                        distinct() %>%
+                        unite(
                             !!sym(
                                 paste0(
                                     Comp[[comp]]$from,
@@ -1212,18 +1212,18 @@ mapping_ambiguity <- function(
                             sep = " --> ",
                             remove = FALSE
                         ) %>%
-                            separate_rows(
+                        separate_rows(
                             !!sym(Comp[[comp]]$to),
                             sep = ", "
                         ) %>%
-                            unite(
+                        unite(
                             UniqueID,
                             c(from, to),
                             sep = "_",
                             remove = FALSE
                         ) %>%
-                            distinct() %>%
-                            mutate(
+                        distinct() %>%
+                        mutate(
                             !!sym(
                                 paste0(
                                     "AcrossGroupMappingIssue(",
@@ -1241,10 +1241,10 @@ mapping_ambiguity <- function(
             # Add NA metabolite maps back if they do exist:
             Removed <-
                 data %>%
-                    unnest(  # unlist the columns in case they are not expaned
+                unnest(  # unlist the columns in case they are not expaned
                     cols = all_of(Comp[[comp]]$from)
                 ) %>%
-                    filter(
+                filter(
                     is.na(!!sym(Comp[[comp]]$from))
                 )
 
@@ -1264,7 +1264,7 @@ mapping_ambiguity <- function(
                         )]],
                         test <-
                             Removed %>%
-                                bind_cols(
+                            bind_cols(
                                 setNames(
                                     as.list(
                                         rep(
@@ -1351,18 +1351,18 @@ mapping_ambiguity <- function(
                     by = "UniqueID",
                     all = TRUE
                 ) %>%
-                    separate(
+                separate(
                     UniqueID,
                     into = c(from, to, grouping_variable),
                     sep = "_",
                     remove = FALSE
                 ) %>%
-                    distinct()
+                distinct()
 
             # Add relevant mapping information
             summary <-
                 summary %>%
-                    mutate(
+                mutate(
                     Mapping = case_when(
                         !!sym(paste0("Count(", from, "_to_", to, ")")) == 1L & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L ~ "one-to-one",
                         !!sym(paste0("Count(", from, "_to_", to, ")")) > 1L & !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L ~ "one-to-many",
@@ -1375,7 +1375,7 @@ mapping_ambiguity <- function(
                         TRUE ~ NA
                     )
                 ) %>%
-                    mutate(
+                mutate(
                     !!sym(
                         paste0("Count(", from, "_to_", to, ")")
                     ) := replace_na(
@@ -1385,7 +1385,7 @@ mapping_ambiguity <- function(
                         0L
                     )
                 ) %>%
-                    mutate(
+                mutate(
                     !!sym(
                         paste0("Count(", to, "_to_", from, ")")
                     ) := replace_na(
@@ -1556,7 +1556,7 @@ checkmatch_pk_to_data <- function(
 
             data <-
                 data %>%
-                    filter(
+                filter(
                     !is.na(.data[[metadata_info[["InputID"]]]])
                 )
 
@@ -1577,7 +1577,7 @@ checkmatch_pk_to_data <- function(
 
             data <-
                 data %>%
-                    distinct(
+                distinct(
                     .data[[metadata_info[["InputID"]]]],
                     .keep_all = TRUE
                 )
@@ -1657,7 +1657,7 @@ checkmatch_pk_to_data <- function(
 
             input_pk <-
                 input_pk %>%
-                    filter(
+                filter(
                     !is.na(.data[[metadata_info[["PriorID"]]]])
                 )
 
@@ -1707,22 +1707,22 @@ checkmatch_pk_to_data <- function(
 
             input_pk <-
                 input_pk %>%
-                    distinct(
+                distinct(
                     .data[[metadata_info[["PriorID"]]]],
                     !!sym(metadata_info[["grouping_variable"]]),
                     .keep_all = TRUE
                 ) %>%
-                    group_by(
+                group_by(
                     !!sym(metadata_info[["PriorID"]])
                 ) %>%
-                    mutate(
+                mutate(
                     across(
                         everything(),
                         ~ if (is.character(.)) paste(unique(.), collapse = ", ")
                     )
                 ) %>%
-                    ungroup() %>%
-                    distinct(
+                ungroup() %>%
+                distinct(
                     .data[[metadata_info[["PriorID"]]]],
                     .keep_all = TRUE
                 )
@@ -1782,25 +1782,25 @@ checkmatch_pk_to_data <- function(
             df_name
         ) {
                 df %>%
-                    mutate(
+                mutate(
                     row_id = row_number()
                 ) %>%
-                    mutate(  # Store original values
+                mutate(  # Store original values
                     !!paste0("OriginalEntry_", df_name, sep = "") :=
                         !!sym(id_col)
                 ) %>%
-                    separate_rows(
+                separate_rows(
                     !!sym(id_col),
                     sep = ", \\s*"
                 ) %>%
-                    group_by(
+                group_by(
                     row_id
                 ) %>%
-                    mutate(
+                mutate(
                     !!(paste0("OriginalGroup_", df_name, sep = "")) :=
                         paste0(df_name, "_", cur_group_id())
                 ) %>%
-                    ungroup()
+                ungroup()
             }
 
         if (data_MultipleIDs) {
@@ -1810,7 +1810,7 @@ checkmatch_pk_to_data <- function(
                     metadata_info[["InputID"]],
                     "data"
                 ) %>%
-                    select(
+                select(
                     metadata_info[["InputID"]],
                     "OriginalEntry_data",
                     OriginalGroup_data
@@ -1818,10 +1818,10 @@ checkmatch_pk_to_data <- function(
         } else {
             data_long <-
                 data %>%
-                    mutate(
+                mutate(
                     OriginalGroup_data := paste0("data_", row_number())
                 ) %>%
-                    select(
+                select(
                     metadata_info[["InputID"]],
                     OriginalGroup_data
                 )
@@ -1836,7 +1836,7 @@ checkmatch_pk_to_data <- function(
                     metadata_info[["PriorID"]],
                     "PK"
                 ) %>%
-                    select(
+                select(
                     metadata_info[["PriorID"]],
                     "OriginalEntry_PK",
                     OriginalGroup_PK,
@@ -1845,10 +1845,10 @@ checkmatch_pk_to_data <- function(
         } else {
             PK_long <-
                 input_pk %>%
-                    mutate(
+                mutate(
                     OriginalGroup_PK := paste0("PK_", row_number())
                 ) %>%
-                    select(
+                select(
                     metadata_info[["PriorID"]],
                     OriginalGroup_PK,
                     metadata_info[["grouping_variable"]]
@@ -1865,7 +1865,7 @@ checkmatch_pk_to_data <- function(
                 by.y = metadata_info[["InputID"]],
                 all = TRUE
             ) %>%
-                distinct(
+            distinct(
                 !!sym(metadata_info[["PriorID"]]),
                 OriginalGroup_data,
                 !!sym(metadata_info[["grouping_variable"]]),
@@ -1941,24 +1941,24 @@ checkmatch_pk_to_data <- function(
             merge(
                 x = summary_df,
                 y = merged_df %>%
-                    select(
+                select(
                         -c(OriginalGroup_PK, OriginalGroup_data)
                     ),
                 by.x = metadata_info[["InputID"]],
                 by.y = "OriginalEntry_data",
                 all.x = TRUE
             ) %>%
-                group_by(
+            group_by(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                mutate(
+            mutate(
                 Count_FeatureIDs_to_GroupingVariable = case_when(
                     is.na(!!sym(metadata_info[["grouping_variable"]])) ~ NA_integer_,
                     TRUE ~ n_distinct(!!sym(metadata_info[["PriorID"]]), na.rm = TRUE)
                 )
             ) %>%
-                mutate(
+            mutate(
                 Group_Conflict_Notes = case_when(
                     any(
                         Count_FeatureIDs_to_GroupingVariable > 1L,
@@ -1980,17 +1980,17 @@ checkmatch_pk_to_data <- function(
                     TRUE ~ "None"
                 )
             ) %>%
-                ungroup() %>%
-                mutate(
+            ungroup() %>%
+            mutate(
                 matches = ifelse(matches == "", NA, matches)
             )
 
         summary_df_short <-
             summary_df %>%
-                group_by(
+            group_by(
                 !!sym(metadata_info[["InputID"]])
             ) %>%
-                mutate(
+            mutate(
                 Unique_GroupingVariable_count = n_distinct(
                     !!sym(metadata_info["grouping_variable"]),
                     na.rm = TRUE
@@ -1999,13 +1999,13 @@ checkmatch_pk_to_data <- function(
                 Count_FeatureIDs_to_GroupingVariable = list(Count_FeatureIDs_to_GroupingVariable),
                 Group_Conflict_Notes = paste(unique(Group_Conflict_Notes), collapse = " || ")
             ) %>%
-                ungroup() %>%
-                distinct(
+            ungroup() %>%
+            distinct(
                 !!sym(metadata_info[["InputID"]]),
                 !!sym(metadata_info[["grouping_variable"]]),
                 .keep_all = TRUE
             ) %>%
-                mutate(
+            mutate(
                 ActionRequired = case_when(
                     original_count >= 1L & matches_count == 1L & Unique_GroupingVariable_count >= 1L ~ "None",
                     original_count >= 1L & matches_count == 0L & Unique_GroupingVariable_count >= 0L ~ "None",
@@ -2014,10 +2014,10 @@ checkmatch_pk_to_data <- function(
                     TRUE ~ NA_character_
                 )
             ) %>%
-                select(
+            select(
                 -!!sym(metadata_info[["PriorID"]])
             ) %>%
-                mutate(
+            mutate(
                 matches = ifelse(matches == "", NA, matches),
                 !!sym(metadata_info[["grouping_variable"]]) :=
                     ifelse(
@@ -2026,7 +2026,7 @@ checkmatch_pk_to_data <- function(
                         !!sym(metadata_info[["grouping_variable"]])
                     )
             ) %>%
-                mutate(
+            mutate(
                 InputID_select = case_when(
                     original_count == 1L & matches_count <= 1L ~ metadata_info[["InputID"]],
                     original_count >= 2L & matches_count == 0L ~ str_split(metadata_info[["InputID"]], ", \\s*") %>% map_chr(first),
@@ -2185,17 +2185,17 @@ function(
         # 1. Create a list of unique MetaboliteIDs for each term
         term_metabolites <-
             data %>%
-                group_by(
+            group_by(
                 !!sym(metadata_info[["grouping_variable"]])
             ) %>%
-                summarize(
+            summarize(
                 MetaboliteIDs = list(
                     unique(
                         !!sym(metadata_info[["InputID"]])
                     )
                 )
             ) %>%
-                ungroup()
+            ungroup()
 
         # 2. Create the overlap matrix based on different methods:
         if (matrix == "percentage") {
@@ -2222,7 +2222,7 @@ function(
                     },
                     simplify = FALSE
                 ) %>%
-                    bind_rows()
+                bind_rows()
 
             # Create overlap matrix: An overlap matrix is typically used to quantify
             # the degree of overlap between two sets or groups.
@@ -2297,10 +2297,10 @@ function(
 
         term_clusters <-
             term_overlap %>%
-                filter(
+            filter(
                 Overlap >= threshold
             ) %>%
-                select(
+            select(
                 Term1,
                 Term2
             )
@@ -2358,15 +2358,15 @@ function(
         # 5. Merge cluster group information back to the original data
         df <-
             data %>%
-                left_join(
+            left_join(
                 term_metabolites %>%
-                    select(
+                select(
                         !!sym(metadata_info[["grouping_variable"]]),
                         cluster
                     ),
                 by = metadata_info[["grouping_variable"]]
             ) %>%
-                mutate(
+            mutate(
                 cluster = ifelse(
                     is.na(cluster),
                     "None",
@@ -2426,7 +2426,7 @@ function(
                 by = list(source = net[[.source]]),
                 FUN = sum
             ) %>%
-                rename("targets_num" = 2)
+            rename("targets_num" = 2)
 
         if (complete == TRUE) {
             res_Add <-
@@ -2452,7 +2452,7 @@ function(
                 net[[.target]] ~ net[[.source]],
                 FUN = toString
             ) %>%
-                rename(
+            rename(
                 "source" = 1,
                 "targets_chr" = 2
             )
@@ -2477,7 +2477,7 @@ function(
                 by.y = .target,
                 all.x = TRUE
             ) %>%
-                filter(
+            filter(
                 !is.na(
                     across(
                         all_of(.source)
@@ -2491,7 +2491,7 @@ function(
                 by = list(source = Detected[[.source]]),
                 FUN = sum
             ) %>%
-                rename("targets_detected_num" = 2)
+            rename("targets_detected_num" = 2)
 
         res_Add <-
             merge(
@@ -2500,7 +2500,7 @@ function(
                 by = "source",
                 all.x = TRUE
             ) %>%
-                mutate(
+            mutate(
                 targets_detected_num = replace_na(targets_detected_num, 0)
             )
 
@@ -2510,7 +2510,7 @@ function(
                 Detected$Symbol ~ Detected[[.source]],
                 FUN = toString
             ) %>%
-                rename(
+            rename(
                 "source" = 1,
                 "targets_detected_chr" = 2
             )
@@ -2533,7 +2533,7 @@ function(
         # sort by score
         res_Add <-
             res_Add %>%
-                arrange(
+            arrange(
                 desc(
                     as.numeric(
                         as.character(score)
@@ -3217,7 +3217,7 @@ function(
                     Superplot = TRUE
                 ),
                 metadata_sample = processed_data %>%
-                    dplyr::rename("Conditions" = "entry_count"),
+                dplyr::rename("Conditions" = "entry_count"),
                 plot_name = plot_name,
                 subtitle = "",
                 plot_type = "Bar"
@@ -3242,7 +3242,7 @@ function(
                 ggplot() +
                 annotation_custom(.)
             } %>%
-                add(
+            add(
                 theme(
                     panel.background = element_rect(fill = "transparent")
                 )

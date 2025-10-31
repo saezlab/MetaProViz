@@ -190,7 +190,7 @@ processing <- function(
     ## ------------------ Prepare the data ------------------- ##
     # data files:
     data <- as.data.frame(data) %>%
-        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
 
     data <- as.data.frame(mutate_all(as.data.frame(data), function(x) as.numeric(as.character(x))))
 
@@ -518,8 +518,8 @@ replicate_sum <- function(
     Input <- merge(x = metadata_sample %>% select(!!metadata_info[["Conditions"]], !!metadata_info[["Biological_Replicates"]], !!metadata_info[["Analytical_Replicates"]]),
     y = data,
     by ="row.names") %>%
-        column_to_rownames("Row.names") %>%
-        rename(
+    column_to_rownames("Row.names") %>%
+    rename(
             "Conditions"= metadata_info[["Conditions"]],
             "Biological_Replicates"= metadata_info[["Biological_Replicates"]],
             "Analytical_Replicates"= metadata_info[["Analytical_Replicates"]]
@@ -532,11 +532,11 @@ replicate_sum <- function(
 
     # Make a number of merged replicates column
     nReplicates <-  Input %>%
-        group_by(Biological_Replicates, Conditions) %>%
-        summarise_all("max") %>%
-        ungroup() %>%
-        select(Analytical_Replicates, Biological_Replicates, Conditions) %>%
-        rename("n_AnalyticalReplicates_Summed"= "Analytical_Replicates")
+    group_by(Biological_Replicates, Conditions) %>%
+    summarise_all("max") %>%
+    ungroup() %>%
+    select(Analytical_Replicates, Biological_Replicates, Conditions) %>%
+    rename("n_AnalyticalReplicates_Summed"= "Analytical_Replicates")
 
     Input_data_numeric_summed <-
         merge(
@@ -748,10 +748,10 @@ pool_estimation <- function(
     # data files:
     if (is.null(metadata_sample) == TRUE) {
         Pooldata <- data %>%
-            mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
     } else {
         Pooldata <- data[metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["PoolSamples"]],] %>%
-            mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
     }
 
     #####################################################################
@@ -775,8 +775,8 @@ pool_estimation <- function(
 
     # Create Output DF
     result_df_final <- result_df %>%
-        t() %>% as.data.frame() %>% rowwise() %>%
-        mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
+    t() %>% as.data.frame() %>% rowwise() %>%
+    mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
 
     result_df_final$MissingValuepercentage <- NAvector
 
@@ -864,7 +864,7 @@ pool_estimation <- function(
     log_trace('CV violin plot.')
     # Make Violin of CVs
     Plot_cv_result_df <- result_df_final_out %>%
-        mutate(HighVar = ifelse((CV > cutoff_cv) == TRUE, paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
+    mutate(HighVar = ifelse((CV > cutoff_cv) == TRUE, paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
 
     ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar, label = Plot_cv_result_df$Metabolite))+
     geom_violin(alpha = 0.5 , fill ="#FF6666")+
@@ -1036,7 +1036,7 @@ feature_filtering <- function(
 
     ## ------------------ Prepare the data ------------------- ##
     feat_filt_data <- as.data.frame(data) %>%
-        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
 
     if (core == TRUE) { # remove core_media samples for feature filtering
         feat_filt_data <- feat_filt_data %>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
@@ -1216,7 +1216,7 @@ mvi_imputation <- function(
     Conditions <- NULL
     ## ------------------ Prepare the data ------------------- ##
     filtered_matrix <- data %>%
-        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
 
     ## ------------------ Perform mvi ------------------ ##
     # Do mvi for the samples
@@ -1234,8 +1234,8 @@ mvi_imputation <- function(
     NA_removed_matrix %<>%
         mutate(Conditions = if (core == TRUE) { # If we have a CoRe experiment we need to remove the sample metainformation of the media blank samples!
             metadata_sample %>%
-                filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]) %>%
-                select(!!sym(metadata_info[["Conditions"]]))
+            filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]) %>%
+            select(!!sym(metadata_info[["Conditions"]]))
         } else {
             metadata_sample[[metadata_info[["Conditions"]]]]# If we have a standard experiments no samples need to be removed
         }) %>%
@@ -1641,7 +1641,7 @@ core_norm <- function(
 
         cutoff_cv <- 30
         result_df <- result_df %>% t() %>% as.data.frame() %>% rowwise() %>%
-            mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
+        mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
         rownames(result_df)<- colnames(core_medias)
 
         # calculate the NAs
@@ -1694,7 +1694,7 @@ core_norm <- function(
 
         # Make Violin of CVs
         Plot_cv_result_df <- cv_result_df %>%
-            mutate(HighVar = ifelse(HighVar == TRUE, "> CV 30", "< CV 30"))
+        mutate(HighVar = ifelse(HighVar == TRUE, "> CV 30", "< CV 30"))
 
         ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar, label = row.names(cv_result_df)))+
         geom_violin(alpha = 0.5 , fill ="#FF6666")+
@@ -1735,14 +1735,14 @@ core_norm <- function(
                 # remove the furthest value from the mean
                 if (HighVar_metabs>1) {
                     max_var_pos <-  core_medias[,result_df$HighVar == TRUE]  %>%
-                        as.data.frame() %>%
-                        mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
-                        summarise_all(.funs = ~ which.max(abs(.)))
+                    as.data.frame() %>%
+                    mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
+                    summarise_all(.funs = ~ which.max(abs(.)))
                 } else {
                     max_var_pos <-  core_medias[,result_df$HighVar == TRUE]  %>%
-                        as.data.frame() %>%
-                        mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
-                        summarise_all(.funs = ~ which.max(abs(.)))
+                    as.data.frame() %>%
+                    mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
+                    summarise_all(.funs = ~ which.max(abs(.)))
                     colnames(max_var_pos)<- colnames(core_medias)[result_df$HighVar == TRUE]
                 }
 
@@ -1763,7 +1763,7 @@ core_norm <- function(
                 rownames(result_df)[1] <- "CV"
 
                 result_df <- result_df %>% t() %>% as.data.frame() %>% rowwise() %>%
-                    mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
+                mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
                 rownames(result_df)<- colnames(core_medias)
 
                 HighVar_metabs <- sum(result_df$HighVar == TRUE)
@@ -1862,9 +1862,9 @@ core_norm <- function(
 
     # Remove core_media samples from the data
     data_tic <- merge(metadata_sample, data_tic, by ="row.names") %>%
-        filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>%
-        column_to_rownames("Row.names") %>%
-        select(-seq_len(ncol(metadata_sample)))
+    filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>%
+    column_to_rownames("Row.names") %>%
+    select(-seq_len(ncol(metadata_sample)))
 
     data_tic_coreNorm_Media <- as.data.frame(t( apply(t(data_tic),2, function(i) i-core_media_df$core_mediaMeans)))  #Subtract from each sample the core_media mean
     data_tic_coreNorm <- as.data.frame(apply(data_tic_coreNorm_Media, 2, function(i) i*core_norm_factor))
@@ -1973,7 +1973,7 @@ outlier_detection <- function(
 
     # Load the data:
     data_norm <- data %>%
-        mutate_all(~ replace(., is.nan(.), 0))
+    mutate_all(~ replace(., is.nan(.), 0))
     data_norm[is.na(data_norm)] <- 0 #replace NA with 0
 
     if (core == TRUE) {
@@ -2276,7 +2276,7 @@ outlier_detection <- function(
 
     # # -- 2.  Quality Control (QC) PCA
     Metadata_Sample <- data_norm_filtered_full %>%
-        mutate(
+    mutate(
             Outliers = case_when(Outliers == "no" ~ 'no',
             Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
             Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',

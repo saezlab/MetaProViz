@@ -210,11 +210,11 @@ viz_pca <- function(
             metadata_sample$shape <- metadata_sample[, paste(metadata_info[["color"]])]
             metadata_sample <-
                 metadata_sample %>%
-                    rename("color" = paste(metadata_info[["color"]]))
+                rename("color" = paste(metadata_info[["color"]]))
         } else {
             metadata_sample <-
                 metadata_sample %>%
-                    rename(
+                rename(
                     "color" = paste(metadata_info[["color"]]),
                     "shape" = paste(metadata_info[["shape"]])
                 )
@@ -223,12 +223,12 @@ viz_pca <- function(
         if ("color" %in% names(metadata_info) == TRUE) {
             metadata_sample <-
                 metadata_sample %>%
-                    rename("color" = paste(metadata_info[["color"]]))
+                rename("color" = paste(metadata_info[["color"]]))
         }
         if ("shape" %in% names(metadata_info) == TRUE) {
             metadata_sample <-
                 metadata_sample %>%
-                    rename("shape" = paste(metadata_info[["shape"]]))
+                rename("shape" = paste(metadata_info[["shape"]]))
         }
     }
 
@@ -236,9 +236,9 @@ viz_pca <- function(
     if (is.null(metadata_sample) == FALSE) {
         InputPCA <-
             merge(x = metadata_sample %>%
-                tibble::rownames_to_column("UniqueID"), y = data %>%
-                tibble::rownames_to_column("UniqueID"), by = "UniqueID", all.y = TRUE) %>%
-                column_to_rownames("UniqueID")
+            tibble::rownames_to_column("UniqueID"), y = data %>%
+            tibble::rownames_to_column("UniqueID"), by = "UniqueID", all.y = TRUE) %>%
+            column_to_rownames("UniqueID")
     } else {
         InputPCA <- data
     }
@@ -301,7 +301,7 @@ viz_pca <- function(
     if ("color" %in% names(metadata_sample) == TRUE) {
         InputPCA <-
             InputPCA %>%
-                rename(!!paste(metadata_info[["color"]]) := "color")
+            rename(!!paste(metadata_info[["color"]]) := "color")
         Param_Col <- paste(metadata_info[["color"]])
     } else {
         color_select <- NULL
@@ -311,7 +311,7 @@ viz_pca <- function(
     if ("shape" %in% names(metadata_sample) == TRUE) {
         InputPCA <-
             InputPCA %>%
-                rename(!!paste(metadata_info[["shape"]]) := "shape")
+            rename(!!paste(metadata_info[["shape"]]) := "shape")
         Param_Sha <- paste(metadata_info[["shape"]])
     } else {
         shape_select <- NULL
@@ -372,7 +372,7 @@ viz_pca <- function(
             ggplot() +
                 annotation_custom(.)
         } %>%
-            add(theme(panel.background = element_rect(fill = "transparent")))
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
     PlotList_adaptedGrid[["Plot_Sized"]] <- PCA
 
@@ -381,7 +381,7 @@ viz_pca <- function(
     # Here we make a list in which we will save the outputs:
     file_name <-
         plot_name %>%
-            {
+        {
             `if`(nchar(.), sprintf("PCA_%s", .), "PCA")
         }
 

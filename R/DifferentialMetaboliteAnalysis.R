@@ -439,7 +439,7 @@ dma <- function(
 
                     # Select only the relevant columns
                     df_selected <- df %>%
-                        select(Metabolite, all_of(core_col))
+                    select(Metabolite, all_of(core_col))
 
                     return(df_selected)
                 }
@@ -762,12 +762,12 @@ log2fc <- function(
         C1_Zero <- C1
         C1_Zero[is.na(C1_Zero)] <- 0
         Mean_C1 <- C1_Zero %>%
-            summarise_all("mean")
+        summarise_all("mean")
 
         C2_Zero <- C2
         C2_Zero[is.na(C2_Zero)] <- 0
         Mean_C2 <- C2_Zero %>%
-            summarise_all("mean")
+        summarise_all("mean")
 
         # Calculate absolute distance between the means. log2 transform
         # and add sign (-/+):
@@ -786,7 +786,7 @@ log2fc <- function(
                 by = "Metabolite",
                 all = TRUE
             ) %>%
-                rename(
+            rename(
                     "C1" = 2,
                     "C2" = 3
                 )
@@ -801,7 +801,7 @@ log2fc <- function(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
             ) == TRUE) {
                 Mean_Merge <- Mean_Merge %>%
-                    mutate(C1 = case_when(
+                mutate(C1 = case_when(
                         # Here we have a "true" 0 value due to 0/NAs
                         # in the input data
                         C2 == 0L & `NA/0` == TRUE ~ paste(C1),
@@ -860,7 +860,7 @@ log2fc <- function(
 
             # Now we can adapt the values to take into account the distance
             Mean_Merge <- Mean_Merge %>%
-                mutate(`Log2(Distance)` = case_when(
+            mutate(`Log2(Distance)` = case_when(
                     # If C1>C2 the distance stays positive to reflect
                     # that C1 > C2
                     C1 > C2 ~ paste(`Log2(Distance)` * +1),
@@ -1064,7 +1064,7 @@ log2fc <- function(
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
             Mean_Merge <- Mean_Merge %>%
-                mutate(C1_Adapted = case_when(
+            mutate(C1_Adapted = case_when(
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
                     C2 == 0L & `NA/0` == TRUE ~ paste(C1),
@@ -1437,7 +1437,7 @@ mpv_aov <- function(
             unique(conditions),
             2
         ) %>%
-            as.matrix()
+        as.matrix()
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
@@ -1453,7 +1453,7 @@ mpv_aov <- function(
         comparisons <- t(
             expand.grid(numerator, denominator)
         ) %>%
-            as.data.frame()
+        as.data.frame()
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
@@ -1472,7 +1472,7 @@ mpv_aov <- function(
             function(x) x[1][[1]][, "p adj"]
         )
     ) %>%
-        as.data.frame()
+    as.data.frame()
 
     comps <- paste(
         comparisons[1, ],
@@ -1501,7 +1501,7 @@ mpv_aov <- function(
             function(x) x[1][[1]][, "diff"]
         )
     ) %>%
-        as.data.frame()
+    as.data.frame()
 
     # if oposite comparisons is true
     if (sum(opp_comps %in% colnames(Tukey_res_diff)) > 0L) {
@@ -1696,7 +1696,7 @@ mpv_kruskal <- function(
         comparisons <- t(
             expand.grid(numerator, denominator)
         ) %>%
-            as.data.frame()
+        as.data.frame()
 
         # Settings:
         MultipleComparison <- TRUE
@@ -1954,7 +1954,7 @@ mpv_welch <- function(
         comparisons <- t(
             expand.grid(numerator, denominator)
         ) %>%
-            as.data.frame()
+        as.data.frame()
 
         # Settings:
         MultipleComparison <- TRUE
@@ -1971,7 +1971,7 @@ mpv_welch <- function(
         data,
         by = 0
     ) %>%
-        rename("conditions" = metadata_info[["Conditions"]])
+    rename("conditions" = metadata_info[["Conditions"]])
     games_data$conditions <- conditions
     posthoc.res.list <- list()
 
@@ -2020,7 +2020,7 @@ mpv_welch <- function(
         sep = "-"
     )  # normal
     Games_Pres <- Games_Pres[, colnames(Games_Pres) %in% comps] %>%
-        rownames_to_column("Metabolite")
+    rownames_to_column("Metabolite")
     # In case of p.adj =0 we change it to 10^-6
     Games_Pres[Games_Pres == 0L] <- 0.000001
 
@@ -2033,7 +2033,7 @@ mpv_welch <- function(
         as.data.frame()
     colnames(Games_Tres) <- rownames(posthoc.res.list[[1]])
     Games_Tres <- Games_Tres[, colnames(Games_Tres) %in% comps] %>%
-        rownames_to_column("Metabolite")
+    rownames_to_column("Metabolite")
 
     results_list <- list()
     for (col_name in colnames(Games_Pres)) {
@@ -2192,16 +2192,16 @@ dma_stat_limma <-
             metadata_sample %>%
             rownames_to_column("sample")
         targets <- targets[, c("sample", metadata_info[["Conditions"]])] %>%
-            rename("condition" = 2) %>%
-            arrange(sample)  # Order the column "sample" alphabetically
+        rename("condition" = 2) %>%
+        arrange(sample)  # Order the column "sample" alphabetically
         # make appropriate condition names accepted by limma
         targets$condition_limma_compatible <- make.names(targets$condition)
 
         if (MultipleComparison == FALSE) {
             # subset the data:
             targets <- targets %>%
-                subset(condition == metadata_info[["Numerator"]] | condition == metadata_info[["Denominator"]]) %>%
-                arrange(sample)  # Order the column "sample" alphabetically
+            subset(condition == metadata_info[["Numerator"]] | condition == metadata_info[["Denominator"]]) %>%
+            arrange(sample)  # Order the column "sample" alphabetically
 
             Limma_input <-
                 data %>%
@@ -2232,7 +2232,7 @@ dma_stat_limma <-
         }
 
         targets_limma <- targets[, -2] %>%
-            rename("condition" = "condition_limma_compatible")
+        rename("condition" = "condition_limma_compatible")
 
         # We need to transpose the df to run limma. Also, if the data is not log2
         # transformed, we will not calculate the Log2FC as limma just substracts
@@ -2414,7 +2414,7 @@ dma_stat_limma <-
                 )
 
             res.t <- res.t %>%
-                rownames_to_column("Metabolite")
+            rownames_to_column("Metabolite")
 
             # Store the data frame in the results list, named after the contrast
             results_list[[contrast_name]] <- res.t
@@ -2498,7 +2498,7 @@ dma_stat_limma <-
 
         # Add input data
         Cond <- metadata_sample %>%
-            rownames_to_column("Code")
+        rownames_to_column("Code")
 
         InputReturn <-
             merge(
@@ -3057,7 +3057,7 @@ mpv_shapiro <- function(
                 list(
                     "DF" = list(
                         "Shapiro_result" = DF_shapiro_results %>%
-                            tibble::rownames_to_column("Code")
+                        tibble::rownames_to_column("Code")
                     ),
                     "Plot" = list(
                         "Distributions" = Density_plots, "QQ_plots" = QQ_plots
@@ -3068,7 +3068,7 @@ mpv_shapiro <- function(
                 list(
                     "DF" = list(
                         "Shapiro_result" = DF_shapiro_results %>%
-                            tibble::rownames_to_column("Code")
+                        tibble::rownames_to_column("Code")
                     ),
                     "Plot" = list(
                         "Distributions" = Density_plots

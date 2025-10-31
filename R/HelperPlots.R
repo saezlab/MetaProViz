@@ -95,8 +95,8 @@ set_size <- function(
 
     idx <-
         name %>%
-            in_gtable(gtbl) %>%
-            gtable_idx(gtbl, ., dim, offset = offset)
+        in_gtable(gtbl) %>%
+        gtable_idx(gtbl, ., dim, offset = offset)
 
     name_miss <- length(idx) == 0L
 
@@ -180,7 +180,7 @@ adjust_layout <- function(
     param
 ) {
     c("widths", "heights") %>%
-        reduce(
+    reduce(
             ~ set_sizes(.x, .y, param[[.y]]),
             .init = gtbl
         )
@@ -200,7 +200,7 @@ set_sizes <- function(
     param
 ) {
     param %>%
-        reduce(
+    reduce(
             ~ exec(set_size, .x, !!!.y, dim = dim),
             .init = gtbl
         )
@@ -222,12 +222,12 @@ parse_unit <- function(
     log_trace("Parsing unit from `%s`", u)
 
     u %>%
-        {
+    {
             `if`(
                 is.character(.),
                 str_trim(.) %>%
-                    str_match("^(-?[0-9.]+)([a-z]+)$") %>%
-                    {
+                str_match("^(-?[0-9.]+)([a-z]+)$") %>%
+                {
                         `if`(
                             !any(is.na(.)),
                             unit(.[, 2L], .[, 3L]),
@@ -258,13 +258,13 @@ with_canvas_size <- function(
     cls <- class(gtable) %>% c("with_canvas_size")
 
     gtable %>%
-        c(
+    c(
             list(
                 width = parse_unit(width),
                 height = parse_unit(height)
             )
         ) %>%
-            `class<-`(cls)
+        `class<-`(cls)
 }
 
 
@@ -282,14 +282,14 @@ gtable_idx <- function(
     dim %<>% gtable_col
 
     name %>%
-        {
+    {
             `if`(
                 is.character(.),
                 filter(gtbl$layout, name %in% .) %>% extract2(dim),
                 .
             )
         } %>%
-            add(offset)
+        add(offset)
 }
 
 
@@ -330,9 +330,9 @@ adjust_title <- function(
 
         # ------- Width: Check how much width is needed for the figure title/subtitle
         title_width <- titles %>%
-            char2cm() %>%
-            max() %>%
-            cm()
+        char2cm() %>%
+        max() %>%
+        cm()
 
         gtbl %<>% set_width(
             c("guide-box-right", "legend"),
@@ -372,18 +372,18 @@ adjust_legend <- function(
         # # Legend titles:
         legend_nchar <-
             metadata_info %>%
-                as.list() %>%
-                extract(sections) %>%
-                unlist() %>%
-                map_int(nchar) %>%
-                max(0L) %>%
-                multiply_by(.25)
+            as.list() %>%
+            extract(sections) %>%
+            unlist() %>%
+            map_int(nchar) %>%
+            max(0L) %>%
+            multiply_by(.25)
 
         legend_width <-
             Legend$widths[3L] %>%
-                as.numeric() %>%
-                round(1L) %>%
-                max(legend_nchar)
+            as.numeric() %>%
+            round(1L) %>%
+            max(legend_nchar)
 
         log_trace(
             "Legend nchar: %.02fcm, Legend width: %.02fcm",
@@ -404,9 +404,9 @@ adjust_legend <- function(
         # ------- Legend heights
         Legend_heights <-
             Legend$heights %>%
-                extract(c(3L, 5L)) %>%
-                as.numeric() %>%
-                sum(2)  # +2 to secure space above and below plot
+            extract(c(3L, 5L)) %>%
+            as.numeric() %>%
+            sum(2)  # +2 to secure space above and below plot
 
         if (as.numeric(gtbl$height) < Legend_heights) {
             Add <- (Legend_heights - as.numeric(gtbl$height)) / 2
@@ -414,7 +414,7 @@ adjust_legend <- function(
             gtbl %<>%
                 # controls margins --> Can be increased if Figure legend needs more space on the top
                 set_height("background", cm(Add)) %>%
-                    # controls margins --> Can be increased if Figure legend needs more space on the bottom
+                # controls margins --> Can be increased if Figure legend needs more space on the bottom
                 set_height("xlab-b", cm(Add), offset = 1L)
 
             gtbl$height <- cm(Legend_heights)
@@ -434,16 +434,16 @@ titles_from_legend <- function(
     leg
 ) {
     leg$grobs %>%
-        map(~ {
+    map(~ {
             (.x$layout$name == "title") %>%
-                which() %>%
-                extract2(.x$grobs, .)
+            which() %>%
+            extract2(.x$grobs, .)
         }) %>%
-            map(~ {
+        map(~ {
             .x$children %>% map_chr(~ .x$label)
         }) %>%
-            unlist() %>%
-            unname()
+        unlist() %>%
+        unname()
 }
 
 
@@ -463,7 +463,7 @@ in_gtable <- function(
     gtbl
 ) {
     name %>%
-        {
+    {
             `if`(is.character(.), intersect(., gtbl$layout$name) %>% head(1L), .)
         }
 }
@@ -534,17 +534,17 @@ plotGrob_Processing <- function(
     # Adjust the parameters:
     Plot_Sized <-
         input_plot %>%
-            ggplotGrob() %>%
-            with_canvas_size(width = 12, height = 11) %>%
-            adjust_layout(SUPER_PARAM) %>%
-            adjust_title(c(plot_name))
+        ggplotGrob() %>%
+        with_canvas_size(width = 12, height = 11) %>%
+        adjust_layout(SUPER_PARAM) %>%
+        adjust_title(c(plot_name))
 
     Plot_Sized %<>%
         {
             ggplot() +
                 annotation_custom(.)
         } %>%
-            add(theme(panel.background = element_rect(fill = "transparent")))
+        add(theme(panel.background = element_rect(fill = "transparent")))
 
     return(Plot_Sized)
 }
@@ -598,11 +598,11 @@ plot_grob_pca <- function(
 
     Plot_Sized <-
         input_plot %>%
-            ggplotGrob() %>%
-            with_canvas_size(width = 12, height = 11) %>%
-            adjust_layout(PCA_PARAM) %>%
-            adjust_title(plot_name) %>%
-            adjust_legend(
+        ggplotGrob() %>%
+        with_canvas_size(width = 12, height = 11) %>%
+        adjust_layout(PCA_PARAM) %>%
+        adjust_title(plot_name) %>%
+        adjust_legend(
             input_plot,
             sections = c("color", "shape"),
             metadata_info = metadata_info
@@ -658,9 +658,9 @@ plot_grob_heatmap <- function(
     Input <- input_plot$gtable
 
     Plot_Sized <- Input %>%
-        with_canvas_size(width = 12, height = 11) %>%
-        adjust_layout(HEAT_PARAM) %>%
-        adjust_title(c(plot_name))
+    with_canvas_size(width = 12, height = 11) %>%
+    adjust_layout(HEAT_PARAM) %>%
+    adjust_title(c(plot_name))
 
     # Extract legend information and adjust:
     color_entries <- grep("^color", names(metadata_info), value = TRUE)
@@ -780,11 +780,11 @@ plot_grob_volcano <- function(
     # Adjust the parameters:
     Plot_Sized <-
         input_plot %>%
-            ggplotGrob() %>%
-            with_canvas_size(width = 12, height = 11) %>%
-            adjust_layout(VOL_PARAM) %>%
-            adjust_title(c(plot_name, subtitle)) %>%
-            # Fix this (if there is no subtitle!)
+        ggplotGrob() %>%
+        with_canvas_size(width = 12, height = 11) %>%
+        adjust_layout(VOL_PARAM) %>%
+        adjust_title(c(plot_name, subtitle)) %>%
+        # Fix this (if there is no subtitle!)
         adjust_legend(
             input_plot,
             sections = c("color", "shape"),
@@ -828,18 +828,18 @@ plot_grob_superplot <- function(
     Conditions <- NULL
     # Set the parameters for the plot we would like to use as a basis, before we start adjusting it:
     X_Con <- metadata_sample %>%
-        distinct(Conditions)
+    distinct(Conditions)
 
     X_tick <- unit(X_Con[[1]] %>% char2cm() %>% max() * 0.6, "cm")
 
     if (plot_type == "Bar") {
         UNIT <-
             unit(X_Con %>%
-                nrow() * 0.5, "cm")
+            nrow() * 0.5, "cm")
     } else {
         UNIT <-
             unit(X_Con %>%
-                nrow() * 1, "cm")
+            nrow() * 1, "cm")
     }
 
     SUPER_PARAM <- list(
@@ -880,11 +880,11 @@ plot_grob_superplot <- function(
     # Adjust the parameters:
     Plot_Sized <-
         input_plot %>%
-            ggplotGrob() %>%
-            with_canvas_size(width = 12, height = 11) %>%
-            adjust_layout(SUPER_PARAM) %>%
-            adjust_title(c(plot_name, subtitle)) %>%
-            adjust_legend(
+        ggplotGrob() %>%
+        with_canvas_size(width = 12, height = 11) %>%
+        adjust_layout(SUPER_PARAM) %>%
+        adjust_title(c(plot_name, subtitle)) %>%
+        adjust_legend(
             input_plot,
             sections = c("Superplot"),  # here we do not have colour and shape, but other parameters
             metadata_info = metadata_info

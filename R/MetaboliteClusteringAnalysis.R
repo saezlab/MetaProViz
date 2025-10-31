@@ -188,22 +188,22 @@ mca_2cond <- function(data_c1,
     #Apply Background filter (label genes that will be removed based on choosen background)
     if(method_background == "C1|C2"){# C1|C2 = Cond2 OR Cond1
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                     Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
                                     Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "C1&C2"){ # Cond2 AND Cond1
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "C2"){ # Cond2 has to be there
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                     Cond1_DF_Detected=="FALSE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', # Just Cond2
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "C1"){ #Cond1 has to be there
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="TRUE" ~ 'TRUE', #Cond1 & Cond2
                                     Cond1_DF_Detected=="TRUE" & Cond2_DF_Detected=="FALSE" ~ 'TRUE', # JustCond1
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "*"){ # Use all genes as the background
@@ -670,22 +670,22 @@ mca_core <- function(data_intra,
     #Apply Background filter (label metabolites that will be removed based on chosen background)
     if(method_background == "Intra|core"){# C1|C2 = core OR Intra
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                     Intra_DF_Detected=="TRUE" & core_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
                                     Intra_DF_Detected=="FALSE" & core_DF_Detected=="TRUE" ~ 'TRUE', # Just core
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "Intra&core"){ # core AND Intra
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "core"){ # core has to be there
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                     Intra_DF_Detected=="FALSE" & core_DF_Detected=="TRUE" ~ 'TRUE', # Just core
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "Intra"){ #Intra has to be there
     MergeDF <- MergeDF%>%
-        mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected=="TRUE" & core_DF_Detected=="TRUE" ~ 'TRUE', #Intra & core
                                     Intra_DF_Detected=="TRUE" & core_DF_Detected=="FALSE" ~ 'TRUE', # JustIntra
                                     TRUE ~ 'FALSE'))
     }else if(method_background == "*"){ # Use all metabolites as the background
@@ -696,7 +696,7 @@ mca_core <- function(data_intra,
 
     #Assign Metabolite cluster names to the metabolites
     MergeDF <- MergeDF%>%
-        mutate(RG1_All = case_when(BG_method =="FALSE"~ 'Background = FALSE',
+    mutate(RG1_All = case_when(BG_method =="FALSE"~ 'Background = FALSE',
                                 Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="DOWN" & core_DF_core_Direction=="Released" ~ 'Intra DOWN + core DOWN_Released',
                                 Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Detected" & core_DF_core_Direction=="Not Detected"~ 'Intra DOWN + core Not Detected',
                                 Intra_DF_Cutoff_Specific=="DOWN" & core_DF_Cutoff_Specific=="Not Significant" & core_DF_core_Direction=="Released"~ 'Intra DOWN + core Not Significant_Released',

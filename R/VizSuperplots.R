@@ -481,7 +481,7 @@ viz_superplot <- function(
                         max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
 
         df <- df %>%
-            mutate(y.position = rep(position, length.out = n()))
+        mutate(y.position = rep(position, length.out = n()))
 
         # select stats based on comparison_table
         if (is.null(stat_comparison) == FALSE) {

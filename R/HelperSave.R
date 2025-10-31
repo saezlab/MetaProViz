@@ -79,7 +79,7 @@ results_dir <- function(
 ) {
     # toDO: options?
     path %>%
-        {
+    {
             `if`(
                 !dir.exists(.),
                 {
@@ -200,7 +200,7 @@ save_res <- function(
 
                 # unlist DF columns if needed
                 inputlist_df[[DF]] <- inputlist_df[[DF]] %>%
-                    mutate(
+                mutate(
                         across(
                             where(is.list),
                             ~ map_chr(.x, ~ paste(sort(unique(.x)), collapse = "; "))
@@ -209,10 +209,10 @@ save_res <- function(
                 # Save table
                 if (save_table == "csv") {
                     inputlist_df[[DF]] %>%
-                        write_csv(paste0(file_name_Save, ".csv", sep = ""))
+                    write_csv(paste0(file_name_Save, ".csv", sep = ""))
                 } else if (save_table == "txt") {
                     inputlist_df[[DF]] %>%
-                        write_delim(paste0(file_name_Save, ".csv", sep = ""))
+                    write_delim(paste0(file_name_Save, ".csv", sep = ""))
                 }
             }
         }

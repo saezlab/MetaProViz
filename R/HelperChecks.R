@@ -1059,7 +1059,7 @@ check_param_ora <- function(
             stop(message)
         } else {
         input_pathway <- input_pathway %>%
-            rename("term"= metadata_info[["PathwayTerm"]])
+        rename("term"= metadata_info[["PathwayTerm"]])
         input_pathway$Description <- input_pathway$term
         }
     } else {
@@ -1081,7 +1081,7 @@ check_param_ora <- function(
             stop(message)
         } else {
         input_pathway <- input_pathway %>%
-            rename("gene"= metadata_info[["PathwayFeature"]])
+        rename("gene"= metadata_info[["PathwayFeature"]])
         }
     } else {
         message <- paste0("metadata_info must provide the column name for PathwayFeature in input_pathway")

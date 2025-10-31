@@ -136,7 +136,7 @@ cluster_ora <- function(
         rownames_to_column("Metabolite")
     } else {
     df <- data %>%
-        rownames_to_column("Metabolite")
+    rownames_to_column("Metabolite")
     }
 
     # Select universe

@@ -67,16 +67,16 @@ viz_stackedbar <- function(
 
     # Determine order of groups by overall frequency (ascending)
     group_order <- data %>%
-        group_by(!!group_sym) %>%
-        summarise(total = n(), .groups = "drop") %>%
-        arrange(total) %>%
-        pull(!!group_sym)
+    group_by(!!group_sym) %>%
+    summarise(total = n(), .groups = "drop") %>%
+    arrange(total) %>%
+    pull(!!group_sym)
 
     # Summarize data by group and fill status, then reorder the group factor
     summary_data <- data %>%
-        group_by(!!group_sym, !!fill_sym) %>%
-        summarise(count = n(), .groups = "drop") %>%
-        mutate(!!group_sym := factor(!!group_sym, levels = group_order))
+    group_by(!!group_sym, !!fill_sym) %>%
+    summarise(count = n(), .groups = "drop") %>%
+    mutate(!!group_sym := factor(!!group_sym, levels = group_order))
 
     # If y_label is not provided, use the grouping column name
     if (is.null(y_label)) {

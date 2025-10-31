@@ -224,7 +224,7 @@ viz_volcano <- function(
             rename("color"= paste(metadata_info[["color"]]))
         } else {
         metadata_feature <- metadata_feature %>%
-            rename("color"= paste(metadata_info[["color"]]),
+        rename("color"= paste(metadata_info[["color"]]),
                         "shape"= paste(metadata_info[["shape"]]))
         }
     }else if ("color" %in% names(metadata_info) == TRUE & "shape" %in% names(metadata_info) == FALSE) {
@@ -293,8 +293,8 @@ viz_volcano <- function(
 
     } else {
     Volcanodata <- data[, c(x, y)] %>%
-        mutate(FeatureNames = rownames(data)) %>%
-        filter(!is.na(x) | !is.na(x))
+    mutate(FeatureNames = rownames(data)) %>%
+    filter(!is.na(x) | !is.na(x))
     }
 
     # Rename the x and y lab if the information has been passed:
@@ -1346,10 +1346,10 @@ viz_volcano_pea <- function(
 
     for (i in IndividualPlots) {
     data2_Select <- data2 %>%
-        filter(PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
+    filter(PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
 
     metadata_feature_Select <- metadata_feature %>%
-        filter(PEA_Pathway == paste(i))
+    filter(PEA_Pathway == paste(i))
 
     InputVolcano <-
         merge(

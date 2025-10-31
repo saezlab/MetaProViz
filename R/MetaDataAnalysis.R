@@ -157,7 +157,7 @@ metadata_analysis <- function(
 
     # Extract loadings for each PC
     PCA.res_Loadings <- as.data.frame(PCA.res$rotation) %>%
-        rownames_to_column("feature")
+    rownames_to_column("feature")
 
     # --- 2. Merge with demographics
     # PCA.res_Info %<>% left_join(metadata_sample, by = by)
@@ -167,7 +167,7 @@ metadata_analysis <- function(
         by = "UniqueID",
         all.y = TRUE
     ) %>%
-        column_to_rownames("UniqueID")
+    column_to_rownames("UniqueID")
 
     # --- 3. convert columns that are not numeric to factor:
     # # Demographics are often non-numerical, categorical explanatory variables, which is often stored as characters, sometimes integers
@@ -229,8 +229,8 @@ metadata_analysis <- function(
     prop_var_ex <-
         as.data.frame(((PCA.res[["sdev"]])^2 / sum((PCA.res[["sdev"]])^2)) * 100) %>%  # to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
         rownames_to_column("PC") %>%
-            mutate(PC = paste("PC", PC, sep = "")) %>%
-            rename("Explained_Variance" = 2)
+        mutate(PC = paste("PC", PC, sep = "")) %>%
+        rename("Explained_Variance" = 2)
 
     Stat_results <- merge(Stat_results, prop_var_ex, by = "PC", all.x = TRUE)
 
@@ -247,9 +247,9 @@ metadata_analysis <- function(
 
         top_features <-
             as.data.frame(head(arrange(pc_loadings, desc(!!sym(names(pc_loadings)[2]))), n_selected)$feature) %>%
-                rename(!!paste("Features_", "(top", percentage, "%)", sep = "") := 1)
+            rename(!!paste("Features_", "(top", percentage, "%)", sep = "") := 1)
         bottom_features <- as.data.frame(head(arrange(pc_loadings, !!sym(names(pc_loadings)[2])), n_selected)$feature) %>%
-            rename(!!paste("Features_", "(Bottom", percentage, "%)", sep = "") := 1)
+        rename(!!paste("Features_", "(Bottom", percentage, "%)", sep = "") := 1)
 
         # Return
         res <-
@@ -259,8 +259,8 @@ metadata_analysis <- function(
                 bottom_features
             )
     }) %>%
-        bind_rows(.id = "PC") %>%
-        mutate(PC = paste("PC", PC, sep = ""))
+    bind_rows(.id = "PC") %>%
+    mutate(PC = paste("PC", PC, sep = ""))
 
 
     # # ---------- Final DF 1------------##
@@ -268,39 +268,39 @@ metadata_analysis <- function(
     Stat_results <-
         merge(Stat_results,
         topBottom_Features %>%
-            group_by(PC) %>%
-            summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
-            ungroup(),         by = "PC",
+        group_by(PC) %>%
+        summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
+        ungroup(),         by = "PC",
         all.x = TRUE
     )
 
     # # ---------- DF 2: Metabolites as row names ------------##
     Res_top <-
         Stat_results %>%
-            filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
-            separate_rows(
+        filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
+        separate_rows(
                 paste("Features_", "(top", percentage, "%)", sep = ""),
                 sep = ", "
             ) %>%
             # Separate 'Features (top 0.1%)'
         rename("feature" := paste("Features_", "(top", percentage, "%)", sep = "")) %>%
-            select(-paste("Features_", "(Bottom", percentage, "%)", sep = ""))
+        select(-paste("Features_", "(Bottom", percentage, "%)", sep = ""))
 
     Res_Bottom <-
         Stat_results %>%
-            filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
-            separate_rows(
+        filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
+        separate_rows(
                 paste("Features_", "(Bottom", percentage, "%)", sep = ""),
                 sep = ", "
             ) %>%
             # Separate 'Features (Bottom 0.1%)'
         rename("feature" := paste("Features_", "(Bottom", percentage, "%)", sep = "")) %>%
-            select(-paste("Features_", "(top", percentage, "%)", sep = ""))
+        select(-paste("Features_", "(top", percentage, "%)", sep = ""))
 
     Res <-
         rbind(Res_top, Res_Bottom) %>%
-            group_by(feature, term) %>%
-            # Group by feature and term
+        group_by(feature, term) %>%
+        # Group by feature and term
         summarise(
             PC = paste(unique(PC), collapse = ", "),  # Concatenate unique PC entries with commas
             `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE)
@@ -312,15 +312,15 @@ metadata_analysis <- function(
 
     Res_summary <-
         Res %>%
-            group_by(feature) %>%
-            summarise(
+        group_by(feature) %>%
+        summarise(
             term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
             `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
             MainDriver = paste(MainDriver, collapse = ", ")
         ) %>%  # Extract the term where MainDriver is TRUE
         ungroup() %>%
-            rowwise() %>%
-            mutate(  # Extract the term where MainDriver is TRUE
+        rowwise() %>%
+        mutate(  # Extract the term where MainDriver is TRUE
             MainDriver_Term = ifelse("TRUE" %in% strsplit(MainDriver, ", ")[[1]],
                 strsplit(
                     term,
@@ -334,16 +334,16 @@ metadata_analysis <- function(
                 NA
             )
         ) %>%
-            ungroup() %>%
-            arrange(desc(`MainDriver_Sum(VarianceExplained)`))
+        ungroup() %>%
+        arrange(desc(`MainDriver_Sum(VarianceExplained)`))
 
     # ##############################################################################################################################################################################################################
     # # ---------- Plot ------------##
     # Plot DF
     data_Heat <-
         Stat_results %>%
-            filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
-            # Filter for significant results
+        filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
+        # Filter for significant results
         filter(Explained_Variance > cutoff_variance) %>%  # Exclude Residuals row
         distinct(
             term,
@@ -351,9 +351,9 @@ metadata_analysis <- function(
             .keep_all = TRUE
         ) %>%  # only keep unique term~PC combinations AND STATS
         select(term, PC, Explained_Variance) %>%
-            pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
-            column_to_rownames("term") %>%
-            mutate_all(~ replace(., is.na(.), 0L))
+        pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
+        column_to_rownames("term") %>%
+        mutate_all(~ replace(., is.na(.), 0L))
 
     if (nrow(data_Heat) > 2L) {
         # Plot
@@ -497,19 +497,19 @@ meta_pk <- function(
             names(metadata_sample)
         metadata_sample_subset <-
             metadata_sample %>%
-                rownames_to_column("SampleID")
+            rownames_to_column("SampleID")
     } else {
         Metadata <-
             metadata_info
         metadata_sample_subset <-
             metadata_sample[, Metadata, drop = FALSE] %>%
-                rownames_to_column("SampleID")
+            rownames_to_column("SampleID")
     }
 
     # Convert into a pathway DF
     Metadata_df <-
         metadata_sample_subset %>%
-            pivot_longer(
+        pivot_longer(
                 cols = -SampleID,
                 names_to = "ColumnName",
                 values_to = "ColumnEntry"

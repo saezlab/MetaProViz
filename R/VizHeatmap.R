@@ -154,14 +154,14 @@ viz_heatmap <- function(
                 by = 0,
                 all.y = TRUE
             ) %>%
-                column_to_rownames("Row.names")
+            column_to_rownames("Row.names")
         metadata_feature <- metadata_feature[, -c((ncol(metadata_feature) - nrow(data) + 1):ncol(metadata_feature))]
     }
 
     if (is.null(metadata_sample) == FALSE) {  # removes information about samples that are not included in the data
         metadata_sample <-
             merge(x = metadata_sample, y = data, by = 0, all.y = TRUE) %>%
-                column_to_rownames("Row.names")
+            column_to_rownames("Row.names")
         metadata_sample <- metadata_sample[, -c((ncol(metadata_sample) - ncol(data) + 1):ncol(metadata_sample))]
     }
 
@@ -175,7 +175,7 @@ viz_heatmap <- function(
         for (i in unique_paths) {  # Check pathways with 1 metabolite
             selected_path <-
                 metadata_feature %>%
-                    filter(get(metadata_info[["individual_Metab"]]) == i)
+                filter(get(metadata_info[["individual_Metab"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
                 message <-
@@ -198,7 +198,7 @@ viz_heatmap <- function(
         for (i in IndividualPlots) {
             selected_path <-
                 metadata_feature %>%
-                    filter(get(metadata_info[["individual_Metab"]]) == i)
+                filter(get(metadata_info[["individual_Metab"]]) == i)
             selected_path_metabs <-
                 colnames(data)[colnames(data) %in% row.names(selected_path)]
             data_path <- data %>% select(all_of(selected_path_metabs))
@@ -211,8 +211,8 @@ viz_heatmap <- function(
                     annot_sel <-
                         col_annot_vars[[x]]
                     col_annot[x] <- metadata_sample %>%
-                        select(annot_sel) %>%
-                        as.data.frame()
+                    select(annot_sel) %>%
+                    as.data.frame()
                     names(col_annot)[x] <- annot_sel
                 }
                 col_annot <- as.data.frame(col_annot)
@@ -229,7 +229,7 @@ viz_heatmap <- function(
                     row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
                     row_annot <-
                         row_annot %>%
-                            as.data.frame()
+                        as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
                 row_annot <- as.data.frame(row_annot)
@@ -318,7 +318,7 @@ viz_heatmap <- function(
                         ggplot() +
                             annotation_custom(.)
                     } %>%
-                        add(theme(panel.background = element_rect(fill = "transparent")))
+                    add(theme(panel.background = element_rect(fill = "transparent")))
 
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
@@ -357,7 +357,7 @@ viz_heatmap <- function(
         for (i in unique_paths_Sample) {  # Check pathways with 1 metabolite
             selected_path <-
                 metadata_sample %>%
-                    filter(get(metadata_info[["individual_Sample"]]) == i)
+                filter(get(metadata_info[["individual_Sample"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
                 message <-
@@ -380,11 +380,11 @@ viz_heatmap <- function(
             # Select the data:
             selected_path <-
                 metadata_sample %>%
-                    filter(get(metadata_info[["individual_Sample"]]) == i) %>%
-                    rownames_to_column("UniqueID")
+                filter(get(metadata_info[["individual_Sample"]]) == i) %>%
+                rownames_to_column("UniqueID")
             selected_path <-
                 as.data.frame(selected_path[, 1]) %>%
-                    rename("UniqueID" = 1)
+                rename("UniqueID" = 1)
             data_path <-
                 merge(
                     selected_path,
@@ -393,7 +393,7 @@ viz_heatmap <- function(
                     all.x = TRUE
                 )
             data_path <- data_path %>%
-                column_to_rownames("UniqueID")
+            column_to_rownames("UniqueID")
 
             # Column annotation
             selected_metadata_sample <-
@@ -411,8 +411,8 @@ viz_heatmap <- function(
                     annot_sel <-
                         col_annot_vars[[x]]
                     col_annot[x] <- selected_metadata_sample %>%
-                        select(annot_sel) %>%
-                        as.data.frame()
+                    select(annot_sel) %>%
+                    as.data.frame()
                     names(col_annot)[x] <- annot_sel
                 }
                 col_annot <- as.data.frame(col_annot)
@@ -429,7 +429,7 @@ viz_heatmap <- function(
                     row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
                     row_annot <-
                         row_annot %>%
-                            as.data.frame()
+                        as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
                 row_annot <- as.data.frame(row_annot)
@@ -518,7 +518,7 @@ viz_heatmap <- function(
                         ggplot() +
                             annotation_custom(.)
                     } %>%
-                        add(theme(panel.background = element_rect(fill = "transparent")))
+                    add(theme(panel.background = element_rect(fill = "transparent")))
 
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
@@ -557,7 +557,7 @@ viz_heatmap <- function(
         for (i in unique_paths) {  # Check pathways with 1 metabolite
             selected_path <-
                 metadata_feature %>%
-                    filter(get(metadata_info[["individual_Metab"]]) == i)
+                filter(get(metadata_info[["individual_Metab"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
                 message <-
@@ -580,7 +580,7 @@ viz_heatmap <- function(
         for (i in unique_paths_Sample) {  # Check pathways with 1 metabolite
             selected_path <-
                 metadata_sample %>%
-                    filter(get(metadata_info[["individual_Sample"]]) == i)
+                filter(get(metadata_info[["individual_Sample"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
                 message <-
@@ -604,7 +604,7 @@ viz_heatmap <- function(
         for (i in IndividualPlots_Metab) {
             selected_path <-
                 metadata_feature %>%
-                    filter(get(metadata_info[["individual_Metab"]]) == i)
+                filter(get(metadata_info[["individual_Metab"]]) == i)
             selected_path_metabs <-
                 colnames(data)[colnames(data) %in% row.names(selected_path)]
             data_path_metab <- data %>% select(all_of(selected_path_metabs))
@@ -619,7 +619,7 @@ viz_heatmap <- function(
                     row_annot[y] <- metadata_feature %>% select(all_of(annot_sel))
                     row_annot <-
                         row_annot %>%
-                            as.data.frame()
+                        as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
                 row_annot <- as.data.frame(row_annot)
@@ -631,11 +631,11 @@ viz_heatmap <- function(
                 # Select the data:
                 selected_path <-
                     metadata_sample %>%
-                        filter(get(metadata_info[["individual_Sample"]]) == s) %>%
-                        rownames_to_column("UniqueID")
+                    filter(get(metadata_info[["individual_Sample"]]) == s) %>%
+                    rownames_to_column("UniqueID")
                 selected_path <-
                     as.data.frame(selected_path[, 1]) %>%
-                        rename("UniqueID" = 1)
+                    rename("UniqueID" = 1)
                 data_path <-
                     merge(
                         selected_path,
@@ -644,7 +644,7 @@ viz_heatmap <- function(
                         all.x = TRUE
                     )
                 data_path <- data_path %>%
-                    column_to_rownames("UniqueID")
+                column_to_rownames("UniqueID")
 
                 # Column annotation
                 selected_metadata_sample <-
@@ -662,8 +662,8 @@ viz_heatmap <- function(
                         annot_sel <-
                             col_annot_vars[[x]]
                         col_annot[x] <- selected_metadata_sample %>%
-                            select(annot_sel) %>%
-                            as.data.frame()
+                        select(annot_sel) %>%
+                        as.data.frame()
                         names(col_annot)[x] <- annot_sel
                     }
                     col_annot <- as.data.frame(col_annot)
@@ -760,7 +760,7 @@ viz_heatmap <- function(
                             ggplot() +
                                 annotation_custom(.)
                         } %>%
-                            add(theme(panel.background = element_rect(fill = "transparent")))
+                        add(theme(panel.background = element_rect(fill = "transparent")))
 
                     PlotList_adaptedGrid[[paste(cleaned_i, cleaned_s, sep = "_")]] <- Plot_Sized
 
@@ -799,8 +799,8 @@ viz_heatmap <- function(
                 annot_sel <-
                     col_annot_vars[[i]]
                 col_annot[i] <- metadata_sample %>%
-                    select(annot_sel) %>%
-                    as.data.frame()
+                select(annot_sel) %>%
+                as.data.frame()
                 names(col_annot)[i] <- annot_sel
             }
             col_annot <- as.data.frame(col_annot)
@@ -817,7 +817,7 @@ viz_heatmap <- function(
                 row_annot[i] <- metadata_feature %>% select(all_of(annot_sel))
                 row_annot <-
                     row_annot %>%
-                        as.data.frame()
+                    as.data.frame()
                 names(row_annot)[i] <- annot_sel
             }
             row_annot <- as.data.frame(row_annot)
@@ -896,7 +896,7 @@ viz_heatmap <- function(
                     ggplot() +
                         annotation_custom(.)
                 } %>%
-                    add(theme(panel.background = element_rect(fill = "transparent")))
+                add(theme(panel.background = element_rect(fill = "transparent")))
 
             PlotList_adaptedGrid[[paste("Heatmap_", plot_name, sep = "")]] <- Plot_Sized
 
