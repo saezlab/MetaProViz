@@ -46,6 +46,7 @@
 #'     Translated ID.
 #'
 #' @examples
+#' \dontrun{
 #' KEGG_Pathways <- metsigdb_kegg()
 #' Res <- translate_id(
 #'     data = KEGG_Pathways,
@@ -56,6 +57,7 @@
 #'     from = c("kegg"),
 #'     to = c("pubchem", "hmdb")
 #' )
+#' }
 #'
 #' @importFrom dplyr mutate select group_by ungroup distinct filter across n
 #' @importFrom tidyselect all_of starts_with
@@ -64,8 +66,7 @@
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower
 #' @export
-translate_id <-
-function(
+translate_id <- function(
     data,
     metadata_info = c(
             InputID = "MetaboliteID",
@@ -823,6 +824,7 @@ function(
 #'     (If summary=TRUE) & 7) Combined summary table (If summary=TRUE)
 #'
 #' @examples
+#' \dontrun{
 #' KEGG_Pathways <- metsigdb_kegg()
 #' InputDF <- translate_id(
 #'     data = KEGG_Pathways,
@@ -840,6 +842,7 @@ function(
 #'     grouping_variable = "term",
 #'     summary = TRUE
 #' )
+#' }
 #'
 #' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom rlang !!! !! := sym syms
@@ -849,8 +852,7 @@ function(
 #' @importFrom purrr map_chr map_int map_lgl
 #' @importFrom dplyr first
 #' @export
-mapping_ambiguity <-
-function(
+mapping_ambiguity <- function(
     data,
     from,
     to,
@@ -1408,6 +1410,7 @@ function(
 #'     detected IDs in long format. }
 #'
 #' @examples
+#' \dontrun{
 #' data(cellular_meta)
 #' DetectedIDs <- cellular_meta %>%
 #'     dplyr::select("Metabolite", "HMDB") %>%
@@ -1430,6 +1433,7 @@ function(
 #'         grouping_variable = "term"
 #'     )
 #' )
+#' }
 #'
 #' @importFrom dplyr cur_group_id filter mutate n_distinct row_number select
 #' @importFrom logger log_trace
@@ -1440,8 +1444,7 @@ function(
 #' @importFrom stringr str_split
 #' @importFrom dplyr first
 #' @export
-checkmatch_pk_to_data <-
-function(
+checkmatch_pk_to_data <- function(
     data,
     input_pk,
     metadata_info = c(
