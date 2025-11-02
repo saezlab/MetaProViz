@@ -271,7 +271,7 @@ processing <- function(
 
     ##########################################################################
     ## ------------------ Sample outlier identification ------------------- ##
-    OutlierRes <-  outlier_detection(
+    OutlierRes <- outlier_detection(
         data = data_norm,
         metadata_sample = metadata_sample,
         metadata_info = metadata_info,
@@ -533,7 +533,7 @@ replicate_sum <- function(
     summarise_all("mean") %>% select(-Analytical_Replicates))
 
     # Make a number of merged replicates column
-    nReplicates <-  Input %>%
+    nReplicates <- Input %>%
     group_by(Biological_Replicates, Conditions) %>%
     summarise_all("max") %>%
     ungroup() %>%
@@ -784,7 +784,7 @@ pool_estimation <- function(
 
     result_df_final$MissingValuepercentage <- NAvector
 
-    rownames(result_df_final)<- colnames(data)
+    rownames(result_df_final) <- colnames(data)
     result_df_final_out <- rownames_to_column(result_df_final, "Metabolite" )
 
     # Remove Metabolites from data based on cutoff_cv
@@ -917,7 +917,7 @@ pool_estimation <- function(
     ResList <- list("DF" = DF_list, "Plot" = PlotList)
 
     # Save
-    DF_list[["data"]]<-  DF_list[["data"]] %>% tibble::rownames_to_column("Code")
+    DF_list[["data"]] <- DF_list[["data"]] %>% tibble::rownames_to_column("Code")
 
     log_info(
         'Saving results: [save_table=%s, save_plot=%s, path=%s].',
@@ -1337,19 +1337,19 @@ mvi_imputation <- function(
 
         # if all values are NA set to 0
         replaceNAdf_zero <- as.data.frame(lapply(replaceNAdf, function(x) if (all(is.na(x))) replace(x, is.na(x), 0) else x))
-        colnames(replaceNAdf_zero) <-  colnames(replaceNAdf)
-        rownames(replaceNAdf_zero) <-  rownames(replaceNAdf)
+        colnames(replaceNAdf_zero) <- colnames(replaceNAdf)
+        rownames(replaceNAdf_zero) <- rownames(replaceNAdf)
 
         # If there is at least 1 value use the half minimum per feature
         replaceNAdf_Zero_mvi <-
             apply(
                 replaceNAdf_zero,
                 2,
-                function(x) {x[is.na(x)] <-  min(x, na.rm = TRUE
+                function(x) {x[is.na(x)] <- min(x, na.rm = TRUE
             )/2
         return(x)
         }) %>% as.data.frame()
-        rownames(replaceNAdf_Zero_mvi) <-  rownames(replaceNAdf)
+        rownames(replaceNAdf_Zero_mvi) <- rownames(replaceNAdf)
 
         # add the samples in the original dataframe
         filtered_matrix_res <- rbind(NA_removed_matrix, replaceNAdf_Zero_mvi)
@@ -1446,7 +1446,7 @@ tic_norm <- function(
             cols = everything(),
             names_to = "Group"
         )
-    names(RLA_data_long)<- c("Samples", "Intensity")
+    names(RLA_data_long) <- c("Samples", "Intensity")
     RLA_data_long <- as.data.frame(RLA_data_long)
     RLA_data_long <- RLA_data_long
     metadata_sample <- metadata_sample
@@ -1490,7 +1490,7 @@ tic_norm <- function(
         ## ------------------ QC plot ------------------- ##
         # # # After tic normalization
         # log tranforms the data
-        log_data_tic  <- log(data_tic) %>% t() %>% as.data.frame()
+        log_data_tic <- log(data_tic) %>% t() %>% as.data.frame()
         medians <- apply(log_data_tic, 2, median)
         # Subtract the medians from each column
         RLA_data_norm <- log_data_tic - medians
@@ -1500,7 +1500,7 @@ tic_norm <- function(
                 cols = everything(),
                 names_to = "Group"
             )
-        names(RLA_data_long)<- c("Samples", "Intensity")
+        names(RLA_data_long) <- c("Samples", "Intensity")
         for (row in seq_len(nrow(RLA_data_long))) {  # add conditions
             RLA_data_long[row, metadata_info[["Conditions"]]] <- metadata_sample[rownames(metadata_sample) %in%RLA_data_long[row, 1], metadata_info[["Conditions"]]]
         }
@@ -1653,13 +1653,13 @@ core_norm <- function(
                 2,
                 function(x) { (sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE))*100 } ) %>% t() %>% as.data.frame(
             )
-        result_df[1, is.na(result_df[1, ])]<- 0
+        result_df[1, is.na(result_df[1, ])] <- 0
         rownames(result_df)[1] <- "CV"
 
         cutoff_cv <- 30
         result_df <- result_df %>% t() %>% as.data.frame() %>% rowwise() %>%
         mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
-        rownames(result_df)<- colnames(core_medias)
+        rownames(result_df) <- colnames(core_medias)
 
         # calculate the NAs
         NAvector <-
@@ -1751,16 +1751,16 @@ core_norm <- function(
             while (HighVar_metabs>0) {
                 # remove the furthest value from the mean
                 if (HighVar_metabs>1) {
-                    max_var_pos <-  core_medias[, result_df$HighVar] %>%
+                    max_var_pos <- core_medias[, result_df$HighVar] %>%
                     as.data.frame() %>%
                     mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
                     summarise_all(.funs = ~ which.max(abs(.)))
                 } else {
-                    max_var_pos <-  core_medias[, result_df$HighVar] %>%
+                    max_var_pos <- core_medias[, result_df$HighVar] %>%
                     as.data.frame() %>%
                     mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
                     summarise_all(.funs = ~ which.max(abs(.)))
-                    colnames(max_var_pos)<- colnames(core_medias)[result_df$HighVar]
+                    colnames(max_var_pos) <- colnames(core_medias)[result_df$HighVar]
                 }
 
                 # Remove rows based on positions
@@ -1776,12 +1776,12 @@ core_norm <- function(
                         2,
                         function(x) { sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE) } ) %>% t() %>% as.data.frame(
                     )
-                result_df[1, is.na(result_df[1, ])]<- 0
+                result_df[1, is.na(result_df[1, ])] <- 0
                 rownames(result_df)[1] <- "CV"
 
                 result_df <- result_df %>% t() %>% as.data.frame() %>% rowwise() %>%
                 mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
-                rownames(result_df)<- colnames(core_medias)
+                rownames(result_df) <- colnames(core_medias)
 
                 HighVar_metabs <- sum(result_df$HighVar)
             }
@@ -1869,7 +1869,7 @@ core_norm <- function(
 
     # # -- Check core_norm_factor
     if (("core_norm_factor" %in% names(metadata_info))) {
-        core_norm_factor <-   metadata_sample %>% filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>% select(metadata_info[["core_norm_factor"]]) %>% dplyr::pull()
+        core_norm_factor <- metadata_sample %>% filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>% select(metadata_info[["core_norm_factor"]]) %>% dplyr::pull()
         if (var(core_norm_factor) == 0) {
             message <- paste("The growth rate or growth factor for normalising the core result, is the same for all samples")
             log_trace("Warning: ", message, sep = "")
@@ -2203,7 +2203,7 @@ outlier_detection <- function(
             Conditions <- Conditions[-hotelling_qcc[["violations"]][["beyond.limits"]]]
 
             # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
-            hotelling_qcc[["violations"]][["beyond.limits"]][1] <-   rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][1]]
+            hotelling_qcc[["violations"]][["beyond.limits"]][1] <- rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][1]]
             sample_outliers[loop] <- list(hotelling_qcc[["violations"]][["beyond.limits"]])
         } else {
             data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]], ]

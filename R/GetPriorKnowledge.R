@@ -321,8 +321,8 @@ make_gene_metab_set <- function(
     grepl("Gene", meta_network_metabs$target), ]
 
     # Get reactant and product
-    meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source), ] %>% rename("metab" = 1, "gene" = 2)
-    meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target), ] %>% rename("gene" = 1, "metab" = 2)
+    meta_network_metabs_reactant <- meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source), ] %>% rename("metab" = 1, "gene" = 2)
+    meta_network_metabs_products <- meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target), ] %>% rename("gene" = 1, "metab" = 2)
 
     meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
     meta_network_metabs$gene <- gsub("Gene.*__", "", meta_network_metabs$gene)
@@ -347,7 +347,7 @@ make_gene_metab_set <- function(
 
 
     # # ------------ Select metabolites only
-    MetabSet <-  GeneMetabSet %>%
+    MetabSet <- GeneMetabSet %>%
     filter(grepl("HMDB", feature))
 
 

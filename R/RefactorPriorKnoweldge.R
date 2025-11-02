@@ -2111,7 +2111,7 @@ checkmatch_pk_to_data <- function(
     message(message2)
 
     if (nrow(summary_df_short %>% filter(ActionRequired == "Check")) >= 1L) {
-        warning1 <-  # "Check"
+        warning1 <-# "Check"
             paste0(
                 "There are cases where multiple detected IDs match to ",
                 "multiple ",

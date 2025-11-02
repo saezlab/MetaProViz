@@ -192,7 +192,7 @@ cluster_ora <- function(
     )
 
     clusterGosummary <- data.frame(clusterGo)
-    clusterGo_list[[g]]<- clusterGo
+    clusterGo_list[[g]] <- clusterGo
     if (!(dim(clusterGosummary)[1] == 0)) {
         # Add pathway information (% of genes in pathway detected)
         clusterGosummary <-
@@ -345,7 +345,7 @@ standard_ora <- function(
     # rank by t.val
     allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]), ]
     selectMetabolites_DF <- allMetabolites_DF[c(seq_len(ceiling(value * nrow(allMetabolites_DF))), (nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))), ]
-    selectMetabolites_DF$`top/Bottom`<- "TRUE"
+    selectMetabolites_DF$`top/Bottom` <- "TRUE"
     selectMetabolites_DF <-
         merge(
             allMetabolites_DF,

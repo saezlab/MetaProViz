@@ -704,7 +704,7 @@ check_param_dma <- function(
         numerator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
         # Remove denom from num
         numerator <- numerator[!numerator %in% denominator]
-        comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
+        comparisons <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE

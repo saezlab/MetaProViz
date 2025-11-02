@@ -124,7 +124,7 @@ mca_2cond <- function(data_c1,
     )
     Cond1_DF <- Cond1_DF[complete.cases(Cond1_DF$ValueCol, Cond1_DF$PadjCol), ]
 
-    Cond2_DF<- as.data.frame(data_c2) %>%
+    Cond2_DF <- as.data.frame(data_c2) %>%
     rename("MetaboliteID" = paste(feature),
                     "ValueCol" = metadata_info_c2[["ValueCol"]],
                     "PadjCol" = metadata_info_c2[["StatCol"]])
@@ -136,7 +136,7 @@ mca_2cond <- function(data_c1,
 
     ## ------------ Assign Groups -------- ##
     #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
-    Cond1_DF <-Cond1_DF %>%
+    Cond1_DF <- Cond1_DF %>%
     mutate(Cutoff = case_when(Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
     Cond1_DF$ValueCol > as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'UP',
                                 Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
@@ -176,14 +176,14 @@ mca_2cond <- function(data_c1,
     rename("MetaboliteID" = "Cond2_DF_MetaboliteID")
 
     colnames(Cond1_DF) <- paste0("Cond1_DF_", colnames(Cond1_DF))
-    Cond1_DF <-Cond1_DF %>%
+    Cond1_DF <- Cond1_DF %>%
     rename("MetaboliteID" = "Cond1_DF_MetaboliteID")
 
     ##Merge
     MergeDF <- merge(Cond1_DF, Cond2_DF, by = "MetaboliteID", all = TRUE)
 
     ##Mark the undetected genes in each data layer
-    MergeDF<-MergeDF %>%
+    MergeDF <- MergeDF %>%
     mutate_at(
         c("Cond2_DF_Detected", "Cond1_DF_Detected"),
         ~replace_na(., "FALSE")
@@ -728,12 +728,12 @@ mca_2cond <- function(data_c1,
     ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
     MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Cond1_DF_Detected", "Cond1_DF_ValueCol", "Cond1_DF_PadjCol", "Cond1_DF_Cutoff", "Cond1_DF_Cutoff_Specific", "Cond2_DF_Detected", "Cond2_DF_ValueCol", "Cond2_DF_PadjCol", "Cond2_DF_Cutoff", "Cond2_DF_Cutoff_Specific", "BG_method", "RG1_All", "RG2_Significant", "RG3_SignificantChange")]
 
-    Cond2ValueCol_Unique<-paste("Cond2_DF_", metadata_info_c2[["ValueCol"]])
-    Cond2PadjCol_Unique <-paste("Cond2_DF_", metadata_info_c2[["StatCol"]])
-    Cond1ValueCol_Unique<-paste("Cond1_DF_", metadata_info_c1[["ValueCol"]])
-    Cond1PadjCol_Unique <-paste("Cond1_DF_", metadata_info_c1[["StatCol"]])
+    Cond2ValueCol_Unique <- paste("Cond2_DF_", metadata_info_c2[["ValueCol"]])
+    Cond2PadjCol_Unique <- paste("Cond2_DF_", metadata_info_c2[["StatCol"]])
+    Cond1ValueCol_Unique <- paste("Cond1_DF_", metadata_info_c1[["ValueCol"]])
+    Cond1PadjCol_Unique <- paste("Cond1_DF_", metadata_info_c1[["StatCol"]])
 
-    MergeDF_Select2<-
+    MergeDF_Select2 <-
         subset(
             MergeDF,
             select = -c(Cond1_DF_Detected, Cond1_DF_Cutoff, Cond2_DF_Detected, Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_SignificantChange)
@@ -751,7 +751,7 @@ mca_2cond <- function(data_c1,
             MergeDF_Select2,
             by = "MetaboliteID"
         )
-    MergeDF_Rearrange <-MergeDF_Rearrange %>%
+    MergeDF_Rearrange <- MergeDF_Rearrange %>%
     rename("Metabolite" = "MetaboliteID")
 
     ##summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
@@ -779,7 +779,7 @@ mca_2cond <- function(data_c1,
     Clustersummary <- Clustersummary[, c(3, 1, 2)]
 
     ## Rename feature
-    MergeDF_Rearrange <-MergeDF_Rearrange %>%
+    MergeDF_Rearrange <- MergeDF_Rearrange %>%
     rename(!!feature := "Metabolite")
 
     ######################################################################################################################################################################
@@ -933,14 +933,14 @@ mca_core <- function(data_intra,
     ################################################################################################################################################################################################
     ## ------------ Prepare the Input -------- ##
     #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
-    core_DF <-  as.data.frame(data_core) %>%
+    core_DF <- as.data.frame(data_core) %>%
     rename("MetaboliteID" = paste(feature),
                     "ValueCol" = metadata_info_core[["ValueCol"]],
                     "PadjCol" = metadata_info_core[["StatCol"]],
                     "core_Direction" = metadata_info_core[["DirectionCol"]])
     core_DF <- core_DF[complete.cases(core_DF$ValueCol, core_DF$PadjCol), ]
 
-    Intra_DF<- as.data.frame(data_intra) %>%
+    Intra_DF <- as.data.frame(data_intra) %>%
     rename("MetaboliteID" = paste(feature),
                     "ValueCol" = metadata_info_intra[["ValueCol"]],
                     "PadjCol" = metadata_info_intra[["StatCol"]])
@@ -1012,14 +1012,14 @@ mca_core <- function(data_intra,
     rename("MetaboliteID" = "core_DF_MetaboliteID")
 
     colnames(Intra_DF) <- paste0("Intra_DF_", colnames(Intra_DF))
-    Intra_DF <-Intra_DF %>%
+    Intra_DF <- Intra_DF %>%
     rename("MetaboliteID" = "Intra_DF_MetaboliteID")
 
     ##Merge
     MergeDF <- merge(Intra_DF, core_DF, by = "MetaboliteID", all = TRUE)
 
     ##Mark the undetected genes in each data layer
-    MergeDF<-MergeDF %>%
+    MergeDF <- MergeDF %>%
     mutate_at(
         c("core_DF_Detected", "Intra_DF_Detected"),
         ~replace_na(., "FALSE")
@@ -1796,12 +1796,12 @@ mca_core <- function(data_intra,
     ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
     MergeDF_Select1 <- MergeDF[, c("MetaboliteID", "Intra_DF_Detected", "Intra_DF_ValueCol", "Intra_DF_PadjCol", "Intra_DF_Cutoff", "Intra_DF_Cutoff_Specific", "core_DF_Detected", "core_DF_ValueCol", "core_DF_PadjCol", "core_DF_Cutoff", "core_DF_Cutoff_Specific", "BG_method", "RG1_All", "RG2_Significant", "RG3_Change")]
 
-    coreValueCol_Unique<-paste("Cond2_DF_", metadata_info_core[["ValueCol"]])
-    corePadjCol_Unique <-paste("Cond2_DF_", metadata_info_core[["StatCol"]])
-    IntraValueCol_Unique<-paste("Cond1_DF_", metadata_info_intra[["ValueCol"]])
-    IntraPadjCol_Unique <-paste("Cond1_DF_", metadata_info_intra[["StatCol"]])
+    coreValueCol_Unique <- paste("Cond2_DF_", metadata_info_core[["ValueCol"]])
+    corePadjCol_Unique <- paste("Cond2_DF_", metadata_info_core[["StatCol"]])
+    IntraValueCol_Unique <- paste("Cond1_DF_", metadata_info_intra[["ValueCol"]])
+    IntraPadjCol_Unique <- paste("Cond1_DF_", metadata_info_intra[["StatCol"]])
 
-    MergeDF_Select2<-
+    MergeDF_Select2 <-
         subset(
             MergeDF,
             select = -c(Intra_DF_Detected, Intra_DF_Cutoff, core_DF_Detected, core_DF_Cutoff, core_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_Change)
@@ -1819,7 +1819,7 @@ mca_core <- function(data_intra,
             MergeDF_Select2,
             by = "MetaboliteID"
         )
-    MergeDF_Rearrange <-MergeDF_Rearrange %>%
+    MergeDF_Rearrange <- MergeDF_Rearrange %>%
     rename("Metabolite" = "MetaboliteID")
 
 
@@ -1857,7 +1857,7 @@ mca_core <- function(data_intra,
     Clustersummary <- Clustersummary[, c(3, 1, 2)]
 
     ## Rename feature
-    MergeDF_Rearrange <-MergeDF_Rearrange %>%
+    MergeDF_Rearrange <- MergeDF_Rearrange %>%
     rename(!!feature := "Metabolite")
 
     ######################################################################################################################################################################

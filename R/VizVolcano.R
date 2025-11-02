@@ -923,19 +923,19 @@ viz_volcano_compare <- function(
                 all.y = TRUE
             ) %>%
         filter(!is.na(x) | !is.na(x))
-        data[, "comparison"]  <- as.character(paste(name_comparison[["data"]]))
-        data2[, "comparison"]  <- as.character(paste(name_comparison[["data2"]]))
-        InputCompare  <- rbind(data, data2)
+        data[, "comparison"] <- as.character(paste(name_comparison[["data"]]))
+        data2[, "comparison"] <- as.character(paste(name_comparison[["data2"]]))
+        InputCompare <- rbind(data, data2)
 
     } else {
-    data2 <-  data2[, c(x, y)] %>%
+    data2 <- data2[, c(x, y)] %>%
     mutate(FeatureNames = rownames(data2)) %>%
     na.omit()
 
     # Combine DFs and add appropriate column names
-    data[, "comparison"]  <- as.character(paste(name_comparison[["data"]]))
-    data2[, "comparison"]  <- as.character(paste(name_comparison[["data2"]]))
-    InputCompare  <-
+    data[, "comparison"] <- as.character(paste(name_comparison[["data"]]))
+    data2[, "comparison"] <- as.character(paste(name_comparison[["data2"]]))
+    InputCompare <-
         rbind(
             data[, c("FeatureNames", x, y, "comparison")],
             data2[, c("FeatureNames", x, y, "comparison")]
