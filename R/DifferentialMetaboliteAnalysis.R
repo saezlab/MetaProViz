@@ -242,7 +242,8 @@ dma <- function(
             UniqueConditions <-
                 metadata_sample %>%
                 subset(
-                    metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] | metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]],
+                    metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["numerator"]] |
+                    metadata_sample[[metadata_info[["Conditions"]]]] %in% Settings[["denominator"]],
                     select = c(metadata_info[["Conditions"]])
                 )
             UniqueConditions <-
@@ -2230,7 +2231,10 @@ dma_stat_limma <-
     if (!MultipleComparison) {
         # subset the data:
         targets <- targets %>%
-        subset(condition == metadata_info[["Numerator"]] | condition == metadata_info[["Denominator"]]) %>%
+        subset(
+            condition == metadata_info[["Numerator"]] |
+            condition == metadata_info[["Denominator"]]
+        ) %>%
         arrange(sample)  # Order the column "sample" alphabetically
 
         Limma_input <-
@@ -2550,7 +2554,8 @@ dma_stat_limma <-
         InputReturn_Filt <-
             InputReturn %>%
             filter(
-                get(metadata_info[["Conditions"]]) == C1 | get(metadata_info[["Conditions"]]) == C2
+                get(metadata_info[["Conditions"]]) == C1 |
+                get(metadata_info[["Conditions"]]) == C2
             ) %>%
             column_to_rownames("Code")
         InputReturn_Filt <-
@@ -2744,7 +2749,8 @@ mpv_shapiro <- function(
             0
         ) %>%  # shapiro test can not handle NAs!
         filter(
-            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator |
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
         ) %>%
         select_if(is.numeric)
 
@@ -2806,7 +2812,8 @@ mpv_shapiro <- function(
     UniqueConditions <-
         metadata_sample %>%
         subset(
-            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator,
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator |
+            metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator,
             select = c(metadata_info[["Conditions"]])
         )
     UniqueConditions <-

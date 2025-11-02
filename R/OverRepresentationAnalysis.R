@@ -362,7 +362,8 @@ standard_ora <- function(
     mutate(Significant = case_when(get(metadata_info[["pvalColumn"]]) <= cutoff_stat ~ 'TRUE',
                                     TRUE ~ 'FALSE')) %>%
     mutate(
-        Cluster_ChangedMetabolites = case_when(Significant & `top/Bottom_percentage` ~ 'TRUE',
+        Cluster_ChangedMetabolites = case_when(Significant &
+        `top/Bottom_percentage` ~ 'TRUE',
         TRUE ~ 'FALSE')
     )
     # remove column as its not needed for output

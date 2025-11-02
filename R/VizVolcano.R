@@ -245,7 +245,10 @@ viz_volcano <- function(
             metadata_feature <-
                 metadata_feature %>%
                 rename("color" = paste(metadata_info[["color"]]))
-        } else if (!("color" %in% names(metadata_info) & "shape" %in% names(metadata_info))) {
+        } else if (!(
+            "color" %in% names(metadata_info) &
+            "shape" %in% names(metadata_info)
+        )) {
             metadata_feature <-
                 metadata_feature %>%
                 rename("shape" = paste(metadata_info[["shape"]]))

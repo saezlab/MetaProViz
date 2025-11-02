@@ -263,7 +263,10 @@ save_res <- function(
             # ComplexUpset plots have theme conflicts with ggsave, so use device-based saving
             plot_obj <- inputlist_plot[[Plot]]
             is_upset_plot <- inherits(plot_obj, "upset_plot") ||
-                ("package:ComplexUpset" %in% search() && inherits(plot_obj, "ggplot"))
+                (
+                    "package:ComplexUpset" %in% search() &&
+                    inherits(plot_obj, "ggplot")
+                )
 
             if (is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)) {
                 # Use device-based saving for upset plots

@@ -314,9 +314,11 @@ make_gene_metab_set <- function(
 
     # adapt to our needs extracting the metabolites:
     # extract entries with metabolites in source or Target
-    meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target), -2]
+    meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) |
+    grepl("Metab__HMDB", meta_network$target), -2]
     # extract entries with genes in source or Target
-    meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target), ]
+    meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) |
+    grepl("Gene", meta_network_metabs$target), ]
 
     # Get reactant and product
     meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source), ] %>% rename("metab" = 1, "gene" = 2)
