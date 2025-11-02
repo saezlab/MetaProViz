@@ -806,42 +806,44 @@ log2fc <- function(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
             )) {
                 Mean_Merge <- Mean_Merge %>%
-                mutate(C1 = case_when(
-                        # Here we have a "true" 0 value due to 0/NAs
-                        # in the input data
-                        C2 == 0L & `NA/0` ~ paste(C1),
-                        # Here we have a "true" 0 value due to 0/NAs
-                        # in the input data
-                        C1 == 0L & `NA/0` ~ paste(C1),
-                        # Here we have a "false" 0 value that occured at random
-                        # and not due to 0/NAs in the input data, hence we add
-                        # the constant +1
-                        C2 == 0L & `NA/0` == FALSE ~ paste(C1 + 1),
-                        # Here we have a "false" 0 value that occured at random
-                        # and not due to 0/NAs in the input data, hence we add
-                        # the constant +1
-                        C1 == 0L & `NA/0` == FALSE ~ paste(C1 + 1),
-                        TRUE ~ paste(C1)
-                    )) %>%
-                    mutate(C2 = case_when(
-                        # Here we have a "true" 0 value due to 0/NAs in the
-                        # input data
-                        C1 == 0L & `NA/0` ~ paste(C2),
-                        # Here we have a "true" 0 value due to 0/NAs in the
-                        # input data
-                        C2 == 0L & `NA/0` ~ paste(C2),
-                        # Here we have a "false" 0 value that occured at random
-                        # and not due to 0/NAs in the input data, hence we
-                        # add the constant +1
-                        C1 == 0L & `NA/0` == FALSE ~ paste(C2 + 1),
-                        # Here we have a "false" 0 value that occured at random
-                        # and not due to 0/NAs in the input data, hence we
-                        # add the constant +1
-                        C2 == 0L & `NA/0` == FALSE ~ paste(C2 + 1),
-                        TRUE ~ paste(C2)
-                    )) %>%
-                    mutate(C1 = as.numeric(C1)) %>%
-                    mutate(C2 = as.numeric(C2))
+                mutate(
+                    C1 = case_when(
+                        C2 == 0L &
+                        `NA/0`
+                            ~paste(C1),
+                        C1 == 0L &
+                        `NA/0`
+                            ~paste(C1),
+                        C2 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C1 + 1),
+                        C1 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C1 + 1),
+                        TRUE
+                            ~paste(C1)
+                    )
+                ) %>%
+                mutate(
+                    C2 = case_when(
+                        C1 == 0L &
+                        `NA/0`
+                            ~paste(C2),
+                        C2 == 0L &
+                        `NA/0`
+                            ~paste(C2),
+                        C1 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C2 + 1),
+                        C2 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C2 + 1),
+                        TRUE
+                            ~paste(C2)
+                    )
+                ) %>%
+                mutate(C1 = as.numeric(C1)) %>%
+                mutate(C2 = as.numeric(C2))
 
                 X <-
                     Mean_Merge %>%
@@ -849,6 +851,7 @@ log2fc <- function(
                         (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
                             (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
                     )
+
                 message(
                     "We added +1 to the mean value of metabolite(s) ",
                     paste0(X$Metabolite, collapse = ", "),
@@ -857,6 +860,7 @@ log2fc <- function(
                         "This was not due to missing values (NA/0)."
                     )
                 )
+
             }
 
             # Add the distance column:
@@ -865,7 +869,8 @@ log2fc <- function(
 
             # Now we can adapt the values to take into account the distance
             Mean_Merge <- Mean_Merge %>%
-            mutate(`Log2(Distance)` = case_when(
+            mutate(
+                `Log2(Distance)` = case_when(
                     # If C1>C2 the distance stays positive to reflect
                     # that C1 > C2
                     C1 > C2 ~ paste(`Log2(Distance)` * +1),
@@ -873,8 +878,9 @@ log2fc <- function(
                     # that C1 < C2
                     C1 < C2 ~ paste(`Log2(Distance)` * -1),
                     TRUE ~ "NA"
-                )) %>%
-                mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+                )
+            ) %>%
+            mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
             # Add additional information:
             temp1 <- Mean_C1
@@ -1069,40 +1075,42 @@ log2fc <- function(
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
             Mean_Merge <- Mean_Merge %>%
-            mutate(C1_Adapted = case_when(
-                    # Here we have a "true" 0 value due to
-                    # 0/NAs in the input data
-                    C2 == 0L & `NA/0` ~ paste(C1),
-                    # Here we have a "true" 0 value due to
-                    # 0/NAs in the input data
-                    C1 == 0L & `NA/0` ~ paste(C1),
-                    # Here we have a "false" 0 value that occured at random
-                    # and not due to 0/NAs in the input data,
-                    # hence we add the constant +1
-                    C2 == 0L & `NA/0` == FALSE ~ paste(C1 + 1),
-                    # Here we have a "false" 0 value that occured at random
-                    # and not due to 0/NAs in the input data,
-                    # hence we add the constant +1
-                    C1 == 0L & `NA/0` == FALSE ~ paste(C1 + 1),
-                    TRUE ~ paste(C1)
-                )) %>%
-                mutate(C2_Adapted = case_when(
-                    # Here we have a "true" 0 value due to
-                    # 0/NAs in the input data
-                    C1 == 0L & `NA/0` ~ paste(C2),
-                    # Here we have a "true" 0 value due to
-                    # 0/NAs in the input data
-                    C2 == 0L & `NA/0` ~ paste(C2),
-                    # Here we have a "false" 0 value that occured at random
-                    # and not due to 0/NAs in the input data,
-                    # hence we add the constant +1
-                    C1 == 0L & `NA/0` == FALSE ~ paste(C2 + 1),
-                    # Here we have a "false" 0 value that occured at random
-                    # and not due to 0/NAs in the input data,
-                    # hence we add the constant +1
-                    C2 == 0L & `NA/0` == FALSE ~ paste(C2 + 1),
-                    TRUE ~ paste(C2)
-                )) %>%
+            mutate(
+                C1_Adapted = case_when(
+                    C2 == 0L &
+                    `NA/0`
+                        ~paste(C1),
+                    C1 == 0L &
+                    `NA/0`
+                        ~paste(C1),
+                    C2 == 0L &
+                    `NA/0` == FALSE
+                        ~paste(C1 + 1),
+                    C1 == 0L &
+                    `NA/0` == FALSE
+                        ~paste(C1 + 1),
+                    TRUE
+                        ~paste(C1)
+                )
+            ) %>%
+                mutate(
+                    C2_Adapted = case_when(
+                        C1 == 0L &
+                        `NA/0`
+                            ~paste(C2),
+                        C2 == 0L &
+                        `NA/0`
+                            ~paste(C2),
+                        C1 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C2 + 1),
+                        C2 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C2 + 1),
+                        TRUE
+                            ~paste(C2)
+                    )
+                ) %>%
                 mutate(C1_Adapted = as.numeric(C1_Adapted)) %>%
                 mutate(C2_Adapted = as.numeric(C2_Adapted))
 
@@ -1110,12 +1118,14 @@ log2fc <- function(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
             )) {
+
                 X <-
                     Mean_Merge %>%
                     subset(
                         (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
                             (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
                     )
+
                 message(
                     "We added +1 to the mean value of metabolite(s) ",
                     paste0(X$Metabolite, collapse = ", "),
@@ -1124,6 +1134,7 @@ log2fc <- function(
                         "This was not due to missing values (NA/0)."
                     )
                 )
+
             }
 
             # Calculate the Log2FC
@@ -1131,6 +1142,7 @@ log2fc <- function(
                 # FoldChange
                 Mean_Merge$FC_C1vC2 <-
                     Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted
+
                 Mean_Merge$Log2FC <-
                     foldchange2logratio(
                         Mean_Merge$FC_C1vC2,

@@ -1373,22 +1373,31 @@ path = NULL
             mutate(
                 Mapping = case_when(
                     !!sym(paste0("Count(", from, "_to_", to, ")")) == 1L &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L ~ "one-to-one",
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L
+                        ~"one-to-one",
                     !!sym(paste0("Count(", from, "_to_", to, ")")) > 1L &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L ~ "one-to-many",
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) == 1L
+                        ~"one-to-many",
                     !!sym(paste0("Count(", from, "_to_", to, ")")) > 1L &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) > 1L ~ "many-to-many",
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) > 1L
+                        ~"many-to-many",
                     !!sym(paste0("Count(", from, "_to_", to, ")")) == 1L &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) > 1L ~ "many-to-one",
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) > 1L
+                        ~"many-to-one",
                     !!sym(paste0("Count(", from, "_to_", to, ")")) >= 1L &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) == NA ~ "one-to-none",
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) == NA
+                        ~"one-to-none",
                     !!sym(paste0("Count(", from, "_to_", to, ")")) >= 1L &
-                    is.na(!!sym(paste0("Count(", to, "_to_", from, ")"))) ~ "one-to-none",
+                    is.na(!!sym(paste0("Count(", to, "_to_", from, ")")))
+                        ~"one-to-none",
                     !!sym(paste0("Count(", from, "_to_", to, ")")) == NA &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1L ~ "none-to-one",
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1L
+                        ~"none-to-one",
                     is.na(!!sym(paste0("Count(", from, "_to_", to, ")"))) &
-                    !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1L ~ "none-to-one",
-                    TRUE ~ NA
+                    !!sym(paste0("Count(", to, "_to_", from, ")")) >= 1L
+                        ~"none-to-one",
+                    TRUE
+                        ~NA
                 )
             ) %>%
             mutate(
@@ -2024,15 +2033,24 @@ checkmatch_pk_to_data <- function(
         ) %>%
         mutate(
             ActionRequired = case_when(
-                original_count >= 1L & matches_count == 1L &
-                Unique_GroupingVariable_count >= 1L ~ "None",
-                original_count >= 1L & matches_count == 0L &
-                Unique_GroupingVariable_count >= 0L ~ "None",
-                original_count > 1L & matches_count > 1L &
-                Unique_GroupingVariable_count == 1L ~ "Check",
-                original_count > 1L & matches_count > 1L &
-                Unique_GroupingVariable_count > 1L ~ "Check",
-                TRUE ~ NA_character_
+                original_count >= 1L &
+                matches_count == 1L &
+                Unique_GroupingVariable_count >= 1L
+                    ~"None",
+                original_count >= 1L &
+                matches_count == 0L &
+                Unique_GroupingVariable_count >= 0L
+                    ~"None",
+                original_count > 1L &
+                matches_count > 1L &
+                Unique_GroupingVariable_count == 1L
+                    ~"Check",
+                original_count > 1L &
+                matches_count > 1L &
+                Unique_GroupingVariable_count > 1L
+                    ~"Check",
+                TRUE
+                    ~NA_character_
             )
         ) %>%
         select(
@@ -2050,21 +2068,29 @@ checkmatch_pk_to_data <- function(
         mutate(
             InputID_select = case_when(
                 original_count == 1L &
-                matches_count <= 1L ~ metadata_info[["InputID"]],
+                matches_count <= 1L
+                    ~metadata_info[["InputID"]],
                 original_count >= 2L &
-                matches_count == 0L ~ str_split(metadata_info[["InputID"]], ", \\s*") %>% map_chr(first),
-                original_count >= 2L & matches_count == 1L ~ matches,
-                TRUE ~ NA_character_
+                matches_count == 0L
+                    ~str_split(metadata_info[["InputID"]], ", \\s*") %>%
+                    map_chr(first),
+                original_count >= 2L &
+                matches_count == 1L
+                    ~matches,
+                TRUE
+                    ~NA_character_
             ),
             Action_Specific = case_when(
                 matches_count >= 2L &
-                Group_Conflict_Notes == "None" ~ "KeepEachID",
+                Group_Conflict_Notes == "None"
+                    ~"KeepEachID",
                 matches_count >= 2L &
-                Group_Conflict_Notes != "None" ~ "KeepOneID",
-                TRUE ~ "None"
+                Group_Conflict_Notes != "None"
+                    ~"KeepOneID",
+                TRUE
+                    ~"None"
             )
         )
-
 
     # 4. Messages and summarise
     message0 <-

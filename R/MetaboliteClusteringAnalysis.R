@@ -137,36 +137,74 @@ mca_2cond <- function(data_c1,
     ## ------------ Assign Groups -------- ##
     #Assign to Group based on individual Cutoff ("UP", "DOWN", "No Change")
     Cond1_DF <- Cond1_DF %>%
-    mutate(Cutoff = case_when(Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
-    Cond1_DF$ValueCol > as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'UP',
-                                Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
-                                Cond1_DF$ValueCol < -as.numeric(metadata_info_c1[["ValueCutoff"]]) ~ 'DOWN',
-                                TRUE ~ 'No Change')) %>%
-    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
-                                        Cutoff == "DOWN" ~ 'DOWN',
-                                        Cutoff == "No Change" &
-                                        Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol > 0 ~ 'Significant Positive',
-                                        Cutoff == "No Change" &
-                                        Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) & Cond1_DF$ValueCol < 0 ~ 'Significant Negative',
-                                        Cutoff == "No Change" &
-                                        Cond1_DF$PadjCol > as.numeric(metadata_info_c1[["cutoff_stat"]]) ~ 'Not Significant',
-                                        TRUE ~ 'NA'))
+    mutate(
+        Cutoff = case_when(
+            Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
+            Cond1_DF$ValueCol > as.numeric(metadata_info_c1[["ValueCutoff"]])
+                ~'UP',
+            Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
+            Cond1_DF$ValueCol < -as.numeric(metadata_info_c1[["ValueCutoff"]])
+                ~'DOWN',
+            TRUE
+                ~'No Change'
+        )
+    ) %>% 
+    mutate(
+        Cutoff_Specific = case_when(
+            Cutoff == "UP"
+                ~'UP',
+            Cutoff == "DOWN"
+                ~'DOWN',
+            Cutoff == "No Change" &
+            Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
+            Cond1_DF$ValueCol > 0
+                ~'Significant Positive',
+            Cutoff == "No Change" &
+            Cond1_DF$PadjCol <= as.numeric(metadata_info_c1[["cutoff_stat"]]) &
+            Cond1_DF$ValueCol < 0
+                ~'Significant Negative',
+            Cutoff == "No Change" &
+            Cond1_DF$PadjCol > as.numeric(metadata_info_c1[["cutoff_stat"]])
+                ~'Not Significant',
+            TRUE
+                ~'NA'
+        )
+    )
 
     Cond2_DF <- Cond2_DF %>%
-    mutate(Cutoff = case_when(Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) &
-    Cond2_DF$ValueCol > as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'UP',
-                                Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) &
-                                Cond2_DF$ValueCol < -as.numeric(metadata_info_c2[["ValueCutoff"]]) ~ 'DOWN',
-                                TRUE ~ 'No Change')) %>%
-    mutate(Cutoff_Specific = case_when(Cutoff == "UP" ~ 'UP',
-                                        Cutoff == "DOWN" ~ 'DOWN',
-                                        Cutoff == "No Change" &
-                                        Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol > 0 ~ 'Significant Positive',
-                                        Cutoff == "No Change" &
-                                        Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) & Cond2_DF$ValueCol < 0 ~ 'Significant Negative',
-                                        Cutoff == "No Change" &
-                                        Cond2_DF$PadjCol > as.numeric(metadata_info_c2[["cutoff_stat"]]) ~ 'Not Significant',
-                                        TRUE ~ 'NA'))
+    mutate(
+        Cutoff = case_when(
+            Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) &
+            Cond2_DF$ValueCol > as.numeric(metadata_info_c2[["ValueCutoff"]])
+                ~'UP',
+            Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) &
+            Cond2_DF$ValueCol < -as.numeric(metadata_info_c2[["ValueCutoff"]])
+                ~'DOWN',
+            TRUE
+                ~'No Change'
+        )
+    ) %>% 
+    mutate(
+        Cutoff_Specific = case_when(
+            Cutoff == "UP"
+                ~'UP',
+            Cutoff == "DOWN"
+                ~'DOWN',
+            Cutoff == "No Change" &
+            Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) &
+            Cond2_DF$ValueCol > 0
+                ~'Significant Positive',
+            Cutoff == "No Change" &
+            Cond2_DF$PadjCol <= as.numeric(metadata_info_c2[["cutoff_stat"]]) &
+            Cond2_DF$ValueCol < 0
+                ~'Significant Negative',
+            Cutoff == "No Change" &
+            Cond2_DF$PadjCol > as.numeric(metadata_info_c2[["cutoff_stat"]])
+                ~'Not Significant',
+            TRUE
+                ~'NA'
+        )
+    )
 
 
     #Merge the dataframes together: Merge the supplied Cond1 and Cond2 dataframes together.
@@ -201,39 +239,63 @@ mca_2cond <- function(data_c1,
     if(method_background == "C1|C2"){  # C1|C2 = Cond2 OR Cond1
     MergeDF <- MergeDF %>%
     # Cond1 & Cond2
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" &
-    Cond2_DF_Detected == "TRUE" ~ 'TRUE',
-                                    # JustCond1
-                                    Cond1_DF_Detected == "TRUE" &
-                                    Cond2_DF_Detected == "FALSE" ~ 'TRUE',
-                                    # Just Cond2
-                                    Cond1_DF_Detected == "FALSE" &
-                                    Cond2_DF_Detected == "TRUE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Cond1_DF_Detected == "TRUE" &
+            Cond2_DF_Detected == "TRUE"
+                ~'TRUE',
+            Cond1_DF_Detected == "TRUE" &
+            Cond2_DF_Detected == "FALSE"
+                ~'TRUE',
+            Cond1_DF_Detected == "FALSE" &
+            Cond2_DF_Detected == "TRUE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "C1&C2"){  # Cond2 AND Cond1
     MergeDF <- MergeDF %>%
     # Cond1 & Cond2
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" &
-    Cond2_DF_Detected == "TRUE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Cond1_DF_Detected == "TRUE" &
+            Cond2_DF_Detected == "TRUE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "C2"){  # Cond2 has to be there
     MergeDF <- MergeDF %>%
     # Cond1 & Cond2
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" &
-    Cond2_DF_Detected == "TRUE" ~ 'TRUE',
-                                    # Just Cond2
-                                    Cond1_DF_Detected == "FALSE" &
-                                    Cond2_DF_Detected == "TRUE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Cond1_DF_Detected == "TRUE" &
+            Cond2_DF_Detected == "TRUE"
+                ~'TRUE',
+            Cond1_DF_Detected == "FALSE" &
+            Cond2_DF_Detected == "TRUE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "C1"){  # Cond1 has to be there
     MergeDF <- MergeDF %>%
     # Cond1 & Cond2
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" &
-    Cond2_DF_Detected == "TRUE" ~ 'TRUE',
-                                    # JustCond1
-                                    Cond1_DF_Detected == "TRUE" &
-                                    Cond2_DF_Detected == "FALSE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Cond1_DF_Detected == "TRUE" &
+            Cond2_DF_Detected == "TRUE"
+                ~'TRUE',
+            Cond1_DF_Detected == "TRUE" &
+            Cond2_DF_Detected == "FALSE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "*"){  # Use all genes as the background
     MergeDF$BG_method <- "TRUE"
     }else{
@@ -244,483 +306,474 @@ mca_2cond <- function(data_c1,
     MergeDF %<>%
         mutate(
             RG1_Specific_Cond2 = case_when(
-                BG_method == "FALSE"~ 'Background = FALSE',
-                # State 1
+                BG_method == "FALSE"
+                    ~'Background = FALSE',
                 Cond1_DF_Cutoff == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',
-                # State 2
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 DOWN + Cond2 DOWN',
                 Cond1_DF_Cutoff == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',
-                # State 3
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 DOWN + Cond2 Not Detected',
                 Cond1_DF_Cutoff == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',
-                # State 4
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 DOWN + Cond2 Not Significant',
                 Cond1_DF_Cutoff == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',
-                # State 5
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 DOWN + Cond2 Significant Negative',
                 Cond1_DF_Cutoff == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',
-                # State 6
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 DOWN + Cond2 Significant Positive',
                 Cond1_DF_Cutoff == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 DOWN + Cond2 UP',
-
-                # State 7
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 DOWN + Cond2 UP',
                 Cond1_DF_Cutoff == "No Change" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 No Change + Cond2 DOWN',
-                # State 8
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 No Change + Cond2 DOWN',
                 Cond1_DF_Cutoff == "No Change" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 No Change + Cond2 Not Detected',
-                # State 9
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 No Change + Cond2 Not Detected',
                 Cond1_DF_Cutoff == "No Change" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 No Change + Cond2 Not Significant',
-                # State 10
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 No Change + Cond2 Not Significant',
                 Cond1_DF_Cutoff == "No Change" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 No Change + Cond2 Significant Negative',
-                # State 11
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 No Change + Cond2 Significant Negative',
                 Cond1_DF_Cutoff == "No Change" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 No Change + Cond2 Significant Positive',
-                # State 6
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 No Change + Cond2 Significant Positive',
                 Cond1_DF_Cutoff == "No Change" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 No Change + Cond2 UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 No Change + Cond2 UP',
                 Cond1_DF_Cutoff == "UP" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 UP + Cond2 DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 UP + Cond2 DOWN',
                 Cond1_DF_Cutoff == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 UP + Cond2 Not Detected',
                 Cond1_DF_Cutoff == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 UP + Cond2 Not Significant',
                 Cond1_DF_Cutoff == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 UP + Cond2 Significant Negative',
                 Cond1_DF_Cutoff == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 UP + Cond2 Significant Positive',
                 Cond1_DF_Cutoff == "UP" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 UP + Cond2 UP',
-                TRUE ~ 'NA'
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 UP + Cond2 UP',
+                TRUE
+                    ~'NA'
             )
-        ) %>%
+        ) %>% 
         mutate(
             RG1_Specific_Cond1 = case_when(
-                BG_method == "FALSE"~ 'Background = FALSE',
-                # State 1
+                BG_method == "FALSE"
+                    ~'Background = FALSE',
                 Cond2_DF_Cutoff == "DOWN" &
-                Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 DOWN + Cond1 DOWN',
-                # State 2
+                Cond1_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2 DOWN + Cond1 DOWN',
                 Cond2_DF_Cutoff == "DOWN" &
-                Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 DOWN + Cond1 Not Detected',
-                # State 3
+                Cond1_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond2 DOWN + Cond1 Not Detected',
                 Cond2_DF_Cutoff == "DOWN" &
-                Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 DOWN + Cond1 Not Significant',
-                # State 4
+                Cond1_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond2 DOWN + Cond1 Not Significant',
                 Cond2_DF_Cutoff == "DOWN" &
-                Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 DOWN + Cond1 Significant Negative',
-                # State 5
+                Cond1_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond2 DOWN + Cond1 Significant Negative',
                 Cond2_DF_Cutoff == "DOWN" &
-                Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 DOWN + Cond1 Significant Positive',
-                # State 6
+                Cond1_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond2 DOWN + Cond1 Significant Positive',
                 Cond2_DF_Cutoff == "DOWN" &
-                Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 DOWN + Cond1 UP',
-
-                # State 7
+                Cond1_DF_Cutoff_Specific == "UP"
+                    ~'Cond2 DOWN + Cond1 UP',
                 Cond2_DF_Cutoff == "No Change" &
-                Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 No Change + Cond1 DOWN',
-                # State 8
+                Cond1_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2 No Change + Cond1 DOWN',
                 Cond2_DF_Cutoff == "No Change" &
-                Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 No Change + Cond1 Not Detected',
-                # State 9
+                Cond1_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond2 No Change + Cond1 Not Detected',
                 Cond2_DF_Cutoff == "No Change" &
-                Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 No Change + Cond1 Not Significant',
-                # State 10
+                Cond1_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond2 No Change + Cond1 Not Significant',
                 Cond2_DF_Cutoff == "No Change" &
-                Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 No Change + Cond1 Significant Negative',
-                # State 11
+                Cond1_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond2 No Change + Cond1 Significant Negative',
                 Cond2_DF_Cutoff == "No Change" &
-                Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 No Change + Cond1 Significant Positive',
-                # State 6
+                Cond1_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond2 No Change + Cond1 Significant Positive',
                 Cond2_DF_Cutoff == "No Change" &
-                Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 No Change + Cond1 UP',
-
-                # State 12
+                Cond1_DF_Cutoff_Specific == "UP"
+                    ~'Cond2 No Change + Cond1 UP',
                 Cond2_DF_Cutoff == "UP" &
-                Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 UP + Cond1 DOWN',
-                # State 13
+                Cond1_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2 UP + Cond1 DOWN',
                 Cond2_DF_Cutoff == "UP" &
-                Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 UP + Cond1 Not Detected',
-                # State 14
+                Cond1_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond2 UP + Cond1 Not Detected',
                 Cond2_DF_Cutoff == "UP" &
-                Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 UP + Cond1 Not Significant',
-                # State 15
+                Cond1_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond2 UP + Cond1 Not Significant',
                 Cond2_DF_Cutoff == "UP" &
-                Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 UP + Cond1 Significant Negative',
-                # State 16
+                Cond1_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond2 UP + Cond1 Significant Negative',
                 Cond2_DF_Cutoff == "UP" &
-                Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 UP + Cond1 Significant Positive',
-                # State 17
+                Cond1_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond2 UP + Cond1 Significant Positive',
                 Cond2_DF_Cutoff == "UP" &
-                Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 UP + Cond1 UP',
-                TRUE ~ 'NA'
+                Cond1_DF_Cutoff_Specific == "UP"
+                    ~'Cond2 UP + Cond1 UP',
+                TRUE
+                    ~'NA'
             )
-        ) %>%
+        ) %>% 
         mutate(
             RG1_All = case_when(
-                BG_method == "FALSE"~ 'Background = FALSE',
-                # State 1
+                BG_method == "FALSE"
+                    ~'Background = FALSE',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',
-                # State 2
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 DOWN + Cond2 DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',
-                # State 3
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 DOWN + Cond2 Not Detected',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',
-                # State 4
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 DOWN + Cond2 Not Significant',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',
-                # State 5
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 DOWN + Cond2 Significant Negative',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',
-                # State 6
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 DOWN + Cond2 Significant Positive',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 DOWN + Cond2 UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 DOWN + Cond2 UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 UP + Cond2 DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 UP + Cond2 DOWN',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 UP + Cond2 Not Detected',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 UP + Cond2 Not Significant',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 UP + Cond2 Significant Negative',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 UP + Cond2 Significant Positive',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 UP + Cond2 UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 UP + Cond2 UP',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Not Detected + Cond2 DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 Not Detected + Cond2 DOWN',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Not Detected + Cond2 Not Detected',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 Not Detected + Cond2 Not Detected',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Not Detected + Cond2 Not Significant',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 Not Detected + Cond2 Not Significant',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Not Detected + Cond2 Significant Negative',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 Not Detected + Cond2 Significant Negative',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Not Detected + Cond2 Significant Positive',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 Not Detected + Cond2 Significant Positive',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Not Detected + Cond2 UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 Not Detected + Cond2 UP',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Significant Negative + Cond2 DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 Significant Negative + Cond2 DOWN',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Significant Negative + Cond2 Not Detected',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 Significant Negative + Cond2 Not Detected',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Significant Negative + Cond2 Not Significant',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 Significant Negative + Cond2 Not Significant',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Significant Negative + Cond2 Significant Negative',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 Significant Negative + Cond2 Significant Negative',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Significant Negative + Cond2 Significant Positive',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 Significant Negative + Cond2 Significant Positive',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Significant Negative + Cond2 UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 Significant Negative + Cond2 UP',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Significant Positive + Cond2 DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 Significant Positive + Cond2 DOWN',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Significant Positive + Cond2 Not Detected',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 Significant Positive + Cond2 Not Detected',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Significant Positive + Cond2 Not Significant',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 Significant Positive + Cond2 Not Significant',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Significant Positive + Cond2 Significant Negative',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 Significant Positive + Cond2 Significant Negative',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Significant Positive + Cond2 Significant Positive',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 Significant Positive + Cond2 Significant Positive',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Significant Positive + Cond2 UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 Significant Positive + Cond2 UP',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Not Significant + Cond2 DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond1 Not Significant + Cond2 DOWN',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Not Significant + Cond2 Not Detected',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1 Not Significant + Cond2 Not Detected',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Not Significant + Cond2 Not Significant',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1 Not Significant + Cond2 Not Significant',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Not Significant + Cond2 Significant Negative',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1 Not Significant + Cond2 Significant Negative',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Not Significant + Cond2 Significant Positive',
-                # State 1
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1 Not Significant + Cond2 Significant Positive',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Not Significant + Cond2 UP',
-                TRUE ~ 'NA'
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond1 Not Significant + Cond2 UP',
+                TRUE
+                    ~'NA'
             )
-        ) %>%
+        ) %>% 
         mutate(
             RG2_Significant = case_when(
-                BG_method == "FALSE"~ 'Background = FALSE',
-                # State 1
+                BG_method == "FALSE"
+                    ~'Background = FALSE',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',
-                # State 2
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'core_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_DOWN',
-                # State 3
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_DOWN',
-                # State 4
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'core_DOWN',
-                # State 5
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'core_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Opposite',
-                # State 6
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_UP',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_UP',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Opposite',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'core_UP',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'core_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'core_UP',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2_DOWN',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond2_UP',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'core_DOWN',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'core_UP',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2_DOWN',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 1
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
-                TRUE ~ 'NA'
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond2_UP',
+                TRUE
+                    ~'NA'
             )
-        ) %>%
+        ) %>% 
         mutate(
             RG3_SignificantChange = case_when(
-                BG_method == "FALSE"~ 'Background = FALSE',
-                # State 1
+                BG_method == "FALSE"
+                    ~'Background = FALSE',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',
-                # State 2
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'core_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_DOWN',
-                # State 3
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_DOWN',
-                # State 4
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1_DOWN',
-                # State 5
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1_DOWN',
-                # State 6
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1_DOWN',
                 Cond1_DF_Cutoff_Specific == "DOWN" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Opposite',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_UP',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'Cond1_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_UP',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'Cond1_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1_UP',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'Cond1_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1_UP',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'Cond1_UP',
                 Cond1_DF_Cutoff_Specific == "UP" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'core_UP',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2_DOWN',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Detected" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond2_UP',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2_DOWN',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Negative" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond2_UP',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2_DOWN',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 17
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Significant Positive" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
-
-                # State 12
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond2_UP',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
-                # State 13
+                Cond2_DF_Cutoff_Specific == "DOWN"
+                    ~'Cond2_DOWN',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
-                # State 14
+                Cond2_DF_Cutoff_Specific == "Not Detected"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
-                # State 15
+                Cond2_DF_Cutoff_Specific == "Not Significant"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
-                # State 16
+                Cond2_DF_Cutoff_Specific == "Significant Negative"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
-                # State 1
+                Cond2_DF_Cutoff_Specific == "Significant Positive"
+                    ~'None',
                 Cond1_DF_Cutoff_Specific == "Not Significant" &
-                Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
-                TRUE ~ 'NA'
+                Cond2_DF_Cutoff_Specific == "UP"
+                    ~'Cond2_UP',
+                TRUE
+                    ~'NA'
             )
         )
 
@@ -955,25 +1008,34 @@ mca_core <- function(data_intra,
         mutate(
             Cutoff = case_when(
                 core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) &
-                core_DF$ValueCol > as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'UP',
+                core_DF$ValueCol > as.numeric(metadata_info_core[["ValueCutoff"]])
+                    ~'UP',
                 core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) &
-                core_DF$ValueCol < -as.numeric(metadata_info_core[["ValueCutoff"]]) ~ 'DOWN',
-                TRUE ~ 'No Change'
+                core_DF$ValueCol < -as.numeric(metadata_info_core[["ValueCutoff"]])
+                    ~'DOWN',
+                TRUE
+                    ~'No Change'
             )
-        ) %>%
+        ) %>% 
         mutate(
             Cutoff_Specific = case_when(
-                Cutoff == "UP" ~ 'UP',
-                Cutoff == "DOWN" ~ 'DOWN',
+                Cutoff == "UP"
+                    ~'UP',
+                Cutoff == "DOWN"
+                    ~'DOWN',
                 Cutoff == "No Change" &
                 core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) &
-                core_DF$ValueCol > 0 ~ 'Significant Positive',
+                core_DF$ValueCol > 0
+                    ~'Significant Positive',
                 Cutoff == "No Change" &
                 core_DF$PadjCol <= as.numeric(metadata_info_core[["cutoff_stat"]]) &
-                core_DF$ValueCol < 0 ~ 'Significant Negative',
+                core_DF$ValueCol < 0
+                    ~'Significant Negative',
                 Cutoff == "No Change" &
-                core_DF$PadjCol > as.numeric(metadata_info_core[["cutoff_stat"]]) ~ 'Not Significant',
-                TRUE ~ 'NA'
+                core_DF$PadjCol > as.numeric(metadata_info_core[["cutoff_stat"]])
+                    ~'Not Significant',
+                TRUE
+                    ~'NA'
             )
         )
 
@@ -981,27 +1043,34 @@ mca_core <- function(data_intra,
         mutate(
             Cutoff = case_when(
                 Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) &
-                Intra_DF$ValueCol > as.numeric(
-                    metadata_info_intra[["ValueCutoff"]]) ~ 'UP',
-                    Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) &
-                    Intra_DF$ValueCol < -as.numeric(metadata_info_intra[["ValueCutoff"]]
-                ) ~ 'DOWN',
-                TRUE ~ 'No Change'
+                Intra_DF$ValueCol > as.numeric(                     metadata_info_intra[["ValueCutoff"]])
+                    ~'UP',
+                Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) &
+                Intra_DF$ValueCol < -as.numeric(metadata_info_intra[["ValueCutoff"]]                 )
+                    ~'DOWN',
+                TRUE
+                    ~'No Change'
             )
-        ) %>%
+        ) %>% 
         mutate(
             Cutoff_Specific = case_when(
-                Cutoff == "UP" ~ 'UP',
-                Cutoff == "DOWN" ~ 'DOWN',
+                Cutoff == "UP"
+                    ~'UP',
+                Cutoff == "DOWN"
+                    ~'DOWN',
                 Cutoff == "No Change" &
                 Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) &
-                Intra_DF$ValueCol > 0 ~ 'Significant Positive',
+                Intra_DF$ValueCol > 0
+                    ~'Significant Positive',
                 Cutoff == "No Change" &
                 Intra_DF$PadjCol <= as.numeric(metadata_info_intra[["cutoff_stat"]]) &
-                Intra_DF$ValueCol < 0 ~ 'Significant Negative',
+                Intra_DF$ValueCol < 0
+                    ~'Significant Negative',
                 Cutoff == "No Change" &
-                Intra_DF$PadjCol > as.numeric(metadata_info_intra[["cutoff_stat"]]) ~ 'Not Significant',
-                TRUE ~ 'NA'
+                Intra_DF$PadjCol > as.numeric(metadata_info_intra[["cutoff_stat"]])
+                    ~'Not Significant',
+                TRUE
+                    ~'NA'
             )
         )
 
@@ -1038,39 +1107,63 @@ mca_core <- function(data_intra,
     if(method_background == "Intra|core"){  # C1|C2 = core OR Intra
     MergeDF <- MergeDF %>%
     # Intra & core
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" &
-    core_DF_Detected == "TRUE" ~ 'TRUE',
-                                    # JustIntra
-                                    Intra_DF_Detected == "TRUE" &
-                                    core_DF_Detected == "FALSE" ~ 'TRUE',
-                                    # Just core
-                                    Intra_DF_Detected == "FALSE" &
-                                    core_DF_Detected == "TRUE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Intra_DF_Detected == "TRUE" &
+            core_DF_Detected == "TRUE"
+                ~'TRUE',
+            Intra_DF_Detected == "TRUE" &
+            core_DF_Detected == "FALSE"
+                ~'TRUE',
+            Intra_DF_Detected == "FALSE" &
+            core_DF_Detected == "TRUE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "Intra&core"){  # core AND Intra
     MergeDF <- MergeDF %>%
     # Intra & core
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" &
-    core_DF_Detected == "TRUE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Intra_DF_Detected == "TRUE" &
+            core_DF_Detected == "TRUE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "core"){  # core has to be there
     MergeDF <- MergeDF %>%
     # Intra & core
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" &
-    core_DF_Detected == "TRUE" ~ 'TRUE',
-                                    # Just core
-                                    Intra_DF_Detected == "FALSE" &
-                                    core_DF_Detected == "TRUE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Intra_DF_Detected == "TRUE" &
+            core_DF_Detected == "TRUE"
+                ~'TRUE',
+            Intra_DF_Detected == "FALSE" &
+            core_DF_Detected == "TRUE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "Intra"){  # Intra has to be there
     MergeDF <- MergeDF %>%
     # Intra & core
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" &
-    core_DF_Detected == "TRUE" ~ 'TRUE',
-                                    # JustIntra
-                                    Intra_DF_Detected == "TRUE" &
-                                    core_DF_Detected == "FALSE" ~ 'TRUE',
-                                    TRUE ~ 'FALSE'))
+    mutate(
+        BG_method = case_when(
+            Intra_DF_Detected == "TRUE" &
+            core_DF_Detected == "TRUE"
+                ~'TRUE',
+            Intra_DF_Detected == "TRUE" &
+            core_DF_Detected == "FALSE"
+                ~'TRUE',
+            TRUE
+                ~'FALSE'
+        )
+    )
     }else if(method_background == "*"){  # Use all metabolites as the background
     MergeDF$BG_method <- "TRUE"
     }else{
@@ -1080,717 +1173,1326 @@ mca_core <- function(data_intra,
 
     #Assign Metabolite cluster names to the metabolites
     MergeDF <- MergeDF %>%
-    mutate(RG1_All = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Intra DOWN + core DOWN_Released',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra DOWN + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'Intra DOWN + core Not Significant_Released',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'Intra DOWN + core Significant Negative_Released',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'Intra DOWN + core Significant Positive_Released',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Intra DOWN + core UP_Released',
-
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Intra UP + core DOWN_Released',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'Intra UP + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released" ~ 'Intra UP + core Not Significant_Released',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released" ~ 'Intra UP + core Significant Negative_Released',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released" ~ 'Intra UP + core Significant Positive_Released',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Intra UP + core UP_Released',
-
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Intra Not Detected + core DOWN_Released',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'Intra Not Detected + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released" ~ 'Intra Not Detected + core Not Significant_Released',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released" ~ 'Intra Not Detected + core Significant Negative_Released',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released" ~ 'Intra Not Detected + core Significant Positive_Released',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Intra Not Detected + core UP_Released',
-
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'Intra Significant Negative + core DOWN_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Significant Negative + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'Intra Significant Negative + core Not Significant_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'Intra Significant Negative + core Significant Negative_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'Intra Significant Negative + core Significant Positive_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'Intra Significant Negative + core UP_Released',
-
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'Intra Significant Positive + core DOWN_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Significant Positive + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'Intra Significant Positive + core Not Significant_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'Intra Significant Positive + core Significant Negative_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'Intra Significant Positive + core Significant Positive_Released',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'Intra Significant Positive + core UP_Released',
-
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'Intra Not Significant + core DOWN_Released',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Not Significant + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'Intra Not Significant + core Not Significant_Released',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'Intra Not Significant + core Significant Negative_Released',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'Intra Not Significant + core Significant Positive_Released',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'Intra Not Significant + core UP_Released',
-
-                                #Consumed:
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Intra DOWN + core DOWN_Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra DOWN + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'Intra DOWN + core Not Significant_Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'Intra DOWN + core Significant Negative_Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'Intra DOWN + core Significant Positive_Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Intra DOWN + core UP_Consumed',
-
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Intra UP + core DOWN_Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'Intra UP + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed" ~ 'Intra UP + core Not Significant_Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed" ~ 'Intra UP + core Significant Negative_Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed" ~ 'Intra UP + core Significant Positive_Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Intra UP + core UP_Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Intra Not Detected + core DOWN_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'Intra Not Detected + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed" ~ 'Intra Not Detected + core Not Significant_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed" ~ 'Intra Not Detected + core Significant Negative_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed" ~ 'Intra Not Detected + core Significant Positive_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Intra Not Detected + core UP_Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Negative + core DOWN_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Significant Negative + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Negative + core Not Significant_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Negative + core Significant Negative_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Negative + core Significant Positive_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Negative + core UP_Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Positive + core DOWN_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Significant Positive + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Positive + core Not Significant_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Positive + core Significant Negative_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Positive + core Significant Positive_Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'Intra Significant Positive + core UP_Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'Intra Not Significant + core DOWN_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Not Significant + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'Intra Not Significant + core Not Significant_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'Intra Not Significant + core Significant Negative_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'Intra Not Significant + core Significant Positive_Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'Intra Not Significant + core UP_Consumed',
-
-                                #Released/Consumed (Consumed in one, released in the other)
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Intra DOWN + core DOWN_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra DOWN + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'Intra DOWN + core Not Significant_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Intra DOWN + core Significant Negative_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Intra DOWN + core Significant Positive_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "DOWN" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Intra DOWN + core UP_Released/Consumed',
-
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Intra UP + core DOWN_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'Intra UP + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'Intra UP + core Not Significant_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Intra UP + core Significant Negative_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Intra UP + core Significant Positive_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "UP" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Intra UP + core UP_Released/Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Detected + core DOWN_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'Intra Not Detected + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Detected + core Not Significant_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Detected + core Significant Negative_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Detected + core Significant Positive_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Detected" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Detected + core UP_Released/Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Negative + core DOWN_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Significant Negative + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Negative + core Not Significant_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Negative + core Significant Negative_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Negative + core Significant Positive_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Negative + core UP_Released/Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Positive + core DOWN_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Significant Positive + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Positive + core Not Significant_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Positive + core Significant Negative_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Positive + core Significant Positive_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Significant Positive + core UP_Released/Consumed',
-
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Significant + core DOWN_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'Intra Not Significant + core Not Detected',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Significant + core Not Significant_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Significant + core Significant Negative_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Significant + core Significant Positive_Released/Consumed',
-                                Intra_DF_Cutoff_Specific == "Not Significant" &
-                                core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Intra Not Significant + core UP_Released/Consumed',
-                                TRUE ~ 'NA')) %>%
-    mutate(RG2_Significant = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Both_DOWN (Released)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'Both_DOWN (Released)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'Opposite (Released UP)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Opposite (Released UP)',
-
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Opposite (Released DOWN)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released" ~ 'Opposite (Released UP)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released" ~ 'Both_UP (Released)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Both_UP (Released)',
-
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'core_DOWN (Released)',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'core_UP (Released)',
-
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'Both_DOWN (Released)',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'Opposite (Released UP)',
-
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'Opposite (Released DOWN)',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'Both_UP (Released)',
-
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'core_DOWN (Released)',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'core_UP (Released)',
-
-                                        #Consumed:
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Both_DOWN (Consumed)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'Both_DOWN (Consumed)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'Opposite (Consumed UP)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Opposite (Consumed UP)',
-
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Opposite (Consumed DOWN)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed" ~ 'Opposite (Consumed UP)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed" ~ 'Both_UP (Consumed)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Both_UP (Consumed)',
-
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'core_DOWN (Consumed)',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'core_UP (Consumed)',
-
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'Both_DOWN (Consumed)',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'Opposite (Consumed UP)',
-
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'Opposite (Consumed DOWN)',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'Both_UP (Consumed)',
-
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'core_DOWN (Consumed)',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'core_UP (Consumed)',
-
-                                        #Consumed/Released (Consumed in one, released in the other)
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed" ~ 'Both_DOWN (Released/Consumed)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'Both_DOWN (Released/Consumed)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'Opposite (Released/Consumed UP)',
-                                        Intra_DF_Cutoff_Specific == "DOWN" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed" ~ 'Opposite (Released/Consumed UP)',
-
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed" ~ 'Opposite (Released/Consumed DOWN)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed" ~ 'Opposite (Released/Consumed UP)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed" ~ 'Both_UP (Released/Consumed)',
-                                        Intra_DF_Cutoff_Specific == "UP" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed" ~ 'Both_UP (Released/Consumed)',
-
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed" ~ 'core_DOWN (Released/Consumed)',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Detected" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed" ~ 'core_UP (Released/Consumed)',
-
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Both_DOWN (Released/Consumed)',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Opposite (Released/Consumed UP)',
-
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'Opposite (Released/Consumed DOWN)',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'Both_UP (Released/Consumed)',
-
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'core_DOWN (Released/Consumed)',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                        Intra_DF_Cutoff_Specific == "Not Significant" &
-                                        core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'core_UP (Released/Consumed)',
-                                        TRUE ~ 'NA')) %>%
-    mutate(RG3_Change = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Both_DOWN (Released)',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Opposite (Released UP)',
-
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'Opposite (Released DOWN)',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'Both_UP (Released)',
-
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released" ~ 'core_DOWN (Released)',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released" ~ 'core_UP (Released)',
-
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'core_DOWN (Released)',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'core_UP (Released)',
-
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'core_DOWN (Released)',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'core_UP (Released)',
-
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released"~ 'core_DOWN (Released)',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released"~ 'core_UP (Released)',
-
-                                    #Consumed:
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Both_DOWN (Consumed)',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Opposite (Consumed UP)',
-
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'Opposite (Consumed DOWN)',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'Both_UP (Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed" ~ 'core_DOWN (Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed" ~ 'core_UP (Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'core_DOWN (Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'core_UP (Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'core_DOWN (Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'core_UP (Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Consumed"~ 'core_DOWN (Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Consumed"~ 'core_UP (Consumed)',
-
-                                    #Consumed/Released (Consumed in one, released in the other)
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed" ~ 'Both_DOWN (Released/Consumed)',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "DOWN" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed" ~ 'Opposite (Released/Consumed UP)',
-
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed" ~ 'Opposite (Released/Consumed DOWN)',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "UP" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed" ~ 'Both_UP (Released/Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed" ~ 'core_DOWN (Released/Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed" ~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Detected" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed" ~ 'core_UP (Released/Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'core_DOWN (Released/Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Negative" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'core_UP (Released/Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'core_DOWN (Released/Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Significant Positive" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'core_UP (Released/Consumed)',
-
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "DOWN" & core_DF_core_Direction == "Released/Consumed"~ 'core_DOWN (Released/Consumed)',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Not Detected" & core_DF_core_Direction == "Not Detected"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Not Significant" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Significant Negative" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "Significant Positive" & core_DF_core_Direction == "Released/Consumed"~ 'None',
-                                    Intra_DF_Cutoff_Specific == "Not Significant" &
-                                    core_DF_Cutoff_Specific == "UP" & core_DF_core_Direction == "Released/Consumed"~ 'core_UP (Released/Consumed)',
-                                    TRUE ~ 'NA'))
+    mutate(
+        RG1_All = case_when(
+            BG_method == "FALSE"
+                ~'Background = FALSE',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Intra DOWN + core DOWN_Released',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra DOWN + core Not Detected',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'Intra DOWN + core Not Significant_Released',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Intra DOWN + core Significant Negative_Released',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Intra DOWN + core Significant Positive_Released',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Intra DOWN + core UP_Released',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Intra UP + core DOWN_Released',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra UP + core Not Detected',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'Intra UP + core Not Significant_Released',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Intra UP + core Significant Negative_Released',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Intra UP + core Significant Positive_Released',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Intra UP + core UP_Released',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Detected + core DOWN_Released',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Not Detected + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Detected + core Not Significant_Released',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Detected + core Significant Negative_Released',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Detected + core Significant Positive_Released',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Detected + core UP_Released',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Negative + core DOWN_Released',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Significant Negative + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Negative + core Not Significant_Released',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Negative + core Significant Negative_Released',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Negative + core Significant Positive_Released',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Negative + core UP_Released',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Positive + core DOWN_Released',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Significant Positive + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Positive + core Not Significant_Released',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Positive + core Significant Negative_Released',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Positive + core Significant Positive_Released',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Significant Positive + core UP_Released',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Significant + core DOWN_Released',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Not Significant + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Significant + core Not Significant_Released',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Significant + core Significant Negative_Released',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Significant + core Significant Positive_Released',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Intra Not Significant + core UP_Released',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra DOWN + core DOWN_Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra DOWN + core Not Detected',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra DOWN + core Not Significant_Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra DOWN + core Significant Negative_Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra DOWN + core Significant Positive_Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra DOWN + core UP_Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra UP + core DOWN_Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra UP + core Not Detected',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra UP + core Not Significant_Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra UP + core Significant Negative_Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra UP + core Significant Positive_Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra UP + core UP_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Detected + core DOWN_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Not Detected + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Detected + core Not Significant_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Detected + core Significant Negative_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Detected + core Significant Positive_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Detected + core UP_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Negative + core DOWN_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Significant Negative + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Negative + core Not Significant_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Negative + core Significant Negative_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Negative + core Significant Positive_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Negative + core UP_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Positive + core DOWN_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Significant Positive + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Positive + core Not Significant_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Positive + core Significant Negative_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Positive + core Significant Positive_Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Significant Positive + core UP_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Significant + core DOWN_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Not Significant + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Significant + core Not Significant_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Significant + core Significant Negative_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Significant + core Significant Positive_Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Intra Not Significant + core UP_Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra DOWN + core DOWN_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra DOWN + core Not Detected',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra DOWN + core Not Significant_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra DOWN + core Significant Negative_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra DOWN + core Significant Positive_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra DOWN + core UP_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra UP + core DOWN_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra UP + core Not Detected',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra UP + core Not Significant_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra UP + core Significant Negative_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra UP + core Significant Positive_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra UP + core UP_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Detected + core DOWN_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Not Detected + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Detected + core Not Significant_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Detected + core Significant Negative_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Detected + core Significant Positive_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Detected + core UP_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Negative + core DOWN_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Significant Negative + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Negative + core Not Significant_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Negative + core Significant Negative_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Negative + core Significant Positive_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Negative + core UP_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Positive + core DOWN_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Significant Positive + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Positive + core Not Significant_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Positive + core Significant Negative_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Positive + core Significant Positive_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Significant Positive + core UP_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Significant + core DOWN_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'Intra Not Significant + core Not Detected',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Significant + core Not Significant_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Significant + core Significant Negative_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Significant + core Significant Positive_Released/Consumed',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Intra Not Significant + core UP_Released/Consumed',
+            TRUE
+                ~'NA'
+        )
+    ) %>% 
+    mutate(
+        RG2_Significant = case_when(
+            BG_method == "FALSE"
+                ~'Background = FALSE',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Both_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Both_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released UP)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released DOWN)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'Both_UP (Released)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Both_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'core_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'core_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Both_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released UP)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released DOWN)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Both_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'core_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'core_UP (Released)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed UP)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed DOWN)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed UP)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed DOWN)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed UP)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed DOWN)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed UP)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed DOWN)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_UP (Released/Consumed)',
+            TRUE
+                ~'NA'
+        )
+    ) %>% 
+    mutate(
+        RG3_Change = case_when(
+            BG_method == "FALSE"
+                ~'Background = FALSE',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Both_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'Opposite (Released DOWN)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'Both_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'core_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'core_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'core_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'core_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'core_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'core_UP (Released)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released"
+                ~'core_DOWN (Released)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released"
+                ~'core_UP (Released)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'Opposite (Consumed DOWN)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'Both_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_DOWN (Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Consumed"
+                ~'core_UP (Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "DOWN" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed UP)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Opposite (Released/Consumed DOWN)',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "UP" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'Both_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_UP (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "DOWN" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_DOWN (Released/Consumed)',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Detected" &
+            core_DF_core_Direction == "Not Detected"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Negative" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "Significant Positive" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'None',
+            Intra_DF_Cutoff_Specific == "Not Significant" &
+            core_DF_Cutoff_Specific == "UP" &
+            core_DF_core_Direction == "Released/Consumed"
+                ~'core_UP (Released/Consumed)',
+            TRUE
+                ~'NA'
+        )
+    )
 
     #Safe the DF and return the groupings
     ##MCA DF (Merged InputDF filtered for background with assigned MCA cluster names)
