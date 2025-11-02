@@ -227,7 +227,7 @@ metadata_analysis <- function(
 
     # Add explained variance into the table:
     prop_var_ex <-
-        as.data.frame(((PCA.res[["sdev"]])^2 / sum((PCA.res[["sdev"]])^2)) * 100) %>%  # to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
+        as.data.frame(((PCA.res[["sdev"]])^2 / sum((PCA.res[["sdev"]])^2)) * 100) %>%# to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
         rownames_to_column("PC") %>%
         mutate(PC = paste("PC", PC, sep = "")) %>%
         rename("Explained_Variance" = 2)
@@ -304,10 +304,10 @@ metadata_analysis <- function(
         summarise(
             PC = paste(unique(PC), collapse = ", "),  # Concatenate unique PC entries with commas
             `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE)
-        ) %>%  # Sum Explained_Variance
-        ungroup() %>%  # Remove previous grouping
-        group_by(feature) %>%  # Group by feature for MainDriver calculation
-        mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>%  # Mark TRUE for the highest value
+        ) %>%# Sum Explained_Variance
+        ungroup() %>%# Remove previous grouping
+        group_by(feature) %>%# Group by feature for MainDriver calculation
+        mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>%# Mark TRUE for the highest value
         ungroup()  # Remove grouping
 
     Res_summary <-
@@ -317,7 +317,7 @@ metadata_analysis <- function(
             term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
             `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
             MainDriver = paste(MainDriver, collapse = ", ")
-        ) %>%  # Extract the term where MainDriver is TRUE
+        ) %>%# Extract the term where MainDriver is TRUE
         ungroup() %>%
         rowwise() %>%
         mutate(  # Extract the term where MainDriver is TRUE
@@ -344,12 +344,12 @@ metadata_analysis <- function(
         Stat_results %>%
         filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
         # Filter for significant results
-        filter(Explained_Variance > cutoff_variance) %>%  # Exclude Residuals row
+        filter(Explained_Variance > cutoff_variance) %>%# Exclude Residuals row
         distinct(
             term,
             PC,
             .keep_all = TRUE
-        ) %>%  # only keep unique term~PC combinations AND STATS
+        ) %>%# only keep unique term~PC combinations AND STATS
         select(term, PC, Explained_Variance) %>%
         pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
         column_to_rownames("term") %>%

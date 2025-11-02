@@ -2469,7 +2469,7 @@ function(
 
     # add number of Genes_targeted_by_TF_detected_num
     mat <-
-        as.data.frame(mat) %>%  # Are these the normalised counts?
+        as.data.frame(mat) %>%# Are these the normalised counts?
         rownames_to_column("Symbol")
 
     Detected <-

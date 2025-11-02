@@ -549,7 +549,7 @@ replicate_sum <- function(
             c("Conditions", "Biological_Replicates"),
             sep = "_",
             remove = FALSE
-        ) %>% # Create a uniqueID
+        ) %>%# Create a uniqueID
         column_to_rownames("UniqueID")# set UniqueID to rownames
 
     # --------------- return ------------------ # #
@@ -938,7 +938,7 @@ pool_estimation <- function(
         assay_mat <- as.matrix(t(as.data.frame(ResList[["DF"]][["data"]])))
 
         coldata_df <- as.data.frame(colData(input_data))
-        rowdata_df <- as.data.frame(ResList[["DF"]][["CV"]])%>% tibble::column_to_rownames("Metabolite")
+        rowdata_df <- as.data.frame(ResList[["DF"]][["CV"]]) %>% tibble::column_to_rownames("Metabolite")
 
         # build the SummarizedExperiment
         se_new <- SummarizedExperiment(
@@ -1734,12 +1734,12 @@ core_norm <- function(
             while (HighVar_metabs>0) {
                 # remove the furthest value from the mean
                 if (HighVar_metabs>1) {
-                    max_var_pos <-  core_medias[, result_df$HighVar]  %>%
+                    max_var_pos <-  core_medias[, result_df$HighVar] %>%
                     as.data.frame() %>%
                     mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
                     summarise_all(.funs = ~ which.max(abs(.)))
                 } else {
-                    max_var_pos <-  core_medias[, result_df$HighVar]  %>%
+                    max_var_pos <-  core_medias[, result_df$HighVar] %>%
                     as.data.frame() %>%
                     mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
                     summarise_all(.funs = ~ which.max(abs(.)))
@@ -2265,7 +2265,7 @@ outlier_detection <- function(
     }
 
     data_norm_filtered_full <-
-        relocate(Outliers) %>%  # Put Outlier columns in the front
+        relocate(Outliers) %>%# Put Outlier columns in the front
         merge(
             metadata_sample,
             data_norm_filtered_full,

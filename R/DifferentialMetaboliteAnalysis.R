@@ -2430,7 +2430,7 @@ dma_stat_limma <-
                 number = Inf,
                 sort.by = "n",
                 adjust.method = padj
-            ) %>%  # coef= the comparison the test is done for!
+            ) %>%# coef= the comparison the test is done for!
             rename(
                 "Log2FC" = 1,
                 "t.val" = 3,
@@ -2737,7 +2737,7 @@ mpv_shapiro <- function(
             data,
             is.na(data),
             0
-        ) %>%  # shapiro test can not handle NAs!
+        ) %>%# shapiro test can not handle NAs!
         filter(
             metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
         ) %>%

@@ -162,8 +162,8 @@ metsigdb_chemicalclass <- function(
             by = "ramp_id",
             all.x = TRUE
         ) %>%
-    filter(str_starts(class_source_id, "hmdb:")) %>% # Select HMDB only!
-    filter(str_starts(chem_source_id, "hmdb:")) %>% # Select HMDB only!
+    filter(str_starts(class_source_id, "hmdb:")) %>%# Select HMDB only!
+    filter(str_starts(chem_source_id, "hmdb:")) %>%# Select HMDB only!
     select(-c("chem_data_source", "chem_source_id")) %>%
     pivot_wider(
         names_from = class_level_name,
@@ -178,7 +178,7 @@ metsigdb_chemicalclass <- function(
         # Combine all common names into one
         .groups = "drop"  # Ungroup after summarising
     ) %>%
-    mutate(class_source_id = str_remove(class_source_id, "^hmdb:")) %>% # Remove 'hmdb:' prefix
+    mutate(class_source_id = str_remove(class_source_id, "^hmdb:")) %>%# Remove 'hmdb:' prefix
     select(
         class_source_id,
         common_name,

@@ -771,7 +771,7 @@ check_param_dma <- function(
     }
 
     ## ------------ Sample Numbers ----------- ##
-    Num <- data %>% #Are sample numbers enough?
+    Num <- data %>%#Are sample numbers enough?
     filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator) %>%
     select_if(is.numeric) # only keep numeric columns with metabolite values
     Denom <- data %>%
