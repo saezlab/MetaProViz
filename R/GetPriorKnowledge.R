@@ -266,15 +266,15 @@ make_gene_metab_set <- function(
     }
     # 2. Target:
     if ("Target" %in% names(metadata_info)) {
-if (!(metadata_info[["Target"]] %in% colnames(input_pk))) {
-        stop(
-            "The ",
-            metadata_info[["Target"]],
-            " column selected as Conditions in metadata_info was not found in input_pk. Please check your input."
-        )
-    }
+        if (!(metadata_info[["Target"]] %in% colnames(input_pk))) {
+            stop(
+                "The ",
+                metadata_info[["Target"]],
+                " column selected as Conditions in metadata_info was not found in input_pk. Please check your input."
+            )
+        }
     } else {
-    stop("Please provide a column name for the Target in metadata_info.")
+        stop("Please provide a column name for the Target in metadata_info.")
     }
 
     if (is.null(pk_name)) {
@@ -287,12 +287,12 @@ if (!(metadata_info[["Target"]] %in% colnames(input_pk))) {
             folder_name = "PK",
             path = path
         )
-
         SubfolderPK <- file.path(folder, "LoadedPK")
-    if (!dir.exists(SubfolderPK)) {dir.create(SubfolderPK)}
-
+    } else if (!dir.exists(SubfolderPK)) {
+        dir.create(SubfolderPK)
         Subfolder <- file.path(SubfolderPK, "MetaboliteSet")
-    if (!dir.exists(Subfolder)) {dir.create(Subfolder)}
+    } else if (!dir.exists(Subfolder)) {
+        dir.create(Subfolder)
     }
 
 

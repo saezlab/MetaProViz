@@ -70,7 +70,7 @@
 #' @importFrom ggplot2 ggplot theme element_rect
 #' @importFrom grid convertUnit
 #' @importFrom dplyr rename select
-#' @importFrom magrittr %>% %<>%
+#' @importFrom magrittr %>% %<>% is_in not
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom logger log_trace
 #' @importFrom pheatmap pheatmap
@@ -93,7 +93,7 @@ viz_heatmap <- function(
 
     ## ------------- Check SummarizedExperiment file ---------- ##
     input_data <- data
-    if (inherits(data, "SummarizedExperiment"))  {
+    if (inherits(data, "SummarizedExperiment")) {
         log_info('Processing input SummarizedExperiment object.')
         se_list <- process_se(data)
         data <- se_list$data
@@ -122,7 +122,7 @@ viz_heatmap <- function(
     }
 
     scale_options <- c("row", "column", "none")
-if (!(scale %in% scale_options)) {
+    if (!(scale %in% scale_options)) {
         message <-
             paste0(
                 "Check input. The selected scale option is not valid. Please select one of the folowwing: ",
@@ -132,7 +132,6 @@ if (!(scale %in% scale_options)) {
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
-
 
     # # ------------ Create Results output folder ----------- ##
     if (!is.null(save_plot)) {
@@ -144,6 +143,7 @@ if (!(scale %in% scale_options)) {
 
     # ####################################################
     # # -------------- Load data --------------- ##
+    # what is this??
     data <- data
 
     if (!is.null(metadata_feature)) {  # removes information about metabolites that are not included in the data
@@ -165,9 +165,8 @@ if (!(scale %in% scale_options)) {
         metadata_sample <- metadata_sample[, -c((ncol(metadata_sample) - ncol(data) + 1):ncol(metadata_sample))]
     }
 
-
     # # -------------- Plot --------------- ##
-if (!("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% names(metadata_info))) {
+    if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info)) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
         unique_paths <- unique(metadata_feature[[metadata_info[["individual_Metab"]]]])
@@ -208,8 +207,7 @@ if (!("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% na
             col_annot <- NULL
             if (length(col_annot_vars) > 0L) {
                 for (x in seq_along(col_annot_vars)) {
-                    annot_sel <-
-                        col_annot_vars[[x]]
+                    annot_sel <- col_annot_vars[[x]]
                     col_annot[x] <- metadata_sample %>%
                     select(annot_sel) %>%
                     as.data.frame()
@@ -265,7 +263,8 @@ if (!("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% na
             if (nrow(t(data_path)) >= 2L) {
                 # set.seed(1234)
 
-                heatmap <- pheatmap(t(data_path),
+                heatmap <- pheatmap(
+                    t(data_path),
                     show_rownames = as.logical(show_rownames),
                     show_colnames = as.logical(show_colnames),
                     clustering_method = "complete",
@@ -346,11 +345,18 @@ if (!("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% na
                 message(message)
             }
         }
+
         # Return if assigned:
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
-if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info)) {
+
+    } else if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info)) {
+
         # Ensure that groups that are assigned NAs do not cause problems:
-        metadata_sample[[metadata_info[["individual_Sample"]]]] <- ifelse(is.na(metadata_sample[[metadata_info[["individual_Sample"]]]]), "NA", metadata_sample[[metadata_info[["individual_Sample"]]]])
+        metadata_sample[[metadata_info[["individual_Sample"]]]] <- ifelse(
+            is.na(metadata_sample[[metadata_info[["individual_Sample"]]]]),
+            "NA",
+            metadata_sample[[metadata_info[["individual_Sample"]]]]
+        )
 
         unique_paths_Sample <- unique(metadata_sample[[metadata_info[["individual_Sample"]]]])
 
@@ -516,7 +522,7 @@ if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% n
                 Plot_Sized %<>%
                     {
                         ggplot() +
-                            annotation_custom(.)
+                        annotation_custom(.)
                     } %>%
                     add(theme(panel.background = element_rect(fill = "transparent")))
 
@@ -546,8 +552,10 @@ if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% n
                 message(message)
             }
         }
+
         # Return if assigned:
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
+
     } else if ("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% names(metadata_info)) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
@@ -642,9 +650,8 @@ if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% n
                         data_path_metab %>% rownames_to_column("UniqueID"),
                         by = "UniqueID",
                         all.x = TRUE
-                    )
-                data_path <- data_path %>%
-                column_to_rownames("UniqueID")
+                    ) %>%
+                    column_to_rownames("UniqueID")
 
                 # Column annotation
                 selected_metadata_sample <-
@@ -699,7 +706,8 @@ if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% n
                 if (nrow(t(data_path)) >= 2L) {
                     # set.seed(1234)
 
-                    heatmap <- pheatmap(t(data_path),
+                    heatmap <- pheatmap(
+                        t(data_path),
                         show_rownames = as.logical(show_rownames),
                         show_colnames = as.logical(show_colnames),
                         clustering_method = "complete",
@@ -786,8 +794,11 @@ if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% n
                 }
             }
         }
+
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
-if (!(!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info))) {
+
+    } else if (c("individual_Metab", "individual_Sample") %>% is_in(names(metadata_info)) %>% any %>% not) {
+
         PlotList <- list()  # Empty list to store all the plots
         PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
@@ -923,6 +934,9 @@ if (!(!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in%
             log_trace(paste("Message ", message, sep = ""))
             message(message)
         }
+
+        return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
+
     }
-    return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
+
 }

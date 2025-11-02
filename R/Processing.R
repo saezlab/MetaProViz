@@ -700,7 +700,7 @@ pool_estimation <- function(
     # `check_param` Specific
     if (!is.null(metadata_sample)) {
         if ("Conditions" %in% names(metadata_info)) {
-if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample)) ) {
+            if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample)) ) {
                 msg <-
                     sprintf(
                         "You have chosen Conditions = %s, %s was not found in metadata_sample as column. Please insert the name of the experimental conditions as stated in the metadata_sample.",
@@ -712,7 +712,7 @@ if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample)) ) {
             }
         }
         if ("PoolSamples" %in% names(metadata_info)) {
-if (!(metadata_info[["PoolSamples"]] %in% metadata_sample[[metadata_info[["Conditions"]]]]) ) {
+            if (!(metadata_info[["PoolSamples"]] %in% metadata_sample[[metadata_info[["Conditions"]]]]) ) {
                 msg <-
                     sprintf(
                         "You have chosen PoolSamples = %s, %s was not found in metadata_sample as sample condition. Please insert the name of the pool samples as stated in the Conditions column of the metadata_sample.",
@@ -958,7 +958,7 @@ if (!(metadata_info[["PoolSamples"]] %in% metadata_sample[[metadata_info[["Condi
         #Return
         invisible(return(ResList))
 
-    }else{
+    } else {
         invisible(return(ResList))
     }
 
@@ -2264,12 +2264,12 @@ outlier_detection <- function(
         data_norm_filtered_full$Outliers <- "no"
     }
 
-    data_norm_filtered_full <- data_norm_filtered_full %>% relocate(Outliers) #Put Outlier columns in the front
     data_norm_filtered_full <-
+        relocate(Outliers) %>%  # Put Outlier columns in the front
         merge(
             metadata_sample,
             data_norm_filtered_full,
-            by = 0) # add the design in the output df (merge by rownames/sample names
+            by = 0  # add the design in the output df (merge by rownames/sample names
         )
     rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
     data_norm_filtered_full$Row.names <- c()

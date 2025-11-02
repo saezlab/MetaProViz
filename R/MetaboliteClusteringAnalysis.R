@@ -400,15 +400,14 @@ mca_2cond <- function(data_c1,
     MergeDF_Select2<-
         subset(
             MergeDF,
-            select=-c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_SignificantChange)
-        )%>%
-    rename(
-        !!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",
-        #This syntax is needed since paste(MetaboliteID
-    )="MetaboliteID" is not working in dyplr
-                    !!Cond2PadjCol_Unique :="Cond2_DF_PadjCol",
-                    !!Cond1ValueCol_Unique :="Cond1_DF_ValueCol",
-                    !!Cond1PadjCol_Unique :="Cond1_DF_PadjCol")
+            select = -c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_SignificantChange)
+        ) %>%
+        rename(
+            !!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",
+            !!Cond2PadjCol_Unique :="Cond2_DF_PadjCol",
+            !!Cond1ValueCol_Unique :="Cond1_DF_ValueCol",
+            !!Cond1PadjCol_Unique :="Cond1_DF_PadjCol"
+        )
 
     MergeDF_Rearrange <-
         merge(
@@ -1096,15 +1095,14 @@ mca_core <- function(data_intra,
     MergeDF_Select2<-
         subset(
             MergeDF,
-            select=-c(Intra_DF_Detected,Intra_DF_Cutoff, core_DF_Detected,core_DF_Cutoff, core_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_Change)
-        )%>%
-    rename(
-        !!coreValueCol_Unique :="core_DF_ValueCol",
-        #This syntax is needed since paste(MetaboliteID
-    )="MetaboliteID" is not working in dyplr
-                    !!corePadjCol_Unique :="core_DF_PadjCol",
-                    !!IntraValueCol_Unique :="Intra_DF_ValueCol",
-                    !!IntraPadjCol_Unique :="Intra_DF_PadjCol")
+            select = -c(Intra_DF_Detected,Intra_DF_Cutoff, core_DF_Detected,core_DF_Cutoff, core_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_Change)
+        ) %>%
+        rename(
+            !!coreValueCol_Unique :="core_DF_ValueCol",
+            !!corePadjCol_Unique :="core_DF_PadjCol",
+            !!IntraValueCol_Unique :="Intra_DF_ValueCol",
+            !!IntraPadjCol_Unique :="Intra_DF_PadjCol"
+        )
 
     MergeDF_Rearrange <-
         merge(

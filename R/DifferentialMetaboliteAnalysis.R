@@ -688,7 +688,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -733,7 +733,7 @@ log2fc <- function(
     # all_vs_all.
     if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         MultipleComparison <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
         MultipleComparison <- TRUE
     } else if (denom_num %>% is_in(meta_vars) %>% all) {
         MultipleComparison <- FALSE
@@ -1449,7 +1449,7 @@ mpv_aov <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1696,7 +1696,7 @@ mpv_kruskal <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]

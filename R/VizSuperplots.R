@@ -155,7 +155,7 @@ viz_superplot <- function(
         stop(message)
     }
 
-if (!(plot_type %in% c("Box", "Bar", "Violin"))) {
+    if (!(plot_type %in% c("Box", "Bar", "Violin"))) {
         message <- paste0("plot_type must be either Box, Bar or Violin.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -163,44 +163,46 @@ if (!(plot_type %in% c("Box", "Bar", "Violin"))) {
 
     if (!is.null(plot_conditions)) {
         for (Condition in plot_conditions) {
-if (!(Condition %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
-            message <-
-                paste0(
-                    "Check Input. The plot_conditions ",
-                    Condition,
-                    " were not found in the Conditions Column."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+            if (!(Condition %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
+                message <-
+                    paste0(
+                        "Check Input. The plot_conditions ",
+                        Condition,
+                        " were not found in the Conditions Column."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
     }
 
     if (!is.null(stat_comparison)) {
         for (Comp in stat_comparison) {
-        if (!is.null(plot_conditions)) {
-if (!(plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
-            message <-
-                paste0(
-                    "Check Input. The stat_comparison condition ",
-                    Comp[1],
-                    " is not found in the Conditions Column of the metadata_sample."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+            # find the differences between the following two blocks
+            # :'''(
+            if (!is.null(plot_conditions)) {
+                if (!(plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
+                    message <-
+                        paste0(
+                            "Check Input. The stat_comparison condition ",
+                            Comp[1],
+                            " is not found in the Conditions Column of the metadata_sample."
+                        )
+                    log_trace(paste("Error ", message, sep =""))
+                    stop(message)
+                }
+                if (!(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
+                    message <-
+                        paste0(
+                            "Check Input. The stat_comparison condition ",
+                            Comp[2],
+                            " is not found in the Conditions Column of the metadata_sample."
+                        )
+                    log_trace(paste("Error ", message, sep =""))
+                    stop(message)
+                }
+            }
         }
-if (!(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
-            message <-
-                paste0(
-                    "Check Input. The stat_comparison condition ",
-                    Comp[2],
-                    " is not found in the Conditions Column of the metadata_sample."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
-        }
-        }
-    }
     }
 
     if (is.null(color_palette)) {
@@ -271,16 +273,16 @@ if (!(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"
             "none"
         )
     if (!is.null(padj)) {
-if (!(padj %in% STAT_padj_options)) {
-        message <-
-            paste0(
-                "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",
-                paste(STAT_padj_options,collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        if (!(padj %in% STAT_padj_options)) {
+            message <-
+                paste0(
+                    "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",
+                    paste(STAT_padj_options,collapse = ", "),
+                    "."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     if (is.null(padj)) {
@@ -307,12 +309,12 @@ if (!(padj %in% STAT_padj_options)) {
             merge(
                 metadata_sample[c("Conditions","Superplot")],
                 data,
-                by = 0
+                by = 0L
             )
         data_merge <- column_to_rownames(data_merge, "Row.names")
     } else {
-    data_merge <- merge(metadata_sample[c("Conditions")] ,data, by = 0)
-    data_merge <- column_to_rownames(data_merge, "Row.names")
+        data_merge <- merge(metadata_sample[c("Conditions")] ,data, by = 0)
+        data_merge <- column_to_rownames(data_merge, "Row.names")
     }
 
     # Rename the x and y lab if the information has been passed:

@@ -149,7 +149,7 @@ check_param <- function(
     if (!is.null(metadata_info)) {
     # Conditions
     if ("Conditions" %in% names(metadata_info)) {
-if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample))) {
+        if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample))) {
             message <-
                 paste0(
                     "The ",
@@ -163,7 +163,7 @@ if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample))) {
 
     # Biological replicates
     if ("Biological_Replicates" %in% names(metadata_info)) {
-if (!(metadata_info[["Biological_Replicates"]] %in% colnames(metadata_sample))) {
+        if (!(metadata_info[["Biological_Replicates"]] %in% colnames(metadata_sample))) {
             message <-
                 paste0(
                     "The ",
@@ -177,7 +177,7 @@ if (!(metadata_info[["Biological_Replicates"]] %in% colnames(metadata_sample))) 
 
     # Numerator
     if ("Numerator" %in% names(metadata_info)) {
-if (!(metadata_info[["Numerator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
+        if (!(metadata_info[["Numerator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "The ",
@@ -191,7 +191,7 @@ if (!(metadata_info[["Numerator"]] %in% metadata_sample[[metadata_info[["Conditi
 
     # Denominator
     if ("Denominator" %in% names(metadata_info)) {
-if (!(metadata_info[["Denominator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
+        if (!(metadata_info[["Denominator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "The ",
@@ -204,7 +204,7 @@ if (!(metadata_info[["Denominator"]] %in% metadata_sample[[metadata_info[["Condi
     }
 
     # Denominator & Numerator
-if (!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadata_info)) {
+    if (!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadata_info)) {
         message <-
             paste0(
                 "Check input. The selected denominator option is empty while ",
@@ -217,7 +217,7 @@ if (!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadat
 
     # Superplot
     if ("Superplot" %in% names(metadata_info)) {
-if (!(metadata_info[["Superplot"]] %in% colnames(metadata_sample))) {
+        if (!(metadata_info[["Superplot"]] %in% colnames(metadata_sample))) {
             message <-
                 paste0(
                     "The ",
@@ -233,7 +233,7 @@ if (!(metadata_info[["Superplot"]] %in% colnames(metadata_sample))) {
         if (plot_types == "Sample") {
         # Plot colour
         if ("color" %in% names(metadata_info)) {
-if (!(metadata_info[["color"]] %in% colnames(metadata_sample))) {
+            if (!(metadata_info[["color"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -247,7 +247,7 @@ if (!(metadata_info[["color"]] %in% colnames(metadata_sample))) {
 
         # Plot shape
         if ("shape" %in% names(metadata_info)) {
-if (!(metadata_info[["shape"]] %in% colnames(metadata_sample))) {
+            if (!(metadata_info[["shape"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -261,7 +261,7 @@ if (!(metadata_info[["shape"]] %in% colnames(metadata_sample))) {
 
         # Plot individual
         if ("individual" %in% names(metadata_info)) {
-if (!(metadata_info[["individual"]] %in% colnames(metadata_sample))) {
+            if (!(metadata_info[["individual"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -272,9 +272,9 @@ if (!(metadata_info[["individual"]] %in% colnames(metadata_sample))) {
                 stop(message)
             }
         }
-        }else if (plot_types == "Feature") {
+    } else if (plot_types == "Feature") {
         if ("color" %in% names(metadata_info)) {
-if (!(metadata_info[["color"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["color"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -288,7 +288,7 @@ if (!(metadata_info[["color"]] %in% colnames(metadata_feature))) {
 
         # Plot shape
         if ("shape" %in% names(metadata_info)) {
-if (!(metadata_info[["shape"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["shape"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -302,7 +302,7 @@ if (!(metadata_info[["shape"]] %in% colnames(metadata_feature))) {
 
         # Plot individual
         if ("individual" %in% names(metadata_info)) {
-if (!(metadata_info[["individual"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["individual"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -313,10 +313,10 @@ if (!(metadata_info[["individual"]] %in% colnames(metadata_feature))) {
                 stop(message)
             }
         }
-        }else if (plot_types == "Both") {
+    } else if (plot_types == "Both") {
         # Plot colour sample
         if ("color_Sample" %in% names(metadata_info)) {
-if (!(metadata_info[["color_Sample"]] %in% colnames(metadata_sample))) {
+            if (!(metadata_info[["color_Sample"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -330,7 +330,7 @@ if (!(metadata_info[["color_Sample"]] %in% colnames(metadata_sample))) {
 
         # Plot colour Metab
         if ("color_Metab" %in% names(metadata_info)) {
-if (!(metadata_info[["color_Metab"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["color_Metab"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -349,7 +349,7 @@ if (!(metadata_info[["color_Metab"]] %in% colnames(metadata_feature))) {
 
         # Plot shape_metab
         if ("shape_Metab" %in% names(metadata_info)) {
-if (!(metadata_info[["shape_Metab"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["shape_Metab"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -363,7 +363,7 @@ if (!(metadata_info[["shape_Metab"]] %in% colnames(metadata_feature))) {
 
         # Plot shape_metab
         if ("shape_Sample" %in% names(metadata_info)) {
-if (!(metadata_info[["shape_Sample"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["shape_Sample"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -377,7 +377,7 @@ if (!(metadata_info[["shape_Sample"]] %in% colnames(metadata_feature))) {
 
         # Plot individual_Metab
         if ("individual_Metab" %in% names(metadata_info)) {
-if (!(metadata_info[["individual_Metab"]] %in% colnames(metadata_feature))) {
+            if (!(metadata_info[["individual_Metab"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -391,7 +391,7 @@ if (!(metadata_info[["individual_Metab"]] %in% colnames(metadata_feature))) {
 
         # Plot individual_Sample
         if ("individual_Sample" %in% names(metadata_info)) {
-if (!(metadata_info[["individual_Sample"]] %in% colnames(metadata_sample))) {
+            if (!(metadata_info[["individual_Sample"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -403,7 +403,7 @@ if (!(metadata_info[["individual_Sample"]] %in% colnames(metadata_sample))) {
             }
         }
 
-        }
+    }
 
     }
     }
@@ -411,7 +411,7 @@ if (!(metadata_info[["individual_Sample"]] %in% colnames(metadata_sample))) {
     # -------------SaveAs
     Save_as_Plot_options <- c("svg","pdf", "png")
     if (!is.null(save_plot)) {
-if (!(save_plot %in% Save_as_Plot_options)) {
+        if (!(save_plot %in% Save_as_Plot_options)) {
         message <-
             paste0(
                 "Check input. The selected save_plot option is not valid. Please select one of the folowwing: ",
@@ -428,19 +428,19 @@ if (!(save_plot %in% Save_as_Plot_options)) {
             "txt",
             "csv",
             "xlsx",
-            "Rdata") # Rdata = SummarizedExperiment (?
+            "Rdata" # Rdata = SummarizedExperiment (?
         )
     if (!is.null(save_table)) {
-if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
-        message <-
-            paste0(
-                "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
-                paste(save_table_options,collapse = ", "),
-                " or set to NULL if no tables should be saved."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
+            message <-
+                paste0(
+                    "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
+                    paste(save_table_options,collapse = ", "),
+                    " or set to NULL if no tables should be saved."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     # -------------core
@@ -465,16 +465,16 @@ if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
                 "theme_void()",
                 "theme_test()"
             )
-if (!(theme %in% theme_options)) {
-        message <-
-            paste0(
-                "Check input. theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",
-                paste(theme_options, collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        if (!(theme %in% theme_options)) {
+            message <-
+                paste0(
+                    "Check input. theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",
+                    paste(theme_options, collapse = ", "),
+                    "."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
     # ------------- general
     if (!is.logical(print_plot)) {
@@ -534,33 +534,34 @@ check_param_processing <- function(
     mvi_percentage=50,
     hotellins_confidence = 0.99
 ) {
-    if (is.vector(metadata_info)) {
-    # -------------metadata_info
-    # core
-    if (core) {   # parse core normalisation factor
-        message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
-        log_trace(paste("Message ", message, sep =""))
-        message(message)
-        if ("core_media" %in% names(metadata_info)) {
-            if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {     # Check for core_media samples
-            message <- paste0("No core_media samples were provided in the 'Conditions' in the metadata_sample. For a core experiment control media samples without cells have to be measured and be added in the 'Conditions'
-                            column labeled as 'core_media' (see @param section). Please make sure that you used the correct labelling or whether you need core = FALSE for your analysis")
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
-        }
-        }
 
-if (!("core_norm_factor" %in% names(metadata_info))) {
-            message <- paste0("No growth rate or growth factor provided for normalising the core result, hence core_norm_factor set to 1 for each sample")
-            log_trace(paste("Warning ", message, sep =""))
-            warning(message)
+    if (is.vector(metadata_info)) {
+        # -------------metadata_info
+        # core
+        if (core) {   # parse core normalisation factor
+            message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
+            log_trace(paste("Message ", message, sep =""))
+            message(message)
+            if ("core_media" %in% names(metadata_info)) {
+                if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {     # Check for core_media samples
+                    message <- paste0("No core_media samples were provided in the 'Conditions' in the metadata_sample. For a core experiment control media samples without cells have to be measured and be added in the 'Conditions'
+                                    column labeled as 'core_media' (see @param section). Please make sure that you used the correct labelling or whether you need core = FALSE for your analysis")
+                    log_trace(paste("Error ", message, sep =""))
+                    stop(message)
+                }
+            }
+
+            if (!("core_norm_factor" %in% names(metadata_info))) {
+                message <- paste0("No growth rate or growth factor provided for normalising the core result, hence core_norm_factor set to 1 for each sample")
+                log_trace(paste("Warning ", message, sep =""))
+                warning(message)
+            }
         }
-    }
     }
 
     # -------------General parameters
     Feature_Filtering_options <- c("Standard","Modified")
-if (!(!(featurefilt %in% Feature_Filtering_options) & is.null(featurefilt))) {
+    if (!(!(featurefilt %in% Feature_Filtering_options) & is.null(featurefilt))) {
         message <-
             paste0(
                 "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
@@ -665,34 +666,37 @@ check_param_dma <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadata_info))) {
-    # all-vs-all: Generate all pairwise combinations
+    meta_vars <- names(metadata_info)
+    denom_num <- c("Denominator", "Numerator")
+
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
+        # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
         numerator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
         comparisons <- combn(unique(conditions), 2) %>% as.matrix()
-    # Settings:
+        # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info)  & "Numerator" %in% names(metadata_info))) {
-    # all-vs-one: Generate the pairwise combinations
-    conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
-    denominator <- metadata_info[["Denominator"]]
-    numerator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
-    # Remove denom from num
-    numerator <- numerator[!numerator %in% denominator]
-    comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
-    # Settings:
-    MultipleComparison <- TRUE
-    all_vs_all <- FALSE
-    }else if ("Denominator" %in% names(metadata_info)  & "Numerator" %in% names(metadata_info)) {
-    # one-vs-one: Generate the comparisons
-    denominator <- metadata_info[["Denominator"]]
-    numerator <- metadata_info[["Numerator"]]
-    comparisons <- matrix(c(metadata_info[["Denominator"]], metadata_info[["Numerator"]]))
-    # Settings:
-    MultipleComparison <- FALSE
-    all_vs_all <- FALSE
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+        # all-vs-one: Generate the pairwise combinations
+        conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        denominator <- metadata_info[["Denominator"]]
+        numerator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
+        # Remove denom from num
+        numerator <- numerator[!numerator %in% denominator]
+        comparisons  <- t(expand.grid(numerator, denominator)) %>% as.data.frame()
+        # Settings:
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
+    } else if (denom_num %>% is_in(meta_vars) %>% all) {
+        # one-vs-one: Generate the comparisons
+        denominator <- metadata_info[["Denominator"]]
+        numerator <- metadata_info[["Numerator"]]
+        comparisons <- matrix(c(metadata_info[["Denominator"]], metadata_info[["Numerator"]]))
+        # Settings:
+        MultipleComparison <- FALSE
+        all_vs_all <- FALSE
     }
 
     ## ------------ Test statistics ----------- ##
@@ -705,28 +709,28 @@ if (!("Denominator" %in% names(metadata_info)  & "Numerator" %in% names(metadata
                 "cor.test",
                 "lmFit"
             )
-if (!(pval %in% STAT_pval_options)) {
-        message <-
-            paste0(
-                "Check input. The selected pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",
-                paste(STAT_pval_options,collapse = ", "),
-                " or specify numerator and denumerator."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        if (!(pval %in% STAT_pval_options)) {
+            message <-
+                paste0(
+                    "Check input. The selected pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",
+                    paste(STAT_pval_options,collapse = ", "),
+                    " or specify numerator and denumerator."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     } else {
-    STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
-if (!(pval %in% STAT_pval_options)) {
-        message <-
-            paste0(
-                "Check input. The selected pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",
-                paste(STAT_pval_options,collapse = ", "),
-                " or change numerator and denumerator."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
+        if (!(pval %in% STAT_pval_options)) {
+            message <-
+                paste0(
+                    "Check input. The selected pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",
+                    paste(STAT_pval_options,collapse = ", "),
+                    " or change numerator and denumerator."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     STAT_padj_options <-
@@ -740,7 +744,7 @@ if (!(pval %in% STAT_pval_options)) {
             "fdr",
             "none"
         )
-if (!(padj %in% STAT_padj_options)) {
+    if (!(padj %in% STAT_padj_options)) {
         message <-
             paste0(
                 "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",
@@ -796,61 +800,61 @@ if (!(padj %in% STAT_padj_options)) {
 
     if ((ncol(Num_Miss)>0 & ncol(Denom_Miss) == 0)) {
         Metabolites_Miss <- colnames(Num_Miss)
-    if (ncol(Num_Miss)<=10) {
-        message <-
-            paste0(
-                "In `Numerator` ",
-                paste0(toString(numerator)),
-                ", NA/0 values exist in ",
-                ncol(Num_Miss),
-                " Metabolite(s): ",
-                paste0(colnames(Num_Miss), collapse = ", "),
-                ". Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
-            )
-        log_info(message)
-        message(message)
-    } else {
-        message <-
-            paste0(
-                "In `Numerator` ",
-                paste0(toString(numerator)),
-                ", NA/0 values exist in ",
-                ncol(Num_Miss),
-                " Metabolite(s).",
-                " Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
-            )
-        log_info(message)
-        message(message)
-    }
+        if (ncol(Num_Miss)<=10) {
+            message <-
+                paste0(
+                    "In `Numerator` ",
+                    paste0(toString(numerator)),
+                    ", NA/0 values exist in ",
+                    ncol(Num_Miss),
+                    " Metabolite(s): ",
+                    paste0(colnames(Num_Miss), collapse = ", "),
+                    ". Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
+                )
+            log_info(message)
+            message(message)
+        } else {
+            message <-
+                paste0(
+                    "In `Numerator` ",
+                    paste0(toString(numerator)),
+                    ", NA/0 values exist in ",
+                    ncol(Num_Miss),
+                    " Metabolite(s).",
+                    " Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
+                )
+            log_info(message)
+            message(message)
+        }
     } else if (ncol(Num_Miss) == 0 & ncol(Denom_Miss)>0) {
-    Metabolites_Miss <- colnames(Denom_Miss)
-    if (ncol(Num_Miss)<=10) {
-        message <-
-            paste0(
-                "In `Denominator` ",
-                paste0(toString(denominator)),
-                ", NA/0 values exist in ",
-                ncol(Denom_Miss),
-                " Metabolite(s): ",
-                paste0(colnames(Denom_Miss), collapse = ", "),
-                ". Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
-            )
-        log_info(message)
-        message(message)
-    } else {
-        message <-
-            paste0(
-                "In `Denominator` ",
-                paste0(toString(denominator)),
-                ", NA/0 values exist in ",
-                ncol(Denom_Miss),
-                " Metabolite(s).",
-                " Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
-            )
-        log_info(message)
-        message(message)#
-    }
-    } else if (ncol(Num_Miss)>0 & ncol(Denom_Miss)>0) {
+        Metabolites_Miss <- colnames(Denom_Miss)
+        if (ncol(Num_Miss)<=10) {
+            message <-
+                paste0(
+                    "In `Denominator` ",
+                    paste0(toString(denominator)),
+                    ", NA/0 values exist in ",
+                    ncol(Denom_Miss),
+                    " Metabolite(s): ",
+                    paste0(colnames(Denom_Miss), collapse = ", "),
+                    ". Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
+                )
+            log_info(message)
+            message(message)
+        } else {
+            message <-
+                paste0(
+                    "In `Denominator` ",
+                    paste0(toString(denominator)),
+                    ", NA/0 values exist in ",
+                    ncol(Denom_Miss),
+                    " Metabolite(s).",
+                    " Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
+                )
+            log_info(message)
+            message(message)#
+        }
+    } else if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
     Metabolites_Miss <- unique(Metabolites_Miss)
 
@@ -867,16 +871,17 @@ if (!(padj %in% STAT_padj_options)) {
             ncol(Denom_Miss),
             " Metabolite(s
         ).",
-                        ". Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA.")
-    log_info(message)
-    message(message)
+            ". Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
+        )
+        log_info(message)
+        message(message)
     } else {
-    message <- paste0("There are no NA/0 values")
-    log_info(message)
-    message(message)
+        message <- paste0("There are no NA/0 values")
+        log_info(message)
+        message(message)
 
-    Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
+        Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
+        Metabolites_Miss <- unique(Metabolites_Miss)
     }
 
     # -------------General parameters
@@ -990,109 +995,109 @@ check_param_ora <- function(
     }
 
     if (!is.null(metadata_info)) {
-    # "ClusterColumn"
-    if ("ClusterColumn" %in% names(metadata_info)) {
-if (!(metadata_info[["ClusterColumn"]] %in% colnames(data))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info[["ClusterColumn"]],
-                    " column selected as ClusterColumn in metadata_info was not found in data. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # "ClusterColumn"
+        if ("ClusterColumn" %in% names(metadata_info)) {
+            if (!(metadata_info[["ClusterColumn"]] %in% colnames(data))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info[["ClusterColumn"]],
+                        " column selected as ClusterColumn in metadata_info was not found in data. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
 
-    # "BackgroundColumn"
-    if ("BackgroundColumn" %in% names(metadata_info)) {
-if (!(metadata_info[["BackgroundColumn"]] %in% colnames(data))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info[["BackgroundColumn"]],
-                    " column selected as BackgroundColumn in metadata_info was not found in data. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # "BackgroundColumn"
+        if ("BackgroundColumn" %in% names(metadata_info)) {
+            if (!(metadata_info[["BackgroundColumn"]] %in% colnames(data))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info[["BackgroundColumn"]],
+                        " column selected as BackgroundColumn in metadata_info was not found in data. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
 
-    # "pvalColumn"
-    if ("pvalColumn" %in% names(metadata_info)) {
-if (!(metadata_info[["pvalColumn"]] %in% colnames(data))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info[["pvalColumn"]],
-                    " column selected as pvalColumn in metadata_info was not found in data. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # "pvalColumn"
+        if ("pvalColumn" %in% names(metadata_info)) {
+            if (!(metadata_info[["pvalColumn"]] %in% colnames(data))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info[["pvalColumn"]],
+                        " column selected as pvalColumn in metadata_info was not found in data. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
 
-    # "percentageColumn"
-    if ("percentageColumn" %in% names(metadata_info)) {
-if (!(metadata_info[["percentageColumn"]] %in% colnames(data))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info[["percentageColumn"]],
-                    " column selected as percentageColumn in metadata_info was not found in data. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # "percentageColumn"
+        if ("percentageColumn" %in% names(metadata_info)) {
+            if (!(metadata_info[["percentageColumn"]] %in% colnames(data))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info[["percentageColumn"]],
+                        " column selected as percentageColumn in metadata_info was not found in data. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
 
-    # "PathwayTerm"
-    if ("PathwayTerm" %in% names(metadata_info)) {
-if (!(metadata_info[["PathwayTerm"]] %in% colnames(input_pathway))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info[["PathwayTerm"]],
-                    " column selected as PathwayTerm in metadata_info was not found in input_pathway. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # "PathwayTerm"
+        if ("PathwayTerm" %in% names(metadata_info)) {
+            if (!(metadata_info[["PathwayTerm"]] %in% colnames(input_pathway))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info[["PathwayTerm"]],
+                        " column selected as PathwayTerm in metadata_info was not found in input_pathway. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            } else {
+                input_pathway <- input_pathway %>%
+                rename("term"= metadata_info[["PathwayTerm"]])
+                input_pathway$Description <- input_pathway$term
+            }
         } else {
-        input_pathway <- input_pathway %>%
-        rename("term"= metadata_info[["PathwayTerm"]])
-        input_pathway$Description <- input_pathway$term
+            message <- paste0("metadata_info must provide the column name for PathwayTerm in input_pathway")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
         }
+
+        # PathwayFeature
+        if ("PathwayFeature" %in% names(metadata_info)) {
+            if (!(metadata_info[["PathwayFeature"]] %in% colnames(input_pathway))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info[["PathwayFeature"]],
+                        " column selected as PathwayFeature in metadata_info was not found in input_pathway. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            } else {
+                input_pathway <- input_pathway %>%
+                rename("gene"= metadata_info[["PathwayFeature"]])
+            }
+        } else {
+            message <- paste0("metadata_info must provide the column name for PathwayFeature in input_pathway")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
+
     } else {
-        message <- paste0("metadata_info must provide the column name for PathwayTerm in input_pathway")
+        message <- paste0("You must provide metadata_info.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
-    }
-
-    # PathwayFeature
-    if ("PathwayFeature" %in% names(metadata_info)) {
-if (!(metadata_info[["PathwayFeature"]] %in% colnames(input_pathway))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info[["PathwayFeature"]],
-                    " column selected as PathwayFeature in metadata_info was not found in input_pathway. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
-        } else {
-        input_pathway <- input_pathway %>%
-        rename("gene"= metadata_info[["PathwayFeature"]])
-        }
-    } else {
-        message <- paste0("metadata_info must provide the column name for PathwayFeature in input_pathway")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
-
-    } else {
-    message <- paste0("You must provide metadata_info.")
-    log_trace(paste("Error ", message, sep =""))
-    stop(message)
     }
 
     # 3. General Settings
@@ -1122,32 +1127,32 @@ if (!(metadata_info[["PathwayFeature"]] %in% colnames(input_pathway))) {
 
     save_table_options <- c("txt","csv", "xlsx")
     if (!is.null(save_table)) {
-if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
-        message <-
-            paste0(
-                "Check input. The selected save_table option is not valid. Please select one of the folowing: ",
-                paste(save_table_options,collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
+            message <-
+                paste0(
+                    "Check input. The selected save_table option is not valid. Please select one of the folowing: ",
+                    paste(save_table_options,collapse = ", "),
+                    "."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     if (!is.null(cutoff_stat)) {
         if (!is.numeric(cutoff_stat) | cutoff_stat > 1 |  cutoff_stat < 0) {
-        message <- paste0("Check input. The selected cutoff_stat value should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+            message <- paste0("Check input. The selected cutoff_stat value should be numeric and between 0 and 1.")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     if (!is.null(cutoff_percentage)) {
         if ( !is.numeric(cutoff_percentage)  | cutoff_percentage > 100 | cutoff_percentage < 0) {
-        message <- paste0("Check input. The selected cutoff_percentage value should be numeric and between 0 and 100.")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+            message <- paste0("Check input. The selected cutoff_percentage value should be numeric and between 0 and 100.")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     ## -------- Return Pathways --------- # #
@@ -1226,110 +1231,111 @@ check_param_mca <- function(
     # ------------- data
     if (!is.null(data_c1)) {
         if (!inherits(data_c1, "data.frame") | !inherits(data_c2, "data.frame")) {
-        message <-
-            paste0(
-                "data_c1 and data_c2 should be a data.frame. It's currently a ",
-                paste(class(data_c1)),
-                paste(class(data_c2)),
-                ".",
-                sep = ""
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
-    if (length(data_c1[duplicated(data_c1[[feature]]), feature]) > 0) {
-        message <- paste0("Duplicated features of data_c1, whilst features must be unique")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
-    if (length(data_c2[duplicated(data_c2[[feature]]), feature]) > 0) {
-        message <- paste0("Duplicated features of data_c2, whilst features must be unique")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+            message <-
+                paste0(
+                    "data_c1 and data_c2 should be a data.frame. It's currently a ",
+                    paste(class(data_c1)),
+                    paste(class(data_c2)),
+                    ".",
+                    sep = ""
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
+        if (length(data_c1[duplicated(data_c1[[feature]]), feature]) > 0) {
+            message <- paste0("Duplicated features of data_c1, whilst features must be unique")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
+        if (length(data_c2[duplicated(data_c2[[feature]]), feature]) > 0) {
+            message <- paste0("Duplicated features of data_c2, whilst features must be unique")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
 
     } else {
-    if (!inherits(data_intra, "data.frame") | !inherits(data_core, "data.frame")) {
-        message <-
-            paste0(
-                "data_intra and data_core should be a data.frame. It's currently a ",
-                paste(class(data_intra)),
-                paste(class(data_core)),
-                ".",
-                sep = ""
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
-    if (length(data_intra[duplicated(data_intra[[feature]]), feature]) > 0) {
-        message <- paste0("Duplicated features of data_intra, whilst features must be unique")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
-    if (length(data_core[duplicated(data_core[[feature]]), feature]) > 0) {
-        message <- paste0("Duplicated features of data_core, whilst features must be unique")
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+
+        if (!inherits(data_intra, "data.frame") | !inherits(data_core, "data.frame")) {
+            message <-
+                paste0(
+                    "data_intra and data_core should be a data.frame. It's currently a ",
+                    paste(class(data_intra)),
+                    paste(class(data_core)),
+                    ".",
+                    sep = ""
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
+        if (length(data_intra[duplicated(data_intra[[feature]]), feature]) > 0) {
+            message <- paste0("Duplicated features of data_intra, whilst features must be unique")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
+        if (length(data_core[duplicated(data_core[[feature]]), feature]) > 0) {
+            message <- paste0("Duplicated features of data_core, whilst features must be unique")
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     # ------------- metadata_info
     if (!is.null(metadata_info_c1)) {
-    ## C1
-    # ValueCol
-    if ("ValueCol" %in% names(metadata_info_c1)) {
-if (!(metadata_info_c1[["ValueCol"]] %in% colnames(data_c1))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info_c1[["ValueCol"]],
-                    " column selected as ValueCol in metadata_info_c1 was not found in data_c1. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        ## C1
+        # ValueCol
+        if ("ValueCol" %in% names(metadata_info_c1)) {
+            if (!(metadata_info_c1[["ValueCol"]] %in% colnames(data_c1))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info_c1[["ValueCol"]],
+                        " column selected as ValueCol in metadata_info_c1 was not found in data_c1. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
-    # StatCol
-    if ("StatCol" %in% names(metadata_info_c1)) {
-if (!(metadata_info_c1[["StatCol"]] %in% colnames(data_c1))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info_c1[["StatCol"]],
-                    " column selected as StatCol in metadata_info_c1 was not found in data_c1. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # StatCol
+        if ("StatCol" %in% names(metadata_info_c1)) {
+            if (!(metadata_info_c1[["StatCol"]] %in% colnames(data_c1))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info_c1[["StatCol"]],
+                        " column selected as StatCol in metadata_info_c1 was not found in data_c1. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
 
-    ## C2
-    # ValueCol
-    if ("ValueCol" %in% names(metadata_info_c2)) {
-if (!(metadata_info_c2[["ValueCol"]] %in% colnames(data_c2))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info_c2[["ValueCol"]],
-                    " column selected as ValueCol in metadata_info_c2 was not found in data_c2. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        ## C2
+        # ValueCol
+        if ("ValueCol" %in% names(metadata_info_c2)) {
+            if (!(metadata_info_c2[["ValueCol"]] %in% colnames(data_c2))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info_c2[["ValueCol"]],
+                        " column selected as ValueCol in metadata_info_c2 was not found in data_c2. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
-    # StatCol
-    if ("StatCol" %in% names(metadata_info_c2)) {
-if (!(metadata_info_c2[["StatCol"]] %in% colnames(data_c2))) {
-            message <-
-                paste0(
-                    "The ",
-                    metadata_info_c2[["StatCol"]],
-                    " column selected as StatCol in metadata_info_c2 was not found in data_c2. Please check your input."
-                )
-            log_trace(paste("Error ", message, sep =""))
-            stop(message)
+        # StatCol
+        if ("StatCol" %in% names(metadata_info_c2)) {
+            if (!(metadata_info_c2[["StatCol"]] %in% colnames(data_c2))) {
+                message <-
+                    paste0(
+                        "The ",
+                        metadata_info_c2[["StatCol"]],
+                        " column selected as StatCol in metadata_info_c2 was not found in data_c2. Please check your input."
+                    )
+                log_trace(paste("Error ", message, sep =""))
+                stop(message)
+            }
         }
-    }
     } else {
     ## Intra
     # ValueCol
@@ -1347,7 +1353,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
     }
     # StatCol
     if ("StatCol" %in% names(metadata_info_intra)) {
-if (!(metadata_info_intra[["StatCol"]] %in% colnames(data_intra))) {
+        if (!(metadata_info_intra[["StatCol"]] %in% colnames(data_intra))) {
             message <-
                 paste0(
                     "The ",
@@ -1362,7 +1368,7 @@ if (!(metadata_info_intra[["StatCol"]] %in% colnames(data_intra))) {
     ## core
     # ValueCol
     if ("ValueCol" %in% names(metadata_info_core)) {
-if (!(metadata_info_core[["ValueCol"]] %in% colnames(data_core))) {
+        if (!(metadata_info_core[["ValueCol"]] %in% colnames(data_core))) {
             message <-
                 paste0(
                     "The ",
@@ -1375,7 +1381,7 @@ if (!(metadata_info_core[["ValueCol"]] %in% colnames(data_core))) {
     }
     # StatCol
     if ("StatCol" %in% names(metadata_info_core)) {
-if (!(metadata_info_core[["StatCol"]] %in% colnames(data_core))) {
+        if (!(metadata_info_core[["StatCol"]] %in% colnames(data_core))) {
             message <-
                 paste0(
                     "The ",
@@ -1389,7 +1395,7 @@ if (!(metadata_info_core[["StatCol"]] %in% colnames(data_core))) {
 
     # StatCol
     if ("DirectionCol" %in% names(metadata_info_core)) {
-if (!(metadata_info_core[["DirectionCol"]] %in% colnames(data_core))) {
+        if (!(metadata_info_core[["DirectionCol"]] %in% colnames(data_core))) {
             message <-
                 paste0(
                     "The ",
@@ -1513,7 +1519,7 @@ if (!(metadata_info_core[["DirectionCol"]] %in% colnames(data_core))) {
                 nrow(data_core)- nrow(data_core[complete.cases(data_core[[metadata_info_core[["ValueCol"]]]], data_core[[metadata_info_core[["StatCol"]]]]), ]),
                 " metabolites containing NAs are removed."
             )
-        log_trace(paste("Warning ", message, sep =""))
+        log_trace(paste("Warning ", message, sep = ""))
         warning(message)
     }
     }
@@ -1521,43 +1527,43 @@ if (!(metadata_info_core[["DirectionCol"]] %in% colnames(data_core))) {
     # ------------- method_background
     if (!is.null(metadata_info_c1)) {
         options <- c("C1 | C2", "C1&C2", "C2", "C1" , "*")
-if (!(any(options %in% method_background))) {
-        message <-
-            paste0(
-                "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
-                paste(options,collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        if (!(any(options %in% method_background))) {
+            message <-
+                paste0(
+                    "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
+                    paste(options,collapse = ", "),
+                    "."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     } else {
-    options <- c("Intra | core", "Intra&core", "core", "Intra" , "*")
-if (!(any(options %in% method_background))) {
-        message <-
-            paste0(
-                "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
-                paste(options,collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(message)
-    }
+        options <- c("Intra | core", "Intra&core", "core", "Intra" , "*")
+        if (!(any(options %in% method_background))) {
+            message <-
+                paste0(
+                    "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
+                    paste(options,collapse = ", "),
+                    "."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(message)
+        }
     }
 
     # ------------- SaveAs
     save_table_options <- c("txt","csv", "xlsx")
     if (!is.null(save_table)) {
-if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
-        message <-
-            paste0(
-                "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
-                paste(save_table_options,collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep =""))
-        stop(  message)
-    }
+        if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
+            message <-
+                paste0(
+                    "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
+                    paste(save_table_options,collapse = ", "),
+                    "."
+                )
+            log_trace(paste("Error ", message, sep =""))
+            stop(  message)
+        }
     }
 }
 
