@@ -90,7 +90,7 @@ viz_upset <- function(
 
 
     # # ------------ Create Results output folder ----------- ##
-    if (is.null(save_plot) == FALSE) {
+    if (!is.null(save_plot)) {
         folder <- save_path(
             folder_name = "UpsetPlots",
             path = path

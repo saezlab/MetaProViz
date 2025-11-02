@@ -49,7 +49,7 @@ save_path <- function(
             dir.create(path)
         }
     } else {
-        if (dir.exists(path) == FALSE) {
+        if (!dir.exists(path)) {
             path <- getwd()
             message(
                 "Provided `path` does not exist and hence results are saved here: ",
@@ -138,11 +138,11 @@ save_res <- function(
     plot_unit = NULL
 ) {
     # ############### Save Tables:
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         # Excel File: One file with multiple sheets:
         if (save_table == "xlsx") {
             # Make file_name
-            if (core == FALSE | is.null(core) == TRUE) {
+            if (!core | is.null(core)) {
                 file_name <-
                     paste0(
                         path,
@@ -172,7 +172,7 @@ save_res <- function(
         } else {
             for (DF in names(inputlist_df)) {
                 # Make file_name
-                if (core == FALSE | is.null(core) == TRUE) {
+                if (!core | is.null(core)) {
                     file_name_Save <-
                         paste0(
                             path,
@@ -219,10 +219,10 @@ save_res <- function(
     }
 
     # ############### Save Plots:
-    if (is.null(save_plot) == FALSE) {
+    if (!is.null(save_plot)) {
         for (Plot in names(inputlist_plot)) {
             # Make file_name
-            if (core == FALSE | is.null(core) == TRUE) {
+            if (!core | is.null(core)) {
                 file_name_Save <-
                     paste0(
                         path,
@@ -333,7 +333,7 @@ save_res <- function(
                 )
             }
 
-            if (print_plot == TRUE) {
+            if (print_plot) {
                 # Special handling for upset plots-they may have theme issues
                 if (is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)) {
                     tryCatch(

@@ -158,42 +158,42 @@ viz_volcano <- function(
                             plot_types ="Feature")
 
     # check_param` Specific:
-    if (is.numeric(cutoff_y) == FALSE | cutoff_y > 1 | cutoff_y < 0) {
+    if (!is.numeric(cutoff_y) | cutoff_y > 1 | cutoff_y < 0) {
         message <- paste0("Check input. The selected cutoff_y value should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.numeric(cutoff_x) == FALSE  | cutoff_x < 0) {
+    if (!is.numeric(cutoff_x)  | cutoff_x < 0) {
         message <- paste0("Check input. The selected cutoff_x value should be numeric and between 0 and +oo.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (paste(x) %in% colnames(data) == FALSE | paste(y) %in% colnames(data) == FALSE) {
+if (!(!(paste(x) %in% colnames(data)) | paste(y) %in% colnames(data))) {
         message <- paste0("Check your input. The column name of x and/ore y does not exist in Input_data.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.null(select_label) == FALSE & is.vector(select_label) == FALSE) {
+    if (!is.null(select_label) & !is.vector(select_label)) {
         message <- paste0("Check input. select_label must be either NULL or a vector.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.logical(connectors) == FALSE) {
+    if (!is.logical(connectors)) {
         message <- paste0("Check input. The connectors value should be either = TRUE if connectors from names to points are to be added to the plot or = FALSE if not.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.null(plot_name) == FALSE & is.vector(plot_name) == FALSE) {
+    if (!is.null(plot_name) & !is.vector(plot_name)) {
         message <- paste0("Check input.plot_name must be either NULL or a vector.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
     Plot_options <- c("Standard", "Compare", "PEA")
-    if (plot_types %in% Plot_options == FALSE) {
+if (!(plot_types %in% Plot_options)) {
         message <-
             paste0(
                 "plot_types option is incorrect. The allowed options are the following: ",
@@ -205,7 +205,7 @@ viz_volcano <- function(
     }
 
     ## ------------ Create Results output folder ----------- ##
-    if (is.null(save_plot) == FALSE) {
+    if (!is.null(save_plot)) {
         folder <- save_path(
             folder_name = "VolcanoPlots",
             path = path
@@ -215,10 +215,10 @@ viz_volcano <- function(
     ##########################################################################
     ## ----------- Prepare data ------------ ##
     # Extract required columns and merge with SettingsFile
-    if (is.null(metadata_feature) == FALSE) {
+    if (!is.null(metadata_feature)) {
     # # --- Prepare the color scheme:
-    if ("color" %in% names(metadata_info) == TRUE & "shape" %in% names(metadata_info) == TRUE) {
-        if ((metadata_info[["shape"]] == metadata_info[["color"]]) == TRUE) {
+    if ("color" %in% names(metadata_info) & "shape" %in% names(metadata_info)) {
+        if ((metadata_info[["shape"]] == metadata_info[["color"]])) {
             metadata_feature$shape <- metadata_feature[,paste(metadata_info[["color"]])]
             metadata_feature <- metadata_feature %>%
             rename("color"= paste(metadata_info[["color"]]))
@@ -227,14 +227,14 @@ viz_volcano <- function(
         rename("color"= paste(metadata_info[["color"]]),
                         "shape"= paste(metadata_info[["shape"]]))
         }
-    }else if ("color" %in% names(metadata_info) == TRUE & "shape" %in% names(metadata_info) == FALSE) {
+if (!("color" %in% names(metadata_info) & "shape" %in% names(metadata_info))) {
         metadata_feature <- metadata_feature %>%
         rename("color"= paste(metadata_info[["color"]]))
-    }else if ("color" %in% names(metadata_info) == FALSE & "shape" %in% names(metadata_info) == TRUE) {
+if (!("color" %in% names(metadata_info)) & "shape" %in% names(metadata_info)) {
         metadata_feature <- metadata_feature %>%
         rename("shape"= paste(metadata_info[["shape"]]))
     }
-    if ("individual" %in% names(metadata_info) == TRUE) {
+    if ("individual" %in% names(metadata_info)) {
         metadata_feature <- metadata_feature %>%
         rename("individual"= paste(metadata_info[["individual"]]))
     }
@@ -298,22 +298,22 @@ viz_volcano <- function(
     }
 
     # Rename the x and y lab if the information has been passed:
-    if (is.null(xlab) == TRUE) { # use column name of x provided by user
+    if (is.null(xlab)) { # use column name of x provided by user
         xlab <- bquote(.(as.symbol(x)))
-    }else if (is.null(xlab) == FALSE) {
+    }else if (!is.null(xlab)) {
     xlab <- bquote(.(as.symbol(xlab)))
     }
 
-    if (is.null(ylab) == TRUE) { # use column name of x provided by user
+    if (is.null(ylab)) { # use column name of x provided by user
         ylab <- bquote(.(as.symbol(y)))
-    }else if (is.null(ylab) == FALSE) {
+    }else if (!is.null(ylab)) {
         ylab <- bquote(.(as.symbol(ylab)))
         }
 
     ## ----------- Set the plot parameters: ------------ ##
     # # --- Prepare colour and shape palette
     if (is.null(color_palette)) {
-        if ("color" %in% names(metadata_info) == TRUE) {
+        if ("color" %in% names(metadata_info)) {
         safe_colorblind_palette <-
             c(
                 "#88CCEE",
@@ -518,7 +518,7 @@ viz_volcano_standard <- function(
     safe_shape_palette <- shape_palette
 
     # Plots
-    if ("individual" %in% names(metadata_info) == TRUE) {
+    if ("individual" %in% names(metadata_info)) {
     # Create the list of individual plots that should be made:
         IndividualPlots <- unique(data$individual)
 
@@ -529,7 +529,7 @@ viz_volcano_standard <- function(
         InputVolcano <- subset(data, individual == paste(i))
 
         if (nrow(InputVolcano)>=1) {
-            if ("color" %in% names(metadata_info) == TRUE ) {
+            if ("color" %in% names(metadata_info) ) {
             color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -544,7 +544,7 @@ viz_volcano_standard <- function(
             keyvals <- NULL
         }
         # Prepare the shape scheme:
-        if ("shape" %in% names(metadata_info) == TRUE) {
+        if ("shape" %in% names(metadata_info)) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
             keyvalsshape <- c()
@@ -559,7 +559,7 @@ viz_volcano_standard <- function(
             keyvalsshape <- NULL
         }
 
-        if ("color" %in% names(metadata_info) == FALSE & "shape" %in% names(metadata_info) == FALSE) {
+if (!(!("color" %in% names(metadata_info)) & "shape" %in% names(metadata_info))) {
             LegendPos <- "none"
         }
 
@@ -602,7 +602,7 @@ viz_volcano_standard <- function(
             drawConnectors = connectors
         )
         # Add the theme
-        if (is.null(theme) == FALSE) {
+        if (!is.null(theme)) {
             Plot <- Plot+theme
         }
 
@@ -650,13 +650,13 @@ viz_volcano_standard <- function(
         )
         }
     }
-    }else if ("individual" %in% names(metadata_info) == FALSE) {
+if (!("individual" %in% names(metadata_info))) {
     PlotList <- list() # Empty list to store all the plots
     PlotList_adaptedGrid <- list() # Empty list to store all the plots
 
     InputVolcano <- data
     if (nrow(InputVolcano)>=1) {
-        if ("color" %in% names(metadata_info) == TRUE ) {
+        if ("color" %in% names(metadata_info) ) {
             color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -671,7 +671,7 @@ viz_volcano_standard <- function(
         keyvals <- NULL
         }
         # Prepare the shape scheme:
-        if ("shape" %in% names(metadata_info) == TRUE) {
+        if ("shape" %in% names(metadata_info)) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
             keyvalsshape <- c()
@@ -686,7 +686,7 @@ viz_volcano_standard <- function(
         keyvalsshape <- NULL
         }
 
-        if ("color" %in% names(metadata_info) == FALSE & "shape" %in% names(metadata_info) == FALSE) {
+if (!(!("color" %in% names(metadata_info)) & "shape" %in% names(metadata_info))) {
             LegendPos <- "none"
         }
 
@@ -729,7 +729,7 @@ viz_volcano_standard <- function(
             drawConnectors = connectors
         )
         # Add the theme
-        if (is.null(theme) == FALSE) {
+        if (!is.null(theme)) {
             Plot <- Plot+theme
         }
 
@@ -860,8 +860,8 @@ viz_volcano_compare <- function(
 
     # # ## # ## # ## # ## # ## # ## # #
     # # --- Check data
-    if (is.data.frame(data2) == FALSE) {
-        if (paste(x) %in% colnames(data2) == FALSE | paste(y) %in% colnames(data2) == FALSE) {
+    if (!is.data.frame(data2)) {
+if (!(!(paste(x) %in% colnames(data2)) | paste(y) %in% colnames(data2))) {
         message <-
             paste(
                 "Check your data2. The column name of ",
@@ -875,7 +875,7 @@ viz_volcano_compare <- function(
     }
     }
 
-    if (any(duplicated(row.names(data2))) == TRUE) {
+    if (any(duplicated(row.names(data2)))) {
         message <- paste("Duplicated row.names of data2, whilst row.names must be unique")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -886,7 +886,7 @@ viz_volcano_compare <- function(
     safe_shape_palette <- shape_palette
 
     # # --- Prepare Input data
-    if (is.null(metadata_feature) == FALSE) {
+    if (!is.null(metadata_feature)) {
         data2 <-
             merge(
                 x = metadata_feature %>% tibble::rownames_to_column("FeatureNames"),
@@ -917,7 +917,7 @@ viz_volcano_compare <- function(
 
     # # ## # ## # ## # ## # ## # ## # #
     # # --- Plots
-    if ("individual" %in% names(metadata_info) == TRUE) {
+    if ("individual" %in% names(metadata_info)) {
     # Create the list of individual plots that should be made:
         IndividualPlots <- unique(InputCompare$individual)
 
@@ -929,7 +929,7 @@ viz_volcano_compare <- function(
 
         if (nrow(InputVolcano)>=1) {
         # Prepare the colour scheme:
-        if ("color" %in% names(metadata_info) == TRUE) {
+        if ("color" %in% names(metadata_info)) {
             color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -949,7 +949,7 @@ viz_volcano_compare <- function(
             }
         }
         # Prepare the shape scheme:
-        if ("shape" %in% names(metadata_info) == TRUE & "color" %in% names(metadata_info) == FALSE) {
+if (!("shape" %in% names(metadata_info) & "color" %in% names(metadata_info))) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
             keyvalsshape <- c()
@@ -958,7 +958,7 @@ viz_volcano_compare <- function(
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
             }
-        } else if ("shape" %in% names(metadata_info) == TRUE & "color" %in% names(metadata_info) == TRUE) {
+        } else if ("shape" %in% names(metadata_info) & "color" %in% names(metadata_info)) {
             # Here we have already used color from metadata_info and we need to use shape for the conditions
             message("For Plot_setting = `Consitions`we can only use colour or shape from metadata_feature. We ignore shape and use it to label the Comparison_name.")
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
@@ -969,7 +969,7 @@ viz_volcano_compare <- function(
             names(sha) <- InputVolcano$comparison[row]
             keyvalsshape <- c(keyvalsshape, sha)
             }
-        } else if ("shape" %in% names(metadata_info) == FALSE & "color" %in% names(metadata_info) == FALSE | "shape" %in% names(metadata_info) == FALSE & "color" %in% names(metadata_info) == TRUE) {
+if (!(!(!("shape" %in% names(metadata_info)) & "color" %in% names(metadata_info)) | "shape" %in% names(metadata_info)) & "color" %in% names(metadata_info)) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
             keyvalsshape <- c()
@@ -1018,7 +1018,7 @@ viz_volcano_compare <- function(
             drawConnectors = connectors
         )
         # Add the theme
-        if (is.null(theme) == FALSE) {
+        if (!is.null(theme)) {
             Plot <- Plot+theme
         }
 
@@ -1068,14 +1068,14 @@ viz_volcano_compare <- function(
     }
 
 
-    } else if ("individual" %in% names(metadata_info) == FALSE) {
+if (!("individual" %in% names(metadata_info))) {
     PlotList <- list() # Empty list to store all the plots
     PlotList_adaptedGrid <- list() # Empty list to store all the plots
 
     if (nrow(InputCompare)>=1) {
         InputVolcano <- InputCompare
         # Prepare the colour scheme:
-        if ("color" %in% names(metadata_info) == TRUE) {
+        if ("color" %in% names(metadata_info)) {
             color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -1095,7 +1095,7 @@ viz_volcano_compare <- function(
         }
         }
         # Prepare the shape scheme:
-        if ("shape" %in% names(metadata_info) == TRUE & "color" %in% names(metadata_info) == FALSE) {
+if (!("shape" %in% names(metadata_info) & "color" %in% names(metadata_info))) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
             keyvalsshape <- c()
@@ -1104,7 +1104,7 @@ viz_volcano_compare <- function(
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
         }
-        } else if ("shape" %in% names(metadata_info) == TRUE & "color" %in% names(metadata_info) == TRUE) {
+        } else if ("shape" %in% names(metadata_info) & "color" %in% names(metadata_info)) {
         # Here we have already used color from metadata_info and we need to use shape for the conditions
         message("For plot_types Comparison we can only use colour or shape from metadata_feature. Hence, we ignore shape and use it to label the name_comparison.")
         shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
@@ -1115,7 +1115,7 @@ viz_volcano_compare <- function(
             names(sha) <- InputVolcano$comparison[row]
             keyvalsshape <- c(keyvalsshape, sha)
         }
-        } else if ("shape" %in% names(metadata_info) == FALSE & "color" %in% names(metadata_info) == FALSE | "shape" %in% names(metadata_info) == FALSE & "color" %in% names(metadata_info) == TRUE) {
+if (!(!(!("shape" %in% names(metadata_info)) & "color" %in% names(metadata_info)) | "shape" %in% names(metadata_info)) & "color" %in% names(metadata_info)) {
         shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
         keyvalsshape <- c()
@@ -1164,7 +1164,7 @@ viz_volcano_compare <- function(
             drawConnectors = connectors
         )
         # Add the theme
-        if (is.null(theme) == FALSE) {
+        if (!is.null(theme)) {
             Plot <- Plot+theme
         }
 
@@ -1290,7 +1290,7 @@ viz_volcano_pea <- function(
     PEA_Pathway <- PEA_Feature <- NULL
     # # ## # ## # ## # ## # ## # ## # #
     # # --- Check PEA settings
-    if (is.vector(metadata_info) == FALSE) {
+    if (!is.vector(metadata_info)) {
         message <- paste0(
             "You have chosen Settings =`PEA` that requires you to ",
             "provide a vector for metadata_info."
@@ -1298,7 +1298,7 @@ viz_volcano_pea <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.null(metadata_feature) == TRUE) {
+    if (is.null(metadata_feature)) {
         message <- paste0(
             "You have chosen Settings =`PEA` that requires you to provide a DF ",
             "metadata_feature including the pathways used for the enrichment analysis."
@@ -1306,8 +1306,8 @@ viz_volcano_pea <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.null(metadata_feature) == FALSE & is.null(metadata_feature) == FALSE) {
-        if ("PEA_Feature" %in% names(metadata_info) == FALSE | "PEA_score" %in% names(metadata_info) == FALSE | "PEA_stat" %in% names(metadata_info) == FALSE | "PEA_Pathway" %in% names(metadata_info) == FALSE) {
+    if (!is.null(metadata_feature) & !is.null(metadata_feature)) {
+if (!(!(!(!("PEA_Feature" %in% names(metadata_info)) | "PEA_score" %in% names(metadata_info)) | "PEA_stat" %in% names(metadata_info)) | "PEA_Pathway" %in% names(metadata_info))) {
         message <- paste0("You have chosen Settings =`PEA` that requires you to provide a vector for metadata_info including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -1363,7 +1363,7 @@ viz_volcano_pea <- function(
 
     if (nrow(InputVolcano)>=1) {
         # Prepare the colour scheme:
-        if ("color" %in% names(metadata_info) == TRUE) {
+        if ("color" %in% names(metadata_info)) {
             color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
 
             keyvals <- c()
@@ -1378,7 +1378,7 @@ viz_volcano_pea <- function(
         keyvals <- NULL
         }
         # Prepare the shape scheme:
-        if ("shape" %in% names(metadata_info) == TRUE) {
+        if ("shape" %in% names(metadata_info)) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
             keyvalsshape <- c()
@@ -1393,7 +1393,7 @@ viz_volcano_pea <- function(
         keyvalsshape <- NULL
         }
 
-        if ("color" %in% names(metadata_info) == FALSE & "shape" %in% names(metadata_info) == FALSE) {
+if (!(!("color" %in% names(metadata_info)) & "shape" %in% names(metadata_info))) {
             LegendPos <- "none"
         }
 
@@ -1436,7 +1436,7 @@ viz_volcano_pea <- function(
             drawConnectors = connectors
         )
         # Add the theme
-        if (is.null(theme) == FALSE) {
+        if (!is.null(theme)) {
             Plot <- Plot+theme
         }
 

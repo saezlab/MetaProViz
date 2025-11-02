@@ -177,7 +177,7 @@ processing <- function(
     )
 
     ## ------------------  Create output folders  and path ------------------- ##
-    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE ) {
+    if (!is.null(save_plot) | !is.null(save_table) ) {
         folder <- save_path(
             folder_name = "Processing",
             path = path
@@ -196,7 +196,7 @@ processing <- function(
 
     ##############################################################################
     ## ------------------ 1. Feature filtering ------------------- ##
-    if (is.null(featurefilt) == FALSE) {
+    if (!is.null(featurefilt)) {
         data_Filtered <- feature_filtering(
             data = data,
             featurefilt = featurefilt,
@@ -212,7 +212,7 @@ processing <- function(
     }
 
     ## ------------------ 2. Missing value Imputation ------------------- ##
-    if (mvi == TRUE) {
+    if (mvi) {
         mviRes <- mvi_imputation(
             data = data_Filt,
             metadata_sample = metadata_sample,
@@ -225,7 +225,7 @@ processing <- function(
     }
 
     ## ------------------  3. total Ion Current Normalization ------------------- ##
-    if (tic == TRUE) {
+    if (tic) {
         # Perform tic
         ticRes_List <- tic_norm(
             data = mviRes,
@@ -255,7 +255,7 @@ processing <- function(
     }
 
     ## ------------------ 4. core media QC (blank) and normalization ------------------- ##
-    if (core == TRUE) {
+    if (core) {
         data_coreNorm <- core_norm(
             data = ticRes,
             metadata_sample = metadata_sample,
@@ -322,7 +322,7 @@ processing <- function(
     DFList$Preprocessing_output <- OutlierRes[["DF"]][["data_outliers"]]
     DFList$data_Rawdata %<>% column_to_rownames('Sample')
 
-    if (core == TRUE) {
+    if (core) {
         if (is.null(data_coreNorm[["DF"]][["Contigency_table_core_blank"]])) {
             DFList_core <- list( "CV_core_blank"= data_coreNorm[["DF"]][["CV_core_blank"]])
         } else {
@@ -336,13 +336,13 @@ processing <- function(
     }
 
     ## ---- Plots
-    if (tic == TRUE) {
+    if (tic) {
         PlotList <- c(ticRes_List[["Plot"]], OutlierRes[["Plot"]])
     } else {
         PlotList <- c(RLAPlot_List[["Plot"]], OutlierRes[["Plot"]])
     }
 
-    if (core == TRUE) {
+    if (core) {
         PlotList <- c(PlotList , data_coreNorm[["Plot"]])
     }
 
@@ -505,7 +505,7 @@ replicate_sum <- function(
     }
 
     ## ------------ Create Results output folder ----------- ##
-    if (is.null(save_table) == FALSE ) {
+    if (!is.null(save_table) ) {
         folder <- save_path(
             folder_name = "Processing",
             path = path
@@ -698,9 +698,9 @@ pool_estimation <- function(
     )
 
     # `check_param` Specific
-    if (is.null(metadata_sample) == FALSE) {
-        if ("Conditions" %in% names(metadata_info) == TRUE) {
-            if (metadata_info[["Conditions"]] %in% colnames(metadata_sample) == FALSE ) {
+    if (!is.null(metadata_sample)) {
+        if ("Conditions" %in% names(metadata_info)) {
+if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample)) ) {
                 msg <-
                     sprintf(
                         "You have chosen Conditions = %s, %s was not found in metadata_sample as column. Please insert the name of the experimental conditions as stated in the metadata_sample.",
@@ -711,8 +711,8 @@ pool_estimation <- function(
                 stop(msg, call. = FALSE)
             }
         }
-        if ("PoolSamples" %in% names(metadata_info) == TRUE) {
-            if (metadata_info[["PoolSamples"]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE ) {
+        if ("PoolSamples" %in% names(metadata_info)) {
+if (!(metadata_info[["PoolSamples"]] %in% metadata_sample[[metadata_info[["Conditions"]]]]) ) {
                 msg <-
                     sprintf(
                         "You have chosen PoolSamples = %s, %s was not found in metadata_sample as sample condition. Please insert the name of the pool samples as stated in the Conditions column of the metadata_sample.",
@@ -725,12 +725,12 @@ pool_estimation <- function(
         }
     }
 
-    if (is.numeric(cutoff_cv) == FALSE | cutoff_cv < 0) {
+    if (!is.numeric(cutoff_cv) | cutoff_cv < 0) {
         stop("Check input. The selected cutoff_cv value should be a positive numeric value.")
     }
 
     ## ------------------  Create output folders  and path ------------------- ##
-    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE ) {
+    if (!is.null(save_plot) | !is.null(save_table) ) {
         folder <- save_path(
             folder_name = "Processing",
             path = path
@@ -746,7 +746,7 @@ pool_estimation <- function(
 
     ## ------------------ Prepare the data ------------------- ##
     # data files:
-    if (is.null(metadata_sample) == TRUE) {
+    if (is.null(metadata_sample)) {
         Pooldata <- data %>%
         mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
     } else {
@@ -785,7 +785,7 @@ pool_estimation <- function(
 
     # Remove Metabolites from data based on cutoff_cv
     log_trace('Applying CV cut-off.')
-    if (is.null(metadata_sample) == FALSE) {
+    if (!is.null(metadata_sample)) {
         unstable_metabs <- rownames(result_df_final)[result_df_final[["HighVar_Metabs"]]]
         if (length(unstable_metabs)>0) {
             filtered_Input_data <- data %>% select(!unstable_metabs)
@@ -804,7 +804,7 @@ pool_estimation <- function(
     # 1. Pool Sample PCA
     log_trace('Pool sample PCA.')
     dev.new()
-    if (is.null(metadata_sample) == TRUE) {
+    if (is.null(metadata_sample)) {
         pca_data <- Pooldata
         pca_QC_pool <- invisible(
             viz_pca(data = pca_data,
@@ -864,7 +864,7 @@ pool_estimation <- function(
     log_trace('CV violin plot.')
     # Make Violin of CVs
     Plot_cv_result_df <- result_df_final_out %>%
-    mutate(HighVar = ifelse((CV > cutoff_cv) == TRUE, paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
+    mutate(HighVar = ifelse((CV > cutoff_cv), paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
 
     ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar, label = Plot_cv_result_df$Metabolite))+
     geom_violin(alpha = 0.5 , fill ="#FF6666")+
@@ -900,7 +900,7 @@ pool_estimation <- function(
     ## ------------------ Return and Save ------------------- ##
     # Save
     log_info('Preparing saved and returned data.')
-    if (is.null(filtered_Input_data) == FALSE) {
+    if (!is.null(filtered_Input_data)) {
         DF_list <-
             list(
                 "data" = data,
@@ -1038,7 +1038,7 @@ feature_filtering <- function(
     feat_filt_data <- as.data.frame(data) %>%
     mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
 
-    if (core == TRUE) { # remove core_media samples for feature filtering
+    if (core) { # remove core_media samples for feature filtering
         feat_filt_data <- feat_filt_data %>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
         Feature_Filtering <- paste0(featurefilt, "_core")
     }
@@ -1054,13 +1054,13 @@ feature_filtering <- function(
             )
         log_info(message)
         message(message)
-        if (core == TRUE) {
+        if (core) {
             feat_filt_Conditions <- metadata_sample[[metadata_info[["Conditions"]]]][!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]]
         } else {
             feat_filt_Conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         }
 
-        if (is.null(unique(feat_filt_Conditions)) ==  TRUE) {
+        if (is.null(unique(feat_filt_Conditions))) {
             message("Conditions information is missing.")
             log_trace(message)
             stop(message)
@@ -1224,7 +1224,7 @@ mvi_imputation <- function(
     log_info(message)
     message(message)
 
-    if (core == TRUE) { # remove blank samples
+    if (core) { # remove blank samples
         NA_removed_matrix <- filtered_matrix %>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
 
     } else {
@@ -1232,7 +1232,7 @@ mvi_imputation <- function(
     }
 
     NA_removed_matrix %<>%
-        mutate(Conditions = if (core == TRUE) { # If we have a CoRe experiment we need to remove the sample metainformation of the media blank samples!
+        mutate(Conditions = if (core) { # If we have a CoRe experiment we need to remove the sample metainformation of the media blank samples!
             metadata_sample %>%
             filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]) %>%
             select(!!sym(metadata_info[["Conditions"]]))
@@ -1272,7 +1272,7 @@ mvi_imputation <- function(
                 .names = "{.col}"
             )
         ) %>%
-        select(where(~ any(. == TRUE)))
+        select(where(~ any(.)))
 
     if (ncol(na_check) > 0L) {
 
@@ -1289,7 +1289,7 @@ mvi_imputation <- function(
 
     }
 
-    if (core == TRUE) {
+    if (core) {
         replaceNAdf <- filtered_matrix %>% filter(metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
 
         # find metabolites with NA
@@ -1455,7 +1455,7 @@ tic_norm <- function(
 
     # RLA_data_raw_Sized <- plotGrob_Processing(input_plot = RLA_data_raw,plot_name= "Before tic Normalization", plot_type= "RLA")
 
-    if (tic == TRUE) {
+    if (tic) {
         ## ------------------ Perform tic ------------------- ##
         message <- paste0("total Ion Count (tic) normalization: total Ion Count (tic) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022")
         log_info(message)
@@ -1655,7 +1655,7 @@ core_norm <- function(
 
         cv_result_df <- result_df
 
-        HighVar_metabs <- sum(result_df$HighVar == TRUE)
+        HighVar_metabs <- sum(result_df$HighVar)
         if (HighVar_metabs>0) {
             message <-
                 paste0(
@@ -1694,7 +1694,7 @@ core_norm <- function(
 
         # Make Violin of CVs
         Plot_cv_result_df <- cv_result_df %>%
-        mutate(HighVar = ifelse(HighVar == TRUE, "> CV 30", "< CV 30"))
+        mutate(HighVar = ifelse(HighVar, "> CV 30", "< CV 30"))
 
         ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar, label = row.names(cv_result_df)))+
         geom_violin(alpha = 0.5 , fill ="#FF6666")+
@@ -1734,16 +1734,16 @@ core_norm <- function(
             while (HighVar_metabs>0) {
                 # remove the furthest value from the mean
                 if (HighVar_metabs>1) {
-                    max_var_pos <-  core_medias[,result_df$HighVar == TRUE]  %>%
+                    max_var_pos <-  core_medias[,result_df$HighVar]  %>%
                     as.data.frame() %>%
                     mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
                     summarise_all(.funs = ~ which.max(abs(.)))
                 } else {
-                    max_var_pos <-  core_medias[,result_df$HighVar == TRUE]  %>%
+                    max_var_pos <-  core_medias[,result_df$HighVar]  %>%
                     as.data.frame() %>%
                     mutate_all(.funs = ~ . - mean(., na.rm = TRUE)) %>%
                     summarise_all(.funs = ~ which.max(abs(.)))
-                    colnames(max_var_pos)<- colnames(core_medias)[result_df$HighVar == TRUE]
+                    colnames(max_var_pos)<- colnames(core_medias)[result_df$HighVar]
                 }
 
                 # Remove rows based on positions
@@ -1766,7 +1766,7 @@ core_norm <- function(
                 mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
                 rownames(result_df)<- colnames(core_medias)
 
-                HighVar_metabs <- sum(result_df$HighVar == TRUE)
+                HighVar_metabs <- sum(result_df$HighVar)
             }
 
             data_cont <- Outlier_data %>% t() %>% as.data.frame()
@@ -1819,7 +1819,7 @@ core_norm <- function(
                 }
             }
 
-            if (is.null(different_samples) == FALSE) {
+            if (!is.null(different_samples)) {
                 message <-
                     paste(
                         "The core_media samples ",
@@ -1976,7 +1976,7 @@ outlier_detection <- function(
     mutate_all(~ replace(., is.nan(.), 0))
     data_norm[is.na(data_norm)] <- 0 #replace NA with 0
 
-    if (core == TRUE) {
+    if (core) {
         Conditions <- metadata_sample[[metadata_info[["Conditions"]]]][!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]]
     } else {
         Conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
@@ -2159,7 +2159,7 @@ outlier_detection <- function(
         dev.off()
 
         a <- loop
-        if (core == TRUE) {
+        if (core) {
             a <- paste0(a,"_core")
         }
 
@@ -2217,7 +2217,7 @@ outlier_detection <- function(
     zero_var_metab_export_df <- data.frame(1,2)
     names(zero_var_metab_export_df) <- c("Filtering round","Metabolite")
 
-    if (zero_var_metab_warning == TRUE) {
+    if (zero_var_metab_warning) {
         message <- paste("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
         log_trace("Warning: " , message, sep ="")
         warning(message)

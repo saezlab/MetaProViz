@@ -149,21 +149,21 @@ viz_superplot <- function(
     )
 
     # check_param` Specific
-    if (is.null(metadata_info) == TRUE) {
+    if (is.null(metadata_info)) {
         message <- paste0("You must provide the column name for Conditions via metadata_info = c(Conditions = ColumnName) in order to plot the x-axis conditions.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (plot_type %in% c("Box", "Bar", "Violin") == FALSE) {
+if (!(plot_type %in% c("Box", "Bar", "Violin"))) {
         message <- paste0("plot_type must be either Box, Bar or Violin.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.null(plot_conditions) == FALSE) {
+    if (!is.null(plot_conditions)) {
         for (Condition in plot_conditions) {
-        if (Condition %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
+if (!(Condition %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "Check Input. The plot_conditions ",
@@ -176,10 +176,10 @@ viz_superplot <- function(
     }
     }
 
-    if (is.null(stat_comparison) == FALSE) {
+    if (!is.null(stat_comparison)) {
         for (Comp in stat_comparison) {
-        if (is.null(plot_conditions) == FALSE) {
-            if (plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
+        if (!is.null(plot_conditions)) {
+if (!(plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "Check Input. The stat_comparison condition ",
@@ -189,7 +189,7 @@ viz_superplot <- function(
             log_trace(paste("Error ", message, sep =""))
             stop(message)
         }
-        if (plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
+if (!(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "Check Input. The stat_comparison condition ",
@@ -227,8 +227,8 @@ viz_superplot <- function(
     }
     }
 
-    if (is.null(pval) == FALSE) {
-        if (MultipleComparison == TRUE & (pval =="t.test" | pval =="wilcox.test")) {
+    if (!is.null(pval)) {
+        if (MultipleComparison & (pval =="t.test" | pval =="wilcox.test")) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing,",
@@ -238,7 +238,7 @@ viz_superplot <- function(
         log_trace(paste("Warning ", message, sep =""))
         warning(message)
         pval <- "aov"
-    }else if (MultipleComparison == FALSE & (pval =="aov" | pval =="kruskal.test")) {
+    }else if (!MultipleComparison & (pval =="aov" | pval =="kruskal.test")) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing,",
@@ -251,11 +251,11 @@ viz_superplot <- function(
         }
     }
 
-    if (is.null(pval) == TRUE & MultipleComparison == FALSE) {
+    if (is.null(pval) & !MultipleComparison) {
         pval <- "t.test"
     }
 
-    if (is.null(pval) == TRUE & MultipleComparison == TRUE) {
+    if (is.null(pval) & MultipleComparison) {
         pval <- "aov"
     }
 
@@ -270,8 +270,8 @@ viz_superplot <- function(
             "fdr",
             "none"
         )
-    if (is.null(padj) == FALSE) {
-        if (padj %in% STAT_padj_options == FALSE) {
+    if (!is.null(padj)) {
+if (!(padj %in% STAT_padj_options)) {
         message <-
             paste0(
                 "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",
@@ -283,12 +283,12 @@ viz_superplot <- function(
     }
     }
 
-    if (is.null(padj) == TRUE) {
+    if (is.null(padj)) {
         padj <- "fdr"
     }
 
     ## ------------ Create Results output folder ----------- ##
-    if (is.null(save_plot) == FALSE) {
+    if (!is.null(save_plot)) {
         folder <- save_path(folder_name =  paste(plot_type, "Plots", sep =""),
                                     path = path)
     }
@@ -316,20 +316,20 @@ viz_superplot <- function(
     }
 
     # Rename the x and y lab if the information has been passed:
-    if (is.null(xlab) == TRUE) { # use column name of x provided by user
+    if (is.null(xlab)) { # use column name of x provided by user
         xlab <- bquote(.(as.symbol(metadata_info[["Conditions"]])))
-    }else if (is.null(xlab) == FALSE) {
+    }else if (!is.null(xlab)) {
     xlab <- bquote(.(as.symbol(xlab)))
     }
 
-    if (is.null(ylab) == TRUE) { # use column name of x provided by user
+    if (is.null(ylab)) { # use column name of x provided by user
         ylab <- bquote(.(as.symbol("Intensity")))
-    }else if (is.null(ylab) == FALSE) {
+    }else if (!is.null(ylab)) {
     ylab <- bquote(.(as.symbol(ylab)))
     }
 
     # Set the theme:
-    if (is.null(theme) == TRUE) {
+    if (is.null(theme)) {
         theme <- theme_classic()
     }
 
@@ -371,7 +371,7 @@ viz_superplot <- function(
     plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
 
     # Take only selected conditions
-    if (is.null(plot_conditions) == FALSE) {
+    if (!is.null(plot_conditions)) {
         dataMeans <- dataMeans %>% filter(Conditions %in% plot_conditions)
         plotdata <- plotdata %>% filter(Conditions %in% plot_conditions)
         plotdata$Conditions <- factor(plotdata$Conditions, levels = plot_conditions)
@@ -402,7 +402,7 @@ viz_superplot <- function(
 
     # Add Superplot
     if ("Superplot" %in% names(metadata_info)) {
-        if (is.null(color_palette_dot) == FALSE) {
+        if (!is.null(color_palette_dot)) {
             Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity,color = as.factor(Superplot)),size = 3)+
             labs(
                 color = metadata_info[["Superplot"]],
@@ -423,7 +423,7 @@ viz_superplot <- function(
     # # ##---- Add stats:
     if (pval =="t.test" | pval =="wilcox.test") {
         # One vs. One comparison: t-test
-        if (is.null(stat_comparison) == FALSE) {
+        if (!is.null(stat_comparison)) {
             Plot <- Plot+ stat_compare_means(comparisons = stat_comparison,
             label = "p.format", method = pval, hide.ns = TRUE,
             position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
@@ -484,7 +484,7 @@ viz_superplot <- function(
         mutate(y.position = rep(position, length.out = n()))
 
         # select stats based on comparison_table
-        if (is.null(stat_comparison) == FALSE) {
+        if (!is.null(stat_comparison)) {
             # Generate the comparisons
             df_select <- data.frame()
             for (comp in stat_comparison) {
@@ -507,7 +507,7 @@ viz_superplot <- function(
                 ) %>%
             column_to_rownames("entry")
 
-            if (all(is.na(df_merge)) == TRUE) { # in case the reverse comparisons are needed
+            if (all(is.na(df_merge))) { # in case the reverse comparisons are needed
                 df_merge <-
                     merge(
                         df_select,

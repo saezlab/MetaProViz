@@ -93,7 +93,7 @@ translate_id <- function(
 
         # Specific checks:
         if ("InputID" %in% names(metadata_info)) {
-            if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["InputID"]] %in% colnames(data))) {
                 message <-
                     paste0(
                         "The ",
@@ -108,7 +108,7 @@ translate_id <- function(
         }
 
         if ("grouping_variable" %in% names(metadata_info)) {
-            if (metadata_info[["grouping_variable"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["grouping_variable"]] %in% colnames(data))) {
                 message <-
                     paste0(
                         "The ",
@@ -122,7 +122,7 @@ translate_id <- function(
             }
         }
 
-        if (is.logical(summary) == FALSE) {
+        if (!is.logical(summary)) {
             message <-
                 paste0(
                     "Check input. The summary parameter should be either =TRUE or ",
@@ -189,7 +189,7 @@ translate_id <- function(
         }
 
         # # ------------------  Create output folders and path ------------------- ##
-        if (is.null(save_table) == FALSE) {
+        if (!is.null(save_table)) {
             folder <-
                 save_path(
                     folder_name = "PK",
@@ -278,7 +278,7 @@ translate_id <- function(
         }
 
         # # Create the long DF summary if summary =TRUE
-        if (summary == TRUE) {
+        if (summary) {
             for (item in to) {
                 summary <-
                     mapping_ambiguity(
@@ -427,7 +427,7 @@ function(
 
         # Specific checks:
         if ("InputID" %in% names(metadata_info)) {
-            if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["InputID"]] %in% colnames(data))) {
                 message <-
                     paste0(
                         "The ",
@@ -489,7 +489,7 @@ function(
         }
 
         # # ------------------  Create output folders and path ------------------- ##
-        if (is.null(save_table) == FALSE) {
+        if (!is.null(save_table)) {
             folder <-
                 save_path(
                     folder_name = "PK",
@@ -523,7 +523,7 @@ function(
         message(message)
 
         # # ------------------ Load manual table ----------------- ##
-        if ((from == "kegg") == FALSE) {
+        if (!(from == "kegg")) {
             data(
                 list = "equivalent_features",
                 package = "MetaProViz",
@@ -623,7 +623,7 @@ function(
                 "InputID", !!sym(from), "AdditionalID"
             ) %>%
             filter(
-                AdditionalID == TRUE
+                AdditionalID
             ) %>%
             mutate(
                 across(
@@ -885,7 +885,7 @@ mapping_ambiguity <- function(
         )
 
         # Specific checks:
-        if (from %in% colnames(data) == FALSE) {
+if (!(from %in% colnames(data))) {
             message <-
                 paste0(
                     from,
@@ -900,7 +900,7 @@ mapping_ambiguity <- function(
             stop(message)
         }
 
-        if (to %in% colnames(data) == FALSE) {
+if (!(to %in% colnames(data))) {
             message <-
                 paste0(
                     to,
@@ -915,8 +915,8 @@ mapping_ambiguity <- function(
             stop(message)
         }
 
-        if (is.null(grouping_variable) == FALSE) {
-            if (grouping_variable %in% colnames(data) == FALSE) {
+        if (!is.null(grouping_variable)) {
+if (!(grouping_variable %in% colnames(data))) {
                 message <-
                     paste0(
                         grouping_variable,
@@ -932,7 +932,7 @@ mapping_ambiguity <- function(
             }
         }
 
-        if (is.logical(summary) == FALSE) {
+        if (!is.logical(summary)) {
             message <-
                 paste0(
                     "Check input. The summary parameter should be either =TRUE or ",
@@ -961,7 +961,7 @@ mapping_ambiguity <- function(
 
 
         # # ------------------  Create output folders and path ------------------- ##
-        if (is.null(save_table) == FALSE) {
+        if (!is.null(save_table)) {
             folder <-
                 save_path(
                     folder_name = "PK",
@@ -980,7 +980,7 @@ mapping_ambiguity <- function(
         # can use it right away
         # If the to column is not a list of IDs, but a character column, we need to
         # convert it into a list of IDs
-        if (is.character(data[[to]]) == TRUE) {
+        if (is.character(data[[to]])) {
             data[[to]] <-
                 data[[to]] %>%
                 strsplit(", ") %>%
@@ -1056,8 +1056,8 @@ mapping_ambiguity <- function(
             )
 
             # #######################################################################
-            if (summary == TRUE) {
-                if (is.null(grouping_variable) == FALSE) {
+            if (summary) {
+                if (!is.null(grouping_variable)) {
                     from_to_v1 <-
                         sprintf(
                             '%s_%s',
@@ -1302,7 +1302,7 @@ mapping_ambiguity <- function(
         }
 
         # # ------------------ Create summaryTable ------------------- ##
-        if (summary == TRUE) {
+        if (summary) {
             # Combine the two tables
             summary <-
                 merge(
@@ -1512,7 +1512,7 @@ checkmatch_pk_to_data <- function(
 
         # # data:
         if ("InputID" %in% names(metadata_info)) {
-            if (metadata_info[["InputID"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["InputID"]] %in% colnames(data))) {
                 message <-
                     paste0(
                         "The ",
@@ -1613,7 +1613,7 @@ checkmatch_pk_to_data <- function(
 
         # # input_pk:
         if ("PriorID" %in% names(metadata_info)) {
-            if (metadata_info[["PriorID"]] %in% colnames(input_pk) == FALSE) {
+if (!(metadata_info[["PriorID"]] %in% colnames(input_pk))) {
                 message <-
                     paste0(
                         "The ",
@@ -1666,7 +1666,7 @@ checkmatch_pk_to_data <- function(
 
         if ("grouping_variable" %in% names(metadata_info)) {
             # Add grouping_variable
-            if (metadata_info[["grouping_variable"]] %in% colnames(input_pk) == FALSE) {
+if (!(metadata_info[["grouping_variable"]] %in% colnames(input_pk))) {
                 message <-
                     paste0(
                         "The ",
@@ -1758,7 +1758,7 @@ checkmatch_pk_to_data <- function(
             )
 
         # # ------------ Create Results output folder ----------- ##
-        if (is.null(save_table) == FALSE) {
+        if (!is.null(save_table)) {
             folder <-
                 save_path(
                     folder_name = "PK",
@@ -2428,7 +2428,7 @@ function(
             ) %>%
             rename("targets_num" = 2)
 
-        if (complete == TRUE) {
+        if (complete) {
             res_Add <-
                 merge(
                     x = res,
@@ -2709,7 +2709,7 @@ function(
         }
 
         # # ------------ Create folders ----------- ##
-        if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
+        if (!is.null(save_plot) | !is.null(save_table)) {
             folder <-
                 save_path(
                     folder_name = "PK",
@@ -3098,7 +3098,7 @@ function(
         .data <- entry_count <- id_label <- NULL
 
         # # ------------------  Create output folders and path ------------------- ##
-        if (is.null(save_table) == FALSE) {
+        if (!is.null(save_table)) {
             folder <- save_path(
                 folder_name = "PK",
                 path = path

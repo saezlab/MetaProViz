@@ -174,27 +174,27 @@ dma <- function(
         )
 
     ## ------------ Create Results output folder ----------- ##
-    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
+    if (!is.null(save_plot) | !is.null(save_table)) {
         folder <- save_path(
             folder_name = "dma",
             path = path
         )
 
-        if (shapiro == TRUE) {
+        if (shapiro) {
             Subfolder_S <- file.path(folder, "shapiro")
             if (!dir.exists(Subfolder_S)) {
                 dir.create(Subfolder_S)
             }
         }
 
-        if (bartlett == TRUE) {
+        if (bartlett) {
             Subfolder_B <- file.path(folder, "bartlett")
             if (!dir.exists(Subfolder_B)) {
                 dir.create(Subfolder_B)
             }
         }
 
-        if (vst == TRUE) {
+        if (vst) {
             Subfolder_V <- file.path(folder, "vst")
             if (!dir.exists(Subfolder_V)) {
                 dir.create(Subfolder_V)
@@ -205,7 +205,7 @@ dma <- function(
     # ###########################################################################
     ## ------------ Check hypothesis test assumptions ----------- ##
     # 1. Normality
-    if (shapiro == TRUE) {
+    if (shapiro) {
         if (length(Settings[["Metabolites_Miss"]] >= 1L)) {
             msg <- "There are NA's / 0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs / 0s."
             log_warn(msg)
@@ -235,10 +235,10 @@ dma <- function(
     }
 
     # 2. Variance homogeneity
-    if (bartlett == TRUE) {
+    if (bartlett) {
         # if we only have two conditions, which can happen even tough multiple
         # comparison (C1 versus C2 and C2 versus C1 is done)
-        if (Settings[["MultipleComparison"]] == TRUE) {
+        if (Settings[["MultipleComparison"]]) {
             UniqueConditions <-
                 metadata_sample %>%
                 subset(
@@ -318,7 +318,7 @@ dma <- function(
         }
     } else {  # MultipleComparison = TRUE
         # Correct data heteroscedasticity
-        if (pval != "lmFit" & vst == TRUE) {
+        if (pval != "lmFit" & vst) {
             vst_res <- mpv_vst(data)
             data <- vst_res[["DFs"]][["Corrected_data"]]
         }
@@ -400,7 +400,7 @@ dma <- function(
 
     # ###########################################################################
     # ##############  Add the metabolite Metadata if available ###############
-    if (is.null(metadata_feature) == FALSE) {
+    if (!is.null(metadata_feature)) {
         DMA_Output <-
             lapply(
                 DMA_Output, function(df) {
@@ -418,7 +418,7 @@ dma <- function(
 
     # ###########################################################################
     # ##############  For core=TRUE create summary of Feature_metadata  #########
-    if (core == TRUE) {
+    if (core) {
         df_list_selected <-
             map(
                 names(DMA_Output), function(df_name) {
@@ -461,7 +461,7 @@ dma <- function(
             # Now we remove all other columns with .x.x, .y.y, etc.
             select(-all_of(grep("\\.[xy]+$", names(merged_df), value = TRUE)))
 
-        if (is.null(metadata_feature) == FALSE) {  # Add to Metadata file:
+        if (!is.null(metadata_feature)) {  # Add to Metadata file:
             Feature_Metadata <-
                 merge(
                     metadata_feature %>% rownames_to_column("Metabolite"),
@@ -474,7 +474,7 @@ dma <- function(
 
     # ###########################################################################
     # ##############  Plots ###############
-    if (core == TRUE) {
+    if (core) {
         x <- "Log2(Distance)"
         VolPlot_metadata_info <- c(color = "core")
         VolPlot_SettingsFile <- DMA_Output
@@ -488,7 +488,7 @@ dma <- function(
     for (DF in names(DMA_Output)) {  # DF = names(DMA_Output)[2]
         Volplotdata <- DMA_Output[[DF]]
 
-        if (core == TRUE) {
+        if (core) {
             VolPlot_SettingsFile <-
                 DMA_Output[[DF]] %>%
                 column_to_rownames("Metabolite")
@@ -520,7 +520,7 @@ dma <- function(
     ## ----- Save and Return
     DMA_Output_List <- list()
     # Here we make a list in which we will save the outputs:
-    if (shapiro == TRUE & exists("Shapiro_output") == TRUE) {
+    if (shapiro & exists("Shapiro_output")) {
         save_res(
             inputlist_df = Shapiro_output[["DF"]],
             inputlist_plot = Shapiro_output[["Plot"]][["Distributions"]],
@@ -536,7 +536,7 @@ dma <- function(
         DMA_Output_List <- list("ShapiroTest" = Shapiro_output)
     }
 
-    if (bartlett == TRUE & exists("Bartlett_output") == TRUE) {
+    if (bartlett & exists("Bartlett_output")) {
         save_res(
             inputlist_df = Bartlett_output[["DF"]],
             inputlist_plot = Bartlett_output[["Plot"]],
@@ -556,7 +556,7 @@ dma <- function(
             )
     }
 
-    if (vst == TRUE & exists("vst_res") == TRUE) {
+    if (vst & exists("vst_res")) {
         save_res(
             inputlist_df = vst_res[["DF"]],
             inputlist_plot = vst_res[["Plot"]],
@@ -572,7 +572,7 @@ dma <- function(
         DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
     }
 
-    if (core == TRUE) {
+    if (core) {
         save_res(
             inputlist_df = list("Feature_Metadata" = Feature_Metadata),
             inputlist_plot = NULL,
@@ -674,7 +674,7 @@ log2fc <- function(
     metaproviz_init()
 
     # ------------ Assignments ----------- ##
-    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
@@ -684,7 +684,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -696,7 +696,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+    } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
         # one-vs-one: Generate the comparisons
         denominator <- metadata_info[["Denominator"]]
         numerator <- metadata_info[["Numerator"]]
@@ -727,11 +727,11 @@ log2fc <- function(
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or
     # all_vs_all.
-    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
         MultipleComparison <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
         MultipleComparison <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+    } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
         MultipleComparison <- FALSE
     }
 
@@ -771,7 +771,7 @@ log2fc <- function(
 
         # Calculate absolute distance between the means. log2 transform
         # and add sign (-/+):
-        if (core == TRUE) {
+        if (core) {
             # core values can be negative and positive, which can does not allow us to
             # calculate a Log2FC.
             Mean_C1_t <-
@@ -799,15 +799,15 @@ log2fc <- function(
             if (any(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
-            ) == TRUE) {
+            )) {
                 Mean_Merge <- Mean_Merge %>%
                 mutate(C1 = case_when(
                         # Here we have a "true" 0 value due to 0/NAs
                         # in the input data
-                        C2 == 0L & `NA/0` == TRUE ~ paste(C1),
+                        C2 == 0L & `NA/0` ~ paste(C1),
                         # Here we have a "true" 0 value due to 0/NAs
                         # in the input data
-                        C1 == 0L & `NA/0` == TRUE ~ paste(C1),
+                        C1 == 0L & `NA/0` ~ paste(C1),
                         # Here we have a "false" 0 value that occured at random
                         # and not due to 0/NAs in the input data, hence we add
                         # the constant +1
@@ -821,10 +821,10 @@ log2fc <- function(
                     mutate(C2 = case_when(
                         # Here we have a "true" 0 value due to 0/NAs in the
                         # input data
-                        C1 == 0L & `NA/0` == TRUE ~ paste(C2),
+                        C1 == 0L & `NA/0` ~ paste(C2),
                         # Here we have a "true" 0 value due to 0/NAs in the
                         # input data
-                        C2 == 0L & `NA/0` == TRUE ~ paste(C2),
+                        C2 == 0L & `NA/0` ~ paste(C2),
                         # Here we have a "false" 0 value that occured at random
                         # and not due to 0/NAs in the input data, hence we
                         # add the constant +1
@@ -1019,7 +1019,7 @@ log2fc <- function(
             Log2FC_C2vC1$`Log2(Distance)` <- Log2FC_C2vC1$`Log2(Distance)` * -1
 
             ## Name them
-            if (MultipleComparison == TRUE) {
+            if (MultipleComparison) {
                 logname <- paste(
                     comparisons[1, column],
                     comparisons[2, column],
@@ -1038,7 +1038,7 @@ log2fc <- function(
             } else {
                 log2fc_table <- Log2FC_C1vC2
             }
-        } else if (core == FALSE) {
+        } else if (!core) {
             # Mean values could be 0, which can not be used to calculate a
             # Log2FC and hence the Log2FC(A versus B)=(log2(A+x)-log2(B+x))
             # for A and/or B being 0, with x being set to 1
@@ -1067,10 +1067,10 @@ log2fc <- function(
             mutate(C1_Adapted = case_when(
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
-                    C2 == 0L & `NA/0` == TRUE ~ paste(C1),
+                    C2 == 0L & `NA/0` ~ paste(C1),
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
-                    C1 == 0L & `NA/0` == TRUE ~ paste(C1),
+                    C1 == 0L & `NA/0` ~ paste(C1),
                     # Here we have a "false" 0 value that occured at random
                     # and not due to 0/NAs in the input data,
                     # hence we add the constant +1
@@ -1084,10 +1084,10 @@ log2fc <- function(
                 mutate(C2_Adapted = case_when(
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
-                    C1 == 0L & `NA/0` == TRUE ~ paste(C2),
+                    C1 == 0L & `NA/0` ~ paste(C2),
                     # Here we have a "true" 0 value due to
                     # 0/NAs in the input data
-                    C2 == 0L & `NA/0` == TRUE ~ paste(C2),
+                    C2 == 0L & `NA/0` ~ paste(C2),
                     # Here we have a "false" 0 value that occured at random
                     # and not due to 0/NAs in the input data,
                     # hence we add the constant +1
@@ -1104,7 +1104,7 @@ log2fc <- function(
             if (any(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
-            ) == TRUE) {
+            )) {
                 X <-
                     Mean_Merge %>%
                     subset(
@@ -1122,7 +1122,7 @@ log2fc <- function(
             }
 
             # Calculate the Log2FC
-            if (transform == TRUE) {  # data are not log2 transformed
+            if (transform) {  # data are not log2 transformed
                 # FoldChange
                 Mean_Merge$FC_C1vC2 <-
                     Mean_Merge$C1_Adapted / Mean_Merge$C2_Adapted
@@ -1135,7 +1135,7 @@ log2fc <- function(
 
             # data has been log2 transformed and hence we need to take this into
             # account when calculating the log2FC
-            if (transform == FALSE) {
+            if (!transform) {
                 Mean_Merge$FC_C1vC2 <- "Empty"
                 Mean_Merge$Log2FC <-
                     Mean_Merge$C1_Adapted - Mean_Merge$C2_Adapted
@@ -1164,7 +1164,7 @@ log2fc <- function(
             Log2FC_C2vC1 <- Log2FC_C1vC2
             Log2FC_C2vC1$Log2FC <- Log2FC_C2vC1$Log2FC * -1
 
-            if (MultipleComparison == TRUE) {
+            if (MultipleComparison) {
                 logname <- paste(
                     comparisons[1, column],
                     comparisons[2, column],
@@ -1318,7 +1318,7 @@ dma_stat_single <-
             PVal_C1vC2 %>%
             mutate(
                 p.val = case_when(
-                    `NA/0` == TRUE ~ NA,
+                    `NA/0` ~ NA,
                     TRUE ~ paste(VecPVAL_C1vC2)
                 )
             )
@@ -1351,7 +1351,7 @@ dma_stat_single <-
         }
 
         # Add Log2FC
-        if (is.null(log2fc_table) == FALSE) {
+        if (!is.null(log2fc_table)) {
             STAT_C1vC2 <-
                 merge(
                     log2fc_table,
@@ -1424,7 +1424,7 @@ mpv_aov <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -1441,7 +1441,7 @@ mpv_aov <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1570,7 +1570,7 @@ mpv_aov <- function(
     }
 
     # Merge the data frames in list1 and list2 based on the "Metabolite" column
-    if (is.null(log2fc_table) == FALSE) {
+    if (!is.null(log2fc_table)) {
         list_names <- names(results_list)
 
         merged_list <- list()
@@ -1593,9 +1593,9 @@ mpv_aov <- function(
     }
 
     # Make sure the right comparisons are returned:
-    if (all_vs_all == TRUE) {
+    if (all_vs_all) {
         STAT_C1vC2 <- merged_list
-    } else if (all_vs_all == FALSE) {
+    } else if (!all_vs_all) {
         # remove the comparisons that are not needed:
         modified_df_list <- list()
         for (df_name in names(merged_list)) {
@@ -1668,7 +1668,7 @@ mpv_kruskal <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -1684,7 +1684,7 @@ mpv_kruskal <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1848,7 +1848,7 @@ mpv_kruskal <- function(
     }
 
     # Merge the data frames in list1 and list2 based on the "Metabolite" column
-    if (is.null(log2fc_table) == FALSE) {
+    if (!is.null(log2fc_table)) {
         merged_list <- list()
         for (name in common_col_names) {
             # Check if the data frames exist in both lists
@@ -1924,7 +1924,7 @@ mpv_welch <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -1942,7 +1942,7 @@ mpv_welch <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -2076,7 +2076,7 @@ mpv_welch <- function(
 
     # Merge the data frames in list1 and list2 based on the
     # "Metabolite" column
-    if (is.null(log2fc_table) == FALSE) {
+    if (!is.null(log2fc_table)) {
         list_names <- names(results_list)
 
         merged_list <- list()
@@ -2175,13 +2175,13 @@ dma_stat_limma <-
 
         ## ------------ Denominator/numerator ----------- ##
         # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-        if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
             MultipleComparison <- TRUE
             all_vs_all <- TRUE
-        } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
             MultipleComparison <- TRUE
             all_vs_all <- FALSE
-        } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+        } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
             MultipleComparison <- FALSE
             all_vs_all <- FALSE
         }
@@ -2197,7 +2197,7 @@ dma_stat_limma <-
         # make appropriate condition names accepted by limma
         targets$condition_limma_compatible <- make.names(targets$condition)
 
-        if (MultipleComparison == FALSE) {
+        if (!MultipleComparison) {
             # subset the data:
             targets <- targets %>%
             subset(condition == metadata_info[["Numerator"]] | condition == metadata_info[["Denominator"]]) %>%
@@ -2215,7 +2215,7 @@ dma_stat_limma <-
             Limma_input <-
                 Limma_input[, -2] %>%
                 arrange(sample)  # Order the column "sample" alphabetically
-        } else if (MultipleComparison == TRUE) {
+        } else if (MultipleComparison) {
             Limma_input <-
                 data %>%
                 tibble::rownames_to_column("sample") %>%
@@ -2223,7 +2223,7 @@ dma_stat_limma <-
         }
 
         # Check if the order of the "sample" column is the same in both data frames
-        if (identical(targets$sample, Limma_input$sample) == FALSE) {
+        if (!identical(targets$sample, Limma_input$sample)) {
             stop(
                 "The order of the 'sample' column is different in both data ",
                 "frames. Please make sure that Input_metadata_sample and ",
@@ -2244,7 +2244,7 @@ dma_stat_limma <-
                 )
             )
 
-        if (transform == TRUE) {
+        if (transform) {
             # communicate the log2 transformation --> how does limma deals with
             # NA when calculating the change?
             Limma_input <- log2(Limma_input)
@@ -2264,7 +2264,7 @@ dma_stat_limma <-
         fit <- limma::lmFit(Limma_input, design)
 
         # ###  Make contrast matrix:
-        if (all_vs_all == TRUE & MultipleComparison == TRUE) {
+        if (all_vs_all & MultipleComparison) {
             unique_conditions <- levels(fcond)  # Get unique conditions
 
             # Create an empty contrast matrix
@@ -2306,7 +2306,7 @@ dma_stat_limma <-
                 }
             }
             cont.matrix <- t(cont.matrix)
-        } else if (all_vs_all == FALSE & MultipleComparison == TRUE) {
+        } else if (!all_vs_all & MultipleComparison) {
             unique_conditions <- levels(fcond)  # Get unique conditions
             denominator <- make.names(metadata_info[["Denominator"]])
 
@@ -2362,7 +2362,7 @@ dma_stat_limma <-
                 i <- i + 1
             }
             cont.matrix <- t(cont.matrix)
-        } else if (all_vs_all == FALSE & MultipleComparison == FALSE) {
+        } else if (!all_vs_all & !MultipleComparison) {
             Name_Comp <- paste(
                 make.names(metadata_info[["Numerator"]]),
                 "-",
@@ -2469,8 +2469,8 @@ dma_stat_limma <-
             results_list_new[[new_name]] <- results_list[[old_name]]
         }
 
-        if (is.null(log2fc_table) == FALSE) {
-            if (core == TRUE) {
+        if (!is.null(log2fc_table)) {
+            if (core) {
                 # If core=TRUE, we need to exchange the Log2FC with the Distance
                 # and we need to combine the lists
                 # Merge the data frames in list1 and list2 based on the "Metabolite" column
@@ -2527,7 +2527,7 @@ dma_stat_limma <-
                     )
                 )
 
-            if (transform == TRUE) {
+            if (transform) {
                 # Add prefix & suffix to each column since the data have
                 # been log2 transformed!
                 colnames(InputReturn_Filt) <-
@@ -2616,7 +2616,7 @@ mpv_shapiro <- function(
     ## ------------- Checks --------------##
     if (grepl(
         "[[:space:]()-./\\\\]", metadata_info[["Conditions"]]
-    ) == TRUE) {
+    )) {
         msg <- paste0(
             "In metadata_info=c(Conditions= ColumnName): ",
             "ColumnName contains special charaters, hence this is renamed."
@@ -2639,7 +2639,7 @@ mpv_shapiro <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if ("Denominator" %in% names(metadata_info) == FALSE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -2657,7 +2657,7 @@ mpv_shapiro <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -2675,7 +2675,7 @@ mpv_shapiro <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
-    } else if ("Denominator" %in% names(metadata_info) == TRUE & "Numerator" %in% names(metadata_info) == TRUE) {
+    } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
         # one-vs-one: Generate the comparisons
         denominator <- metadata_info[["Denominator"]]
         numerator <- metadata_info[["Numerator"]]
@@ -2868,7 +2868,7 @@ mpv_shapiro <- function(
         # data distribution. The data are normal if the p-value of the
         # shapiro.test > 0.05.
         Density_plots <- list()
-        if (qqplots == TRUE) {
+        if (qqplots) {
             QQ_plots <- list()
         }
         for (x in seq_len(nrow(DF_shapiro_results))) {
@@ -3015,7 +3015,7 @@ mpv_shapiro <- function(
             Density_plots[[paste(colnames(transpose))]] <- sampleDist
 
             # QQ plots
-            if (qqplots == TRUE) {
+            if (qqplots) {
                 # Make folders
                 conds <- unique(c(numerator, denominator))
 
@@ -3052,7 +3052,7 @@ mpv_shapiro <- function(
         # #####################################
         ## -------- Return
         # Here we make a list
-        if (qqplots == TRUE) {
+        if (qqplots) {
             Shapiro_output_list <-
                 list(
                     "DF" = list(

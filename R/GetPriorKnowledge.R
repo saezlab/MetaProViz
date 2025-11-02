@@ -128,7 +128,7 @@ metsigdb_chemicalclass <- function(
     metaproviz_init()
 
     ## ------------ folder ----------- ##
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "PK",
             path = path
@@ -147,7 +147,7 @@ metsigdb_chemicalclass <- function(
     directory <- user_cache_dir() # get chache directory
     File_path <- paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep ="")
 
-    if (file.exists(File_path) == TRUE) {# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
+    if (file.exists(File_path)) {# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
         HMDB_ChemicalClass <- readRDS(File_path)
         message("Cached file loaded from: ", File_path)
     } else {# load from OmniPath
@@ -261,12 +261,12 @@ make_gene_metab_set <- function(
 
     ## ------------ Check Input files ----------- ##
     # 1. The input data:
-    if (is.data.frame(input_pk) == FALSE) {
+    if (!is.data.frame(input_pk)) {
         stop("`input_pk` must be of class data.frame with columns for source (= term) and Target (= gene). Please check your input")
     }
     # 2. Target:
     if ("Target" %in% names(metadata_info)) {
-        if (metadata_info[["Target"]] %in% colnames(input_pk) == FALSE) {
+if (!(metadata_info[["Target"]] %in% colnames(input_pk))) {
         stop(
             "The ",
             metadata_info[["Target"]],
@@ -282,7 +282,7 @@ make_gene_metab_set <- function(
     }
 
     ## ------------ folder ----------- ##
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "PK",
             path = path
@@ -437,7 +437,7 @@ metsigdb_metalinks <- function(
 
 
     # ------------------------------------------------------------------
-    if ((any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) =="?")) == FALSE) {
+    if (!(any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) =="?"))) {
     # Check Input parameters
 
 
@@ -448,7 +448,7 @@ metsigdb_metalinks <- function(
     # We could provide the user the ability to point to their own path were they already dumpled/stored QA version of metalinks they like to use!
 
     ## ------------ folder ----------- ##
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "PK",
             path = path

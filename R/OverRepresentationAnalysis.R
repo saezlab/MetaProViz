@@ -117,7 +117,7 @@ cluster_ora <- function(
     )
 
     ## ------------ Create Results output folder ----------- ##
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "ClusterOra",
             path = path
@@ -127,7 +127,7 @@ cluster_ora <- function(
     ##########################################################################
     ## ------------ Prepare data ----------- ##
     # open the data
-    if (remove_background == TRUE) {
+    if (remove_background) {
         df <-
             subset(
                 data,
@@ -320,7 +320,7 @@ standard_ora <- function(
     )
 
     ## ------------ Create Results output folder ----------- ##
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "ORA",
             path = path
@@ -352,19 +352,19 @@ standard_ora <- function(
 
     InputSelection <- selectMetabolites_DF %>%
     mutate(
-        `top/Bottom_percentage` = case_when(`top/Bottom` == TRUE ~ 'TRUE',
+        `top/Bottom_percentage` = case_when(`top/Bottom` ~ 'TRUE',
         TRUE ~ 'FALSE')
     ) %>%
     mutate(Significant = case_when(get(metadata_info[["pvalColumn"]]) <= cutoff_stat ~ 'TRUE',
                                     TRUE ~ 'FALSE')) %>%
     mutate(
-        Cluster_ChangedMetabolites = case_when(Significant == TRUE & `top/Bottom_percentage` == TRUE ~ 'TRUE',
+        Cluster_ChangedMetabolites = case_when(Significant & `top/Bottom_percentage` ~ 'TRUE',
         TRUE ~ 'FALSE')
     )
     InputSelection$`top/Bottom` <- NULL #remove column as its not needed for output
 
     selectMetabolites <- InputSelection %>%
-    subset(Cluster_ChangedMetabolites == TRUE)
+    subset(Cluster_ChangedMetabolites)
     selectMetabolites <- as.character(selectMetabolites$Metabolite)
 
     # Load Pathways

@@ -135,12 +135,12 @@ viz_pca <- function(
     )
 
     # check_param` Specific
-    if (is.logical(show_loadings) == FALSE) {
+    if (!is.logical(show_loadings)) {
         message <- paste("The Show_Loadings value should be either =TRUE if loadings are to be shown on the PCA plot or = FALSE if not.")
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
-    if (is.logical(scaling) == FALSE) {
+    if (!is.logical(scaling)) {
         message <- paste("The scaling value should be either =TRUE if data scaling is to be performed prior to the PCA or = FALSE if not.")
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
@@ -155,7 +155,7 @@ viz_pca <- function(
 
     # # ------------ Create Results output folder ----------- ##
     folder <- NULL
-    if (is.null(save_plot) == FALSE) {
+    if (!is.null(save_plot)) {
         folder <- save_path(
             folder_name = "PCAPlots",
             path = path
@@ -205,8 +205,8 @@ viz_pca <- function(
     log_info(paste("viz_pca shape:", paste(safe_shape_palette, collapse = ", ")))
 
     # # --- Prepare the color scheme:
-    if ("color" %in% names(metadata_info) == TRUE & "shape" %in% names(metadata_info) == TRUE) {
-        if ((metadata_info[["shape"]] == metadata_info[["color"]]) == TRUE) {
+    if ("color" %in% names(metadata_info) & "shape" %in% names(metadata_info)) {
+        if ((metadata_info[["shape"]] == metadata_info[["color"]])) {
             metadata_sample$shape <- metadata_sample[, paste(metadata_info[["color"]])]
             metadata_sample <-
                 metadata_sample %>%
@@ -219,13 +219,13 @@ viz_pca <- function(
                     "shape" = paste(metadata_info[["shape"]])
                 )
         }
-    } else if ("color" %in% names(metadata_info) == TRUE & "shape" %in% names(metadata_info) == FALSE) {
-        if ("color" %in% names(metadata_info) == TRUE) {
+if (!("color" %in% names(metadata_info) & "shape" %in% names(metadata_info))) {
+        if ("color" %in% names(metadata_info)) {
             metadata_sample <-
                 metadata_sample %>%
                 rename("color" = paste(metadata_info[["color"]]))
         }
-        if ("shape" %in% names(metadata_info) == TRUE) {
+        if ("shape" %in% names(metadata_info)) {
             metadata_sample <-
                 metadata_sample %>%
                 rename("shape" = paste(metadata_info[["shape"]]))
@@ -233,7 +233,7 @@ viz_pca <- function(
     }
 
     # # --- Prepare Input data:
-    if (is.null(metadata_sample) == FALSE) {
+    if (!is.null(metadata_sample)) {
         InputPCA <-
             merge(x = metadata_sample %>%
             tibble::rownames_to_column("UniqueID"), y = data %>%
@@ -244,12 +244,12 @@ viz_pca <- function(
     }
 
     # # --- Prepare the color and shape settings:
-    if ("color" %in% names(metadata_sample) == TRUE) {
+    if ("color" %in% names(metadata_sample)) {
         if (scale_color == "discrete") {
             InputPCA$color <- as.factor(InputPCA$color)
             color_select <- safe_colorblind_palette[seq_along(unique(InputPCA$color))]
         } else if (scale_color == "continuous") {
-            if (is.numeric(InputPCA$color) == TRUE | is.integer(InputPCA$color) == TRUE) {
+            if (is.numeric(InputPCA$color) | is.integer(InputPCA$color)) {
                 InputPCA$color <- as.numeric(InputPCA$color)
                 color_select <- safe_colorblind_palette
             } else {
@@ -288,7 +288,7 @@ viz_pca <- function(
 
     log_info("viz_pca scale_color: ", scale_color)
 
-    if ("shape" %in% names(metadata_sample) == TRUE) {
+    if ("shape" %in% names(metadata_sample)) {
         shape_select <- safe_shape_palette[seq_along(unique(InputPCA$shape))]
 
         if (!is.character(InputPCA$shape)) {
@@ -298,7 +298,7 @@ viz_pca <- function(
     }
 
     # # ---  #assign column and legend name
-    if ("color" %in% names(metadata_sample) == TRUE) {
+    if ("color" %in% names(metadata_sample)) {
         InputPCA <-
             InputPCA %>%
             rename(!!paste(metadata_info[["color"]]) := "color")
@@ -308,7 +308,7 @@ viz_pca <- function(
         Param_Col <- NULL
     }
 
-    if ("shape" %in% names(metadata_sample) == TRUE) {
+    if ("shape" %in% names(metadata_sample)) {
         InputPCA <-
             InputPCA %>%
             rename(!!paste(metadata_info[["shape"]]) := "shape")
@@ -354,7 +354,7 @@ viz_pca <- function(
     }
 
     # Add the theme
-    if (is.null(theme) == FALSE) {
+    if (!is.null(theme)) {
         PCA <- PCA + theme
     } else {
         PCA <- PCA + theme_classic()

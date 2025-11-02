@@ -74,7 +74,7 @@ check_param <- function(
     # # ## # ## # ## # ### Parameters valid for multiple MetaProViz functions
 
     # -------------data
-    if (is.data.frame(data) == FALSE) {
+    if (!is.data.frame(data)) {
         message <-
             paste0(
                 "data should be a data.frame. It's currently a ",
@@ -85,15 +85,15 @@ check_param <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (any(duplicated(row.names(data))) == TRUE) {
+    if (any(duplicated(row.names(data)))) {
         message <- paste0("Duplicated row.names of data, whilst row.names must be unique")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (data_num == TRUE) {
+    if (data_num) {
         Test_num <- apply(data, 2, function(x) is.numeric(x))
-    if ((any(Test_num) ==  FALSE) ==  TRUE) {
+    if ((!any(Test_num))) {
         message <- paste0("data needs to be of class numeric")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -107,7 +107,7 @@ check_param <- function(
     }
 
     # -------------SettingsFile
-    if (is.null(metadata_sample) == FALSE) {
+    if (!is.null(metadata_sample)) {
         Test_match <-
             merge(
                 metadata_sample,
@@ -122,7 +122,7 @@ check_param <- function(
         }
     }
 
-    if (is.null(metadata_feature) == FALSE) {
+    if (!is.null(metadata_feature)) {
         Test_match <-
             merge(
                 metadata_feature,
@@ -136,7 +136,7 @@ check_param <- function(
     }
 
     # -------------metadata_info
-    if (is.vector(metadata_info) == FALSE & is.null(metadata_info) == FALSE) {
+    if (!is.vector(metadata_info) & !is.null(metadata_info)) {
         message <-
             paste0(
                 "metadata_info should be NULL or a vector. It's currently a ",
@@ -146,10 +146,10 @@ check_param <- function(
         stop(message)
     }
 
-    if (is.null(metadata_info) == FALSE) {
+    if (!is.null(metadata_info)) {
     # Conditions
     if ("Conditions" %in% names(metadata_info)) {
-        if (metadata_info[["Conditions"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["Conditions"]] %in% colnames(metadata_sample))) {
             message <-
                 paste0(
                     "The ",
@@ -163,7 +163,7 @@ check_param <- function(
 
     # Biological replicates
     if ("Biological_Replicates" %in% names(metadata_info)) {
-        if (metadata_info[["Biological_Replicates"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["Biological_Replicates"]] %in% colnames(metadata_sample))) {
             message <-
                 paste0(
                     "The ",
@@ -176,8 +176,8 @@ check_param <- function(
     }
 
     # Numerator
-    if ("Numerator" %in% names(metadata_info) == TRUE) {
-        if (metadata_info[["Numerator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
+    if ("Numerator" %in% names(metadata_info)) {
+if (!(metadata_info[["Numerator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "The ",
@@ -190,8 +190,8 @@ check_param <- function(
     }
 
     # Denominator
-    if ("Denominator" %in% names(metadata_info) == TRUE) {
-        if (metadata_info[["Denominator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
+    if ("Denominator" %in% names(metadata_info)) {
+if (!(metadata_info[["Denominator"]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
             message <-
                 paste0(
                     "The ",
@@ -204,7 +204,7 @@ check_param <- function(
     }
 
     # Denominator & Numerator
-    if ("Denominator" %in% names(metadata_info) == FALSE  & "Numerator" %in% names(metadata_info) == TRUE) {
+if (!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadata_info)) {
         message <-
             paste0(
                 "Check input. The selected denominator option is empty while ",
@@ -217,7 +217,7 @@ check_param <- function(
 
     # Superplot
     if ("Superplot" %in% names(metadata_info)) {
-        if (metadata_info[["Superplot"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["Superplot"]] %in% colnames(metadata_sample))) {
             message <-
                 paste0(
                     "The ",
@@ -229,11 +229,11 @@ check_param <- function(
         }
     }
 
-    if (is.null(plot_types) == FALSE) {
+    if (!is.null(plot_types)) {
         if (plot_types == "Sample") {
         # Plot colour
         if ("color" %in% names(metadata_info)) {
-            if (metadata_info[["color"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["color"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -247,7 +247,7 @@ check_param <- function(
 
         # Plot shape
         if ("shape" %in% names(metadata_info)) {
-            if (metadata_info[["shape"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["shape"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -261,7 +261,7 @@ check_param <- function(
 
         # Plot individual
         if ("individual" %in% names(metadata_info)) {
-            if (metadata_info[["individual"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["individual"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -274,7 +274,7 @@ check_param <- function(
         }
         }else if (plot_types == "Feature") {
         if ("color" %in% names(metadata_info)) {
-            if (metadata_info[["color"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["color"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -288,7 +288,7 @@ check_param <- function(
 
         # Plot shape
         if ("shape" %in% names(metadata_info)) {
-            if (metadata_info[["shape"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["shape"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -302,7 +302,7 @@ check_param <- function(
 
         # Plot individual
         if ("individual" %in% names(metadata_info)) {
-            if (metadata_info[["individual"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["individual"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -316,7 +316,7 @@ check_param <- function(
         }else if (plot_types == "Both") {
         # Plot colour sample
         if ("color_Sample" %in% names(metadata_info)) {
-            if (metadata_info[["color_Sample"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["color_Sample"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -330,7 +330,7 @@ check_param <- function(
 
         # Plot colour Metab
         if ("color_Metab" %in% names(metadata_info)) {
-            if (metadata_info[["color_Metab"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["color_Metab"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -349,7 +349,7 @@ check_param <- function(
 
         # Plot shape_metab
         if ("shape_Metab" %in% names(metadata_info)) {
-            if (metadata_info[["shape_Metab"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["shape_Metab"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -363,7 +363,7 @@ check_param <- function(
 
         # Plot shape_metab
         if ("shape_Sample" %in% names(metadata_info)) {
-            if (metadata_info[["shape_Sample"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["shape_Sample"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -377,7 +377,7 @@ check_param <- function(
 
         # Plot individual_Metab
         if ("individual_Metab" %in% names(metadata_info)) {
-            if (metadata_info[["individual_Metab"]] %in% colnames(metadata_feature) == FALSE) {
+if (!(metadata_info[["individual_Metab"]] %in% colnames(metadata_feature))) {
                 message <-
                     paste0(
                         "The ",
@@ -391,7 +391,7 @@ check_param <- function(
 
         # Plot individual_Sample
         if ("individual_Sample" %in% names(metadata_info)) {
-            if (metadata_info[["individual_Sample"]] %in% colnames(metadata_sample) == FALSE) {
+if (!(metadata_info[["individual_Sample"]] %in% colnames(metadata_sample))) {
                 message <-
                     paste0(
                         "The ",
@@ -410,8 +410,8 @@ check_param <- function(
 
     # -------------SaveAs
     Save_as_Plot_options <- c("svg","pdf", "png")
-    if (is.null(save_plot) == FALSE) {
-        if (save_plot %in% Save_as_Plot_options == FALSE) {
+    if (!is.null(save_plot)) {
+if (!(save_plot %in% Save_as_Plot_options)) {
         message <-
             paste0(
                 "Check input. The selected save_plot option is not valid. Please select one of the folowwing: ",
@@ -430,8 +430,8 @@ check_param <- function(
             "xlsx",
             "Rdata") # Rdata = SummarizedExperiment (?
         )
-    if (is.null(save_table) == FALSE) {
-        if ((save_table %in% save_table_options == FALSE) | (is.null(save_table) == TRUE)) {
+    if (!is.null(save_table)) {
+if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
         message <-
             paste0(
                 "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
@@ -444,14 +444,14 @@ check_param <- function(
     }
 
     # -------------core
-    if (is.logical(core) == FALSE) {
+    if (!is.logical(core)) {
         message <- paste0("Check input. The core value should be either = TRUE for preprocessing of Consuption/Release experiment or = FALSE if not.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
     # -------------theme
-    if (is.null(theme) == FALSE) {
+    if (!is.null(theme)) {
         theme_options <-
             c(
                 "theme_grey()",
@@ -465,7 +465,7 @@ check_param <- function(
                 "theme_void()",
                 "theme_test()"
             )
-    if (theme %in% theme_options == FALSE) {
+if (!(theme %in% theme_options)) {
         message <-
             paste0(
                 "Check input. theme option is incorrect. You can check for complete themes here: https://ggplot2.tidyverse.org/reference/ggtheme.html. Options are the following: ",
@@ -477,7 +477,7 @@ check_param <- function(
     }
     }
     # ------------- general
-    if (is.logical(print_plot) == FALSE) {
+    if (!is.logical(print_plot)) {
         message <- paste0("Check input. print_plot should be either = TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -534,10 +534,10 @@ check_param_processing <- function(
     mvi_percentage=50,
     hotellins_confidence = 0.99
 ) {
-    if (is.vector(metadata_info) == TRUE) {
+    if (is.vector(metadata_info)) {
     # -------------metadata_info
     # core
-    if (core == TRUE) {   # parse core normalisation factor
+    if (core) {   # parse core normalisation factor
         message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
         log_trace(paste("Message ", message, sep =""))
         message(message)
@@ -550,7 +550,7 @@ check_param_processing <- function(
         }
         }
 
-        if ("core_norm_factor" %in% names(metadata_info) == FALSE) {
+if (!("core_norm_factor" %in% names(metadata_info))) {
             message <- paste0("No growth rate or growth factor provided for normalising the core result, hence core_norm_factor set to 1 for each sample")
             log_trace(paste("Warning ", message, sep =""))
             warning(message)
@@ -560,7 +560,7 @@ check_param_processing <- function(
 
     # -------------General parameters
     Feature_Filtering_options <- c("Standard","Modified")
-    if (featurefilt %in% Feature_Filtering_options == FALSE & is.null(featurefilt) == FALSE) {
+if (!(!(featurefilt %in% Feature_Filtering_options) & is.null(featurefilt))) {
         message <-
             paste0(
                 "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
@@ -570,27 +570,27 @@ check_param_processing <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.numeric(cutoff_featurefilt) == FALSE | cutoff_featurefilt > 1 | cutoff_featurefilt < 0) {
+    if (!is.numeric(cutoff_featurefilt) | cutoff_featurefilt > 1 | cutoff_featurefilt < 0) {
         message <- paste0("Check input. The selected cutoff_featurefilt should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.logical(tic) == FALSE) {
+    if (!is.logical(tic)) {
         message <- paste0("Check input. The tic value should be either `TRUE` if tic normalization is to be performed or `FALSE` if no data normalization is to be applied.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.logical(mvi) == FALSE) {
+    if (!is.logical(mvi)) {
         message <- paste0("Check input. The mvi value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.numeric(mvi_percentage) == FALSE | hotellins_confidence > 100 | hotellins_confidence < 0) {
+    if (!is.numeric(mvi_percentage) | hotellins_confidence > 100 | hotellins_confidence < 0) {
         message <- paste0("Check input. The selected mvi_percentage value should be numeric and between 0 and 100.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if ( is.numeric(hotellins_confidence) == FALSE | hotellins_confidence > 1 | hotellins_confidence < 0) {
+    if ( !is.numeric(hotellins_confidence) | hotellins_confidence > 1 | hotellins_confidence < 0) {
         message <- paste0("Check input. The selected hotellins_confidence value should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -657,7 +657,7 @@ check_param_dma <- function(
 ) {
 
     # -------------metadata_info
-    if (is.null(metadata_info) == TRUE) {
+    if (is.null(metadata_info)) {
         message <- paste0("You have to provide metadata_info's for Conditions.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -665,7 +665,7 @@ check_param_dma <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-    if ("Denominator" %in% names(metadata_info) == FALSE  & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!(!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadata_info))) {
     # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
@@ -674,7 +674,7 @@ check_param_dma <- function(
     # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    }else if ("Denominator" %in% names(metadata_info) == TRUE  & "Numerator" %in% names(metadata_info) == FALSE) {
+if (!("Denominator" %in% names(metadata_info)  & "Numerator" %in% names(metadata_info))) {
     # all-vs-one: Generate the pairwise combinations
     conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     denominator <- metadata_info[["Denominator"]]
@@ -685,7 +685,7 @@ check_param_dma <- function(
     # Settings:
     MultipleComparison <- TRUE
     all_vs_all <- FALSE
-    }else if ("Denominator" %in% names(metadata_info) == TRUE  & "Numerator" %in% names(metadata_info) == TRUE) {
+    }else if ("Denominator" %in% names(metadata_info)  & "Numerator" %in% names(metadata_info)) {
     # one-vs-one: Generate the comparisons
     denominator <- metadata_info[["Denominator"]]
     numerator <- metadata_info[["Numerator"]]
@@ -696,7 +696,7 @@ check_param_dma <- function(
     }
 
     ## ------------ Test statistics ----------- ##
-    if (MultipleComparison == FALSE) {
+    if (!MultipleComparison) {
         STAT_pval_options <-
             c(
                 "t.test",
@@ -705,7 +705,7 @@ check_param_dma <- function(
                 "cor.test",
                 "lmFit"
             )
-    if (pval %in% STAT_pval_options == FALSE) {
+if (!(pval %in% STAT_pval_options)) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",
@@ -717,7 +717,7 @@ check_param_dma <- function(
     }
     } else {
     STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
-    if (pval %in% STAT_pval_options == FALSE) {
+if (!(pval %in% STAT_pval_options)) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",
@@ -740,7 +740,7 @@ check_param_dma <- function(
             "fdr",
             "none"
         )
-    if (padj %in% STAT_padj_options == FALSE) {
+if (!(padj %in% STAT_padj_options)) {
         message <-
             paste0(
                 "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",
@@ -880,23 +880,23 @@ check_param_dma <- function(
     }
 
     # -------------General parameters
-    if (is.logical(vst) == FALSE) {
+    if (!is.logical(vst)) {
         message <- paste0("Check input. The vst value should be either = TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.logical(shapiro) == FALSE) {
+    if (!is.logical(shapiro)) {
         message <- paste0("Check input. The shapiro value should be either = TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.logical(bartlett) == FALSE) {
+    if (!is.logical(bartlett)) {
         message <- paste0("Check input. The bartlett value should be either = TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (is.logical(transform) == FALSE) {
+    if (!is.logical(transform)) {
         message <- paste0("Check input. `transform` should be either = TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -972,14 +972,14 @@ check_param_ora <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (any(duplicated(row.names(data))) == TRUE) {
+    if (any(duplicated(row.names(data)))) {
         message <- paste0("Duplicated row.names of data, whilst row.names must be unique")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
     # 2. Settings Columns:
-    if (is.vector(metadata_info) == FALSE & is.null(metadata_info) == FALSE) {
+    if (!is.vector(metadata_info) & !is.null(metadata_info)) {
         message <-
             paste0(
                 "metadata_info should be NULL or a vector. It's currently a ",
@@ -989,10 +989,10 @@ check_param_ora <- function(
         stop(message)
     }
 
-    if (is.null(metadata_info) == FALSE) {
+    if (!is.null(metadata_info)) {
     # "ClusterColumn"
     if ("ClusterColumn" %in% names(metadata_info)) {
-        if (metadata_info[["ClusterColumn"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["ClusterColumn"]] %in% colnames(data))) {
             message <-
                 paste0(
                     "The ",
@@ -1006,7 +1006,7 @@ check_param_ora <- function(
 
     # "BackgroundColumn"
     if ("BackgroundColumn" %in% names(metadata_info)) {
-        if (metadata_info[["BackgroundColumn"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["BackgroundColumn"]] %in% colnames(data))) {
             message <-
                 paste0(
                     "The ",
@@ -1020,7 +1020,7 @@ check_param_ora <- function(
 
     # "pvalColumn"
     if ("pvalColumn" %in% names(metadata_info)) {
-        if (metadata_info[["pvalColumn"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["pvalColumn"]] %in% colnames(data))) {
             message <-
                 paste0(
                     "The ",
@@ -1034,7 +1034,7 @@ check_param_ora <- function(
 
     # "percentageColumn"
     if ("percentageColumn" %in% names(metadata_info)) {
-        if (metadata_info[["percentageColumn"]] %in% colnames(data) == FALSE) {
+if (!(metadata_info[["percentageColumn"]] %in% colnames(data))) {
             message <-
                 paste0(
                     "The ",
@@ -1048,7 +1048,7 @@ check_param_ora <- function(
 
     # "PathwayTerm"
     if ("PathwayTerm" %in% names(metadata_info)) {
-        if (metadata_info[["PathwayTerm"]] %in% colnames(input_pathway) == FALSE) {
+if (!(metadata_info[["PathwayTerm"]] %in% colnames(input_pathway))) {
             message <-
                 paste0(
                     "The ",
@@ -1070,7 +1070,7 @@ check_param_ora <- function(
 
     # PathwayFeature
     if ("PathwayFeature" %in% names(metadata_info)) {
-        if (metadata_info[["PathwayFeature"]] %in% colnames(input_pathway) == FALSE) {
+if (!(metadata_info[["PathwayFeature"]] %in% colnames(input_pathway))) {
             message <-
                 paste0(
                     "The ",
@@ -1096,33 +1096,33 @@ check_param_ora <- function(
     }
 
     # 3. General Settings
-    if (is.character(pathway_name) == FALSE) {
+    if (!is.character(pathway_name)) {
         message <- paste0("Check input. pathway_name must be a character of syntax 'example'.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.logical(remove_background) == FALSE) {
+    if (!is.logical(remove_background)) {
         message <- paste0("Check input. remove_background value should be either = TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.numeric(min_gssize) == FALSE) {
+    if (!is.numeric(min_gssize)) {
         message <- paste0("Check input. The selected min_gssize value should be numeric.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.numeric(max_gssize) == FALSE) {
+    if (!is.numeric(max_gssize)) {
         message <- paste0("Check input. The selected max_gssize value should be numeric.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
     save_table_options <- c("txt","csv", "xlsx")
-    if (is.null(save_table) == FALSE) {
-        if ((save_table %in% save_table_options == FALSE) | (is.null(save_table) == TRUE)) {
+    if (!is.null(save_table)) {
+if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
         message <-
             paste0(
                 "Check input. The selected save_table option is not valid. Please select one of the folowing: ",
@@ -1134,16 +1134,16 @@ check_param_ora <- function(
     }
     }
 
-    if (is.null(cutoff_stat) == FALSE) {
-        if (is.numeric(cutoff_stat) == FALSE | cutoff_stat > 1 |  cutoff_stat < 0) {
+    if (!is.null(cutoff_stat)) {
+        if (!is.numeric(cutoff_stat) | cutoff_stat > 1 |  cutoff_stat < 0) {
         message <- paste0("Check input. The selected cutoff_stat value should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
     }
 
-    if (is.null(cutoff_percentage) == FALSE) {
-        if ( is.numeric(cutoff_percentage) == FALSE  | cutoff_percentage > 100 | cutoff_percentage < 0) {
+    if (!is.null(cutoff_percentage)) {
+        if ( !is.numeric(cutoff_percentage)  | cutoff_percentage > 100 | cutoff_percentage < 0) {
         message <- paste0("Check input. The selected cutoff_percentage value should be numeric and between 0 and 100.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -1224,7 +1224,7 @@ check_param_mca <- function(
     metaproviz_init()
 
     # ------------- data
-    if (is.null(data_c1) == FALSE) {
+    if (!is.null(data_c1)) {
         if (!inherits(data_c1, "data.frame") | !inherits(data_c2, "data.frame")) {
         message <-
             paste0(
@@ -1274,11 +1274,11 @@ check_param_mca <- function(
     }
 
     # ------------- metadata_info
-    if (is.null(metadata_info_c1) == FALSE) {
+    if (!is.null(metadata_info_c1)) {
     ## C1
     # ValueCol
     if ("ValueCol" %in% names(metadata_info_c1)) {
-        if (metadata_info_c1[["ValueCol"]] %in% colnames(data_c1) == FALSE) {
+if (!(metadata_info_c1[["ValueCol"]] %in% colnames(data_c1))) {
             message <-
                 paste0(
                     "The ",
@@ -1291,7 +1291,7 @@ check_param_mca <- function(
     }
     # StatCol
     if ("StatCol" %in% names(metadata_info_c1)) {
-        if (metadata_info_c1[["StatCol"]] %in% colnames(data_c1) == FALSE) {
+if (!(metadata_info_c1[["StatCol"]] %in% colnames(data_c1))) {
             message <-
                 paste0(
                     "The ",
@@ -1306,7 +1306,7 @@ check_param_mca <- function(
     ## C2
     # ValueCol
     if ("ValueCol" %in% names(metadata_info_c2)) {
-        if (metadata_info_c2[["ValueCol"]] %in% colnames(data_c2) == FALSE) {
+if (!(metadata_info_c2[["ValueCol"]] %in% colnames(data_c2))) {
             message <-
                 paste0(
                     "The ",
@@ -1319,7 +1319,7 @@ check_param_mca <- function(
     }
     # StatCol
     if ("StatCol" %in% names(metadata_info_c2)) {
-        if (metadata_info_c2[["StatCol"]] %in% colnames(data_c2) == FALSE) {
+if (!(metadata_info_c2[["StatCol"]] %in% colnames(data_c2))) {
             message <-
                 paste0(
                     "The ",
@@ -1334,7 +1334,7 @@ check_param_mca <- function(
     ## Intra
     # ValueCol
     if ("ValueCol" %in% names(metadata_info_intra)) {
-        if (metadata_info_intra[["ValueCol"]] %in% colnames(data_intra) == FALSE) {
+if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
             message <-
                 paste0(
                     "The ",
@@ -1347,7 +1347,7 @@ check_param_mca <- function(
     }
     # StatCol
     if ("StatCol" %in% names(metadata_info_intra)) {
-        if (metadata_info_intra[["StatCol"]] %in% colnames(data_intra) == FALSE) {
+if (!(metadata_info_intra[["StatCol"]] %in% colnames(data_intra))) {
             message <-
                 paste0(
                     "The ",
@@ -1362,7 +1362,7 @@ check_param_mca <- function(
     ## core
     # ValueCol
     if ("ValueCol" %in% names(metadata_info_core)) {
-        if (metadata_info_core[["ValueCol"]] %in% colnames(data_core) == FALSE) {
+if (!(metadata_info_core[["ValueCol"]] %in% colnames(data_core))) {
             message <-
                 paste0(
                     "The ",
@@ -1375,7 +1375,7 @@ check_param_mca <- function(
     }
     # StatCol
     if ("StatCol" %in% names(metadata_info_core)) {
-        if (metadata_info_core[["StatCol"]] %in% colnames(data_core) == FALSE) {
+if (!(metadata_info_core[["StatCol"]] %in% colnames(data_core))) {
             message <-
                 paste0(
                     "The ",
@@ -1389,7 +1389,7 @@ check_param_mca <- function(
 
     # StatCol
     if ("DirectionCol" %in% names(metadata_info_core)) {
-        if (metadata_info_core[["DirectionCol"]] %in% colnames(data_core) == FALSE) {
+if (!(metadata_info_core[["DirectionCol"]] %in% colnames(data_core))) {
             message <-
                 paste0(
                     "The ",
@@ -1404,51 +1404,51 @@ check_param_mca <- function(
     }
 
     # ------------- metadata_info Cutoffs:
-    if (is.null(metadata_info_c1) == FALSE) {
-        if (is.na(as.numeric(metadata_info_c1[["cutoff_stat"]])) == TRUE | as.numeric(metadata_info_c1[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c1[["cutoff_stat"]]) < 0) {
+    if (!is.null(metadata_info_c1)) {
+        if (is.na(as.numeric(metadata_info_c1[["cutoff_stat"]])) | as.numeric(metadata_info_c1[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c1[["cutoff_stat"]]) < 0) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_c1 should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_c2[["cutoff_stat"]])) == TRUE | as.numeric(metadata_info_c2[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c2[["cutoff_stat"]]) < 0) {
+    if (is.na(as.numeric(metadata_info_c2[["cutoff_stat"]])) | as.numeric(metadata_info_c2[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c2[["cutoff_stat"]]) < 0) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_c2 should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_c1[["ValueCutoff"]])) == TRUE) {
+    if (is.na(as.numeric(metadata_info_c1[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_c1 should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_c2[["ValueCutoff"]])) == TRUE) {
+    if (is.na(as.numeric(metadata_info_c2[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_c2 should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
     } else {
-    if (is.na(as.numeric(metadata_info_intra[["cutoff_stat"]])) == TRUE | as.numeric(metadata_info_intra[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_intra[["cutoff_stat"]]) < 0) {
+    if (is.na(as.numeric(metadata_info_intra[["cutoff_stat"]])) | as.numeric(metadata_info_intra[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_intra[["cutoff_stat"]]) < 0) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_intra should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_core[["cutoff_stat"]])) == TRUE | as.numeric(metadata_info_core[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_core[["cutoff_stat"]]) < 0) {
+    if (is.na(as.numeric(metadata_info_core[["cutoff_stat"]])) | as.numeric(metadata_info_core[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_core[["cutoff_stat"]]) < 0) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_core should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_intra[["ValueCutoff"]])) == TRUE) {
+    if (is.na(as.numeric(metadata_info_intra[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_intra should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_core[["ValueCutoff"]])) == TRUE) {
+    if (is.na(as.numeric(metadata_info_core[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_core should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -1456,7 +1456,7 @@ check_param_mca <- function(
     }
 
     # ------------ NAs in data
-    if (is.null(data_c1) == FALSE) {
+    if (!is.null(data_c1)) {
         if (nrow(data_c1[complete.cases(data_c1[[metadata_info_c1[["ValueCol"]]]], data_c1[[metadata_info_c1[["StatCol"]]]]), ]) < nrow(data_c1)) {
         message <-
             paste0(
@@ -1519,9 +1519,9 @@ check_param_mca <- function(
     }
 
     # ------------- method_background
-    if (is.null(metadata_info_c1) == FALSE) {
+    if (!is.null(metadata_info_c1)) {
         options <- c("C1 | C2", "C1&C2", "C2", "C1" , "*")
-    if (any(options %in% method_background) == FALSE) {
+if (!(any(options %in% method_background))) {
         message <-
             paste0(
                 "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
@@ -1533,7 +1533,7 @@ check_param_mca <- function(
     }
     } else {
     options <- c("Intra | core", "Intra&core", "core", "Intra" , "*")
-    if (any(options %in% method_background) == FALSE) {
+if (!(any(options %in% method_background))) {
         message <-
             paste0(
                 "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
@@ -1547,8 +1547,8 @@ check_param_mca <- function(
 
     # ------------- SaveAs
     save_table_options <- c("txt","csv", "xlsx")
-    if (is.null(save_table) == FALSE) {
-        if ((save_table %in% save_table_options == FALSE) | (is.null(save_table) == TRUE)) {
+    if (!is.null(save_table)) {
+if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
         message <-
             paste0(
                 "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",

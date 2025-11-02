@@ -108,7 +108,7 @@ mca_2cond <- function(data_c1,
                                 save_table=save_table)
 
     ## ------------ Create Results output folder ----------- ##
-    if(is.null(save_table)==FALSE){
+    if(!is.null(save_table)){
     folder <- save_path(folder_name= "MCA2Cond",
                                     path=path)
     }
@@ -589,7 +589,7 @@ mca_core <- function(data_intra,
 
 
     ## ------------ Create Results output folder ----------- ##
-    if(is.null(save_table)==FALSE){
+    if(!is.null(save_table)){
     folder <- save_path(folder_name= "MCAcore",
                                     path=path)
     }

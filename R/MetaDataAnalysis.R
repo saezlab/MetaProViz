@@ -141,7 +141,7 @@ metadata_analysis <- function(
     }
 
     # # ------------ Create Results output folder ----------- ##
-    if (is.null(save_plot) == FALSE | is.null(save_table) == FALSE) {
+    if (!is.null(save_plot) | !is.null(save_table)) {
         folder <- save_path(
             folder_name = "MetadataAnalysis",
             path = path
@@ -482,7 +482,7 @@ meta_pk <- function(
 
 
     # # ------------ Create Results output folder ----------- ##
-    if (is.null(save_table) == FALSE) {
+    if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "MetadataAnalysis",
             path = path
@@ -492,7 +492,7 @@ meta_pk <- function(
     # ##############################################################################################################################################################################################################
     # # ---------- Create Prior Knowledge file format to perform enrichment analysis ------------##
     # Use the Sample metadata for this:
-    if (is.null(metadata_info) == TRUE) {
+    if (is.null(metadata_info)) {
         Metadata <-
             names(metadata_sample)
         metadata_sample_subset <-

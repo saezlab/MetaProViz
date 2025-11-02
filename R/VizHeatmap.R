@@ -115,14 +115,14 @@ viz_heatmap <- function(
     )
 
     # check_param` Specific
-    if (is.logical(enforce_featurenames) == FALSE | is.logical(enforce_samplenames) == FALSE) {
+    if (!is.logical(enforce_featurenames) | !is.logical(enforce_samplenames)) {
         message <- paste0("Check input. The enforce_featurenames and enforce_samplenames value should be either =TRUE or = FALSE.")
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     scale_options <- c("row", "column", "none")
-    if (scale %in% scale_options == FALSE) {
+if (!(scale %in% scale_options)) {
         message <-
             paste0(
                 "Check input. The selected scale option is not valid. Please select one of the folowwing: ",
@@ -135,7 +135,7 @@ viz_heatmap <- function(
 
 
     # # ------------ Create Results output folder ----------- ##
-    if (is.null(save_plot) == FALSE) {
+    if (!is.null(save_plot)) {
         folder <- save_path(
             folder_name = "Heatmap",
             path = path
@@ -146,7 +146,7 @@ viz_heatmap <- function(
     # # -------------- Load data --------------- ##
     data <- data
 
-    if (is.null(metadata_feature) == FALSE) {  # removes information about metabolites that are not included in the data
+    if (!is.null(metadata_feature)) {  # removes information about metabolites that are not included in the data
         metadata_feature <-
             merge(
                 x = metadata_feature,
@@ -158,7 +158,7 @@ viz_heatmap <- function(
         metadata_feature <- metadata_feature[, -c((ncol(metadata_feature) - nrow(data) + 1):ncol(metadata_feature))]
     }
 
-    if (is.null(metadata_sample) == FALSE) {  # removes information about samples that are not included in the data
+    if (!is.null(metadata_sample)) {  # removes information about samples that are not included in the data
         metadata_sample <-
             merge(x = metadata_sample, y = data, by = 0, all.y = TRUE) %>%
             column_to_rownames("Row.names")
@@ -167,7 +167,7 @@ viz_heatmap <- function(
 
 
     # # -------------- Plot --------------- ##
-    if ("individual_Metab" %in% names(metadata_info) == TRUE & "individual_Sample" %in% names(metadata_info) == FALSE) {
+if (!("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% names(metadata_info))) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
         unique_paths <- unique(metadata_feature[[metadata_info[["individual_Metab"]]]])
@@ -238,7 +238,7 @@ viz_heatmap <- function(
 
             # Check number of features:
             Features <- as.data.frame(t(data_path))
-            if (enforce_featurenames == TRUE) {
+            if (enforce_featurenames) {
                 show_rownames <- TRUE
                 cellheight_Feature <- 9
             } else if (nrow(Features) > 100L) {
@@ -250,7 +250,7 @@ viz_heatmap <- function(
             }
 
             # Check number of samples
-            if (enforce_samplenames == TRUE) {
+            if (enforce_samplenames) {
                 show_colnames <- TRUE
                 cellwidth_Sample <- 9
             } else if (nrow(data_path) > 50L) {
@@ -348,7 +348,7 @@ viz_heatmap <- function(
         }
         # Return if assigned:
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
-    } else if ("individual_Metab" %in% names(metadata_info) == FALSE & "individual_Sample" %in% names(metadata_info) == TRUE) {
+if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info)) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_sample[[metadata_info[["individual_Sample"]]]] <- ifelse(is.na(metadata_sample[[metadata_info[["individual_Sample"]]]]), "NA", metadata_sample[[metadata_info[["individual_Sample"]]]])
 
@@ -438,7 +438,7 @@ viz_heatmap <- function(
 
             # Check number of features:
             Features <- as.data.frame(t(data_path))
-            if (enforce_featurenames == TRUE) {
+            if (enforce_featurenames) {
                 show_rownames <- TRUE
                 cellheight_Feature <- 9
             } else if (nrow(Features) > 100L) {
@@ -450,7 +450,7 @@ viz_heatmap <- function(
             }
 
             # Check number of samples
-            if (enforce_samplenames == TRUE) {
+            if (enforce_samplenames) {
                 show_colnames <- TRUE
                 cellwidth_Sample <- 9
             } else if (nrow(data_path) > 50L) {
@@ -548,7 +548,7 @@ viz_heatmap <- function(
         }
         # Return if assigned:
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
-    } else if ("individual_Metab" %in% names(metadata_info) == TRUE & "individual_Sample" %in% names(metadata_info) == TRUE) {
+    } else if ("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% names(metadata_info)) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
 
@@ -672,7 +672,7 @@ viz_heatmap <- function(
 
                 # Check number of features:
                 Features <- as.data.frame(t(data_path))
-                if (enforce_featurenames == TRUE) {
+                if (enforce_featurenames) {
                     show_rownames <- TRUE
                     cellheight_Feature <- 9
                 } else if (nrow(Features) > 100L) {
@@ -684,7 +684,7 @@ viz_heatmap <- function(
                 }
 
                 # Check number of samples
-                if (enforce_samplenames == TRUE) {
+                if (enforce_samplenames) {
                     show_colnames <- TRUE
                     cellwidth_Sample <- 9
                 } else if (nrow(data_path) > 50L) {
@@ -787,7 +787,7 @@ viz_heatmap <- function(
             }
         }
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
-    } else if ("individual_Metab" %in% names(metadata_info) == FALSE & "individual_Sample" %in% names(metadata_info) == FALSE) {
+if (!(!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info))) {
         PlotList <- list()  # Empty list to store all the plots
         PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
@@ -826,7 +826,7 @@ viz_heatmap <- function(
 
         # Check number of features:
         Features <- as.data.frame(t(data))
-        if (enforce_featurenames == TRUE) {
+        if (enforce_featurenames) {
             show_rownames <- TRUE
             cellheight_Feature <- 9
         } else if (nrow(Features) > 100L) {
@@ -838,7 +838,7 @@ viz_heatmap <- function(
         }
 
         # Check number of samples
-        if (enforce_samplenames == TRUE) {
+        if (enforce_samplenames) {
             show_colnames <- TRUE
             cellwidth_Sample <- 9
         } else if (nrow(data) > 50L) {
