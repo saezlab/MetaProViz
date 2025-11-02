@@ -397,56 +397,56 @@ viz_volcano <- function(
         )
 
     }else if (plot_types == "Compare") {  # ## # #--- 2. Compare
-    VolcanoRes <- viz_volcano_compare(
-        data = Volcanodata,
-        data2 = data2,
-        metadata_feature = metadata_feature,
-        metadata_info = metadata_info,
-        y = y,
-        x = x,
-        xlab = xlab,
-        ylab = ylab,
-        cutoff_x = cutoff_x,
-        cutoff_y = cutoff_y,
-        connectors = connectors,
-        select_label = select_label,
-        plot_name = plot_name,
-        subtitle = subtitle,
-        color_palette = safe_colorblind_palette,
-        shape_palette = safe_shape_palette,
-        theme = theme,
-        feature = feature,
-        name_comparison = name_comparison,
-        save_plot = save_plot,
-        print_plot = print_plot,
-        folder = folder
-    )
+        VolcanoRes <- viz_volcano_compare(
+            data = Volcanodata,
+            data2 = data2,
+            metadata_feature = metadata_feature,
+            metadata_info = metadata_info,
+            y = y,
+            x = x,
+            xlab = xlab,
+            ylab = ylab,
+            cutoff_x = cutoff_x,
+            cutoff_y = cutoff_y,
+            connectors = connectors,
+            select_label = select_label,
+            plot_name = plot_name,
+            subtitle = subtitle,
+            color_palette = safe_colorblind_palette,
+            shape_palette = safe_shape_palette,
+            theme = theme,
+            feature = feature,
+            name_comparison = name_comparison,
+            save_plot = save_plot,
+            print_plot = print_plot,
+            folder = folder
+        )
 
     } else if (plot_types == "PEA") {  # ## # #--- 3. PEA
-    VolcanoRes <- viz_volcano_pea(
-        data = Volcanodata,
-        data2 = data2,
-        metadata_feature = metadata_feature,
-        # Problem: we need to know the column name of the feature!
-        metadata_info = metadata_info,
-        y = y,
-        x = x,
-        xlab = xlab,
-        ylab = ylab,
-        cutoff_x = cutoff_x,
-        cutoff_y = cutoff_y,
-        connectors = connectors,
-        select_label = select_label,
-        plot_name = plot_name,
-        subtitle = subtitle,
-        color_palette = safe_colorblind_palette,
-        shape_palette = safe_shape_palette,
-        theme = theme,
-        feature = feature,
-        save_plot = save_plot,
-        print_plot = print_plot,
-        folder = folder
-    )
+        VolcanoRes <- viz_volcano_pea(
+            data = Volcanodata,
+            data2 = data2,
+            metadata_feature = metadata_feature,
+            # Problem: we need to know the column name of the feature!
+            metadata_info = metadata_info,
+            y = y,
+            x = x,
+            xlab = xlab,
+            ylab = ylab,
+            cutoff_x = cutoff_x,
+            cutoff_y = cutoff_y,
+            connectors = connectors,
+            select_label = select_label,
+            plot_name = plot_name,
+            subtitle = subtitle,
+            color_palette = safe_colorblind_palette,
+            shape_palette = safe_shape_palette,
+            theme = theme,
+            feature = feature,
+            save_plot = save_plot,
+            print_plot = print_plot,
+            folder = folder
+        )
     }
     return(invisible(VolcanoRes))
 }
