@@ -1075,24 +1075,24 @@ log2fc <- function(
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
             Mean_Merge <- Mean_Merge %>%
-            mutate(
-                C1_Adapted = case_when(
-                    C2 == 0L &
-                    `NA/0`
-                        ~paste(C1),
-                    C1 == 0L &
-                    `NA/0`
-                        ~paste(C1),
-                    C2 == 0L &
-                    `NA/0` == FALSE
-                        ~paste(C1 + 1),
-                    C1 == 0L &
-                    `NA/0` == FALSE
-                        ~paste(C1 + 1),
-                    TRUE
-                        ~paste(C1)
-                )
-            ) %>%
+                mutate(
+                    C1_Adapted = case_when(
+                        C2 == 0L &
+                        `NA/0`
+                            ~paste(C1),
+                        C1 == 0L &
+                        `NA/0`
+                            ~paste(C1),
+                        C2 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C1 + 1),
+                        C1 == 0L &
+                        `NA/0` == FALSE
+                            ~paste(C1 + 1),
+                        TRUE
+                            ~paste(C1)
+                    )
+                ) %>%
                 mutate(
                     C2_Adapted = case_when(
                         C1 == 0L &
@@ -1123,7 +1123,7 @@ log2fc <- function(
                     Mean_Merge %>%
                     subset(
                         (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
-                            (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
+                        (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
                     )
 
                 message(
